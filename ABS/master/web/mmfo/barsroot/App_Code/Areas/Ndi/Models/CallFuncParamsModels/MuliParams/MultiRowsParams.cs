@@ -18,7 +18,7 @@ namespace BarsWeb.Areas.Ndi.Models
         }
         public string ColumnNames { get; set; }
         public List<string> ListColumnNames { get; set; }
-
+        public int? SemanticRowNumber { get; set; }
         public List<FieldProperties> RowColumnsParams { get; set; }
 
     }

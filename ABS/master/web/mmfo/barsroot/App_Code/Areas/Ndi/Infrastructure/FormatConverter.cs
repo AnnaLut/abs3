@@ -4,10 +4,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Diagnostics;
 using ibank.core;
 using System.Web;
 using BarsWeb.Areas.Ndi.Models;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -301,8 +303,19 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
             return res;
         }
+        public static string StringToBase64(string plainText)
+        {
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
 
-
+        public static string ObjectToJsonInBase64(Object modelToConvert)
+        {
+            if (modelToConvert == null)
+                return string.Empty;
+            string jsonString = ObjectToJsom(modelToConvert);
+            return StringToBase64(jsonString);
+        }
         public static string ConvertFromUrlBase64UTF8(string param)
         {
             string res = string.Empty;

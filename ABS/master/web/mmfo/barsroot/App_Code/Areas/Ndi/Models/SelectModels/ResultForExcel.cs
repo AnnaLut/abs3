@@ -1,4 +1,6 @@
-﻿using BarsWeb.Areas.Ndi.Models;
+﻿using Bars.CommonModels;
+using Bars.CommonModels.ExternUtilsModels;
+using BarsWeb.Areas.Ndi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,9 @@ namespace BarsWeb.Areas.Ndi.Models.SelectModels
             // TODO: Add constructor logic here
             //
         }
-
+        public ExcelExtModel ExcelModelRequest { get; set; }
         public string ExcelParam { get; set; }
+
     }
+    
 }

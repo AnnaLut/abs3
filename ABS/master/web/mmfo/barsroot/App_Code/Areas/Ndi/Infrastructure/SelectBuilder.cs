@@ -5,16 +5,19 @@ using System.Text;
 using BarsWeb.Areas.Ndi.Models;
 using Oracle.DataAccess.Client;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
+using Bars.CommonModels.ExternUtilsModels;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
+    using Bars.CommonModels;
+
     /// <summary>
     /// Класс для построения запросов на вычитку данных из справочников с применением различных условий фильтрации, сортировки и т.д.
     /// </summary>
     public class SelectBuilder
     {
         List<string> SKIP_KEYS = new List<string> { "COL_ALL_ALIAS" };
-
+        public  SelectModel SelectCmdModel { get; set; }
         /// <summary>
         /// Конструктор построителя запросов
         /// </summary>
@@ -24,6 +27,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             StartRecord = 1;
             RecordsCount = 10;
             ExternalMetaColumns = new List<ColumnMetaInfo>();
+            SelectCmdModel = new SelectModel();
         }
         public static readonly string ClauseAlias = "$~~ALIAS~~$";
         /// <summary>
@@ -305,7 +309,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     // if (param.Type == "boolean" && param.Value == "0")
                     //  BuildGridParameter(param);
                     selectCmd.Parameters.Add(param.ParamName, param.ParamValue);
-
+                    SelectCmdModel.SqlParams.Add(new SqlParamModel()
+                                                     {
+                                                         Name =  param.Field,
+                                                         Type =  param.Type,
+                                                         Value = param.Value,
+                                                         ParamOrder = param.ParamOrder
+                    });
                     //fullFilter.Append(" OR " + param.ParamName + "IS NULL");
                 }
                 fullFilter.Append(filterWhere);
@@ -325,6 +335,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                             var param = new OracleParameter(data.Name, parValue);
                             selectCmd.Parameters.Add(param);
                             selectCmd.BindByName = true;
+                            SelectCmdModel.SqlParams.Add(new SqlParamModel()
+                            {
+                                Name =  data.Name,
+                                Value =  data.Value,
+                                Type =  data.Type
+                            });
                         }
 
                     }
@@ -367,67 +383,67 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
             // условия расширенного (внешнего) фильтра
             //
-            if (hasExtFilters)
-            {
-                var extFilterWhere = new StringBuilder("");
-                if (!string.IsNullOrEmpty(fullFilter.ToString()))
-                {
-                    fullFilter.Append(" and ");
-                }
-                //получим список уникальных пар таблица.поле, потому как могут быть дубли в случае фильтрации по диапазону дат или числел
-                //для таких пар нужно строить один EXISTS для лучшего плана выполнения запроса
-                var uniqExFilters = ExtFilters.Select(ef =>
-                    new
-                    {
-                        ef.ExtFilterMeta.HostColName,
-                        ef.ExtFilterMeta.FullAddColName,
-                        ef.ExtFilterMeta.FullVarColName
-                    }).Distinct().ToList();
+            //if (hasExtFilters)
+            //{
+            //    var extFilterWhere = new StringBuilder("");
+            //    if (!string.IsNullOrEmpty(fullFilter.ToString()))
+            //    {
+            //        fullFilter.Append(" and ");
+            //    }
+            //    //получим список уникальных пар таблица.поле, потому как могут быть дубли в случае фильтрации по диапазону дат или числел
+            //    //для таких пар нужно строить один EXISTS для лучшего плана выполнения запроса
+            //    var uniqExFilters = ExtFilters.Select(ef =>
+            //        new
+            //        {
+            //            ef.ExtFilterMeta.HostColName,
+            //            ef.ExtFilterMeta.FullAddColName,
+            //            ef.ExtFilterMeta.FullVarColName
+            //        }).Distinct().ToList();
 
-                var exFiltersList = new List<string>();
+            //    var exFiltersList = new List<string>();
 
-                //заполним список условий внешней фильтрации 
-                foreach (var exFilter in uniqExFilters)
-                {
-                    var filterItems =
-                        ExtFilters.Where(
-                            ef =>
-                                ef.ExtFilterMeta.HostColName == exFilter.HostColName &&
-                                ef.ExtFilterMeta.FullAddColName == exFilter.FullAddColName &&
-                                ef.ExtFilterMeta.FullVarColName == exFilter.FullVarColName).ToList();
-                    if (filterItems.Any())
-                    {
-                        string secondСlause = "";
-                        if (filterItems.Count() > 1)
-                        {
-                            secondСlause = filterItems[1].ExtFilterMeta.Filter();
-                        }
-                        exFiltersList.Add(string.Format(" exists (select * from {0} where {1} = {2} {3} {4})",
-                            filterItems[0].ExtFilterMeta.AddTabName,
-                            TableName + "." + filterItems[0].ExtFilterMeta.HostColName,
-                            filterItems[0].ExtFilterMeta.FullAddColName,
-                            filterItems[0].ExtFilterMeta.Filter(),
-                            secondСlause
-                            ));
-                    }
-                }
+            //    //заполним список условий внешней фильтрации 
+            //    foreach (var exFilter in uniqExFilters)
+            //    {
+            //        var filterItems =
+            //            ExtFilters.Where(
+            //                ef =>
+            //                    ef.ExtFilterMeta.HostColName == exFilter.HostColName &&
+            //                    ef.ExtFilterMeta.FullAddColName == exFilter.FullAddColName &&
+            //                    ef.ExtFilterMeta.FullVarColName == exFilter.FullVarColName).ToList();
+            //        if (filterItems.Any())
+            //        {
+            //            string secondСlause = "";
+            //            if (filterItems.Count() > 1)
+            //            {
+            //                secondСlause = filterItems[1].ExtFilterMeta.Filter();
+            //            }
+            //            exFiltersList.Add(string.Format(" exists (select * from {0} where {1} = {2} {3} {4})",
+            //                filterItems[0].ExtFilterMeta.AddTabName,
+            //                TableName + "." + filterItems[0].ExtFilterMeta.HostColName,
+            //                filterItems[0].ExtFilterMeta.FullAddColName,
+            //                filterItems[0].ExtFilterMeta.Filter(),
+            //                secondСlause
+            //                ));
+            //        }
+            //    }
 
-                extFilterWhere.Append(string.Join(" and ", exFiltersList));
+            //    extFilterWhere.Append(string.Join(" and ", exFiltersList));
 
-                foreach (var extFilter in ExtFilters)
-                {
-                    if (extFilter.ExtFilterMeta.VarColType == "D")
-                    {
-                        selectCmd.Parameters.Add(extFilter.ExtFilterMeta.ParamName,
-                        DateTime.Parse(extFilter.Value));
-                    }
-                    else
-                    {
-                        selectCmd.Parameters.Add(extFilter.ExtFilterMeta.ParamName, extFilter.Value);
-                    }
-                }
-                fullFilter.Append(extFilterWhere);
-            }
+            //    foreach (var extFilter in ExtFilters)
+            //    {
+            //        if (extFilter.ExtFilterMeta.VarColType == "D")
+            //        {
+            //            selectCmd.Parameters.Add(extFilter.ExtFilterMeta.ParamName,
+            //            DateTime.Parse(extFilter.Value));
+            //        }
+            //        else
+            //        {
+            //            selectCmd.Parameters.Add(extFilter.ExtFilterMeta.ParamName, extFilter.Value);
+            //        }
+            //    }
+            //    fullFilter.Append(extFilterWhere);
+            //}
 
             // условие проваливания из другого справочника
             //
@@ -445,6 +461,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                         selectCmd.Parameters.Add(par.Name,
                             Convert.ChangeType(par.Value, SqlStatementParamsParser.GetCsTypeCode(par.Type)));
                     }
+                    SelectCmdModel.SqlParams.Add(new SqlParamModel()
+                                                         {
+                                                             Name = par.Name,
+                                                             Type =  par.Type,
+                                                             Value = par.Value
+                                                         });
                 }
 
                 if (!string.IsNullOrEmpty(fullFilter.ToString()))
@@ -627,7 +649,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         {
             OracleCommand cmd = _connection.CreateCommand();
             //строим внутренний запрос
-            cmd.CommandText = string.Format("select ROW_NUMBER() OVER ({0}) rn, {1} from {2} ", GetOrderBy(true), GetInternalStatementColumns(), FromTables);
+            SelectCmdModel.SelectString = string.Format("select ROW_NUMBER() OVER ({0}) rn, {1} from {2} ", GetOrderBy(true), GetInternalStatementColumns(), FromTables);
+            cmd.CommandText = SelectCmdModel.SelectString;
             //применяем параметеры фильтрации
             SetWhere(cmd);
             return cmd;
@@ -650,6 +673,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     internalCommand.CommandText += " where rn > :firstRecord and rn <= :lastRecord";
                     internalCommand.Parameters.Add("firstRecord", StartRecord);
                     internalCommand.Parameters.Add("lastRecord", EndRecord);
+                    SelectCmdModel.SqlParams.Add(new SqlParamModel() { Name = "firstRecord", Type = "N", Value = StartRecord.ToString() });
+                    SelectCmdModel.SqlParams.Add(new SqlParamModel() { Name = "lastRecord", Type = "N", Value = EndRecord.ToString() });
                 }
             }
             return internalCommand;

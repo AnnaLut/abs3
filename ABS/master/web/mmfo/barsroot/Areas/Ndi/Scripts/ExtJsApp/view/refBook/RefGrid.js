@@ -187,7 +187,7 @@ Ext.onReady(function () {
             }
 
 
-           
+            
             var getDataUrl = '/barsroot/ndi/ReferenceBook/GetData/?' +
                 'tableid=' +
                 getDataObj.TableId +

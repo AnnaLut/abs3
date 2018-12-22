@@ -85,6 +85,7 @@
             });
         }
         else if (isFuncOnly && isFuncOnly.toLowerCase() == 'true') {
+            
             Ext.Ajax.request({
                 url: '/barsroot/ndi/ReferenceBook/GetFuncOnlyMetaData',
                 params: {

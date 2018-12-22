@@ -20,7 +20,6 @@ namespace BarsWeb.Areas.Ndi.Models
             this.DefParamModel = new DefParamModel();
         }
 
-        public MainOptionsViewModel Res { get; set; }
         // public string Res { get; set; }
         public DefParamModel DefParamModel { get;set; }
         public int? TableId { get; set; }

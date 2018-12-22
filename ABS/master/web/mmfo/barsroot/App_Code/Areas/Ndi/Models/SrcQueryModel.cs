@@ -12,9 +12,7 @@ namespace BarsWeb.Areas.Ndi.Models
     {
         public SrcQueryModel()
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            
         }
 
         public SrcQueryModel(int tabid, int colId, List<ColumnMetaInfo> queryParamsInfo)

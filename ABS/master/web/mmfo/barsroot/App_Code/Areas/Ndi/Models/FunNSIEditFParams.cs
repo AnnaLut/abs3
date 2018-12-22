@@ -1,6 +1,7 @@
 ﻿using BarsWeb.Areas.Ndi.Infrastructure;
 using BarsWeb.Areas.Ndi.Models;
 using BarsWeb.Areas.Ndi.Models.Attributes;
+using BarsWeb.Areas.Ndi.Models.ViewModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +43,8 @@ namespace BarsWeb.Areas.Ndi.Models
             this.EditMode = settings.EDIT_MODE ?? this.EditMode;
             this.SummVisibleRows = settings.SUMM_VISIBLE == 1 ? "TRUE" : "FALSE";
             this.Conditions = settings.CONDITIONS ?? "";
+            this.CustomOprions = settings.CUSTOM_OPTIONS ?? "";
+            this.Code = settings.CODE;
             BuildParams();
 
 
@@ -53,8 +56,12 @@ namespace BarsWeb.Areas.Ndi.Models
 
         [MainOptionAttribute("INSERT_ROW_AFTER", true)]
         public bool InsertRowAfter { get; set; }
-
+        
         public AddEditRowsInform addEditRowsInform { get; set; }
+        public string Code { get; set; }
+        public Type TargetType { get; set; }
+        public CallFunctionMetaInfo TargetObject { get; set; }
+        public string CustomOprions { get; set; }
         public bool ShowRecordsCount { get; set; }
         public string SaveColumns { get; set; }
         public int? CodeOper { get; set; }
@@ -103,6 +110,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public string ExcelParam { get; set; }
 
         public string MultiParams { get; set; }
+        public string CustomOptionsToClass { get; set; }
 
         private string[] GetParamArrayByString(string procString)
         {
@@ -115,6 +123,7 @@ namespace BarsWeb.Areas.Ndi.Models
         {
             if (string.IsNullOrEmpty(this.WebFormName))
                 return;
+
             this.FunNSIEditFParamsArray = GetParamArrayByString(this.WebFormName);
             this.ParsParams(this.FunNSIEditFParamsArray);
         }
@@ -137,6 +146,18 @@ namespace BarsWeb.Areas.Ndi.Models
         private void ParsParams(string[] paramsArray)
         {
             this.TableName = paramsArray[0];
+            string optionsToClass = paramsArray.FirstOrDefault(u => u.Contains("CUSTOM_OPTIONS_TO_CLASS=>"));
+            if (!string.IsNullOrEmpty(optionsToClass))
+            {
+                this.CustomOptionsToClass = optionsToClass.Substring(optionsToClass.IndexOf("CUSTOM_OPTIONS_TO_CLASS=>") + "CUSTOM_OPTIONS_TO_CLASS=>".Length).Trim();
+                this.TargetType = Type.GetType(this.CustomOptionsToClass);
+                this.TargetObject = FormatConverter.JsonToObject<CallFunctionMetaInfo>(this.CustomOprions);
+                this.IsFuncOnly = this.TargetObject.isFuncOnly;
+                this.TargetObject.Code = this.Code;
+                return;
+            }
+
+
             this.IsInMeta_NSIFUNCTION = !string.IsNullOrEmpty(paramsArray.FirstOrDefault(u => u.Contains("NSIFUNCTION")));
             string exec = paramsArray.FirstOrDefault(u => u.Contains("EXEC=>"));
             if (!string.IsNullOrEmpty(exec))
@@ -243,10 +264,7 @@ namespace BarsWeb.Areas.Ndi.Models
             if (!string.IsNullOrEmpty(throwParams))
                 if (throwParams.Length > throwParams.IndexOf("THROW_PARAMS=>") + "THROW_PARAMS=>".Length)
                     this.ThrowNsiParamsString = throwParams.Substring(throwParams.IndexOf("THROW_PARAMS=>") + "THROW_PARAMS=>".Length).Trim();
-
-
-            if (!string.IsNullOrEmpty("FUNCTION_BUTTONS"))
-                RenderFunctionsIn = RenderFunctions.RenderInToolbar.ToString();
+            
             if (string.IsNullOrEmpty(TableName) && !string.IsNullOrEmpty(this.PROC))
                 this.IsFuncOnly = true;
             else
@@ -254,13 +272,16 @@ namespace BarsWeb.Areas.Ndi.Models
 
         }
 
+
+
         private void BuildParams()
         {
-            ParsWebFormName();
-            this.FunNSIEditFParamsInfo = new List<ParamMetaInfo>();
             this.ParamsNames = new List<string>();
             this.RowParamNames = new List<string>();
             this.InputParamaNames = new List<string>();
+            ParsWebFormName();
+            this.FunNSIEditFParamsInfo = new List<ParamMetaInfo>();
+
             regForParamsNames = new Regex(patternForParamsNames);
 
             CollectConditionsParams();
@@ -326,15 +347,18 @@ namespace BarsWeb.Areas.Ndi.Models
             func.UploadParams = UploadParams;
             func.ThrowNsiParams = this.ThrowNsiParams;
             func.ConvertParams = this.ConvertParams;
+            func.MultiParams = this.MultiParams;
+            func.CUSTOM_OPTIONS = this.CustomOprions;
+            func.OutParams = this.OutParams;
             List<ParamMetaInfo> paramsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.PROC_PAR);
-            List<UploadParamsInfo> uploadParamsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<UploadParamsInfo>(func.PROC_NAME, func.PROC_PAR);
+            //List<UploadParamsInfo> uploadParamsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<UploadParamsInfo>(func.PROC_NAME, func.PROC_PAR);
 
             // преобразуем список информации о параметрах к формату, который ожидает клиент
-            func.ParamsInfo = paramsInfo.Select(x => new
+            func.ParamsInfo = paramsInfo.Select(x => new ParamMetaInfo
             {
                 IsInput = x.IsInput,
                 DefaultValue = x.DefaultValue,
-                ColumnInfo = new
+                ColumnInfo = new ColumnViewModel
                 {
                     COLNAME = x.ColName,
                     COLTYPE = x.ColType,
@@ -343,7 +367,7 @@ namespace BarsWeb.Areas.Ndi.Models
                     SrcTableName = x.SrcTableName,
                     SrcTextColName = x.SrcTextColName
                 }
-            });
+            }).ToList();
             return func;
         }
 

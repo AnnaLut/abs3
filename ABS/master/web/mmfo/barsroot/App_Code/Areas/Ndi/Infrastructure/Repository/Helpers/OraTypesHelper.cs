@@ -79,7 +79,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
             return dictionaryList;
         }
 
-        static public void AddMoltiParamsToProc(CallFunctionMetaInfo callFunction,
+        static public void AddMultiParamsToProc(CallFunctionMetaInfo callFunction,
             MultiRowParamsDataModel dataModel, OracleDbModel oraConnector)
         {
             if (callFunction.MultiRowsParams.FirstOrDefault(x =>  x.GetFrom == "EXCEL_FILE") != null)

@@ -5,9 +5,13 @@ using BarsWeb.Areas.Ndi.Models;
 using Areas.Ndi.Models;
 using System;
 using BarsWeb.Areas.Ndi.Models.SelectModels;
+using Bars.CommonModels.ExternUtilsModels;
+using Bars.Oracle.Factories;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
+  
+
     /// <summary>
     /// Конвертирует набор данных класса OracleDataReader в таблицу вида [ключ,значенне]. Удобно использовать для сериализации полученного набора в json.
     /// </summary>
@@ -166,6 +170,18 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
         }
 
+        public static ResultForExcel GetExtResultExcelModel(SelectBuilder selectBuilder,int count)
+        {
+            ExternModelFactory execModelFactory = new ExternModelFactory(AvailableExecTypes.ExceleExport);
+            ResultForExcel result = new ResultForExcel
+            {
+                ExcelModelRequest = execModelFactory.CreateExecModel(selectBuilder.SelectCmdModel)
+            };
+            result.IsLazy = true;
+            result.RecordsCount = count;
+            result.ExcelParam = "ALL_EXTERN";
+            return result;
+        }
 
         public static ResultForExcel GetDataForExcelCsv(OracleDataReader reader, string excelParam = "")
         {

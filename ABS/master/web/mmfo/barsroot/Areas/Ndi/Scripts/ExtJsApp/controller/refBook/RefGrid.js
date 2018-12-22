@@ -137,6 +137,7 @@
     },
 
     onCellclick: function (grid, cell, cellIndex, record, row, rowIndex, e) {
+        
         if (window.hasCallbackFunction && window.hasCallbackFunction.toUpperCase() == 'TRUE')
             return false;
         var thisController = this;
@@ -159,25 +160,30 @@
         if (!col || !col.WEB_FORM_NAME || record.phantom)
             return;
         if (col.WEB_FORM_NAME.indexOf(":") > -1 && col.WEB_FORM_NAME.indexOf("/") > -1) {
-            paramValues = ExtApp.utils.RefBookUtils.getUrlParameterValues(col.WEB_FORM_NAME);
-            for (key in paramValues) {
-                par = paramValues[key];
-                par = par.replace(':', '');
-                var ColParam = Ext.Array.findBy(referenceGrid.metadata.columnsInfo, function (item) {
-                    return item.COLNAME == par;
-                })
-                if (record.data[par] !== undefined) {
-                    var field = {};
-                    field.Name = ColParam.COLNAME;
-                    field.Type = ColParam.COLTYPE;
-                    field.Value = record.data[ColParam.COLNAME];
-                    params.push(field);
+            if(col.WEB_FORM_NAME.indexOf('?') < 0 && record && referenceGrid.metadata.columnsInfo)
+                href = ExtApp.utils.RefBookUtils.replaceStringFromRowGrid(col.WEB_FORM_NAME,record,referenceGrid.metadata.columnsInfo);
+            // separating the GET parameters from the current URL
+            if(col.WEB_FORM_NAME.indexOf('?') > -1) {
+                paramValues = ExtApp.utils.RefBookUtils.getUrlParameterValues(col.WEB_FORM_NAME, record, referenceGrid.metadata.columnsInfo);
+                for (key in paramValues) {
+                    par = paramValues[key];
+                    par = par.replace(':', '');
+                    var ColParam = Ext.Array.findBy(referenceGrid.metadata.columnsInfo, function (item) {
+                        return item.COLNAME == par;
+                    })
+                    if (record.data[par] !== undefined) {
+                        var field = {};
+                        field.Name = ColParam.COLNAME;
+                        field.Type = ColParam.COLTYPE;
+                        field.Value = record.data[ColParam.COLNAME];
+                        params.push(field);
+                    }
                 }
             }
-
         }
         if (Ext.Array.findBy(params, function (param) { return param.Value === "" }))
             return false;
+        if(!href)
         href = col.WEB_FORM_NAME;
 
         if (href.indexOf("barsroot/ndi/referencebook") < 0) {
@@ -262,8 +268,8 @@
         }
     },
 
-    openWindowForUploadOnly: function (tabid,funcId) {
-        var url = '/barsroot/ndi/ReferenceBook/GetUploadFile?tabid=' + tabid + '&funcid=' + funcId;
+    openWindowForUploadOnly: function (tabid,funcId,code) {
+        var url = '/barsroot/ndi/ReferenceBook/GetUploadFile?tabid=' + tabid + '&funcid=' + funcId +'&code=' + code;
         var width = 1000;
         var height = 600;
         var params = 'width=' + width + ',' + 'height=' + height + ',' + 'scrollbars=1' + ',' + 'left=205,top=125';
@@ -313,7 +319,7 @@
             ExtApp.utils.RefBookUtils.onBeforeEditFormByDependencies(rowEditing.editor.form, e.record, metadata.nativeMetaColumns);
             return;
         }
-
+        
         var hasColsToInsert = false
         var notEditCols = Ext.Array.filter(e.grid.metadata.columnsInfo, function (col) { return col.InputInNewRecord == 1; })
         if (notEditCols && notEditCols.length && notEditCols.length > 0)
@@ -2351,8 +2357,35 @@
 
             }
         });
-    },   
+    },
 
+    getDataFromServer: function (url, params, afterRequestFunction) {
+        var thisController = this;
+        Ext.Ajax.request({
+            url: url,
+            method: 'POST',
+            params: params,
+            success: function (conn, resp) {
+                var response = Ext.decode(conn.responseText);
+                if (afterRequestFunction) {
+
+                    afterRequestFunction(response.Status, response.Message,response.Data, thisController);
+                }
+            },
+            failure: function (conn, response) {
+                if(conn && conn.request)
+                {
+                    if(conn.request.responseText === '')
+                        return;
+                    Ext.Msg.show({ title: "Виникли проблеми при з'єднанні з сервером", msg: conn.request.responseText + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK });
+                }
+                else
+                    return;
+                //обработка при неудачном запросе на сервер
+
+            }
+        });
+    },
     getFileFromServer: function (url) {
         window.location = url;
     },
@@ -2401,7 +2434,7 @@
         };
         metaData.columnsInfo = [];
         var sort = grid.store.sorters.items;
-
+        
         var oper = new Ext.data.Operation();
         grid.store.fireEvent('BeforeLoad', grid.store, oper);
 
@@ -2441,270 +2474,285 @@
         var gridSelectModel = referenceGrid.getSelectionModel();
         var selectedRows;
         //заполнить информацию о вызываемой функции по метаданным
-        thisController.fillCallFuncInfo(funcMetaInfo,referenceGrid.metadata);
+        thisController.fillCallFuncInfo(funcMetaInfo,referenceGrid.metadata,function () {
+            thisController.callFuncByType(funcMetaInfo);
+        });
+        
+
+    },
+    callFuncByType:  function(funcMetaInfo){
+        var thisController = this;
+        var referenceGrid = thisController.getGrid();
+        var gridSelectModel = referenceGrid.getSelectionModel();
+        var selectedRows;
         var func = thisController.currentCalledSqlFunction;
+        
         switch (funcMetaInfo.PROC_EXEC) {
             //выполнение процедуры один раз, параметры не берутся из данных грида, а либо константы либо вводятся вручную
             case "ONCE":
-                {
-                    func.infoDialogTitle = 'Виконання процедури: ' + funcMetaInfo.DESCR;
-                    //для ONCE заполняем единожды параметры в диалоге и вызываем функцию (из строк грида никакие данные не берутся)
-                    func.params.push({ rowIndex: null, rowParams: new Array() });
+            {
+                func.infoDialogTitle = 'Виконання процедури: ' + funcMetaInfo.DESCR;
+                //для ONCE заполняем единожды параметры в диалоге и вызываем функцию (из строк грида никакие данные не берутся)
+                func.params.push({ rowIndex: null, rowParams: new Array() });
 
-                    if (funcMetaInfo.SystemParamsInfo && funcMetaInfo.SystemParamsInfo.length > 0)
-                        thisController.setSystemParams();
-                    if (func.paramsInfo.length > 0 &&
-                        Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                        thisController.showInputParamsDialog(false,
-                            function () {
-                                thisController.executeCurrentSqlFunction();
-                            });
-                    else
-                        thisController.executeCurrentSqlFunction();
-                    break;
-                }
-                //выполнение процедуры для каждой выделенной строки
+                if (funcMetaInfo.SystemParamsInfo && funcMetaInfo.SystemParamsInfo.length > 0)
+                    thisController.setSystemParams();
+                
+
+                if (func.paramsInfo.length > 0 &&
+                    Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+
+                    thisController.showInputParamsDialog(false,
+                        function () {
+                            thisController.executeCurrentSqlFunction();
+                        });
+                else
+                    thisController.executeCurrentSqlFunction();
+                break;
+            }
+            //выполнение процедуры для каждой выделенной строки
             case "EACH":
             case "BATCH":
-                {
-                    //получаем собственно выбранные строки
-                    selectedRows = gridSelectModel.getSelection();
-                    func.allFuncCallCount = selectedRows.length;
-                    func.infoDialogTitle = 'Виконання процедури для вибранних рядків';
-                    var qst = funcMetaInfo.QST;
-                    var descr = funcMetaInfo.DESCR;
+            {
+                //получаем собственно выбранные строки
+                selectedRows = gridSelectModel.getSelection();
+                func.allFuncCallCount = selectedRows.length;
+                func.infoDialogTitle = 'Виконання процедури для вибранних рядків';
+                var qst = funcMetaInfo.QST;
+                var descr = funcMetaInfo.DESCR;
 
-                    //если пользователь не выбрал строк
-                    if (selectedRows.length === 0) {
-                        Ext.MessageBox.show({
-                            title: func.infoDialogTitle,
-                            msg: "Не обрано жодного рядка",
-                            buttons: Ext.MessageBox.OK
-                        });
-                        return;
-                    }
-                    if (qst) {
-                        var selectRow = selectedRows[0];
-                        if (descr && descr.indexOf(":") > -1) {
-                                var thisController = this;
-                                var referenceGrid = thisController.getGrid();
-                                Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                                    var par = ':' + item.COLNAME;
-                                    descr = descr.replace(par, selectRow.data[item.COLNAME]);
-                                });
-                            }
-                        if (qst.indexOf(":") > -1) {
-                            var thisController = this;
-                            var referenceGrid = thisController.getGrid();
-                            Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                                var par = ':' + item.COLNAME;
-                                qst = qst.replace(par, selectRow.data[item.COLNAME]);
-                            });
-                        }
-                        var titleMsg = 'Виконання процедури' + descr;//.replace(;
-                        Ext.MessageBox.confirm(titleMsg, qst + '</br>', function (btn) {
-                            if (btn != 'yes') {
-                                return false;
-                            }
-                            else {
-                                thisController.fillFuncParamsFromRows(selectedRows);
-
-                                //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
-                                //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
-                                if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                                    thisController.showInputParamsDialog(false, function () {
-                                        //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
-                                        thisController.executeCurrentSqlFunction();
-                                    });
-                                else
-                                    thisController.executeCurrentSqlFunction();
-                            }
-                        });
-                    }
-                    else {
-
-                        //заполняем значения параметров из выбранных строк
-                        thisController.fillFuncParamsFromRows(selectedRows);
-
-                        //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
-                        //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
-                        if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                            thisController.showInputParamsDialog(false, function () {
-                                //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
-                                thisController.executeCurrentSqlFunction();
-                            });
-                        else
-                            thisController.executeCurrentSqlFunction();
-                    }
+                //если пользователь не выбрал строк
+                if (selectedRows.length === 0) {
+                    Ext.MessageBox.show({
+                        title: func.infoDialogTitle,
+                        msg: "Не обрано жодного рядка",
+                        buttons: Ext.MessageBox.OK
+                    });
+                    return;
                 }
-                break;
-           case "SELECTED_ONE":
-                {
-                    
-                    selectedRows = gridSelectModel.getSelection();
-                    func.allFuncCallCount = selectedRows.length;
-                    var qst = funcMetaInfo.QST;
-                    var descr = funcMetaInfo.DESCR;
-                    var warningMsg;
-                    //если пользователь не выбрал строк
-                    if (selectedRows.length === 0)
-                        warningMsg = "Не обрано жодного рядка";
-                    if (selectedRows.length > 1)
-                        warningMsg = "Обрано більше одного рядка";
-                    if (warningMsg) {
-                        Ext.MessageBox.show({
-                            title: func.infoDialogTitle,
-                            msg: warningMsg,
-                            buttons: Ext.MessageBox.OK
-                        });
-                        return;
-                    }
+                if (qst) {
                     var selectRow = selectedRows[0];
-                    func.infoDialogTitle = 'Виконання процедури для рядка' + referenceGrid.metadata.CurrentActionInform.lastClickRowInform.rowNumber;
-                    if (qst) {
-
-                        if (descr)
-                            if (descr.indexOf(":") > -1) {
-                                var thisController = this;
-                                var referenceGrid = thisController.getGrid();
-                                Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                                    var par = ':' + item.COLNAME;
-                                    descr = descr.replace(par, selectRow.data[item.COLNAME]);
-                                });
-
-                            }
-                        if (qst.indexOf(":") > -1) {
-                            var thisController = this;
-                            var referenceGrid = thisController.getGrid();
-                            Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                                var par = ':' + item.COLNAME;
-                                qst = qst.replace(par, selectRow.data[item.COLNAME]);
-                            });
-
+                    if (descr && descr.indexOf(":") > -1) {
+                        var thisController = this;
+                        var referenceGrid = thisController.getGrid();
+                        Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                            var par = ':' + item.COLNAME;
+                            descr = descr.replace(par, selectRow.data[item.COLNAME]);
+                        });
+                    }
+                    if (qst.indexOf(":") > -1) {
+                        var thisController = this;
+                        var referenceGrid = thisController.getGrid();
+                        Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                            var par = ':' + item.COLNAME;
+                            qst = qst.replace(par, selectRow.data[item.COLNAME]);
+                        });
+                    }
+                    var titleMsg = 'Виконання процедури' + descr;//.replace(;
+                    Ext.MessageBox.confirm(titleMsg, qst + '</br>', function (btn) {
+                        if (btn != 'yes') {
+                            return false;
                         }
-                        var titleMsg = 'Виконання процедури' + descr;//.replace(;
-                        Ext.MessageBox.confirm(titleMsg, qst + '</br>', function (btn) {
-                            if (btn != 'yes') {
-                                return false;
-                            }
-                            else {
-                                thisController.fillFuncParamsFromRows(selectedRows);
+                        else {
+                            thisController.fillFuncParamsFromRows(selectedRows);
 
-                                //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
-                                //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
-                                if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                                    thisController.showInputParamsDialog(true, function () {
-                                        //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
-                                        thisController.executeCurrentSqlFunction();
-                                    });
-                                else
+                            //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
+                            //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
+                            if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+                                thisController.showInputParamsDialog(false, function () {
+                                    //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
                                     thisController.executeCurrentSqlFunction();
-                            }
-                        });
-                    }
-                    else {
-
-                        //заполняем значения параметров из выбранных строк
-                        thisController.fillFuncParamsFromRows(selectedRows);
-
-                        //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
-                        //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
-                        if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                            thisController.showInputParamsDialog(true, function () {
-                                //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
+                                });
+                            else
                                 thisController.executeCurrentSqlFunction();
-                            });
-                        else
-                            thisController.executeCurrentSqlFunction();
-                    }
-                    break;
+                        }
+                    });
                 }
-            case "ALL":
-                {
-                    //если процедуру нужно вызвать для всех строк, то выделяем все строки, для более простого их получения
-                    gridSelectModel.selectAll();
-                    //selectedRows = gridSelectModel.getSelection();
-                    //var params = new Array();
-                    //Ext.each(gridSelectModel.getStore().data.items,function (item) {
-                    //    params.push(item.data);
-                    //});
-                    selectedRows = gridSelectModel.getStore().data.items
-                    func.allFuncCallCount = selectedRows.length;
-                    func.infoDialogTitle = 'Виконання процедури для всіх рядків, що відображаються';
-
-                    //если в гриде вообще нет строк с данными
-                    if (selectedRows.length == 0) {
-                        Ext.MessageBox.show({
-                            title: func.infoDialogTitle,
-                            msg: "Рядки з даними відсутні",
-                            buttons: Ext.MessageBox.OK
-                        });
-                        return;
-                    }
+                else {
 
                     //заполняем значения параметров из выбранных строк
                     thisController.fillFuncParamsFromRows(selectedRows);
-                    //gridSelectModel.deselectAll();
-                    //для ALL заполняем единожды параметры функции, значения которых нужно ввести в диалоге ввода параметров
-                    //после нажатия "Ok" в диалоге ввода параметров - проходимся по всем строкам, дозаполняем параметры и вызываем функции для конкретных строк
+
+                    //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
+                    //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
                     if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
                         thisController.showInputParamsDialog(false, function () {
-                            //var metadata =  this.getgrid().metadata;
+                            //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
+                            thisController.executeCurrentSqlFunction();
+                        });
+                    else
+                        thisController.executeCurrentSqlFunction();
+                }
+            }
+                break;
+            case "SELECTED_ONE":
+            {
+                
+                selectedRows = gridSelectModel.getSelection();
+                func.allFuncCallCount = selectedRows.length;
+                var qst = funcMetaInfo.QST;
+                var descr = funcMetaInfo.DESCR;
+                var warningMsg;
+                //если пользователь не выбрал строк
+                if (selectedRows.length === 0)
+                    warningMsg = "Не обрано жодного рядка";
+                if (selectedRows.length > 1)
+                    warningMsg = "Обрано більше одного рядка";
+                if (warningMsg) {
+                    Ext.MessageBox.show({
+                        title: func.infoDialogTitle,
+                        msg: warningMsg,
+                        buttons: Ext.MessageBox.OK
+                    });
+                    return;
+                }
+                var selectRow = selectedRows[0];
+                func.infoDialogTitle = 'Виконання процедури для рядка' + referenceGrid.metadata.CurrentActionInform.lastClickRowInform.rowNumber;
+                if (qst) {
+
+                    if (descr)
+                        if (descr.indexOf(":") > -1) {
+                            var thisController = this;
+                            var referenceGrid = thisController.getGrid();
+                            Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                                var par = ':' + item.COLNAME;
+                                descr = descr.replace(par, selectRow.data[item.COLNAME]);
+                            });
+
+                        }
+                    if (qst.indexOf(":") > -1) {
+                        var thisController = this;
+                        var referenceGrid = thisController.getGrid();
+                        Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                            var par = ':' + item.COLNAME;
+                            qst = qst.replace(par, selectRow.data[item.COLNAME]);
+                        });
+
+                    }
+                    var titleMsg = 'Виконання процедури' + descr;//.replace(;
+                    Ext.MessageBox.confirm(titleMsg, qst + '</br>', function (btn) {
+                        if (btn != 'yes') {
+                            return false;
+                        }
+                        else {
+                            thisController.fillFuncParamsFromRows(selectedRows);
+
+                            //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
+                            //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
+                            if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+                                thisController.showInputParamsDialog(true, function () {
+                                    //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
+                                    thisController.executeCurrentSqlFunction();
+                                });
+                            else
+                                thisController.executeCurrentSqlFunction();
+                        }
+                    });
+                }
+                else {
+
+                    //заполняем значения параметров из выбранных строк
+                    thisController.fillFuncParamsFromRows(selectedRows);
+
+                    //для EACH параметры заполняются в диалоге заново для каждой выбранной строки
+                    //после заполнения параметров из грида заполняем вводимые параметры в диалоге для всех строк, и посли нажатия Ok вызываем функцию
+                    if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+                        thisController.showInputParamsDialog(true, function () {
+                            //запоминаем номер строки для которой вызывается процедура, чтобы в случае неудачи пользователь знал на какой строке свалилось
+                            thisController.executeCurrentSqlFunction();
+                        });
+                    else
+                        thisController.executeCurrentSqlFunction();
+                }
+                break;
+            }
+            case "ALL":
+            {
+                //если процедуру нужно вызвать для всех строк, то выделяем все строки, для более простого их получения
+                gridSelectModel.selectAll();
+                //selectedRows = gridSelectModel.getSelection();
+                //var params = new Array();
+                //Ext.each(gridSelectModel.getStore().data.items,function (item) {
+                //    params.push(item.data);
+                //});
+                selectedRows = gridSelectModel.getStore().data.items
+                func.allFuncCallCount = selectedRows.length;
+                func.infoDialogTitle = 'Виконання процедури для всіх рядків, що відображаються';
+
+                //если в гриде вообще нет строк с данными
+                if (selectedRows.length == 0) {
+                    Ext.MessageBox.show({
+                        title: func.infoDialogTitle,
+                        msg: "Рядки з даними відсутні",
+                        buttons: Ext.MessageBox.OK
+                    });
+                    return;
+                }
+
+                //заполняем значения параметров из выбранных строк
+                thisController.fillFuncParamsFromRows(selectedRows);
+                //gridSelectModel.deselectAll();
+                //для ALL заполняем единожды параметры функции, значения которых нужно ввести в диалоге ввода параметров
+                //после нажатия "Ok" в диалоге ввода параметров - проходимся по всем строкам, дозаполняем параметры и вызываем функции для конкретных строк
+                if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+                    thisController.showInputParamsDialog(false, function () {
+                        //var metadata =  this.getgrid().metadata;
+                        thisController.executeCurrentSqlFunction();
+                    })
+                else
+                    thisController.executeCurrentSqlFunction();
+                break;
+            }
+            case "ON_ROW_CLICK":
+            {
+                func.infoDialogTitle = 'Виконання процедури: ' + funcMetaInfo.DESCR;
+
+                func.params.push({ rowIndex: null, rowParams: new Array() });
+                var qst = funcMetaInfo.QST;
+                if (qst) {
+                    qst = ExtApp.utils.RefBookUtils.replaceParamsFromRow(funcMetaInfo.dataRowArray, qst);
+                    Ext.MessageBox.confirm(funcMetaInfo.DESCR, qst + '</br>', function (btn) {
+                        if (btn != 'yes') {
+                            return false;
+                        }
+                        else {
+                            if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+                                thisController.showInputParamsDialog(false, function () {
+                                    thisController.executeCurrentSqlFunction();
+                                })
+                            else
+                                thisController.executeCurrentSqlFunction();
+                        }
+                    });
+                }
+                else {
+                    if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+                        thisController.showInputParamsDialog(false, function () {
                             thisController.executeCurrentSqlFunction();
                         })
                     else
                         thisController.executeCurrentSqlFunction();
-                    break;
                 }
-            case "ON_ROW_CLICK":
-                {
-                    func.infoDialogTitle = 'Виконання процедури: ' + funcMetaInfo.DESCR;
 
-                    func.params.push({ rowIndex: null, rowParams: new Array() });
-                    var qst = funcMetaInfo.QST;
-                    if (qst) {
-                        qst = ExtApp.utils.RefBookUtils.replaceParamsFromRow(funcMetaInfo.dataRowArray, qst);
-                        Ext.MessageBox.confirm(funcMetaInfo.DESCR, qst + '</br>', function (btn) {
-                            if (btn != 'yes') {
-                                return false;
-                            }
-                            else {
-                                if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                                    thisController.showInputParamsDialog(false, function () {
-                                        thisController.executeCurrentSqlFunction();
-                                    })
-                                else
-                                    thisController.executeCurrentSqlFunction();
-                            }
-                        });
-                    }
-                    else {
-                        if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                            thisController.showInputParamsDialog(false, function () {
-                                thisController.executeCurrentSqlFunction();
-                            })
-                        else
-                            thisController.executeCurrentSqlFunction();
-                    }
-
-                    break;
-                }
+                break;
+            }
             case "LINK_FUNC_BEFORE":
-                {
+            {
+                var WEB_NAME;
+                if((func.RowParamsNames && func.RowParamsNames.length > 0) || func.ConditionParamNames && func.ConditionParamNames.length > 0) {
                     var gridSelectModel = referenceGrid.getSelectionModel();
                     var selectedRows = gridSelectModel.getSelection();
                     if (!selectedRows || selectedRows.length < 1) {
-                        Ext.Msg.show({ title: "не обрано жодного рядка", msg: 'Не обрано жодного рядка' + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK });
+                        Ext.Msg.show({
+                            title: "не обрано жодного рядка",
+                            msg: 'Не обрано жодного рядка' + '</br> </br>',
+                            icon: Ext.Msg.ERROR,
+                            buttons: Ext.Msg.OK
+                        });
                         return;
                     }
                     var selectRow = selectedRows[0];
                     var params = new Array();
-                    //заполняем параметры функции значения которых нужно взять из текущей строки грида
-                    //if (referenceGrid.metadata.columnsInfo && !selectRow) {
-                    //    Ext.Msg.show({ title: "Не вибрано жодного рядка", msg: "оберіть будь ласка рядок для обробки даних" + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK });
-                    //    return;
-                    //}   )
-
                     if (funcMetaInfo)
                         Ext.each(funcMetaInfo.ParamsInfo, function (par) {
                             Ext.each(referenceGrid.metadata.columnsInfo,
@@ -2722,21 +2770,23 @@
                         });
                     if (funcMetaInfo && funcMetaInfo.ConditionParamNames)
                         Ext.each(referenceGrid.metadata.columnsInfo,
-                                function (item) {
-                                   if (Ext.Array.contains(funcMetaInfo.ConditionParamNames, item.COLNAME) && !Ext.Array.findBy(params, function (param) {
+                            function (item) {
+                                if (Ext.Array.contains(funcMetaInfo.ConditionParamNames, item.COLNAME) && !Ext.Array.findBy(params, function (param) {
                                         return param.Name == item.COLNAME;
                                     })) {
 
-                                        var field = {};
-                                        field.Name = item.COLNAME;
-                                        field.Type = item.COLTYPE;
-                                        field.SEMANTIC = item.SEMANTIC;
-                                        field.Value = selectRow.data[item.COLNAME];
-                                        params.push(field);
-                                    }
-                                });
+                                    var field = {};
+                                    field.Name = item.COLNAME;
+                                    field.Type = item.COLTYPE;
+                                    field.SEMANTIC = item.SEMANTIC;
+                                    field.Value = selectRow.data[item.COLNAME];
+                                    params.push(field);
+                                }
+                            });
 
-                    var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value === "" || param.Value === undefined });
+                    var emptyParam = Ext.Array.findBy(params, function (param) {
+                        return param.Value === "" || param.Value === undefined
+                    });
                     if (emptyParam) {
                         if (emptyParam.Name)
                             Ext.MessageBox.show({
@@ -2746,201 +2796,189 @@
                             });
                         return false;
                     }
-                    //if (funcMetaInfo.ConditionParamNames)
-                    //    Ext.each(funcMetaInfo.ConditionParamNames, function (parName) {
-                    //        Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                    //            if (item.COLNAME == parName ){
-                    //                ;
-                    //                var field = {};
-                    //                field.Name = item.COLNAME;
-                    //                field.Type = item.COLTYPE;
-                    //                field.Value = selectRow.data[parName]
-                    //                params.push(field);
-                    //            }
-                    //        })
-
-                    //    });
                     var paramsString = Ext.JSON.encode(params);
-                    var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
-                    var WEB_NAME = funcMetaInfo.WEB_FORM_NAME + "&jsonSqlParams=" + paramsString;
-                    if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true)
-                        this.openWindowByFunction(WEB_NAME);
-                    else
-                        window.open(WEB_NAME, '_blank');
-                    break;
+                    WEB_NAME = funcMetaInfo.WEB_FORM_NAME + "&jsonSqlParams=" + paramsString;
                 }
+                else
+                 WEB_NAME = funcMetaInfo.WEB_FORM_NAME;
+                if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true)
+                    this.openWindowByFunction(WEB_NAME);
+                else
+                    window.open(WEB_NAME, '_blank');
+                break;
+            }
             case "INTERNER_LINK_WITH_PARAMS":
-                {
-                    
-                    var params = new Array();
-                    var insertDefParams = Array();
-                    var gridSelectModel = referenceGrid.getSelectionModel();
-                    var selectedRows = gridSelectModel.getSelection();
-                    //если в гриде вообще нет строк с данными
-                    if (selectedRows.length == 0) {
+            {
+
+                var params = new Array();
+                var insertDefParams = Array();
+                var gridSelectModel = referenceGrid.getSelectionModel();
+                var selectedRows = gridSelectModel.getSelection();
+                //если в гриде вообще нет строк с данными
+                if (selectedRows.length == 0) {
+                    Ext.MessageBox.show({
+                        title: func.infoDialogTitle,
+                        msg: "Не обрано жодного рядка",
+                        buttons: Ext.MessageBox.OK
+                    });
+                    return;
+                }
+                var selectRow = selectedRows[0];
+                Ext.each(funcMetaInfo.ConditionParamNames, function (parName) {
+                    Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                        if (item.COLNAME == parName) {
+                            var field = {};
+                            field.Name = item.COLNAME;
+                            field.Type = item.COLTYPE;
+                            field.SEMANTIC = item.SEMANTIC;
+                            field.Value = selectRow.data[parName];
+                            params.push(field);
+                        }
+                    })
+
+                });
+
+
+                Ext.each(funcMetaInfo.RowParamsNames, function (parName) {
+                    Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                        if (item.COLNAME == parName) {
+                            var field = {};
+                            field.Name = item.COLNAME;
+                            field.Type = item.COLTYPE;
+                            field.SEMANTIC = item.SEMANTIC;
+                            field.Value = selectRow.data[parName];
+                            params.push(field);
+                        }
+                    })
+
+                });
+                if (funcMetaInfo.ThrowNsiParams && funcMetaInfo.ThrowNsiParams.DefParams && funcMetaInfo.ThrowNsiParams.DefParams.length)
+                    Ext.each(funcMetaInfo.ThrowNsiParams.DefParams, function (defPar) {
+                        Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                            if (item.COLNAME == defPar.ColName && defPar.Kind == 'DEF_VAL_BY_INSERT') {
+                                var field = {};
+                                field.Name = item.COLNAME;
+                                field.Type = item.COLTYPE;
+                                field.SEMANTIC = item.SEMANTIC;
+                                field.Value = selectRow.data[defPar.ColName];
+                                insertDefParams.push(field);
+                            }
+                        })
+
+                    });
+
+                var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value === "" || param.Value == undefined});
+                if (emptyParam) {
+                    if (emptyParam.Name)
                         Ext.MessageBox.show({
                             title: func.infoDialogTitle,
-                            msg: "Не обрано жодного рядка",
+                            msg: "Параметер " + emptyParam.SEMANTIC + 'порожній',
                             buttons: Ext.MessageBox.OK
                         });
-                        return;
-                    }
-                    var selectRow = selectedRows[0];
-                    Ext.each(funcMetaInfo.ConditionParamNames, function (parName) {
-                        Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                            if (item.COLNAME == parName) {
-                                var field = {};
-                                field.Name = item.COLNAME;
-                                field.Type = item.COLTYPE;
-                                field.SEMANTIC = item.SEMANTIC;
-                                field.Value = selectRow.data[parName];
-                                params.push(field);
-                            }
-                        })
-
-                    });
-
-                    
-                    Ext.each(funcMetaInfo.RowParamsNames, function (parName) {
-                        Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                            if (item.COLNAME == parName) {
-                                var field = {};
-                                field.Name = item.COLNAME;
-                                field.Type = item.COLTYPE;
-                                field.SEMANTIC = item.SEMANTIC;
-                                field.Value = selectRow.data[parName];
-                                params.push(field);
-                            }
-                        })
-
-                    });
-                    if (funcMetaInfo.ThrowNsiParams && funcMetaInfo.ThrowNsiParams.DefParams && funcMetaInfo.ThrowNsiParams.DefParams.length)
-                        Ext.each(funcMetaInfo.ThrowNsiParams.DefParams, function (defPar) {
-                            Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
-                                if (item.COLNAME == defPar.ColName && defPar.Kind == 'DEF_VAL_BY_INSERT') {
-                                    var field = {};
-                                    field.Name = item.COLNAME;
-                                    field.Type = item.COLTYPE;
-                                    field.SEMANTIC = item.SEMANTIC;
-                                    field.Value = selectRow.data[defPar.ColName];
-                                    insertDefParams.push(field);
-                                }
-                            })
-
-                        });
-
-                    var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value === "" || param.Value == undefined});
-                    if (emptyParam) {
-                        if (emptyParam.Name)
-                            Ext.MessageBox.show({
-                                title: func.infoDialogTitle,
-                                msg: "Параметер " + emptyParam.SEMANTIC + 'порожній',
-                                buttons: Ext.MessageBox.OK
-                            });
-                        return false;
-                    }
-
-                    var paramsString = Ext.JSON.encode(params);
-                    //var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
-
-                   // var bas64Params = Base64.encode(paramsString);
-                    var WEB_NAME = funcMetaInfo.WEB_FORM_NAME + "&jsonSqlParams=" + paramsString;
-                    if (insertDefParams.length > 0)
-                        WEB_NAME += "&InsertDefParams=" + Ext.JSON.encode(insertDefParams);
-                    if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true)
-                        this.openWindowByFunction(WEB_NAME);
-                    else
-                        window.open(WEB_NAME, '_blank');
-
-                    break;
+                    return false;
                 }
+
+                var paramsString = Ext.JSON.encode(params);
+                //var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
+
+                // var bas64Params = Base64.encode(paramsString);
+                var WEB_NAME = funcMetaInfo.WEB_FORM_NAME + "&jsonSqlParams=" + paramsString;
+                if (insertDefParams.length > 0)
+                    WEB_NAME += "&InsertDefParams=" + Ext.JSON.encode(insertDefParams);
+                if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true)
+                    this.openWindowByFunction(WEB_NAME);
+                else
+                    window.open(WEB_NAME, '_blank');
+
+                break;
+            }
             case "INTERNER_LINK":
-                {
-                    var WEB_NAME = funcMetaInfo.WEB_FORM_NAME;
-                    if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true)
-                        this.openWindowByFunction(WEB_NAME);
-                    else
-                        window.open(WEB_NAME, '_blank');
-                    break;
-                }
+            {
+                var WEB_NAME = funcMetaInfo.WEB_FORM_NAME;
+                if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true)
+                    this.openWindowByFunction(WEB_NAME);
+                else
+                    window.open(WEB_NAME, '_blank');
+                break;
+            }
             case "LINK_WITH_PARAMS":
-                {
-                    var gridSelectModel = referenceGrid.getSelectionModel();
-                    var selectedRows = gridSelectModel.getSelection();
-                    //если в гриде вообще нет строк с данными
-                    if (selectedRows.length == 0) {
-                        Ext.MessageBox.show({
-                            title: func.infoDialogTitle,
-                            msg: "Не обрано жодного рядка",
-                            buttons: Ext.MessageBox.OK
-                        });
-                        return;
-                    }
-                    var selectRow = selectedRows[0];
-                    var WEB_NAME = funcMetaInfo.WEB_FORM_NAME;
-                    var hasEmptyParams;
-                    var uriParams = ExtApp.utils.RefBookUtils.getUrlParameterValues(WEB_NAME);
-                    Ext.each(referenceGrid.metadata.columnsInfo, function (col) {
-                        var parName = ':' + col.COLNAME;
-                        if (WEB_NAME.indexOf(parName) !== -1) {
-                            var Value = selectRow.data[col.COLNAME];
-                            for (var key in uriParams) {
-                                if (parName == uriParams[key]) {
-                                    if (Value === undefined || Value === '') {
-                                        Ext.MessageBox.show({
-                                            title: func.infoDialogTitle,
-                                            msg: "Параметер " + col.SEMANTIC + ' порожній',
-                                            buttons: Ext.MessageBox.OK
-                                        });
-                                        hasEmptyParams = true;
-                                        return false;
-                                    }
-                                    WEB_NAME = WEB_NAME.replace(parName, Value);
+            {
+                var gridSelectModel = referenceGrid.getSelectionModel();
+                var selectedRows = gridSelectModel.getSelection();
+                //если в гриде вообще нет строк с данными
+                if (selectedRows.length == 0) {
+                    Ext.MessageBox.show({
+                        title: func.infoDialogTitle,
+                        msg: "Не обрано жодного рядка",
+                        buttons: Ext.MessageBox.OK
+                    });
+                    return;
+                }
+                var selectRow = selectedRows[0];
+                var WEB_NAME = funcMetaInfo.WEB_FORM_NAME;
+                var hasEmptyParams;
+                var uriParams = ExtApp.utils.RefBookUtils.getUrlParameterValues(WEB_NAME);
+                Ext.each(referenceGrid.metadata.columnsInfo, function (col) {
+                    var parName = ':' + col.COLNAME;
+                    if (WEB_NAME.indexOf(parName) !== -1) {
+                        var Value = selectRow.data[col.COLNAME];
+                        for (var key in uriParams) {
+                            if (parName == uriParams[key]) {
+                                if (Value === undefined || Value === '') {
+                                    Ext.MessageBox.show({
+                                        title: func.infoDialogTitle,
+                                        msg: "Параметер " + col.SEMANTIC + ' порожній',
+                                        buttons: Ext.MessageBox.OK
+                                    });
+                                    hasEmptyParams = true;
+                                    return false;
                                 }
+                                WEB_NAME = WEB_NAME.replace(parName, Value);
                             }
                         }
-                    });
-                    if (!hasEmptyParams) {
-                        if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true) {
-                            this.openWindowByFunction(WEB_NAME);
-                        }
-                        else
-                            window.open(WEB_NAME, '_blank');
                     }
-
-                    break;
-                }
-            case "LINK":
-                {
-                    var WEB_NAME = funcMetaInfo.WEB_FORM_NAME;
+                });
+                if (!hasEmptyParams) {
                     if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true) {
                         this.openWindowByFunction(WEB_NAME);
                     }
                     else
-                        window.open(WEB_NAME, "_blank");
-                    break;
+                        window.open(WEB_NAME, '_blank');
                 }
+
+                break;
+            }
+            case "LINK":
+            {
+                var WEB_NAME = funcMetaInfo.WEB_FORM_NAME;
+                if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true) {
+                    this.openWindowByFunction(WEB_NAME);
+                }
+                else
+                    window.open(WEB_NAME, "_blank");
+                break;
+            }
             case "GET_FILE_ONCE":
-                {
-                    
-                    func.infoDialogTitle = 'Виконання процедури: ' + funcMetaInfo.DESCR;
-                    //для ONCE заполняем единожды параметры в диалоге и вызываем функцию (из строк грида никакие данные не берутся)
-                    func.params.push({ rowIndex: null, rowParams: new Array() });
-                    if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
-                        thisController.showInputParamsDialog(false, function () {
-                            thisController.executeCurrentSqlFunctionWithOutParams();
-                        })
-                    else
+            {
+
+                func.infoDialogTitle = 'Виконання процедури: ' + funcMetaInfo.DESCR;
+                //для ONCE заполняем единожды параметры в диалоге и вызываем функцию (из строк грида никакие данные не берутся)
+                func.params.push({ rowIndex: null, rowParams: new Array() });
+                if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
+                    thisController.showInputParamsDialog(false, function () {
                         thisController.executeCurrentSqlFunctionWithOutParams();
-                    break;
-                }
+                    })
+                else
+                    thisController.executeCurrentSqlFunctionWithOutParams();
+                break;
+            }
             case "SIMPLE_VIS":
-                {
-                    func.infoDialogTitle = funcMetaInfo.DESCR;
-                    selectedRows = gridSelectModel.getStore().data.items;
-                    thisController.fillFuncParamsFromRows(selectedRows);
-                    thisController.executeSimpleMathFuncs();
-                }
+            {
+                func.infoDialogTitle = funcMetaInfo.DESCR;
+                selectedRows = gridSelectModel.getStore().data.items;
+                thisController.fillFuncParamsFromRows(selectedRows);
+                thisController.executeSimpleMathFuncs();
+            }
             default:
                 Ext.Msg.show({
                     title: "Тип процедури не знайдено",
@@ -2970,8 +3008,8 @@
 
     //заполнить информацию о вызываемой sql-функции 
     //funcMetaInfo - метаинформация о вызываемой функции
-    fillCallFuncInfo: function (funcMetaInfo,metadata) {
-        
+    fillCallFuncInfo: function (funcMetaInfo,metadata,callBackFunc) {
+
         var thisController = this;
         
         //метаинформация о параметрах
@@ -2980,11 +3018,12 @@
         //в данном объекте будем сохранять нужную информацию о текущей вызванной функции
         thisController.currentCalledSqlFunction = {
             hasFileResult: funcMetaInfo.HasFileResult,
-            CodeOper: funcMetaInfo.CodeOper,
-            isFuncOnly: funcMetaInfo.isFuncOnly,
-            tableId: funcMetaInfo.TABID,
+            CodeOper: funcMetaInfo.CodeOper || '',
+            isFuncOnly: funcMetaInfo.isFuncOnly || false,
+            tableId: funcMetaInfo.TABID || '',
             ColumnId: funcMetaInfo.ColumnId,
-            funcId: funcMetaInfo.FUNCID,
+            funcId: funcMetaInfo.FUNCID || '',
+            Code: funcMetaInfo.Code || '',
             //имя и тип параметров
             paramsInfo: new Array(),
             systemParamsInfo: new Array(),
@@ -2998,7 +3037,7 @@
             successCallCount: 0,
             //общее количество раз которое функция будет вызвана (зависит от количества выбранных строк на которых мы вызываем функцию)
             allFuncCallCount: 1,
-            infoDialogTitle: "Виконання процедури: " + funcMetaInfo.DESCR,
+            infoDialogTitle: "Виконання процедури: " + funcMetaInfo.DESCR || '',
             paramsFormPanelItems: new Array(),
             //данный параметр нужен для отслеживания количества вызова диалога ввода параметов (для режима EACH)
             currentParamsInputIndex: 0,
@@ -3017,26 +3056,6 @@
        
         var func = thisController.currentCalledSqlFunction;
         //по переданным данным заполняем форму ввода параметров
-        Ext.each(paramsMeta, function (par) {
-            //упрощенные метаданные параметров - только то что нужно для заполнения значений
-            func.paramsInfo.push({
-                Name: par.ColumnInfo.COLNAME,
-                Type: par.ColumnInfo.COLTYPE,
-                IsInput: par.IsInput,
-                kind: par.Kind,
-                additionalUse : par.AdditionalUse
-            });
-            //для параметров, которые нужно вводить вручную, заполняем поля формы
-            if (par.IsInput == true) {
-                //конфигурируем поле ввода по метаописанию и устанавливаем значение по умолчанию, если есть
-                var formField = ExtApp.utils.RefBookUtils.configFormField(par.ColumnInfo);
-                if (par.DefaultValue) {
-                    formField.value = par.DefaultValue;
-                }
-                func.paramsFormPanelItems.push(formField);
-            }
-        });
-        ;
         if (systemParamsInfo && systemParamsInfo.length > 0)
             Ext.each(systemParamsInfo, function (par) {
                 func.systemParamsInfo.push({
@@ -3044,6 +3063,69 @@
                     Type: par.ColType
                 })
             });
+
+        if(paramsMeta && paramsMeta.length > 0)
+            thisController.buildParams(func,paramsMeta,-1,callBackFunc);
+        else if(callBackFunc) callBackFunc();
+
+
+    },
+
+    buildParams: function (func,params,i,callBackFunc) {
+        if(i >= params.length -1)
+        {
+            if(callBackFunc)
+            callBackFunc();
+            return;
+        }
+
+        i++
+            this.buildParam(func,params,i,callBackFunc);
+    },
+
+    buildParam: function (func,params,i,callBackFunc) {
+        thisController = this;
+        var par = params[i];
+        func.paramsInfo.push({
+            Name: par.ColumnInfo.COLNAME,
+            Type: par.ColumnInfo.COLTYPE,
+            IsInput: par.IsInput,
+            kind: par.Kind,
+            additionalUse : par.AdditionalUse
+        });
+        if (par.IsInput == true) {
+
+            
+            //конфигурируем поле ввода по метаописанию и устанавливаем значение по умолчанию, если есть
+            var formField = ExtApp.utils.RefBookUtils.configFormField(par.ColumnInfo);
+            if (par.DefaultValue) {
+                formField.value = par.DefaultValue;
+            }
+            if(par.SelectDefValue)
+                thisController.getDataFromServer(
+                    "/barsroot/ReferenceBook/GetValueByDefaultSelect",
+                    {
+                        tabId : func.tableId, funcId: func.funcId, paramName: par.ColumnInfo.COLNAME
+                    },
+                    function (status, msg,data, controller) {
+                        
+                        if(status == 'OK')
+                            par.DefaultValue = data;
+                        formField.value = par.DefaultValue;
+                        func.paramsFormPanelItems.push(formField);
+                        thisController.buildParams(func,params,i,callBackFunc);
+                    });
+            else
+            {
+                func.paramsFormPanelItems.push(formField);
+                thisController.buildParams(func,params,i,callBackFunc);
+            }
+            ;
+        }
+        else
+        {
+            thisController.buildParams(func,params,i,callBackFunc);
+        }
     },
 
     openWindowByFunction: function (WEB_NAME) {
@@ -3312,6 +3394,7 @@
 
     //вызвать sql-функцию, по данным объекта thisController.currentCalledSqlFunction
     executeCurrentSqlFunction: function (callbackFunc) {
+        
         var thisController = this;
         var func = thisController.currentCalledSqlFunction;
         if (func.systemParams && func.systemParams.length > 0)
@@ -3320,6 +3403,12 @@
         if (func.hasFileResult) {
             thisController.executeCurrentSqlFunctionWithOutParams(callbackFunc);
             return true;
+        }
+
+        if(func.MultiRowsParams != null &&func.MultiRowsParams.length > 0 && func.MultiRowsParams[0].Kind =='FROM_UPLOAD_EXCEL')
+        {
+            thisController.openWindowForUploadOnly(func.tableId,func.funcId,func.Code);
+            return;
         }
         Ext.MessageBox.show({
             title: func.infoDialogTitle,
@@ -3351,7 +3440,7 @@
                     ColumnId: func.ColumnId, procName: func.funcName, random: Math.random, base64ExternProcParams: func.base64ExternProcParams
                 },
                function (status, msg, controller) {
-                    
+                   
                     var callbackFunc;
                    if (window.hasCallbackFunction && window.hasCallbackFunction.toUpperCase() == 'TRUE' && window.ExternelFuncOnly &&  window.ExternelFuncOnly.toUpperCase() == 'TRUE')
                        callbackFunc =  window.parent.CallBackFunctionOnly;

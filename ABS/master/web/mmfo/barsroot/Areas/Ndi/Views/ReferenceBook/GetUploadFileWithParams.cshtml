@@ -6,16 +6,24 @@
 @model CallFunctionMetaInfo
 <div class="container">
     <h2>Завантаження файла</h2>
-    <form id="uploadForm" action="@Url.Action("PostUploadFile", "ReferenceBook")">
+    
+    <form id="uploadFormWithParams" action="@Url.Action("PostUploadFileWithParams", "ReferenceBook")">
         <div class="form-group">
             <label class="control-label col-sm-2 col-sm-offset-2">оберіть Excel файл:</label>
             <div class="col-sm-6 col-sm-offset-2 ">
                 <input name="file" id="uploadInput" type="file" accept=".xlsx" />
             </div>
         </div>
+
+        <div class="form-group">
+            <label class="control-label col-sm-2 col-sm-offset-2" for="start">оберіть дату:</label>
+            <div class="col-sm-6 col-sm-offset-2 ">
+                <input type="date" id="choceDate" name="trip" class="form-control" />
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button id="uploadBtn" onclick="fileUpload();">Завантажити файл</button>
+                <button id="uploadBtn" onclick="fileUploadWithParams();">Завантажити файл</button>
             </div>
         </div>
     </form>
@@ -24,7 +32,7 @@
 <script>
     window.funcId = '@Model.FUNCID';
     window.tabId = '@Model.TABID';
-    window.code = '@Model.Code';
+
 </script>
 <script src="@Url.Content("~/Areas/Ndi/Scripts/JS/UploadFile.js")"></script>
 <link rel="stylesheet" href="~/Areas/Ndi/CSS/MVC_CSS/FileUploadForm.css">

@@ -75,6 +75,7 @@
                 },
                 method: 'POST',
                 afterRequest: function (req, res) {
+                    
                     //
                     //window.executeBeforFunc = 'no';
                     var response = Ext.decode(req.operation.response.responseText);

@@ -338,6 +338,7 @@
         },
 
         getUrlBySrcCond: function (combo, selectedRow) {
+            
             var srcQueryModel = combo.srcQueryModel;
             if (!srcQueryModel)
                 return null;
@@ -354,15 +355,16 @@
                         srcQueryModel.QueryParams.push(param);
                     }
 
-                })
+            })
+            srcQueryModel.QueryParamsInfo = [];
             var queryModelString = Ext.JSON.encode(srcQueryModel);
             var dynamicUrl = '/barsroot/ndi/ReferenceBook/GerSrcQueryData?srcQueryModel=' + queryModelString;
             return dynamicUrl;
            
         },
 
+
         getUrlParameterValues: function (url) {
-            // separating the GET parameters from the current URL
             var getParams = url.split("?");
             // transforming the GET parameters into a dictionnary
             var params = Ext.urlDecode(getParams[1]);
@@ -451,6 +453,19 @@
             })
 
             return strForReplace;
+        },
+        replaceLastParameter:function (rowArray, strForReplace) {
+            Ext.each(rowArray, function (param) {
+                var par = ':' + param.Name;
+                if (strForReplace.indexOf(par) > -1 && strForReplace.length == strForReplace.indexOf(par) + par.length)
+                    strForReplace = strForReplace.replace(par, param.Value)
+            })
+            return strForReplace;
+        },
+        replaceStringFromRowGrid: function (strForReplace,record,columnsInfo) {
+            var Util = this;
+            var rowArray = Util.buildRowToArray(record, columnsInfo);
+            return Util.replaceLastParameter(rowArray,strForReplace);
         },
         compareRecords: function (oldRecord, newRecord, keyNames) {
             var isDirty = false;
