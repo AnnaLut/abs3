@@ -56,6 +56,6 @@ namespace BarsWeb.Areas.Ndi.Models
 
         public string CODEAPP { get; set; }
         public string BASE_OPTIONS { get; set; }
-
+        public string CUSTOM_OPTIONS { get; set; }
     }
 }

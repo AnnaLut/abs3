@@ -71,7 +71,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
 
         string UpdateFilter(EditFilterModel editFilterModel);
 
-        string InsertFilters(List<CreateFilterModel> filterModels);
 
         FiltersMetaInfo GetFiltersInfo(int tableId, IEnumerable<ColumnMetaInfo> columnsInfo = null);
         //string GetFilterStructure(int dynFilterId);
@@ -93,11 +92,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         /// <param name="funcParams">Параметры процедуры и их значения</param>
         /// <exception cref="Exception"></exception>
         /// <returns>Сообщение о выполнении</returns>
-       string CallRefFunction(int? tableId, int? funcId,int? codeOper,int? columnId, List<FieldProperties> jsonFuncParams, 
+        string CallRefFunction(int? tableId, int? funcId,int? codeOper,int? columnId, List<FieldProperties> jsonFuncParams, 
             string procName = "", string msg = "", string web_form_name = "", string jsonSqlProcParams = "", List<FieldProperties> addParams = null);
 
-        string CallParsExcelFunction(HttpPostedFileBase excelFile, string fileName, string date,int? tabid,int? funcid);
-        string CallEachFuncWithMultypleRows(int? tableId, int? funcId, int? codeOper, int? columnId, MultiRowParamsDataModel dataModel, string funcText = "", string msg = "", string web_form_name = "", string ListjsonSqlProcParams = "");
+        string CallParsExcelFunction(HttpPostedFileBase excelFile, List<FieldProperties> inputParams, int? tabid,int? funcid,string code = null);
+        string CallEachFuncWithMultypleRows(int? tableId, int? funcId, int? codeOper, int? columnId, MultiRowParamsDataModel dataModel, string funcText = "", string msg = "", string web_form_name = "", CallFunctionMetaInfo callFunc = null);
         /// <summary>
         /// Получить дерево справочников в формате необходимом для клиентского extjs дерева
         /// </summary>
@@ -162,7 +161,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         MetaCallSettings GetMetaCallSettingsByAppCodeAndTabid(string appCode,int tabId);
         FunNSIEditFParams GetNsiParams(string nsiParamString, int? baseCodeOper = null, List<FieldProperties> rowParams = null);
         CallFunctionMetaInfo GetFunctionsMetaInfo(int? codeOper, string code = "");
+        string GetValueByDefaultSelect(int tabId, int funcId, string paramName, List<FieldProperties> parameters = null);
         CallFunctionMetaInfo GetCallFunction(int tableId, int funcid);
+        CallFunctionMetaInfo GetFunctionsMetaInfo(int tabId, int funcId);
         MetaTable GetMetaTableByName(string name);
         string GetFirstKeyName(int tabId);
         string GetSelectName(int tabid);

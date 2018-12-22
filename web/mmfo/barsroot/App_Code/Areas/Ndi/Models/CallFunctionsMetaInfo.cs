@@ -36,10 +36,11 @@ namespace BarsWeb.Areas.Ndi.Models
         public string QST { get; set; }
         public string MSG { get; set; }
         public string CHECK_FUNC { get; set; }
-        public object ParamsInfo { get; set; }
+        public List<ParamMetaInfo> ParamsInfo { get; set; }
         public string WEB_FORM_NAME { get; set; }
         public List<string> ConditionParamNames { get; set; }
         public int? CodeOper { get; set; }
+        public string Code { get; set; }
         public string OutParams { get; set; }
         public string SysPar { get; set; }
         public string UploadParams { get; set; }

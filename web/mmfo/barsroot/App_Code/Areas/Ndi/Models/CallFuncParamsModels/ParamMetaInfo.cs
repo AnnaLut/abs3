@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
+using BarsWeb.Areas.Ndi.Models.ViewModels;
 
 namespace BarsWeb.Areas.Ndi.Models
 {
@@ -16,9 +17,11 @@ namespace BarsWeb.Areas.Ndi.Models
         }
         public ParamMetaInfo(bool isInput)
         {
-            this.AdditionalUse = new List<string>();
-            this.IsInput = isInput;
+            AdditionalUse = new List<string>();
+            IsInput = isInput;
         }
+
+        public ColumnViewModel ColumnInfo { get; set; }
         /// <summary>
         /// Имя колонки
         /// </summary>
@@ -54,6 +57,7 @@ namespace BarsWeb.Areas.Ndi.Models
         /// </summary>
         public string DefaultValue { get; set; }
       
+       public string SelectDefValue { get; set; }
         /// <summary>
         /// Наименование колонки
         /// </summary>
@@ -76,6 +80,13 @@ namespace BarsWeb.Areas.Ndi.Models
 
         public string SrcTextColName2 { get; set; }
 
+        /// <summary>
+        /// Опеределяет какие дополнительныедействия будем делать на фронтенде, 
+        /// заменять семантику таблицы (ReplaseTableSemantic)  и др. 
+        /// для того, что бы мы брали полученные по из предыдущей табличной формы, или 
+        /// из другого источника параметры, и сохраненные на странице(saveInPageParams)
+        /// и использовали по назначению
+        /// </summary> 
         public List<string> AdditionalUse { get; set; }
 
         public bool FileForBackend { get; set; }

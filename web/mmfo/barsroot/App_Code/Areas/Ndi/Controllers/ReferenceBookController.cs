@@ -85,11 +85,6 @@ namespace BarsWeb.Areas.Ndi.Controllers
                         if (funcParams.Count() > 0 && funcParams.FirstOrDefault(c => c.Type == "BLOB") != null)
                         funcParams.FirstOrDefault(c => c.Type == "BLOB").ByteBody = binData;
                     additionalParams.Add(new FieldProperties { Name = "FileName", Value = fileName, Type = "S" });
-
-
-
-
-
                     string res = _repository.CallRefFunction(tableId, funcId, codeOper, null, funcParams, procName, msg, web_form_name, null, additionalParams);
                     //_repository.ExecProcWithClobParam(result, fileName, null, 0);
                     return Content("{success: 'true', resultMessage: '" + res + "'}");
@@ -109,15 +104,92 @@ namespace BarsWeb.Areas.Ndi.Controllers
         public ViewResult GetUploadFile(int? funcId, int? tabid, string code = null)
         {
             CallFunctionMetaInfo func = null;
-            if (funcId != null && tabid != null)
-                func = _repository.GetCallFunction(tabid.Value, funcId.Value);
-            if (func != null)
+            //try
+           // {
+
+
+                if (funcId != null && tabid != null)
+                {
+
+                    func = _repository.GetCallFunction(tabid.Value, funcId.Value);
+                if (func == null)
+                    throw new ArgumentNullException(String.Format("не знайдений опис процедузи з таблиці id = {0}, funcId = {1} ", tabid.Value, funcId.Value));
+
+                }
+                else
+                if (!string.IsNullOrEmpty(code))
+                {
+                    func = _repository.GetFunctionsMetaInfo(null, code);
+                    if(func == null)
+                    throw new ArgumentNullException(String.Format("не знайдений опис процедузи з таблиці meta_call_settings  code = {0}", code));
+
+                }
+
+
                 SqlStatementParamsParser.BuildFunction(func);
-            return View(func);
+                if (!string.IsNullOrEmpty(code) && code != "undefined")
+                    return View(func);
+                else
+                    return View("GetUploadFileWithParams", func);
+
+           // }
+
+            //catch (OracleException orex)
+            //{
+            //    JsonResult.Status = JsonResponseStatus.Error;
+            //    JsonResult.Message = orex.Message;
+            //    JsonResult.Data = orex.Data;
+            //   return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+            //}
+            //catch (Exception ex)
+            //{
+            //    JsonResult.Status = JsonResponseStatus.Error;
+            //    JsonResult.Message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+            //     return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+            //}
+
+
         }
 
         [HttpPost]
-        public ActionResult PostUploadFile(string fileName, string date, int? tabid, int? funcid)
+        public ActionResult PostUploadFileWithParams(string fileName, int? tabid, int? funcid, string date = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(date))
+                    throw new ArgumentNullException("дата не заповнена");
+                var file = Request.Files[0];
+
+
+
+                string dirPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                List<FieldProperties> inputParams = new List<FieldProperties>();
+                inputParams.Add(new FieldProperties() { Name = "p_file_name", Type = "C", Value = fileName });
+                inputParams.Add(new FieldProperties() { Name = "p_ddate", Type = "C", Value = date });
+                JsonResult.Message = _repository.CallParsExcelFunction(file, inputParams, tabid, funcid);
+                JsonResult.Status = JsonResponseStatus.Ok;
+                return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+
+            }
+
+
+            catch (OracleException orex)
+            {
+                JsonResult.Status = JsonResponseStatus.Error;
+                JsonResult.Message = orex.Message;
+                JsonResult.Data = orex.Data;
+            }
+            catch (Exception ex)
+            {
+                JsonResult.Status = JsonResponseStatus.Error;
+                JsonResult.Message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+            }
+
+            return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult PostUploadFile(string fileName, int? tabid, int? funcid,string code = null)
         {
             var file = Request.Files[0];
 
@@ -125,7 +197,9 @@ namespace BarsWeb.Areas.Ndi.Controllers
             {
 
                 string dirPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                JsonResult.Message = _repository.CallParsExcelFunction(file, fileName, date, tabid, funcid);
+                List<FieldProperties> inputParams = new List<FieldProperties>();
+                inputParams.Add(new FieldProperties() { Name = "p_file_name", Type = "C", Value = fileName });
+                JsonResult.Message = _repository.CallParsExcelFunction(file, inputParams, tabid, funcid,code);
                 JsonResult.Status = JsonResponseStatus.Ok;
                 return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
 
@@ -253,6 +327,11 @@ namespace BarsWeb.Areas.Ndi.Controllers
         //}
         public ActionResult GetRefBookData(RequestMolel requestModel)
         {
+            if (requestModel == null)
+            {
+                throw new ArgumentNullException("обєкт requestModel порожній");
+            }
+
             try
             {
                 Logger.Debug(string.Format(" begin GetRefBookData for: accessCode: {0},tableName: {1}, jsonSqlParams: {2},sPar: {3},sParColumn: {4},nativeTabelId: " +
@@ -649,7 +728,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         }
 
         public JsonResult CallFuncWithMultypleRows(int? tableId, int? funcId, string listJsonSqlProcParams, int? codeOper, int? columnId, string procName = "", string msg = "",
-    string web_form_name = "", string sPar = "", string inputProcParams = "", string base64JExternProcParams = "")
+    string code = "", string sPar = "", string inputProcParams = "", string base64JExternProcParams = "")
         {
             try
             {
@@ -661,7 +740,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
                     InputParams = inputParams
                 };
 
-                string resultMessage = _repository.CallEachFuncWithMultypleRows(tableId, funcId, codeOper, columnId, dataModel, procName, msg, web_form_name);
+                string resultMessage = _repository.CallEachFuncWithMultypleRows(tableId, funcId, codeOper, columnId, dataModel, procName, msg,  code);
                 return Json(new { status = "ok", msg = resultMessage });
             }
             catch (Exception e)
@@ -671,12 +750,35 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
         }
 
+        public JsonResult GetValueByDefaultSelect(int tabId, int funcId, string paramName, string base64Parameterts = null)
+        {
+            try
+            {
 
+                JsonResult.Data = _repository.GetValueByDefaultSelect(tabId, funcId, paramName);
+                JsonResult.Status = JsonResponseStatus.Ok;
+                return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+
+            }
+            catch (OracleException orex)
+            {
+                JsonResult.Status = JsonResponseStatus.Error;
+                JsonResult.Message = orex.Message;
+                JsonResult.Data = orex.Data;
+            }
+            catch (Exception ex)
+            {
+                JsonResult.Status = JsonResponseStatus.Error;
+                JsonResult.Message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+            }
+
+            return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+        }
         public JsonResult GetFuncOnlyMetaData(int? codeOper, string code = "")
         {
             try
             {
-                if (codeOper == null && string.IsNullOrEmpty(code))
+                if (codeOper == null && string.IsNullOrEmpty(code)) 
                     throw new Exception("ідентифікатор процедути пустий");
                 CallFunctionMetaInfo funcInfo = _repository.GetFunctionsMetaInfo(codeOper, code);
                 var result = new { success = true, funcMetaInfo = funcInfo };
@@ -745,7 +847,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
                         case ".csv":
                             return File(System.IO.File.ReadAllBytes(resultModel.Path), "attachment", Path.GetFileName(resultModel.Path));
                         default:
-                            return File(System.IO.File.ReadAllBytes(resultModel.Path), "attachment", resultModel.FileName + ".xlsx");
+                            return File(System.IO.File.ReadAllBytes(resultModel.Path), "attachment", Path.GetFileName(resultModel.Path));
                     }
 
                 }

@@ -9,6 +9,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using Ninject;
 using BarsWeb.Core.Logger;
 using BarsWeb.Areas.Ndi.Models;
+using Bars.CommonModels.ExternUtilsModels;
 /// <summary>
 /// Summary description for ImportToFileHelper
 /// </summary>
@@ -29,12 +30,16 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
         public string ExcelExportToZipCSVFiles(char columnSeparator, string fileName, IEnumerable<Dictionary<string, object>> dataRecords, 
             List<ColumnMetaInfo> columnsInfo,int limit)
         {
+        
             _dbLogger.Info(string.Format("begin ExcelExportToZipCSVFiles for file:  {0} ", fileName));
             string _tempDir = Path.GetTempPath();
             string fileNameWithExt = fileName + ".csv";
             string dirPath = _tempDir + "__" + HttpContext.Current.Session.SessionID + "__" + fileName;
             CreateNewDirectoryAndFile(dirPath);
             string path = dirPath + "\\" + fileNameWithExt;
+            string zipFileName = fileName + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + ".zip";
+            string zipFilePath = dirPath + "\\" + zipFileName;
+      
             Dictionary<string, int> headerLen = new Dictionary<string, int>();
             Encoding windows = Encoding.GetEncoding("windows-1251");
             StringBuilder sbHeaders = new StringBuilder();
@@ -108,8 +113,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                 sw = null;
                 if (filePathes.Count() == 1)
                     return filePathes.First();
-                string zipFilePath = _tempDir + fileName + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + ".zip";
-                ToZip(filePathes, zipFilePath);
+
+                ArchiveZip archiveZip = new ArchiveZip()
+                {
+                    TempDirPath = dirPath,
+                    ZipName = zipFileName
+                };
+                ToZip(archiveZip);
                 return zipFilePath;
 
 
@@ -117,9 +127,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
             }
             catch (Exception e)
             {
-                sw.Close();
-                sw.Dispose();
-                sw = null;
+                if(sw != null)
+                {
+                    sw.Close();
+                    sw.Dispose();
+                    sw = null;
+                }
+
                 DirectoryInfo di = new DirectoryInfo(dirPath);
 
                 foreach (FileInfo file in di.GetFiles())
@@ -133,30 +147,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                 _dbLogger.Error(string.Format("ExcelExportToZipCSVFiles BarsWeb.Areas.Ndi.Infrastructure.Helpers: {0}", e.Message), "ExcelExportToZipCSVFiles");
                 throw e;
             }
-            finally
-            {
-                
-            }
         }
 
-        private static void ToZip(List<string> filesPathes, string zipFile)
+        private static void ToZip(ArchiveZip archiveZip)
         {
-            var zipOutputStream = new ZipOutputStream(File.Create(zipFile));
-            foreach (var item in filesPathes)
-            {
-                ZipEntry zipEntry = new ZipEntry(Path.GetFileName(item));
-                zipOutputStream.PutNextEntry(zipEntry);
-                FileStream fs = File.OpenRead(item);
-                byte[] buffer = new byte[fs.Length];
-                fs.Read(buffer, 0, buffer.Length);
-                zipOutputStream.Write(buffer, 0, buffer.Length);
-                fs.Close();
-                fs.Dispose();
-                fs = null;
-            }
-
-            zipOutputStream.Finish();
-            zipOutputStream.Close();
+            ExcelHelper.ExportExcelWithUtil(archiveZip);
         }
 
         public static void CreateNewDirectoryAndFile(string path)

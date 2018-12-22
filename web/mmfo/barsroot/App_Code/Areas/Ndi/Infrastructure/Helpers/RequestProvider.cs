@@ -66,7 +66,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 {
                     MetaCallSettings colSettings = _repository.GetMetaCallSettingsByCode(requestModel.Code);
                     if (!string.IsNullOrEmpty(colSettings.WEB_FORM_NAME))
-                        nsiEditParams = new FunNSIEditFParams(colSettings.WEB_FORM_NAME);
+                        nsiEditParams = new FunNSIEditFParams(colSettings);
                     tableViwModel.Code = colSettings.CODE;
                 }
             }
