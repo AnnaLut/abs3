@@ -101,7 +101,7 @@ is
   ----------------------------------------------
   --  константы
   ----------------------------------------------
-  G_BODY_VERSION    constant varchar2(64) := 'version 1.0  17.12.2018';
+  G_BODY_VERSION    constant varchar2(64) := 'version 1.1  27.12.2018';
   G_MODULE          constant char(3)      := 'T00';    -- код модуля
   G_TRACE           constant varchar2(50) := 't00_stats.';
 
@@ -171,12 +171,12 @@ is
                           -- расформированные $A (формирования уже нету в zag_b)
                           r as (select ref, s  from bars.opldok where tt='R02' and fdat = p_bankdate and dk =1 and sos = 5 and acc =  l_acc),
                           -- Первичный провод - суммы уходящие в СЕП-ВПС
-                          z as (select ref, skr from bars.zag_b  where kv = 980 and fn like '$A%' and dat between p_bankdate  and p_bankdate + 1  and skr <> 0),
+                          z as (select ref, skr from bars.zag_b  where kv = 980 and fn like '$A%' and dat between p_bankdate  and p_bankdate + 2  and skr <> 0),
                           -- Ответный провод - суммы из СЕП-ВПС
                           a as (select ref, s    
                                   from bars.arc_rrp a  
                                  where kv = 980  and a.dk = 1
-                                   and ( mfob=bars.gl.KF and fn_a like '$B%' and dat_a > p_bankdate  - 5 and dat_a <=  p_bankdate + 1)
+                                   and ( mfob=bars.gl.KF and fn_a like '$B%' and dat_a > p_bankdate  - 5 and dat_a <=  p_bankdate + 2)
                                ),
                           ot as (     select o.ref,  sum(s) over () s_total  
                                          from o, 
@@ -200,11 +200,11 @@ is
                       -- расформированные $A
                       k_r as (select ref, s      from bars.opldok where tt='R02' and fdat = p_bankdate and dk =1 and sos = 5 and acc =  l_acc),
                       -- Ответный провод - поступившие суммы на транзит $B файлов
-                      k_z as (select ref, skr    from bars.zag_a  where kv = 980 and fn like '$B%' and dat between p_bankdate and p_bankdate + 1  and skr <> 0),
+                      k_z as (select ref, skr    from bars.zag_a  where kv = 980 and fn like '$B%' and dat between p_bankdate and p_bankdate + 2  and skr <> 0),
                       -- Первичный провод - зачисления на транзит для дальнешего формирования $A
                       k_a as (select ref, s      from bars.arc_rrp a  
                              where kv = 980  and a.dk = 1
-                               and ( mfoa = bars.gl.KF and fn_b like '$A%' and dat_b > p_bankdate - 5 and dat_b <=  p_bankdate + 1)
+                               and ( mfoa = bars.gl.KF and fn_b like '$A%' and dat_b > p_bankdate - 5 and dat_b <=  p_bankdate + 2)
                            ),
                       -- документы, которые прошли вне регламента
                       k_ot as (     select k_o.ref,  sum(s) over () s_total  
