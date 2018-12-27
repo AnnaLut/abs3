@@ -1686,7 +1686,11 @@ LOOP
         SELECT a.acc,a.nlsalt,a.tip,a.isp, a.grp, a.nms,cu.rnk,a.sec
           INTO   acck_,nlsalt_,tipk_, isp_,  grp_,  nms_,  rnk_, sec_
           FROM accounts a,cust_acc cu
-         WHERE a.acc=cu.acc AND a.nls=nlsb_ AND a.kv=kv_;
+         WHERE a.acc=cu.acc AND a.nls=nlsb_ AND a.kv=kv_
+               and ( -- COBUMMFO-10448
+                     ( regexp_like(nlsb_, '^26[0,5]5') and a.dazs is null )
+                     or not regexp_like(nlsb_, '^26[0,5]5')
+                   );
        EXCEPTION
           WHEN NO_DATA_FOUND THEN 
                -- COBUMMFO-7501 Begin
@@ -2576,6 +2580,16 @@ end if;
              SELECT dazs,blkd,blkk,tip INTO dazs_,blk0_,blk1_,tip_
                FROM accounts
               WHERE nls=nlsb_ AND kv=kv_;
+             
+             -- COBUMMFO-10448 begin
+             if dazs_ IS NOT NULL and regexp_like(nlsb_, '^26[0,5]5') and tip_ like 'W4%' then
+                SELECT dazs , blkd , blkk , tip , nls
+                INTO   dazs_, blk0_, blk1_, tip_, nlsb_
+                FROM accounts
+                WHERE nlsalt = nlsb_ AND kv = kv_ and tip like 'W4%' and dat_alt is not null;
+             end if;
+             -- COBUMMFO-10448 End 
+
              IF dazs_ IS NOT NULL    THEN blkd_ := 9303; -- Acc closed
              ELSIF dk_=1 AND blk1_>0 THEN blkd_ := 9305; -- Acc blk cred
              ELSIF dk_=0 AND blk0_>0 THEN blkd_ := 9304; -- Acc blk deb
