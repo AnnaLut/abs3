@@ -6,11 +6,18 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 19/11/2018 (09/11/2018)
+% VERSION     : 21/12/2018 (18/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+19/12/2018 - для 2203 і деяких OB22 (банківський продукт) будуть включатися 
+             рахунки для яких буде додатня різниця між Дт і Кт оборотами
+18/12/2018 - не будут включаться в файл Дт обороты которые были в
+             кореспонденции со счетами овердрафтов - перенос на просрочку
+             ( Дт 2063 (тип "SP") Кт 2600 (овердрафт) )
+             Добавлено условие для 2063 TIP = "SP".
+             Счета овердрафта выбираем из CC_DEAL VIDD = 10 вместо ACC_OVER   
 19/11/2018 - не будут включаться в файл Дт обороты которые были в
              кореспонденции со счетами овердрафтов - перенос на просрочку
              ( Дт 2203 (тип "SP","KSP") Кт 223(2233)
@@ -219,6 +226,7 @@ IS
    ret_     number;
    date_spr date := dat_next_u(dat_, 1);
    dat_izm1     date := to_date('26/12/2017','dd/mm/yyyy');
+   dat_izm2     date := to_date('31/12/2018','dd/mm/yyyy');
 --------------------------------------------------------------------------
    CURSOR scheta
    IS
@@ -879,6 +887,17 @@ BEGIN
                 END;
              END IF;
 
+             -- новый блок відбору в файл для 2203 і деяких OB22 (банківський продукт)  
+             if dat_ > dat_izm2 and nbs_ = '2203' and ob22_ in ('36','37','38','39','40','41','42','43','44','49','50','70','87','D0','D1')
+             then
+                if sdos_ - skos_ > 0 
+                then
+                   sdos_ := sdos_ - skos_;
+                else 
+                   sdos_ := 0;
+                end if;
+             end if;
+    
              -- если это не овердрафты и были дебетовые обороты
              IF nbs_ NOT IN
                        ('1500',
@@ -999,7 +1018,14 @@ BEGIN
                              WHERE FDAT = data_
                                AND accd=acc_
                                AND nlsk like poisk_
-                               AND acck in (select acc from acc_over where NVL (sos, 0) <> 1);
+                               AND acck in (select a.acc
+                                            from cc_deal cc,
+                                                 nd_acc n,
+                                                 accounts a 
+                                            where cc.vidd = 10
+                                              and n.nd = cc.nd
+                                              and n.acc = a.acc
+                                              and a.nbs in ('2600','2650'));
 
                              p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
 
@@ -3182,8 +3208,8 @@ BEGIN
                    END IF;
 
                    IF  (300465 IN (mfo_,mfou_) AND nbs_ = '2625' AND nls_ not like '8625%') OR
-                       (300465 IN (mfo_,mfou_) AND nbs_ = '2620' AND ob22_ = '36' and spcnt_ <> 0) OR                      
-                       (300465 IN (mfo_,mfou_) AND nbs_ = '2620' AND ob22_ <> '36') OR                      
+                       (300465 IN (mfo_,mfou_) AND nbs_ = '2620' AND ob22_ = '36' and spcnt_ <> 0) OR
+                       (300465 IN (mfo_,mfou_) AND nbs_ = '2620' AND ob22_ <> '36') OR
                        (300465 IN (mfo_,mfou_) AND nbs_ not in ('2620','2625')) OR
                        (mfou_ NOT IN (300465))
                    THEN
@@ -3626,24 +3652,24 @@ BEGIN
                AND a.recid = b.recid - 1
                AND a.odate = b.odate
                AND a.acc=s.acc
-               AND s.nbs = '2203' 
+               AND s.nbs = '2203'
                and s.tip in ('ISS','ISP')
              ORDER BY a.kodp)
     LOOP
 
          BEGIN
-            select OW.SUB_INT_RATE + OW.SUB_FEE_RATE 
+            select OW.SUB_INT_RATE + OW.SUB_FEE_RATE
                into cntr_
             from w4_acc_inst w4, ow_inst_totals ow
             where w4.acc = i.acc_
-              and w4.chain_idt = ow.chain_idt; 
+              and w4.chain_idt = ow.chain_idt;
          EXCEPTION WHEN NO_DATA_FOUND THEN
              cntr_ := 0;
          END;
 
          -- обновление процентной ставки
          -- в протоколе
-         if cntr_ <> 0 
+         if cntr_ <> 0
          then
             UPDATE RNBU_TRACE
                SET znap = Trim(TO_CHAR (ROUND (cntr_, 4), fmt_))
