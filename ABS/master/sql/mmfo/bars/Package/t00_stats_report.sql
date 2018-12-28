@@ -205,6 +205,12 @@ is
                       k_a as (select ref, s      from bars.arc_rrp a  
                              where kv = 980  and a.dk = 1
                                and ( mfoa = bars.gl.KF and fn_b like '$A%' and dat_b > p_bankdate - 5 and dat_b <=  p_bankdate + 2)
+                               union all
+                              -- есть такие документы, которые еще не отобраны в файлы
+                              select ref, s      from bars.arc_rrp a, rec_que r  
+                               where kv = 980 
+                                 and a.dk = 1 and r.rec = a.rec
+                                 and mfoa = bars.gl.KF and fn_b is null
                            ),
                       -- документы, которые прошли вне регламента
                       k_ot as (     select k_o.ref,  sum(s) over () s_total  
@@ -279,11 +285,14 @@ is
       l_kf varchar2(6) := sys_context('bars_context','user_mfo');
       l_t00_ost number;
       l_sum     number := 0;
+      l_fantomsum number := 0;
       l_cnt     number;
       l_id      number;
       l_trace   varchar2(1000) := G_TRACE||'get_outcome_balance: ';
       l_acc     number;
    begin
+
+      bars.bars_audit.info(l_trace||'старт населения информации по исходящему остатку');
 
      select count(1) into l_cnt 
      from t00_stats where kf = gl.kf and report_date = p_bankdate and stat_id in (select id from t00_stats_desc where stat_type like 'OST%');
@@ -296,6 +305,7 @@ is
        from saldoa s, accounts a 
       where a.tip = 'T00' and s.fdat = p_bankdate and a.kv = 980 and a.acc = s.acc; 
 
+      l_sum := 0;
       for c in (
                   --Начальный провод. Документ в rec_que, имя файла еще не присвоено
                   select 'OST_BLKOUT' type, sum(s) s, nvl( to_char(blk), 'пусто') blk
@@ -346,19 +356,29 @@ is
             
             
             
-             
+               bars.bars_audit.info(l_trace||'вставка для '||gl.kf||' суммы по коду блокировки=('||c.blk||'), сумма='||c.s);
+
                insert into  t00_stats (id, kf, report_date, stat_id, amount)
                values(s_t00_stats.nextval, gl.kf, p_bankdate, l_id, c.s);
                
                l_sum := l_sum + c.s;
+               bars.bars_audit.info(l_trace||'накопленная сумма'||l_sum);
         end loop;    
               
+
+
+
+        l_fantomsum := l_t00_ost - l_sum;
+        bars.bars_audit.info(l_trace||'вставка для '||gl.kf||' суми фантома = l_t00_ost - l_sum  = '||l_t00_ost||'-'||l_sum||'='||l_fantomsum);
+
         -- населенеи строки фантомных сумм
         select id into l_id from t00_stats_desc where stat_type = 'OST_OTHER';
         insert into  t00_stats (id, kf, report_date, stat_id, amount)
-        values(s_t00_stats.nextval, gl.kf, p_bankdate, l_id, l_t00_ost - l_sum);
+        values(s_t00_stats.nextval, gl.kf, p_bankdate, l_id, l_fantomsum);
 
-        
+   exception when others then
+       bars.bars_audit.error(l_trace||'ошибка вставки данных по исходящему остатку:' || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
+       raise;
    end;
    -----------------------------------------------------------------
    --    GET_T00_REPORT()

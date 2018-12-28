@@ -139,8 +139,10 @@ begin
   bars_metabase.add_column(l_tabid, 14, 'ID_KR',        'N', 'ид. в (кр.)'                 , ''  , null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 15, 'DESC_KR',      'C', 'Опис складових~кр. оборотів' , '5' , null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=OPER[CONDITIONS=>(OPER.REF in (select ref from T00_STATS_REFLIST where id= :ID_KR  ) ) ][ACCESSCODE=>1]', '', 0);
   bars_metabase.add_column(l_tabid, 16, 'S_KR',         'N', 'Сума'                        , ''  , null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9,  'DESC_IN',      'C', 'Вих.зал.~код блокування'     , '2' , null, 17 , 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'S_IN',         'N', 'Вих.зал.~cума'               , ''  , null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'OST',          'N', 'Вих.зал.'                    , ''  , null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '' , 0);
+  bars_metabase.add_column(l_tabid, 9,  'DESC_IN',      'C', 'Складові~вих.залишку'        , '2' , null, 18 , 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'S_IN',         'N', 'Сума'                        , ''  , null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '' , 0);
+
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

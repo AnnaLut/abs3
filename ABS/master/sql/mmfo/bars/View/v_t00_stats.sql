@@ -14,12 +14,13 @@ CREATE OR REPLACE FORCE VIEW BARS.V_T00_STATS AS
             s_db,
             id_kr,
             desc_kr,
-            s_kr
+            s_kr, 
+            DECODE (rn, 1, ostf - dos + kos, NULL) ost
        FROM (
        select ROW_NUMBER () OVER ( PARTITION BY NVL (t.report_date, t_in.fdat), NVL (t.kf, t_in.kf), NVL (t.acc, t_in.acc) ORDER BY NVL (t.n, t_in.n)) rn,                   
-              t.kf     ,
+              t.kf         ,
               t.report_date,
-              t.acc,
+              t.acc        ,
               t.nls,
               t.ostf,
               t.dos,
@@ -35,27 +36,14 @@ CREATE OR REPLACE FORCE VIEW BARS.V_T00_STATS AS
               t_in.amount s_in              
        from (WITH t_db AS (SELECT ROW_NUMBER () OVER (PARTITION BY kf, stat_type ORDER BY stat_type_id) n, t.* FROM v_t00_stats_plain t WHERE stat_type = 'DB'),
                   t_kr AS (SELECT ROW_NUMBER () OVER (PARTITION BY kf, stat_type ORDER BY stat_type_id) n, t.* FROM v_t00_stats_plain t WHERE stat_type = 'KR')
-                  --t_in AS (SELECT ROW_NUMBER () OVER (PARTITION BY kf            ORDER BY stat_id_desc) n, t.* FROM v_t00_stats_plain t WHERE stat_type LIKE 'OST_%')
-             SELECT /*ROW_NUMBER () OVER ( PARTITION BY NVL (t_db.fdat, t_in.fdat), NVL (t_db.kf, t_in.kf), NVL (t_db.acc, t_in.acc) ORDER BY NVL (t_db.n, t_in.n)) rn,
-                    NVL (t_db.fdat, t_in.fdat) fdat,
-                    NVL (t_db.kf, t_in.kf) kf,
-                    NVL (t_db.acc, t_in.acc) acc,
-                    NVL (t_db.nls, t_in.nls) nls,
-                    NVL (t_db.ostf, t_in.ostf) ostf,
-                    NVL (t_db.dos, t_in.dos) dos,
-                    NVL (t_db.kos, t_in.kos) kos,
-                    t_in.n,
-                    t_in.stat_id_desc desc_in,
-                    t_in.amount s_in,
-                    */
-                    nvl(t_db.n ,t_kr.n)  n,
+             SELECT nvl(t_db.n ,t_kr.n)  n,
                     nvl(t_db.kf,t_kr.kf) kf,
                     nvl(t_db.acc, t_kr.acc) acc,
                     nvl(t_db.nls, t_kr.nls) nls,
                     nvl(t_db.ostf, t_kr.ostf) ostf,
                     nvl(t_db.dos, t_kr.dos) dos,
                     nvl(t_db.kos, t_kr.kos) kos,
-                    t_db.report_date  report_date,
+                    nvl(t_db.report_date, t_kr.report_date)  report_date,
                     t_db.id id_db,
                     t_db.stat_id_desc desc_db,
                     t_db.amount s_db,
