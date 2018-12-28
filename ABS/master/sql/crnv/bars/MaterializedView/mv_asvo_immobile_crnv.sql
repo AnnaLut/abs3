@@ -2,11 +2,11 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/CRNV/BARS/MaterializedView/MV_ASVO_IMMOBILE_CRNV.sql =========*** Run **
 PROMPT =======================================================================================================
 begin
-  execute immediate 'drop materialized view MV_ASVO_IMMOBILE_CRNV';
-exception 
-    when others then
-        if sqlcode = -12003 then null; else raise; end if;
-end;
+ execute immediate 'drop materialized view MV_ASVO_IMMOBILE_CRNV';
+exception
+  when others then 
+    if sqlcode = -12003 then null; else raise; end if;
+end; 
 /
 
 begin
@@ -14,8 +14,8 @@ begin
 create materialized view MV_ASVO_IMMOBILE_CRNV
 partition by hash(mfo)
 partitions 26
-build deferred
-refresh fast on commit
+build immediate
+refresh fast on demand
 with rowid
 as
 select m.ND, m.BRANCH, m.DEPVIDNAME, m.NLS, m.KV, m.SOURCE, m.IDCODE, m.FIO, m.OST/100 as OST,
