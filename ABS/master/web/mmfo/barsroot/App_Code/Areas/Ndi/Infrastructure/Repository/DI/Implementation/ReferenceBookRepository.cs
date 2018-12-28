@@ -2594,8 +2594,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             {
                 getCustomFiltersSqlString = "select * from DYN_FILTER where USERID = :p_userId  and TABID = :p_tabid";
                 parameters = new object[] {
-                   pTableId,
-                   new OracleParameter("p_userId", OracleDbType.Decimal).Value = userId
+                     new OracleParameter("p_userId", OracleDbType.Decimal).Value = userId,
+                   pTableId
                };
             }
             else
