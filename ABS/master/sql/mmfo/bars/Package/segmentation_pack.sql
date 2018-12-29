@@ -222,7 +222,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.SEGMENTATION_PACK IS
           WHEN '14' THEN
             -- Страхування життя (Кеш)
             bars.attribute_utl.set_value(l_rnk, 'CUSTOMER_PRDCT_AMNT_INSURANCE_CASH', udf_to_number(l_pt));
-        END CASE;
+		  /*добавление новых атрибутов в сегмент клиента по заявке COBUMMFO-7126 */
+          WHEN '15' THEN
+            --БПК преміальний           
+            bars.attribute_utl.set_value(l_rnk, 'CUSTOMER_PRDCT_AMNT_CARD_CREDIT_PRIME', udf_to_number(l_pt));       
+          WHEN '16' THEN
+            --Мобільні заощадження 
+            bars.attribute_utl.set_value(l_rnk, 'MOBILE_SAVING',udf_to_number(l_pt)); 
+          WHEN '17' THEN
+            --Ощад 24/7 (інформац.активний) 
+            bars.attribute_utl.set_value(l_rnk, 'OSHAD_ACTIVE',udf_to_number(l_pt));    
+          END CASE;	
 
       EXCEPTION
         WHEN no_data_found THEN

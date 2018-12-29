@@ -113,7 +113,7 @@
                                 <asp:TextBox ID="CSP_DATE_START" runat="server"  Enabled="false"
                                     TabIndex="2" CssClass="InfoText40" Style="margin-left: 20px" Width="100px" />
                             </td>
-                            <td>
+                             <td>
                                 <a href='#' onclick='frameCustCapacity();return false;'>>>>></a>
                             </td>
                         </tr>
@@ -135,7 +135,7 @@
 
                         </tr>
 		                <tr>
-                            <td runat="server">Кіл-ть операцій зняття готівки в АТМ
+                            <td runat="server">Кіл-ть безготівкових операцій в АТМ
                             </td>
                             <td>
                                 <asp:TextBox ID="CUSTOMER_SEGMENT_ATM" runat="server" Enabled="false"
