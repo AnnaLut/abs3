@@ -52,8 +52,12 @@ function functionName(func) {
 }
 
 function createLinkTemplate(fieldName, parameter, clickFunction) {
+    var resultTempateString = "";
+    if (parameter != null && parameter != "") {
+        resultTempateString = '<a href="#" onclick="' + functionName(clickFunction) + '(\'' + parameter + '\')" style="color: blue">' + fieldName + '</a>';
+    }
     //here clickFunction parameter is passed like reference to function, while we need only name
-    return '<a href="#" onclick="' + functionName(clickFunction) + '(\'' + parameter + '\')" style="color: blue">' + fieldName + '</a>';
+    return resultTempateString;
 }
 
 function makeAutofitColumnWidth(grid) {
