@@ -26,7 +26,7 @@ namespace clientregister
         {
             fillFields();
         }
-        public VCustomerSegmentsCapacityRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? RNK, Decimal? PRODUCT_AMOUNT, Decimal? DEPOSIT_AMOUNT, Decimal? CREDITS_AMOUNT, Decimal? CARDCREDITS_AMOUNT, Decimal? GARANT_CREDITS_AMOUNT, Decimal? ENERGYCREDITS_AMOUNT, Decimal? CARDS_AMOUNT, Decimal? ACCOUNTS_AMOUNT, Decimal? INDIVIDUAL_SAFES_AMOUNT, Decimal? CASHLOANS_AMOUNT, Decimal? BPK_CREDITLINE_AMOUNT, Decimal? INSURANCE_AVTOCIVILKA_AMOUNT, Decimal? INSURANCE_AVTOCIVILKAPLUS_AMOUNT, Decimal? INSURANCE_OBERIG_AMOUNT, Decimal? INSURANCE_CASH_AMOUNT)
+        public VCustomerSegmentsCapacityRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? RNK, Decimal? PRODUCT_AMOUNT, Decimal? DEPOSIT_AMOUNT,Decimal? CREDITS_AMOUNT, Decimal? CARDCREDITS_AMOUNT, Decimal? GARANT_CREDITS_AMOUNT, Decimal? ENERGYCREDITS_AMOUNT, Decimal? CARDS_AMOUNT, Decimal? ACCOUNTS_AMOUNT, Decimal? INDIVIDUAL_SAFES_AMOUNT, Decimal? CASHLOANS_AMOUNT, Decimal? BPK_CREDITLINE_AMOUNT, Decimal? INSURANCE_AVTOCIVILKA_AMOUNT, Decimal? INSURANCE_AVTOCIVILKAPLUS_AMOUNT, Decimal? INSURANCE_OBERIG_AMOUNT, Decimal? INSURANCE_CASH_AMOUNT, Decimal? CARD_CREDIT_PRIME, Decimal? MOBILE_SAVING, Decimal? OSHAD_ACTIVE)
             : this(Parent)
         {
             this.RNK = RNK;
@@ -45,6 +45,9 @@ namespace clientregister
             this.INSURANCE_AVTOCIVILKAPLUS_AMOUNT = INSURANCE_AVTOCIVILKAPLUS_AMOUNT;
             this.INSURANCE_OBERIG_AMOUNT = INSURANCE_OBERIG_AMOUNT;
             this.INSURANCE_CASH_AMOUNT = INSURANCE_CASH_AMOUNT;
+            this.CARD_CREDIT_PRIME = CARD_CREDIT_PRIME;
+            this.MOBILE_SAVING = MOBILE_SAVING;
+            this.OSHAD_ACTIVE = OSHAD_ACTIVE;
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
             this.ClearChanges();
@@ -67,6 +70,10 @@ namespace clientregister
             Fields.Add(new BbField("INSURANCE_AVTOCIVILKAPLUS_AMNT", OracleDbType.Decimal, true, false, false, false, false, "V_CUSTOMER_SEGMENTS_CAPACITY", ObjectTypes.View, "", ""));
             Fields.Add(new BbField("INSURANCE_OBERIG_AMOUNT", OracleDbType.Decimal, true, false, false, false, false, "V_CUSTOMER_SEGMENTS_CAPACITY", ObjectTypes.View, "", ""));
             Fields.Add(new BbField("INSURANCE_CASH_AMOUNT", OracleDbType.Decimal, true, false, false, false, false, "V_CUSTOMER_SEGMENTS_CAPACITY", ObjectTypes.View, "", ""));
+            Fields.Add(new BbField("CARD_CREDIT_PRIME", OracleDbType.Decimal, true, false, false, false, false, "V_CUSTOMER_SEGMENTS_CAPACITY", ObjectTypes.View, "", ""));
+            Fields.Add(new BbField("MOBILE_SAVING", OracleDbType.Decimal, true, false, false, false, false, "V_CUSTOMER_SEGMENTS_CAPACITY", ObjectTypes.View, "", ""));
+            Fields.Add(new BbField("OSHAD_ACTIVE", OracleDbType.Decimal, true, false, false, false, false, "V_CUSTOMER_SEGMENTS_CAPACITY", ObjectTypes.View, "", ""));
+            
         }
         public Decimal? RNK { get { return (Decimal?)FindField("RNK").Value; } set {SetField("RNK", value);} }
         public Decimal? PRODUCT_AMOUNT { get { return (Decimal?)FindField("PRODUCT_AMOUNT").Value; } set {SetField("PRODUCT_AMOUNT", value);} }
@@ -84,6 +91,9 @@ namespace clientregister
         public Decimal? INSURANCE_AVTOCIVILKAPLUS_AMOUNT { get { return (Decimal?)FindField("INSURANCE_AVTOCIVILKAPLUS_AMNT").Value; } set { SetField("INSURANCE_AVTOCIVILKAPLUS_AMNT", value); } }
         public Decimal? INSURANCE_OBERIG_AMOUNT { get { return (Decimal?)FindField("INSURANCE_OBERIG_AMOUNT").Value; } set { SetField("INSURANCE_OBERIG_AMOUNT", value); } }
         public Decimal? INSURANCE_CASH_AMOUNT { get { return (Decimal?)FindField("INSURANCE_CASH_AMOUNT").Value; } set { SetField("INSURANCE_CASH_AMOUNT", value); } }
+        public Decimal? CARD_CREDIT_PRIME { get { return (Decimal?)FindField("CARD_CREDIT_PRIME").Value; } set { SetField("CARD_CREDIT_PRIME", value); } }
+        public Decimal? MOBILE_SAVING { get { return (Decimal?)FindField("MOBILE_SAVING").Value; } set { SetField("MOBILE_SAVING", value); } }
+        public Decimal? OSHAD_ACTIVE { get { return (Decimal?)FindField("OSHAD_ACTIVE").Value; } set { SetField("OSHAD_ACTIVE", value); } }
     }
 
     public sealed class VCustomerSegmentsCapacityFilters : BbFilters
@@ -106,6 +116,9 @@ namespace clientregister
             INSURANCE_AVTOCIVILKAPLUS_AMOUNT = new BBDecimalFilter(this, "INSURANCE_AVTOCIVILKAPLUS_AMNT");
             INSURANCE_OBERIG_AMOUNT = new BBDecimalFilter(this, "INSURANCE_OBERIG_AMOUNT");
             INSURANCE_CASH_AMOUNT = new BBDecimalFilter(this, "INSURANCE_CASH_AMOUNT");
+            CARD_CREDIT_PRIME = new BBDecimalFilter(this, "CARD_CREDIT_PRIME");
+            MOBILE_SAVING = new BBDecimalFilter(this, "MOBILE_SAVING");
+            OSHAD_ACTIVE = new BBDecimalFilter(this, "OSHAD_ACTIVE");
         }
         public BBDecimalFilter RNK;
         public BBDecimalFilter PRODUCT_AMOUNT;
@@ -123,6 +136,10 @@ namespace clientregister
         public BBDecimalFilter INSURANCE_AVTOCIVILKAPLUS_AMOUNT;
         public BBDecimalFilter INSURANCE_OBERIG_AMOUNT;
         public BBDecimalFilter INSURANCE_CASH_AMOUNT;
+        public BBDecimalFilter CARD_CREDIT_PRIME;
+        public BBDecimalFilter MOBILE_SAVING;
+        public BBDecimalFilter OSHAD_ACTIVE;
+        
     }
 
     public partial class VCustomerSegmentsCapacity : BbTable<VCustomerSegmentsCapacityRecord, VCustomerSegmentsCapacityFilters>
@@ -150,25 +167,28 @@ namespace clientregister
                     rdr = ExecuteReader(Item);
                     while (rdr.Read())
                     {
-                        res.Add(new VCustomerSegmentsCapacityRecord(this,
-                        rdr.IsDBNull(0) ? OracleDecimal.Null : rdr.GetOracleDecimal(0),
-                        rdr.IsDBNull(1) ?  (Decimal?)null : Convert.ToDecimal(rdr[1]), 
-                        rdr.IsDBNull(2) ?  (Decimal?)null : Convert.ToDecimal(rdr[2]), 
-                        rdr.IsDBNull(3) ?  (Decimal?)null : Convert.ToDecimal(rdr[3]), 
-                        rdr.IsDBNull(4) ?  (Decimal?)null : Convert.ToDecimal(rdr[4]), 
-                        rdr.IsDBNull(5) ?  (Decimal?)null : Convert.ToDecimal(rdr[5]), 
-                        rdr.IsDBNull(6) ?  (Decimal?)null : Convert.ToDecimal(rdr[6]), 
-                        rdr.IsDBNull(7) ?  (Decimal?)null : Convert.ToDecimal(rdr[7]), 
-                        rdr.IsDBNull(8) ?  (Decimal?)null : Convert.ToDecimal(rdr[8]), 
-                        rdr.IsDBNull(9) ?  (Decimal?)null : Convert.ToDecimal(rdr[9]), 
-                        rdr.IsDBNull(10) ? (Decimal?)null : Convert.ToDecimal(rdr[10]), 
-                        rdr.IsDBNull(11) ? (Decimal?)null : Convert.ToDecimal(rdr[11]),
-                        rdr.IsDBNull(12) ? (Decimal?)null : Convert.ToDecimal(rdr[12]),
-                        rdr.IsDBNull(13) ? (Decimal?)null : Convert.ToDecimal(rdr[13]),
-                        rdr.IsDBNull(14) ? (Decimal?)null : Convert.ToDecimal(rdr[14]),
-                        rdr.IsDBNull(15) ? (Decimal?)null : Convert.ToDecimal(rdr[15]),
-                        rdr.IsDBNull(16) ? (Decimal?)null : Convert.ToDecimal(rdr[16]))
-                        );
+                         res.Add(new VCustomerSegmentsCapacityRecord(this,
+                         rdr.IsDBNull(0) ? OracleDecimal.Null : rdr.GetOracleDecimal(0),
+                         rdr.IsDBNull(1) ?  (Decimal?)null : Convert.ToDecimal(rdr[1]), 
+                         rdr.IsDBNull(2) ?  (Decimal?)null : Convert.ToDecimal(rdr[2]), 
+                         rdr.IsDBNull(3) ?  (Decimal?)null : Convert.ToDecimal(rdr[3]), 
+                         rdr.IsDBNull(4) ?  (Decimal?)null : Convert.ToDecimal(rdr[4]), 
+                         rdr.IsDBNull(5) ?  (Decimal?)null : Convert.ToDecimal(rdr[5]), 
+                         rdr.IsDBNull(6) ?  (Decimal?)null : Convert.ToDecimal(rdr[6]), 
+                         rdr.IsDBNull(7) ?  (Decimal?)null : Convert.ToDecimal(rdr[7]), 
+                         rdr.IsDBNull(8) ?  (Decimal?)null : Convert.ToDecimal(rdr[8]), 
+                         rdr.IsDBNull(9) ?  (Decimal?)null : Convert.ToDecimal(rdr[9]), 
+                         rdr.IsDBNull(10) ? (Decimal?)null : Convert.ToDecimal(rdr[10]), 
+                         rdr.IsDBNull(11) ? (Decimal?)null : Convert.ToDecimal(rdr[11]),
+                         rdr.IsDBNull(12) ? (Decimal?)null : Convert.ToDecimal(rdr[12]),
+                         rdr.IsDBNull(13) ? (Decimal?)null : Convert.ToDecimal(rdr[13]),
+                         rdr.IsDBNull(14) ? (Decimal?)null : Convert.ToDecimal(rdr[14]),
+                         rdr.IsDBNull(15) ? (Decimal?)null : Convert.ToDecimal(rdr[15]),
+                         rdr.IsDBNull(16) ? (Decimal?)null : Convert.ToDecimal(rdr[16]),
+                         rdr.IsDBNull(17) ? (Decimal?)null : Convert.ToDecimal(rdr[17]),
+                         rdr.IsDBNull(18) ? (Decimal?)null : Convert.ToDecimal(rdr[18]),
+                         rdr.IsDBNull(19) ? (Decimal?)null : Convert.ToDecimal(rdr[19]))
+                         );
                     }
                 }
                 finally

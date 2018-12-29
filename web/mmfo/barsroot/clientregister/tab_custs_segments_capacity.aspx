@@ -124,10 +124,10 @@
                             </td>
                         </tr>
                         <tr>
-                            <td runat="server"><a href="#" onclick="redirectToMainFrame('/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.portfolio'); return false;">БПК</a>
+                            <td runat="server"><a href="#" onclick="redirectToMainFrame('/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.portfolio'); return false;">БПК не преміальна</a>
                             </td>
                             <td>
-                                <asp:TextBox ID="CARDS_AMOUNT" runat="server" MaxLength="15" Enabled="false" TabIndex="1" ToolTip="БПК" CssClass="auto-style1"/>
+                                <asp:TextBox ID="CARDS_AMOUNT" runat="server" MaxLength="15" Enabled="false" TabIndex="1" ToolTip="БПК не преміальна" CssClass="auto-style1"/>
                             </td>
                         </tr>
                         <tr>
@@ -172,6 +172,28 @@
                                 <asp:TextBox ID="INSURANCE_CASH_AMOUNT" runat="server" MaxLength="15" Enabled="False" TabIndex="1" ToolTip="Страхування життя (Кеш)»" CssClass="auto-style1"/>
                             </td>
                         </tr>
+                        <tr>
+                            <td runat="server"><a href="#" onclick="redirectToMainFrame('/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.portfolio'); return false;">БПК Преміальна</a>
+                            </td>
+                            <td>
+                                <asp:TextBox ID="CARD_CREDIT_PRIME" runat="server" Maxlength="15" Enabled="false" TabIndex="1" ToolTip="БПК Преміальна" CssClass="auto-style1"/>
+                           </td>      
+                       </tr>
+                        <tr>
+                            <td runat="server"><a href="#" onclick="redirectToMainFrame('/barsroot/clientproducts/dptclientsearch.aspx'); return false;">Мобільні заощадження</a>
+                            </td>
+                            <td>
+                                <asp:TextBox ID="MOBILE_SAVING" runat="server" Maxlength="15" Enabled="false" TabIndex="1" ToolTip="Мобільні заощадження" CssClass="auto-style1"/>
+                           </td>      
+                       </tr>
+                         <tr>
+                            <%--<td runat="server"><a href="https://oschadbank.ewa.ua/#/contracts" target="_blank">Ощад 24/7 (інформац.активний)</a>--%>
+                                <td runat="server"> <a>Ощад 24/7 (інформаційно активний)</a>
+                            </td>
+                            <td>
+                                <asp:TextBox ID="OSHAD_ACTIVE" runat="server" Maxlength="15" Enabled="false" TabIndex="1" ToolTip="Ощад 24/7 (інформаційно активний)" CssClass="auto-style1"/>
+                           </td> 
+                       </tr>
                     </table>
                 </asp:Panel>
             </td>

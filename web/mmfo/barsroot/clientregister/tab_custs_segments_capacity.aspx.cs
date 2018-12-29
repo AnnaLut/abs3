@@ -45,6 +45,9 @@ public partial class clientregister_tab_custs_segments_capacity : System.Web.UI.
             INSURANCE_AVTOCIVILKAPLUS_AMOUNT.Text = datarecord.INSURANCE_AVTOCIVILKAPLUS_AMOUNT.ToString();
             INSURANCE_OBERIG_AMOUNT.Text = datarecord.INSURANCE_OBERIG_AMOUNT.ToString();
             INSURANCE_CASH_AMOUNT.Text = datarecord.INSURANCE_CASH_AMOUNT.ToString();
+            CARD_CREDIT_PRIME.Text = datarecord.CARD_CREDIT_PRIME.ToString();
+            MOBILE_SAVING.Text = datarecord.MOBILE_SAVING.ToString();
+            OSHAD_ACTIVE.Text = datarecord.OSHAD_ACTIVE.ToString();
         }
         else
         {
@@ -63,6 +66,9 @@ public partial class clientregister_tab_custs_segments_capacity : System.Web.UI.
             INSURANCE_AVTOCIVILKAPLUS_AMOUNT.Text = "";
             INSURANCE_OBERIG_AMOUNT.Text = "";
             INSURANCE_CASH_AMOUNT.Text = "";
+            CARD_CREDIT_PRIME.Text = "";
+            MOBILE_SAVING.Text="";
+            OSHAD_ACTIVE.Text = "";
         }
 
    }
