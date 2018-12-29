@@ -11,6 +11,7 @@ using Kendo.Mvc.UI;
 using Kendo.Mvc.Extensions;
 using BarsWeb.Areas.Forex.Infrastructure.DI.Abstract;
 using Kendo.Mvc;
+using Areas.Swift.Models;
 
 namespace BarsWeb.Areas.Swift.Controllers
 {
@@ -40,7 +41,7 @@ namespace BarsWeb.Areas.Swift.Controllers
                 {
                     DateTime bankDate = _repoForBankDate.GetBankDate();
                     TimeSpan fiveDaysSpan = new TimeSpan(5, 0, 0, 0);
-                    request.Filters.Add(new FilterDescriptor("DateIn", FilterOperator.IsGreaterThanOrEqualTo, bankDate.Subtract(fiveDaysSpan)));
+                    request.Filters.Add(new FilterDescriptor("VDate", FilterOperator.IsGreaterThanOrEqualTo, bankDate.Subtract(fiveDaysSpan)));
                 }
 
                 if (request.Filters != null && request.Filters.Count > 0)
@@ -49,8 +50,20 @@ namespace BarsWeb.Areas.Swift.Controllers
                     request.Filters = transformedFilters;
                 }
 
-                var dataList = _repo.GetMTGridItems();
-                return Json(dataList.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+                //var dataList = _repo.GetMTGridItems();
+
+                Core.Models.DataSourceRequest coreRequest = new Core.Models.DataSourceRequest();
+                coreRequest.Page = request.Page;
+                coreRequest.PageSize = request.PageSize;
+                coreRequest.Sorts = request.Sorts;
+                coreRequest.Filters = request.Filters;
+                coreRequest.Aggregates = request.Aggregates;
+                coreRequest.Groups = request.Groups;
+
+                var sql = SqlCreatorGPIMessages.GetGPIMessagesList();
+                var dataList = _repo.GetMTGridItemsFast<SwiftGPIStatuses>(coreRequest, sql);
+                var dataCount = _repo.CountGlobal(coreRequest, sql);
+                return Json(new { Data = dataList, Total = dataCount }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {

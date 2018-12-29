@@ -63,11 +63,12 @@ namespace BarsWeb.Areas.Swift.Infrastructure.DI.Implementation
         public List<SwiftGPIStatuses> GetMTGridItems()
         {
             List<SwiftGPIStatuses> dataList = new List<SwiftGPIStatuses>();
-            using (OracleConnection conn = OraConnector.Handler.IOraConnection.GetUserConnection())
-            {
-                using (OracleCommand command = conn.CreateCommand())
+
+                using (OracleConnection conn = OraConnector.Handler.IOraConnection.GetUserConnection())
                 {
-                    command.CommandText = @"Select 
+                    using (OracleCommand command = conn.CreateCommand())
+                    {
+                        command.CommandText = @"Select 
                                 Ref, 
                                 MT103, 
                                 io_ind_103 as InputOutputInd103,
@@ -87,47 +88,83 @@ namespace BarsWeb.Areas.Swift.Infrastructure.DI.Implementation
                                 status_code as Status,
                                 status_description as StatusDescription
                                     from v_sw_gpi_statuses";
-                    command.CommandType = System.Data.CommandType.Text;
+                        command.CommandType = System.Data.CommandType.Text;
 
-                    using (OracleDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        using (OracleDataReader reader = command.ExecuteReader())
                         {
-                            SwiftGPIStatuses row = new SwiftGPIStatuses();
-                            row.Ref = Convert.ToInt64(reader["Ref"].ToString());
-                            row.MT103 = Convert.ToInt64(reader["MT103"].ToString());
-                            row.InputOutputInd103 = reader["InputOutputInd103"].ToString();
-                            row.SWRef = Convert.ToInt64(reader["SWRef"].ToString());
-                            if (reader["DateIn"].ToString() != null)
+                            while (reader.Read())
                             {
-                                row.DateIn = Convert.ToDateTime(reader["DateIn"].ToString());
-                            }
-                            if (reader["VDate"].ToString() != null)
-                            {
-                                row.VDate = Convert.ToDateTime(reader["VDate"].ToString());
-                            }
-                            if (reader["DateOut"].ToString() != null)
-                            {
-                                row.DateOut = Convert.ToDateTime(reader["DateOut"].ToString());
-                            }
-                            row.SenderCode = reader["SenderCode"].ToString();
-                            row.SenderAccount = reader["SenderAccount"].ToString();
-                            row.ReceiverCode = reader["ReceiverCode"].ToString();
-                            row.Payer = reader["Payer"].ToString();
-                            row.Payee = reader["Payee"].ToString();
-                            row.Summ = Convert.ToDecimal(reader["Summ"].ToString());
-                            row.Currency = reader["Currency"].ToString();
-                            row.STI = reader["STI"].ToString();
-                            row.UETR = reader["UETR"].ToString();
-                            row.Status = reader["Status"].ToString();
-                            row.StatusDescription = reader["StatusDescription"].ToString();
+                                SwiftGPIStatuses row = new SwiftGPIStatuses();
+                                if (!String.IsNullOrEmpty(reader["Ref"].ToString()))
+                                {
+                                    row.Ref = Convert.ToInt64(reader["Ref"].ToString());
+                                }
 
-                            dataList.Add(row);
+                                row.MT103 = Convert.ToInt64(reader["MT103"].ToString());
+
+                                row.InputOutputInd103 = reader["InputOutputInd103"].ToString();
+                                if (!String.IsNullOrEmpty(reader["SWRef"].ToString()))
+                                {
+                                    row.SWRef = Convert.ToInt64(reader["SWRef"].ToString());
+                                }
+                                if (!String.IsNullOrEmpty(reader["DateIn"].ToString()))
+                                {
+                                    row.DateIn = Convert.ToDateTime(reader["DateIn"].ToString());
+                                }
+                                if (!String.IsNullOrEmpty(reader["VDate"].ToString()))
+                                {
+                                    row.VDate = Convert.ToDateTime(reader["VDate"].ToString());
+                                }
+                                if (!String.IsNullOrEmpty(reader["DateOut"].ToString()))
+                                {
+                                    row.DateOut = Convert.ToDateTime(reader["DateOut"].ToString());
+                                }
+                                row.SenderCode = reader["SenderCode"].ToString();
+                                if (reader["SenderAccount"] != null)
+                                {
+                                    row.SenderAccount = reader["SenderAccount"].ToString();
+                                }
+                                row.ReceiverCode = reader["ReceiverCode"].ToString();
+                                if (reader["Payer"] != null)
+                                {
+                                    row.Payer = reader["Payer"].ToString();
+                                }
+                                if (reader["Payee"] != null)
+                                {
+                                    row.Payee = reader["Payee"].ToString();
+                                }
+                                row.Summ = Convert.ToDecimal(reader["Summ"].ToString());
+                                row.Currency = reader["Currency"].ToString();
+                                if (reader["STI"] != null)
+                                {
+                                    row.STI = reader["STI"].ToString();
+                                }
+                                if (reader["UETR"] != null)
+                                {
+                                    row.UETR = reader["UETR"].ToString();
+                                }
+                                if (reader["Status"] != null)
+                                {
+                                    row.Status = reader["Status"].ToString();
+                                }
+                                if (reader["StatusDescription"] != null)
+                                {
+                                    row.StatusDescription = reader["StatusDescription"].ToString();
+                                }
+
+                                dataList.Add(row);
+                            }
                         }
                     }
                 }
-            }
             return dataList;
+        }
+
+        public IEnumerable<T> GetMTGridItemsFast<T>(DataSourceRequest request, BarsSql mtQuery)
+        {
+            BarsSql query = _sqlTransformer.TransformSql(mtQuery, request);
+            var item = _swift.ExecuteStoreQuery<T>(query.SqlText, query.SqlParams);
+            return item;
         }
 
         public List<SwiftGPIStatusesMT199> GetMT199GridItems(string uetr)

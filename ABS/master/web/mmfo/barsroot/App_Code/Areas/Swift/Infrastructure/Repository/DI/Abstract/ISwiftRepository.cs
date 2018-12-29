@@ -14,6 +14,7 @@ namespace BarsWeb.Areas.Swift.Infrastructure.DI.Abstract
         int ExecuteStoreCommand(string commandText, params object[] parameters);
         Params GetParam(string id);
         List<SwiftGPIStatuses> GetMTGridItems();
+        IEnumerable<T> GetMTGridItemsFast<T>(DataSourceRequest request, BarsSql mtQuery);
         List<SwiftGPIStatusesMT199> GetMT199GridItems(string uetr);
     }
 }
