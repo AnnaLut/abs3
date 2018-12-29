@@ -30,7 +30,9 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
                     condition = condition.Insert(condition.Length, " and dbcode = crkr_compen_web.f_dbcode('" + model.doctype + "', '" + model.docserial + "', '" + model.docnumber + "')");
 
                 if (!string.IsNullOrEmpty(model.fio))
+                {
                     condition = condition.Insert(condition.Length, " and (l_fio like lower('" + model.fio + "%'))");
+                }
 
                 if (!string.IsNullOrEmpty(model.branch))
                     condition = condition.Insert(condition.Length, " and ( branch like '" + model.branch + "%')");
@@ -79,8 +81,8 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
         public List<CrcaProfile> GetProfiles(CrkrBag model, [DataSourceRequest] DataSourceRequest request)
         {
             //check what input param
-            if (!string.IsNullOrEmpty(model.fio) && model.fio.Contains("%"))
-                throw new Exception("Неможливо здійснити пошук для %. Введіть ПІБ вкладу.");
+            if (!String.IsNullOrEmpty (model.fio) && model.fio.Trim(new char[]{' '}) == "%")
+                throw new Exception("Неможливо здійснити пошук лише для %. Введіть ПІБ вкладу або частину данних з % чи _ символами.");
             if (!string.IsNullOrEmpty(model.branch) && model.branch[0].ToString() != "/")
                 model.branch = "/" + model.branch;
             if (!string.IsNullOrEmpty(model.fio) && model.fio.Contains("'"))
