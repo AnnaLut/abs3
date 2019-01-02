@@ -1,6 +1,6 @@
 
 delete from nbur_ref_sel_trans
- where file_id =33551 ;                 --#3M(3MX)
+ where file_id =33551;
 
 insert into nbur_ref_sel_trans
          ( FILE_ID, KV, TT, MFO, COMM, PR_DEL, 
@@ -11,7 +11,7 @@ insert into nbur_ref_sel_trans
                    ACC_NUM_CR, OB22_CR, ACC_TYPE_CR 
  from nbur_ref_sel_trans
    where file_id =16757
-     and (pr_del is null or pr_del !=1) ;
+     and (pr_del is null or pr_del !=1);
                                              
 insert into nbur_ref_sel_trans
          ( FILE_ID, KV, TT, MFO, COMM, PR_DEL, 
