@@ -47,13 +47,13 @@ show errors;
 
 ----------------------------------------------------------------------------------------------------
 
-create or replace package body NBUR_XML
+CREATE OR REPLACE package body BARS.NBUR_XML
 is
 
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 3.5  2018.12.05';
+  g_body_version  constant varchar2(64) := 'version 3.6  2018.12.27';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -753,8 +753,11 @@ $end
     l_rpt_code := NBUR_FILES.GET_FILE_CODE_ALT( p_file_id );
     l_period_type := nbur_files.GET_FILE_PERIOD_TYPE(p_file_id);
 
+    --для 2GX дата отчетости НБУ совпалает с датой АБС
+    if l_rpt_code ='2G' then
+      l_rpt_dt := p_rpt_dt;
     --Если месячный файл, то берем первый день календарного месяца
-    if (l_period_type = 'M') then
+    elsif (l_period_type = 'M') then
       l_rpt_dt := last_day( p_rpt_dt ) + 1;
     -- якщо декадна дата, то перший календарний день після закінчення декади 
     elsif (l_period_type = 'T') then
