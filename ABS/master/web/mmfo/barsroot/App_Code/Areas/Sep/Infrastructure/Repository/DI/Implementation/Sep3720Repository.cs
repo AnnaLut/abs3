@@ -370,7 +370,7 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Implementation
 
         public decimal SumT902Docs3720()
         {
-            string sql = @"SELECT SUM (s/100)
+            string sql = @"SELECT  nvl(SUM (s/100),0)
                               FROM opldok
                              WHERE     REF IN (SELECT REF FROM t902)
                                    AND acc IN (SELECT acc
