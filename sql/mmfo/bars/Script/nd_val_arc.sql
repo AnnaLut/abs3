@@ -8,12 +8,12 @@ BEGIN
        end; 
          '; 
    BEGIN 
-      execute immediate 'create table nd_val_arc as select * from nd_val where fdat < to_date(''01-01-2019'',''dd-mm-yyyy'')';
+      execute immediate 'create table nd_val_arc as select * from nd_val';
    exception when others then
       -- ORA-00955: name is already used by an existing object
       if SQLCODE = -00955 then null;   else raise; end if;
    end;
-   execute immediate 'delete from ND_VAL where fdat < to_date(''01-01-2019'',''dd-mm-yyyy'')';
+   execute immediate 'truncate table ND_VAL';
    commit;
 END; 
 /
