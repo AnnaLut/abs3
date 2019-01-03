@@ -21,9 +21,9 @@ where not exists (
                      and m.norm_NLS      = s.norm_NLS
                      and m.ID            = s.norm_ID
                   )
-  and s.branch like sys_context('BARS_CONTEXT','USER_BRANCH_MASK')
-  and s.mfo = sys_context('BARS_CONTEXT','USER_MFO')
-  and sys_context('BARS_CONTEXT','USER_MFO') is not null
+  and s.branch like f_user_branch_mask
+  and s.mfo = f_user_mfo
+  and f_user_mfo is not null
   and s.fl in (3, -2, 0, 5 , 1)
 union all
 select s.ND, s.BRANCH, s.DEPVIDNAME, s.NLS, s.KV, s.SOURCE, s.IDCODE,  s.FIO, s.OST
@@ -39,8 +39,8 @@ where not exists (
                      and m.norm_NLS      = s.norm_NLS
                      and m.ID            = s.norm_ID
                   )
-  and sys_context('BARS_CONTEXT','USER_MFO') is null
-  and sys_context('BARS_CONTEXT','USER_BRANCH_MASK') = '/%'
+  and f_user_mfo is null
+  and f_user_branch_mask = '/%'
   and s.fl in (3, -2, 0, 5 , 1)
 ;
 
