@@ -21,10 +21,9 @@ where not exists(
                     and m.norm_NLS      = s.norm_NLS
                     and m.ID            = s.norm_ID
                  )
-  and m.branch like sys_context('BARS_CONTEXT','USER_BRANCH_MASK')
-  and m.mfo = sys_context('BARS_CONTEXT','USER_MFO')
-  and sys_context('BARS_CONTEXT','USER_MFO') is not null
-
+  and m.branch like f_user_branch_mask
+  and m.mfo = f_user_mfo
+  and f_user_mfo is not null
 union all
 select m.ND, m.BRANCH, m.DEPVIDNAME, m.NLS, m.KV, m.SOURCE, m.IDCODE,  m.FIO, m.OST
 from mv_asvo_immobile_crnv m
@@ -39,8 +38,8 @@ where not exists(
                     and m.norm_NLS      = s.norm_NLS
                     and m.ID            = s.norm_ID
                  )
-  and sys_context('BARS_CONTEXT','USER_MFO') is null
-  and sys_context('BARS_CONTEXT','USER_BRANCH_MASK') = '/%'
+  and f_user_mfo is null
+  and f_user_branch_mask = '/%'
 ;
 
 
