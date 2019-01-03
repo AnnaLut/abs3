@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/ND_VAL.sql =========*** Run *** ======
 PROMPT ===================================================================================== 
@@ -11,13 +9,14 @@ PROMPT *** ALTER_POLICY_INFO to ND_VAL ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''ND_VAL'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''ND_VAL'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''ND_VAL'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''ND_VAL'', ''WHOLE''  , null, null, null, null);
                null;
            end; 
           '; 
 END; 
 /
+
 
 PROMPT *** Create  table ND_VAL ***
 begin 
@@ -43,9 +42,6 @@ exception when others then
 end; 
 /
 
-
-
-
 PROMPT *** ALTER_POLICIES to ND_VAL ***
  exec bpa.alter_policies('ND_VAL');
 
@@ -63,22 +59,25 @@ COMMENT ON COLUMN BARS.ND_VAL.ISTVAL IS 'Источник валютной выручки';
 COMMENT ON COLUMN BARS.ND_VAL.S080 IS 'Параметр s080';
 COMMENT ON COLUMN BARS.ND_VAL.KF IS '';
 
-
-
+begin
+ execute immediate   'alter table ND_VAL add (OKPO VARCHAR2(30)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN ND_VAL.OKPO  IS 'ОКПО';
 
 PROMPT *** Create  constraint PK_ND_VAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ND_VAL ADD CONSTRAINT PK_ND_VAL PRIMARY KEY (FDAT, RNK, ND, TIPA)
+  ALTER TABLE BARS.ND_VAL ADD CONSTRAINT PK_ND_VAL PRIMARY KEY (FDAT, okpo, ND, TIPA)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_NDVAL_KF_NN ***
 begin   
@@ -89,21 +88,16 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  index PK_ND_VAL ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_ND_VAL ON BARS.ND_VAL (FDAT, RNK, ND, TIPA) 
+  CREATE UNIQUE INDEX BARS.PK_ND_VAL ON BARS.ND_VAL (FDAT, okpo, ND, TIPA) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
-
 
 PROMPT *** Create  grants  ND_VAL ***
 grant SELECT                                                                 on ND_VAL          to BARSREADER_ROLE;

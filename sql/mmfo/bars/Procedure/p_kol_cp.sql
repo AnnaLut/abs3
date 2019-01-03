@@ -26,7 +26,7 @@ PROMPT *** Create  procedure P_KOL_CP ***
 
 begin
    for d in (SELECT a.rnk, a.acc, a.kv, d.id,  d.REF,  d.erat, a.nls, a.tobo, d.accs,kk.vncrr,kk.emi,kk.fin23,kk.cp_id,kk.datp,kk.dox,
-                     c.custtype, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, a.branch,
+                     c.custtype, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, a.branch, F_RNK_gcif (c.okpo, c.rnk) okpo,
                      DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ
               FROM cp_deal d,  accounts a, CP_KOD KK, customer c
               WHERE D.ID = KK.ID AND (d.acc = a.acc AND KK.DOX > 1    OR     d.accp = a.acc  AND KK.DOX = 1 ) and
@@ -68,7 +68,9 @@ begin
          end if;
       end if;
       l_s080 := f_get_s080(p_dat01, l_tip, l_fin);
-      p_get_nd_val(p_dat01, d.ref, 15, L_KOL, d.rnk, l_tip, l_fin, l_s080);
+      p_get_nd_val(p_dat01 => p_dat01, p_nd   => d.ref , p_tipa => 15, p_kol => l_kol, p_rnk => d.rnk, p_tip_fin => l_tip, 
+                   p_fin   => l_fin  , p_s080 => l_s080, p_okpo => d.okpo);
+
 
    end LOOP;
 end ;

@@ -9,14 +9,15 @@ PROMPT *** Create  procedure CR ***
 
   CREATE OR REPLACE PROCEDURE BARS.CR (p_dat01 date) IS
 
-/* Версия 3.1 05-09-2017  29-01-2017  20-01-2017  21-12-2016
+/* Версия 3.2 13-11-2018  05-09-2017  29-01-2017  20-01-2017  21-12-2016
    Розрахунок кредитного ризику (Загальна)
+ 5) 13-11-2018 - Добавлено set_client_info
  4) 05-09-2017 - Добавлена процедура  REZ_ND_VAL_1200(p_dat01, l_kol);
  3) 29-01-2017 - p_2401_OSBB - отдельная процедура (выполняется при выгрузке T0)
  2) 20-01-2017 - Протоколирование о начале и окончании  расчета
  1) 21-12-2016 - ОСББ --> Портфельный метод p_2401_OSBB
 */
-l_kol integer;
+l_kol integer; l_kf varchar2(6);
 
 begin
    z23.to_log_rez (user_id , 13 , p_dat01 ,'ПОЧАТОК (CR) Кредитний ризик 351 ');
@@ -24,11 +25,10 @@ begin
    delete from rez_cr     where fdat = p_dat01;
    delete from errors_351 where fdat < p_dat01;
    pul_dat(to_char(p_dat01,'dd-mm-yyyy'),'');
-   if sys_context('bars_context','user_mfo') ='300465' THEN l_kol :=1;
-   else                                                     l_kol :=0;
+   l_kf := sys_context('bars_context','user_mfo');
+   if l_kf ='300465' THEN l_kol :=1;
+   else                   l_kol :=0;
    end if;
-   -- p_2401_OSBB(p_dat01);
-   -- commit;
    p_nd_open  (p_dat01);
    commit;
    p_kol_deb(p_dat01, l_kol,0);
@@ -48,20 +48,27 @@ begin
    commit;
    REZ_ND_VAL_1200(p_dat01, l_kol);
    commit;
+   dbms_application_info.set_client_info('CR_351:'||l_kf ||':Дебиторка господарська');
    deb_351(P_DAT01,1,0);
+   dbms_application_info.set_client_info('CR_351:'||l_kf ||':Дебиторка фінансова');
    deb_351(P_DAT01,1,1);
    commit;
+   dbms_application_info.set_client_info('CR_351:'||l_kf ||':Кредити + БПК + ОВЕР + МБДК');
    CCK_351(P_DAT01,0,1);
    commit;
-   mbdk_351(P_DAT01,1);
+   dbms_application_info.set_client_info('CR_351:'||l_kf ||':МБДК');
+   --mbdk_351(P_DAT01,1);                         
    commit;
+   dbms_application_info.set_client_info('CR_351:'||l_kf ||':ЦП');
    cp_351(P_DAT01,1);
    commit;
-   p_nbu23_cr(p_dat01);
+   dbms_application_info.set_client_info('CR_351:'||l_kf ||':Параметры + NBU23_REZ');
+   p_nbu23_cr(p_dat01);                         
    commit;
    z23.to_log_rez (user_id , -13 , p_dat01 ,'КІНЕЦЬ (CR) Кредитний ризик 351 ');
 END;
 /
+
 show err;
 
 PROMPT *** Create  grants  CR ***
@@ -71,8 +78,3 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on CR              to START1;
 grant EXECUTE                                                                on CR              to UPLD;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CR.sql =========*** End *** ======
-PROMPT ===================================================================================== 

@@ -22,14 +22,13 @@ PROMPT *** Create  procedure P_KOL_ND ***
 */
 
  PR_    number ; l_s  NUMBER ; fl_      number ; l_dos  number ; l_cls  integer; l_fin_okpo  NUMBER ;
-
  KOL_N  integer; l_f  INTEGER; l_fin23  INTEGER; l_fin  INTEGER; l_tipa INTEGER;
 
  l_TIP  varchar2(50); DATSP_   varchar2(30); DASPN_   varchar2(30); l_txt    varchar2(1000);
 
  DATP_  date; l_dat31  date;
 
- l_s080 specparam.s080%type;  l_sed customer.sed%type;
+ l_s080 specparam.s080%type;  l_sed customer.sed%type; l_okpo  varchar2(30);
 
   TYPE CurTyp IS REF CURSOR;
   c0 CurTyp;
@@ -171,6 +170,7 @@ begin
          EXCEPTION WHEN NO_DATA_FOUND THEN l_sed := '00';
          end;
       end if;
+      l_okpo := F_RNK_gcif (null, k.rnk); 
       if l_sed = '91' THEN k.vidd := 11; end if;
       l_dos := 0; kol_n := 0;
       if k.vidd in (11,12,13) THEN l_s := 25000;
@@ -256,7 +256,8 @@ begin
       if l_fin_okpo is not null THEN l_fin := least(l_fin,l_fin_okpo); end if;
       --logger.info('FIN 4 : nd = ' || k.nd || ' l_fin = '|| l_fin ) ;
       l_s080 := f_get_s080(p_dat01, l_tip, l_fin);
-      p_get_nd_val(p_dat01, k.nd, l_tipa, kol_n, k.rnk, l_tip, nvl(l_fin,1), l_s080);
+      p_get_nd_val(p_dat01 => p_dat01     , p_nd   => k.nd  , p_tipa => l_tipa, p_kol => kol_n, p_rnk => k.rnk, p_tip_fin => l_tip, 
+                   p_fin   => nvl(l_fin,1), p_s080 => l_s080, p_okpo => l_okpo);
    end LOOP;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец К-во дней кредиты 351 ');
 end;

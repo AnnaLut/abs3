@@ -390,6 +390,16 @@ end;
 /
 COMMENT ON COLUMN REZ_CR.OKPO  IS 'Œ œŒ';
 
+begin
+ execute immediate   'alter table REZ_CR modify (OKPO varchar2(30)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.OKPO  IS 'Œ œŒ';
+
+
 PROMPT *** Create  index I4_REZ_CR_FDAT_OKPO ***
 begin   
  execute immediate '

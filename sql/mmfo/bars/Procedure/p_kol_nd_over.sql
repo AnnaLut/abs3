@@ -22,9 +22,9 @@ PROMPT *** Create  procedure P_KOL_ND_OVER ***
 
  l_s080 specparam.s080%type;
 
- l_kol   integer; l_custtype  integer;  l_fin      integer; l_f    integer; l_fin23     integer;
- l_tip   integer; fl_    integer; l_cls       integer;
- l_dat31 date   ; l_txt  varchar2(1000);
+ l_kol   number; l_custtype  number;  l_fin      number; l_f   number; l_fin23     number;
+ l_tip   number; fl_         number;  l_cls      number; 
+ l_dat31 date  ; l_okpo      varchar2(30);l_txt  varchar2(1000);
 
  TYPE CurTyp IS REF CURSOR;
  c0   CurTyp;
@@ -61,7 +61,7 @@ begin
          FETCH c0 INTO k;
          EXIT WHEN c0%NOTFOUND;
          l_kol  := 0;
-         select c.custtype into l_custtype from  customer c where c.rnk = k.rnk;
+         select c.custtype, F_RNK_gcif (c.okpo, c.rnk)  into l_custtype, l_okpo from  customer c where c.rnk = k.rnk;
          --DECLARE
          --   TYPE r1Typ IS RECORD
          --   ( kol       number );
@@ -122,7 +122,7 @@ begin
             --logger.info('OVER  6 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_fin = '|| l_fin  ) ;
             fin_nbu.record_fp_nd('CLSP', l_fin, l_f, p_dat01, k.nd, k.rnk); -- фін.стан зкоригований на к-ть днів прострочки
             l_s080 := f_get_s080(p_dat01, l_tip, l_fin);
-            p_get_nd_val( p_dat01, k.nd, 10, l_kol, k.rnk, l_tip, l_fin, l_s080 );
+            p_get_nd_val( p_dat01, k.nd, 10, l_kol, k.rnk, l_tip, l_fin, l_s080, null, l_okpo );
             --END LOOP;
          end;
       end LOOP;

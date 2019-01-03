@@ -9,9 +9,8 @@ PROMPT *** Create  procedure MBDK_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.MBDK_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 11.4  30-11-2018  23-10-2018  27-09-2017  14-09-2017  05-04-2017  10-03-2017  06-03-2017  03-03-2017 
+/* Версия 11.3  23-10-2018  27-09-2017  14-09-2017  05-04-2017  10-03-2017  06-03-2017  03-03-2017 
    Розрахунок кредитного ризику по МБДК + коррахунки
-15) 30-11-2018(11.4) - (COBUMMFO-10179) - LGD для активов, державна власність > 51% через довідник REZ_PAR
 14) 23-10-2018(11.3) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 13) 27-09-2017(11.2)  - Запись IDF <-- l_idf, было l_fp
 12) 14-09-2017 - PD по l_idf ,было по l_fp
@@ -35,7 +34,7 @@ PROMPT *** Create  procedure MBDK_351 ***
 
  l_pd      NUMBER ; l_CRQ    NUMBER ; l_zalq  NUMBER ; l_EAD     NUMBER ; l_zal    NUMBER ; l_dv     NUMBER ;  l_EADQ    NUMBER ;
  l_LGD     NUMBER ; l_zal_BV NUMBER ; l_CR    NUMBER ; l_RC      NUMBER ; l_CR_LGD NUMBER ; l_bv     NUMBER ;  l_BVQ     NUMBER ;
- l_zal_BVq NUMBER ; l_bv02   NUMBER ; l_BV02q NUMBER ; l_zal_lgd NUMBER ; l_s      NUMBER ; l_lgd_51 NUMBER ;
+ l_zal_BVq NUMBER ; l_bv02   NUMBER ; l_BV02q NUMBER ; l_zal_lgd NUMBER ; l_s      NUMBER ; l_lgd_51 NUMBER := 0.3;
  acc8_     INTEGER; l_idf    INTEGER; l_fin   INTEGER; l_tipa    INTEGER; l_fin23  INTEGER;  l_fp    INTEGER;  l_tip_fin INTEGER;
  --l_kol   INTEGER;
 
@@ -50,9 +49,8 @@ begin
    l_dat31   := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    l_tip_fin := 1;
    if p_mode = 0 THEN p_kol_nd_MBDK(p_dat01, 0); end if;
-   --delete from REZ_CR where fdat=p_Dat01 and tipa in ( 5, 6);
-   l_lgd_51 := GET_REZ_PAR( 'LGD' );
-   for d in (SELECT d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, D.FIN23, D.BRANCH,f_get_nd_val_n ('KOL', d.nd, p_dat01, 5, d.rnk) KOL, 5 tipa,
+   delete from REZ_CR where fdat=p_Dat01 and tipa in ( 5, 6);
+   for d in (SELECT d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, D.FIN23, D.BRANCH,f_get_nd_val_n ('KOL', d.nd, p_dat01, 5, d.okpo) KOL, 5 tipa,
                     FIN_351, PD, f_vkr_MBDK(d.rnk) VKR, 'МБДК ' l_vkr
              FROM (select * from accounts where  nbs >'1500' and nbs < '1600') a,
                   (select e.* from cc_deal e,nd_open n
@@ -62,7 +60,7 @@ begin
                    d.nd=(select max(n.nd) from nd_acc n,cc_deal d1  where n.acc=a.acc and n.nd=d1.nd and (d1.vidd> 1500  and d1.vidd<  1600 )
                    and d1.vidd<>1502 and d1.sdate< p_dat01 and  (sos>9 and sos< 15 or d1.wdate >= l_dat31 ) )
              union all
-             select d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, nvl(d.fin23,1) FIN23, D.BRANCH, f_get_nd_val_n ('KOL', d.nd, p_dat01, 6, d.rnk) KOL,6 tipa,
+             select d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, nvl(d.fin23,1) FIN23, D.BRANCH, f_get_nd_val_n ('KOL', d.nd, p_dat01, 6, d.okpo) KOL,6 tipa,
                     FIN_351, PD, cck_app.get_nd_txt(d.nd, 'VNCRR') VKR, 'Коррахунки ' l_vkr
              from  cc_deal d  where vidd = 150
             )
@@ -72,7 +70,7 @@ begin
       l_tipa := d.tipa;
       for s in (select a.tip, a.nls, a.ob22, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S, a.rnk,
                 substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, c.custtype cus,
-                DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, c.okpo
+                DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (с.okpo, c.rnk) okpo
                 from nd_acc n, accounts a,customer c
                 where n.nd=d.nd and n.acc=a.acc and a.nbs like '15%' and  ost_korr(a.acc,l_dat31,null,a.nbs)<0 and a.rnk=c.rnk
                 )
@@ -125,7 +123,7 @@ begin
 
             --l_fin23 := d.fin23;
             l_fin   := nvl(D.fin_351,l_fin);
-            l_fin   := f_rnk_maxfin(p_dat01, s.rnk, l_tip_fin, d.nd, 1);
+            l_fin   := f_rnk_maxfin(p_dat01, s.okpo, l_tip_fin, d.nd, 1);
             l_pd    := d.pd;
             if l_pd is null  THEN
                l_pd := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, d.VKR,l_idf);

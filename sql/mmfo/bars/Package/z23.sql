@@ -2048,7 +2048,8 @@ begin
 
   If nvl(p_mode ,0) = 0 then
      update rez_log set fdat = dat01_+1 where fdat = dat01_;
-     delete from nd_val     where fdat = p_dat01;
+     z23.to_log_rez (user_id , 351 , p_dat01 ,'START 1');
+     delete from nd_val     where fdat = p_dat01 and kf = sys_context('bars_context','user_mfo');
      delete from errors_351 where fdat = p_dat01;
      delete from nd_kol;
      p_nd_open  (p_dat01);

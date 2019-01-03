@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/DEB_351.sql =========*** Run *** =
 PROMPT ===================================================================================== 
@@ -90,7 +88,7 @@ begin
            nd        accounts.acc%type,
            sdate     date,
            deb       rez_deb.deb%type,
-           okpo      customer.okpo%type
+           okpo      varchar2(30)
           );
    k r0Typ;
 
@@ -99,14 +97,14 @@ begin
          OPEN c0 FOR
             select 17 tipa, decode(c.custtype,3,3,2) custtype, c.custtype cus, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK,
                    c.PRINSIDER, c.COUNTRY, c.ISE, a.nbs, a.tip, a.nls, a.kv, a.acc, a.ob22, -ost_korr(a.acc,l_dat31,null,a.nbs) bv,a.rnk, a.branch,
-                   DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, a.acc nd, null sdate,d.deb, c.okpo
+                   DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, a.acc nd, null sdate,d.deb, F_RNK_gcif (c.okpo, c.rnk) okpo  
             from   accounts a,customer c, rez_deb d
             where  a.nbs = d.nbs and d.deb in (1,2) and d.deb is not null and a.nbs is not null and (a.dazs is null or a.dazs >= p_dat01)
                    and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk and  ( f_tip_xoz(p_dat01, a.acc, a.tip) not in ('XOZ','W4X')   or l_xoz_new != 1 )
             union  all
             select 17 tipa,decode(c.custtype,3,3,2) custtype, c.custtype cus, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK,
                    c.PRINSIDER, c.COUNTRY, c.ISE, nvl(nbs,substr(nls,1,4)) nbs, a.tip, a.nls, a.kv, a.acc, a.ob22, -ost_korr(a.acc,l_dat31,null,a.nbs) bv,
-                   a.rnk, a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, a.acc nd, null sdate,1 deb, c.okpo
+                   a.rnk, a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, a.acc nd, null sdate,1 deb, F_RNK_gcif (c.okpo, c.rnk) okpo
             from   accounts a, cp_deal cp, customer c
             where  (cp.active=1 or cp.active = -1 and cp.dazs >= p_dat01) and substr(a.nls,1,4)='3541'  and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and  a.acc in  (cp.accr,cp.acc) and
                    a.rnk = c.rnk  and a.acc not in ( select accc from accounts where nbs is null  and  substr(nls,1,4)='3541'  and accc is not null);
@@ -114,7 +112,7 @@ begin
          OPEN c0 FOR
             select 21 tipa, decode(c.custtype,3,3,2) custtype, c.custtype cus, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK,
                    c.PRINSIDER, c.COUNTRY, c.ISE, a.nbs, a.tip, a.nls, a.kv, a.acc, a.ob22, x.s0 bv,a.rnk, a.branch,
-                   DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, x.id nd, x.fdat sdate, d.deb, c.okpo
+                   DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, x.id nd, x.fdat sdate, d.deb, F_RNK_gcif (c.okpo, c.rnk) okpo
             from   xoz_ref_arc x, accounts a, customer c, rez_deb d
             where  x.mdat = p_dat01 and a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (x.datz >= p_dat01 or x.datz is null) and s0<>0 and s<>0 and x.acc=a.acc
                    and  ( f_tip_xoz(p_dat01, a.acc, a.tip) in ('XOZ','W4X')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
@@ -162,8 +160,8 @@ begin
             if l_RNK_FIN = '0' THEN l_MAX := 0 ; -- не враховувати в єдину категорію
             end if;
 
-            l_kol    := f_get_nd_val_n ('KOL', k.nd, p_dat01, k.tipa, k.rnk);
-            l_fin    := f_rnk_maxfin (p_dat01, k.rnk  , l_tip_fin, k.nd, l_max);
+            l_kol    := f_get_nd_val_n ('KOL', k.nd  , p_dat01  , k.tipa, k.rnk);
+            l_fin    := f_rnk_maxfin (p_dat01, k.okpo, l_tip_fin, k.nd  , l_max);
             --logger.info('XOZ 1 : acc = ' || k.acc || 'k.deb = ' || k.deb || ' k.nbs = ' || k.nbs  ) ;
             case WHEN k.deb = 1 and l_s250 = 8 THEN l_deb := 3; l_fin:=1;
             else                                    l_deb := k.deb;
