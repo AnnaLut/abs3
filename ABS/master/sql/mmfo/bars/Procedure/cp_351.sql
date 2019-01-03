@@ -1,9 +1,8 @@
 CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 12.8  30-11-2018  23-10-2018  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 
+/* Версия 12.7  23-10-2018  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   
    Розрахунок кредитного ризику по ЦП
 
-24) 30-11-2018(12.8) - (COBUMMFO-10179) - LGD для активов, державна власність > 51% через довідник REZ_PAR
 23) 23-10-2018(12.7) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 22) 12-07-2018(12.6) - Новые счета ('SDI','SDA','SDM','SDF','SRR')
 21) 26-01-2018(12.5) - PD_0 - для пассивных = l , было =0!
@@ -41,8 +40,7 @@ CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0
  l_BVQ      NUMBER ;  l_bv02    NUMBER ;  l_BV02q     NUMBER ;  cp_acc_     number ;  cp_accp_  number ;  cp_accd_   number ;  
  cp_accs_   number ;  cp_accr_  number ;  cp_accr2_   number ;  l_accexpr   number ;  l_accr3   number ;  l_RCQ      number ;  
  l_dv       NUMBER ;  l_CR_LGD  NUMBER ;  l_RZ        NUMBER ;  l_zal_lgd   NUMBER ;  l_fin_351 NUMBER ;  l_pd_351   NUMBER ;  
- l_fin_okpo NUMBER ;  l_s       NUMBER ;  l_lgd_51    NUMBER ;
-
+ l_fin_okpo NUMBER ;  l_s       NUMBER ;  l_lgd_51    NUMBER := 0.3;
 
  VKR_  varchar2(3);  l_txt  varchar2(1000); l_vkr  varchar2(50); l_nbs  char(4); l_kf varchar2(6);
 
@@ -56,11 +54,10 @@ begin
    dbms_application_info.set_client_info('CR_351_JOB:'|| l_kf ||': ЦП 351');
    l_tipa := 15;
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
-   --delete from REZ_CR where fdat=p_Dat01 and tipa = l_tipa;
-   l_lgd_51 := GET_REZ_PAR( 'LGD' );
+   delete from REZ_CR where fdat=p_Dat01 and tipa = l_tipa;
    for d in ( SELECT a.rnk, a.acc, a.kv, d.id,  d.REF,  d.erat, a.nls, a.tobo, d.accs,kk.vncrr,kk.emi,kk.fin23,kk.cp_id,kk.datp,kk.dox,
                      c.custtype, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, 
-                     DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, c.okpo  
+                     DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo  
               FROM cp_deal d,  accounts a, CP_KOD KK, customer c
               WHERE D.ID = KK.ID AND (d.acc = a.acc AND KK.DOX > 1    OR     d.accp = a.acc  AND KK.DOX = 1 ) and 
                    (d.active=1 or d.active = -1 and d.dazs >= p_dat01) and a.rnk = c.rnk and substr(a.nls,1,4) not in ('3541')
@@ -143,7 +140,7 @@ begin
             else                                    l_idf := 62; l_tip_fin := 1;
             end if;
    
-            l_fin      := f_rnk_maxfin(p_dat01, d.rnk, l_tip_fin, d.ref, 1);
+            l_fin      := f_rnk_maxfin(p_dat01, d.okpo, l_tip_fin, d.ref, 1);
             l_fin_okpo := f_get_fin_okpo (d.rnk);
             if l_fin_okpo is not null THEN l_fin := least(l_fin,l_fin_okpo); end if;
       
@@ -224,7 +221,7 @@ begin
                l_RCQ     := 0;
                l_CR_LGD  := l_ead*l_pd*l_lgd;
                l_nbs     := substr(s.nls,1,4);
-               l_kol     := f_get_nd_val_n('KOL', d.ref, p_dat01, l_tipa, d.rnk);
+               l_kol     := f_get_nd_val_n('KOL', d.ref, p_dat01, l_tipa, d.okpo);
                l_zal_bv  := z.sall/100;
                l_zal_bvq := p_icurval(s.kv,l_zal_bv*100,l_dat31)/100;      
                --logger.info('REZ_351_cp 4 : nd = ' || d.ref || ' l_fin = '|| l_fin || ' l_pd = ' || l_pd  ) ;   

@@ -131,12 +131,12 @@ BEGIN
                       bv02  , KOL    , kpz    , SDATE   , wdate , TIPA, LGD     , OVKR, P_DEF, OVD   , sum( EADQ) eadq, sum( CR   ) cr  , sum( CRQ ) crq,
                       RZ    , FIN_Z  , CCF    , PD_0    , istval, rpb , CC_ID   , s250, TIP  , TEXT  , sum( RC  ) rc  , nvl(sum( ZAL    ),0) zal   , 
                       GRP   , S080   , DDD_6B , VKR     , OPD   , NMK , custtype, nvl(ob22,'01') ob22, sum( RCQ ) RCQ , NVL(sum( ZALQ   ),0) zalq  , 
-                      S080_z, FIN_KOL, FIN_KOR, Z       , poci  ,                                                       nvl(sum( ZAL_BV ),0) zal_BV,
+                      S080_z, FIN_KOL, FIN_KOR, Z       , poci  , OKPO,                                                 nvl(sum( ZAL_BV ),0) zal_BV,
                                                                                                                         nvl(sum( ZAL_BVQ),0) zal_BVQ
              from     REZ_CR where fdat = p_dat01 
              group by FDAT  , RNK    , ACC    , KV      , NLS   , nbs   , ND     , VIDD   , FIN , VKR , KOL  , FIN23, kpz   , NMK, SDATE, wdate, TIPA, 
                       LGD   , bv02   , bv02q  , OVKR    , P_DEF , OVD   , OPD    , CCF    , PD_0, RZ  , FIN_Z, cc_id, ISTVAL, RPB, S250 , TIP  , TEXT, 
-                      GRP   , S080   , DDD_6B , custtype, OB22  , s080_z, FIN_KOL, FIN_KOR, Z   , POCI)
+                      GRP   , S080   , DDD_6B , custtype, OB22  , s080_z, FIN_KOL, FIN_KOR, Z   , POCI, OKPO)
    LOOP
       begin
          select DECODE (TRIM (sed),'91', DECODE (custtype, 3, 2, custtype), custtype) 
@@ -172,7 +172,6 @@ BEGIN
       elsif k.tipa in (10, 90)                                THEN l_id := 'OVER' || k.nd ||        k.acc; l_ta :=10;                    
       elsif k.tipa in (42)                                    THEN l_id := 'W4'   || k.nd ||        k.acc; l_ta := 4;                         
       elsif k.tipa in (41)                                    THEN l_id := 'BPK'  || k.nd ||        k.acc; l_ta := 4;                         
-      elsif k.tipa in (44)                                    THEN l_id := 'INS'  || k.nd ||        k.acc; l_ta :=23;                         
       else                                                         l_id := 'NNN'  || k.nd ||        k.acc; l_ta := NULL;                  
       end if;
 
@@ -219,7 +218,7 @@ BEGIN
              ZAL_BL  , ZAL_BLQ  , ND_CP  , SUM_IMP  , SUMQ_IMP  , VKR      , ZAL_SV   , ZAL_SVQ   , GRP    , REZ23     , REZQ23 , KAT23 , 
              S250_23 , EAD      , EADQ   , CR       , CRQ       , KOL_351  , FIN_351  , KPZ       , LGD    , OVKR      , P_DEF  , OVD   , 
              OPD     , RC       , RCQ    , ZAL_351  , ZALQ_351  , CCF      , TIP_351  , PD_0      , FIN_Z  , ISTVAL_351, RPB    , S080  , 
-             arjk    , DDD_6B   , PVZ    , PVZQ     , tipa      , S080_z   , FIN_P    , FIN_D     , Z      )                                                           
+             arjk    , DDD_6B   , PVZ    , PVZQ     , tipa      , S080_z   , FIN_P    , FIN_D     , Z      , OKPO_GCIF)                                                           
       values                                                                                                       
            ( k.FDAT  , l_ID     , k.RNK  , k.NBS    , k.kv      , k.ND     , k.CC_ID  , k.ACC     , k.NLS  , P_BRANCH  , k.FIN  , 1     , 
              P_ZAL   , k.BV     , k.CR   , k.CRQ    , DD_       , DDD_     , k.BVQ    , k.CUSTTYPE, l_IDR  , k.WDATE   , l_OKPO , k.NMK , 
@@ -227,7 +226,7 @@ BEGIN
              P_ZAL_BL, P_ZAL_BLQ, L_ND_CP, P_SUM_IMP, P_SUMQ_IMP, k.VKR    , P_ZAL_SV , P_ZAL_SVQ , k.GRP  , k.CR      , k.CRQ  , P_KAT , 
              k.s250  , k.EAD    , k.EADQ , k.CR     , k.CRQ     , k.KOL    , k.FIN    , k.KPZ     , k.LGD  , k.OVKR    , k.P_DEF, k.OVD , 
              k.OPD   , k.RC     , k.RCQ  , k.ZAL_BV , k.ZAL_BVQ , k.CCF    , k.TIPA   , k.PD_0    , k.FIN_Z, k.ISTVAL  , k.RPB  , k.s080, 
-             k.poci  , k.DDD_6B , k.zal  , k.zalq   , l_ta      , k.s080_z , k.FIN_KOL, k.FIN_KOR , k.Z    );
+             k.poci  , k.DDD_6B , k.zal  , k.zalq   , l_ta      , k.s080_z , k.FIN_KOL, k.FIN_KOR , k.Z    , k.OKPO    );
       exception when others then
            --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
            if SQLCODE = -00001 then NULL;

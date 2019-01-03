@@ -2,6 +2,7 @@ CREATE OR REPLACE PROCEDURE BARS.rezerv_23 (dat01_   in date) is
 /* Версия 3.3  26-02-2018  05-10-2017  30-08-2017  14-07-2017  06-06-2017  11-04-2017  03-02-2017
    Рівчачок з проміжними комітами
 
+16) 16-10-2018(3.4) Тип счета из NBU23_REZ - было из accounts (ЖДЕТ ЗАЯВКИ)
 15) 26-02-2018(3.3)/COBUMMFO-6811/ - Использование архива PRVN_FIN_DEB --> FIN_DEB_ARC для определения номера договора
 14) 05-10-2017(3.2) - Разделение фин.дебиторки (номер договора из табдицы PRVN_FIN_DEB 
 13) 30-08-2017  -   Резерв брать по хоз.дебиторке  из REZ39 , если прислал FV
@@ -95,7 +96,7 @@ begin
    l_mfo := gl.aMfo;
    If (getglobaloption('MFOP') = '300465' ) or l_mfo = '300465' THEN l_oschad := true; else l_oschad := false; end if; -- ОЩАД
    for k in (select /*+ INDEX (s PK_SPECPARAM) */
-                    substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv, a.tip     , n.ob22  , n.rz  , n.cc_id   , n.rnk, a.accc, nd_cp,
+                    substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv, n.tip   , n.ob22 , n.rz      , n.cc_id   , n.rnk, a.accc, nd_cp,
                     n.kv, n.nbs, n.nls , n.r013    , n.branch, n.ROWID RI, 1 kat   , s.istval, n.tipa, n.custtype,
                     -- Если FINEVARE в резерв берется рез.39, только по DEBH - REZ23
                     -- (Совещание в Делойте 12-01-2016, Костенко Г.С.)

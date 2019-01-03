@@ -38,7 +38,7 @@ begin
 
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало К-во дней МБДК 351 ');
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
-   for k in (SELECT d.nd, d.wdate, d.fin_351, d.fin23, c.custtype, c.rnk, 5 tipa
+   for k in (SELECT d.nd, d.wdate, d.fin_351, d.fin23, c.custtype, c.rnk, 5 tipa, F_RNK_gcif (c.okpo, c.rnk) okpo
              FROM (select * from accounts where  nbs >'1500' and nbs < '1600') a,
                   (select e.* from cc_deal e,nd_open n
                    where n.fdat = p_dat01 and e.nd = n.nd and (e.vidd> 1500  and e.vidd<  1600 ) and e.sdate< p_dat01 and e.vidd<>1502 and
@@ -47,7 +47,7 @@ begin
                    d.nd=(select max(n.nd) from nd_acc n,cc_deal d1  where n.acc=a.acc and n.nd=d1.nd and (d1.vidd> 1500  and d1.vidd<  1600 )
                    and d1.vidd<>1502 and d1.sdate< p_dat01 and  (sos>9 and sos< 15 or d1.wdate >= l_dat31 ) )
              union all
-             select d.nd, d.wdate, d.fin_351, d.fin23, c.custtype, c.rnk, 6 tipa from  cc_deal d, customer c, nd_open n
+             select d.nd, d.wdate, d.fin_351, d.fin23, c.custtype, c.rnk, 6 tipa, F_RNK_gcif (c.okpo, c.rnk) okpo from  cc_deal d, customer c, nd_open n
              where vidd = 150 and n.fdat = p_dat01 and d.nd = n.nd  and d.rnk = c.rnk
             )
    LOOP
@@ -90,7 +90,8 @@ begin
       end if;
       KOL_n := greatest(kol_n,kol_);
       l_s080 := f_get_s080(p_dat01, 1, l_fin);
-      p_get_nd_val(p_dat01, k.nd, k.tipa, kol_n, k.rnk, 1, l_fin, l_s080);
+      p_get_nd_val(p_dat01 => p_dat01, p_nd   => k.nd  , p_tipa => k.tipa, p_kol => kol_n, p_rnk => k.rnk, p_tip_fin => 1, 
+                   p_fin   => l_fin  , p_s080 => l_s080, p_okpo => k.okpo);
    end LOOP;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец К-во дней МБДК 351 ');
 end;

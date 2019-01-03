@@ -20,7 +20,7 @@ begin
    l_d1 := sysdate; 
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало параметры 1200');
    for k in ( select p_dat01 fdat,c.custtype,substr(c.nmk,1,35) nmk, 'NEW/' || acc id, - ost_korr(a.acc,l_dat31,null,a.nbs) bv, 
-                     decode(d.tipa,12,1,r.fin) fin,1 kat, c.OKPO, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, 
+                     decode(d.tipa,12,1,r.fin) fin,1 kat, F_RNK_gcif (c.okpo, c.rnk) okpo, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, 
                      case when d.tipa in (12, 93) then 1 else 0 end PD_0, d.tipa, a.*, d.tipa_FV, r.pd  
               from rez_par_9200 r, accounts a, customer c, rez_deb d 
               where r.nd=a.acc and d.tipa in (12, 30, 92, 93) and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and a.rnk = c.rnk and a.nbs = d.nbs and (a.dazs is null or  a.dazs>= p_dat01)
@@ -31,7 +31,7 @@ begin
      --    l_fin := f_rnk_maxfin(p_dat01, k.rnk, l_tip_fin, k.acc, 1);
      --    select 
       l_s080   := f_get_s080 (p_dat01, l_tip_fin, k.fin);
-      p_get_nd_val(p_dat01, k.acc, k.tipa, 0, k.rnk, l_tip_fin, nvl(k.fin,1), l_s080);
+      p_get_nd_val(p_dat01, k.acc, k.tipa, 0, k.rnk, l_tip_fin, nvl(k.fin,1), l_s080, null, k.okpo);
    end LOOP;                                                                                             
    commit;
    l_time := round((sysdate - l_d1) * 24 * 60 , 2 ); 

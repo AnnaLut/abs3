@@ -69,7 +69,8 @@ begin
            bv        rez_cr.bv%type,
            deb       rez_deb.deb%type,
            mdate     accounts.mdate%type,
-           nd        accounts.acc%type
+           nd        accounts.acc%type,
+           okpo      varchar2(30)
           );
    k r0Typ;
 
@@ -87,22 +88,22 @@ begin
       end;
       if  p_deb = 0   THEN
          OPEN c0 FOR
-            select 17 tip, decode(c.custtype,3,3,2) custtype, c.custtype cus, a.nbs, a.nls, a.kv, a.acc, a.rnk, a.branch, -ost_korr(a.acc,l_dat31,null,a.nbs) bv, d.deb, a.mdate, a.acc nd
+            select 17 tip, decode(c.custtype,3,3,2) custtype, c.custtype cus, a.nbs, a.nls, a.kv, a.acc, a.rnk, a.branch, -ost_korr(a.acc,l_dat31,null,a.nbs) bv, 
+                   d.deb, a.mdate, a.acc nd, F_RNK_gcif (c.okpo, c.rnk) okpo
             from   accounts a,customer c, rez_deb d 
             where  a.nbs = d.nbs and d.deb in (1,2) and d.deb is not null and a.nbs is not null and (a.dazs is null or a.dazs >= p_dat01) 
                    and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null) and a.rnk = c.rnk and  
                  ( f_tip_xoz(p_dat01, a.acc, a.tip) not in ('XOZ','W4X')  or l_xoz_new != 1 )
             union  all 
             select 17 tip,decode(c.custtype,3,3,2) custtype, c.custtype cus, nvl(nbs,substr(nls,1,4)) nbs, a.nls, a.kv, a.acc, a.rnk, a.branch,  -ost_korr(a.acc,l_dat31,null,a.nbs) bv,
-                   1 deb, a.mdate, a.acc nd
+                   1 deb, a.mdate, a.acc nd, F_RNK_gcif (c.okpo, c.rnk) okpo
             from   accounts a, cp_deal cp, customer c
             where  (cp.active=1 or cp.active = -1 and cp.dazs >= p_dat01) and substr(a.nls,1,4)='3541'  and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and  a.acc in  (cp.accr,cp.acc) and 
                     a.rnk = c.rnk  and a.acc not in ( select accc from accounts where nbs is null  and  substr(nls,1,4)='3541'  and accc is not null) ; 
       else 
          OPEN c0 FOR
             select 21 tip, decode(c.custtype,3,3,2) custtype, c.custtype cus, a.nbs, a.nls, a.kv, a.acc, a.rnk, a.branch,-ost_korr(a.acc,l_dat31,null,a.nbs) bv, 3 deb, 
-                   x.fdat mdate,  --nvl(x.mdate,xoz_mdate(a.acc,x.fdat, a.nbs, a.ob22, a.MDATE )) mdate, 
-                   x.id nd 
+                   x.fdat mdate, x.id nd, F_RNK_gcif (c.okpo, c.rnk) okpo
             from   xoz_ref_arc x, accounts a, customer c, rez_deb d 
             where  mdat = p_dat01 and a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (datz >= p_dat01 or datz is null) and s0<>0 and s<>0 and x.acc=a.acc  
                    and  ( f_tip_xoz(p_dat01, a.acc, a.tip) in ('W4X', 'XOZ')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
@@ -224,7 +225,8 @@ begin
             end if;
             l_s080 := f_get_s080(p_dat01, l_tip, l_fin);
             --logger.info('DEBF 17 5 : acc = ' || k.acc || ' k.rnk = '|| k.rnk || ' l_tip = '|| l_tip || ' k.tip = '|| k.tip || ' l_fin = '|| l_fin  || ' k.nd = '|| k.nd ) ;
-            p_get_nd_val(p_dat01, k.nd, k.tip, l_kol, k.rnk, l_tip, l_fin, l_s080, l_s180);  --nd = k.acc в nd_val по дебиторке всегда  acc
+            p_get_nd_val(p_dat01 => p_dat01, p_nd   => k.nd  , p_tipa => k.tip, p_kol => l_kol, p_rnk => k.rnk, p_tip_fin => l_tip, 
+                         p_fin   => l_fin  , p_s080 => l_s080, p_okpo => k.okpo);
             l_commit := l_commit + 1; 
             If l_commit >= 1000 then  commit;  l_commit:= 0 ; end if;
          end if; 

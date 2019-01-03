@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_REZ_NLO_351 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_REZ_NLO_351 ("DAT", "RNK", "BRANCH", "NBS", "ND", "KV", "NLS", "NMK", "SDATE", "WDATE", "FIN", "KAT", "BV", "BVQ", "REZ", "REZQ", "ZAL", "ZALQ", "TIP", "OB22", "PD", "LGD", "CUSTTYPE", "OKPO", "RZ", "ISTVAL", "S080", "TIP_FIN") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_REZ_NLO_351  ("DAT", "RNK", "BRANCH", "NBS", "ND", "KV", "NLS", "NMK", "SDATE", "WDATE", "FIN", "KAT", "BV", "BVQ", "REZ", "REZQ", "ZAL", "ZALQ", "TIP", "OB22", "PD", "LGD", "CUSTTYPE", "OKPO", "OKPO_GCIF", "RZ", "ISTVAL", "S080", "TIP_FIN") AS 
   SELECT B, 
           rnk,  
           branch, 
@@ -43,6 +43,7 @@ PROMPT *** Create  view V_REZ_NLO_351 ***
           LGD,
           custtype,
           okpo,
+          okpo_gcif,
           RZ,
           ISTVAL,
           f_get_s080 (nvl(TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy'), gl.bd),
@@ -66,7 +67,7 @@ PROMPT *** Create  view V_REZ_NLO_351 ***
                   a.daos, 
                   a.mdate, 
                   nvl(a.nbs,substr(a.nls,1,4)) NBS,
-                  nvl(f_rnk_maxfin( NVL (TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy'), gl.bd), a.rnk, decode(c.custtype,2,2,1), a.acc, 1), 1) fin,
+                  nvl(f_rnk_maxfin( NVL (TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy'), gl.bd), F_RNK_gcif (c.okpo, c.rnk), decode(c.custtype,2,2,1), a.acc, 1), 1) fin,
                   1 kat, 
                   -OST_KORR (a.acc, NVL (TO_DATE (pul.get_mas_ini_val ('zFdat1'), 'dd.mm.yyyy'), gl.bd),z23.di, a.nbs) / 100 BV, 
                   nvl(a.ob22,'01') ob22, 
@@ -74,7 +75,8 @@ PROMPT *** Create  view V_REZ_NLO_351 ***
                   0 ZAL,
                   0 ZALQ,  
                   c.custtype, 
-                  c.OKPO,
+                  F_RNK_gcif (c.okpo, c.rnk) okpo_gcif,
+                  c.okpo,
                   substr(c.nmk,1,35) NMK,
                   1 LGD,
                   DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,

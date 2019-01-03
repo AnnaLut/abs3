@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_GET_ND_VAL.sql =========*** Run 
 PROMPT ===================================================================================== 
@@ -9,14 +7,15 @@ PROMPT *** Create  procedure P_GET_ND_VAL ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_GET_ND_VAL (
        p_dat01   date,
-       p_nd      integer,
-       p_tipa    integer,
+       p_nd      number,
+       p_tipa    number,
        p_kol     number,
-       p_rnk     integer,
-       p_tip_fin integer,
-       p_fin     integer,
+       p_rnk     number,
+       p_tip_fin number,
+       p_fin     number,
        p_s080    varchar2,
-       p_s180    varchar2 default null) IS
+       p_s180    varchar2 default null,
+       p_okpo    varchar2) IS
 
 /* Версия 3.1 11-09-2017  23-01-2017  05-12-2016
    Запись в таблицу кількість днів прострочки по договору
@@ -43,13 +42,13 @@ BEGIN
    EXCEPTION WHEN NO_DATA_FOUND THEN l_istval := 1;
    end;
 */
-   update nd_val    set fdat   = p_dat01 , nd   = p_nd  , tipa = p_tipa, kol = p_kol, rnk = p_rnk, tip_fin = p_tip_fin, fin = p_fin,
-                        istval = l_istval, s080 = p_s080, s180 = p_s180
+   update nd_val    set fdat   = p_dat01 , nd   = p_nd  , tipa = p_tipa, kol  = p_kol, rnk = p_rnk, tip_fin = p_tip_fin, fin = p_fin,
+                        istval = l_istval, s080 = p_s080, s180 = p_s180, okpo = p_okpo
    where  nd = p_nd and rnk  = p_rnk and fdat = p_dat01;
 
    IF SQL%ROWCOUNT=0 then
-      Insert into BARS.nd_val (fdat   , nd  , tipa  , kol  , rnk  , tip_fin  , fin  , istval  , s080  , s180   )
-                       Values (p_dat01, p_nd, p_tipa, p_kol, p_rnk, p_tip_fin, p_fin, l_istval, p_s080, p_s180);
+      Insert into BARS.nd_val (fdat   , nd  , tipa  , kol  , rnk  , tip_fin  , fin  , istval  , s080  , s180  , okpo  )
+                       Values (p_dat01, p_nd, p_tipa, p_kol, p_rnk, p_tip_fin, p_fin, l_istval, p_s080, p_s180, p_okpo);
    END IF;
 END;
 /

@@ -9,10 +9,9 @@ PROMPT *** Create  procedure P_KOL_ND_BPK ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_BPK (p_dat01 date, p_mode integer) IS
 
-/* Версия 4.5  25-10-2018  23-10-2018  26-03-2018 08-02-2017   24-01-2017  03-10-2016
+/* Версия 4.4  23-10-2018  26-03-2018 08-02-2017   24-01-2017  03-10-2016
    К_льк_сть дн_в прострочки по договорам БПК
    -------------------------------------
- 9) 25-10-2018(4.5) - Клас по Instolment берется из REZ_w4_bpk(fin23) договора БПК
  8) 23-10-2018(4.4) - Проверка: если клас не определен и в договоре только 9129 - клас =1, иначе самый плохой
  7) 26-03-2018(4.3) - если фін.класс не определен для физ.=5, для юр. =10  (Письмо Коваленко Светланы 23-03-2018)
  6) 24-10-2017(4.2) - 2625,2627 - и нет др. задолженности - fin = 5, VKR = 'ГГГ', PD = 1
@@ -51,8 +50,8 @@ begin
 
    begin
 
-      FOR k in (select nd, rnk, max(kol) kol, fin23, custtype,tipa
-                from (select r.nd, r.fin23, r.rnk, r.nbs, r.nls, r.kv, r.tip,c.custtype, r.tip_kart tipa,
+      FOR k in (select nd, rnk, max(kol) kol, fin23, custtype, tipa, okpo
+                from (select r.nd, r.fin23, r.rnk, r.nbs, r.nls, r.kv, r.tip,c.custtype, r.tip_kart tipa, F_RNK_gcif (c.okpo, c.rnk) okpo,
                              case WHEN r.tip in ('SS ', 'CR9', 'SK0', 'SN ') THEN 0
                              else f_days_past_due(p_DAT01, r.acc,decode(c.custtype,3,25000,50000))
                              end  kol
@@ -61,7 +60,7 @@ begin
                              r.rnk = c.rnk --and ost_korr(a.acc,l_dat31,null,a.nbs) < 0
                              and r.NBS not in ('3570','3578','3579','3550','3551')
                      )
-                group by nd, rnk, custtype,fin23,tipa )
+                group by nd, rnk, custtype,fin23,tipa, okpo )
       loop
          l_fin   := null;
          l_fin23 := k.fin23;
@@ -78,9 +77,7 @@ begin
          IF l_S250 = 8 THEN
             l_fin := f_fin_pd_grupa (1, k.kol);
          else
-            if k.tipa <> 23 THEN  l_cls := nvl(fin_nbu.zn_p_nd('CLS',  l_f, p_dat01, k.nd, k.rnk),0); 
-            else                  l_cls := k.fin23;  -- Instolment
-            end if;
+            l_cls := nvl(fin_nbu.zn_p_nd('CLS',  l_f, p_dat01, k.nd, k.rnk),0);
             if l_cls = 0 THEN
                begin
                   select nd into l_nd from rez_w4_bpk where nd = k.nd and nbs in ('2625','2627','2620','2203','2208') and rownum=1;   --COBUMMFO-5208
@@ -126,7 +123,9 @@ begin
          end if;
          fin_nbu.record_fp_nd('CLSP', l_fin, l_f, p_dat01, k.nd, k.rnk); -- ф_н.стан зкоригований на к-ть дн_в прострочки
          l_s080 := f_get_s080(p_dat01, l_tip, l_fin);
-         p_get_nd_val(p_dat01, k.nd, k.tipa, k.kol, k.rnk, l_tip, l_fin, l_s080);
+         p_get_nd_val(p_dat01 => p_dat01, p_nd   => k.nd  , p_tipa => k.tipa, p_kol => k.kol, p_rnk => k.rnk, p_tip_fin => l_tip, 
+                      p_fin   => l_fin  , p_s080 => l_s080, p_okpo => k.okpo);
+
       end LOOP;
       z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец К-во дней БПК 351');
    end;

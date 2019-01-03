@@ -39,7 +39,7 @@ l_bv     number; l_bvq number; l_idf    number; l_pd   number; l_dat31  date; l_
 begin
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день мес€ца
    for k in ( select p_dat01 fdat,c.custtype,substr(c.nmk,1,35) nmk, 'NEW/' || acc id, - ost_korr(a.acc,l_dat31,null,a.nbs) bv, 1 fin, 1 kat,
-                     c.OKPO, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, case when d.tipa in (12, 93) then 1 else 0 end PD_0,
+                     F_RNK_gcif (c.okpo, c.rnk) okpo, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, case when d.tipa in (12, 93) then 1 else 0 end PD_0,
                      d.tipa, a.*, d.tipa_FV
               from accounts a, customer c, rez_deb d
               where d.tipa in (12, 30, 92, 93) and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and a.rnk = c.rnk and d.nbs = a.nbs )
@@ -77,7 +77,7 @@ begin
       l_pd  := par.pd;
       l_tip_fin:= f_pd ( p_dat01, k.rnk, k.acc, k.custtype, k.kv, k.nbs, 1, 1);
       l_s080   := f_get_s080 (p_dat01, l_tip_fin, l_fin);
-      p_get_nd_val(p_dat01, k.acc, k.tipa, 0, k.rnk, l_tip_fin, nvl(k.fin,1), l_s080);
+      p_get_nd_val(p_dat01, k.acc, k.tipa, 0, k.rnk, l_tip_fin, nvl(k.fin,1), l_s080, null, k.okpo);
       l_DDD_6B := f_ddd_6B(k.nbs);
       l_lgd    := 1;
       l_cr     := round(l_ead * l_lgd * l_pd,2);

@@ -28,7 +28,7 @@ begin
    z23.DI_SNP;
 
    for k in ( select distinct acc from accounts a, kl_f3_29 f
-              where  ost_korr(a.acc,dat31_,z23.di_,a.nbs)<0 and a.nbs=f.r020 and f.kf='1B' and (dazs is null or dazs >= p_dat01)
+              where  ost_korr(a.acc,dat31_,z23.di_,a.nbs)<0 and a.tip<>'REZ' and a.nbs=f.r020 and f.kf='1B' and (dazs is null or dazs >= p_dat01)
                      and f.r020 not in ('2805','2806','1410','1412','1413','1414','1415','1416','1417','1418','1419','1420','1426','1427','1428','3103',
                                         '3102','3105','3107','3110','3111','3113','3114','3115','3116','3117','3118','3119','3214')
                      and a.acc  not in ( select accc from accounts  where nbs is null and substr(nls,1,4)='3541' and accc is not null)
@@ -51,13 +51,13 @@ begin
                        NULL   , 0     , NULL , NULL, REZ     , REZQ  , 99           , NULL  , 0      , 0      , null , NULL,
                        NULL   , BV    , BVQ  , LGD , CUSTTYPE, REZ   , nbs          , 0     , 0      , NULL   , 0    , 0   ,
                        0      , 0     , NULL , RZ  , tip     , NULL  , BV           , BVQ   , ob22   , null   , null , 0   ,
-                       okpo   ,null   , null , null, istval  , null  , f_ddd_6B(nbs), null  , 0      , tip_fin, s080
+                       okpo   ,null   , null , null, istval  , null  , f_ddd_6B(nbs), null  , 0      , tip_fin, s080 
                  from  V_rez_NLO_351;
 
    INSERT INTO NBU23_REZ ( ob22  , tip, acc , FDAT   , branch, nls  , nmk  , RNK   , NBS, KV  , ND , ID       , BV  , BVQ   , custtype,
-                           istval, rz , OKPO, FIN    , KAT   , sdate, REZ23, REZQ23, cr , crq , ead, eadq     , s080, ddd_6B)
+                           istval, rz , OKPO, FIN    , KAT   , sdate, REZ23, REZQ23, cr , crq , ead, eadq     , s080, ddd_6B, okpo_gcif)
                     SELECT ob22  , tip, nd  , p_dat01, branch, nls  , nmk  , rnk   , nbs, kv  , nd , 'NLO'||ND, BV  , BVQ   , custtype,
-                           istval, rz , OKPO, fin    , kat   , sdate, REZ  , REZQ  , rez, REZq, BV , BVQ      , s080, f_ddd_6B(nbs)
+                           istval, rz , OKPO, fin    , kat   , sdate, REZ  , REZQ  , rez, REZq, BV , BVQ      , s080, f_ddd_6B(nbs), okpo_gcif
                     from   V_rez_NLO_351;
 
    commit;

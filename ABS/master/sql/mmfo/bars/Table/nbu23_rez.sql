@@ -464,6 +464,15 @@ exception when others then
  end;
 /
 
+begin
+ execute immediate   'alter table NBU23_REZ add (OKPO_GCIF varchar2(30)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN NBU23_REZ.OKPO  IS 'Œ œŒ-GCIF';
+
 
 PROMPT *** Create  grants  NBU23_REZ ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBU23_REZ       to BARSDWH_ACCESS_USER;
