@@ -1,5 +1,3 @@
--- Start of DDL Script for View BARS.V_SW_GPI_STATUSES
--- Generated 28.11.2018 16:20:58 from BARS@COBUSUPABS_DEV_MMFO_DB
 
 CREATE OR REPLACE VIEW v_sw_gpi_statuses (
    ref,
@@ -43,23 +41,25 @@ SELECT   q.REF,
 
          s.VALUE AS status_code,
          s.description AS status_description
-FROM     sw_oper_queue q
-         INNER JOIN sw_journal j
-             ON j.swref = q.swref
-         INNER JOIN sw_statuses s
-             ON q.status = s.id
-         LEFT JOIN oper o
-             ON o.REF = q.REF
----  left join sw_journal j2 on j2.swref=q.swref_199
+FROM
+           sw_journal j
+           left join  sw_oper_queue q  ON j.swref = q.swref
+           left  JOIN sw_statuses s  ON q.status = s.id
+      ---     LEFT JOIN oper o    ON o.REF = q.REF
 
-WHERE    q.swref_199 = (SELECT MAX (swref_199)
+WHERE  ( q.swref_199 is null or   q.swref_199 = (SELECT MAX (swref_199)
                         FROM   sw_oper_queue qq
-                        WHERE  qq.swref = q.swref)
+                        WHERE  qq.swref = q.swref))
+
+  AND j.mt <> 199
+
 /
 
 -- Grants for View
 GRANT SELECT ON v_sw_gpi_statuses TO bars_access_defrole
 /
 
--- End of DDL Script for View BARS.V_SW_GPI_STATUSES
+ 
+
+
 
