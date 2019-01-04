@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.25 09.08.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.28 28.12.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -51,7 +51,7 @@ IS
       NO_P       NUMBER,
       ACTIVE     NUMBER,
       OSTRD      NUMBER,
-      OSTS2      NUMBER      
+      OSTS2      NUMBER
    );
 
    TYPE t_cp_v_set IS TABLE OF r_cp_v;
@@ -268,7 +268,12 @@ PROCEDURE F_SAVE (p_fl_END      IN     INT,
                   --------
                   p_sNLS_FXC    IN     varchar2,
                   p_sNMS_FXC    IN     varchar2,
-                  p_repo        IN     number);
+                  p_repo        IN     number,
+                  --------
+                  p_ifrs        in     ifrs.ifrs_id%type default null,
+                  p_bus_mod     in     bus_mod.bus_mod_id%type default null,
+                  p_sppi        in     sppi.sppi_value%type default null
+                  );
 
 
   PROCEDURE setNazn (p_REF_MAIN   IN     VARCHAR2,
@@ -502,26 +507,8 @@ TYPE r_many_grid
 
   FUNCTION CONCAT_BLOB(A IN BLOB, B IN BLOB) RETURN BLOB;
 
-  type r_int_prepare is record ( runn   number,
-                                 acc    accounts.acc%type,
-                                 nmsa   accounts.nms%type,
-                                 nlsa   accounts.nls%type,
-                                 kva    accounts.kv%type,
-                                 id_a   customer.okpo%type,
-                                 nmsb   accounts.nms%type,
-                                 nlsb   accounts.nls%type,
-                                 kvb    accounts.kv%type,
-                                 id_b   customer.okpo%type,
-                                 fdat   date,
-                                 tdat   date,
-                                 ir     number,
-                                 ostt   number,
-                                 int    number,
-                                 ost    number,
-                                 nazn   oper.nazn%type,
-                                 tt     oper.tt%type);
-  type t_int_prepare is table of r_int_prepare;
-  function make_int_prepare return t_int_prepare pipelined;
+  procedure make_int_prepare;
+  procedure make_oper_cp_int(p_id cp_int.id%type);
 
   subtype r_nbu23_rez is nbu23_rez%rowtype;
   type t_nbu23_rez is table of r_nbu23_rez;
@@ -565,12 +552,19 @@ TYPE r_many_grid
   function getRYNcombo(p_vidd in ps.nbs%type, p_id in cp_kod.id%type) return t_RYNCombo pipelined;
   function getRYNcomboEmi(p_emi in cp_kod.emi%type, p_dox in cp_kod.dox%type, p_vidd in ps.nbs%type) return t_RYNCombo pipelined;
 
+  procedure change_params(p_par_name  cp_params.par_name%type,
+                          p_par_value cp_params.par_value%type,
+                          p_mode      number); --1 insert, 2 update, 3 delete
+                          
+  function get_ifrs(p_nbs ps.nbs%type) return varchar2;               
+  
+  procedure cp_sdm_create(p_ref cp_deal.ref%type, p_dat date default null); 
 
 END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.41 20.08.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.45 03.01.2019';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -645,6 +639,14 @@ IS
       CLOSE v_cpv_cursor;
    END;
 
+   function get_param(p_par_name cim_params.par_name%type) return cim_params.par_value%type is
+     l_val cim_params.par_value%type;
+   begin
+     select par_value
+     into l_val
+     from cp_params where par_name = p_par_name;
+     return l_val;
+   end;
 
    FUNCTION prepare_wnd_deal (p_nOp         INT,
                               p_fl_END      INT,
@@ -658,10 +660,15 @@ IS
       l_cp_deal        cp_deal%ROWTYPE;
    BEGIN
      bars_audit.info('prepare_wnd_deal starts');
+     /*
     -- везде это вх параметры окна. но это дурня. надо прописать в параметры, в атрибуты (по новому). Пока так
       l_deal_prepare.B_4621 := '37392555';
       l_deal_prepare.B_1819 := '35413555';
       l_deal_prepare.B_1919 := '36412555';
+      */
+      l_deal_prepare.B_4621 := get_param('TRANSIT1');
+      l_deal_prepare.B_1819 := get_param('D_ZABORG');
+      l_deal_prepare.B_1919 := get_param('K_ZABORG');
 
       IF (TRIM (p_strPar02) IS NULL)
       THEN
@@ -1230,7 +1237,11 @@ PROCEDURE F_SAVE (p_fl_END      IN     INT,
                   --------
                   p_sNLS_FXC    IN     varchar2,
                   p_sNMS_FXC    IN     varchar2,
-                  p_repo        IN     number
+                  p_repo        IN     number,
+                  ---------
+                  p_ifrs        in     ifrs.ifrs_id%type default null,
+                  p_bus_mod     in     bus_mod.bus_mod_id%type default null,
+                  p_sppi        in     sppi.sppi_value%type default null
                   )
 IS
    o_rec oper%rowtype;
@@ -1247,7 +1258,7 @@ IS
    l_MFOB varchar2(6);
    l_cena number;
    L_CLOB varchar2(10000);
-   L_BLOB blob;
+--   L_BLOB blob;
    l_description varchar2(50);
    l_cpkod_row cp_kod%rowtype;
    l_rynname varchar2(50);
@@ -1322,9 +1333,12 @@ BEGIN
                       p_sREF,
                       p_sErr,
                       p_REF_MAIN);
-            if (UPPER(p_sErr) LIKE '%ORA-20203: \9303 %')
-            then p_sErr := 'Перевірте налаштування відкритих рахунків обраного субпортфеля! (' || substr(p_sErr, 17, 20) || ')';
+            if p_sErr is not null then
+              if (UPPER(p_sErr) LIKE '%ORA-20203: \9303 %') then
+                p_sErr := 'Перевірте налаштування відкритих рахунків обраного субпортфеля! (' || substr(p_sErr, 17, 20) || ')';
            end if;
+              return;
+            end if;
         END;
 
          If p_nDCP = 0 and p_cb_NO_PAY = 0
@@ -1545,9 +1559,12 @@ BEGIN
                      p_sREF,
                      p_sErr,
                      p_REF_MAIN);
-           bars_audit.info(p_sErr);
+--           bars_audit.info(p_sErr);
+           if p_sErr is not null then
            if (UPPER(p_sErr) LIKE '%ORA-20203: \9303 %')
             then p_sErr := 'Перевірте налаштування відкритих рахунків обраного субпортфеля! (' || substr(p_sErr, 17, 20) || ')';
+           end if;
+             return;
            end if;
          if (p_cb_SWIFT = 0 and p_SSA is not null and  p_cb_NO_PAY != 1) --  в DAT_OPL ожидать поступления
          then
@@ -1781,7 +1798,7 @@ BEGIN
                            LPAD (NVL ( (GetGlobalOption ('OKPO')), '0'), 8, '0'),
                            p_OKPOB_,
                            NULL, NULL, NULL, NULL, NULL);
-                           BARS_AUDIT.INFO('o_reck.kv = '||o_reck.kv);
+                         --  BARS_AUDIT.INFO('o_reck.kv = '||o_reck.kv);
                 gl.payv(flg_ => 0,
                         ref_ => o_reck.ref,
                         dat_ => o_reck.pdat,
@@ -1812,10 +1829,16 @@ BEGIN
     END;
     /* ФОРМИРОВАНИЕ ТЕКСТА ТИКЕТА*/
 
+    begin
     select name
       into l_rynname
       from cp_ryn
      where ryn = p_nRYN;
+       exception
+         when NO_DATA_FOUND then
+           p_sErr := 'Не знайшов субпортфель '||p_nRYN;
+           return;
+    end;
 
 
 
@@ -1849,7 +1872,7 @@ BEGIN
             ||'  ------------------------------------------------------------------------------------------------'                                           ||g_newline
             --|| (select TT ||ACC, DK, FDAT, ID, KF, OTM, REF, S, SOS, SQ, STMT, TT, TXT from opldok where ref = p_ref_main)
             ;
-        bars_audit.info(to_char(length(L_CLOB))||':L_CLOB = ' || L_CLOB);
+--        bars_audit.info(to_char(length(L_CLOB))||':L_CLOB = ' || L_CLOB);
 /*  Контрагенту  :Название
     Дата         МФО            ЗКПО           Рахунок                 Сума
     28/09/2016   300001         00032106       46216992704           500,00
@@ -1875,13 +1898,14 @@ FX7 28/09/16 14168011052901 980 14162151                               200,00   
 */
 
   /* fucking ФОРМИРОВАНИЕ ТЕКСТА ТИКЕТА*/
-  dbms_lob.createtemporary(L_BLOB, TRUE);
+/*
+--  dbms_lob.createtemporary(L_BLOB, TRUE);
   for i in 0..(length(L_CLOB)/1000)
   loop
-    bars_audit.info('L_BLOB: i=' || to_char(i));
+    bars_audit.info('L_CLOB: i=' || to_char(i));
     --L_BLOB := DBMS_LOB.CONVERTTOBLOB(l_BLOB,  utl_raw.cast_to_raw(substr(L_CLOB, i*1000, 1000)));
   end loop;
-
+*/
 
   update cp_arch
       set stiket =  utl_raw.cast_to_raw(substr(L_CLOB, 1, 2000))
@@ -1891,7 +1915,9 @@ FX7 28/09/16 14168011052901 980 14162151                               200,00   
  exception when others then
      if (sqlcode = -20203)
      then p_sErr := 'Перевірте налаштування відкритих рахунків обраного субпортфеля! '|| substr(sqlerrm, 17, instr(sqlerrm,')',1)-17+1) ;
-     else p_sErr := sqlerrm;
+     else
+       bars_audit.error('value_paper.F_SAVE: '||SQLERRM||','||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
+       p_sErr := sqlerrm;
      end if;
 END;
 
@@ -2240,6 +2266,7 @@ END;
   l_cp_irrwnd r_cp_irrwnd;
    sRet varchar2(500);
   begin
+    bars_audit.info('value_paper.prepare_irr_wnd:start with p_nMode1 = '||to_char(p_nMode1)||', p_REF='||to_char(p_REF)||',p_ID='||to_char(p_ID)||', pDAT_UG='||to_char(pDAT_UG,'dd.mm.yyyy'));
       select tip-1,
              PERIOD_KUP,
              dok,
@@ -2313,7 +2340,7 @@ END;
   l_Dati date;
   l_cp_irrwnd r_cp_irrwnd;
   begin
-
+   bars_audit.info('value_paper.populate_irr_grid:start with p_nMode1 = '||to_char(p_nMode1)||', p_REF='||to_char(p_REF)||',p_ID='||to_char(p_ID)||', pDAT_UG='||to_char(pDAT_UG,'dd.mm.yyyy'));
    select distinct *
      into l_cp_irrwnd
      from table(value_paper.prepare_irr_wnd(p_nMode1, p_REF, p_ID, strPar01, strPar02, pDAT_UG));
@@ -2370,6 +2397,7 @@ END;
       l_prepare_many_wnd r_prepare_many_wnd;
       l_id  cp_kod.id%type;
       begin
+        bars_audit.info('value_paper.prepare_many_wnd:start with p_ref = '||to_char(p_ref));
        begin
          SELECT d.id, D.erat, Nvl(D.erate,D.erat),  A.N/100 , d.acc, -(c.ostb+c.ostf), d.accr2
            INTO l_id, l_prepare_many_wnd.IRR, l_prepare_many_wnd.IRE, l_prepare_many_wnd.NONIMAL, l_prepare_many_wnd.nAcc, l_prepare_many_wnd.nOst, l_prepare_many_wnd.nAccR2
@@ -2789,10 +2817,9 @@ END;
   end loop;
 
  end;
- function make_int_prepare return t_int_prepare pipelined
+
+ procedure make_int_prepare
  is
- pragma autonomous_transaction;
- l_int_prepare r_int_prepare;
  l_int number := 0;
  l_dat2 date;
  begin
@@ -2888,9 +2915,9 @@ END;
                  p_Int  => l_int,  -- Interest accrued
                  p_Ost  => k.ostc,
                  p_Mode => 1);
-  commit;
   end loop;
 
+  delete cp_int where user_id = user_id();
   for k in (  WITH cpacc as (select cp_acc, cp_ref from cp_accounts)
             SELECT user_id, a.acc,
                    ar.nms as nmsa,
@@ -2921,7 +2948,8 @@ END;
                               ||' '||trim(ck.cp_id)
                               ||' уг.'||(select nd from oper where ref = cd.ref)||' '||abs(a.ostc/(100*ck.cena))||'шт. купон'
                               ||(select kup from cp_dat where id = ck.id  and dok = (select min(dok) from cp_dat where dok > l_dat2 and id = ck.id)) ||' за період '||to_char(fdat,'dd.mm.yyyy')||' - '||to_char(tdat,'dd.mm.yyyy')
-                   END nazn
+                   END nazn,
+                   rownum rn
               FROM acr_intN an, cpacc c, accounts a, accounts ar, int_accn ia, cp_deal cd, cp_kod ck
              where an.acc = c.cp_acc
                and a.acc = an.acc
@@ -2932,28 +2960,58 @@ END;
                and cd.id = ck.id
               order by a.acc, an.fdat)
   loop
-      l_int_prepare.runn   := 0;
-      l_int_prepare.acc    := k.acc;
-      l_int_prepare.nmsa   := k.nmsa;
-      l_int_prepare.nlsa   := k.nlsa;
-      l_int_prepare.kva    := k.kva;
-      l_int_prepare.id_a   := k.id_a;
-      l_int_prepare.fdat   := k.fdat;
-      l_int_prepare.tdat   := k.tdat;
-      l_int_prepare.ir     := k.ir;
-      l_int_prepare.ostt   := k.ostt;
-      l_int_prepare.int    := k.int;
-      l_int_prepare.ost    := k.ost;
-      l_int_prepare.nmsb   := k.nmsb;
-      l_int_prepare.nlsb   := k.nlsb;
-      l_int_prepare.kvb    := k.kvb;
-      l_int_prepare.id_b   := k.id_b;
-      l_int_prepare.tt     := k.tt;
-      l_int_prepare.nazn   := k.nazn;
+    insert into cp_int(fdat,
+                       int,
+                       ir,
+                       kva,
+                       nlsa,
+                       nmsa,
+                       ost,
+                       ostt,
+                       tdat,
+                       nazn,
+                       nlsb,
+                       tt,
+                       runn,
+                       acc,
+                       kvb,
+                       nmsb,
+                       id_a,
+                       id_b,
+                       id)
+                       values(k.fdat,
+                       k.int,
+                       k.ir,
+                       k.kva,
+                       k.nlsa,
+                       k.nmsa,
+                       k.ost,
+                       k.ostt,
+                       k.tdat,
+                       k.nazn,
+                       k.nlsb,
+                       k.tt,
+                       0,
+                       k.acc,
+                       k.kvb,
+                       k.nmsb,
+                       k.id_a,
+                       k.id_b,
+                       k.rn);
 
-      pipe row (l_int_prepare);
   end loop;
  end;
+
+ procedure make_oper_cp_int(p_id cp_int.id%type) is
+   l_cp_int cp_int%rowtype;
+ begin
+   bars_audit.info('value_paper.make_oper_cp_int START: p_id=' || p_id);
+   select * into l_cp_int from cp_int where id = p_id and user_id = user_id();
+   make_cp_int(l_cp_int.ACC,l_cp_int.TDAT,l_cp_int.TT,l_cp_int.ID_A,l_cp_int.ID_B,l_cp_int.NLSA,l_cp_int.NLSB,l_cp_int.NMSA,l_cp_int.NMSB,l_cp_int.KVA,l_cp_int.KVB,l_cp_int.INT,l_cp_int.NAZN);
+   delete from cp_int where id = p_id and user_id = user_id();
+   bars_audit.info('value_paper.make_oper_cp_int END: p_id=' || p_id);
+ end;
+
 
  function populate_nbu23_rez(p_ref in number) return t_nbu23_rez pipelined
  is
@@ -3029,7 +3087,7 @@ END;
    end case;
  end;
 
- --Існує функція по нарахуванню купону make_int_prepare
+ --Існує функція(вже процедура) по нарахуванню купону make_int_prepare
  --Ця ж функція для можливості нарахування дивідентів (інший рахунок чим звичайне нарахування, суму вкажуть вручну)
  --Ньюанс - якщо для угоди невідкритий внесистемний рахунок дивідентів, то відкрити його та підвязати до угоди.
  procedure make_int_dividends_prepare(p_ref cp_deal.ref%type default null)
@@ -3211,7 +3269,7 @@ end;
   procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null) as
    l_ref           cp_deal.ref%type;
    l_cp_id         cp_kod.cp_id%type;
-   l_acc           accounts.acc%type;    
+   l_acc           accounts.acc%type;
    l_sum           cp_pay_dividents.sum%type;
   begin
      if p_ref is null then
@@ -3224,25 +3282,25 @@ end;
        raise_application_error(-20001,  'Вкажіть REF угоди по якій необхідно виплатити дивіденти');
      end if;
 
-     select k.cp_id into l_cp_id from cp_kod k, cp_deal d where k.id = d.id and d.ref = l_ref; 
-     
-     begin 
+     select k.cp_id into l_cp_id from cp_kod k, cp_deal d where k.id = d.id and d.ref = l_ref;
+
+     begin
        select ac.cp_acc
        into  l_acc
        from cp_accounts ac
-       where ac.cp_ref = p_ref and ac.cp_acctype = 'RD';     
+       where ac.cp_ref = p_ref and ac.cp_acctype = 'RD';
        exception
          when NO_DATA_FOUND then
            raise_application_error(-20001,  'Не знайшов рахунок для нарахованих дивідентів(Раніше повина бути використанна функція Нарахування дивідентів). ');
      end;
-     
+
      l_sum := abs(FOSTZn(l_acc, gl.bd)) /100;
-     
+
      delete from cp_pay_dividents where user_id = user_id();
      insert into cp_pay_dividents(ref, nazn, sum) values(l_ref, 'Утриманий податок __% від суми____ з доходів по акціях '||l_cp_id||', дохід на 1шт.- ________, кіл-ть ________, зг. служб. записки №______ від _______р.', l_sum);
      bars_audit.info('value_paper.make_pay_dividends_prepare END');
   end;
-    
+
   procedure change_pay_dividends_prepare(p_ref cp_pay_dividents.ref%type, p_certificate cp_pay_dividents.certificate%type, p_sum cp_pay_dividents.sum%type, p_sum_tax cp_pay_dividents.sum_tax%type, p_sum_comis_transf cp_pay_dividents.sum_comis_transf%type, p_sum_comis_custody cp_pay_dividents.sum_comis_custody%type, p_nazn cp_pay_dividents.nazn%type)
   is
     l_sum_divid number;
@@ -3251,21 +3309,21 @@ end;
      if p_ref is null then
        raise_application_error(-20001,  'Вкажіть REF угоди');
      end if;
-     
-     begin 
+
+     begin
        select ac.cp_acc
        into  l_acc
        from cp_accounts ac
-       where ac.cp_ref = p_ref and ac.cp_acctype = 'RD';     
+       where ac.cp_ref = p_ref and ac.cp_acctype = 'RD';
        exception
          when NO_DATA_FOUND then
            raise_application_error(-20001,  'Не знайшов рахунок для нарахованих дивідентів(Раніше повина бути використанна функція Нарахування дивідентів). ');
      end;
-     
+
      l_sum_divid := abs(FOSTZn(l_acc, gl.bd)) /100;
-     
+
      update cp_pay_dividents
-        set nazn = p_nazn, 
+        set nazn = p_nazn,
             sum = case when p_sum = sum then l_sum_divid - nvl(p_sum_tax, 0) - nvl(p_sum_comis_custody, 0) - nvl(p_sum_comis_transf, 0) else p_sum end,
             sum_tax = p_sum_tax,
             certificate = p_certificate,
@@ -3277,8 +3335,8 @@ end;
        raise_application_error(-20001,  'Оновив 0 записів!');
      end if;
 
-  end;  
-  
+  end;
+
   procedure make_oper_cp_pay_dividends (p_ref cp_pay_dividents.ref%type, p_nazn cp_pay_dividents.nazn%type, p_sum cp_pay_dividents.sum%type, p_sum_tax cp_pay_dividents.sum_tax%type, p_sum_comis_transf cp_pay_dividents.sum_comis_transf%type, p_sum_comis_custody cp_pay_dividents.sum_comis_custody%type, p_certificate cp_pay_dividents.certificate%type)
   is
     oo                oper%rowtype;
@@ -3286,7 +3344,7 @@ end;
     l_nls_3620        accounts.nls%type;
     l_nls_7419        accounts.nls%type;
     l_nls_7500        accounts.nls%type;
-    l_nls_7503        accounts.nls%type;        
+    l_nls_7503        accounts.nls%type;
   begin
     bars_audit.info('value_paper.make_oper_cp_pay_dividends START: REF=' || p_ref);
 
@@ -3295,7 +3353,7 @@ end;
     end if;
     if nvl(p_sum, 0) = 0 then
       raise_application_error(-20001,  'Вкажіть суму на виплату дивідентів');
-    end if;    
+    end if;
     if p_sum_tax is null and p_sum_comis_transf is null and p_sum_comis_custody is null then
       raise_application_error(-20001,  'Вкажіть хоча б одну суму по виплаті дивідентів');
     end if;
@@ -3307,8 +3365,8 @@ end;
     end if;
     if instr(p_nazn, '__') > 0 then
       raise_application_error(-20001,  'Відредагуйте призначення платежу (видаліть символи _ )');
-    end if;  
-    
+    end if;
+
     select a.nls_3620, a.nls_7419, a.nls_7500, a.nls_7503
      into l_nls_3620, l_nls_7419, l_nls_7500, l_nls_7503
     from cp_kod k
@@ -3317,8 +3375,8 @@ end;
     left join accounts acp on (d.accp = acp.acc)
     left join cp_accc a on (d.ryn = a.ryn and nvl(d.pf, a.pf) = a.pf and k.emi = a.emi and (substr(ac.nls,1,4)=a.vidd or substr(acp.nls,1,4)=a.vidd))
     where d.ref = p_ref;
-       
-    
+
+
     select a.nls, a.kv, substr(a.nms, 1, 38), c.okpo
     into   oo.nlsb, oo.kv, oo.nam_b, oo.id_b
     from cp_accounts ac, accounts a, customer c
@@ -3347,44 +3405,44 @@ end;
                   oo.nam_a, oo.nlsa,  gl.aMfo,
                   oo.nam_b, oo.nlsb,  gl.amfo,
                   oo.nazn ,null,oo.id_a, gl.Aokpo, null, null, 1, null, null);
-    gl.payv(0, oo.ref, gl.bdate, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2, oo.nlsb, oo.s2);    
-    
+    gl.payv(0, oo.ref, gl.bdate, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2, oo.nlsb, oo.s2);
+
     --3.1.	На суму утриманого податку з дивідендів
     if p_sum_tax > 0 then
-      if p_certificate = 1 then -- 3.1.1.	При наявності довідки 
-        if l_nls_3620 is null then 
+      if p_certificate = 1 then -- 3.1.1.	При наявності довідки
+        if l_nls_3620 is null then
           raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 3620');
-        end if;  
+        end if;
         gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_3620, gl.p_icurval(oo.kv2, p_sum_tax*100, gl.bd), oo.kv2, oo.nlsb, p_sum_tax*100);
-        else --3.1.2.	За відсутності довідки  
-          if l_nls_7419 is null then 
+        else --3.1.2.	За відсутності довідки
+          if l_nls_7419 is null then
             raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 7419');
-          end if;  
+          end if;
           gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_7419, gl.p_icurval(oo.kv2, p_sum_tax*100, gl.bd), oo.kv2, oo.nlsb, p_sum_tax*100);
-      end if;  
-    end if;   
-    
-    --3.2.	На суму утриманої банком-кореспондентом комісії за перерахування коштів 
+      end if;
+    end if;
+
+    --3.2.	На суму утриманої банком-кореспондентом комісії за перерахування коштів
     if p_sum_comis_transf > 0 then
-        if l_nls_7500 is null then 
+        if l_nls_7500 is null then
           raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 7500');
-        end if;  
+        end if;
         gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_7500, gl.p_icurval(oo.kv2, p_sum_comis_transf*100, gl.bd), oo.kv2, oo.nlsb, p_sum_comis_transf*100);
-    end if;  
+    end if;
 
-    --3.3.	 На суму утриманої зберігачем комісії 
+    --3.3.	 На суму утриманої зберігачем комісії
     if p_sum_comis_custody > 0 then
-        if l_nls_7503 is null then 
+        if l_nls_7503 is null then
           raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 7503');
-        end if;  
+        end if;
         gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_7503, gl.p_icurval(oo.kv2, p_sum_comis_custody*100, gl.bd), oo.kv2, oo.nlsb, p_sum_comis_custody*100);
-    end if;  
+    end if;
 
-    
+
     delete from cp_pay_dividents where user_id = user_id() and ref = p_ref;
     bars_audit.info('value_paper.make_oper_cp_pay_dividends END: REF=' || p_ref);
-  end;  
-  
+  end;
+
 
   --за основу функції взяті з нового пакету cp_rep_dgp
   --після устаканювання звітів, та потоків потрібно зробити єдину точку визову цих функцій, наприклад з цього пакету.
@@ -3456,7 +3514,7 @@ end;
       l_PFCombo.pf     := k.pf;
       l_PFCombo.val    := k.val;
       l_PFCombo.vidd   := k.vidd;
-      pipe row (l_PFCombo);      
+      pipe row (l_PFCombo);
     end loop;
  end;
 
@@ -3482,7 +3540,7 @@ end;
    loop
      l_RYNCombo.ryn     := k.ryn;
      l_RYNCombo.name    := k.name;
-     pipe row (l_RYNCombo);     
+     pipe row (l_RYNCombo);
    end loop;
  end;
 
@@ -3508,7 +3566,7 @@ end;
      l_PFCombo.pf     := k.pf;
      l_PFCombo.val    := k.val;
      l_PFCombo.vidd   := k.vidd;
-     pipe row (l_PFCombo);     
+     pipe row (l_PFCombo);
    end loop;
  end;
 
@@ -3530,9 +3588,216 @@ end;
    loop
      l_RYNCombo.ryn     := k.ryn;
      l_RYNCombo.name    := k.name;
-     pipe row (l_RYNCombo);     
+     pipe row (l_RYNCombo);
    end loop;
  end;
+
+ procedure change_params(p_par_name  cp_params.par_name%type,
+                         p_par_value cp_params.par_value%type,
+                         p_mode      number) --1 insert, 2 update, 3 delete
+ is
+ begin
+   if p_mode = 2 then
+     update cp_params set par_value = p_par_value where par_name = p_par_name;
+     else
+       --raise_application_error(-20001,  'Додавання та видалення параметрів модуля заборонені!');
+       bars_error.raise_nerror('CPN', 'DONT_TOUCH_PARAMS');
+   end if;
+ end;
+
+ function get_ifrs(p_nbs ps.nbs%type) return varchar2
+ is
+   l_ifrs            ifrs.ifrs_id%type := null;
+   l_is              number(1);
+   l_nbs_fvtpl_arr   string_list := string_list('1400', '1401', '1402', '1403', '1404', '1450', '3002', '3003', '3005', '3010', '3011', '3012', '3013', '3014');
+   l_nbs_fvoci_arr   string_list := string_list('1410', '1411', '1412', '1413', '1414', '1430', '3102', '3103', '3105', '3110', '3111', '3112', '3113', '3114');   
+   l_nbs_ac_arr      string_list := string_list('1420', '1421', '1422', '1423', '1424', '1440', '3210', '3211', '3212', '3213', '3214');      
+ begin
+   /* Можна було б додати в таблицю IFRS поле CP_NBS і туди прописати рахунки та надати можливість правити в інтерфейсі співробітникам... 
+      але ... знайшов в пакеті msfz9 обрахунок ifrs на базі двух параметрів - таблиця BUSMOD_SPPI_IFRS
+      ці параметри вони заповнють при придбані на формі і логічніше вкористовувати один варіант... 
+      ... але відділ ЦП надав саме алгоритм по балансовому рахунку (COBUMMFO-10301)
+   */
+   select count(*) into l_is from (select column_value from table( l_nbs_fvtpl_arr) ) t where t.column_value = p_nbs;
+   if l_is > 0 then
+     l_ifrs := 'FVTPL/Other';
+     return l_ifrs;
+   end if;  
+   select count(*) into l_is from (select column_value from table( l_nbs_fvoci_arr) ) t where t.column_value = p_nbs;
+   if l_is > 0 then
+     l_ifrs := 'FVOCI';
+     return l_ifrs;
+   end if;  
+   select count(*) into l_is from (select column_value from table( l_nbs_ac_arr) ) t where t.column_value = p_nbs;
+   if l_is > 0 then
+     l_ifrs := 'AC';
+     return l_ifrs;
+   end if;  
+  
+   return null;
+ end;  
+
+ --Create by Suhova T
+ --Adaptation by Honcharuk S
+ procedure cp_sdm_create(p_ref cp_deal.ref%type, p_dat date default null) is
+  -- Выравнивание бад.стоимости до справедливой путем создения счета SDM , входящено в бал.стоимость, так называемого "Д/П від модифік"
+    dd   cp_deal%rowtype;
+    kk   cp_kod%rowtype;
+    aD   accounts%rowtype;    --дочерний счет номинала, затем SDM
+    AR   accounts%rowtype;    --родительский счет номинала
+    CC   cp_accc%rowtype;     --вектор родительских счетов
+    AZ   accounts%rowtype;    --родительский счет SDM
+    k9   cck_ob22_9%rowtype;  --Справочник дл  6*7 кл
+    a6   accounts%rowtype;    --счет 6/7 класса
+    oo   oper%rowtype;        -- для проводки
+    --------------------------
+    l_Dat     date   ;
+    l_BV_Old  number ;
+    l_BV_New  number ;
+    l_Irr     number ;
+    p4_       int    ;
+    -------------------
+
+  begin
+    bars_audit.info('value_paper.cp_sdm_create: START p_ref='||p_ref||' p_dat='||p_dat);
+    --  проверка наличия входных данных и настроек
+    begin 
+      select * into dd from  cp_deal    where ref  = p_ref    and Erat > 0 and Erat < 100 ;  -- сделка
+      EXCEPTION 
+        WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'1) Угода реф='||p_ref || ' не існує або не розрахована реальна єф. ставка');
+    end;
+    begin   
+      select * into KK from  cp_kod     where id   = dd.id    and datp > gl.Bdate  and dox  > 1 ; -- ЦБ
+      EXCEPTION 
+        WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'2) ЦП id='||dd.id || ' неактуальна для даної операції');
+    end;
+    begin  
+      select * into aD from  accounts   where acc  = dd.acc   and ostc < 0                ;  -- номинал счелки
+      EXCEPTION 
+        WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'3) Рах. номіналу ACC ='||dd.acc || ' з сумою нуль');
+    end;
+    begin  
+      select * into aR from  accounts   where acc  = AD.ACCC  and dazs is null            ;  -- род.счет номинала
+      EXCEPTION 
+        WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'4) Рах. батьківського номіналу ACC ='||AD.ACCC || ' закритий');
+    end;
+    begin  
+      select * into CC from  cp_accc    where vidd = AR.NBS   and ryn  = dd.ryn    and NLSA = aR.NLS and D_CLOSE  is null ;
+      EXCEPTION 
+        WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'5) В cp_accc для vidd='||AR.NBS || ' та субпортфеля ryn='||dd.ryn||' неактіальні настройки');
+    end;
+
+    if CC.SDM is null then
+      raise_application_error(-20000,'6) Рахунок батьківський Д/П Модифікації в cp_accc для vidd='||AR.NBS || ' та субпортфеля ryn='||dd.ryn||' невказаний');
+    end if;  
+    begin 
+      select * into AZ from  accounts   where kv  = AR.kv  and nls = CC.SDM  and dazs is null;  -- род.счет SDM
+    EXCEPTION WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'6.1) Рахунок батьківський Д/П Модифікації SDM='||CC.SDM||' закритий або не існує');
+    end;        
+    begin
+        select * into K9 from  cck_ob22_9 where nbs = ar.NBS and ob22 = ar.ob22 and ( S3NM is not null  and S3VM is not null  and S3NP is not null  and S3VP is not null ) ;
+    EXCEPTION WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'7) Налаштування довідника cck_ob22_9 недостатнє для даної операції (NBS='||ar.NBS||' ob22='||ar.ob22||')');
+    end ;
+
+    -- Фактическая бал.стоимость
+    l_Dat := nvl( p_DAT, gl.Bdate)  ;
+    select  NVL( sum(fost(cp_acc, l_DAT) ), 0)                                 
+    into l_BV_Old
+    from cp_accounts 
+    where cp_ref = p_ref and cp_acctype in ('N','R2', 'D', 'P', 'R', 'R3', 'DT', 'PT', 'DV', 'PV', 'EXPN', 'EXPI', 'EXPR', 'SDM');
+
+    -- Расчетная Справедливая   стоимость
+    l_Irr := 1 + dd.Erat /100 ;
+    select nvl( sum( (ss1+sdp+sn2)*100/ power ( l_Irr, (fdat-l_DAT)/365) ),0)  
+    into l_BV_New  
+    from CP_MANY 
+    where ref = p_ref and fdat > l_DAT ;
+
+    -- Отклонение
+    oo.S  := trunc( l_BV_Old + l_BV_New );
+    If oo.S =0 then  Return; end if;
+    --------------------------------------
+
+    -- открыть (узнать) счет SDM
+    aD.nls := vkrzn ( substr(gl.aMfo,1,5),  substr( AZ.nls,1,4)||'_3'||substr(aD.nls,7,8)  ) ;
+    aD.nms := substr( 'SDM/'|| aD.nms, 1, 38  ) ;
+    cp.CP_REG_EX ( 99,0,0, ad.grp, p4_, ad.RNK, aD.nls, ad.kv, aD.NMS, 'SDM', ad.isp, aD.acc);
+    update accounts set accc = aZ.acc, mdate = aD.mdate, tobo = aD.tobo  where acc =  aD.acc ;
+
+    begin 
+      insert into cp_ref_acc( ref, acc) values (p_ref, ad.acc) ;
+      exception when dup_val_on_index then null;  -- ORA-00001: unique constraint (BARS.PK_CPREFACC) violated
+    end;
+
+    begin     
+      insert into cp_accounts (cp_ref,cp_acctype,cp_acc)     values (p_ref, 'SDM', aD.acc);
+      exception when dup_val_on_index then null;        --   when others then null;
+    end;
+
+    -- найти счет 6/7 кл для создания останка на SDM
+    if oo.S < 0 then
+       oo.dk := 0;  oo.S := - oo.S ;  -- Дисконт 7 кл
+       if aD.kv = gl.baseVal then 
+         a6.nbs := Substr (k9.S3NP,1,4);  a6.ob22 := Substr (k9.S3NP,5,2); -- IS 'БС+Об22~NEW_FEE~плюс S3 грн~від модф~MODIF'
+       else                       
+         a6.nbs := Substr (k9.S3VP,1,4);  a6.ob22 := Substr (k9.S3VP,5,2); -- IS 'БС+Об22~NEW_FEE~плюс S3 вал~від модф~MODIF'
+       end if;
+    else
+      oo.dk := 1;                   -- Премися 6 кл
+      if ad.kv = gl.baseVal then 
+        a6.nbs := Substr (k9.S3NM,1,4);  a6.ob22 := Substr (k9.S3NM,5,2); -- IS 'БС+Об22~NEW_FEE~мінус S3 грн~від модф~MODIF
+      else                       
+        a6.nbs := Substr (k9.S3VM,1,4);  a6.ob22 := Substr (k9.S3VM,5,2); -- IS 'БС+Об22~NEW_FEE~мінус S3 вал~від модф~MODIF'
+      end if;
+    end if  ;
+
+    begin 
+      select * 
+        into a6 
+        from  (select * from accounts 
+               where  nbs= a6.nbs and ob22 = a6.ob22 and dazs is null  
+               order by decode (BRANCH, Substr(ad.BRANCH,1,15) ,1,2 ) )   
+        where rownum = 1 ;
+        
+        EXCEPTION WHEN NO_DATA_FOUND  THEN
+          OP_BS_OB1( PP_BRANCH => substr( ad.branch,1,15), P_BBBOO => a6.nbs||a6.ob22) ;
+          a6.nls := nbs_ob22_null (nbs_  => a6.nbs,  ob22_ => a6.ob22,  p_branch => substr( ad.branch,1,15) ) ;
+          if a6.nls is not null then 
+            select * into a6 from accounts  where kv = gl.baseval and nls = a6.nls   ; 
+          end if;
+    end ;
+    if a6.nls is null then   
+      raise_application_error(-20000, 'Не отримано рах.'||a6.NBS||'.'||a6.ob22); 
+    end if ;
+
+    oo.s2 := gl.p_icurval (ad.KV, oo.s, l_DAT);
+    oo.nazn := Substr('Коригування валової балансової вартості ЦП '|| oo.Nazn || ' на '|| to_char(l_DAT, 'dd.mm.yyyy') ||'р. пакет REF='||  p_ref ,1,160) ;
+    oo.TT := 'FXM' ;
+
+    GL.REF ( oo.ref) ;
+    GL.in_doc3 (ref_ =>oo.REF ,  tt_  => oo.TT  , vob_ => 6 , nd_   =>substr(to_char(oo.ref),1,10), pdat_=> sysdate,
+                vdat_=>gl.Bdate,  dk_ => oo.dk  , kv_  =>aD.kv, s_  =>oo.s,  kv2_  =>gl.baseval,   s2_ => oo.s2,
+                sk_  =>null   ,  data_=>gl.bDATE, datp_=>gl.bdate,
+               nam_a_=>substr(ar.NMS,1,38),  nlsa_=> aR.nls , mfoa_=> gl.AMFO ,
+               nam_b_=>substr(a6.NMS,1,38),  nlsb_=> a6.NLS , mfob_=> gl.AMFO,
+                nazn_=>oo.nazn, d_rec_=> null   , id_a_ =>gl.aOKPO, id_b_ =>gl.aOKPO,
+                id_o_=>null   ,  sign_=> null   , sos_ => 1     , prty_ =>null   , uid_ => null ) ;
+    gl.payv( 0, oo.ref, gl.Bdate , oo.TT,  oo.dk, ad.kv, ad.nls, oo.s, gl.baseval, a6.nls, oo.s2 );
+    
+    --додамо в архів операцій. допоМоже в перебудові потоків cp_many 
+    insert into cp_arch (REF_MAIN,    REF,    ID, DAT_UG  , DAT_OPL, DAT_ROZ, SUMB,   N, OP, d, p, r, s, vd, vp, t, tq) values
+                        (p_ref   , oo.ref, dd.id, gl.bdate,gl.bdate,gl.bdate, oo.s,   0, 30, 0, 0, 0, 0,  0,  0, 0,  0);
+    
+    
+    bars_audit.info('value_paper.cp_sdm_create: END p_ref='||p_ref);
+    
+    exception
+      when others then
+        bars_audit.error('value_paper.cp_sdm_create: '||SQLERRM||','||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
+        raise;
+  end cp_sdm_create;
+
+
 
 
 END value_paper;

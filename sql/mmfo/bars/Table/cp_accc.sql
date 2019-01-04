@@ -290,6 +290,12 @@ end;
 /
 COMMENT ON COLUMN BARS.CP_ACCC.NLS_7419 IS 'Рах 7503 (при виплаті дивідентів)';
 
+begin 
+  EXECUTE IMMEDIATE 'alter table CP_ACCC add (SDM varchar2(15) ) ';
+  exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+
 
 PROMPT *** Create  grants  CP_ACCC ***
 grant SELECT                                                                 on CP_ACCC         to BARSUPL;
