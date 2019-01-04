@@ -353,7 +353,11 @@ function homeController($scope, paramsService, $window, LS) {
         });
     }
 
-    $scope.openMetaTableWithRef = function () {        
+    $scope.openMetaTableWithRef = function () {    
+        if (!$scope.firstSelRow) {
+            bars.ui.error({ text: "необхідно виділити рядок в таблиці" });
+            return;
+        }
         var options = {
             jsonSqlParams: "[{\"Name\":\"P_REF\",\"Type\":\"S\",\"Value\":" + $scope.firstSelRow.REF+ "}]",
             code: "V_CP_INT_DIVIDENTS",
@@ -367,7 +371,11 @@ function homeController($scope, paramsService, $window, LS) {
 
     }
           
-    $scope.openMetaTable4PayDiv = function () {        
+    $scope.openMetaTable4PayDiv = function () {
+        if (!$scope.firstSelRow) {
+            bars.ui.error({ text: "необхідно виділити рядок в таблиці" });
+            return;
+        }
         var options = {
             jsonSqlParams: "[{\"Name\":\"P_REF\",\"Type\":\"S\",\"Value\":" + $scope.firstSelRow.REF+ "}]",
             code: "V_CP_PAY_DIVIDENTS",
@@ -380,6 +388,22 @@ function homeController($scope, paramsService, $window, LS) {
         }, options);
 
     }
+    $scope.openMetaTable4accOpen = function () {
+        if (!$scope.firstSelRow) {
+            bars.ui.error({ text: "необхідно виділити рядок в таблиці" });
+            return;
+        }
+        var options = {
+            jsonSqlParams: "[{\"Name\":\"P_REF\",\"Type\":\"S\",\"Value\":" + $scope.firstSelRow.REF + "}]",
+            code: "V_CP_DPM",
+            hasCallbackFunction: false//,
+            // externelFuncOnly: true,
+        };
+
+        bars.ui.getMetaDataNdiTable("", function () {}, options);
+
+    }
+
     $scope.getBMD = function () {
         bars.ui.getMetaDataNdiTable("CP_KOD", function (response) {
             bars.ui.dialog({
