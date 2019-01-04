@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.28 28.12.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.29 04.01.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -506,6 +506,29 @@ TYPE r_many_grid
   return t_cpv_grid pipelined;
 
   FUNCTION CONCAT_BLOB(A IN BLOB, B IN BLOB) RETURN BLOB;
+  
+            ----  залишено на момент перехідного між 51 релізом і багфіксом
+              type r_int_prepare is record ( runn   number,
+                                             acc    accounts.acc%type,
+                                             nmsa   accounts.nms%type,
+                                             nlsa   accounts.nls%type,
+                                             kva    accounts.kv%type,
+                                             id_a   customer.okpo%type,
+                                             nmsb   accounts.nms%type,
+                                             nlsb   accounts.nls%type,
+                                             kvb    accounts.kv%type,
+                                             id_b   customer.okpo%type,
+                                             fdat   date,
+                                             tdat   date,
+                                             ir     number,
+                                             ostt   number,
+                                             int    number,
+                                             ost    number,
+                                             nazn   oper.nazn%type,
+                                             tt     oper.tt%type);
+              type t_int_prepare is table of r_int_prepare;
+              function make_int_prepare return t_int_prepare pipelined;
+            ------видалити як все устаканиться
 
   procedure make_int_prepare;
   procedure make_oper_cp_int(p_id cp_int.id%type);
@@ -555,16 +578,16 @@ TYPE r_many_grid
   procedure change_params(p_par_name  cp_params.par_name%type,
                           p_par_value cp_params.par_value%type,
                           p_mode      number); --1 insert, 2 update, 3 delete
-                          
-  function get_ifrs(p_nbs ps.nbs%type) return varchar2;               
-  
-  procedure cp_sdm_create(p_ref cp_deal.ref%type, p_dat date default null); 
+
+  function get_ifrs(p_nbs ps.nbs%type) return varchar2;
+
+  procedure cp_sdm_create(p_ref cp_deal.ref%type, p_dat date default null);
 
 END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.46 04.01.2019';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.47 04.01.2019';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -2825,6 +2848,175 @@ END;
   end loop;
 
  end;
+
+            ----  залишено на момент перехідного між 51 релізом і багфіксом
+ function make_int_prepare return t_int_prepare pipelined
+ is
+ pragma autonomous_transaction;
+ l_int_prepare r_int_prepare;
+ l_int number := 0;
+ l_dat2 date;
+ begin
+  l_dat2 := to_date(bars.pul.get('cp_v_date'),'dd.mm.yyyy');
+  bars_audit.info('value_paper.make_int_prepare:' || to_char(l_dat2,'dd.mm.yyyy'));
+  for k in (     SELECT
+                    (SELECT NVL (k.dok, k.dat_em)
+                       FROM cp_deal d, cp_kod k
+                      WHERE d.acc = x.Acc AND k.id = cpid) as dok,
+                    (SELECT NVL (k.dnk, k.datp)
+                       FROM cp_deal d, cp_kod k
+                      WHERE d.acc = x.Acc AND k.id = cpid) as dnk,
+                    (SELECT COUNT (REF)
+                       FROM opldok
+                      WHERE acc = x.accr AND sos > 0 AND sos < 5)
+                       AS notvisa,
+                    x.kv,
+                    x.nls,
+                    x.nms,
+                    x.nbs,
+                    x.ACCC,
+                    x.tip,
+                    x.acc,
+                    x.rnk,
+                    x.id,
+                    x.ACR_DAT,
+                    x.acra,
+                    x.acrb,
+                    x.stp_DAT,
+                    x.METR,
+                    x.BASEY,
+                    x.BASEM,
+                    x.tt,
+                    aa.nls NLSA,
+                    aa.nms NMSA,
+                    aa.kv KVA,
+                    bb.nls NLSb,
+                    bb.nms NMSb,
+                    bb.kv KVb,
+                    x.ob22,
+                    x.ostc / 100 ostc,
+                    x.dapp,
+                    x.branch,
+                    x.accr,
+                    x.REF
+               FROM accounts aa,
+                    accounts bb,
+                    (SELECT a.kv,
+                            a.nls,
+                            a.nms,
+                            a.nbs,
+                            a.ACCC,
+                            a.tip,
+                            a.acc,
+                            a.rnk,
+                            a.ob22,
+                            a.ostc,
+                            a.dapp,
+                            i.id,
+                            cd.id cpid,
+                            GREATEST (a.daos - 1, i.acr_dat) ACR_DAT,
+                            i.acra,
+                            i.acrb,
+                            i.stp_DAT,
+                            i.METR,
+                            i.BASEY,
+                            i.BASEM,
+                            i.tt,
+                            a.branch,
+                            ca.CP_ref REF,
+                            car.cp_acc accr
+                       FROM int_accn i,
+                            cp_accounts ca,
+                            accounts a,
+                            cp_deal cd,
+                            cp_accounts car
+                      WHERE     a.acc = i.acc
+                            AND a.acc = ca.cp_acc
+                            AND ca.cp_ref = car.cp_ref
+                            AND car.cp_acctype = 'R'
+                            AND a.acc = cd.acc
+                            AND a.dazs IS NULL
+                            and cd.ref in (select ref from table(value_paper.get_cp(0, 22, null, bars.pul.Get_Mas_Ini_Val('cp_filter'), l_dat2, 1)))
+                            AND (   i.metr IN (0,1,2,3,4,5,7,8,10,12,23,515) OR i.metr > 90)
+                            AND i.id NOT IN (10, 11)) x
+              WHERE x.acra = aa.acc AND x.acrb = bb.acc)
+  loop
+   BARS.INT_CP_P(p_METR => k.metr, --код методики
+                 p_Acc  => k.acc,  -- для передачи в
+                 p_Id   => k.id,   -- acrn.p_int(nAcc,nId,dDat1,dDat2,nInt,nOst,nMode)
+                 p_Dat1 => k.ACR_DAT+1,  --
+                 p_Dat2 => l_dat2,  --
+                 p_Int  => l_int,  -- Interest accrued
+                 p_Ost  => k.ostc,
+                 p_Mode => 1);
+  commit;
+  end loop;
+
+  for k in (  WITH cpacc as (select cp_acc, cp_ref from cp_accounts)
+            SELECT user_id, a.acc,
+                   ar.nms as nmsa,
+                   ar.nls as nlsa,
+                   ar.kv as kva,
+                   (select okpo from customer where rnk = (select rnk from accounts where acc = a.acc)) as id_a,
+                   an.fdat, an.tdat, an.ir,
+                   abs(fost(a.acc, an.tdat)/100) ostt,
+                   abs(an.acrd/100) int,
+                   abs(a.ostc/100) ost,
+                   (select nls from accounts where acc = ia.acrb) nlsb,
+                   (select nms from accounts where acc = ia.acrb) nmsb,
+                   (select kv from accounts where acc = ia.acrb) kvb,
+                   (select okpo from customer where rnk = (select rnk from accounts where acc = ia.acrb)) as id_b,
+                   ia.tt,
+                   case when ck.tip =  ck.tip -- 2 говорят, не правильное назначение для ДС, надо для всех такое
+                   THEN
+                       'Нарах.% по '
+                              --||trim(case when ck.tip = 2 then 'ДС' when ck.kv = '036' then 'ЦП' else 'ОВДП' end)
+                              ||(select name from cp_type where idt = ck.idt)
+                              ||' '||trim(ck.cp_id)
+                              ||' уг.'||(select nd from oper where ref = cd.ref)||' '||abs(a.ostc/(100*ck.cena))||'шт. купон'
+                              ||(select kup from cp_dat where id = ck.id  and dok = (select min(dok) from cp_dat where dok > l_dat2 and id = ck.id))||' за період ' ||to_char(fdat,'dd.mm.yyyy')||' - '||to_char(tdat,'dd.mm.yyyy')
+                   ELSE
+                       'нарах.%(купон) по рах. '||a.nls||' '
+                              --||trim(case when ck.tip = 2 then 'ДС' when ck.kv = '036' then 'ЦП' else 'ОВДП' end)
+                              ||(select name from cp_type where idt = ck.idt)
+                              ||' '||trim(ck.cp_id)
+                              ||' уг.'||(select nd from oper where ref = cd.ref)||' '||abs(a.ostc/(100*ck.cena))||'шт. купон'
+                              ||(select kup from cp_dat where id = ck.id  and dok = (select min(dok) from cp_dat where dok > l_dat2 and id = ck.id)) ||' за період '||to_char(fdat,'dd.mm.yyyy')||' - '||to_char(tdat,'dd.mm.yyyy')
+                   END nazn
+              FROM acr_intN an, cpacc c, accounts a, accounts ar, int_accn ia, cp_deal cd, cp_kod ck
+             where an.acc = c.cp_acc
+               and a.acc = an.acc
+               and ia.acc = a.acc
+               and ia.acra = ar.acc
+               and ia.id = an.id
+               and cd.ref = c.cp_ref
+               and cd.id = ck.id
+              order by a.acc, an.fdat)
+  loop
+      l_int_prepare.runn   := 0;
+      l_int_prepare.acc    := k.acc;
+      l_int_prepare.nmsa   := k.nmsa;
+      l_int_prepare.nlsa   := k.nlsa;
+      l_int_prepare.kva    := k.kva;
+      l_int_prepare.id_a   := k.id_a;
+      l_int_prepare.fdat   := k.fdat;
+      l_int_prepare.tdat   := k.tdat;
+      l_int_prepare.ir     := k.ir;
+      l_int_prepare.ostt   := k.ostt;
+      l_int_prepare.int    := k.int;
+      l_int_prepare.ost    := k.ost;
+      l_int_prepare.nmsb   := k.nmsb;
+      l_int_prepare.nlsb   := k.nlsb;
+      l_int_prepare.kvb    := k.kvb;
+      l_int_prepare.id_b   := k.id_b;
+      l_int_prepare.tt     := k.tt;
+      l_int_prepare.nazn   := k.nazn;
+
+      pipe row (l_int_prepare);
+  end loop;
+ end;
+ ------------видалити  як все устаканиться
+
 
  procedure make_int_prepare
  is
