@@ -63,7 +63,7 @@
                 <button style="background: whitesmoke;" title="Куплено-Продано-Погашено" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_CP_TOTALS')"><img src="~/Areas/ValuePapers/Content/Images/LOOK.png"></button>
                 <button style="background: white;" title="Сплата купону" class="k-button" ng-click="payTicket('@Model.strPar02', '@Model.nGrp', 0)"><img src="~/Areas/ValuePapers/Content/Images/DESCEND.png"></button>
                 <button style="background: white; " title="Сплата купону однотипної групи" class="k-button" ng-click="payTicket('@Model.strPar02', '@Model.nGrp', 1)"><img src="~/Areas/ValuePapers/Content/Images/DESCEND2.png"></button>
-                <button title="Амортизація Дисконту/Премії на дату" class="k-button" ng-click="cpAmor()"><img src="~/Areas/ValuePapers/Content/Images/SELECT.png"></button>                
+                <button title="Амортизація Дисконту/Премії на дату" class="k-button" ng-click="cpAmor()"><img src="~/Areas/ValuePapers/Content/Images/SELECT.png"></button>
                 <button style="background: beige;" title="Гарантії по пакету цінних паперів від третіх осіб" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&tableName=V_CP_WARRANTY_WEB')"><img src="~/Areas/ValuePapers/Content/Images/A_ACCS.png"></button>
                 <button style="background: white;" title="Додаткові реквізити до портфелю ЦП" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_CP_EMI')"><img src="~/Areas/ValuePapers/Content/Images/CREATE.png"></button>
                 <button style="background: honeydew;" title="Кандидати на прострочку" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&tableName=V_CP_EXPCANDIDATES_NEW')"><img src="~/Areas/ValuePapers/Content/Images/LINKR.png"></button>
@@ -75,6 +75,7 @@
                 <button style="background: mintcream; " title="Перегляд своїх операцій" class="k-button" ng-click="openBarsDialog('/barsroot/documentsview/documents.aspx?type=1&par=11')"><img src="~/Areas/ValuePapers/Content/Images/SEARCH.png"></button>
                 <button class=" k-button" title="План потоки" ng-click="openPlanMoneyFlow()"><img src="~/Areas/ValuePapers/Content/Images/A_FINS.png"></button>
                 <button style="background: whitesmoke;" title="Потоки" class="k-button" ng-click="openMoneyFlow()"><img src="~/Areas/ValuePapers/Content/Images/CHARTL.png"></button>
+                <button style="background: whitesmoke;" title="Дисконт/премія модифікації" class="k-button" ng-click="openMetaTable4accOpen()"><img src="~/Areas/ValuePapers/Content/Images/accOpen.png"></button>
             </div>
             <div style="margin-top: 20px;" class="row">
                 <div id="grid" kendo-grid="grid" options="gridOptions"></div>
