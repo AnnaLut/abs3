@@ -53,16 +53,16 @@ begin
     l_zpr.default_vars := ':TEMA=''0'',:BRANCH=''%'',:PRN=''0'',:ISP=''0''';
     l_zpr.bind_sql     := ':TEMA=''TEST_ZVT|TEMA|NAME|ORDER BY TEMA'',:BRANCH=''BRANCH2|BRANCH|NAME|ORDER BY BRANCH''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select t.TEMA, b.BRANCH, d.isp USERID, d.KV, d.TT, d.REF, d.NLSD, d.NLSK, 
-     d.S S, d.SQ, b.NAME,t.name NAMET 
+    l_zpr.txt          := 'select t.TEMA, b.BRANCH, d.isp USERID, d.KV, d.TT, d.REF, d.NLSD, d.NLSK,
+     d.S S, d.SQ, b.NAME,t.name NAMET
 from  branch b, TEST_ZVT t, zvt_doc d
-where d.fdat = to_date( :sFdat1,''dd-mm-yyyy'')  
-  and ( nvl(:PRN,''0'') = ''0'' or t.PRN =:PRN ) 
-  and b.branch = substr( d.branch,1,15) 
+where d.fdat = to_date( :sFdat1,''dd-mm-yyyy'')
+  and ( nvl(:PRN,''0'') = ''0'' or t.PRN =:PRN )
+  and b.branch = substr( d.branch,1,15)
   and t.tema =abs(d.tema )
   and t.tema = decode(:TEMA,''0'', t.tema, to_number(:TEMA))
-  and b.branch like :BRANCH || decode ( length(:BRANCH), 8, '''',''%'' )   
-  and d.isp = :ISP  
+  and b.branch like :BRANCH || decode ( length(:BRANCH), 8, '''',''%'' )
+  and d.isp = decode(:ISP,''0'', d.ISP, to_number(:ISP))
 order by 1, 2, 3,  sign(tema),   4, 5, 6';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
@@ -142,6 +142,14 @@ end;
                                             
 commit;                                     
 
+exec umu.add_report2arm(107,'$RM_BUHG');
+exec umu.add_report2arm(107,'$RM_DRU1');
+exec umu.add_report2arm(107,'$RM_OWAY');
+exec umu.add_report2arm(107,'$RM_MAIN');
+exec umu.add_report2arm(107,'$RM_OPER');
+exec umu.add_report2arm(107,'$RM_BVBB');
+exec umu.add_report2arm(107,'$RM_BVB ');
+commit;
 
 
 PROMPT ===================================================================================== 
