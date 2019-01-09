@@ -281,12 +281,13 @@ begin
       --
       insert
         into tmp_accm_snap_first(acc, rnk, ost, ostq, dos, dosq, kos, kosq)
-      select acc, null, 0, 0, 0, 0, 0, 0
-        from tmp_sal_acc
-       where p_dat1 not between daos and nvl(dazs, to_date('01.01.4000','dd.mm.yyyy'))
+      select t_acc.acc, null, 0, 0, 0, 0, 0, 0
+        from tmp_sal_acc t_acc
+       where p_dat1 not between t_acc.daos and nvl(t_acc.dazs, to_date('01.01.4000','dd.mm.yyyy'))
          and (p_dat1, p_dat2+0.999994)
              overlaps
-             (daos, nvl(dazs, to_date('01.01.4000','dd.mm.yyyy'))+0.999994);
+             (t_acc.daos, nvl(t_acc.dazs, to_date('01.01.4000','dd.mm.yyyy'))+0.999994)
+         and not exists (select t.acc from tmp_accm_snap_first t where t.acc = t_acc.acc);
       --
       logger.trace('%s: дополнено %s счетов', p, to_char(sql%rowcount));
       --
