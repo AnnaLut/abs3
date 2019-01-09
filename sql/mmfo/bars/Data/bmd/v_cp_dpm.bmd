@@ -133,7 +133,7 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Вирівняти бал. варт. від дій по модифікації', 'value_paper.cp_sdm_create(:REF, null) ', '', 'EACH', 'Виконати необхідні дії-?: Так/НІ', 'OK', '', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Вирівняти бал. варт. від дій по модифікації', '', '', 'EACH', 'Виконати відкриття рах. та проведення?', 'OK', '', '', 'sPar=[PROC=>value_paper.cp_sdm_create(:REF, :DV, :z)][PAR=>:DV(SEM=Дата валютування,TYPE=D),:z(SEM=Коригуючими - 1,TYPE=N)]', null);
 
 
   -- восстанавливаем ссылки сложных полей других таблиц
