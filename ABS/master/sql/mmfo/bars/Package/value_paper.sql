@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.29 04.01.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.30 09.01.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -581,13 +581,15 @@ TYPE r_many_grid
 
   function get_ifrs(p_nbs ps.nbs%type) return varchar2;
 
-  procedure cp_sdm_create(p_ref cp_deal.ref%type, p_dat date default null);
+  procedure cp_sdm_create(p_ref    cp_deal.ref%type, 
+                         p_dat    date default null,
+                         p_zo     int  default 0);
 
 END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.47 04.01.2019';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.48 09.01.2019';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -3839,7 +3841,9 @@ end;
 
  --Create by Suhova T
  --Adaptation by Honcharuk S
- procedure cp_sdm_create(p_ref cp_deal.ref%type, p_dat date default null) is
+ procedure cp_sdm_create(p_ref    cp_deal.ref%type, 
+                         p_dat    date default null,
+                         p_zo     int  default 0) is
   -- Выравнивание бад.стоимости до справедливой путем создения счета SDM , входящено в бал.стоимость, так называемого "Д/П від модифік"
     dd   cp_deal%rowtype;
     kk   cp_kod%rowtype;
@@ -3901,7 +3905,7 @@ end;
 
     -- Фактическая бал.стоимость
     l_Dat := nvl( p_DAT, gl.Bdate)  ;
-    select  NVL( sum(fost(cp_acc, l_DAT) ), 0)
+    select  NVL( sum(OSTM(cp_acc, l_DAT) ), 0)
     into l_BV_Old
     from cp_accounts
     where cp_ref = p_ref and cp_acctype in ('N','R2', 'D', 'P', 'R', 'R3', 'DT', 'PT', 'DV', 'PV', 'EXPN', 'EXPI', 'EXPR', 'SDM');
@@ -3969,20 +3973,29 @@ end;
     if a6.nls is null then
       raise_application_error(-20000, 'Не отримано рах.'||a6.NBS||'.'||a6.ob22);
     end if ;
-
+    if a6.daos > l_Dat then 
+      update accounts set daos = l_dat where acc = a6.acc; 
+    end if;
     oo.s2 := gl.p_icurval (ad.KV, oo.s, l_DAT);
     oo.nazn := Substr('Коригування валової балансової вартості ЦП '|| oo.Nazn || ' на '|| to_char(l_DAT, 'dd.mm.yyyy') ||'р. пакет REF='||  p_ref ,1,160) ;
     oo.TT := 'FXM' ;
+    oo.vdat := l_Dat ;
+    if p_Zo = 1 then 
+      oo.Vob := 96 ; 
+      else             
+        oo.Vob :=  6 ;
+    end if ;
+    
 
     GL.REF ( oo.ref) ;
-    GL.in_doc3 (ref_ =>oo.REF ,  tt_  => oo.TT  , vob_ => 6 , nd_   =>substr(to_char(oo.ref),1,10), pdat_=> sysdate,
-                vdat_=>gl.Bdate,  dk_ => oo.dk  , kv_  =>aD.kv, s_  =>oo.s,  kv2_  =>gl.baseval,   s2_ => oo.s2,
+    GL.in_doc3 (ref_ =>oo.REF ,  tt_  => oo.TT  , vob_ => oo.Vob , nd_   =>substr(to_char(oo.ref),1,10), pdat_=> sysdate,
+                vdat_=>oo.vdat,  dk_ => oo.dk  , kv_  =>aD.kv, s_  =>oo.s,  kv2_  =>gl.baseval,   s2_ => oo.s2,
                 sk_  =>null   ,  data_=>gl.bDATE, datp_=>gl.bdate,
                nam_a_=>substr(ar.NMS,1,38),  nlsa_=> aR.nls , mfoa_=> gl.AMFO ,
                nam_b_=>substr(a6.NMS,1,38),  nlsb_=> a6.NLS , mfob_=> gl.AMFO,
                 nazn_=>oo.nazn, d_rec_=> null   , id_a_ =>gl.aOKPO, id_b_ =>gl.aOKPO,
                 id_o_=>null   ,  sign_=> null   , sos_ => 1     , prty_ =>null   , uid_ => null ) ;
-    gl.payv( 0, oo.ref, gl.Bdate , oo.TT,  oo.dk, ad.kv, ad.nls, oo.s, gl.baseval, a6.nls, oo.s2 );
+    gl.payv( 0, oo.ref, oo.vdat , oo.TT,  oo.dk, ad.kv, ad.nls, oo.s, gl.baseval, a6.nls, oo.s2 );
 
     --додамо в архів операцій. допоМоже в перебудові потоків cp_many
     insert into cp_arch (REF_MAIN,    REF,    ID, DAT_UG  , DAT_OPL, DAT_ROZ, SUMB,   N, OP, d, p, r, s, vd, vp, t, tq) values
