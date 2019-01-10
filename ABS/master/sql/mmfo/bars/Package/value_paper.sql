@@ -3979,11 +3979,13 @@ end;
     oo.s2 := gl.p_icurval (ad.KV, oo.s, l_DAT);
     oo.nazn := Substr('Коригування валової балансової вартості ЦП '|| oo.Nazn || ' на '|| to_char(l_DAT, 'dd.mm.yyyy') ||'р. пакет REF='||  p_ref ,1,160) ;
     oo.TT := 'FXM' ;
-    oo.vdat := l_Dat ;
+--    oo.vdat := l_Dat ;
     if p_Zo = 1 then 
       oo.Vob := 96 ; 
+      oo.vdat := dat_next_u(trunc(gl.bDATE, 'MM'), - 1);
       else             
         oo.Vob :=  6 ;
+        oo.vdat := gl.bDATE;
     end if ;
     
 
