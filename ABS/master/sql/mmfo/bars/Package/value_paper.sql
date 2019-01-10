@@ -589,7 +589,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.48 09.01.2019';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.49 10.01.2019';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -3915,7 +3915,7 @@ end;
     select nvl( sum( (ss1+sdp+sn2)*100/ power ( l_Irr, (fdat-l_DAT)/365) ),0)
     into l_BV_New
     from CP_MANY
-    where ref = p_ref and fdat > l_DAT ;
+    where ref = p_ref and fdat >= l_DAT ;
 
     -- Отклонение
     oo.S  := trunc( l_BV_Old + l_BV_New );
