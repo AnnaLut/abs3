@@ -1,7 +1,9 @@
 CREATE OR REPLACE TYPE t_compare_json AS OBJECT (
-  id                  NUMBER,                                    
+  id                  NUMBER,
   report_id           NUMBER,
   object_id           NUMBER,
-  json                CLOB
+  json                CLOB,
+  reporting_date      date, 
+  reporting_time      date
 )
 /
