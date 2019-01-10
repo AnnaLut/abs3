@@ -101,7 +101,7 @@ is
   ----------------------------------------------
   --  константы
   ----------------------------------------------
-  G_BODY_VERSION    constant varchar2(64) := 'version 1.1  27.12.2018';
+  G_BODY_VERSION    constant varchar2(64) := 'version 1.2 09.01.2019';
   G_MODULE          constant char(3)      := 'T00';    -- код модуля
   G_TRACE           constant varchar2(50) := 't00_stats.';
 
@@ -156,9 +156,14 @@ is
         --bars_error.nerror('REP', 'DATE_YET_PROCCED', to_char(p_bankdate, 'dd/mm/yyyy'));  
      end if; 
      
-     select acc into l_acc 
-       from accounts a 
-      where a.tip = 'T00' and a.kv = 980 ; 
+     begin 
+        select acc into l_acc 
+          from accounts a 
+         where a.tip = 'T00' and a.kv = 980; 
+     exception when no_data_found then
+       return;
+     end;
+
    
        -- население дебетовых оборотов 
        bars.bars_audit.info(l_trace||'старт населения информации оп оборотам');
@@ -301,9 +306,14 @@ is
         --bars_error.nerror('REP', 'DATE_YET_PROCCED', to_char(p_bankdate, 'dd/mm/yyyy'));  
      end if;
 
-      select s.ostf - s.dos + s.kos, a.acc into l_t00_ost, l_acc 
-       from saldoa s, accounts a 
-      where a.tip = 'T00' and s.fdat = p_bankdate and a.kv = 980 and a.acc = s.acc; 
+     begin
+        select s.ostf - s.dos + s.kos, a.acc into l_t00_ost, l_acc 
+          from saldoa s, accounts a 
+         where a.tip = 'T00' and s.fdat = p_bankdate and a.kv = 980 and a.acc = s.acc;   
+     exception when no_data_found then
+       return;
+     end;
+
 
       l_sum := 0;
       for c in (
@@ -368,7 +378,12 @@ is
 
 
 
-        l_fantomsum := l_t00_ost - l_sum;
+        if  l_t00_ost > 0 then 
+            l_fantomsum := l_t00_ost - l_sum;
+        else
+            l_fantomsum := l_t00_ost + l_sum;
+        end if;
+
         bars.bars_audit.info(l_trace||'вставка для '||gl.kf||' суми фантома = l_t00_ost - l_sum  = '||l_t00_ost||'-'||l_sum||'='||l_fantomsum);
 
         -- населенеи строки фантомных сумм
