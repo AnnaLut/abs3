@@ -1433,6 +1433,10 @@ end add_dop_req;
                       raise_application_error(-20000, 'Рахунок відправника не знайдено!');
               end;
 
+              if (substr(p_nlsb,1,4) in ('2605','2625','2655')) then
+                 raise_application_error(-20000, ' Номери карт. рах. 2625, 2605, 2655 змінено у зв''язку з вимогами Постанови НБУ № 89 від 11.09.2017!!!');
+              end if;
+              
               select sb.id
                 into l_userid
                 from staff$base sb
