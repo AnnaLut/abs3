@@ -80,7 +80,7 @@ create or replace package nbu_601_request_data_ru is
     procedure  p_nbu_pledge_dep  (kf_ in varchar2);
 end;
 /
-CREATE OR REPLACE package body BARS.nbu_601_request_data_ru is
+create or replace package body nbu_601_request_data_ru is
 
     g_balance_accounts string_list := string_list('2010', '2018', '2020', '2027', '2028', '2029', '2030', '2037', '2038', '2039', '2060', '2062',
                                                   '2063', '2067', '2068', '2069', '2071', '2077', '2078', '2079', '2082', '2083', '2087', '2088',
@@ -940,7 +940,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                   group by t.acc) proc on proc.acc = bpk.acc_pk
                                                 -- and bpk.nbs in ('2625', '2202', '2203', '2605', '2062', '2063','9129') --номінальна процентна ставка
 
-                       left join (select s.nd, s.tag,s.value from bpk_parameters  s where tag='FLAGINSURANCE') flg on flg.nd=bpk.nd 
+                       left join (select s.nd, s.tag,s.value from bpk_parameters  s where tag='FLAGINSURANCE') flg on flg.nd=bpk.nd
                        --sumpay
                        left join(select nd ,sum(sumo+sumk) as sumpay
                                        from cc_lim
@@ -965,11 +965,9 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
       commit;
     end;
 
-     --заполнение кредитов + вызов процедуры наполнение бпк
-    procedure  p_nbu_credit (kf_ in varchar2)
+--заполнение кредитов + вызов процедуры наполнение бпк
+procedure  p_nbu_credit (kf_ in varchar2)
       is
-      l_in_sp  number;
-      l_in_spn  number;
       begin
        bc.go (kf_);
        begin
@@ -982,7 +980,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
        commit;
        p_nbu_credit_over (kf_);
        commit;
-       end; 
+       end;
 
     for person in (select distinct d.rnk,
                                      d.nd,
@@ -1015,7 +1013,6 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      'cc_deal' as table_name,
                                      case when d.cc_id like '%\%' then replace (d.cc_id,'\','\\')||'--'||d.nd else d.cc_id||'--'||d.nd end
                                      as numberdog,
-                                     --d.cc_id||'--'||d.nd as numberdog,
                                       case
                                         when  d.sdate is not null then d.sdate
                                           else (select a.daos from accounts a where a.acc=ad.accs)
@@ -1026,13 +1023,14 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                             end endday,
                                      sumzagal.sum_zagal as sumzagal,
                                      ltrim(ad.kv) as r030,
-                                     ltrim(nvl(proc.proccredit,proc1.proccredit)) as proccredit,
+                                     ltrim(coalesce(proc.proccredit,proc1.proccredit,0)) as proccredit,
                                      sum_lim.sumpay as sumpay,
+                                     abs(sp_cred.sp_sum) as arrearbase,
+                                     abs(spn_cred.spn_sum) as arrearproc,
                                      /*(select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbase,*/
-                                     (select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ') as periodbase,
-                                     nvl((select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP')
-                                        ,(select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ')) as periodproc,
-                                     --sumarrears.sum_ost as sumarrears,
+                                     nvl((select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1,12,4))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ'),periodbase1.freq) as periodbase,
+                                     coalesce((select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1,12,4))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP')
+                                        ,(select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1,12,4))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ'),periodbase1.freq) as periodproc,
                                      (abs(nvl(sumarrears.sum_ost,0))+abs(nvl(sumacommission.sum_ostcom,0))) as sumarrears,
                                      ltrim(nbu23_rez.daybase) as daybase,
                                      ltrim(nbu23_rez.daybase) as dayproc,
@@ -1048,32 +1046,19 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      ltrim(nbu23_rez.fin) as klass,
                                      nbu23_rez.cr as risk,
                                      ndt.flagInsurance
-                     /*case when  (d.prod like '2082%' or  d.prod like '2232%') then 'true'
-                                         when  (d.prod like '2083%' or  d.prod like '2233%') then 'true'
-                                           end flagInsurance*/
                      from (select rnk,kf from nbu_person_fo
                            union
                            select rnk,kf from nbu_person_uo) rnk_client ,
-                           cc_deal d,
+                           cc_deal d
+						   left join(select nd, ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1,12,4))  as freq from bars.nd_txt dt where dt.kf=kf_ and dt.tag='FREQ') periodbase1 on periodbase1.nd=d.ndg,
                            cc_add ad
 
                      left join --загальна сума (ліміт кредитної лінії)
-                          /*(select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
-                            from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv*/
-
-                            (select distinct cd.nd ,ca.kv, --((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
-                                              (cd.sdog*100) as  sum_zagal
+                            (select distinct cd.nd ,ca.kv,(cd.sdog*100) as  sum_zagal
                                              from cc_add ca,cc_deal cd
-                                             /*left join (select a.nd,sum(a.amount_com) as amount_com from(
-                                                            select distinct ad.nd,na.acc,ad.kv,a.kv,
-                                                               case  when ad.kv<>a.kv then (select (abs(s.ostc)*(c.rate_o)) as amount_com from accounts s where s.acc=a.acc and s.kv=a.kv and s.kv=c.kv and c.vdate=trunc(sysdate,'dd'))
-                                                               else abs(a.ostc) end amount_com
-                                                            from accounts a, cur_rates c,nd_acc na,cc_add ad where ad.nd=na.nd and na.acc=a.acc and a.kv=c.kv and  nbs in (3578,3579))a
-                                                            group by a.nd) b on b.nd=cd.nd*/
                                                        where ca.nd=cd.nd)sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv
 
-
-                    left join--залишок заборгованості за кредитною операцією
+                     left join--залишок заборгованості за кредитною операцією
                            (select nd ,kv, sum (sum_ost) as sum_ost
                             from (select n.nd, a2.kv,(ag.ost + ag.crkos - ag.crdos) sum_ost
                                   from   agg_monbals ag,
@@ -1105,10 +1090,6 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                            group by nd) nbu23_rez on nbu23_rez.nd = ad.nd
 
                     --sumpay
-                    /*left join(select nd ,sum(sumo+sumk) as sumpay
-                                       from cc_lim
-                                       where fdat between  add_months(trunc(sysdate,'mm'),-1) and add_months(trunc(sysdate,'mm'),11) and sumo>0
-                                       group by nd) sum_lim on sum_lim.nd=ad.nd*/
                     left join(select a.nd ,sum(sumo+sumk) as sumpay
                                        from cc_lim_arc a, cc_deal c
                                        where fdat between  add_months(trunc(sysdate,'mm'),-1) and add_months(trunc(sysdate,'mm'),11) and sumo>0
@@ -1136,7 +1117,18 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
 												               when txt='Taк' then 'true'
 												               when txt='Ні' then 'false'
 												               end flagInsurance
-							          	             from nd_txt where tag='INSCC') ndt on ndt.nd=ad.nd,
+							          	             from nd_txt where tag='INSCC') ndt on ndt.nd=ad.nd
+                     left join (select nd,kv, sum (sp) sp_sum  from (
+                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,add_months(trunc(sysdate,'mm'),-1)) sp
+                                        from  bars.nd_acc n,  bars.accounts a2
+                                        where  n.acc = a2.acc and a2.tip='SP')
+                                       group by nd,kv)  sp_cred  on sp_cred.nd=ad.nd 
+                                                     
+                      left join (select nd,kv, sum (spn) spn_sum  from (
+                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,add_months(trunc(sysdate,'mm'),-1)) spn
+                                        from  bars.nd_acc n,  bars.accounts a2
+                                        where  n.acc = a2.acc and a2.tip='SPN')
+                                       group by nd,kv) spn_cred  on spn_cred.nd=ad.nd,                   
                           nd_acc n,
                           nd_txt nt,
                           accounts a
@@ -1149,73 +1141,29 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                            a.tip = 'LIM' and
                            a.nls like '8999%' and
                            (a.dazs is null or a.dazs >= add_months(trunc(sysdate, 'mm'), -1))
-                           --and
-                           --proc.acc = ad.accs
                            and d.nd=nt.nd
                            and nt.tag <>'PR_TR'-- убираем транши
                            )
-
           loop
             begin
            insert into nbu_credit ( rnk,nd,ordernum,flagosoba,typecredit,numdog,dogday,endday,sumzagal,r030
-                       ,proccredit,sumpay,arrearbase,periodbase ,periodproc, sumarrears,
+                       ,proccredit,sumpay,arrearbase,arrearproc,periodbase ,periodproc, sumarrears,
                                     daybase,dayproc,factendday,flagz,klass,risk,flagInsurance,status,kf)
                                   values
                               (person.rnk,person.nd,person.ordernum,person.flagosoba,person.typecredit,person.numberdog,person.dogday,person.endday,person.sumzagal,person.r030,
-                               person.proccredit,person.sumpay,'',person.periodbase,person.periodproc,person.sumarrears,person.daybase,person.dayproc,person.factendday,person.flagz
+                               person.proccredit,person.sumpay,person.arrearbase,person.arrearproc,person.periodbase,person.periodproc,person.sumarrears,person.daybase,person.dayproc,person.factendday,person.flagz
                                ,person.klass,person.risk,person.flagInsurance,'',kf_);
                                exception when others then
                                if sqlcode=-1438 then
                                  dbms_output.put_line(person.rnk||':'||person.nd);
-                                  end if;
-                                --end;
-
-                                -- dup_val_on_index then null;
+                               end if;
              end;
+         end loop;
+commit;
+end;
 
-           ----- проверка на наличия sp
-           begin
-             select count(*) into l_in_sp from accounts ca,nd_acc n where n.nd=person.nd  and ca.kv=person.r030 and n.acc=ca.acc and ca.tip='SP ';
-           end;
-           ----- проверка на наличия spn
-            begin
-             select count(*) into l_in_spn from accounts ca,nd_acc n where n.nd=person.nd  and ca.kv=person.r030 and n.acc=ca.acc and ca.tip='SPN';
-            end;
-           ----подсчет сумы sp
-           if l_in_sp>=1 then
-             begin
-              for sp in (select nd,kv, sum (sp) sp_sum  from (
-                                        select distinct n.nd,a2.kv,a2.acc,ost_korr(a2.acc,dat_next_u(trunc(sysdate,'mm'),-1),null,null) sp
-                                        from  nd_acc n,  accounts a2
-                                        where  person.nd=n.nd and a2.kv=person.r030 and n.acc = a2.acc and a2.tip='SP')
-                                       group by nd,kv)
-                   loop
-                    update  nbu_credit set arrearbase=sp.sp_sum where nd=person.nd and  r030=sp.kv;
-                   end loop;
-                   end;
-                   end if;
-
-             ----подсчет сумы spn
-             if l_in_spn>=1 then
-                   begin
-                   for spn in (select nd,kv,sum  (spn) spn_sum  from (
-                                          select distinct n.nd,a2.kv,a2.acc,ost_korr(a2.acc,dat_next_u(trunc(sysdate,'mm'),-1),null,null) spn
-                                          from  nd_acc n,  accounts a2
-                                          where  person.nd=n.nd and a2.kv=person.r030 and n.acc = a2.acc and a2.tip='SPN')
-                                          group by nd,kv)
-                   loop
-                     update  nbu_credit set arrearproc=spn.spn_sum where nd=person.nd and  r030=spn.kv;
-                   end loop;
-                   end;
-              end if;
-        end loop;
-     commit;
-     -- bars_context.home();
-       end;
-
-
-    ----nbu_credit_dep
-    procedure  p_nbu_credit_pledge (kf_ in varchar2)
+----nbu_credit_dep
+procedure  p_nbu_credit_pledge (kf_ in varchar2)
     is
        begin
          bc.go (kf_) ;
@@ -1555,10 +1503,10 @@ end;
 
         commit;
     end;
-    
-----кредиты овердрафты 
+
+----кредиты овердрафты
 procedure p_nbu_credit_over (kf_ in varchar2) is
-  begin  
+  begin
 bc.go (kf_);
 for over in (select distinct over_deal.rnk,
                                      over_deal.nd,
@@ -1578,7 +1526,7 @@ for over in (select distinct over_deal.rnk,
                                         when  over_deal.wdate is not null then over_deal.wdate
                                           else (select a.daos from accounts aa where aa.acc=a.acc and a.nls like '8998%')
                                             end endday,
-                                     sumzagal.lim as sumzagal,
+                                     sumzagal.sum_zagal as sumzagal,
                                       currency.kv as r030,
                                       nvl(proc1.proccredit,ltrim(proc.proccredit))   as proccredit,
                                       sum_lim.sumpay as sumpay,
@@ -1588,7 +1536,7 @@ for over in (select distinct over_deal.rnk,
                                      arrearBase.sumarbase,
                                      arrearproc.sumarproc,
                                      ltrim(nbu23_rez.daybase) as daybase,
-                                     ltrim(nbu23_rez.daybase) as dayproc, 
+                                     ltrim(nbu23_rez.daybase) as dayproc,
                                      a.dazs as factendday,
                                       'false' as flagz,
                                      ltrim(nbu23_rez.fin) as klass,
@@ -1597,36 +1545,39 @@ for over in (select distinct over_deal.rnk,
                      from (select rnk,kf from nbu_person_fo
                            union
                            select rnk,kf from nbu_person_uo) rnk_client,
-                     
-                     cc_deal  over_deal 
-                        
-                     left join --загальна сума (ліміт кредитної лінії)
-                            (select na.nd,a.lim from accounts a, nd_acc na where na.acc=a.acc and a.nls like '8998%') sumzagal on sumzagal.nd=over_deal.nd
-                            
+
+                     cc_deal  over_deal
+							
+					left join
+							(select na.nd,a.acc, min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal
+                                  from bars.saldoa a, bars.accounts a1, bars.nd_acc na
+                                  where a1.acc=na.acc and a.acc=a1.acc and a1.nbs=9129 
+                                  group by na.nd,a.acc)	sumzagal on sumzagal.nd=over_deal.nd
+							
                      left join--залишок заборгованості за кредитною операцією
                            (select nd, sum (sum_ost) as sum_ost
                             from (select n.nd, a2.kv,(ag.ost + ag.crkos - ag.crdos) sum_ost
                                   from   agg_monbals ag,
                                          nd_acc n,
                                          accounts a2
-                                  where ag.fdat = add_months(trunc(sysdate,'mm'),-1) 
-                                        and a2.tip in ('OVN','SN') 
-                                        and n.acc = a2.acc 
+                                  where ag.fdat = add_months(trunc(sysdate,'mm'),-1)
+                                        and a2.tip in ('OVN','SN')
+                                        and n.acc = a2.acc
                                         and n.acc = ag.acc)
-                            group by nd) sumarrears on sumarrears.nd=over_deal.nd 
-                    
+                            group by nd) sumarrears on sumarrears.nd=over_deal.nd
+
                      left join--комисия
                            (select nd, sum (sum_ost) as sum_ostcom
                             from (select n.nd, a2.kv,(ag.ost + ag.crkos - ag.crdos) sum_ost
                                   from   agg_monbals ag,
                                          nd_acc n,
                                          accounts a2
-                                  where ag.fdat = add_months(trunc(sysdate,'mm'),-1) 
-                                        and a2.nbs ='3578' 
-                                        and n.acc = a2.acc 
+                                  where ag.fdat = add_months(trunc(sysdate,'mm'),-1)
+                                        and a2.nbs ='3578'
+                                        and n.acc = a2.acc
                                         and n.acc = ag.acc)
                             group by nd) sumacommission on over_deal.nd = sumacommission.nd
-                    
+
                      left join
                           (select nd,
                                   decode(max(kol_351), null, 0, max(kol_351)) daybase,
@@ -1643,50 +1594,49 @@ for over in (select distinct over_deal.rnk,
                                        and a.nd=c.nd
                                        and mdat = (select max(mdat) from cc_lim_arc aa where aa.nd=c.nd)
                                        group by a.nd) sum_lim on sum_lim.nd=over_deal.nd
-                                       
+
                      --Прострочена заборгованість за основним боргом
                      left join (select d.nd, a.acc , a.nls, a.ob22, fdos(a.acc, add_months(trunc(sysdate,'mm'),-1), trunc(sysdate,'mm')-1) sumarbase, a.tip
                                       from accounts a, cc_deal d, nd_acc n
-                                      where  a.tip ='SN ' and  a.acc= n.acc and n.nd = d.nd and d.vidd = 10) arrearBase on arrearbase.nd=over_deal.nd                    
-                    
+                                      where  a.tip ='SN ' and  a.acc= n.acc and n.nd = d.nd and d.vidd = 10) arrearBase on arrearbase.nd=over_deal.nd
+
                      --Прострочена заборгованість  за процентами
                      left join (select d.nd, a.acc , a.nls, a.ob22,NVL(( select sum(S) from opldok where fdat >=add_months(trunc(sysdate,'mm'),-1) and fdat <= trunc(sysdate,'mm')-1 and acc = a.acc and dk = 0 and tt ='%%1'),0) sumarproc, a.tip
                                 from accounts a, cc_deal d, nd_acc n
-                                where  a.tip ='SPN' and  a.acc= n.acc and n.nd = d.nd and d.vidd = 10) arrearproc  on arrearproc.nd=over_deal.nd                
-                    
+                                where  a.tip ='SPN' and  a.acc= n.acc and n.nd = d.nd and d.vidd = 10) arrearproc  on arrearproc.nd=over_deal.nd
+
                      --номінальна процентна ставка
                      left join (select t4.nd,t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
                            from int_ratn t,
                                 accounts t2,
                                 nd_acc t4
-                           where  t.id = 0 and t4.acc = t2.acc and t.acc=t4.acc and bdat< trunc(sysdate,'mm') 
-                             and t2.nls like '8998%'    
+                           where  t.id = 0 and t4.acc = t2.acc and t.acc=t4.acc and bdat< trunc(sysdate,'mm')
+                             and t2.nls like '8998%'
                            group by t4.nd,t.acc) proc on proc.nd = over_deal.nd
-                           
+
                      left join (select t4.nd,t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
                            from int_ratn t,
                                 accounts t2,
                                 nd_acc t4
-                           where  t.id = 0 and t4.acc = t2.acc and t.acc=t4.acc and bdat< trunc(sysdate,'mm') 
-                             and t2.nls like '2600%'    
+                           where  t.id = 0 and t4.acc = t2.acc and t.acc=t4.acc and bdat< trunc(sysdate,'mm')
+                             and t2.nls like '2600%'
                            group by t4.nd,t.acc) proc1 on proc1.nd = over_deal.nd
-                    ----------------------------             
-                           
+                    ----------------------------
 
                      left join (select nd, case
                                        when txt='Taк' then 'true'
                                        else 'false'
                                        end flagInsurance
-                                       from nd_txt where tag='INSCC') ndt on ndt.nd=over_deal.nd                  
-                    
-                     left join (select na.nd, a.kv from accounts a, nd_acc na where na.acc=a.acc and a.nls like '8998%' )currency on currency.nd= over_deal.nd,              
+                                       from nd_txt where tag='INSCC') ndt on ndt.nd=over_deal.nd
+
+                     left join (select na.nd, a.kv from accounts a, nd_acc na where na.acc=a.acc and a.nls like '8998%' )currency on currency.nd= over_deal.nd,
                           nd_acc n,
                           accounts a
                      where rnk_client.rnk = over_deal.rnk and
                            rnk_client.kf = over_deal.kf and
                            over_deal.nd = n.nd and
                            a.acc = n.acc and
-                           n.kf = a.kf 
+                           n.kf = a.kf
                            and (a.dazs is null or a.dazs >= add_months(trunc(sysdate, 'mm'), -1))
                            and over_deal.vidd=10
                            and over_deal.sos <>15
@@ -1695,7 +1645,7 @@ for over in (select distinct over_deal.rnk,
                  insert into nbu_credit ( rnk,nd,ordernum,flagosoba,typecredit,numdog,dogday,endday,sumzagal,r030,proccredit,sumpay,arrearbase,arrearproc,periodbase,periodproc,sumarrears,daybase,dayproc,factendday,flagz,klass,risk,flagInsurance,status,kf)
                                   values
                               (over.rnk,over.nd,over.ordernum,over.flagosoba,over.typecredit,over.numberdog,over.dogday,over.endday,over.sumzagal,over.r030,
-                               over.proccredit,over.sumpay,over.sumarbase,over.sumarproc,over.periodbase,over.periodproc,over.sumarrears,over.daybase,over.dayproc,over.factendday,over.flagz,over.klass,over.risk,over.flagInsurance,'',kf_);  
+                               over.proccredit,over.sumpay,over.sumarbase,over.sumarproc,over.periodbase,over.periodproc,over.sumarrears,over.daybase,over.dayproc,over.factendday,over.flagz,over.klass,over.risk,over.flagInsurance,'',kf_);
                                exception when others then
                                if sqlcode=-1438 then
                                  dbms_output.put_line(over.rnk||':'||over.nd);
@@ -1703,8 +1653,8 @@ for over in (select distinct over_deal.rnk,
                  end;
                  end loop;
                  commit;
-end;                 
-                              
+end;
+
 /*
     ---------------------------
     function indicator_601(
