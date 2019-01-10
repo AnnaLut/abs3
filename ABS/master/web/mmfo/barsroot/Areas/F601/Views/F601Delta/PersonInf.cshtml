@@ -1,5 +1,5 @@
 ﻿<script id="PersonCurrent" type="text/x-kendo-template">
-    <strong>схема «Позичальник - фізична особа» Поточні дані</strong>
+    <strong>схема «Позичальник - фізична особа» Поточні дані (#=formatDate(reporting_date)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldLb" id="codMan">Унікальний код Боржника</td>                                                   <td class="fldTxt">#=formatFldV(codMan)#</td>                  </tr>
         <tr><td class="fldLb" id="lastName">Прізвище</td>                                                                <td class="fldTxt">#=formatFldV(lastName)#</td>                </tr>
@@ -39,7 +39,7 @@
 </script>
 
 <script id="PersonLast" type="text/x-kendo-template">
-    <strong>Попередні дані</strong>
+    <strong>Попередні дані (#=formatDate(reporting_date)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldTxt2">#=formatFldV(codMan)#</td>          <td class="fldLb2">Унікальний код Боржника</td>                                                           </tr>
         <tr><td class="fldTxt2">#=formatFldV(lastName)#</td>        <td class="fldLb2">Прізвище</td>                                                                        </tr>

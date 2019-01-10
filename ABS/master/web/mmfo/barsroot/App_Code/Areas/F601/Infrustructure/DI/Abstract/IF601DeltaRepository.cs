@@ -10,6 +10,6 @@ namespace BarsWeb.Areas.F601.Infrastructure.DI
        // int ExecuteStoreProcedere(string commandText, params object[] parameters);
         List<NBUReportInstance> GetReports();
         List<NBUSessionHistory> GetNBUSessionHistory(Decimal? id);
-        List<NBUSessionData> GetNBUSessionData(Decimal?reportId, Decimal?sessionId);
+        List<NBUSessionData> GetNBUSessionData(Decimal?reportId, Decimal?sessionId, Decimal? typeId, string kf);
     }
 }

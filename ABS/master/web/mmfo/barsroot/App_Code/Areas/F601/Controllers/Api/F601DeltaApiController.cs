@@ -26,7 +26,9 @@ namespace BarsWeb.Areas.F601.Controllers.Api
         public F601DeltaApiController() {
             _repo = new F601DeltaRepository();
         }
-
+        /// <summary>
+        /// Отримати перелік звітів по 601 формі
+        /// </summary>
         [HttpGet]
         [GET("api/F601/F601DeltaApi/GetNBUReports")]
         public HttpResponseMessage GetNBUReports()
@@ -38,6 +40,10 @@ namespace BarsWeb.Areas.F601.Controllers.Api
             catch (Exception ex) {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message); }
         }
+        /// <summary>
+        /// Отримати перелік сесій відправки звітів
+        /// </summary>
+        /// <param name="id">id звіту</param>
         [HttpGet]
         [GET("api/F601/F601DeltaApi/GetNBUSessionHistory")]
         public HttpResponseMessage GetNBUSessionHistory(Decimal? id)
@@ -50,13 +56,20 @@ namespace BarsWeb.Areas.F601.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        /// <summary>
+        /// Отримати дані вказаної і попередньої сесій для порівняння
+        /// </summary>
+        /// <param name="reportId">Звіт</param>
+        /// <param name="sessionId">сесія</param>
+        /// <param name="typeId">тип схеми</param>
+        /// <param name="kf">код філії</param>
         [HttpGet]
         [GET("api/F601/F601DeltaApi/GetNBUSessionData")]
-        public HttpResponseMessage GetNBUSessionData(Decimal? reportId, Decimal? sessionId)
+        public HttpResponseMessage GetNBUSessionData(Decimal? reportId, Decimal? sessionId, Decimal? typeId, string kf)
         {
             try
             {
-                var data = _repo.GetNBUSessionData(reportId, sessionId);
+                var data = _repo.GetNBUSessionData(reportId, sessionId, typeId, kf);
                 return Request.CreateResponse(HttpStatusCode.OK, data);
             }
             catch (Exception ex)

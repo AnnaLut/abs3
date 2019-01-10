@@ -1,5 +1,5 @@
 ﻿<script id="LegalCurrent" type="text/x-kendo-template">
-    <strong>схема «Позичальник - юридична особа» Поточні дані</strong>
+    <strong>схема «Позичальник - юридична особа» Поточні дані (#=formatDate(reporting_date)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldLb" id="codMan"           >Унікальний код Боржника</td>                                                                                                                               <td class="fldTxt">#=formatFldV(codMan           )#</td> </tr>
         <tr><td class="fldLb" id="nameUr"           >Найменування Боржника</td>                                                                                                                                 <td class="fldTxt">#=formatFldV(nameUr           )#</td> </tr>
@@ -47,7 +47,7 @@
 </script>
 
 <script id="LegalLast" type="text/x-kendo-template">
-    <strong>Попередні дані</strong>
+    <strong>Попередні дані (#=formatDate(reporting_date)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldTxt2">#=formatFldV(codMan           )#</td><td class="fldLb2">Унікальний код Боржника</td>                                                                                                                                </tr>
         <tr><td class="fldTxt2">#=formatFldV(nameUr           )#</td><td class="fldLb2">Найменування Боржника</td>                                                                                                                                  </tr>

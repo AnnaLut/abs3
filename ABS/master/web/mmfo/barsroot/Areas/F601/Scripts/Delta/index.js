@@ -220,6 +220,8 @@ mainApp.controller("F601DeltaCtrl", function ($controller, $scope, $rootScope, $
             id: { type: "number" }
             , report_id: { type: "number" }
             , object_id: { type: "number" }
+            , reporting_date: { type: "date" }
+            , reporting_time: { type: "date" }
             , json: { type: "string" }
         }
     }
@@ -236,8 +238,7 @@ mainApp.controller("F601DeltaCtrl", function ($controller, $scope, $rootScope, $
                 dataType: "json",
                 data: function () {
                     bars.ui.loader($("#DeltaViewWindow"), true);
-                    return { reportId: $scope.ReportID, sessionId: $scope.sessionData.OBJECT_ID }
-                    //return { reportId: 21, sessionId: 391 }
+                    return { reportId: $scope.ReportID, sessionId: $scope.sessionData.OBJECT_ID, typeId: $scope.sessionData.OBJECT_TYPE_ID, kf: $scope.sessionData.OBJECT_KF }
                 },
                 async: true
             },
@@ -248,50 +249,73 @@ mainApp.controller("F601DeltaCtrl", function ($controller, $scope, $rootScope, $
         schema: {
             model: $scope.DataModel
             , parse: function (response) {
-                if ($scope.JSON1) // видаляємо попередній перегляд
-                    delete $scope.JSON1, $scope.JSON2;
-                $scope.JSON1 = {};
-                $scope.JSON2 = {};
-                if (response.length > 0) {
-                    if (response.length > 2) 
-                        alert('Надано ' + response.length + ' записів для порівняння. Берем перші два.');
-                    if (response.length < 2) {
-                        alert('Надано ' + response.length + ' запис для порівняння. Нема з чим порівнювати.');
-                        return;
-                    }
+                try {
+                    if ($scope.JSON1) delete $scope.JSON1; // видаляємо попередній перегляд
+                    if ($scope.JSON2) delete $scope.JSON2;
+                    $scope.JSON1 = {};
+                    $scope.JSON2 = {};
+                    if (response.length > 0) {
+                        if (response.length > 2)
+                            alert('Надано ' + response.length + ' записів для порівняння. Берем перші два.');
+                        if (response.length < 2) {
+                            alert('Надано ' + response.length + ' запис для порівняння. Нема з чим порівнювати.');
+                            return;
+                        }
 
-                    $scope.JSON1txt = '';
-                    $scope.JSON2txt = '';
+                        $scope.JSON1txt = '';
+                        $scope.JSON2txt = '';
 
-                    if (response[0].json) {
-                        $scope.JSON1txt = response[0].json;
-                        $scope.JSON1 = JSON.parse(response[0].json);
-                    }
-                    if (response[1].json) {
-                        $scope.JSON2txt = response[1].json;
-                        $scope.JSON2 = JSON.parse(response[1].json);
-                    }
+                        if (response[0].json) {
+                            $scope.JSON1txt = response[0].json;
+                            $scope.JSON1 = JSON.parse(response[0].json);
+                            if ($scope.JSON1.data.length) {
+                                $scope.JSON1.data[0].reporting_date = response[0].reporting_date;
+                                $scope.JSON1.data[0].reporting_time = response[0].reporting_time;
+                            } else {
+                                $scope.JSON1.data.reporting_date = response[0].reporting_date;
+                                $scope.JSON1.data.reporting_time = response[0].reporting_time;
+                            }
+                        }
+                        if (response[1].json) {
+                            $scope.JSON2txt = response[1].json;
+                            $scope.JSON2 = JSON.parse(response[1].json);
+                            if ($scope.JSON2.data.length) {
+                                $scope.JSON2.data[0].reporting_date = response[1].reporting_date;
+                                $scope.JSON2.data[0].reporting_time = response[1].reporting_time;
+                            } else {
+                                $scope.JSON2.data.reporting_date = response[1].reporting_date;
+                                $scope.JSON2.data.reporting_time = response[1].reporting_time;
+                            }
+                        }
+                        $("#DeltaViewCurrent").attr("title", $scope.JSON1txt);
+                        $("#DeltaViewLast").attr("title", $scope.JSON2txt);
 
-                    buildDelta();
+                        buildDelta();
 
-                    switch ($scope.sessionData.OBJECT_TYPE_ID) {
-                    //switch (1) {
-                        case 4:
-                            showKredOper(); // схема Кредитні операції
-                            break;
-                        case 3:
-                            showPledge(); // схема Забезпечення за Кредитною операцією (Застава)
-                            break;
-                        case 2:
-                            showUO(); // схема Позичальник - юридична особа
-                            break;
-                        case 1:
-                            showFO(); // схема Позичальник - фізична особа
-                            break;
+                        switch ($scope.sessionData.OBJECT_TYPE_ID) {
+                            case 4:
+                                showKredOper(); // схема Кредитні операції
+                                break;
+                            case 3:
+                                showPledge(); // схема Забезпечення за Кредитною операцією (Застава)
+                                break;
+                            case 2:
+                                showUO(); // схема Позичальник - юридична особа
+                                break;
+                            case 1:
+                                showFO(); // схема Позичальник - фізична особа
+                                break;
+                        }
                     }
                 }
-                $("#DeltaViewCurrent").attr("title", $scope.JSON1txt); 
-                $("#DeltaViewLast").attr("title", $scope.JSON2txt); 
+                catch (err) {
+                    bars.ui.alert({
+                        text: '<storng title="' + (err.stack || '') + '">'+"Перегляд дельти даних неможливий</storng><br/><br/>Деталі сесії обробки даних НБУ:<br/><br/>" + $scope.sessionData.SESSION_DETAILS
+                        , title: 'Інформаційне повідомлення'
+                        , width: '600px'
+                        , height: '200px'
+                    });
+                }
                 bars.ui.loader($("#DeltaViewWindow"), false);
                 return response;
             }
@@ -1023,14 +1047,31 @@ mainApp.controller("F601DeltaCtrl", function ($controller, $scope, $rootScope, $
         ]
     };
     formatFldV = function (val) {
-        return val ? val : '';
+        var rv;
+        switch (typeof val) {
+            case 'boolean':
+                rv = val ? 'так' : 'ні';
+                break;
+            case 'string':
+            case 'number':
+                rv = val;
+                break;
+            default:
+                rv = '';
+        }
+        return  rv ;
     }
     iif = function (val) {
-        return val ? val : '-';
+        return val == undefined ? '-' : val;
     }
     formatDate = function (strDate) {
         if (strDate)
             return kendo.toString(kendo.parseDate(strDate), 'dd MMM yyyy');
+        return '';
+    }
+    formatDateTime = function (strDate) {
+        if (strDate)
+            return kendo.toString(kendo.parseDate(strDate), 'g');
         return '';
     }
     // шаблон для виводу в гріді значення коду з його назвою в тайтлі

@@ -21,7 +21,8 @@ namespace BarsWeb.Areas.F601.Models
         public decimal? id { get; set; } // просто порядковий № рядка
         public decimal? report_id { get; set; } // p_reportId --> NBUSessionHistory.REPORT_ID
         public decimal? object_id { get; set; } // p_sessionId --> NBUSessionHistory.OBJECT_ID
+        public DateTime reporting_date { get; set; } // звітна дата
+        public DateTime reporting_time { get; set; } // дата формування звіту
         public string json { get; set; } // власне дані в форматі json, формат залежить від значення поля --> NBUSessionHistory.OBJECT_TYPE_ID 
-
     }
 }

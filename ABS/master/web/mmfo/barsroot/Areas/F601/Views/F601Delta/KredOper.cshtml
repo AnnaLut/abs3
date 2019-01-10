@@ -1,5 +1,5 @@
 ﻿<script id="KredOperCurrent" type="text/x-kendo-template">
-    <strong>схема "Кредитні операції" Поточні дані</strong>
+    <strong>схема "Кредитні операції" Поточні дані (#=formatDate(reporting_date)# | #=formatDateTime(reporting_time)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldLb" id="orderNum">Порядковий номер кредитної операції у повідомлені</td>                                  <td class="fldTxt">#=formatFldV(orderNum)#</td>     </tr>
         <tr><td class="fldLb" id="flagOsoba">Ознака особи</td>                                                                      <td class="fldTxt">#=formatFldV(flagOsoba)#</td>    </tr>
@@ -38,7 +38,7 @@
 </script>
 
 <script id="KredOperLast" type="text/x-kendo-template">
-    <strong>Попередні дані</strong>
+    <strong>Попередні дані (#=formatDate(reporting_date)# | #=formatDateTime(reporting_time)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldTxt2">#=formatFldV(orderNum)#</td>         <td class="fldLb2">Порядковий номер кредитної операції у повідомлені</td>                                      </tr>
         <tr><td class="fldTxt2">#=formatFldV(flagOsoba)#</td>        <td class="fldLb2">Ознака особи</td>                                                                           </tr>
