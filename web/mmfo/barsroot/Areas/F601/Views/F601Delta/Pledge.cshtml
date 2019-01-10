@@ -1,5 +1,5 @@
 ﻿<script id="PledgeCurrent" type="text/x-kendo-template">
-    <strong>схема «Забезпечення за Кредитною операцією» Поточні дані</strong>
+    <strong>схема «Забезпечення за Кредитною операцією» Поточні дані (#=formatDate(reporting_date)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldLb" id="orderNum">Порядковий номер  запису у повідомлені</td>                                             <td class="fldTxt">#=formatFldV(orderNum)#</td>             </tr>
         <tr><td class="fldLb" id="codZastava">Унікальний код забезпечення за кредитною операцією Боржника</td>                      <td class="fldTxt">#=formatFldV(codZastava)#</td>           </tr>
@@ -30,7 +30,7 @@
 </script>
 
 <script id="PledgeLast" type="text/x-kendo-template">
-    <strong>Попередні дані</strong>
+    <strong>Попередні дані (#=formatDate(reporting_date)#)</strong>
     <table class="DtlBlk">
         <tr><td class="fldTxt2">#=formatFldV(orderNum)#</td>             <td class="fldLb2">Порядковий номер  запису у повідомлені</td>                                         </tr>
         <tr><td class="fldTxt2">#=formatFldV(codZastava)#</td>           <td class="fldLb2">Унікальний код забезпечення за кредитною операцією Боржника</td>                    </tr>

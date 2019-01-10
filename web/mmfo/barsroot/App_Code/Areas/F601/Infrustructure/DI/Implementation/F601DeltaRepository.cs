@@ -104,10 +104,10 @@ namespace BarsWeb.Areas.F601.Infrastructure.DI
         /// <param name="reportId"></param>
         /// <param name="sessionId"></param>
         /// <returns>Дані в форматі json, формат залежить від значення поля --> NBUSessionHistory.OBJECT_TYPE_ID (Отримуються з GetNBUSessionHistory)</returns>
-        public List<NBUSessionData> GetNBUSessionData(Decimal? reportId, Decimal? sessionId)
+        public List<NBUSessionData> GetNBUSessionData(Decimal? reportId, Decimal? sessionId, Decimal? typeId, string kf)
         {
             List<NBUSessionData> sessions = new List<NBUSessionData>();
-            BarsSql sql = SqlCreator.GetNBUSessionData(reportId, sessionId);
+            BarsSql sql = SqlCreator.GetNBUSessionData(reportId, sessionId, typeId, kf);
             using (OracleConnection connection = OraConnector.Handler.UserConnection)
             {
                 using (OracleCommand cmd = connection.CreateCommand())
@@ -120,11 +120,16 @@ namespace BarsWeb.Areas.F601.Infrastructure.DI
                         {
                             using (OracleClob clob = reader.GetOracleClob(3)) //reader["json"] as OracleClob
                             {
+                                DateTime dtReportDate, dtSendingTime;
+                                DateTime.TryParse(reader["reporting_date"].ToString(), out dtReportDate);
+                                DateTime.TryParse(reader["reporting_time"].ToString(), out dtSendingTime);
                                 sessions.Add(new NBUSessionData()
                                 {
                                     id = Convert.ToInt64(reader["id"]),
                                     report_id = Convert.ToInt64(reader["report_id"]),
-                                    object_id = Convert.ToInt64(reader["object_id"]),
+                                    object_id = Convert.ToInt64(reader["object_id"]), 
+                                    reporting_date = dtReportDate,
+                                    reporting_time = dtSendingTime,
                                     json = null != clob && !clob.IsNull ? clob.Value.Replace("\n", string.Empty) : string.Empty
                                 });
                             }
