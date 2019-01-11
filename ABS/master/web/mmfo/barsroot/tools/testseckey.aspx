@@ -5,14 +5,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta http-equiv="x-ua-compatible" content="IE=EmulateIE10" />
     <title>Перевірка працездатності таємного ключа</title>
     <script type="text/javascript" src="/barsroot/scripts/jquery/jquery.js"></script>
-    <script type="text/javascript" src="/barsroot/Scripts/crypto/barsCrypto.js?v1.0.5"></script>
+    
     <script type="text/javascript" src="/Common/Script/json.js"></script>
     <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
     <script type="text/javascript" src="/Common/Script/BarsIe.js?v1.2"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/crypto/barsCrypto.js?v1.0.5"></script>
     <script type="text/javascript">
 
         function appendError(errMessage) {
@@ -63,6 +64,29 @@
             });
         }
 
+        function versionCompare(v1, v2) {
+            // Сравнение численных версий (1.0.10 etc.)
+            var v1parts = v1.split('.');
+            var v2parts = v2.split('.');
+            for (var i = 0; i < v1parts.length; ++i) {
+                if (v2parts.length == i) {
+                    return 1;
+                }
+
+                if (parseInt(v1parts[i], 10) == parseInt(v2parts[i], 10)) {
+                    continue;
+                }
+                else if (parseInt(v1parts[i], 10) > parseInt(v2parts[i], 10)) {
+                    return 1; // v1 > v2
+                }
+                else {
+                    return -1; // v1 < v2
+                }
+            }
+            return 0; // v1 = v2
+        }
+        
+        
         function doBcCheck() {
             document.getElementById("spSuccess").innerHTML = "";
             document.getElementById("spError").innerHTML = "";
@@ -86,13 +110,30 @@
             barsCrypto.init(options);
             barsCrypto.getModuleVersions(
                 function (resp) {
-                    var res = JSON.parse(resp);
+                    var res;
+                    try
+                    {
+                        res = JSON.parse(resp);
+                    }
+                    catch (e)
+                    {
+                        res = resp;
+                    }
                     if (res.Versions.vega2 && res.Versions.vega2.indexOf('1.0.7') < 0) { // проверка версии с CORS тут еще не доступна была
                         barsCrypto.getVersion(function (resp) {
-                            var version = JSON.parse(resp).version;
+                            var res;
+                            try
+                            {
+                                res = JSON.parse(resp);
+                            }
+                            catch (e)
+                            {
+                                res = resp;
+                            }
+                            var version = res.version;
                             document.getElementById("lbBcVersion").innerText = version;
-                            if (version >= minVersion) {
-                                if (version < actualVersion)
+                            if (versionCompare(minVersion, version) == -1) {
+                                if (versionCompare(version, actualVersion) == -1)
                                     $('#btBcUpdate').show();
                             }
                             else {
