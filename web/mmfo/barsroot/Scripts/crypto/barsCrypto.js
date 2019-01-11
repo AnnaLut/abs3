@@ -538,6 +538,7 @@ barsCrypto.vega2_module = function () {
             type: 'POST',
             url: url,
             crossDomain: true,
+            headers: { 'Access-Control-Allow-Origin': 'x-requested-with', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
             data: json,
             dataType: 'json',
             timeout: (timeout ? timeout : 60000), // sets timeout limit to 60 seconds
@@ -611,7 +612,6 @@ barsCrypto.vega2_module = function () {
                     cbError(barsCrypto.resource.vega2.vega2DeviceNotFound.replace('{0}', VG2TokenId));
                     return;
                 }
-
                 // инициализируем токен
                 bc_init(selectedToken,
                     function (response) {
