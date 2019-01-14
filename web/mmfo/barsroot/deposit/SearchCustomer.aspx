@@ -145,7 +145,7 @@
             format: "dd/MM/yyyy"
           }).removeClass('k-textbox').parent().parent().removeClass('k-textbox');
 
-          $this.form().find('#textClientCode').kendoMaskedTextBox({ mask: "9999999999", promptChar: " " })/*.kendoNumericTextBox({ format: 'g' })*/
+          $this.form().find('#textClientCode').kendoMaskedTextBox({ mask: "9999999999", promptChar: "" })/*.kendoNumericTextBox({ format: 'g' })*/
               .parent().removeClass('k-numeric-wrap')
                     .removeClass('k-state-default')
                     .removeClass('k-state-focused')
