@@ -30,6 +30,11 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
      FROM cc_deal c, cc_add d
     WHERE c.nd = d.nd
       and c.vidd in (1,2,3,5,11,12,13)
+      and sos between  case
+                  when vidd<10 then 10
+                  else 0
+                end 
+              and 15
       --and sos between 10 and 15
    UNION ALL                                                       -- гарантії
    SELECT 'GAR' AS tip,
