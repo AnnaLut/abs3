@@ -157,7 +157,7 @@ begin
          SELECT a.nls,greatest(a.ostc,a.ostb)
          into l_SG_NLS,l_nSG
          from nd_acc n, accounts a where n.nd=l_ND
-         and a.NBS='2620' and a.kv=l_KV and n.acc=a.acc and a.dazs is null;
+         and a.NBS='2620' and a.kv=l_KV and n.acc=a.acc and a.dazs is null and a.tip not like 'W4%'; --COBUMMFO-9987 кроме карточных
         EXCEPTION
         WHEN Too_Many_Rows THEN
          l_sRet :='пом. №6.1.КД №'||l_ccid||' Знайдено дек_лька рахунк_в погашення 2620!'; raise STOP_PRC;
