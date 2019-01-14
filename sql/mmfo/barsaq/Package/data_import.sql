@@ -229,8 +229,8 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure sync_account_stmt2(
     p_acc       in number default null,
     p_startdate in date default trunc(sysdate-1));
-    
-    
+
+
   ----
   -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
   -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -2063,7 +2063,6 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_turnovers2;
-  
    ----
   -- sync_acc_turnovers2_kf - синхронизиреут историю остатков и оборотов в АБС для передачи в систему
   --
@@ -2086,7 +2085,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_cnt       integer;
   begin
     -- точка отката
-    --savepoint sp;
+   -- savepoint sp;
     --
     --l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
     --
@@ -2224,7 +2223,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                        ||' починаючи з дати '||to_char(l_startdate,'DD.MM.YYYY'));
   exception when others then
     --
-   -- rollback to sp;
+    -- rollback to sp;
     --
     raise_application_error(-20000, get_error_msg());
     --
@@ -2684,7 +2683,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_transactions2;
-  
+
   ----
   -- sync_acc_transactions2_kf - синхронизиреут проводки в АБС для передачи в систему
   --
@@ -2711,7 +2710,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_ref92_bank_name acc_transactions.ref92_bank_name%type;
   begin
     -- точка отката
-    --savepoint sp;
+  --    savepoint sp;
     --
    -- l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
     --
@@ -4029,7 +4028,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_ACC_TRANSACTIONS, JOB_STATUS_FAILED, l_acc_msg, SQLCODE, get_error_msg());
     --
   end sync_account_stmt2;
-  
+
   ----
   -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
   -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -6622,12 +6621,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- точка отката
         savepoint sp;
         -- точка отсчета
-        l_scn := dbms_flashback.get_system_change_number();
+/*      l_scn := dbms_flashback.get_system_change_number();
         --
         replace_tags(l_local_tag, l_remote_tag);
         --
         -- инстанцируем таблицу схемы BARSAQ базы АБС БАРС в базе IBANK
-        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_DOC_EXPORT, g_global_name, l_scn);
+        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_DOC_EXPORT, g_global_name, l_scn);*/
         --
        /* for c in (select kf from v_kf)
         loop*/
@@ -6740,11 +6739,11 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- фиксируем изменения
         commit;
         -- устанавливаем SCN, с которого необходимо синхронизировать таблицу в будущем
-        dbms_apply_adm.set_table_instantiation_scn(SRCTAB_SOS_TRACK, g_global_name, l_scn);
+        --dbms_apply_adm.set_table_instantiation_scn(SRCTAB_SOS_TRACK, g_global_name, l_scn);
         -- устанавливаем SCN, с которого необходимо синхронизировать таблицу в будущем
-        dbms_apply_adm.set_table_instantiation_scn(SRCTAB_ZAY_TRACK, g_global_name, l_scn);
+       -- dbms_apply_adm.set_table_instantiation_scn(SRCTAB_ZAY_TRACK, g_global_name, l_scn);
         --
-        restore_tags(l_local_tag, l_remote_tag);
+        ---restore_tags(l_local_tag, l_remote_tag);
         --
         bars.bars_audit.info('Виконано синхронізацію статусів документів з дати '||to_char(p_startdate, 'DD.MM.YYYY'));
         --
@@ -6752,7 +6751,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         --
         rollback to sp;
         --
-        restore_tags(l_local_tag, l_remote_tag);
+       -- restore_tags(l_local_tag, l_remote_tag);
         --
         raise_application_error(-20000, get_error_msg());
     end;
