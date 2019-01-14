@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.17.043 27/11/2018 (15/11/2018)
+% VERSION : v.17.045  03/01/2019 (27/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -22,10 +22,11 @@ IS
  17 K K077 код сектору економiки
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 27.11.2018 вирівнювання 2049 
- 15.11.2018 добавлені новые бал.счета 1426,1428 lkz выравнивания с балансом
- 14.11.2018 из табл. OTC_C5_PROC не удаляем сумму резерва если есть другие 
-            счета по договору тип 'SS' или 'SP' с ненулевым остатком 
+ 03.01.2019 в OTC_C5_PROC будут включаться бал.сч. 1536,2386,2396,2456,3016
+ 27.11.2018 вир_внювання 2049
+ 15.11.2018 добавлен_ новые бал.счета 1426,1428 lkz выравнивания с балансом
+ 14.11.2018 из табл. OTC_C5_PROC не удаляем сумму резерва если есть другие
+            счета по договору тип 'SS' или 'SP' с ненулевым остатком
  23.10.2018 розраховуємо суму обтяження для ЦП в екв_валент_
  09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок
  активу 3541
@@ -41,44 +42,6 @@ IS
  21.02.2017 расширен список счетов, для которых определяется S580 в P_Set_S580_Def
  исключение задвоения для 3541 (есть основные и дочерние счета)
  31.01.2017 второй блок резервов -оптимизация для счетов просроченных процентов
- 21.09.2016 -в ограничения по счетам добавлены 2657
- 19.09.2016 -резервы по счетам просроченных процентов обрабатываются
- во втором блоке резервов (как в #A7)
- 12.09.2016 -для счетов просрочки по телу r012=B при обработке данных из tmp_rez_risk
- 02.09.2016 -для бал.счетов с отсутсвующим либо закрытым r013 в kl_r013
- параметр r013 устанавливается в '0'
- 31.08.2016 - изменение структуры показателей с отчета за 01.09.2016
- 29.07.2016 - перераспределение R013 при превышении резерва над текущим
- остатком для проц.счетов ЦБ
- 21/07/2016 - для счетов резерва параметр R013 будет определяться по
- R013 активов (счета начисленных процентов до 30, больше 30)
- 02/07/2016 - для таблиц OPLDOK добавил условие o.fdat = z.fdat
- для уменьшения времени формирования
- для валюты 974 (белоруские рубли) из V_TMP_REZ_RISK_C5
- изменяем на значение 933
- 14/06/2016 - для счетов резервов под непросроченные проценты будет
- разбивка по параметру R012 на 'A' и "B'
- 10/06/2016 - для счетов резервов под непросроченные проценты формируем
- параметр R012 = 'A'
- 17/05/2016 - ГРЦ Ощадбанка. Макаренко И.В.
- в самом конце процедуры проверка на академическое время вызова процедуры,
- если вызывается после 19:00 (технологи закрывают/открывают день) -
- ничего не писать в архив, если в операционное время - технологи выполняют
- формирование файла - в архив фиксируем запись
- 15/10/2014 - для блока "списання за рахунок резерву" добавлено умову
-              and x.nls not like '3800%' тому що при перенесенн_ суми
-              з одного рахунку 2400 на _нший _ пот_м погашення з _ншого
-              не включались суми погашення
- 20/11/2013 - суттєва аоптим_зац_я
- 23/09/2013 - не враховуволось погашення за рахунок резерву на 3599
- 11/09/2013 - доопрацювання по r012 для дисконт_в
- 20/08/2013 - доопрацювання по S580 (додала перев_рку _нвесттиц. класу для вс_х)
- 15/08/2013 - виправила помилку по 1528 (зауваження в_д ПКБ) при робот_ з INT_ACCN
- 14/08/2013 - з ГОУ над_йшло зауваження, що не виконується розбивка по R013
-              для рахунк_в 1408, 1418, 1428
- 13/08/2013 - виключила рахунок 2924 3 формування показник_в по резерву (ГОУ)
- 22/07/2013 - для курсора SALDO_CP добавив параметр S580 iз SPECPARAM
-              (зауваження ГОУ)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
  kodf_ Varchar2(2) := 'C5';
  sheme_ Varchar2(1) := 'G';
@@ -1177,13 +1140,17 @@ BEGIN
                      kodp = substr(kodp,1,10) || '9' || substr(kodp,12)
                  where recid = p.recid;
              else -- забезпечення не перекриває актив
-                 for k in (select substr(r.kodp,11,1) s580a, sum(T.OST_EQV) ost,
-                                  nvl((count(*) over (partition by substr(r.kodp,11,1))), 0) cnt,
-                                  row_number() over (partition by substr(r.kodp,11,1) order by substr(r.kodp,11,1)) rnum
-                           from otcn_f42_temp t, rnbu_trace r
+                 for k in (select r.s580a, 
+                                  sum(T.OST_EQV) ost,
+                                  nvl((count(*) over (partition by r.s580a)), 0) cnt,
+                                  row_number() over (partition by r.s580a order by r.s580a) rnum
+                           from otcn_f42_temp t, 
+                               (select distinct acc, substr(kodp,11,1) s580a 
+                                from rnbu_trace 
+                                where acc in (select accc from otcn_f42_temp where acc = p.acc)) r
                            where t.acc = p.acc and
                                  t.accc = r.acc
-                          group by substr(r.kodp,11,1))
+                          group by r.s580a)
                  loop
                     if k.cnt = 1 or k.rnum = 1 then
                        update rnbu_trace
@@ -1289,7 +1256,7 @@ BEGIN
 
       -- ознака рахунку нарахованих в_дсотк_в
       TP_SND := (case when substr(k.nls, 1,1) in ('1','2','3') and
-                           ( (substr(k.nls,1,4) in ('2607','2627','2657') and k.tip = 'SNA') or
+                           ( substr(k.nls,1,4) in ('2607','2627','2657') or
                              substr(k.nls,4,1) = '8' or
                              (substr(k.nls,4,1) = '9' and k.tip = 'SNA')
                            )  and
@@ -1306,8 +1273,12 @@ BEGIN
              else
                 kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              end if;
+             
+             sakt_ := k.suma;
 
              srez_ := abs(k.szq);
+             
+             srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
 
              sum_ := round(srez_ * k.koef);
 
@@ -1381,7 +1352,7 @@ BEGIN
                         comm_, k.nd, nbuc_, k.tobo );
           end if;
 
-          if srezp_ <> 0 and not TP_SND and k.cnt = k.rnum then
+          if srezp_ <> 0 and k.cnt = k.rnum then
              if srezp_ <> 0  then
                 r012_:='B';
 
@@ -1394,7 +1365,7 @@ BEGIN
                 end if;
 
                 znap_ := to_char(sign(k.szq) * srezp_);
-                comm_ := SUBSTR(' перевищення резерву над осн. боргом до R012='||r012_, 1,100);
+                comm_ := SUBSTR(' перевищення резерву над активом (3) ', 1,100);
 
                 insert into rnbu_trace
                          ( recid, userid,
@@ -1564,7 +1535,7 @@ BEGIN
       nbs_ := substr(nbs_r013_, 1, 4);
       r013_ := substr(nbs_r013_, 5, 1);
 
- select nvl(min(s245), '1')
+      select nvl(min(s245), '1')
       into s245_
       from NBUR_TMP_A7_S245
       where report_date = datd_ and
@@ -1651,7 +1622,7 @@ BEGIN
 
       -- ознака рахунку нарахованих в_дсотк_в
       TP_SND := (case when substr(k.nls, 1,1) in ('1','2','3') and
-                           ( (substr(k.nls,1,4) in ('2607','2627','2657') and k.tip = 'SNA') or
+                           ( substr(k.nls,1,4) in ('2607','2627','2657') or
                              substr(k.nls,4,1) = '8' or
                              (substr(k.nls,4,1) = '9' and k.tip = 'SNA')
                            )  and
@@ -1668,7 +1639,6 @@ BEGIN
 
              comm_ := SUBSTR (' резерв п_д '||(case when k.tip in ('SPN', 'XPN') then 'прострочен_ ' else '' end)||'в_дсотки ' , 1, 200);
           else
---?? как здесь определить просрочку
              if substr(k.nls, 4, 1)  = '7' and
                 substr(k.nls, 1, 4) not in ('2607','2627','2657') or
                 trim(k.tip) in ('SP')
@@ -1788,6 +1758,7 @@ BEGIN
                         o.acc = a.acc
                         and a.tip = 'REZ'
                         and o.tt not like 'AR%'
+                        and o.tt not like 'IF%'
                         and o.ref = z.ref
                         and o.fdat = z.fdat
                         and o.stmt = z.stmt
@@ -1879,11 +1850,12 @@ BEGIN
        using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
               from (
                 select acc_id acc, s245, nbs, ost
-                from NBUR_TMP_A7_S245
+                from nbur_tmp_a7_s245
                 where report_date = dat_ and
                       nbs like '___9') a
                     join
-                (select acc, substr(kodp, 16, 1) s245, substr(kodp, 2, 4) nbs, sum(znap) ost
+                (select acc, substr(kodp, 16, 1) s245, 
+                        substr(kodp, 2, 4) nbs, sum(znap) ost
                 from rnbu_trace
                 where kodp like '____9%'
                 group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
@@ -1899,30 +1871,29 @@ BEGIN
                    comm = comm || ' *=' || to_char(b.rizn)
        WHERE b.acc is not null;
 
- -- по дсиконтах
- merge into rnbu_trace a
- using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
- from (
- select acc_id acc, s245, nbs, ost
- from NBUR_TMP_A7_S245
- where report_date = dat_ and
- nbs = '2046') a
- join
- (select acc, substr(kodp, 16, 1) s245, substr(kodp, 2, 4) nbs, sum(znap) ost
- from rnbu_trace
- where kodp like '_2046%'
- group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
- on (a.acc = b.acc and
- a.s245 = b.s245 and
- a.nbs=b.nbs)
- where nvl(a.ost,0)<>nvl(b.ost,0)
- order by nvl(a.nbs, b.nbs)) b
- on (a.acc = b.acc and
- a.kodp like '_'||b.nbs||'__________'||b.s245||'%')
- WHEN MATCHED THEN
- update set a.znap = a.znap + b.rizn,
- comm = comm || ' *=' || to_char(b.rizn)
- WHERE b.acc is not null;
+       -- по дсиконтах
+       merge into rnbu_trace a
+       using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
+              from (select acc_id acc, s245, nbs, ost
+                    from NBUR_TMP_A7_S245
+                    where report_date = dat_ and
+                          nbs = '2046') a
+                       join
+                    (select acc, substr(kodp, 16, 1) s245, substr(kodp, 2, 4) nbs, sum(znap) ost
+                     from rnbu_trace
+                     where kodp like '_2046%'
+                     group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
+                     on (a.acc = b.acc and
+                         a.s245 = b.s245 and
+                         a.nbs=b.nbs)
+            where nvl(a.ost,0)<>nvl(b.ost,0)
+            order by nvl(a.nbs, b.nbs)) b
+       on (a.acc = b.acc and
+           a.kodp like '_'||b.nbs||'__________'||b.s245||'%')
+       when matched then
+         update set a.znap = a.znap + b.rizn,
+         comm = comm || ' *=' || to_char(b.rizn)
+       where b.acc is not null;
    end if;
 
 ------------------------------------------------
@@ -1951,7 +1922,8 @@ BEGIN
                                 sign(decode(a.kv, 980, a.ost, a.ostq)) t020, a.nbs, a.kv,
                                 sum(decode(a.kv, 980, a.ost, a.ostq)) ostq
                             from otcn_saldo a, otcn_acc s, customer c
-                            where nvl(a.nbs, substr(a.nls,1,4)) in ('1410','1412','1415','1416','1417','1418',
+                            where nvl(a.nbs, substr(a.nls,1,4)) in ('1410','1412','1415','1416','1417','1418','1419',
+                                           '1420','1422','1425','1426','1427','1428','1429',
                                           '1490','1491','1492','1493','1590','1592','1890',
                                           '2890','3190','3290','3590','3599','3690','3692',
                                           '9010','9015','9030','9031','9036','9500',
@@ -1974,7 +1946,8 @@ BEGIN
                             min('1'||substr(kodp, 6, 2)) R013_s580,
                             min('1'||substr(kodp, 6, 2)) R013_s580_A
                         from rnbu_trace r, customer c
-                        where substr(r.kodp, 2, 4) in ('1410','1412','1415','1416','1417','1418',
+                        where substr(r.kodp, 2, 4) in ('1410','1412','1415','1416','1417','1418','1419',
+                                      '1420','1422','1425','1426','1427','1428','1429',
                                       '1490','1491','1492','1493','1590','1592','1890',
                                       '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                       '9010','9015','9030','9031','9036','9500',
@@ -1989,7 +1962,7 @@ BEGIN
                 order by 1, 2, 3, 4, 9 )
        loop
           begin
-               select r.recid
+               select /*+ leading(r)*/ r.recid
                into recid_
                from rnbu_trace r, customer c
                where r.nbuc = k.nbuc and
@@ -2004,7 +1977,7 @@ BEGIN
           exception
              when no_data_found then
                  begin
-                   select r.recid
+                   select /*+ leading(r)*/ r.recid
                    into recid_
                    from rnbu_trace r, customer c
                    where r.nbuc = k.nbuc and
@@ -2018,7 +1991,7 @@ BEGIN
                  exception
                     when no_data_found then
                        begin
-                           select r.recid
+                           select /*+ leading(r)*/ r.recid
                            into recid_
                            from rnbu_trace r, customer c
                            where r.nbuc = k.nbuc and
@@ -2032,7 +2005,7 @@ BEGIN
                        exception
                             when no_data_found then
                               begin
-                                   select r.recid
+                                   select /*+ leading(r)*/ r.recid
                                    into recid_
                                    from rnbu_trace r, customer c
                                    where r.nbuc = k.nbuc and
@@ -2147,11 +2120,13 @@ BEGIN
          v.seg_02 not in ('2806','3116','3216')
          or
          v.seg_02 in ('1535','2387','2397','2457')
+         or 
+         v.seg_02 in ('1536','2386','2396','2456') 
          ) and
          v.seg_04 in ('2', '4')
          or
         not (substr(v.seg_02,1,3) in ('150','300','301','310','311','321') or
-             v.seg_02 in ('1535','1607','2387','2397','2457','2607','2627','2657','3040', '3692') or
+             v.seg_02 in ('1535','1536','1607','2386','2387','2396','2397','2456','2457','2607','2627','2657','3040', '3692') or
              v.seg_02 like '___6'  or
              v.seg_02 like '___8'  or
              v.seg_02 like '___9')
@@ -2210,6 +2185,12 @@ BEGIN
         v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
         v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('4')
+        or
+        v.seg_02 = '3016' and v.seg_03 in ('A','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        or
+        v.seg_02 = '3016' and v.seg_03 in ('A','K','N') and v.seg_04 in ('4')
+        or
+        v.seg_02 = '3016' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
         v.seg_02 = '3015' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
@@ -2373,15 +2354,15 @@ BEGIN
        o.acc in (select /*+ index(s, XPK_SNAP_BALANCES)*/
                       acc
                  from snap_balances s
-                 where fdat = dat_ and ost=0) and 
-      not exists ( select 1 from otc_c5_proc o1, accounts a 
-                   where o1.datf = dat_ 
-                     and o1.kodp like '1%' 
-                     and o1.acc = a.acc 
-                     and o1.kv = o.kv 
+                 where fdat = dat_ and ost=0) and
+      not exists ( select 1 from otc_c5_proc o1, accounts a
+                   where o1.datf = dat_
+                     and o1.kodp like '1%'
+                     and o1.acc = a.acc
+                     and o1.kv = o.kv
                      and trim(a.tip) in ('SS', 'SP')
-                     and o1.nd = o.nd 
-                     and o1.znap <> 0  
+                     and o1.nd = o.nd
+                     and o1.znap <> 0
                  );
     commit;
 
