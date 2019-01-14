@@ -87,7 +87,16 @@ public partial class DepositCardAcc : Bars.BarsPage
                     " where custid = :RNK and currency = :cur_id ";
             }
             else
-            {
+				if (AccType == "BPK190")
+               {
+                cmdGetCardAcc.CommandText =
+                    "select '<A href=# onclick=\"returnAcc('''||bankcode||''','''||balacc||''','''||replace(custname,'''','`')||''','''||custcode||''')\">Вибрати</a>', " +
+                    "       cardnum, balacc, currency, custname, bankcode, custcode " +
+                    "  from V_CARDACCOUNTS " +
+                    " where custid = :RNK and currency = :cur_id  and tip like 'W4%'";
+                }
+               else
+				
                 if (Request["mode"] == "cardn")
                 {
                     cmdGetCardAcc.CommandText =
@@ -124,7 +133,7 @@ public partial class DepositCardAcc : Bars.BarsPage
                     "          from ACCOUNTS a, customer b" +
                  "         where a.nbs in " + a + " and a.dazs Is Null and a.RNK = b.RNK" +
                     "           and a.rnk = :rnk and a.kv =  :cur_id )";
-                }
+                
             }
 
             cmdGetCardAcc.Parameters.Add("rnk", OracleDbType.Decimal, Convert.ToString(Request["rnk"]), ParameterDirection.Input);
