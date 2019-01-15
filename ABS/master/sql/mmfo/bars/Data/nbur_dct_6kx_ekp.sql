@@ -329,8 +329,8 @@ Insert into BARS.NBUR_DCT_F6KX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
     FORMULA, LCY_PCT, FCY_PCT, R030_980, INCL_980)
  Values
-   ('A6K066', 'Кошти банків у розрахунках, які є забезпеченням за кредитами рефінансування Національного банку України', '1', 'A6K002', NULL, 
-    NULL, 100, 100, NULL, NULL);
+   ('A6K066', 'Кошти банків у розрахунках, які є забезпеченням за кредитами рефінансування Національного банку України', '1', 'A6K003', NULL, 
+    NULL, 0, 0, NULL, NULL);
 Insert into BARS.NBUR_DCT_F6KX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
     FORMULA, LCY_PCT, FCY_PCT, R030_980, INCL_980)
@@ -677,7 +677,7 @@ Insert into BARS.NBUR_DCT_F6KX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
     FORMULA, LCY_PCT, FCY_PCT, R030_980, INCL_980)
  Values
-   ('A6K088', 'Кошти банків у розрахунках (крім тих, які є забезпеченням за кредитами рефінансування Національного банку України)', '1', NULL, 0, 
+   ('A6K088', 'Кошти банків у розрахунках (крім тих, які є забезпеченням за кредитами рефінансування Національного банку України)', '1', 'A6K003', 0, 
     NULL, 100, 100, NULL, NULL);
 Insert into BARS.NBUR_DCT_F6KX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
