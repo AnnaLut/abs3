@@ -113,6 +113,15 @@ CREATE OR REPLACE package body BARS.eds_intg is
  exception when dup_val_on_index then
     null;
   end;
+ procedure set_exists_decl_id(p_id varchar2, p_decl_id number) is
+    pragma autonomous_transaction;
+ begin
+    update eds_decl e 
+       set e.decl_id = p_decl_id, 
+           e.state = st_declaration_prepared 
+     where e.id = p_id;
+    commit;
+ end;
   
 --------------------
 --xml_2_obj-----------------------------------------------------------------------------------
@@ -672,6 +681,8 @@ end;
     else
       if p_transp_id is not null then
         barstrans.transp_utl.add_resp(p_transp_id, crt_xml(l_id));
+      else
+        set_exists_decl_id(p_eds_decl.id ,l_id);
       end if;      
     end if;
   exception when others then
