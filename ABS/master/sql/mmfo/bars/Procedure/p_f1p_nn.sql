@@ -7,17 +7,32 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F1P_NN ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (dat_      DATE, 
+CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (dat_      DATE,
                                            sheme_    VARCHAR2 DEFAULT 'D')
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    10/07/2018 (03/05/2018, 01/03/2018)
+% VERSION     :    10/01/2019 (14/12/2018, 03/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+10/01/2019 - для проводок  Дт 1500  Кт 292460003717,2924430003718 та 
+                           Дт 292460003717,2924430003718  Кт - 1500
+                           в показник (DD=04) буде формуватися значення "В"  
+14/12/2018 - код показника 04 (тип клієнта) формується для всіх сум операцій
+             декларування (DECL=1, DECL=2 в KL_R040)
+             для деяких визначених рахунків кореспонденцій заносимо 
+             визначені значення (вимога Максименко)
+03/12/2018 - в блоке (строка 1207) добавил условие ROWNUM=1
+31/10/2018 - для проводок Дт 100 Кт 1811 будем изменять код банка (KOD_B)
+             из проводки Дт 1811 Кт 3739 если значение этого реквизита 
+             пустое или равно "6".                       
+             для проводок Дт 100 Кт 1911 будем изменять код банка (KOD_B)
+             из проводки Дт 1911 Кт 3739 если значение этого реквизита 
+             пустое или равно "6".                       
+03/10/2018 - в блоке (строка 1217) добавил условие ROWNUM=1
 10/07/2018 - для проводок Дт 100 Кт 1911 будем изменять код банка (KOD_B)
              заполняем по проводке Дт 1911 Кт 3739
 03/05/2018 - для проводок Дт 1811 Кт 3739 добавлено новое условие для отбора
@@ -52,7 +67,7 @@ IS
 16.06.2016 - для кодов операций 1221,1251,1551,1721,1751 будем заполнять
              код "NNN" - умовний номер для формирования общей суммы по виду
              операции (есть различные коды 99)
-15.06.2016 - для суммы показателей 715, 716 будем учитівать 7-и значній
+15.06.2016 - для суммы показателей 715, 716 будем учит_вать 7-и значн_й
              код назначения из поля "COMM" табл. RNBU_TRACE
 07.06.2016 - изменил коды 2312002,2312003 на 2311002,2311003
 26.05.2016 - для проводок Дт 1500 Кт 3739 которые декларируются будем
@@ -481,8 +496,9 @@ BEGIN
                SET a.VALUE = '2311002'
              WHERE     a.tag = 'KOD_N'
                    AND (   TRIM (a.VALUE) IS NULL
-                        OR TRIM (a.VALUE) = '0000000'
-                        OR TRIM (a.VALUE) <> '2311002') --По просьбе Максименко принудительное проставление--<>'2311002')
+                        OR TRIM (a.VALUE) = '0000000')
+                        --OR TRIM (a.VALUE) <> '8446015') -- 31/10/2018 не изменяем если значение 8446015 
+                        --OR TRIM (a.VALUE) <> '2311002') --По просьбе Максименко принудительное проставление--<>'2311002')
                    AND a.REF = k.REF;
          END IF;
 
@@ -499,8 +515,9 @@ BEGIN
                SET a.VALUE = '2311003'
              WHERE     a.tag = 'KOD_N'
                    AND (   TRIM (a.VALUE) IS NULL
-                        OR TRIM (a.VALUE) = '0000000'
-                        OR TRIM (a.VALUE) <> '2311003') --По просьбе Максименко принудительное проставление--<>'2311003')
+                        OR TRIM (a.VALUE) = '0000000')
+                        --OR TRIM (a.VALUE) <> '8446015') -- 31/10/2018 не изменяем если значение 8446014 
+                        --OR TRIM (a.VALUE) <> '2311003') --По просьбе Максименко принудительное проставление--<>'2311003')
                    AND a.REF = k.REF;
          END IF;
 
@@ -537,7 +554,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
-         -- видано підкріплень (Укрпошта)
+         -- видано п_дкр_плень (Укрпошта)
          IF     k.nlsd LIKE '2600%'
             AND k.nlsk LIKE '100%'
             AND (   k.name_a LIKE '%' || UPPER ('Укрпошт') || '%'
@@ -554,7 +571,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
-         -- видача по чеку інвалюти
+         -- видача по чеку _нвалюти
          IF     SUBSTR (k.nlsd, 1, 4) IN ('2600', '2604')
             AND k.nlsk LIKE '100%'
             AND k.tt IN ('065', '067', '00H', '00F')
@@ -597,7 +614,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
-         -- прийнято (повернення) підкріпленя (Укрпошта)
+         -- прийнято (повернення) п_дкр_пленя (Укрпошта)
          IF     k.nlsd LIKE '100%'
             AND k.nlsk LIKE '2600%'
             AND (   k.name_b LIKE '%' || UPPER ('Укрпошт') || '%'
@@ -655,7 +672,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
          -------------------------------------------------------------------------
-         -- Оприбуткування надлишків
+         -- Оприбуткування надлишк_в
          IF     k.nlsd LIKE '100%'
             AND k.nlsk LIKE '3800%'
             AND ob22_ = '03'
@@ -842,7 +859,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
-         -- видано готівку за переказом MIGOM
+         -- видано гот_вку за переказом MIGOM
          IF     nlsd1_ LIKE '2809%'
             AND nlsk1_ LIKE '100%'
             AND ob22_ = '17'
@@ -927,7 +944,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
-         -- видано готiвку за переказом Лидер+Хазри+ИНТЕЛЄКСПРЕСС+Глобал Мані
+         -- видано готiвку за переказом Лидер+Хазри+ИНТЕЛЄКСПРЕСС+Глобал Ман_
          -- 12.02.2014 видано готiвку за переказом Анелик OB22='35'
          IF     nlsd1_ LIKE '2809%'
             AND nlsk1_ LIKE '100%'
@@ -941,7 +958,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
-         -- прийнято готiвку за переказом Лидер+Хазри+ИНТЕЛЄКСПРЕСС+RIA+Глобал Мані
+         -- прийнято готiвку за переказом Лидер+Хазри+ИНТЕЛЄКСПРЕСС+RIA+Глобал Ман_
          -- 12.02.2014 прийнято готiвку за переказом Анелик OB22='35'
          -- 01.10.2015 прийнято готiвку за переказом Золота корона OB22='36'
          IF     k.nlsd LIKE '100%'
@@ -1056,7 +1073,7 @@ BEGIN
                    AND a.REF = k.REF;
          END IF;
 
-         -- видано готiвку за переказом (24 - Швидка копійка, 27 - Контакт)
+         -- видано готiвку за переказом (24 - Швидка коп_йка, 27 - Контакт)
          IF     nlsd1_ LIKE '2809%'
             AND nlsk1_ LIKE '100%'
             AND ob22_ IN ('24', '27')
@@ -1214,12 +1231,14 @@ BEGIN
                  and o.s*100 = k.s
                  and o.ref = w.ref(+)
                  and w.tag(+) like 'KOD_B%'
-                 and instr(k.nazn, substr(o.nazn, instr(o.nazn, 'ТТ')+2,3)) > 0;
+                 and instr(k.nazn, substr(o.nazn, instr(o.nazn, 'ТТ')+2,3)) > 0
+                 and rownum = 1;
 
                UPDATE operw a
                   SET a.VALUE = bank_
                 WHERE  a.tag = 'KOD_B'
-                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   --AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '6')
                    AND a.REF = k.REF;
             exception when no_data_found then
                begin
@@ -1229,16 +1248,18 @@ BEGIN
                   where o.fdat = k.fdat
                     and o.nlsd like k.nlsk || '%'
                     and o.nlsk like '3739%'
-                    and o.kv = k.kv 
+                    and o.kv = k.kv
                     and o.s*100 = k.s
                     and o.ref = w.ref(+)
                     and w.tag(+) like 'KOD_B%'
-                    and instr(k.nazn, substr(o.nazn, instr(o.nazn, '№')+6,3)) > 0;
+                    and instr(k.nazn, substr(o.nazn, instr(o.nazn, '№')+6,3)) > 0
+                    and rownum = 1;
 
                UPDATE operw a
                   SET a.VALUE = bank_
                 WHERE  a.tag = 'KOD_B'
-                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   --AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '6')
                    AND a.REF = k.REF;
                exception when no_data_found then
                   begin
@@ -1248,7 +1269,7 @@ BEGIN
                     where o.fdat = k.fdat
                       and o.nlsd like k.nlsk || '%'
                       and o.nlsk like '3739%'
-                      and o.kv = k.kv 
+                      and o.kv = k.kv
                       and o.s*100 = k.s
                       and o.ref = w.ref(+)
                       and w.tag(+) like 'KOD_B%'
@@ -1257,12 +1278,13 @@ BEGIN
                     UPDATE operw a
                        SET a.VALUE = bank_
                     WHERE  a.tag = 'KOD_B'
-                       AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                       --AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                       AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '6')
                        AND a.REF = k.REF;
                   exception when no_data_found then
                null;
             end;
-               end; 
+               end;
             end;
 
          END IF;
@@ -1314,7 +1336,7 @@ BEGIN
                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '804')
                    AND a.REF = k.REF;
 
-            -- заміна коду банка із проводки Дт 1911 Кт 3739
+            -- зам_на коду банка _з проводки Дт 1911 Кт 3739
             begin
                select trim(w.value)
                   into bank_
@@ -1330,7 +1352,8 @@ BEGIN
                UPDATE operw a
                   SET a.VALUE = bank_
                 WHERE  a.tag = 'KOD_B'
-                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   --AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '6')
                    AND a.REF = k.REF;
             exception when no_data_found then
                null;
@@ -1576,7 +1599,7 @@ BEGIN
          IF k.nlsd LIKE '1007%' AND k.nlsk LIKE '1001%' and
             LOWER (k.nazn) like '%видача гот_вки%через представника%'
          THEN
-            -- заміна коду банка із проводки Дт 1911 Кт 1007
+            -- зам_на коду банка _з проводки Дт 1911 Кт 1007
             begin
                select trim(w.value)
                   into bank_
@@ -1844,7 +1867,7 @@ BEGIN
             END IF;
          END IF;
 
-         -- анулювання відкликааня переказів в IВ
+         -- анулювання в_дкликааня переказ_в в IВ
          IF     (k.nlsd LIKE '2809%' OR k.nlsd LIKE '2909%')
             AND k.nlsk LIKE '100%'
             AND k.tt IN ('M37', 'MMV', 'CN3', 'CN4')
@@ -1907,7 +1930,7 @@ BEGIN
                      -20000,
                         'Помилка для РЕФ = '
                      || TO_CHAR (k.REF)
-                     || ': перевірте доп.реквізити D_1PB(DATT) та D_REF(REFT)! '
+                     || ': перев_рте доп.рекв_зити D_1PB(DATT) та D_REF(REFT)! '
                      || SQLERRM);
             END;
          END IF;
@@ -1979,7 +2002,7 @@ BEGIN
                  c.rnk,
                  LPAD (TRIM (c.okpo), 10, '0') OKPO,
                  t.country,
-                 'ГОТІВКА',
+                 'ГОТ_ВКА',
                  t.lcv,
                  a.nls,
                  NVL (fost (a.acc, dat_), 0)
@@ -2228,22 +2251,34 @@ BEGIN
 
          IF    (    decl_r040 = '2'
                 AND gl.p_icurval (g.KV, k.S, Datp_) >=
-                       gl.p_icurval (840, 5000000, Datp_)
+                       gl.p_icurval (840, 1, Datp_)  -- gl.p_icurval (840, 5000000, Datp_)
                 AND SUBSTR (g.NLS, 1, 2) <> '10')
             OR (    decl_r040 = '1'
                 AND gl.p_icurval (g.KV, k.S, Datp_) >=
-                       gl.p_icurval (840, 2000000, Datp_)
+                       gl.p_icurval (840, 1, Datp_)  -- gl.p_icurval (840, 2000000, Datp_)
                 AND SUBSTR (g.NLS, 1, 2) <> '10')
             OR (    gl.p_icurval (g.KV, k.S, k.fdat) >=
                        gl.p_icurval (840, 100000000, k.fdat)
                 AND SUBSTR (g.NLS, 1, 2) = '10')
          THEN
             nd_ := k.REF;
-            nnn1_ := nnn1_ + 1;
-            if nnn1_  > 999
-            then
-               nnn1_ := 1;
-            end if;
+
+            IF  ( decl_r040 = '2'  AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 5000000, Datp_)
+                 AND SUBSTR (g.NLS, 1, 2) <> '10')
+             OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 2000000, Datp_)
+                 AND SUBSTR (g.NLS, 1, 2) <> '10')
+            OR (    gl.p_icurval (g.KV, k.S, k.fdat) >=
+                       gl.p_icurval (840, 100000000, k.fdat)
+                AND SUBSTR (g.NLS, 1, 2) = '10')
+
+            THEN 
+
+               nnn1_ := nnn1_ + 1;
+               if nnn1_  > 999
+               then
+                  nnn1_ := 1;
+               end if;
+            END IF;
 
             -- deb.trace( 12, 'S', k.S );
             BEGIN
@@ -2476,7 +2511,7 @@ BEGIN
                   k.NLSA like '2708%' or k.NLSA like '3548%' or k.NLSA like '3660%' or
                   k.NLSA like '3666%' or k.NLSA like '3668%' or k.NLSA like '1624%' or
                   k.NLSA like '1626%' or k.NLSA like '1628%' or
-                  k.NLSA like '37397005523%' or k.NLSA like '3739401901%'
+                  k.NLSA like '37397005523%' or k.NLSA like '3739401901%'  
                then
                   asp_S_ := 'B';
                   asp_K_ := our_okpo_;
@@ -2486,32 +2521,101 @@ BEGIN
                if k.NLSB like '2700%' or k.NLSB like '2701%' or k.NLSB like '2706%' or
                   k.NLSB like '2708%' or k.NLSB like '3548%' or k.NLSB like '3660%' or
                   k.NLSB like '3666%' or k.NLSB like '3668%' or k.NLSB like '1624%' or
-                  k.NLSB like '1626%' or k.NLSB like '1628%'
+                  k.NLSB like '1626%' or k.NLSB like '1628%' 
                then
                   asp_S_ := 'B';
                   asp_K_ := our_okpo_;
                   asp_N_ := 'АТ Ощадбанк';
                end if;
 
-               kodp_ :=
-                     '03'
-                  || k.kod_e
-                  || country_
-                  || b010_
-                  || SUBSTR (g.nls, 1, 4)
-                  || LPAD (TO_CHAR (g.kv), 3, '0')
-                  || kod_
-                  || LPAD (coun_, 3, '0')
-                  || LPAD (TO_CHAR (nnn1_), 3, '0');
-
-               if g.nls like '1600%'
+               if k.NLSA like '292460003717%' or k.NLSA like '2924430003718%'
                then
-                  p_ins (kodp_, LPAD (TO_CHAR (bank_), 3, ' '));
-               else
-                  p_ins (kodp_, LPAD (TO_CHAR (glb_), 3, ' '));
+                  asp_S_ := 'B';
                end if;
 
-               -- код DD=04 код типу-клієнта
+               if k.NLSB like '292460003717%' or k.NLSB like '2924430003718%'
+               then
+                  asp_S_ := 'B';
+               end if;
+
+               if ( k.NLSA like '2062%' or k.NLSA like '2063%' or k.NLSA like '2520%' or
+                    k.NLSA like '2530%' or k.NLSA like '2542%' or k.NLSA like '2600%' or
+                    k.NLSA like '2601%' or k.NLSA like '2602%' or k.NLSA like '2605%' or 
+                    k.NLSA like '2607%' or k.NLSA like '2608%' or k.NLSA like '2650%'
+                  ) and LENGTH (asp_K_) ='8'
+               then
+                  asp_S_ := 'U';
+               end if;
+
+               if ( k.NLSB like '2062%' or k.NLSB like '2063%' or k.NLSB like '2520%' or
+                    k.NLSB like '2530%' or k.NLSB like '2542%' or k.NLSB like '2600%' or
+                    k.NLSB like '2601%' or k.NLSB like '2602%' or k.NLSB like '2605%' or 
+                    k.NLSB like '2607%' or k.NLSB like '2608%' or k.NLSB like '2650%'
+                  ) and LENGTH (asp_K_) ='8'
+               then
+                  asp_S_ := 'U';
+               end if;
+
+               if ( k.NLSA like '2600%' or k.NLSA like '2601%' or k.NLSA like '2602%' or 
+                    k.NLSA like '2605%' or k.NLSA like '2607%' or k.NLSA like '2608%'
+                  ) and LENGTH (asp_K_) ='10'
+               then
+                  asp_S_ := 'S';
+               end if;
+
+               if ( k.NLSB like '2600%' or k.NLSB like '2601%' or k.NLSB like '2602%' or 
+                    k.NLSB like '2605%' or k.NLSB like '2607%' or k.NLSB like '2608%'
+                  ) and LENGTH (asp_K_) ='10'
+               then
+                  asp_S_ := 'S';
+               end if;
+
+               if k.NLSA like '2620%' and LENGTH (asp_K_) ='10'
+               then
+                  asp_S_ := 'F';
+               end if;
+
+               if k.NLSB like '2620%' and LENGTH (asp_K_) ='10'
+               then
+                  asp_S_ := 'F';
+               end if;
+
+               if ( k.NLSA like '6%' or k.NLSA like '7%') and trim(asp_K_) ='32139'
+               then
+                  asp_S_ := 'B';
+               end if;
+
+               if ( k.NLSB like '6%' or k.NLSB like '7%') and trim(asp_K_) ='32139'
+               then
+                  asp_S_ := 'B';
+               end if;
+
+               IF  ( decl_r040 = '2'  AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 5000000, Datp_)
+                    AND SUBSTR (g.NLS, 1, 2) <> '10')
+                OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 2000000, Datp_)
+                    AND SUBSTR (g.NLS, 1, 2) <> '10')
+               THEN 
+
+                  kodp_ :=
+                        '03'
+                     || k.kod_e
+                     || country_
+                     || b010_
+                     || SUBSTR (g.nls, 1, 4)
+                     || LPAD (TO_CHAR (g.kv), 3, '0')
+                     || kod_
+                     || LPAD (coun_, 3, '0')
+                     || LPAD (TO_CHAR (nnn1_), 3, '0');
+
+                  if g.nls like '1600%'
+                  then
+                     p_ins (kodp_, LPAD (TO_CHAR (bank_), 3, ' '));
+                  else
+                     p_ins (kodp_, LPAD (TO_CHAR (glb_), 3, ' '));
+                  end if;
+               END IF;
+
+               -- код DD=04 код типу-кл_єнта
                kodp_ :=
                      '04'
                   || k.kod_e
@@ -2526,36 +2630,43 @@ BEGIN
                p_ins (kodp_, asp_S_);
 
                -- код DD=05 код за ЄДРПОУ (ДРФО) умовний номер
-               kodp_ :=
-                     '05'
-                  || k.kod_e
-                  || country_
-                  || b010_
-                  || SUBSTR (g.nls, 1, 4)
-                  || LPAD (TO_CHAR (g.kv), 3, '0')
-                  || kod_
-                  || LPAD (coun_, 3, '0')
-                  || LPAD (TO_CHAR (nnn1_), 3, '0');
+               IF  ( decl_r040 = '2'  AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 5000000, Datp_)
+                    AND SUBSTR (g.NLS, 1, 2) <> '10')
+                OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 2000000, Datp_)
+                    AND SUBSTR (g.NLS, 1, 2) <> '10')
+               THEN 
 
-               p_ins (kodp_, LPAD (TRIM (asp_K_), 10, '0'));
+                  kodp_ :=
+                        '05'
+                     || k.kod_e
+                     || country_
+                     || b010_
+                     || SUBSTR (g.nls, 1, 4)
+                     || LPAD (TO_CHAR (g.kv), 3, '0')
+                     || kod_
+                     || LPAD (coun_, 3, '0')
+                     || LPAD (TO_CHAR (nnn1_), 3, '0');
 
-               -- код DD=06 назва клієнта
-               if asp_S_ in ('F','S')
-               then
-                  asp_N_ := '';
-               end if;
-               kodp_ :=
-                     '06'
-                  || k.kod_e
-                  || country_
-                  || b010_
-                  || SUBSTR (g.nls, 1, 4)
-                  || LPAD (TO_CHAR (g.kv), 3, '0')
-                  || kod_
-                  || LPAD (coun_, 3, '0')
-                  || LPAD (TO_CHAR (nnn1_), 3, '0');
+                  p_ins (kodp_, LPAD (TRIM (asp_K_), 10, '0'));
 
-               p_ins (kodp_, asp_N_);
+                  -- код DD=06 назва кл_єнта
+                  if asp_S_ in ('F','S')
+                  then
+                     asp_N_ := '';
+                  end if;
+                  kodp_ :=
+                        '06'
+                     || k.kod_e
+                     || country_
+                     || b010_
+                     || SUBSTR (g.nls, 1, 4)
+                     || LPAD (TO_CHAR (g.kv), 3, '0')
+                     || kod_
+                     || LPAD (coun_, 3, '0')
+                     || LPAD (TO_CHAR (nnn1_), 3, '0');
+
+                  p_ins (kodp_, asp_N_);
+               END IF;
             END IF;
 
             -- код DD=10 назва банка-кореспондента
@@ -2637,7 +2748,7 @@ BEGIN
 
             p_ins (kodp_, TO_CHAR (k.s));
 
-            -- код DD=99 опис операції
+            -- код DD=99 опис операц_ї
             kodp_ :=
                   '99'
                || k.kod_e
@@ -2730,7 +2841,7 @@ BEGIN
 
             p_ins (kodp_, TO_CHAR (k.s));
 
-            -- код DD=99 опис операції
+            -- код DD=99 опис операц_ї
             kodp_ :=
                   '99'
                || k.kod_e
@@ -2746,7 +2857,7 @@ BEGIN
          -- deb.trace( 17, 'OPER_', OPER_);
          END IF;
 
-         -- анулювання відкликання переказів в IВ
+         -- анулювання в_дкликання переказ_в в IВ
          IF k.tt IN ('M37', 'MMV', 'CN3', 'CN4')
          THEN
             BEGIN
@@ -2794,9 +2905,9 @@ BEGIN
                      THEN
                         raise_application_error (
                            -20001,
-                              'Перевірте доп.реквізит D_1PB для РЕФ = '
+                              'Перев_рте доп.рекв_зит D_1PB для РЕФ = '
                            || TO_CHAR (k.REF)
-                           || ' ! Дата повинна бути в форматі dd/mm/yyyy');
+                           || ' ! Дата повинна бути в формат_ dd/mm/yyyy');
                      ELSE
                         RAISE;
                      END IF;
@@ -2902,26 +3013,55 @@ BEGIN
                AND SUBSTR (kodp, 24, 4) IN ('2314', '2343')
                AND TRIM (znap) IS NULL;
 
+   asp_S_ := null;
+
+   -- блок для заповнення типу контрагента по REF
+   FOR k IN (  SELECT kodp,
+                      TRIM (znap) znap,
+                      TRIM (comm) comm,
+                      REF
+                 FROM rnbu_trace
+                WHERE kodp LIKE '04%' AND TRIM (znap) is not null
+             ORDER BY 1, 2, 3)
+   LOOP
+      IF asp_S_ IS NULL 
+      THEN
+         asp_S_ := k.znap;
+      END IF;
+
+      IF asp_S_ <> k.znap 
+      THEN
+         asp_S_ := k.znap;
+      END IF;
+
+      UPDATE rnbu_trace
+         SET comm = SUBSTR ( asp_S_ || '  ' || k.comm, 1, 200) 
+       WHERE REF = k.REF;
+   END LOOP;
+
    SELECT MAX (TO_NUMBER (SUBSTR (kodp, -3))) INTO nnn_ FROM rnbu_trace;
 
    bank_ := NULL;
    kod7_ := NULL;
+   asp_S_ := null;
 
    FOR k IN (  SELECT kodp,
                       TRIM (znap) znap,
-                      SUBSTR (comm, 1, 7) kod_n,
+                      SUBSTR (comm, 4, 7) kod_n,
+                      SUBSTR (comm, 1, 1) k018,
                       REF
                  FROM rnbu_trace
                 WHERE kodp LIKE '07%' AND SUBSTR (kodp, 31, 3) = '000'
-             ORDER BY 1, 2, 3)
+             ORDER BY 1, 2, 3, 4)
    LOOP
-      IF bank_ IS NULL AND kod7_ IS NULL
+      IF bank_ IS NULL AND kod7_ IS NULL AND asp_S_ IS NULL 
       THEN
          bank_ := k.znap;
          kod7_ := k.kod_n;
+         asp_S_ := k.k018;
       END IF;
 
-      IF bank_ <> k.znap OR kod7_ <> k.kod_n
+      IF bank_ <> k.znap OR kod7_ <> k.kod_n OR asp_S_ <> k.k018 
       THEN
          nnn_ := nnn_ + 1;
          if nnn_ > 999
@@ -2930,6 +3070,7 @@ BEGIN
          end if;
          bank_ := k.znap;
          kod7_ := k.kod_n;
+         asp_S_ := k.k018;
       END IF;
 
       UPDATE rnbu_trace
@@ -2986,7 +3127,7 @@ BEGIN
 
    CLOSE basel;
 
-   -- формирование показателя DD='80' - кількість операцій
+   -- формирование показателя DD='80' - к_льк_сть операц_й
    nnn_ := 0;
 
    FOR k
