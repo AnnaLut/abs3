@@ -1,6 +1,6 @@
 create or replace package eds_intg is
 
-  gc_header_version constant varchar2(64)  := 'version 1.01 22.05.2018';
+  gc_header_version constant varchar2(64)  := 'version 1.1 26.12.2018';
 
   -- eds_request.act_type
   req_DECLARATION_DATA  constant number := 1; -- Запит на підготовку декларації
@@ -46,26 +46,15 @@ create or replace package eds_intg is
   -------------------------------------------------------------
   procedure pocess_request(p_transp_id varchar2);
   procedure set_data_request_state( p_decl in int ,p_state_req int);
-  procedure p_cur_rates (p_req_id varchar2);
-  procedure fill_data(p_req_id varchar2, p_kf varchar2); 
-  procedure crt_decl(p_eds_decl eds_decl%rowtype, p_transp_id varchar2 default null);
-  procedure create_send_job1(p_id varchar2);
   procedure send_decl_id (p_decl_id varchar2);
-  procedure set_main_status(p_id varchar2);
-  function xml_extract(p_xml xmltype, p_xpath varchar2) return varchar2;
----------------
-procedure  run_parallel(p_task    in varchar2,
-                        p_chunk   in varchar2,
-                        p_stmt    in varchar2,
-                        p_parallel_level number); 
-   
-
-
+  procedure fill_data(p_req_id varchar2 ,p_kf varchar2);
+  
 end eds_intg;
 /
-create or replace package body eds_intg is
 
-  gc_body_version constant varchar2(64) := 'version 1.01 22.05.2018';
+CREATE OR REPLACE package body BARS.eds_intg is
+
+  gc_body_version constant varchar2(64) := 'version 1.1 26.12.2018';
   gc_pkg          constant varchar2(8)  := 'eds_intg';
   -----------------------------------------------------------------------------------------
 
@@ -112,55 +101,73 @@ create or replace package body eds_intg is
                  substr(l_retval, 21);
      return l_retval;
  end;
-
-  -----------------------------------------------------------------------------------------
-  --  create_request
-  --
-  --    Реєстрація запиту в системі
-  --
-  procedure create_request(
-    p_okpo       in eds_decl.okpo%type,
-    p_birth_date in eds_decl.birth_date%type,
-    p_doc_type   in eds_decl.doc_type%type,
-    p_doc_serial in eds_decl.doc_serial%type,
-    p_doc_number in eds_decl.doc_number%type,
-    p_date_from  in eds_decl.date_from%type,
-    p_date_to    in eds_decl.date_to%type,
-    p_name       in eds_decl.cust_name%type default null,
-    p_comm       in eds_decl.comm%type default null
-    )
-  is
-    l_eds_decl          eds_decl%rowtype;
-    l_act               varchar2(255) := gc_pkg||'.create_request ';
-    l_id                eds_decl.id%type;
-  begin
-    insert into eds_decl
-    values(get_guid, null, sysdate, st_DECLARATION_REGISTER, p_okpo, p_name, p_birth_date,
-           p_doc_type, p_doc_serial, p_doc_number, p_date_from, p_date_to,  p_comm, user_id, user_name,
-           sys_context('bars_context','user_branch'))
-           returning id into l_id;
-    insert into EDS_DECLS_POLICY(ID, ADD_DATE, ADD_ID, KF)
-      values(l_id, sysdate, user_id, sys_context('bars_context','user_mfo'));
+ 
+ procedure add_new_decl(p_eds_decl eds_decl%rowtype, p_eds_decls_policy eds_decls_policy%rowtype default null) is
+    pragma autonomous_transaction;
+ begin
+    insert into eds_decl values p_eds_decl;
+    if p_eds_decls_policy.id is not null then
+        insert into EDS_DECLS_POLICY values p_eds_decls_policy;
+    end if;    
     commit;
-    l_eds_decl.id          := l_id;
-    l_eds_decl.okpo        := p_okpo;
-    l_eds_decl.cust_name   := p_name;
-    l_eds_decl.doc_type    := p_doc_type;
-    l_eds_decl.doc_serial  := p_doc_serial;
-    l_eds_decl.doc_number  := p_doc_number;
-    l_eds_decl.birth_date  := p_birth_date;
-    l_eds_decl.date_from   := p_date_from;
-    l_eds_decl.date_to     := p_date_to;
+ exception when dup_val_on_index then
+    null;
+  end;
+  
+--------------------
+--xml_2_obj-----------------------------------------------------------------------------------
+  function xml_2_obj(p_xml clob) return eds_decl%rowtype is
+  l_retval   eds_decl%rowtype;
+  l_xml        xmltype;
+  begin
+  l_xml:=xmltype(p_xml);
+  l_retval.ID         := xml_extract(l_xml, '/ROOT/ID/text()');
+  l_retval.DECL_ID    := xml_extract(l_xml, '/ROOT/DECL_ID/text()');
+  l_retval.CRT_DATE   := to_date(xml_extract(l_xml, '/ROOT/CRT_DATE/text()'),'dd.mm.yyyy hh24:mi:ss');
+  l_retval.STATE      := xml_extract(l_xml, '/ROOT/STATE/text()');
+  l_retval.OKPO       := xml_extract(l_xml, '/ROOT/OKPO/text()');
+  l_retval.CUST_NAME  := xml_extract(l_xml, '/ROOT/CUST_NAME/text()');
+  l_retval.BIRTH_DATE := to_date(xml_extract(l_xml, 'ROOT/BIRTH_DATE/text()'),'dd.mm.yyyy');
+  l_retval.DOC_TYPE   := xml_extract(l_xml, '/ROOT/DOC_TYPE/text()');
+  l_retval.DOC_SERIAL := xml_extract(l_xml, '/ROOT/DOC_SERIAL/text()');
+  l_retval.DOC_NUMBER := xml_extract(l_xml, '/ROOT/DOC_NUMBER/text()');
+  l_retval.DATE_FROM  := to_date(xml_extract(l_xml, '/ROOT/DATE_FROM/text()'),'dd.mm.yyyy');
+  l_retval.DATE_TO    := to_date(xml_extract(l_xml, '/ROOT/DATE_TO/text()'),'dd.mm.yyyy');
+  l_retval.COMM       := xml_extract(l_xml, '/ROOT/COMM/text()');
+  l_retval.DONEBY     := xml_extract(l_xml, '/ROOT/DONEBY/text()');
+  l_retval.DONEBY_FIO := xml_extract(l_xml, '/ROOT/DONEBY_FIO/text()');
+  l_retval.BRANCH     := xml_extract(l_xml, '/ROOT/BRANCH/text()');
+  return l_retval;
+  end;
+  
+  --crt_xml-------------------------------------------------------------------------------------
+  function crt_xml(p_req_id number, p_type number default 0) return clob is
+  l_xml xmltype;
+  begin
+  select
+  xmlroot(xmlelement("ROOT",
+                     xmlelement("ID",         e.id),
+                     xmlelement("DECL_ID",    e.decl_id),
+                     xmlelement("CRT_DATE",   to_char(e.crt_date, 'dd.mm.yyyy hh24:mi:ss')),
+                     xmlelement("STATE",      to_char(e.state)),
+                     xmlelement("OKPO",       e.okpo),
+                     xmlelement("CUST_NAME",  e.cust_name),
+                     xmlelement("BIRTH_DATE", to_char(e.birth_date, 'dd.mm.yyyy')),
+                     xmlelement("DOC_TYPE",   e.doc_type),
+                     xmlelement("DOC_SERIAL", e.doc_serial),
+                     xmlelement("DOC_NUMBER", e.doc_number),
+                     xmlelement("DATE_FROM",  to_char(e.date_from, 'dd.mm.yyyy')),
+                     xmlelement("DATE_TO",    to_char(e.date_to, 'dd.mm.yyyy')),
+                     xmlelement("COMM",       e.comm),
+                     xmlelement("DONEBY",     case when p_type = 0 then null else to_number(e.doneby) end),
+                     xmlelement("DONEBY_FIO", case when p_type = 0 then null else e.doneby_fio end),
+                     xmlelement("BRANCH",     e.branch)), version '1.0" encoding="windows-1251')
+  INTO l_xml
+  from eds_decl e
+  where decl_id = p_req_id;
+  return l_xml.GetClobVal();
+  end; 
 
-    eds_intg.crt_decl(l_eds_decl);
-
-  exception
-    when others then
-    bars.logger.info('edecl-'||l_eds_decl.id|| ' error crt_decl ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
-      bars_error.raise_nerror(p_errmod  => gc_pkg,
-                              p_errname => 'ERR_CREATE_REQUEST',
-                              p_param1  => l_act || ' error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
-  end create_request;
 --create_report-------------------------------------------------------------------------------
   procedure create_report(P_TRANSTP_ID VARCHAR2) is
     l_buff      xmltype;
@@ -233,12 +240,69 @@ create or replace package body eds_intg is
 ---------------------обработка данных Литвин В.Ю
 procedure set_data_request_state( p_decl in int ,p_state_req int)
    is
+   pragma autonomous_transaction;
    begin
        update  eds_decl t
        set    t.state=p_state_req
        where  t.decl_id=p_decl;
        commit;
 end;
+
+--set_main_status-----------------------------------------------------------------------------
+ procedure set_main_status(p_id varchar2) is
+  l_prepare number;
+  l_err number;
+  l_count_mass number;
+  l_transp_id varchar2(36);
+  l_decl_id number;
+  l_resp varchar2(4000);
+  begin
+
+    select sum(case when l.status = st_DECLARATION_PREPARED then 1 else 0 end) as prepare,
+           sum(case when l.status = st_DECLARATION_ERROR    then 1 else 0 end) as err,
+           count(*) as cont_mass
+           into l_prepare, l_err, l_count_mass
+    from eds_send_ru_log l
+    where l.req_id=p_id;
+    if (l_prepare+l_err)=l_count_mass and l_err<>l_count_mass then
+       l_decl_id:= S_EDS_DECLS.Nextval;
+    end if;
+      if (l_prepare=l_count_mass) then
+         update eds_decl e
+            set e.state=st_DECLARATION_PREPARED,
+                e.decl_id = l_decl_id
+         where e.id=p_id;
+      elsif ((l_prepare+l_err)=l_count_mass) then
+        update eds_decl e
+           set e.state=st_DECLARATION_ERROR,
+               e.decl_id = l_decl_id
+        where e.id=p_id;
+      elsif ((l_err)=l_count_mass) then
+        update eds_decl e
+           set e.state=st_DECLARATION_REJECTED
+        where e.id=p_id;
+      end if;
+
+      if (l_prepare+l_err)=l_count_mass then
+      begin
+      select TRANSP_REQ_ID into l_transp_id from EDS_CRT_REQ_LOG
+      where ID = p_id;
+      exception when no_data_found then
+      null;
+      end;
+      commit;    
+          if l_transp_id is not null then
+          l_resp:=to_char(crt_xml(l_decl_id));
+              if l_resp is not null then
+              barstrans.transp_utl.add_resp(l_transp_id, l_resp);
+              else 
+              barstrans.transp_utl.resive_status_err(l_transp_id, l_resp);
+              end if;
+          end if;
+      end if;
+
+      
+  end;
 
 procedure p_cur_rates (p_req_id varchar2)
  is
@@ -247,7 +311,6 @@ procedure p_cur_rates (p_req_id varchar2)
    select e.id,c.kv,n.name,e.date_to,c.rate_o,c.rate_b,c.rate_s
        from bars.eds_decl e, bars.cur_rates c,bars.TABVAL$GLOBAL n
             where c.vdate=date_from and c.kv in (840,978,643) and c.kv=n.kv and e.id=p_req_id;
-            commit;
 end;
 
 procedure crt_data_set(p_req_id varchar2,
@@ -272,32 +335,30 @@ procedure crt_data_set(p_req_id varchar2,
                            case when i.doc_type = 7
                            then '1' else i.doc_serial end) loop
 
-                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as END_BAL, a.acc, a.nls, a.nbs, a.kv, b.name, a.kf, w4.code, w4.grp_code,
+                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as END_BAL, a.acc, a.nls, a.nbs, a.kv, b.attribute_value, a.kf, w4.code, w4.grp_code,
                             case when w4.grp_code= 'SALARY' then 'SALARY'
                                            when w4.grp_code in ('PENSION', 'MOYA_KRAYINA') then 'PENSION'
                                            else 'OTHERS' end as ACC_TYPE
                                          from accounts a
-                                         left join branch b on  a.branch=b.branch
+                                         left join(select * from branch_attribute_value where attribute_code='NAME_BRANCH') b on b.branch_code=a.branch
                                          left join (select w4.acc_pk, w4.kf, c.code, t.grp_code
                                                      from w4_acc w4
                                                      join w4_card c on w4.card_code = c.code
                                                      join w4_product t on t.code=c.product_code
                                                     where t.grp_code in ('PENSION', 'MOYA_KRAYINA', 'SALARY')) w4 on w4.acc_pk = a.acc and w4.kf = a.kf
                                         where a.rnk=cust.rnk
-                                          and a.nbs in ('2620','2625')) loop
+                                          and a.nbs in ('2620','2625') and not exists(select 1 from w4_acc ww where ww.acc_2625d = a.acc)) loop
                                         EDS_W4_DATA.EXTEND;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).REQ_ID:=cust.id;
-                                        --EDS_W4_DATA(EDS_W4_DATA.LAST).OKPO:=cust.okpo;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).RNK:=cust.rnk;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).ACC:=account.acc;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).NLS:=account.nls;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).KV:=account.kv;
-                                        EDS_W4_DATA(EDS_W4_DATA.LAST).OPEN_IN:=account.name;
+                                        EDS_W4_DATA(EDS_W4_DATA.LAST).OPEN_IN:=account.attribute_value;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).ACC_TYPE:=account.ACC_TYPE;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).END_BAL:= account.END_BAL;
                                         EDS_W4_DATA(EDS_W4_DATA.LAST).KF:=account.KF;
-
-
+                                        
                                begin
                                select sum(case when (account.grp_code= 'SALARY' and o.tt in ('PKS','KL1','IB6','IB5','PKB','CL5')) or
                                                     (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and tt ='PKX') or
@@ -318,28 +379,27 @@ procedure crt_data_set(p_req_id varchar2,
                                    EDS_W4_DATA(EDS_W4_DATA.LAST).OTHER_ACCRUALS:=0;
                                end;
                                         end loop;
-
-                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as END_BAL, a.acc, a.nls, a.nbs, a.kv, b.name, a.kf,a.tip
+                       --deposit
+                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as END_BAL, a.acc, a.nls, a.nbs, a.kv, b.attribute_value, a.kf,a.tip, acc_pp.acc as acc_dpt
                                          from accounts a
-                                         left join branch b on  a.branch=b.branch
-                                        where a.rnk=cust.rnk
-                                          and a.nbs in ('2630','2638')) loop
+                                         left join (select dpa.accid, a1.acc from dpt_accounts dpa
+                                                            join dpt_accounts dpa1 on dpa1.dptid=dpa.dptid                                           
+                                                            join accounts a1 on a1.acc=dpa1.accid and a1.nbs='2638') acc_pp on acc_pp.accid=a.acc
+                                         left join (select * from branch_attribute_value where attribute_code='NAME_BRANCH') b on b.branch_code=a.branch
+                                        where a.rnk = cust.rnk
+                                          and a.nbs = '2630') loop
 
                                         EDS_DPT_DATA.EXTEND;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).REQ_ID:=cust.id;
-                                       -- EDS_DPT_DATA(EDS_DPT_DATA.LAST).INN:=cust.okpo;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).RNK:=cust.rnk;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).ACC:=account.acc;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).NLS:=account.nls;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).KV:=account.kv;
-                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).OPEN_IN:=account.name;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).OPEN_IN:=account.attribute_value;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).END_BAL:=account.END_BAL;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).KF:=account.kf;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).TIP:=account.tip;
                                         
-                                        
-
-
                                        begin
                                        select sum(case when o.tt ='%%1' then o.s else 0 end) as sum_proc,
                                               sum(case when o.tt ='%15' then o.s else 0 end) as sum_pdfo,
@@ -348,7 +408,7 @@ procedure crt_data_set(p_req_id varchar2,
                                               into EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_PROC, EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_PDFO,
                                                    EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_MIL, EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_TOTALY
                                          from opldok o
-                                        where o.acc = account.acc
+                                        where o.acc = account.acc_dpt
                                           and o.kf = account.kf
                                           and o.fdat between cust.date_from and cust.date_to
                                         group by o.acc;
@@ -359,8 +419,49 @@ procedure crt_data_set(p_req_id varchar2,
                                              EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_TOTALY:=0;
                                          end;
                                         end loop;
+                                        
+                          --mobilni zaoschadzhenia              
+                          for account in (select bars.fost(a.acc,trunc(cust.date_to)) as END_BAL, a.acc, a.nls, a.nbs, a.kv, b.attribute_value, a.kf, a.tip, w.acc_2628
+                                         from accounts a
+                                         join w4_acc w on a.acc = w.acc_2625d
+                                         left join(select * from branch_attribute_value where attribute_code='NAME_BRANCH') b on b.branch_code=a.branch
+                                        where a.rnk=cust.rnk
+                                          and a.nbs in ('2625','2620')) loop
 
-                          for credit in (select s.nd, s.kf, b.name, c.sdate, c.vidd, bars.fost(a.acc,cust.date_to) as BAL_DEBT,
+                                        EDS_DPT_DATA.EXTEND;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).REQ_ID:=cust.id;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).RNK:=cust.rnk;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).ACC:=account.acc;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).NLS:=account.nls;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).KV:=account.kv;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).OPEN_IN:=account.attribute_value;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).END_BAL:=account.END_BAL;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).KF:=account.kf;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).TIP:=account.tip;
+                                        
+                                       begin
+                                       select sum(case when o.dk=1 and a1.nbs='7040' then o.s else 0 end) as sum_proc,
+                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='37' then o.s else 0 end) as sum_pdfo,
+                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='36' then o.s else 0 end) as sum_mil,
+                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then o.s else 0 end) as sum_totaly 
+                                              into EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_PROC, EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_PDFO,
+                                                   EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_MIL, EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_TOTALY                         
+                                        from opldok o
+                                        join opldok o2 on o.ref=o2.ref and o2.dk=1-o.dk and  o2.stmt=o.stmt
+                                        join accounts a1 on a1.acc=o2.acc and a1.nbs in ('3622', '7040')   
+                                       where o.acc = account.acc_2628 
+                                         and o.kf = account.kf
+                                         and o.fdat between cust.date_from and cust.date_to
+                                        group by o.acc;
+                                         exception when no_data_found then
+                                             EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_PROC:=0;
+                                             EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_PDFO:=0;
+                                             EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_MIL:=0;
+                                             EDS_DPT_DATA(EDS_DPT_DATA.LAST).SUM_TOTALY:=0;
+                                         end;
+                                        end loop;
+
+                          for credit in (select s.nd, s.kf, b.attribute_value, c.sdate, c.vidd, bars.fost(a.acc,cust.date_to) as BAL_DEBT,
                                                 a.kv, s.proc_sum, s.credit_sum, s.proc_sum + s.credit_sum as sum_totaly
                                          from
                                         (select n.nd, n.kf,
@@ -385,19 +486,18 @@ procedure crt_data_set(p_req_id varchar2,
                                          join bars.nd_acc n on n.nd = s.nd and n.kf = s.kf
                                          join bars.cc_deal c on c.nd = s.nd and c.kf = s.kf
                                          join accounts a on n.acc = a.acc and n.kf = a.kf and a.tip='SS' and (a.dazs >= cust.date_from or a.dazs is null)
-                                         left join bars.branch b on a.branch=b.branch
+                                         left join(select * from branch_attribute_value where attribute_code='NAME_BRANCH') b on b.branch_code=a.branch
                                          where c.wdate>=cust.date_from
                                            and a.tip='SS'
                                            and (a.dazs >= cust.date_from or a.dazs is null))
                                          loop
                                          EDS_CREDIT_DATA.EXTEND;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).REQ_ID:=cust.id;
-                                         --EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).INN:=cust.okpo;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).RNK:=cust.rnk;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).ND:=credit.nd;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).VIDd:=credit.vidd;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).KV:=credit.kv;
-                                         EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).OPEN_IN:=credit.name;
+                                         EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).OPEN_IN:=credit.attribute_value;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).SDATE:=credit.sdate;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).BALANCE_DEBT:=credit.BAL_DEBT;
                                          EDS_CREDIT_DATA(EDS_CREDIT_DATA.LAST).AMOUNT_PAY_PROC:=credit.proc_sum;
@@ -417,6 +517,9 @@ procedure fill_data(p_req_id varchar2 ,p_kf varchar2) is
        l_EDS_CREDIT_DATA T_EDS_CREDIT_DATA := T_EDS_CREDIT_DATA();
      begin
          bc.go(p_kf);
+           if p_kf = '300465' then
+              eds_intg.p_cur_rates (p_req_id);
+           end if; 
          crt_data_set(p_req_id,
                       l_EDS_w4_DATA,
                       l_EDS_DPT_DATA,
@@ -443,7 +546,7 @@ procedure fill_data(p_req_id varchar2 ,p_kf varchar2) is
            and l.kf = p_kf;
 
          commit;
-         eds_intg.set_main_status(p_req_id);
+         set_main_status(p_req_id);
 
      exception when others then
          update eds_send_ru_log l
@@ -452,99 +555,7 @@ procedure fill_data(p_req_id varchar2 ,p_kf varchar2) is
            and l.kf = p_kf;
          commit;
 end;
---crt_xml-------------------------------------------------------------------------------------
-  function crt_xml(p_req_id number, p_type number default 0) return clob is
-  l_xml xmltype;
-  begin
-  select
-  xmlroot(xmlelement("ROOT",
-                     xmlelement("ID",         e.id),
-                     xmlelement("DECL_ID",    e.decl_id),
-                     xmlelement("CRT_DATE",   to_char(e.crt_date, 'dd.mm.yyyy hh24:mi:ss')),
-                     xmlelement("STATE",      to_char(e.state)),
-                     xmlelement("OKPO",       e.okpo),
-                     xmlelement("CUST_NAME",  e.cust_name),
-                     xmlelement("BIRTH_DATE", to_char(e.birth_date, 'dd.mm.yyyy')),
-                     xmlelement("DOC_TYPE",   e.doc_type),
-                     xmlelement("DOC_SERIAL", e.doc_serial),
-                     xmlelement("DOC_NUMBER", e.doc_number),
-                     xmlelement("DATE_FROM",  to_char(e.date_from, 'dd.mm.yyyy')),
-                     xmlelement("DATE_TO",    to_char(e.date_to, 'dd.mm.yyyy')),
-                     xmlelement("COMM",       e.comm),
-                     xmlelement("DONEBY",     case when p_type = 0 then null else to_number(e.doneby) end),
-                     xmlelement("DONEBY_FIO", case when p_type = 0 then null else e.doneby_fio end),
-                     xmlelement("BRANCH",     e.branch)), version '1.0" encoding="windows-1251')
-  INTO l_xml
-  from eds_decl e
-  where decl_id = p_req_id;
-  return l_xml.GetClobVal();
-  end;
---crt_decl------------------------------------------------------------------------------------
- procedure crt_decl(p_eds_decl eds_decl%rowtype, p_transp_id varchar2 default null) is
-   l_eds_decl    eds_decl%rowtype;
-   l_id          number;
-   l_buff        clob;
-   l_transp_id   varchar2(50);
 
-  begin
-    begin
-      if p_eds_decl.doc_type = 7 then
-       select d.decl_id into l_id
-       from eds_decl d
-       where d.okpo =       p_eds_decl.okpo
-         and d.doc_type =   p_eds_decl.doc_type
-         and d.doc_number = p_eds_decl.doc_number
-         and d.birth_date = p_eds_decl.birth_date
-         and d.date_from =  p_eds_decl.DATE_FROM
-         and d.date_to =    p_eds_decl.DATE_TO
-         and d.state =      st_DECLARATION_PREPARED;
-     else
-        select d.decl_id into l_id
-       from eds_decl d
-       where d.okpo = p_eds_decl.okpo
-         and d.doc_type = p_eds_decl.doc_type
-         and d.doc_number = p_eds_decl.doc_number
-         and d.doc_serial = p_eds_decl.doc_serial
-         and d.birth_date =  p_eds_decl.birth_date
-         and d.date_from = p_eds_decl.DATE_FROM
-         and d.date_to = p_eds_decl.DATE_TO
-         and d.state = st_DECLARATION_PREPARED;
-     end if;
-       exception when no_data_found then
-       l_id:=null;
-    end;
-
-    if l_id is null then
-        l_eds_decl:= p_eds_decl;
-        l_eds_decl.state:= st_DECLARATION_REGISTER;
-        -- запис параметрів запиту на формування декларації
-        begin
-        select d.id into l_eds_decl.id from  eds_decl d where d.id=l_eds_decl.id;
-        exception when no_data_found then
-        insert into eds_decl values l_eds_decl;
-        end;
-        commit;
-        bars.logger.info('l_idif-'||l_eds_decl.id|| ' error crt_decl ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
-        eds_intg.p_cur_rates (l_eds_decl.id); -- выборка курсов для каждой делкларации!
-        eds_intg.create_send_job1(l_eds_decl.id);
-        begin
-        l_buff:=crt_xml(l_id);
-        select c.TRANSP_REQ_ID into l_transp_id  from eds_crt_req_log c  where c.id=p_eds_decl.id;
-        barstrans.transp_utl.add_resp(l_transp_id, l_buff);
-        exception when no_data_found then null;
-        end;
-    else
-      begin
-        l_buff:=crt_xml(l_id);
-        select c.TRANSP_REQ_ID into l_transp_id  from eds_crt_req_log c  where c.id=p_eds_decl.id;
-        barstrans.transp_utl.add_resp(l_transp_id, l_buff);
-        exception when no_data_found then null;
-        end;
-    end if;
-  exception when others then
-   bars.logger.info('edecl-'||l_eds_decl.id|| ' error crt_decl ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
-   raise_application_error(-20001,'error crt_decl');
-end;
 --create_send_job1----------------------------------------------------------------------------
   procedure create_send_job1(p_id varchar2) is
      l_jobname varchar2(30);
@@ -614,81 +625,70 @@ end;
                        l_parallel_ch);
 end;
 
---set_main_status-----------------------------------------------------------------------------
- procedure set_main_status(p_id varchar2) is
-  l_prepare number;
-  l_err number;
-  l_count_mass number;
-  l_transp_id varchar2(36);
-  l_decl_id number;
-  begin
+--crt_decl------------------------------------------------------------------------------------
+ procedure crt_decl(p_eds_decl eds_decl%rowtype, p_transp_id varchar2 default null) is
+   l_eds_decl    eds_decl%rowtype;
+   l_id          number;
+   l_buff        clob;
+   l_transp_id   varchar2(50);
 
-    select sum(case when l.status = st_DECLARATION_PREPARED then 1 else 0 end) as prepare,
-           sum(case when l.status = st_DECLARATION_ERROR    then 1 else 0 end) as err,
-           count(*) as cont_mass
-           into l_prepare, l_err, l_count_mass
-    from eds_send_ru_log l
-    where l.req_id=p_id;
-    if (l_prepare+l_err)=l_count_mass and l_err<>l_count_mass then
-       l_decl_id:= S_EDS_DECLS.Nextval;
+  begin
+    begin
+      if p_eds_decl.doc_type = 7 then
+       select d.decl_id into l_id
+       from eds_decl d
+       where d.okpo =       p_eds_decl.okpo
+         and d.doc_type =   p_eds_decl.doc_type
+         and d.doc_number = p_eds_decl.doc_number
+         and d.birth_date = p_eds_decl.birth_date
+         and d.date_from =  p_eds_decl.DATE_FROM
+         and d.date_to =    p_eds_decl.DATE_TO
+         and d.state =      st_DECLARATION_PREPARED;
+     else
+        select d.decl_id into l_id
+       from eds_decl d
+       where d.okpo = p_eds_decl.okpo
+         and d.doc_type = p_eds_decl.doc_type
+         and d.doc_number = p_eds_decl.doc_number
+         and d.doc_serial = p_eds_decl.doc_serial
+         and d.birth_date =  p_eds_decl.birth_date
+         and d.date_from = p_eds_decl.DATE_FROM
+         and d.date_to = p_eds_decl.DATE_TO
+         and d.state = st_DECLARATION_PREPARED;
+     end if;
+       exception when no_data_found then
+       l_id:=null;
+    end;
+
+    if l_id is null then
+        l_eds_decl:= p_eds_decl;
+        l_eds_decl.state:= st_DECLARATION_REGISTER;
+        add_new_decl(l_eds_decl); -- запис параметрів запиту на формування декларації
+        if p_transp_id is null then
+        eds_intg.create_send_job1(l_eds_decl.id);
+        else
+        send_decl_id(l_eds_decl.id);
+        end if;
+    else
+      if p_transp_id is not null then
+        barstrans.transp_utl.add_resp(p_transp_id, crt_xml(l_id));
+      end if;      
     end if;
-      if (l_prepare=l_count_mass) then
-         update eds_decl e
-            set e.state=st_DECLARATION_PREPARED,
-                e.decl_id = l_decl_id
-         where e.id=p_id;
-      elsif ((l_prepare+l_err)=l_count_mass) then
-        update eds_decl e
-           set e.state=st_DECLARATION_ERROR,
-               e.decl_id = l_decl_id
-        where e.id=p_id;
-      elsif ((l_err)=l_count_mass) then
-        update eds_decl e
-           set e.state=st_DECLARATION_REJECTED
-        where e.id=p_id;
-      end if;
-
-      if (l_prepare+l_err)=l_count_mass and l_transp_id is not null then
-      barstrans.transp_utl.add_resp(l_transp_id, crt_xml(p_id));
-      end if;
-
-      commit;
-  end;
---------------------
---xml_2_obj-----------------------------------------------------------------------------------
-  function xml_2_obj(p_xml clob) return eds_decl%rowtype is
-  l_retval   eds_decl%rowtype;
-  l_xml        xmltype;
-  begin
-  l_xml:=xmltype(p_xml);
-  l_retval.ID         := xml_extract(l_xml, '/ROOT/ID/text()');
-  l_retval.DECL_ID    := xml_extract(l_xml, '/ROOT/DECL_ID/text()');
-  l_retval.CRT_DATE   := to_date(xml_extract(l_xml, '/ROOT/CRT_DATE/text()'),'dd.mm.yyyy hh24:mi:ss');
-  l_retval.STATE      := xml_extract(l_xml, '/ROOT/STATE/text()');
-  l_retval.OKPO       := xml_extract(l_xml, '/ROOT/OKPO/text()');
-  l_retval.CUST_NAME  := xml_extract(l_xml, '/ROOT/CUST_NAME/text()');
-  l_retval.BIRTH_DATE := to_date(xml_extract(l_xml, 'ROOT/BIRTH_DATE/text()'),'dd.mm.yyyy');
-  l_retval.DOC_TYPE   := xml_extract(l_xml, '/ROOT/DOC_TYPE/text()');
-  l_retval.DOC_SERIAL := xml_extract(l_xml, '/ROOT/DOC_SERIAL/text()');
-  l_retval.DOC_NUMBER := xml_extract(l_xml, '/ROOT/DOC_NUMBER/text()');
-  l_retval.DATE_FROM  := to_date(xml_extract(l_xml, '/ROOT/DATE_FROM/text()'),'dd.mm.yyyy');
-  l_retval.DATE_TO    := to_date(xml_extract(l_xml, '/ROOT/DATE_TO/text()'),'dd.mm.yyyy');
-  l_retval.COMM       := xml_extract(l_xml, '/ROOT/COMM/text()');
-  l_retval.DONEBY     := xml_extract(l_xml, '/ROOT/DONEBY/text()');
-  l_retval.DONEBY_FIO := xml_extract(l_xml, '/ROOT/DONEBY_FIO/text()');
-  l_retval.BRANCH     := xml_extract(l_xml, '/ROOT/BRANCH/text()');
-  return l_retval;
-  end;
+  exception when others then
+   bars.logger.info('edecl-'||l_eds_decl.id|| ' error crt_decl ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+   raise_application_error(-20001,'error crt_decl');
+end;
 -------------------------
   --  set_request_state
-function log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2 default null) return varchar2 is
+procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, p_id out varchar2) is
       pragma autonomous_transaction;
       l_id varchar2(36);
   begin
+      l_id:=xml_extract(xmltype(p_req_body), '/ROOT/ID/text()');
       insert into EDS_CRT_REQ_LOG
           (ID, TRANSP_REQ_ID, SO_KF, REQ_USER_ID, REQ_TIME, REQ_BODY, REQ_STATUS)
       values
-          (coalesce(xml_extract(xmltype(p_req_body), '/ROOT/ID/text()'), eds_intg.get_guid),
+          (coalesce(l_id, get_guid),
            p_transp_id,
            p_kf,
            user_id,
@@ -696,19 +696,73 @@ function log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2 de
            p_req_body,
            st_REQUEST_NEW) returning ID into l_id;
       commit;
-      return l_id;
+      p_id:= l_id;
+  exception when dup_val_on_index then
+      p_id:= l_id;
   end;
+  
+  -----------------------------------------------------------------------------------------
+  --  create_request
+  --
+  --    Реєстрація запиту в системі
+  --
+  procedure create_request(
+    p_okpo       in eds_decl.okpo%type,
+    p_birth_date in eds_decl.birth_date%type,
+    p_doc_type   in eds_decl.doc_type%type,
+    p_doc_serial in eds_decl.doc_serial%type,
+    p_doc_number in eds_decl.doc_number%type,
+    p_date_from  in eds_decl.date_from%type,
+    p_date_to    in eds_decl.date_to%type,
+    p_name       in eds_decl.cust_name%type default null,
+    p_comm       in eds_decl.comm%type default null
+    )
+  is
+    l_eds_decl          eds_decl%rowtype;
+    l_eds_decls_policy  eds_decls_policy%rowtype;
+    l_act               varchar2(255) := gc_pkg||'.create_request ';
+  begin
+    l_eds_decl.id          := get_guid;
+    l_eds_decl.crt_date    := sysdate;
+    l_eds_decl.state       := st_DECLARATION_REGISTER;   
+    l_eds_decl.okpo        := p_okpo;
+    l_eds_decl.cust_name   := p_name;
+    l_eds_decl.birth_date  := p_birth_date;
+    l_eds_decl.doc_type    := p_doc_type;
+    l_eds_decl.doc_serial  := p_doc_serial;
+    l_eds_decl.doc_number  := p_doc_number;
+    l_eds_decl.date_from   := p_date_from;
+    l_eds_decl.date_to     := p_date_to;
+    l_eds_decl.comm        := p_comm;
+    l_eds_decl.doneby      := user_id;
+    l_eds_decl.doneby_fio  := user_name;
+    l_eds_decl.branch      := sys_context('bars_context','user_branch');
+    
+    l_eds_decls_policy.id       := l_eds_decl.id;
+    l_eds_decls_policy.add_date := sysdate;
+    l_eds_decls_policy.add_id   := user_id;
+    l_eds_decls_policy.kf       := f_ourmfo;
+    
+    add_new_decl(l_eds_decl, l_eds_decls_policy);
+    
+    crt_decl(l_eds_decl);
+
+  exception
+    when others then
+    bars.logger.info('edecl-'||l_eds_decl.id|| ' error crt_decl ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+      bars_error.raise_nerror(p_errmod  => gc_pkg,
+                              p_errname => 'ERR_CREATE_REQUEST',
+                              p_param1  => l_act || ' error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+  end create_request; 
+  
 --for oshad 24
  procedure pocess_request(p_transp_id varchar2)
   is
     l_buff              varchar2(4000);
     l_mfo               varchar2(6);
-   -- l_xml               xmltype;
     l_id                varchar2(36);
-   -- l_decl_id           number;
     l_act               varchar2(255) := gc_pkg||'.parse_request ';
     l_eds_decl          eds_decl%rowtype;
-  --  l_req_2_ru_id       varchar2(36);
     unknown_action_type exception;
   begin
         select rq.d_clob
@@ -724,18 +778,15 @@ function log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2 de
                and p.param_type = 'GET';
         exception
             when no_data_found then
-                raise_application_error(-20001,'no_data_found');
+                l_mfo:='300465';
         end;
 
-    l_id:=log_crt_req(p_transp_id, l_mfo, l_buff);
+    log_crt_req(p_transp_id, l_mfo, l_buff, l_id);
 
     l_eds_decl:=xml_2_obj(l_buff);
     l_eds_decl.id := l_id;
 
-    eds_intg.crt_decl(l_eds_decl);
-
-    --crt_decl(l_eds_decl, P_TRANSP_ID);
-
+    crt_decl(l_eds_decl, p_transp_id);
 
   exception
     when unknown_action_type then
@@ -748,15 +799,5 @@ function log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2 de
                               p_param1  => l_act || ' error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
 end pocess_request;
 
-
-
-begin
-  -- Initialization
-  null;
-
 end eds_intg;
-/
-grant execute on eds_intg to barstrans;
-/
-grant execute on eds_intg to bars_access_defrole;
 /

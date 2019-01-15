@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="11/28/2018 18:27:49" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="01/09/2019 13:29:34" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -310,8 +310,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="edecl" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQNE6q3xAFNhWAFAEfdw09M8=">
-      <TableDataSource Name="Table" Alias="salary" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,ps.name,&#13;&#10; case when ac.tip is not null then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name    &#13;&#10;from bars.eds_w4_data s&#13;&#10;     left join(select a.acc,a.tip from accounts a where a.tip='KW4') ac on ac.acc=s.acc&#13;&#10;, bars.eds_decl d , bars.ps &#13;&#10;where s.req_id=d.id and s.acc_type='SALARY' and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4)  and decl_id=:p_decl_id">
+    <OracleDataConnection Name="edecl" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQLM9NqUVzqvLKP73OQMgJvg=">
+      <TableDataSource Name="Table" Alias="salary" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,replace(ps.name,'ў','і') as name  &#13;&#10;from bars.eds_w4_data s, bars.eds_decl d , bars.ps &#13;&#10;where s.req_id=d.id and s.acc_type='SALARY' and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4) and decl_id=:p_decl_id">
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="DECL_ID" DataType="System.Decimal"/>
         <Column Name="RNK" DataType="System.Decimal"/>
@@ -324,7 +324,6 @@ namespace FastReport
         <Column Name="END_BAL" DataType="System.Decimal"/>
         <Column Name="ACC_TYPE" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
-        <Column Name="MOB_NAME" DataType="System.String"/>
         <CommandParameter Name="p_decl_id" DataType="112" Expression="[p_decl_id]" DefaultValue="22"/>
       </TableDataSource>
       <TableDataSource Name="Table2" Alias="eds_decls_info" DataType="System.Int32" Enabled="true" SelectCommand="select t.decl_id,&#13;&#10;       t.id,&#13;&#10;       t.okpo,&#13;&#10;       t.cust_name,&#13;&#10;       t.birth_date,&#13;&#10;       t.doc_type,&#13;&#10;       t.doc_serial,&#13;&#10;       t.doc_number,&#13;&#10;       t.date_from,&#13;&#10;       t.date_to,&#13;&#10;       bars.gl.bd as bankdate,&#13;&#10;(select  name from bars.passp p  where p.passp=t.doc_type) as passpn  &#13;&#10;from bars.eds_decl t where t. decl_id=:p_decl_id">
@@ -342,7 +341,7 @@ namespace FastReport
         <Column Name="DATE_TO" DataType="System.DateTime"/>
         <CommandParameter Name="p_decl_id" DataType="112" Expression="[p_decl_id]" DefaultValue="456"/>
       </TableDataSource>
-      <TableDataSource Name="Table1" Alias="Pension" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,ps.name,&#13;&#10; case when ac.tip is not null then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name &#13;&#10;from bars.eds_w4_data s&#13;&#10;left join(select a.acc,a.tip from accounts a where a.tip='KW4') ac on ac.acc=s.acc&#13;&#10;,bars.eds_decl d ,bars.ps&#13;&#10;where s.req_id=d.id and s.acc_type='PENSION' and decl_id=:p_decl_id and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4) ">
+      <TableDataSource Name="Table1" Alias="Pension" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,replace(ps.name,'ў','і') as name&#13;&#10;from bars.eds_w4_data s,bars.eds_decl d ,bars.ps&#13;&#10;where s.req_id=d.id and s.acc_type='PENSION' and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4) and decl_id=:p_decl_id  ">
         <Column Name="DECL_ID" DataType="System.Decimal"/>
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="ACC" DataType="System.Decimal"/>
@@ -355,10 +354,9 @@ namespace FastReport
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="ACC_TYPE" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
-        <Column Name="MOB_NAME" DataType="System.String"/>
         <CommandParameter Name="p_decl_id" DataType="112" Expression="[p_decl_id]" DefaultValue="22"/>
       </TableDataSource>
-      <TableDataSource Name="Table3" Alias="others_pay" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,ps.name,&#13;&#10; case when ac.tip is not null then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name&#13;&#10;from bars.eds_w4_data s&#13;&#10;left join(select a.acc,a.tip from accounts a where a.tip='KW4') ac on ac.acc=s.acc&#13;&#10;,bars.eds_decl d, bars.ps &#13;&#10;where s.req_id=d.id and s.acc_type='OTHERS' and decl_id=:p_decl_id  and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4)  ">
+      <TableDataSource Name="Table3" Alias="others_pay" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,replace(ps.name,'ў','і') as name&#13;&#10;from bars.eds_w4_data s,bars.eds_decl d, bars.ps &#13;&#10;where s.req_id=d.id and s.acc_type='OTHERS' and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4) and decl_id=:p_decl_id ">
         <Column Name="DECL_ID" DataType="System.Decimal"/>
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="ACC" DataType="System.Decimal"/>
@@ -371,7 +369,6 @@ namespace FastReport
         <Column Name="ACC_TYPE" DataType="System.String"/>
         <Column Name="OTHER_ACCRUALS" DataType="System.Decimal"/>
         <Column Name="NAME" DataType="System.String"/>
-        <Column Name="MOB_NAME" DataType="System.String"/>
         <CommandParameter Name="p_decl_id" DataType="112" Expression="[p_decl_id]" DefaultValue="22"/>
       </TableDataSource>
       <TableDataSource Name="Table4" Alias="cur_kv" DataType="System.Int32" Enabled="true" SelectCommand="select  &#13;&#10;       max(case when kv=643 then kv  else null end)  as kv643,&#13;&#10;       max(case when kv=840 then kv  else null end) as kv840,&#13;&#10;       max(case when kv=978 then kv  else null end)  as kv978,&#13;&#10;       max(case when kv=643 then name  else null end)  as name643,&#13;&#10;       max(case when kv=840 then name  else null end) as name840,&#13;&#10;       max(case when kv=978 then name  else null end)  as name978, &#13;&#10;        max(case when kv=643 then vdate else null end)  as vdate643,&#13;&#10;        max(case when kv=840 then vdate else null end) as vdate840,&#13;&#10;        max(case when kv=978 then vdate else null end)  as vdate978, &#13;&#10;            max(case when kv=643 then rate_o/10 else null end) as rateo_643, &#13;&#10;            max(case when kv=840 then rate_o/100 else null end) as rateo_840,&#13;&#10;            max(case when kv=978 then rate_o/100 else null end)as rateo_978,&#13;&#10;              max(case when kv=643 then rate_b/10 else null end) as rateb_643, &#13;&#10;              max(case when kv=840 then rate_b/100 else null end) as rateb_840,&#13;&#10;              max(case when kv=978 then rate_b/100 else null end)as rateb_978,&#13;&#10;               max(case when kv=643 then rate_s/10 else null end) as rates_643, &#13;&#10;               max(case when kv=840 then rate_s/100 else null end) as rates_840,&#13;&#10;               max(case when kv=978 then rate_s/100 else null end)as rates_978      &#13;&#10;       from bars.eds_curs_rates ,bars.eds_decl d &#13;&#10;       where req_id=d.id and d.decl_id=:p_decl_id  &#13;&#10;&#13;&#10;&#13;&#10;">
@@ -395,7 +392,7 @@ namespace FastReport
         <Column Name="RATES_978" DataType="System.Decimal"/>
         <CommandParameter Name="p_decl_id" DataType="112" Expression="[p_decl_id]" DefaultValue="22"/>
       </TableDataSource>
-      <TableDataSource Name="Table5" Alias="deposit" DataType="System.Int32" Enabled="true" SelectCommand="select de.decl_id,&#13;&#10;       d.req_id,&#13;&#10;       d.rnk,&#13;&#10;       d.acc,&#13;&#10;       d.nls,&#13;&#10;       d.kv,&#13;&#10;       d.open_in,&#13;&#10;       d.end_bal/100 as end_bal ,&#13;&#10;       d.sum_proc/100 as sum_proc,&#13;&#10;       d.sum_pdfo/100 as sum_pdfo,&#13;&#10;       d.sum_mil/100 as sum_mil,&#13;&#10;       d.sum_totaly as sum_totaly,&#13;&#10;       d.kf,&#13;&#10;       ps.name,&#13;&#10;       case when ac.tip is not null then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name           &#13;&#10;       from bars.eds_dpt_data d&#13;&#10;             left join(select a.acc,a.tip from accounts a where a.tip='KW4') ac on ac.acc=d.acc,&#13;&#10;            bars.eds_decl de,bars.ps&#13;&#10;       where d.req_id=de.id and (d.end_bal&gt;0 or d.sum_proc&gt;0 or d.sum_pdfo&gt;0 or d.sum_mil&gt;0) and ps.nbs=substr(d.nls,1,4) and de.decl_id=:p_decl_id ">
+      <TableDataSource Name="Table5" Alias="deposit" DataType="System.Int32" Enabled="true" SelectCommand="select de.decl_id,&#13;&#10;       d.req_id,&#13;&#10;       d.rnk,&#13;&#10;       d.acc,&#13;&#10;       d.nls,&#13;&#10;       d.kv,&#13;&#10;       d.open_in,&#13;&#10;       d.end_bal/100 as end_bal ,&#13;&#10;       d.sum_proc/100 as sum_proc,&#13;&#10;       d.sum_pdfo/100 as sum_pdfo,&#13;&#10;       d.sum_mil/100 as sum_mil,&#13;&#10;       d.sum_totaly/100 as sum_totaly,&#13;&#10;       d.kf,&#13;&#10;       replace(ps.name,'ў','і') as name,&#13;&#10;       case when  (d.nls like '2620%' or d.nls like '2625%' ) then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name           &#13;&#10;       from bars.eds_dpt_data d,bars.eds_decl de,bars.ps&#13;&#10;       where d.req_id=de.id and (d.end_bal&gt;0 or d.sum_proc&gt;0 or d.sum_pdfo&gt;0 or d.sum_mil&gt;0) and ps.nbs=substr(d.nls,1,4) and de.decl_id=:p_decl_id ">
         <Column Name="DECL_ID" DataType="System.Decimal"/>
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="ACC" DataType="System.Decimal"/>
@@ -515,7 +512,7 @@ namespace FastReport
       <TextObject Name="Text10" Left="18.9" Top="66.15" Width="160.65" Height="18.9" Text="Баланс на кінцеву дату:"/>
       <TextObject Name="Text11" Left="18.9" Top="94.5" Width="170.1" Height="18.9" Text="Надходження за період:"/>
       <TextObject Name="Text12" Left="18.9" Top="122.85" Width="141.75" Height="18.9" Text="Інші нарахування:"/>
-      <TextObject Name="Text46" Left="75.6" Top="9.45" Width="321.3" Height="18.9" Fill.Color="WhiteSmoke" Text="[salary.NLS]/[salary.NAME]/[salary.MOB_NAME]" AutoWidth="true"/>
+      <TextObject Name="Text46" Left="75.6" Top="9.45" Width="321.3" Height="18.9" Fill.Color="WhiteSmoke" Text="[salary.NLS]/[salary.NAME]" AutoWidth="true"/>
       <TextObject Name="Text51" Left="151.2" Top="37.8" Width="113.4" Height="18.9" Fill.Color="WhiteSmoke" Text="[salary.OPEN_IN]" AutoWidth="true"/>
       <TextObject Name="Text52" Left="189" Top="66.15" Width="132.3" Height="18.9" Fill.Color="WhiteSmoke" Text="[salary.END_BAL] [viewcursal]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
       <TextObject Name="Text53" Left="189" Top="94.5" Width="132.3" Height="18.9" Fill.Color="WhiteSmoke" Text="[salary.AMOUNT_PERIOD] [viewcursal]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
@@ -530,7 +527,7 @@ namespace FastReport
       <TextObject Name="Text40" Left="18.9" Top="66.15" Width="245.7" Height="18.9" Text="Баланс на кінцеву дату:"/>
       <TextObject Name="Text41" Left="18.9" Top="94.5" Width="170.1" Height="18.9" Text="Надходження за період:"/>
       <TextObject Name="Text42" Left="18.9" Top="122.85" Width="141.75" Height="18.9" Text="Інші нарахування:"/>
-      <TextObject Name="Text55" Left="75.6" Top="9.45" Width="396.9" Height="18.9" Fill.Color="WhiteSmoke" Text="[Pension.NLS]/[Pension.NAME]/[Pension.MOB_NAME]" AutoWidth="true"/>
+      <TextObject Name="Text55" Left="75.6" Top="9.45" Width="396.9" Height="18.9" Fill.Color="WhiteSmoke" Text="[Pension.NLS]/[Pension.NAME]" AutoWidth="true"/>
       <TextObject Name="Text56" Left="151.2" Top="37.8" Width="132.3" Height="18.9" Fill.Color="WhiteSmoke" Text="[Pension.OPEN_IN]" AutoWidth="true"/>
       <TextObject Name="Text57" Left="170.1" Top="66.15" Width="113.4" Height="18.9" Fill.Color="WhiteSmoke" Cursor="Cross" Text="[Pension.END_BAL] [viewcurpen]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
       <TextObject Name="Text58" Left="170.1" Top="94.5" Width="113.4" Height="18.9" Fill.Color="WhiteSmoke" Text="[Pension.AMOUNT_PERIOD] [viewcurpen]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
@@ -553,7 +550,7 @@ namespace FastReport
       <TextObject Name="Text24" Left="406.35" Top="94.5" Width="122.85" Height="18.9" Fill.Color="WhiteSmoke" Text="[Equivalotherper] грн." Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
       <TextObject Name="Text72" Left="311.85" Top="94.5" Width="85.05" Height="18.9" Text="еквівалент:"/>
       <TextObject Name="Text25" Left="179.55" Top="94.5" Width="122.85" Height="18.9" Fill.Color="WhiteSmoke" Text="[others_pay.AMOUNT_PERIOD] [viewcurother]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
-      <TextObject Name="Text26" Left="75.6" Top="9.45" Width="406.35" Height="18.9" Fill.Color="WhiteSmoke" Text="[others_pay.NLS]/[others_pay.NAME]/[others_pay.MOB_NAME]" AutoWidth="true"/>
+      <TextObject Name="Text26" Left="75.6" Top="9.45" Width="406.35" Height="18.9" Fill.Color="WhiteSmoke" Text="[others_pay.NLS]/[others_pay.NAME]" AutoWidth="true"/>
       <TextObject Name="Text27" Left="151.2" Top="37.8" Width="141.75" Height="18.9" Fill.Color="WhiteSmoke" Text="[others_pay.OPEN_IN]" AutoWidth="true"/>
       <DataHeaderBand Name="DataHeader3" Top="937.75" Width="718.2" Height="28.35">
         <TextObject Name="Text44" Left="9.45" Top="9.45" Width="113.4" Height="18.9" Text="Інші виплати" Font="Arial, 10pt, style=Italic"/>
@@ -567,11 +564,11 @@ namespace FastReport
       <TextObject Name="Text75" Left="75.6" Top="37.8" Width="85.05" Height="18.9" Text="Відкрито в:"/>
       <TextObject Name="Text76" Left="151.2" Top="37.8" Width="141.75" Height="18.9" Fill.Color="WhiteSmoke" Text="[deposit.OPEN_IN]" AutoWidth="true"/>
       <TextObject Name="Text61" Left="160.65" Top="66.15" Width="94.5" Height="18.9" Fill.Color="WhiteSmoke" Text="[deposit.END_BAL] [viewcurdep]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
-      <TextObject Name="Text77" Left="264.6" Top="66.15" Width="85.05" Height="18.9" Text="еквівалент:"/>
-      <TextObject Name="Text78" Left="340.2" Top="66.15" Width="122.85" Height="18.9" Fill.Color="WhiteSmoke" Text="[Equivaldepend] грн." Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
+      <TextObject Name="Text77" Left="330.75" Top="66.15" Width="85.05" Height="18.9" Text="еквівалент:"/>
+      <TextObject Name="Text78" Left="415.8" Top="66.15" Width="122.85" Height="18.9" Fill.Color="WhiteSmoke" Text="[Equivaldepend] грн." Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
       <TextObject Name="Text79" Left="217.35" Top="94.5" Width="94.5" Height="18.9" Fill.Color="WhiteSmoke" Text="[deposit.SUM_PROC] [viewcurdep]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
-      <TextObject Name="Text80" Left="321.3" Top="94.5" Width="85.05" Height="18.9" Text="еквівалент:"/>
-      <TextObject Name="Text81" Left="396.9" Top="94.5" Width="122.85" Height="18.9" Fill.Color="WhiteSmoke" Text="[Equivaldepper] грн." Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
+      <TextObject Name="Text80" Left="330.75" Top="94.5" Width="85.05" Height="18.9" Text="еквівалент:"/>
+      <TextObject Name="Text81" Left="415.8" Top="94.5" Width="122.85" Height="18.9" Fill.Color="WhiteSmoke" Text="[Equivaldepper] грн." Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
       <TextObject Name="Text82" Left="9.45" Top="122.85" Width="283.5" Height="18.9" Text="Утримано податки на доходи з депозиту:" Font="Arial, 10pt, style=Italic"/>
       <TextObject Name="Text83" Left="9.45" Top="151.2" Width="56.7" Height="18.9" Text="ПДФО:"/>
       <TextObject Name="Text84" Left="122.85" Top="151.2" Width="132.3" Height="18.9" Fill.Color="WhiteSmoke" Text="[deposit.SUM_PDFO] [viewcurdep]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
@@ -584,7 +581,7 @@ namespace FastReport
       <TextObject Name="Text62" Left="122.85" Top="207.9" Width="132.3" Height="18.9" Fill.Color="WhiteSmoke" Text="[deposit.SUM_TOTALY] [viewcurdep]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
       <TextObject Name="Text91" Left="9.45" Top="207.9" Width="122.85" Height="18.9" Text="Усього утримано:"/>
       <TextObject Name="Text92" Left="255.15" Top="207.9" Width="85.05" Height="18.9" Text="еквівалент:"/>
-      <TextObject Name="Text93" Left="330.75" Top="207.9" Width="103.95" Height="18.9" Fill.Color="WhiteSmoke" Text="[Equivaldeptotal] грн." Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
+      <TextObject Name="Text93" Left="321.3" Top="207.9" Width="103.95" Height="18.9" Fill.Color="WhiteSmoke" Text="[Equivaldeptotal] грн." Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true"/>
       <DataHeaderBand Name="DataHeader4" Top="1096.95" Width="718.2" Height="28.35">
         <TextObject Name="Text59" Left="255.15" Width="170.1" Height="18.9" Text="Грошові Активи" Font="Arial, 12pt, style=Bold"/>
         <TextObject Name="Text74" Left="9.45" Top="9.45" Width="75.6" Height="18.9" Text="Депозит" Font="Arial, 10pt, style=Italic"/>

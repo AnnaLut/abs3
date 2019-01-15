@@ -201,7 +201,7 @@ procedure resive_blob(p_type    in varchar2,
 
   --procedure resive_status_ok(p_res_id number);
 
-  --procedure resive_status_err(p_res_id number, p_errmesage varchar2);
+  procedure resive_status_err(p_res_id varchar2, p_errmesage varchar2);
 
   --procedure resive_status_start(p_res_id number);
 
@@ -700,6 +700,7 @@ end;
  procedure  exec_action(p_req_id varchar2) is
      l_act_type varchar2(255);
  begin
+    savepoint bef_exec;
      begin
     select t.act_type into l_act_type
     from input_types t
@@ -722,11 +723,14 @@ end;
                                           dbms_utility.format_error_backtrace(),
                                           1,
                                           4000));
+         rollback to bef_exec;
          update input_reqs rq
          set rq.status = g_in_req_proc_err
          where rq.id = p_req_id;
-
+         
          delete input_queue q where q.req_id = p_req_id;
+         commit;
+         raise_application_error(-20000, dbms_utility.format_error_backtrace());
  end;
  --exec_out_action--------------------------------------------------------------------------------
  procedure exec_out_action(p_main_req_id varchar2) is
@@ -792,7 +796,6 @@ end;
 
          for j in 1 .. l_req_ids.count loop
              exec_action(l_req_ids(j).req_id);
-             upd_in_stat(l_req_ids(j).req_id, g_in_req_procesed);
              commit;
          end loop;
 exception when others then
@@ -1300,7 +1303,7 @@ END;
                                comments   => p_req_id,
                                job_action => 'declare
                                  l_start_time timestamp := localtimestamp;
-                                  begin
+                                  begin 
                                   execute immediate ''begin ' ||
                                              p_acction || ' end;'' using ''' ||
                                              p_req_id || ''';
@@ -1314,9 +1317,11 @@ END;
                                                      'YYYY-MM-DD HH24:MI:SS.FF6') ||
                                              ''',''YYYY-MM-DD HH24:MI:SS.FF6''))||'' SEC.'');
                                     exception when others then
+                                        rollback;
                                         barstrans.transp_utl.upd_in_stat(''' ||
                                              p_req_id || ''', ' ||
                                              g_in_req_proc_err || ');
+                                        commit;
                                         barstrans.transp_utl.resive_loger(''' ||
                                              p_req_id ||
                                              ''', ''JOB_EXECUTE'', ''ERROR'', ''TRANSP_UTL_PROC_SESS_' ||
@@ -2452,12 +2457,12 @@ begin
 end;
 
 procedure resive_status_err(p_res_id varchar2, p_errmesage varchar2) is
-
+pragma autonomous_transaction;
 begin
     update input_reqs r
        set r.processed_time = localtimestamp, r.status = 3
      where R.ID = p_res_id;
-
+   commit;
 end;
 
 procedure resive_status_start(p_res_id varchar2) is
