@@ -117,8 +117,7 @@ CREATE OR REPLACE package body BARS.eds_intg is
     pragma autonomous_transaction;
  begin
     update eds_decl e 
-       set e.decl_id = p_decl_id, 
-           e.state = st_declaration_prepared 
+       set e.state = st_DECLARATION_REJECTED 
      where e.id = p_id;
     commit;
  end;
