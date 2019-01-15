@@ -3,13 +3,18 @@ CREATE OR REPLACE PROCEDURE BARS.P_F07_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #07 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 11/12/2018 (09/11/2018)
+% VERSION     : 11/01/2019 (11/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+09.01.2019 - з 10/01/2019 для код_в S240 in ('6','7','8','A','B') не буде 
+             виконуватися зам_на на значення "J" 
+             з 10/01/2019 введено нов_ значення S240 ("O","N","P") 
+             для ЦП параметр S240 буде формуватися _з VIEW 
+             V_NBUR_#A7_DTL файлу A7
 11.12.2018 - не будуть формуватися показники з нульовим значенням
-09.11.2018 - розраховуємо суму обтяження для ЦП в еквіваленті 
+09.11.2018 - розраховуємо суму обтяження для ЦП в екв_валент_ 
 11.09.2018 - для 14 розд?лу виконується розбивка на обтяжен? ?
              необтяжен? ЦП ? для необтяжених зам?на параметру R011
 08.08.2018 - изменено формирование переменной KIL_ (кол-во ЦБ)
@@ -86,6 +91,7 @@ sql_doda_ varchar2(200):='';
 ret_     number;
 dats_    Date;
 dat_izm1 Date := to_date('29122017','ddmmyyyy');
+dat_izm2 Date := to_date('10012019','ddmmyyyy');
 dat23_   Date;
 country_ Varchar2(3);
 s240_    Varchar2(1);
@@ -511,6 +517,7 @@ END LOOP;
 CLOSE SALDO;
 --------------------------------------------------------------------------
 -- перекодування параметру S240
+
     update rnbu_trace
        set kodp =substr(kodp,1,18)||'M'||substr(kodp,20)
      where substr(kodp,19,1) in ('G','H');
@@ -523,9 +530,25 @@ CLOSE SALDO;
        set kodp =substr(kodp,1,18)||'K'||substr(kodp,20)
      where substr(kodp,19,1) in ('C','D');
 
-    update rnbu_trace
-       set kodp =substr(kodp,1,18)||'J'||substr(kodp,20)
-     where substr(kodp,19,1) in ('6','7','8','A','B');
+    IF dat_ < dat_izm2 THEN
+       update rnbu_trace
+          set kodp =substr(kodp,1,18)||'J'||substr(kodp,20)
+        where substr(kodp,19,1) in ('6','7','8','A','B');
+    END IF;
+
+    IF dat_ >= dat_izm2 THEN
+       update rnbu_trace
+          set kodp =substr(kodp,1,18)||'N'||substr(kodp,20)
+        where substr(kodp,19,1) in ('6');
+
+       update rnbu_trace
+          set kodp =substr(kodp,1,18)||'O'||substr(kodp,20)
+        where substr(kodp,19,1) in ('7');
+
+       update rnbu_trace
+          set kodp =substr(kodp,1,18)||'P'||substr(kodp,20)
+        where substr(kodp,19,1) in ('8','A','B');
+    END IF;
 
     update rnbu_trace
        set kodp =substr(kodp,1,18)||'I'||substr(kodp,20)
@@ -838,6 +861,39 @@ for k in ( select comm, substr(kodp,20,4) NOMCP,
        end if;
 
      end loop;
+---------------------------------------------------
+-- блок для коригування параметру S240 для бал.рахунк_в ЦП 
+-- по данних файлу #A7 (п_сля зв_тної дати зм_нюється дата погашення (MDATE)
+if mfo_ = 300465 then
+
+   for k in ( select recid, acc, substr(kodp, 19, 1) s240
+              from rnbu_trace
+              where substr(kodp,3,3) in ('140', '141', '142', '143', '144', '300', '301', 
+                                         '310', '311', '312', '313', '320', '321')
+                and substr(kodp,3,4) not like '___9%'
+            )
+
+       loop
+       
+          begin
+             select substr(field_code, 9, 1) 
+                into s240_
+             from v_nbur_#A7_dtl
+             where report_date = dat_
+               and acc_id = k.acc
+               and rownum = 1;
+         
+             if k.s240 <> s240_ then
+                update rnbu_trace r1 set r1.kodp = substr(r1.kodp, 1, 18) || s240_ || substr(r1.kodp, 20)  
+                where  r1.recid = k.recid;
+             end if;
+          exception when no_data_found then
+             null;
+          end; 
+
+   end loop;
+
+end if;
 ---------------------------------------------------
 DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
 ---------------------------------------------------
