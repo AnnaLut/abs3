@@ -8872,7 +8872,6 @@ is
     l_bonusval  number;
     l_arest11   number := 0;
     l_type_cod  dpt_vidd.type_cod%type;
-    l_check_brid int_ratn.br%type;
 
     function get_bonusval(p_deposit_id in dpt_deposit.deposit_id%type)
       return number is
@@ -8938,9 +8937,11 @@ is
                      title,
                      to_char(l_min_summ));
                      
+    /*
     bars_audit.info(title||'l_mnthcnt => '||to_char(l_mnthcnt)||' l_dayscnt => '||to_char(l_dayscnt)||' l_fixrate => '||to_char(l_fixrate)||
     ' l_extype => '||to_char(l_extype)||' l_termtype => '||to_char(l_termtype)||' l_min_summ => '||to_char(l_min_summ)||' l_br_id => '||to_char(l_br_id)||' l_type_cod => '||to_char(l_type_cod));
-
+    */
+    
     begin
       select sum(nvl(blkd, 0))
         into l_arest11
@@ -8956,7 +8957,7 @@ is
       when no_data_found then
         l_arest11 := 0;
     end;
-    bars_audit.info(title||' l_arest11 => '||to_char(l_arest11));
+    --bars_audit.info(title||' l_arest11 => '||to_char(l_arest11));
     --COBUSUPABS-3722
 
     begin
@@ -9014,8 +9015,10 @@ is
                        to_char(p_dptdata.datbeg, 'dd.mm.yyyy'),
                        to_char(p_dptdata.datend, 'dd.mm.yyyy'));
 
+      /*
       bars_audit.info(title||' num -> '||to_char(p_dptdata.dptnum) ||' sum -> '|| to_char(p_dptdata.dptsum)||
       ' dates -> '||to_char(p_dptdata.datbeg, 'dd.mm.yyyy')||' '||to_char(p_dptdata.datend, 'dd.mm.yyyy'));
+      */
                        
       -- изменение дат погашения и стоп-дат по начислению процентов
       update accounts
@@ -9038,21 +9041,10 @@ is
                       ', l_extype =' || to_char(l_extype) ||
                       ', p_dptdata.cntdubl= ' ||
                       to_char(p_dptdata.cntdubl));
-      
-      -- проверка!!!! COBUMMFO-10335
-      select max(v.br_id) keep (dense_rank last order by v.dateu, v.idu) 
-      into l_check_brid
-      from dpt_vidd_update v
-      where v.vidd =  p_dptdata.dptype
-      and v.dateu < p_dptdata.dptdat + 1;
-      
-      bars_audit.info(title||' l_check_br_id => '||to_char(l_check_brid));
-      ----- 
                                       
       for ext in (select indv_rate indv_rate,
                          oper_id oper_id,
                          base_rate base_rate,
-                         old_base_rate old_base_rate, -- так раньше определялось
                          method_id method_id,
                          dpt.get_datend_uni(p_dptdata.datbeg,
                                             term_mnth,
@@ -9080,19 +9072,6 @@ is
                                       where v.vidd =  p_dptdata.dptype
                                       and v.dateu < p_dptdata.dptdat + 1)
                                  end base_rate,
-                                 case
-                                   when method_id not in (5, 9) then
-                                    base_rate
-                                   else
-                                     (select v.br_id
-                                       from dpt_vidd_update v
-                                      where v.vidd = p_dptdata.dptype
-                                        and dateu = (select max(dateu)
-                                                   from dpt_vidd_update v
-                                                   where v.vidd = p_dptdata.dptype
-                                                     and dateu <= p_dptdata.dptdat + 0.99999)
-                                        and rownum = 1)
-                                 end old_base_rate,
                                  method_id,
                                  ext_num,
                                  lead(ext_num) over(partition by type_id order by ext_num) - 1 next_num,
@@ -9112,9 +9091,10 @@ is
                          to_char(ext.base_rate),
                          to_char(ext.method_id));
                          
+       /*
        bars_audit.info(title||' ext.intdat => '||to_char(ext.intdat, 'dd.mm.yyyy')||' ext.indv_rate => '||to_char(ext.indv_rate)||' ext.oper_id => '||to_char(ext.oper_id)||
        ' ext.base_rate => '||to_char(ext.base_rate)||' ext.old_base_rate => '||to_char(ext.old_base_rate)||' ext.method_id => '||to_char(ext.method_id));
-                                          
+       */                                   
         l_indrate := null;
         l_basrate := null;
         l_opid    := null;
@@ -9317,9 +9297,9 @@ is
         
         if nvl(l_arest11,0) = 0 then -- если счет арестован, бонусная ставка не устанавливается  -- COBUMMFO-7402
           
-        bars_audit.info('start dpt_bonus.set_bonus for deposit_id = '||to_char(p_dptdata.dptid));
+        --bars_audit.info('start dpt_bonus.set_bonus for deposit_id = '||to_char(p_dptdata.dptid));
         dpt_bonus.set_bonus(p_dptdata.dptid);
-        bars_audit.info('end dpt_bonus.set_bonus');
+        --bars_audit.info('end dpt_bonus.set_bonus');
 
         /*Если метод переоформления для вклада не (8,9,10) - убираем Эксклюзивный  (bonus_id = 4) 2017 года для вкладов с пролонгацией до 8,9,10 метода, так как его действие начинается в будущем (или не начинается)*/
         if (ext.method_id not in (8, 9, 10)) then

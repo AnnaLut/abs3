@@ -10,7 +10,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''DPT_VIDD_UPDATE'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''DPT_VIDD_UPDATE'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''DPT_VIDD_UPDATE'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''DPT_VIDD_UPDATE'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
@@ -63,8 +63,7 @@ begin
 	FL_2620 NUMBER(1,0), 
 	COMMENTS VARCHAR2(128), 
 	IDG NUMBER(38,0), 
-	IDS NUMBER(38,0),
-  KF  VARCHAR2(6)  default SYS_CONTEXT(''BARS_CONTEXT'',''USER_MFO'') constraint CC_DPTVIDDUPDATE_KF_NN NOT NULL
+	IDS NUMBER(38,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -120,8 +119,6 @@ COMMENT ON COLUMN BARS.DPT_VIDD_UPDATE.IDG IS '';
 COMMENT ON COLUMN BARS.DPT_VIDD_UPDATE.IDS IS '';
 
 
-
-
 PROMPT *** Create  constraint PK_DPTVIDDUPDATE ***
 begin   
  execute immediate '
@@ -132,8 +129,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
 
 
 PROMPT *** Create  index PK_DPTVIDDUPDATE ***
@@ -158,21 +153,21 @@ exception when others then
  end;
 /
 
-PROMPT *** Add column KF into DPT_VIDD_UPDATE ***
+PROMPT *** Drop constraint CC_DPTVIDDUPDATE_KF_NN ***
+begin   
+ execute immediate 'ALTER TABLE BARS.DPT_VIDD_UPDATE DROP CONSTRAINT CC_DPTVIDDUPDATE_KF_NN';
+exception when others then
+  if  sqlcode=-2443  then null; else raise; end if;
+ end;
+/
 
-begin EXECUTE IMMEDIATE 'ALTER TABLE BARS.DPT_VIDD_UPDATE ADD KF VARCHAR2(6) default SYS_CONTEXT(''BARS_CONTEXT'',''USER_MFO'') ';
-exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+PROMPT *** drop column KF from DPT_VIDD_UPDATE ***
+
+begin EXECUTE IMMEDIATE 'ALTER TABLE BARS.DPT_VIDD_UPDATE DROP COLUMN KF ';
+exception when others then   if SQLCODE = -00904 then null;   else raise; end if; 
 end;
 /
 
-PROMPT *** Create  constraint CC_DPTVIDDUPDATE_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_UPDATE MODIFY (KF CONSTRAINT CC_DPTVIDDUPDATE_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
 
 PROMPT *** ALTER_POLICIES to DPT_VIDD_UPDATE ***
  exec bpa.alter_policies('DPT_VIDD_UPDATE');
