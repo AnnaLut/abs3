@@ -35,8 +35,9 @@ create or replace package eds_intg is
     p_doc_number in eds_decl.doc_number%type,
     p_date_from  in eds_decl.date_from%type,
     p_date_to    in eds_decl.date_to%type,
-    p_name       in eds_decl.cust_name%type default null,
-    p_comm       in eds_decl.comm%type default null
+    p_name       in eds_decl.cust_name%type,
+    p_comm       in eds_decl.comm%type,
+    p_status     out varchar2
     );
 
   procedure decl_search(p_decl_id number, p_resp out number);
@@ -724,12 +725,14 @@ end;
     p_doc_number in eds_decl.doc_number%type,
     p_date_from  in eds_decl.date_from%type,
     p_date_to    in eds_decl.date_to%type,
-    p_name       in eds_decl.cust_name%type default null,
-    p_comm       in eds_decl.comm%type default null
+    p_name       in eds_decl.cust_name%type,
+    p_comm       in eds_decl.comm%type,
+    p_status     out varchar2
     )
   is
     l_decl_id           number;
     l_state             number;
+    l_err_txt           varchar2(255);
     l_eds_decl          eds_decl%rowtype;
     l_eds_decls_policy  eds_decls_policy%rowtype;
     l_act               varchar2(255) := gc_pkg||'.create_request ';
@@ -760,14 +763,17 @@ end;
         add_new_decl(l_eds_decl, l_eds_decls_policy);
         set_decl_status(l_eds_decl.id ,st_DECLARATION_REGISTER);
         eds_intg.create_send_job1(l_eds_decl.id);
+        l_err_txt:= 'Запит зареєстровано.';
     else
         decl_search(l_decl_id, l_state);
+        l_err_txt:=case l_state
+                       when 0 then 'Декларація за наданими параметрами вже була сформована з ІД - '||to_char(l_decl_id)||' та додана до переліку.'
+                       when 1 then 'Декларація за наданими параметрами вже існує в переліку з ІД - '||to_char(l_decl_id)||'.'
+                       when 2 then 'Декларація за наданими параметрами вже була сформована з ІД - '||to_char(l_decl_id)||', але виникла помилка підчас додавання до переліку.'
+                       when 3 then 'Декларація за наданими параметрами вже була сформована з ІД - '||to_char(l_decl_id)||', але виникла помилка підчас її пошуку в реєстрі.' 
+                  end;
     end if;
-    
-    if l_state in (2, 3) then
-        add_new_decl(l_eds_decl, l_eds_decls_policy);
-        set_decl_status(l_eds_decl.id ,st_DECLARATION_REJECTED);
-    end if;
+     p_status:=l_err_txt;
 
   exception
     when others then
