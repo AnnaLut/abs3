@@ -1536,14 +1536,10 @@ BEGIN
                     oper_id,
                     case when method_id not in (5, 9) then
                           base_rate else
-                          (select v.br_id
-                          from dpt_vidd_update v
-                          where v.vidd = l_dptvidd
-                          and dateu =
-                              (select max(dateu)
-                              from dpt_vidd_update v
-                              where v.vidd = l_dptvidd
-                              and dateu <= l_dptdatz + 0.99999))
+			                    (select max(v.br_id) keep (dense_rank last order by v.dateu, v.idu) 
+                             from dpt_vidd_update v
+                            where v.vidd =  l_dptvidd
+                              and v.dateu < l_dptdatz + 1)                          
                     end base_rate,
                     method_id,
                     ext_num,
