@@ -19,7 +19,7 @@ namespace BarsWeb.Areas.EDeclarations.Infrastructure.DI.Abstract
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        Int32 CreateRequest(BarsSql sql);
+        string CreateRequest(BarsSql sql);
 
         /// <summary>
         /// Поиск декларации по ИД

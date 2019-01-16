@@ -39,9 +39,9 @@
             data: data,
             success: function (e) {
                 window.parent.$('.k-overlay').css('z-index', '10002');
-                if (e === '')
+                //if (e === '')
                     bars.ui.alert({
-                        text: 'Запит створено!',
+                        text: e,
                         close: function (e) {
                             window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
                             window.parent.$('#creatClientsWindow').closest(".k-window-content").data("kendoWindow").close();
@@ -51,7 +51,7 @@
             error: function (err) {
                 window.parent.$('.k-overlay').css('z-index', '10002');
                 bars.ui.error({
-                    text: 'Виникла помилка',
+                    text: err.responseJSON,
                     close: function (err) {
                     }
                 })

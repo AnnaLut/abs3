@@ -63,17 +63,11 @@ namespace BarsWeb.Areas.EDeclarations.Infrastructure.DI.Implementation
             return _globalData.GetParam(id);
         }
 
-        public Int32 CreateRequest(BarsSql sql)
+        public string CreateRequest(BarsSql sql)
         {
-            try
-            {
-                OracleParameterCollection collection = ExecuteOracleRequest(sql);
-                return 1;
-            }
-            catch(Exception e)
-            {
-                return 0;
-            }
+            OracleParameterCollection collection = ExecuteOracleRequest(sql);
+            string result = collection["p_status"].Value.ToString();
+            return result;
         }
 
         private OracleParameterCollection ExecuteOracleRequest(BarsSql barsSql)

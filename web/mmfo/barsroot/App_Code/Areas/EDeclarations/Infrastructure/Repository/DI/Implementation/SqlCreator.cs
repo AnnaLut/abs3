@@ -30,7 +30,7 @@ namespace BarsWeb.Areas.EDeclarations.Infrastructure.DI.Implementation {
         public static BarsSql GetCreateRequest(EDeclViewModel model)
         {
             model.PersonDocSerial = String.IsNullOrEmpty(model.PersonDocSerial)? "": model.PersonDocSerial.ToUpper();
-            OracleParameter[] parameters = new OracleParameter[9]
+            OracleParameter[] parameters = new OracleParameter[10]
             {
                 new OracleParameter("p_okpo", OracleDbType.Varchar2, model.Inn, ParameterDirection.Input),
                 new OracleParameter("p_birth_date", OracleDbType.Date, model.DateOfBirth, ParameterDirection.Input),
@@ -40,7 +40,8 @@ namespace BarsWeb.Areas.EDeclarations.Infrastructure.DI.Implementation {
                 new OracleParameter("p_date_from", OracleDbType.Date, model.DateFrom, ParameterDirection.Input),
                 new OracleParameter("p_date_to", OracleDbType.Date, model.DateTo, ParameterDirection.Input),
                 new OracleParameter("p_name", OracleDbType.Varchar2, model.Fullname, ParameterDirection.Input),
-                new OracleParameter("p_comm", OracleDbType.Varchar2, model.Rnk, ParameterDirection.Input)
+                new OracleParameter("p_comm", OracleDbType.Varchar2, model.Rnk, ParameterDirection.Input),
+                new OracleParameter("p_status", OracleDbType.Varchar2, 2000, null,  ParameterDirection.Output)
             };
 
             return new BarsSql

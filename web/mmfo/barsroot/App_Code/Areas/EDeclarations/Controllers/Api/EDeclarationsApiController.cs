@@ -67,14 +67,17 @@ namespace BarsWeb.Areas.EDeclarations.Controllers.Api
             String req = Request.Content.ReadAsStringAsync().Result;
             EDeclViewModel model = JsonConvert.DeserializeObject<EDeclViewModel>(req);
 
-            if (ModelState.IsValid)
+            try
             {
                 BarsSql sql = SqlCreator.GetCreateRequest(model);
-                Int32 result = _repo.CreateRequest(sql);
-                if(result == 1)
-                    return new HttpResponseMessage(HttpStatusCode.OK);
+                string result = _repo.CreateRequest(sql);
+                return Request.CreateResponse(HttpStatusCode.OK, result);
             }
-            return new HttpResponseMessage(HttpStatusCode.NotAcceptable);
+            catch(Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+
         }
 
         [HttpPost]
