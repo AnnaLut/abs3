@@ -685,7 +685,7 @@ end;
  begin
      begin
       if p_eds_decl.doc_type = 7 then
-       select d.decl_id into l_id
+       select max(d.decl_id) into l_id
        from eds_decl d
        where d.okpo =       p_eds_decl.okpo
          and d.doc_type =   p_eds_decl.doc_type
@@ -695,7 +695,7 @@ end;
          and d.date_to =    p_eds_decl.DATE_TO
          and d.state =      st_DECLARATION_PREPARED;
      else
-        select d.decl_id into l_id
+        select max(d.decl_id) into l_id
        from eds_decl d
        where d.okpo = p_eds_decl.okpo
          and d.doc_type = p_eds_decl.doc_type
