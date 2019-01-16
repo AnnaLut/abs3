@@ -113,14 +113,58 @@ CREATE OR REPLACE package body BARS.eds_intg is
  exception when dup_val_on_index then
     null;
   end;
- procedure set_exists_decl_id(p_id varchar2, p_decl_id number) is
+ procedure set_decl_status(p_id varchar2, p_status number) is
     pragma autonomous_transaction;
  begin
     update eds_decl e 
-       set e.state = st_DECLARATION_REJECTED 
+       set e.state = p_status
      where e.id = p_id;
     commit;
- end;
+ end; 
+ -------------------------
+  --  set_request_state
+procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, p_id out varchar2) is
+      pragma autonomous_transaction;
+      l_id varchar2(36);
+  begin
+      l_id:=xml_extract(xmltype(p_req_body), '/ROOT/ID/text()');
+      insert into EDS_CRT_REQ_LOG
+          (ID, TRANSP_REQ_ID, SO_KF, REQ_USER_ID, REQ_TIME, REQ_BODY, REQ_STATUS)
+      values
+          (coalesce(l_id, get_guid),
+           p_transp_id,
+           p_kf,
+           user_id,
+           sysdate,
+           p_req_body,
+           st_REQUEST_NEW) returning ID into l_id;
+      commit;
+      p_id:= l_id;
+  exception when dup_val_on_index then
+     raise_application_error(-20000, 'Запит з ІД "'||l_id||'" надіснано повторно!');
+  end;
+  
+  procedure upd_log_req_status(p_id varchar2, p_status number, p_err varchar2 default null) is 
+  pragma autonomous_transaction;
+  begin
+    update EDS_CRT_REQ_LOG l 
+       set l.REQ_STATUS = p_status,
+           l.err = p_err
+     where l.id = p_id;
+     commit;
+  end;
+  
+  procedure add_log_req_resp(p_id varchar2, p_status number, p_resp_body varchar2, p_decl_id number) is
+  pragma autonomous_transaction;
+  begin
+      update EDS_CRT_REQ_LOG l 
+       set l.REQ_STATUS = p_status,
+           l.resp_time = sysdate,
+           l.resp_body = p_resp_body,
+           l.decl_id = p_decl_id
+     where l.id = p_id;
+     commit;
+  end;
   
 --------------------
 --xml_2_obj-----------------------------------------------------------------------------------
@@ -290,20 +334,22 @@ end;
            set e.state=st_DECLARATION_REJECTED
         where e.id=p_id;
       end if;
-
+        commit;
       if (l_prepare+l_err)=l_count_mass then
-      begin
-      select TRANSP_REQ_ID into l_transp_id from EDS_CRT_REQ_LOG
-      where ID = p_id;
-      exception when no_data_found then
-      null;
-      end;
-      commit;    
+          begin
+          select TRANSP_REQ_ID into l_transp_id from EDS_CRT_REQ_LOG
+          where ID = p_id;
+          exception when no_data_found then
+          l_transp_id:=null;
+          end;
+          
           if l_transp_id is not null then
           l_resp:=to_char(crt_xml(l_decl_id));
               if l_resp is not null then
+              add_log_req_resp(p_id, st_DECLARATION_PREPARED, l_resp, l_decl_id);
               barstrans.transp_utl.add_resp(l_transp_id, l_resp);
-              else 
+              else
+              upd_log_req_status(p_id, st_DECLARATION_ERROR, 'RESPONCE IS EMPTY');
               barstrans.transp_utl.resive_status_err(l_transp_id, l_resp);
               end if;
           end if;
@@ -318,7 +364,7 @@ procedure p_cur_rates (p_req_id varchar2)
    insert into eds_curs_rates (req_id,kv,name,vdate,rate_o,rate_b,rate_s)
    select e.id,c.kv,n.name,e.date_to,c.rate_o,c.rate_b,c.rate_s
        from bars.eds_decl e, bars.cur_rates c,bars.TABVAL$GLOBAL n
-            where c.vdate=date_from and c.kv in (840,978,643) and c.kv=n.kv and e.id=p_req_id;
+            where c.vdate=e.date_to and c.kv in (840,978,643) and c.kv=n.kv and e.id=p_req_id;
 end;
 
 procedure crt_data_set(p_req_id varchar2,
@@ -608,7 +654,7 @@ end;
       l_stmt        varchar2(4000);
   begin
 
-          insert into  eds_send_ru_log (req_id,status,kf)
+          insert into eds_send_ru_log (req_id,status,kf)
            select p_decl_id,st_DECLARATION_REGISTER,kf  from  mv_kf;
            commit;
 
@@ -633,15 +679,10 @@ end;
                        l_parallel_ch);
 end;
 
---crt_decl------------------------------------------------------------------------------------
- procedure crt_decl(p_eds_decl eds_decl%rowtype, p_transp_id varchar2 default null) is
-   l_eds_decl    eds_decl%rowtype;
-   l_id          number;
-   l_buff        clob;
-   l_transp_id   varchar2(50);
-
-  begin
-    begin
+ function get_ex_decl(p_eds_decl eds_decl%rowtype) return number is
+ l_id          number;
+ begin
+     begin
       if p_eds_decl.doc_type = 7 then
        select d.decl_id into l_id
        from eds_decl d
@@ -667,49 +708,8 @@ end;
        exception when no_data_found then
        l_id:=null;
     end;
-
-    if l_id is null then
-        l_eds_decl:= p_eds_decl;
-        l_eds_decl.state:= st_DECLARATION_REGISTER;
-        add_new_decl(l_eds_decl); -- запис параметрів запиту на формування декларації
-        if p_transp_id is null then
-        eds_intg.create_send_job1(l_eds_decl.id);
-        else
-        send_decl_id(l_eds_decl.id);
-        end if;
-    else
-      if p_transp_id is not null then
-        barstrans.transp_utl.add_resp(p_transp_id, crt_xml(l_id));
-      else
-        set_exists_decl_id(p_eds_decl.id ,l_id);
-      end if;      
-    end if;
-  exception when others then
-   bars.logger.info('edecl-'||l_eds_decl.id|| ' error crt_decl ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
-   raise_application_error(-20001,'error crt_decl');
-end;
--------------------------
-  --  set_request_state
-procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, p_id out varchar2) is
-      pragma autonomous_transaction;
-      l_id varchar2(36);
-  begin
-      l_id:=xml_extract(xmltype(p_req_body), '/ROOT/ID/text()');
-      insert into EDS_CRT_REQ_LOG
-          (ID, TRANSP_REQ_ID, SO_KF, REQ_USER_ID, REQ_TIME, REQ_BODY, REQ_STATUS)
-      values
-          (coalesce(l_id, get_guid),
-           p_transp_id,
-           p_kf,
-           user_id,
-           sysdate,
-           p_req_body,
-           st_REQUEST_NEW) returning ID into l_id;
-      commit;
-      p_id:= l_id;
-  exception when dup_val_on_index then
-      p_id:= l_id;
-  end;
+    return l_id;
+ end;
   
   -----------------------------------------------------------------------------------------
   --  create_request
@@ -728,6 +728,8 @@ procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, 
     p_comm       in eds_decl.comm%type default null
     )
   is
+    l_decl_id           number;
+    l_state             number;
     l_eds_decl          eds_decl%rowtype;
     l_eds_decls_policy  eds_decls_policy%rowtype;
     l_act               varchar2(255) := gc_pkg||'.create_request ';
@@ -753,16 +755,24 @@ procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, 
     l_eds_decls_policy.add_id   := user_id;
     l_eds_decls_policy.kf       := f_ourmfo;
     
-    add_new_decl(l_eds_decl, l_eds_decls_policy);
+    l_decl_id:= get_ex_decl(l_eds_decl);
+    if l_decl_id is null then
+        add_new_decl(l_eds_decl, l_eds_decls_policy);
+        set_decl_status(l_eds_decl.id ,st_DECLARATION_REGISTER);
+        eds_intg.create_send_job1(l_eds_decl.id);
+    else
+        decl_search(l_decl_id, l_state);
+    end if;
     
-    crt_decl(l_eds_decl);
+    if l_state in (2, 3) then
+        add_new_decl(l_eds_decl, l_eds_decls_policy);
+        set_decl_status(l_eds_decl.id ,st_DECLARATION_REJECTED);
+    end if;
 
   exception
     when others then
     bars.logger.info('edecl-'||l_eds_decl.id|| ' error crt_decl ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
-      bars_error.raise_nerror(p_errmod  => gc_pkg,
-                              p_errname => 'ERR_CREATE_REQUEST',
-                              p_param1  => l_act || ' error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+    raise;
   end create_request; 
   
 --for oshad 24
@@ -771,6 +781,7 @@ procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, 
     l_buff              varchar2(4000);
     l_mfo               varchar2(6);
     l_id                varchar2(36);
+    l_decl_id           number;
     l_act               varchar2(255) := gc_pkg||'.parse_request ';
     l_eds_decl          eds_decl%rowtype;
     unknown_action_type exception;
@@ -792,21 +803,21 @@ procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, 
         end;
 
     log_crt_req(p_transp_id, l_mfo, l_buff, l_id);
-
     l_eds_decl:=xml_2_obj(l_buff);
     l_eds_decl.id := l_id;
-
-    crt_decl(l_eds_decl, p_transp_id);
-
-  exception
-    when unknown_action_type then
-      bars_error.raise_nerror(p_errmod  => gc_pkg,
-                              p_errname => 'UNCNOWN_REQUEST_TYPE',
-                              p_param1  => 'Помилка розбору запиту. Тип запиту не описаний в базі даних.');
-    when others then
-      bars_error.raise_nerror(p_errmod  => gc_pkg,
-                              p_errname => 'ERR_PARSE_REQUEST',
-                              p_param1  => l_act || ' error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+    
+    l_decl_id:= get_ex_decl(l_eds_decl);
+    
+    if l_decl_id is null then
+        l_eds_decl.state:= st_DECLARATION_REGISTER;
+        add_new_decl(l_eds_decl); 
+        upd_log_req_status(l_eds_decl.id, st_REQUEST_CREATED);
+        send_decl_id(l_eds_decl.id);
+    else
+        l_buff:=crt_xml(l_decl_id);
+        add_log_req_resp(l_id, st_DECLARATION_PREPARED, l_buff, l_decl_id);
+        barstrans.transp_utl.add_resp(p_transp_id, l_buff);
+    end if;
 end pocess_request;
 
 end eds_intg;
