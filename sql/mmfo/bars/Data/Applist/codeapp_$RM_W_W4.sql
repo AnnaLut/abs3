@@ -548,6 +548,15 @@ begin
                                                   p_rolename => 'OW' ,
                                                   p_frontend => l_application_type_id
                                                   );
+          --  Створюємо функцію Way4. Пакетне відкриття карток
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Way4. Пакетне відкриття карток',
+                                                  p_funcname => '/barsroot/BatchOpeningCardAccounts/BatchOpeningCardAccounts',
+                                                  p_rolename => 'OW' ,
+                                                  p_frontend => l_application_type_id
+                                                  );												  
 
 
       --  Створюємо дочірню функцію Way4.newdeal_uo
