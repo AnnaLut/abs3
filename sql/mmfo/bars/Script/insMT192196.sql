@@ -23,11 +23,11 @@ delete from sw_dictionary_status_mt196;
 Insert into BARS.SW_DICTIONARY_STATUS_MT196
    (ID, NAME, DESCRIPTION)
  Values
-   ('CNCL', 'Анульований', 'Кінцева відповідь, яка підтверджує анулювання платежу згідно з запитом та ініціювання повернення кош');
+   ('CNCL/', 'Анульований', 'Кінцева відповідь, яка підтверджує анулювання платежу згідно з запитом та ініціювання повернення кош');
 Insert into BARS.SW_DICTIONARY_STATUS_MT196
    (ID, NAME, DESCRIPTION)
  Values
-   ('PDCR', 'Незавершений', 'Проміжний статус, що підтверджує наявність запиту gSRP, але потрібна додаткова робота для надіслання');
+   ('PDCR/', 'Незавершений', 'Проміжний статус, що підтверджує наявність запиту gSRP, але потрібна додаткова робота для надіслання');
 Insert into BARS.SW_DICTIONARY_STATUS_MT196
    (ID, NAME, DESCRIPTION)
  Values

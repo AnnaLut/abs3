@@ -7,7 +7,7 @@ IS
    --**************************************************************--
 
 
-   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.22 04.10.2018';
+   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.23 08.01.2019';
    VERSION_HEADER_DEFS   CONSTANT VARCHAR2 (512) := '';
 
    -- Устаревшие типы
@@ -340,7 +340,7 @@ IS
    
    PROCEDURE generate_mt192 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_indm number, p_20 varchar2);
    
-   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_20 varchar2);
+   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_20 varchar2, p_21 varchar2);
    
    PROCEDURE generate_acsc (p_uetr IN sw_journal.uetr%TYPE);
    
@@ -402,7 +402,7 @@ END bars_swift_msg;
 
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.62 17.10.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.64 10.01.2019';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -8318,7 +8318,7 @@ IS
   end generate_mt192;
    
    
-   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_20 varchar2)
+   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_20 varchar2, p_21 varchar2)
     is 
      CURSOR cursModel (p_mt IN NUMBER)
       IS
@@ -8410,8 +8410,8 @@ IS
          mid_        => NULL,
          page_       => NULL,
          io_         => 'I',
-         sender_     => l_sw_journal.sender,
-         receiver_   => l_sw_journal.receiver,
+         sender_     => l_sw_journal.receiver,
+         receiver_   => l_sw_journal.sender,
          transit_    => l_sw_journal.transit,
          payer_      => NULL,
          payee_      => l_sw_journal.payee,
@@ -8468,7 +8468,8 @@ IS
          ELSIF (l_recModel.tag = '21')
          THEN
             l_opt := '';
-            l_value := l_20fld;
+            l_value:=p_21;
+            --l_value := l_20fld;
             genmsg_document_instag (l_recModel,
                                     l_swref_new,
                                     NULL,
@@ -8482,7 +8483,8 @@ IS
          ELSIF (l_recModel.tag = '76')
          THEN
             l_opt := '';
-            l_value := '/'||p_status_code||'/'||CRLF||bars_swift.get_ourbank_bic;
+            --l_value := '/'||p_status_code||'/'||CRLF||bars_swift.get_ourbank_bic;  
+            l_value := '/'||p_status_code||CRLF||bars_swift.get_ourbank_bic;
             genmsg_document_instag (l_recModel,
                                     l_swref_new,
                                     NULL,
