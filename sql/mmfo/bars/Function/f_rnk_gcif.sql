@@ -13,7 +13,7 @@ begin
    if l_okpo is null or l_okpo like '00000%' THEN
       begin
          select trim(gcif) into l_okpo from ebkc_gcif  where  rnk = p_rnk;
-      EXCEPTION  WHEN NO_DATA_FOUND  THEN  l_okpo := p_okpo;
+      EXCEPTION  WHEN NO_DATA_FOUND  THEN  l_okpo := null;
       END;
    end  if;
    return(nvl(l_okpo,sys_context('bars_context','user_mfo')||'-'||p_rnk));

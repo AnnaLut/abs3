@@ -53,7 +53,7 @@ DECLARE
 
 begin
 
-      if nal_ in ('0','1','2','5','7','B','C','D') THEN
+      if nal_ in ('0','1','2','5','B','C','D') THEN
 
       OPEN c0 FOR
          select t.ri, t.country, t.id   , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz   , t.branch,
