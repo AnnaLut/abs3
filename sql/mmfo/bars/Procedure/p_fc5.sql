@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.17.045  03/01/2019 (27/11/2018)
+% VERSION : v.17.047  17/01/2019 (15/01/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -22,6 +22,18 @@ IS
  17 K K077 код сектору економiки
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 17/01/2019 відкореговано перелік бал.рах. і їч параметрів для наповнення 
+            табл. OTC_C5_PROC яка використовується для формування #42
+            для контрагента 10009201 параметр S580_ = '1' для необхідних
+            бал.рах. і визначених параметрів R011, R013< S245
+ 15/01/2019 для дочерних счетов по ЦБ будет формироваться код остатка 
+            родительского счета и значение показателя с противоположным 
+            знаком если типы остаков не совпадают
+ 10/01/2019 для бал.рах. 1415, 3015, 3115 будуть включатися доч_рн_ особов_
+            рахунки зам_сть консол_дованих 
+ 08.01.2019 бал.рах. 2396 буде оброблятися аналог_чно як _ 2046
+            (в VIEW V_TMP_REZ_RISK_C5 для цього бал.рах. буде заповнено 
+             поле ZPR) 
  03.01.2019 в OTC_C5_PROC будут включаться бал.сч. 1536,2386,2396,2456,3016
  27.11.2018 вир_внювання 2049
  15.11.2018 добавлен_ новые бал.счета 1426,1428 lkz выравнивания с балансом
@@ -58,6 +70,7 @@ IS
  se_ DECIMAL (24);
  se1_ DECIMAL (24);
  dk_ CHAR (1);
+ dk_k CHAR (1);
  kodp_ VARCHAR2 (20);
  znap_ VARCHAR2 (30);
 
@@ -252,6 +265,29 @@ IS
      then
         s580_ := '9';
      end if;
+
+     IF rnk_ = 10009201 THEN
+        if    r020_ in ('1200','1203') and s245_ in ('0')  
+           or r020_ in ('1207') and s245_ in ('1','2')
+           or r020_ in ('1208','1211','1212','1216','1218','1430',
+                        '1435','1436','1438','1440','1446','1448',
+                        '1450','1455','1456','1458') and s245_ in ('1') 
+           or r020_ in ('1502','1508','1509') and r011_ in ('4','5') and s245_ in ('1')
+           or r020_ in ('1819','1890') and r011_ in ('5') and s245_ in ('1')  
+           or r020_ in ('2800','2890') and r011_ in ('2') and s245_ in ('1')  
+           or r020_ in ('3040') and r011_ in ('5') and s245_ in ('1')  
+           or r020_ in ('3041','3042','3043','3044','3049') and r011_ in ('3') and s245_ in ('1')  
+           or r020_ in ('3541') and r011_ in ('5') and s245_ in ('1')  
+           or r020_ in ('3548') and r011_ in ('B') and s245_ in ('1')  
+           or r020_ in ('3599') and r011_ in ('3') and r013_ in ('A') and s245_ in ('1')  
+           or r020_ in ('3540') and r011_ in ('1') and s245_ in ('1')  
+           or r020_ in ('3599') and r011_ in ('2') and r013_ in ('5') and s245_ in ('1')       
+           or r020_ in ('9200') and r013_ in ('3','9') and s245_ in ('1','2')  
+           or r020_ in ('9202','9204','9207','9208','9350') and r013_ in ('3') and s245_ in ('1','2')  
+        then
+           s580_ := '1';
+        end if;
+     END IF; 
  end;
 
  procedure p_add_rec(p_recid rnbu_trace.recid%type, p_userid rnbu_trace.userid%type, p_nls rnbu_trace.nls%type,
@@ -559,7 +595,7 @@ BEGIN
                                 s.acc = a.acc and
                                 s.acc = cc.acc(+) and
                                 a.tip <> ''REZ'' and
-                                not (a.nls like ''204%'' and a.tip = ''SDF'')
+                                not ((a.nls like ''204%'' or a.nls like ''239%'') and a.tip = ''SDF'')
                          ) a
                          join customer c
                              ON (a.rnk = c.rnk)
@@ -671,6 +707,7 @@ BEGIN
           segm_WWW := LPAD (kv_, 3,'0');
 
           pr_accc := 0;
+          dk_k := null;
 
           IF     mfou_ = 300465
              AND SUBSTR (nls_, 1, 3) IN
@@ -680,9 +717,10 @@ BEGIN
              -- добавил для банка ОПЕРУ СБ обработку дочерних счетов по ЦБ
              -- вместо консолидированных
              IF     nbs_ IS NOT NULL
-                AND (mfo_ = 300465 and nbs_ NOT IN ('1415', '1435', '3007', '3015', '3107', '3115','3541') or
+                AND (mfo_ = 300465 and nbs_ NOT IN ('1435', '3007', '3107', '3541') or
                      mfo_ <> 300465)
              THEN
+
                 BEGIN
                    SELECT COUNT ( * )
                      INTO pr_accc
@@ -766,7 +804,7 @@ BEGIN
           IF    (    mfou_ IN (300205, 300465)
                  AND (   (    nbs_ IS NULL
                           AND (mfo_ = 300465 and SUBSTR (nls_, 1, 4) NOT IN
-                                 ('1415', '1435', '3007', '3015', '3107','3115','3541') or
+                                 ('1435', '3007', '3107', '3541') or
                                mfo_ <> 300465)
                          )
                       OR (pr_accc = 0 AND nbs_ IS NOT NULL)
@@ -774,6 +812,23 @@ BEGIN
                 )
              OR mfou_ NOT IN (300205, 300465)
           THEN
+
+              BEGIN
+                 SELECT a.ost
+                   INTO se1_
+                   FROM sal a, accounts s
+                  WHERE a.fdat = dat_
+                    AND s.acc = acc_
+                    AND s.accc = a.acc
+                    AND a.nbs IS NOT NULL;
+
+                 dk_k := iif_n (se1_, 0, '1', '2', '2');
+              EXCEPTION
+                 WHEN NO_DATA_FOUND
+                 THEN
+                      null;
+              END;
+
               IF nbs_ IS NULL
               THEN
                  nbs_ := SUBSTR (nls_, 1, 4);
@@ -938,6 +993,12 @@ BEGIN
                           kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'0'||k077_;
                           znap_ := TO_CHAR (ABS (sum_z0));
 
+                          if dk_k is not null and dk_ <> dk_k 
+                          then
+                             kodp_ := dk_k || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'0'||k077_;
+                             znap_ := 0 - znap_;
+                          end if;
+
                           p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
                                          nd_, acc_, mdate_, nbuc_, tobo_);
                        end if;
@@ -946,6 +1007,12 @@ BEGIN
                           kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'1'||k077_;
                           znap_ := TO_CHAR (ABS (sum_z1));
 
+                          if dk_k is not null and dk_ <> dk_k 
+                          then
+                             kodp_ := dk_k || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'1'||k077_;
+                             znap_ := 0 - znap_;
+                          end if;
+
                           p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
                                          nd_, acc_, mdate_, nbuc_, tobo_);
                        end if;
@@ -953,6 +1020,12 @@ BEGIN
                        if sum_z2 <> 0 then
                           kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'2'||k077_;
                           znap_ := TO_CHAR (ABS (sum_z2));
+
+                          if dk_k is not null and dk_ <> dk_k 
+                          then
+                             kodp_ := dk_k || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'2'||k077_;
+                             znap_ := 0 - znap_;
+                          end if;
 
                           p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
                                          nd_, acc_, mdate_, nbuc_, tobo_);
@@ -1358,7 +1431,7 @@ BEGIN
 
                 if nbs_ in ('2609','2629','2659') then
                     kodp_ := k.sign_rez||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
- 			    elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
+                 elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
                     kodp_ := k.sign_rez||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
                 else
                     kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
@@ -1380,10 +1453,10 @@ BEGIN
           end if;
 
           if k.discont_SDF <> 0 then
-	      	 r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
-		  	 r011_ := substr(k.kodp,6,1);
+               r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
+               r011_ := substr(k.kodp,6,1);
 
- 			 kodp_ := '2'||'2046'||r011_||r013_||substr(k.kodp,8);
+              kodp_ := '2'||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
              comm_ := SUBSTR(' дисконт SDF c1', 1,100);
@@ -1400,10 +1473,10 @@ BEGIN
           end if;
       else
          if k.discont_SDF <> 0 then
-			r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
-			r011_ := substr(k.kodp,6,1);
+            r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
+            r011_ := substr(k.kodp,6,1);
 
-			kodp_ := '2'||'2046'||r011_||r013_||substr(k.kodp,8);
+            kodp_ := '2'||substr(k.nls,1,3)||'6'||r011_||r013_||substr(k.kodp,8);
             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c1', 1,100);
@@ -1488,7 +1561,7 @@ BEGIN
                          and a.kv = to_number(l.r030)
                          and nvl(a.nbs, substr(a.nls,1,4)) not in ('2924')
                          and substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('410','420')
-                         and t.nbs not like '204%'
+                         and t.nbs not like '204%' and t.nbs not like '239%'
                          and (   mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_
                               or
                                 mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
@@ -1699,7 +1772,7 @@ BEGIN
           end if;
 
           if k.discont_SDF <> 0 then
-             kodp_ := '2'||'2046'||'6'||r013_||substr(kodp_,8);
+             kodp_ := '2'||substr(k.nls,1,3)||'6'||'6'||r013_||substr(kodp_,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
              comm_ := SUBSTR(' дисконт SDF c2', 1,100);
@@ -1716,7 +1789,7 @@ BEGIN
           end if;
       else
          if k.discont_SDF <> 0 then
-            kodp_ := '2'||'2046'||'6'||(case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
+            kodp_ := '2'||substr(k.nls,1,3)||'6'||'6'||(case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c2', 1,100);
@@ -1845,7 +1918,7 @@ BEGIN
 ------------------------------------------------
    -- вир_внювання з А7 по рахунках резерву на декадну дату
    if dat_ = dat_end_ then
- 	   -- по резервах
+        -- по резервах
        merge into rnbu_trace a
        using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
               from (
@@ -1877,11 +1950,11 @@ BEGIN
               from (select acc_id acc, s245, nbs, ost
                     from NBUR_TMP_A7_S245
                     where report_date = dat_ and
-                          nbs = '2046') a
+                          nbs in ('2046','2396') ) a
                        join
                     (select acc, substr(kodp, 16, 1) s245, substr(kodp, 2, 4) nbs, sum(znap) ost
                      from rnbu_trace
-                     where kodp like '_2046%'
+                     where (kodp like '_2046%' or kodp like '_2396%')  
                      group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
                      on (a.acc = b.acc and
                          a.s245 = b.s245 and
@@ -1929,7 +2002,7 @@ BEGIN
                                           '9010','9015','9030','9031','9036','9500',
                                           '1419','1426','1428','1429','1509','1519','1529',
                                           '2039','2046','2049','2069','2089','2109','2119','2129',
-                                          '2609','2629','2659',
+                                          '2396','2609','2629','2659',
                                           '2139','2206','2209','2236','2239','3119','3219')
                               and a.acc = s.acc
                               and a.rnk = c.rnk
@@ -1953,7 +2026,7 @@ BEGIN
                                       '9010','9015','9030','9031','9036','9500',
                                       '1419','1426','1428','1429','1509','1519','1529',
                                       '2039','2046','2049','2069','2089','2109','2119','2129',
-                                      '2609','2629','2659',
+                                      '2396','2609','2629','2659',
                                       '2139','2206','2209','2236','2239','3119','3219')
                           and r.rnk = c.rnk
                         group by r.nbuc, substr(r.kodp, 1, 1), 2-MOD(c.codcagent,2),substr(r.kodp, 2, 4), r.kv) b
@@ -2151,9 +2224,52 @@ BEGIN
         v.seg_02 = '1509' and v.seg_03 in ('2', '3', '6') and v.seg_04 in ('2', '4')
         )
     order by seg_02, seg_01, acc_num;
-    -----------------------------------------------------
     commit;
+    -----------------------------------------------------
 
+   INSERT INTO otc_c5_proc
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        v.seg_02  = '1811' and v.seg_03 in ('2')
+        or
+        v.seg_02  = '1819' and v.seg_03 in ('4')
+        or
+        v.seg_02  = '1890' and v.seg_03 in ('2','4')
+        )
+    order by seg_02, seg_01, acc_num;
+    commit;
+    -----------------------------------------------------
+
+   INSERT INTO otc_c5_proc
+            (datf, rnk, nd, acc, nls, kv, kodp, znap )
+    select /*+ parallel(8) */
+        dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
+    where k.kf = '42' and k.ddd = '001' and
+        v.seg_02 = k.r020 and
+        (v.seg_01 = k.r012 or k.r012 = '3') and
+        (
+        v.seg_02  = '2800' and v.seg_03 in ('1')
+        or
+        v.seg_02  = '2801' and v.seg_03 in ('3')
+        or 
+        v.seg_02  = '2805' and v.seg_03 in ('4')
+        or 
+        v.seg_02  = '2806' and v.seg_03 in ('5')
+        or
+        v.seg_02  = '2809' and v.seg_03 in ('6')
+        or 
+        v.seg_02  = '2890' and v.seg_03 in ('1','3','4','5','6')
+        )
+    order by seg_02, seg_01, acc_num;
+    commit;
+    -----------------------------------------------------
 
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
@@ -2172,19 +2288,21 @@ BEGIN
         or
         v.seg_02 = '3008' and v.seg_03 in ('6', 'B') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3010' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
-        or
+        --v.seg_02 = '3010' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
+        --or
         v.seg_02 = '3011' and v.seg_03 in ('5') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3012' and v.seg_03 in ('8','9') and v.seg_04 in ('9')
+        v.seg_02 = '3012' and v.seg_03 in ('9') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3013' and v.seg_03 in ('A','B','E','F','J','K') and v.seg_04 in ('9')
+        v.seg_02 = '3013' and v.seg_03 in ('A','B','E','F','K') and v.seg_04 in ('9')
         or
         v.seg_02 = '3014' and v.seg_03 in ('N','O') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3015' and v.seg_03 in ('A','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('4')
+        v.seg_02 = '3015' and v.seg_03 in ('A','K','N') and v.seg_04 in ('4')
+        or 
+        v.seg_02 = '3015' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
         v.seg_02 = '3016' and v.seg_03 in ('A','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
@@ -2192,13 +2310,21 @@ BEGIN
         or
         v.seg_02 = '3016' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
-        v.seg_02 = '3015' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
-        or
-        v.seg_02 = '3018' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('9') and v.seg_09 in ('1')
+        v.seg_02 = '3018' and v.seg_03 in ('A','K','N') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
         v.seg_02 = '3018' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3040' and v.seg_03 in ('2', '4')
+        v.seg_02 = '3040' and v.seg_03 in ('4')
+        or
+        v.seg_02 = '3041' and v.seg_03 in ('2')
+        or
+        v.seg_02 = '3042' and v.seg_03 in ('2')
+        or
+        v.seg_02 = '3043' and v.seg_03 in ('2')
+        or
+        v.seg_02 = '3044' and v.seg_03 in ('2')
+        or
+        v.seg_02 = '3049' and v.seg_03 in ('2')
         )
     order by seg_02, seg_01, acc_num;
     commit;
@@ -2221,33 +2347,35 @@ BEGIN
         or
         v.seg_02 = '3108' and v.seg_03 in ('2','5','6','9') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3110' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
-        or
+        --v.seg_02 = '3110' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
+        --or
         v.seg_02 = '3111' and v.seg_03 in ('5') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3112' and v.seg_03 in ('6','7') and v.seg_04 in ('9')
+        v.seg_02 = '3112' and v.seg_03 in ('7') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3113' and v.seg_03 in ('A','B','C','D','E','F') and v.seg_04 in ('9')
+        v.seg_02 = '3113' and v.seg_03 in ('A','B','D','E','F') and v.seg_04 in ('9')
         or
         v.seg_02 = '3114' and v.seg_03 in ('K','L') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3115' and v.seg_03 in ('2','5','6','7','A','B','C','D','E','F','K','L','P') and v.seg_04 in ('9')
+        v.seg_02 = '3115' and v.seg_03 in ('5','7','A','B','D','E','F','K','L') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3116' and v.seg_03 in ('A','D','K') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('4')
+        v.seg_02 = '3116' and v.seg_03 in ('A','D','K') and v.seg_04 in ('4')
         or
         v.seg_02 = '3116' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
         or
-        v.seg_02 = '3118' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('9') and v.seg_09 in ('1')
+        v.seg_02 = '3118' and v.seg_03 in ('A','D','K') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
         v.seg_02 = '3118' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3119' and v.seg_03 in ('A','D','K') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('4')
+        v.seg_02 = '3119' and v.seg_03 in ('A','D','K') and v.seg_04 in ('4')
         or
         v.seg_02 = '3119' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
+        or
+        v.seg_02  in ('3140','3141','3142','3143','3144') and v.seg_03 in ('2') 
         )
     order by seg_02, seg_01, acc_num;
     commit;
@@ -2262,29 +2390,29 @@ BEGIN
         v.seg_02 = k.r020 and
         (v.seg_01 = k.r012 or k.r012 = '3') and
         (
-        v.seg_02 = '3210' and v.seg_03 in ('1','P')
-        or
+        --v.seg_02 = '3210' and v.seg_03 in ('1','P')
+        --or
         v.seg_02 = '3211' and v.seg_03 in ('2')
         or
-        v.seg_02 = '3212' and v.seg_03 in ('3','4')
+        v.seg_02 = '3212' and v.seg_03 in ('3')
         or
-        v.seg_02 = '3213' and v.seg_03 in ('5','6','7','8','9','A')
+        v.seg_02 = '3213' and v.seg_03 in ('5','6','8','9','A')
         or
         v.seg_02 = '3214' and v.seg_03 in ('B','C')
         or
-        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3216' and v.seg_03 in ('5','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('4')
+        v.seg_02 = '3216' and v.seg_03 in ('5','8','B') and v.seg_04 in ('4')
         or
         v.seg_02 = '3216' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         or
-        v.seg_02 = '3218' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('9') and v.seg_09 in ('1')
+        v.seg_02 = '3218' and v.seg_03 in ('5','8','B') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
         v.seg_02 = '3218' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3219' and v.seg_03 in ('5','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('4')
+        v.seg_02 = '3219' and v.seg_03 in ('5','8','B') and v.seg_04 in ('4')
         or
         v.seg_02 = '3219' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         )
@@ -2301,11 +2429,15 @@ BEGIN
         v.seg_02 = k.r020 and
         (v.seg_01 = k.r012 or k.r012 = '3') and
         (
-        v.seg_02 = '3599' and v.seg_03 in ('2') and v.seg_04 in ('9') and v.acc_num not like '3570%'
+        v.seg_02 in ('3510', '3511', '3519','3590')
+        or 
+        v.seg_02 = '3540' and v.seg_03 in ('2','3')
         or
-        v.seg_02 = '3578' and v.seg_03 in ('1') and v.seg_04 in ('2')
+        v.seg_02 = '3541' and v.seg_03 in ('2','4')
         or
-        v.seg_02 = '3599' and v.seg_03 in ('1') and v.seg_04 in ('2') and v.acc_num not like '3570%'
+        v.seg_02 = '3542' and v.seg_03 in ('1')
+        or
+        v.seg_02 = '3548' and v.seg_03 in ('2','4','6','8','A')
         or
         v.seg_02 = '3560' and v.seg_03 in ('1','3')
         or
@@ -2315,27 +2447,59 @@ BEGIN
         or
         v.seg_02 = '3569' and v.seg_03 in ('1','3') and v.seg_04 in ('2','4')
         or
+        v.seg_02 = '3578' and v.seg_03 in ('1') and v.seg_04 in ('2')
+        or
+        v.seg_02 = '3599' and v.seg_03 in ('2') and v.seg_04 in ('6','7','9') --and v.acc_num not like '3570%'
+        or
+        v.seg_02 = '3599' and v.seg_03 in ('1') and v.seg_04 in ('2') --and v.acc_num not like '3570%'
+        or
         v.seg_02 = '9129' and v.seg_04 in ('1')
         or
-        v.seg_02 = '3692' and v.acc_num not like '9129%'
+        v.seg_02 = '3690' and v.seg_03 in ('2','4','6','8') 
         or
-        v.seg_02 in ('1819', '2809', '3049', '3519','3548')
+        v.seg_02 = '3692' and v.seg_03 in ('2','3','4') 
         )
     order by seg_02, seg_01, acc_num;
     commit;
    -----------------------------------------------------
 
+   --INSERT INTO otc_c5_proc
+   --         (datf, rnk, nd, acc, nls, kv, kodp, znap )
+   -- select /*+ parallel(8) */
+   --     dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
+   -- from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k, specparam s
+   -- where k.kf = '42' and k.ddd = '001' and
+   --     v.seg_02 = k.r020 and
+   --     (v.seg_01 = k.r012 or k.r012 = '3') and
+   --     v.seg_02 = '3692' and v.acc_num like '9129%' and
+   --     v.acc_id = s.acc and
+   --     nvl(trim(s.r013), '0') = '1'
+   -- order by seg_02, seg_01, acc_num;
+   -- commit;
+
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
     select /*+ parallel(8) */
         dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
-    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k, specparam s
+    from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
     where k.kf = '42' and k.ddd = '001' and
         v.seg_02 = k.r020 and
         (v.seg_01 = k.r012 or k.r012 = '3') and
-        v.seg_02 = '3692' and v.acc_num like '9129%' and
-        v.acc_id = s.acc and
-        nvl(trim(s.r013), '0') = '1'
+        (
+        v.seg_02  = '9000' and v.seg_03 in ('2')
+        or
+        v.seg_02  = '9001' and v.seg_03 in ('4')
+        or 
+        v.seg_02  = '9002' and v.seg_03 in ('6')
+        or 
+        v.seg_02  = '9003' and v.seg_03 in ('8')
+        or
+        v.seg_02  = '9100' and v.seg_03 in ('2')
+        or 
+        v.seg_02  = '9122' and v.seg_03 in ('3')
+        or 
+        v.seg_02  = '9129' and v.seg_03 in ('4') and v.seg_04 in ('1') 
+        )
     order by seg_02, seg_01, acc_num;
     commit;
     -----------------------------------------------------
