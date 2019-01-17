@@ -70,10 +70,9 @@ BEGIN
   , p_file_pid => r_file.ID
   );
 
-  NBUR_FILES.SET_FILE_DEPENDENCIES
-  ( p_file_id  => l_file_id
-  , p_file_pid => r_file.ID
-  );
+  update NBUR_LNK_FILES_FILES lf
+     set lf.start_date = date '2018-01-01'
+  where lf.file_id = r_file.ID;
 
   COMMIT; 
 END; 
