@@ -727,9 +727,23 @@ IS
       l_nls   accounts.nls%TYPE;
       l_kv    INT;
       l_reqid number;
+      l_date_close date;
    BEGIN
       bc.go (p_branch);
       l_nls := p_nls;
+      begin
+         select least(nvl(b.date_close, bankdate + 1), nvl(c.date_close, bankdate + 1))
+           into l_date_close 
+           from w4_product b, w4_card c
+          where c.code = p_cardcode
+            and c.product_code = b.code;
+      exception when no_data_found then
+         -- Не найден продукт p_cardcode
+         bars_error.raise_nerror('BPK', 'CARDCODE_NOT_FOUND', p_cardcode);
+      end;
+      if bankdate > l_date_close then
+         raise_application_error(-20000, 'Продукт '|| p_cardcode ||' закрито '||to_char(l_date_close, 'dd.mm.yyyy'));
+      end if; 
       dbms_session.set_context('clientcontext','iscrm','1');
       bars_ow.open_card (p_rnk          => bars_sqnc.rukey(p_rnk),
                          p_nls          => l_nls,
