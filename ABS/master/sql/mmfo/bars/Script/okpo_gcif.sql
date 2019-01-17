@@ -34,6 +34,7 @@ begin
           comments => 'Приведення OKPO_GCIF' 
          );
    end loop;
+   bc.go('/');
 END;
 /
 

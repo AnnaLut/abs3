@@ -247,7 +247,7 @@ BEGIN
       k r0Typ;
    begin
 
-      if nal_ in ('0','1','2','5','7','B','C') THEN
+      if nal_ in ('0','1','2','5','B','C') THEN
 
          OPEN c0 FOR
          select t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz    , t.branch, t.sz,
