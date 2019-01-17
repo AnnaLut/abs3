@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CR.sql =========*** Run *** ======
 PROMPT ===================================================================================== 
@@ -20,6 +18,7 @@ PROMPT *** Create  procedure CR ***
 l_kol integer; l_kf varchar2(6);
 
 begin
+   dbms_application_info.set_client_info(':'|| gl.aMfo ||':6) Розрахунок кредитного ризику (351)');
    z23.to_log_rez (user_id , 13 , p_dat01 ,'ПОЧАТОК (CR) Кредитний ризик 351 ');
    p_BLOCK_351(p_dat01);
    delete from rez_cr     where fdat = p_dat01;

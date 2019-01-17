@@ -214,6 +214,17 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I1_PRVN_OSAQ ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_PRVN_OSAQ ON BARS.PRVN_OSAQ (kf,tip) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 
 PROMPT *** Create  grants  PRVN_OSAQ ***

@@ -67,7 +67,7 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
  l_EAD      NUMBER; l_zal     NUMBER; l_EADQ     NUMBER; l_LGD      NUMBER; l_CR       NUMBER; l_RC        NUMBER; l_bv       NUMBER; 
  l_BVQ      NUMBER; l_bv02    NUMBER; l_BV02q    NUMBER; l_ccf      NUMBER; l_srok     NUMBER; L_RCQ       NUMBER; L_CR_LGD   NUMBER; 
  l_zalq     NUMBER; l_zal_BV  NUMBER; l_zal_BVq  NUMBER; l_dv       NUMBER; l_polis    NUMBER; l_zal_lgd   NUMBER; l_s        NUMBER; 
- l_EADR     NUMBER; l_RZ      NUMBER; l_tip_kv   NUMBER; l_fin_okpo NUMBER; l_lgd_51   NUMBER:= 0.3;
+ l_EADR     NUMBER; l_RZ      NUMBER; l_tip_kv   NUMBER; l_fin_okpo NUMBER; l_lgd_51   NUMBER;
         
  VKR_       varchar2(3);  l_txt  varchar2(1000);  l_vkr   varchar2(50)  ;  l_real  varchar2(3);  l_text  VARCHAR2(250) ; l_kf varchar2(6);
  l_poci_    varchar2(3);
@@ -90,7 +90,8 @@ begin
       p_kol_nd_MBDK(p_dat01, 0);
    end if;
    delete from ex_kl351;
-   delete from REZ_CR where fdat=p_Dat01 and tipa in ( 3, 4, 5, 6, 9, 10, 41, 42, 90, 94);
+   --delete from REZ_CR where fdat=p_Dat01 and tipa in ( 3, 4, 5, 6, 9, 10, 41, 42, 90, 94);
+   l_lgd_51 := GET_REZ_PAR( 'LGD' );
    for d in (
              SELECT e.nd, e.cc_id, e.vidd, e.fin23, decode(e.vidd, 110, 10, 3) tipa, sdate, wdate, e.prod, e.rnk, e.pd, cck_app.get_nd_txt(e.nd, 'VNCRR') vkr, 
                     decode(trim(c.sed),'91',3,c.custtype) custtype, trim(c.sed) sed, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo,
@@ -144,9 +145,9 @@ begin
       else                    l_poci := 0;
       end if; 
 
-      l_grp   := f_get_port (d.nd, d.rnk);
-      if  l_grp <>0 THEN  l_s250 := '8';
-      else                l_s250 := null; l_grp := null;
+      if     d.tipa in (41,42,10) and d.custtype = 2 THEN d.vidd := 1 ;
+      elsif  d.tipa in (41,42,10)                    THEN d.vidd := 11;
+      elsif  d.sed = '91'                            THEN d.vidd := 11;
       end if;
 
       if d.custtype in (1, 2) THEN
@@ -156,23 +157,10 @@ begin
       elsif d.custtype = 2                THEN l_tip_fin := 2;
       else                                     l_tip_fin := 1;
       end if;
-      l_kol  := f_get_nd_val_n('KOL', d.nd, p_dat01, d.tipa, d.rnk);
+      l_kol  := f_get_nd_val_n('KOL', d.nd, p_dat01, d.tipa, d.okpo);
       l_s240 := case when (p_dat01 >= d.wdate ) THEN 'Z' else  F_SROK (D.SDATE, d.wdate, 2) end;
-      l_fin      := f_rnk_maxfin(p_dat01, d.okpo, l_tip_fin, d.nd, 1);
-      l_fin_okpo := f_get_fin_okpo (d.rnk);
-      if l_fin_okpo is not null THEN l_fin := least(l_fin,l_fin_okpo); end if;
-      IF    l_S250 = 8 and d.vidd     in ( 1, 2, 3) THEN  l_fin := 1;
-      elsif l_S250 = 8 and d.vidd not in ( 1, 2, 3) THEN  l_fin := f_fin_pd_grupa (1, l_kol);
-      end if;
-      if l_fin is null and d.tipa in (41,42) THEN l_fin := 5; VKR_ := 'Г'; end if; -- не санкционированный ОВЕРДРАФТ
-      l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);
       --logger.info('S080 1 : nd = ' || d.nd || ' l_tip_fin = '||l_tip_fin || ' l_fin = ' || l_fin || ' s080 = ' || l_s080 ) ;
       l_tipa := d.tipa;
-
-      if     d.tipa in (41,42,10) and d.custtype = 2 THEN d.vidd := 1 ;
-      elsif  d.tipa in (41,42,10)                    THEN d.vidd := 11;
-      elsif  d.sed = '91'                            THEN d.vidd := 11;
-      end if;
 
       DECLARE
          TYPE r0Typ IS RECORD
@@ -205,6 +193,19 @@ begin
          loop
             FETCH c0 INTO s;
             EXIT WHEN c0%NOTFOUND;
+            l_grp   := f_get_port (d.nd, d.rnk);
+            if  l_grp <>0 THEN  l_s250 := '8';
+            else                l_s250 := null; l_grp := null;
+            end if;
+      
+            l_fin      := f_rnk_maxfin(p_dat01, d.okpo, l_tip_fin, d.nd, 1);
+            l_fin_okpo := f_get_fin_okpo (d.rnk);
+            if l_fin_okpo is not null THEN l_fin := least(l_fin,l_fin_okpo); end if;
+            IF    l_S250 = 8 and d.vidd     in ( 1, 2, 3) THEN  l_fin := 1;
+            elsif l_S250 = 8 and d.vidd not in ( 1, 2, 3) THEN  l_fin := f_fin_pd_grupa (1, l_kol);
+            end if;
+            if l_fin is null and d.tipa in (41,42) THEN l_fin := 5; VKR_ := 'Г'; end if; -- не санкционированный ОВЕРДРАФТ
+            l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);
 
             if l_s240 in ('C','D','E','F','G','H','Z') and d.tipa not in (5, 6, 41, 42) THEN
                update ex_kl351 set kl_351 = 0 where acc = s.acc and pawn = 28;

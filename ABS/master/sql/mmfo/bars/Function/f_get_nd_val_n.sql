@@ -8,12 +8,15 @@
 
 begin
    begin
-      execute immediate 'select    nvl(' || p_tag   || ',0) from nd_val
+      execute immediate 'select    max(nvl(' || p_tag   || ',0)) from nd_val
                          where fdat  = :p_dat01 and okpo = :p_okpo and nd  = :p_nd and tipa = :p_tipa'
                          into l_val_n using p_dat01, p_okpo, p_nd, p_tipa;
    exception when NO_DATA_FOUND THEN l_val_n := 0;
    end;
-   return l_val_n;
+   if l_val_n is null THEN 
+      p_error_351( P_dat01, p_nd, user_id, 44, null, null, null, null, 'Не нашла ' || p_tag || ' в nd_val, OKPO = ' || p_okpo || ' tipa = ' || p_tipa , 999, null);
+   end if;
+   return nvl(l_val_n,0);
 end;
 /
  show err;
