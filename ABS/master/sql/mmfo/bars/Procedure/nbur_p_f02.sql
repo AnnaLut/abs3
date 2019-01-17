@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F02.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure NBUR_P_F02 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F02 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F02 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'G',
@@ -18,9 +9,9 @@ PROMPT *** Create  procedure NBUR_P_F02 ***
 % DESCRIPTION : Процедура формирования #02 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.007 16/11/2018 (05.11.2018)
+% VERSION     :  v.16.009 14/01/2019 (06/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.007  16.11.2018';
+  ver_          char(30)  := 'v.16.009  146.01.2019';
 /*
    Структура показника    DD BBBB VVV Y
 
@@ -36,7 +27,7 @@ PROMPT *** Create  procedure NBUR_P_F02 ***
    l_type          number;
    l_datez         date := p_report_date + 1;
    l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
-   
+
    -- COBUMMFO-7501 Begin
    l_date_first     date := trunc(p_report_date, 'MM');
    l_date_last      date := last_day(p_report_date);
@@ -52,16 +43,16 @@ BEGIN
    -- определяем дату замены счетов по МФО
    begin
 	  select max(bal.report_date)
-      into l_date_transform 
-      from nbur_kor_balances bal 
-      where bal.kf = p_kod_filii 
+      into l_date_transform
+      from nbur_kor_balances bal
+      where bal.kf = p_kod_filii
             and bal.report_date between l_date_first and l_date_last;
-   exception 
+   exception
 	  when others then
  	       l_date_transform := to_date('01011900', 'ddmmyyyy'); -- Загоням дату трансформации ниже текущих отчетов
    end;
    -- COBUMMFO-7501 End
-   
+
    if l_date_transform is null then
         BEGIN
            INSERT /*+ APPEND */
@@ -124,14 +115,22 @@ BEGIN
                                      DECODE (SIGN (b.adj_bal), 1, 0, -adj_bal) P11,
                                      DECODE (SIGN (b.adj_bal), 1, adj_bal, 0) P21,
                                      (CASE
-                                         WHEN b.kosq - b.cukosq < 0 THEN b.dosq - b.cudosq + ABS (b.kosq - b.cukosq)
-                                         WHEN b.dosq - b.cudosq < 0 THEN 0
+                                         WHEN b.dosq - b.cudosq < 0 AND b.kosq - b.cukosq < 0
+                                            THEN ABS (b.kosq - b.cukosq)
+                                         WHEN b.kosq - b.cukosq < 0 
+                                            THEN b.dosq - b.cudosq + ABS (b.kosq - b.cukosq)
+                                         WHEN b.dosq - b.cudosq < 0 
+                                            THEN 0
                                          ELSE b.dosq - b.cudosq
                                       END)
                                      P50,
                                      (CASE
-                                         WHEN b.dosq - b.cudosq < 0 THEN b.kosq - b.cukosq + ABS (b.dosq - b.cudosq)
-                                         WHEN b.kosq - b.cukosq < 0 THEN 0
+                                         WHEN b.kosq - b.cukosq < 0 AND b.dosq - b.cudosq < 0 
+                                            THEN ABS (b.dosq - b.cudosq)
+                                         WHEN b.dosq - b.cudosq < 0 
+                                            THEN b.kosq - b.cukosq + ABS (b.dosq - b.cudosq)
+                                         WHEN b.kosq - b.cukosq < 0 
+                                            THEN 0
                                          ELSE b.kosq - b.cukosq
                                       END)
                                      P60,
@@ -292,7 +291,9 @@ BEGIN
                                      AND b.kf = p_kod_filii
                                      AND a.cust_id = c.cust_id
                                      AND c.report_date = p_report_date
-                                     and trunc(nvl(a.acc_alt_dt, add_months(p_report_date, -1)), 'mm') <> trunc(p_report_date, 'mm')
+                                     AND (trunc(nvl(a.acc_alt_dt, add_months(p_report_date, -1)), 'mm') <> trunc(p_report_date, 'mm') OR
+                                          a.acc_alt_dt is not null and a.acc_num_alt not like '2625%' OR
+                                          a.acc_alt_dt is not null and a.acc_num_alt like '2625%' and (a.open_date >= a.acc_alt_dt or a.acc_alt_dt <> l_date_transform))
                                      AND c.kf = p_kod_filii) UNPIVOT (VALUE
                                                                         FOR colname
                                                                         IN  (P10,
@@ -315,7 +316,7 @@ BEGIN
         END;
 
         commit;
-    
+
         BEGIN
            INSERT /*+ APPEND */
                 INTO nbur_detail_protocols (report_date,
@@ -415,7 +416,7 @@ BEGIN
                                 FROM nbur_kor_balances d,
                                      nbur_dm_accounts a,
                                      nbur_dm_customers c,
-                                     nbur_dm_balances_monthly b                                 
+                                     nbur_dm_balances_monthly b
                                WHERE      substr(d.acc_num,1,4) in (select r020 from nbur_tmp_kod_r020)
                                      AND d.report_date = l_date_transform  -- COBUMMFO-7501 to_date('18122017','ddmmyyyy')
                                      and d.kf = p_kod_filii
@@ -485,10 +486,3 @@ BEGIN
     logger.info ('NBUR_P_F02 end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END NBUR_P_F02;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F02.sql =========*** End **
-PROMPT ===================================================================================== 
