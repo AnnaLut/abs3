@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : ѕроцедура формировани€ #D8 дл€  Ѕ (универсальна€)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 28/11/2018 (14/11/2018)
+% VERSION     : 15/01/2019 (28/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетна€ дата
                sheme_ - схема формировани€
@@ -18,10 +18,11 @@ IS
     содержитьс€ в поле RNKA (в RNKB участвующие клиенты нашего банка или
     пустое значение дл€ не клиентов банка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%15/01/2019 - дл€ бал.рах. 2396 и типа SDF измен€ем код 122 на код 125
 %28/11/2018 - добавлено формирование показател€ 092 при наличии
-              показател€ 125 и отсутствии показателей 118,119,121,123 
-%25/10/2018 - доработки дл€ »нстолмента (б/c 2203, 2208, 3570 
-              тип 'ISS','IKN','IK0') 
+              показател€ 125 и отсутствии показателей 118,119,121,123
+%25/10/2018 - доработки дл€ »нстолмента (б/c 2203, 2208, 3570
+              тип 'ISS','IKN','IK0')
 %09/11/2018 - изменено формирование показател€ 164
 %10/10/2018 - изменено формирование показател€ 111 дл€ первого транша
 %08/10/2018 - дл€ формировани€ части показател€ "H" дополнительно
@@ -701,7 +702,7 @@ IS
                  ORDER BY SUBSTR (r.kodp, 4, 10),
                           SUBSTR (r.kodp, 33),
                           SUBSTR (r.kodp, 1, 3) )
-            group by kodp 
+            group by kodp
             union all
             select kodp, znap from
             (SELECT DISTINCT r.kodp, r.znap
@@ -1292,7 +1293,7 @@ IS
                into nd_, p090_, dat_nkd_, p111p_, p112p_
             from w4_acc_inst w, accounts a
             where w.acc = acc_
-              and a.acc = w.acc; 
+              and a.acc = w.acc;
          exception when no_data_found then
             null;
          end;
@@ -4432,7 +4433,7 @@ BEGIN
                           --decode(NVL(s250_23,'0'), '8', '0', s080)
                              s080,
                              NVL(s250_23,'0')
-                         into pd_0_, s080_, fin_, s250_23_ 
+                         into pd_0_, s080_, fin_, s250_23_
                    from nbu23_rez
                    where fdat = dat23_
                      and acc = acc_
@@ -4930,11 +4931,11 @@ BEGIN
                                           kod_mm := substr(sep.h2_rrp(trunc(mod(n_trans,36*36)/36)),1,1)
                                                  || substr(sep.h2_rrp(mod(n_trans,36)),1,1);
 
-                                          if p111_ > k.p112 
+                                          if p111_ > k.p112
                                           then
                                              p111_ := k.p112;
                                           end if;
- 
+
                                           -- дата виникненн€ заборгованост_
                                           p_ins ('111' || kod_okpo || kod_nnnn || '0000' || p140_,
                                                   TO_CHAR (p111_, dfmt_),
@@ -6128,7 +6129,7 @@ for z in ( select r.acc, r.nls, r.kv, r.nd, r.kodp
 
 -------------------------------------------------------------------------------------------------
 -- блок дл€ »нстолмента
-for z in ( select distinct r.nd nd 
+for z in ( select distinct r.nd nd
            from rnbu_trace r
            where substr(kodp,1,3)  in ('121','123')
              and substr(kodp, 25, 2) = '00'
@@ -6141,10 +6142,10 @@ for z in ( select distinct r.nd nd
           idt_ := 0;
           n_trans := 0;
 
-          for k in ( select r.nd, w.chain_idt idt, r.acc, r.nls, r.kv,  r.kodp 
+          for k in ( select r.nd, w.chain_idt idt, r.acc, r.nls, r.kv,  r.kodp
                      from rnbu_trace r, w4_acc_inst w
-                     where r.nd = z.nd 
-                       and r.acc = w.acc 
+                     where r.nd = z.nd
+                       and r.acc = w.acc
                        order by 1,2
                    )
              loop
@@ -6156,7 +6157,7 @@ for z in ( select distinct r.nd nd
 
                   kod_mm := substr(sep.h2_rrp(trunc(mod(n_trans,36*36)/36)),1,1)
                          || substr(sep.h2_rrp(mod(n_trans,36)),1,1);
-               end if; 
+               end if;
 
                -- код класса контрагента/инсайдера
                update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
@@ -6262,29 +6263,29 @@ where substr(r.kodp,1,3) = '083'
 --delete from rnbu_trace where rnk in (94915201,94915401);
 
 delete from rnbu_trace r
-where r.nd in ( select r1.nd 
+where r.nd in ( select r1.nd
                 from rnbu_trace r1
                 where substr(r1.kodp,1,3)='125'
-                  and r1.znap <> 0 
-                  and not exists ( select 1 
+                  and r1.znap <> 0
+                  and not exists ( select 1
                                    from rnbu_trace r2
-                                   where r2.nd = r1.nd 
+                                   where r2.nd = r1.nd
                                      and substr(r2.kodp,4,10) = substr(r1.kodp,4,10)
                                      and substr(r2.kodp,1,3) in ('118','119','121','123')
                                      and r2.znap <> '0'
                                  )
               )
-and substr(r.kodp,1,3) not in ('010', '019', '021', '025', '040', '041', '042', '050', '055', 
+and substr(r.kodp,1,3) not in ('010', '019', '021', '025', '040', '041', '042', '050', '055',
                                '060', '080', '082', '085', '090', '091', '092', '110', '113');
 
 delete from rnbu_trace r
-where r.rnk in ( select r1.rnk 
+where r.rnk in ( select r1.rnk
                 from rnbu_trace r1
                 where substr(r1.kodp,1,3)='010'
-                  and r1.znap is not null 
-                  and not exists ( select 1 
+                  and r1.znap is not null
+                  and not exists ( select 1
                                    from rnbu_trace r2
-                                   where r2.rnk = r1.rnk 
+                                   where r2.rnk = r1.rnk
                                      and substr(r2.kodp,1,3) in ('118','119','121','123','125')
                                      and r2.znap <> '0'
                                  )
@@ -6375,7 +6376,7 @@ then
    for k in ( select r.kodp, r.znap, r.nls, r.acc
               from rnbu_trace r, accounts a
               where substr(r.kodp, 1, 3) = '122'
-                and substr(r.kodp,18,4) in ('2046')
+                and substr(r.kodp,18,4) in ('2046', '2396')
                 and r.acc = a.acc
                 and a.tip = 'SDF'
             )
