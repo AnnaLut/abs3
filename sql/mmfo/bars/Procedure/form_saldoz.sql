@@ -4,10 +4,10 @@ CREATE OR REPLACE PROCEDURE BARS.FORM_SALDOZ
 ) IS
   /**
   <b>FORM_SALDOZ</b> - перенакопиченн€ коригуючих оборот≥в за зв≥тну дату
-  %param p_dat31 - 
-  %param p_acc   - 
-  
-  %version 3.0
+  %param p_dat31 -
+  %param p_acc   -
+
+  %version 3.1  16/01/2019
   %usage   перенакопиченн€ м≥с€чних виправних оборот≥в.
   */
   l_dat    DATE := trunc( z_dat31, 'MM' ); -- 1e число зв≥тного м≥с€ц€
@@ -15,19 +15,19 @@ CREATE OR REPLACE PROCEDURE BARS.FORM_SALDOZ
   l_dat0   DATE := add_months( l_dat, 1 );
   l_dat1   DATE := last_day(l_dat0);
 BEGIN
-  
+
   bars_audit.info( $$PLSQL_UNIT||': Start '  ||to_char(l_dat, 'dd/mm/yyyy')||' по '||to_char(z_dat31,'dd/mm/yyyy') );
-  bars_audit.info( $$PLSQL_UNIT||': обороти '||to_char(l_dat0,'dd/mm/yyyy')||' < ' ||to_char(l_dat1, 'dd/mm/yyyy') ); 
-  
+  bars_audit.info( $$PLSQL_UNIT||': обороти '||to_char(l_dat0,'dd/mm/yyyy')||' < ' ||to_char(l_dat1, 'dd/mm/yyyy') );
+
   if ( p_acc is null )
   then
-      
-    bars_audit.info( $$PLSQL_UNIT||': for all accounts.' ); 
+
+    bars_audit.info( $$PLSQL_UNIT||': for all accounts.' );
 
     delete SALDOZ
      where FDAT = l_dat;
-    
-    insert 
+
+    insert
       into SALDOZ
          ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
     select /*+ FULL( o ) */ o.KF, l_dat, o.ACC
@@ -44,10 +44,11 @@ BEGIN
         on ( d.KF = o.KF and d.REF = o.REF )
      where o.FDAT between l_dat0 AND l_dat1
        and o.SOS  = 5
-       and d.VDAT = z_dat31 
+       and d.VDAT = z_dat31
        and d.VOB  = any ( 96, 99 )
+       and d.tt not like 'ZG%'
      group BY o.KF, o.ACC;
-    
+
     insert
       into SALDOZ
          ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
@@ -66,15 +67,15 @@ BEGIN
      WHERE s.FDAT = l_dat
        and a.NBS Is Null
      group by s.KF, s.FDAT, a.ACCC;
-     
+
   else
-    
-    bars_audit.info( $$PLSQL_UNIT||': for acc = '||to_char(p_acc) ); 
-    
+
+    bars_audit.info( $$PLSQL_UNIT||': for acc = '||to_char(p_acc) );
+
     delete SALDOZ
      where FDAT = l_dat
        and ACC  = p_acc;
-    
+
     insert
       into SALDOZ
          ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
@@ -93,17 +94,14 @@ BEGIN
      where o.FDAT between l_dat0 AND l_dat1
        and o.SOS  = 5
        and o.ACC  = p_acc
-       and d.VDAT = z_dat31 
+       and d.VDAT = z_dat31
        and d.VOB  = any ( 96, 99 )
+       and d.tt not like 'ZG%'
      group BY o.KF, o.ACC;
-    
+
   end if;
 
   bars_audit.info( $$PLSQL_UNIT||': Finish (сформовано '||to_char(sql%rowcount)||' запис≥в).' );
 
 END FORM_SALDOZ;
 /
-
-show err
-
-grant execute on FORM_SALDOZ to BARS_ACCESS_DEFROLE;
