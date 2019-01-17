@@ -14,8 +14,14 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 27/11/2018 (16/11/2018)
+% VERSION     : 17/01/2019 (27/11/2018)
 %------------------------------------------------------------------------
+% 17/01/2019 - із показників 01, 02, 04 видаляємо банки нерезиденти
+%              у яких ALT_BIC=('8260000013', '8400000053', '8400000054')
+%              і у яких рейтинг 'BBB', 'BBB+','BBB-','Baa1','Baa2','Baa3'
+%              або починається на 'A', 'T', 'F' 
+%              і для яких включилися указані бал.рахунки
+%              добавлено формування показника B400000
 % 27/11/2018 - изменено формирование части кода показателя "NNNN" для 
 %              показателя 05
 % 16/11/2018 - изменено формирование части кода показателя "NNNN" для 
@@ -1939,6 +1945,25 @@ BEGIN
     where (kodp like '01%' or kodp like '02%' or kodp like '61%')
       and rnk = 90092301;
 
+    -- блок для удаления банков нерезидентов с необходимыми значениями ALT_BIG 
+    -- и с необходимыми рейтингами и с указанными бал.счета
+    delete from rnbu_trace
+    where (kodp like '01%' or kodp like '02%' or kodp like '04%')
+      and rnk in ( select rnk from customer 
+                   where codcagent = 2  
+                     and rnk in ( select rnk from custbank 
+                                  where alt_bic in ('8260000013', '8400000053', '8400000054')
+                                    and ( trim(rating) in ('BBB', 'BBB+','BBB-','Baa1','Baa2','Baa3')  or
+                                          substr(trim(rating),1,1) in ('A', 'T', 'F') )
+                                )
+                 ) 
+      and rnk in ( select rnk from accounts where nbs in ('1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
+                                                          '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
+                                                          '1532', '1533', '1535', '1536', '1538', 
+                                                          '1542', '1543', '1545', '1546', '1548', '1549', 
+                                                          '1600', '1607', '1609')
+                 ) ;
+    
     nnnn01_ := 0;
     rnk_ := 0;
     ddd_ := '00';
@@ -2029,6 +2054,19 @@ BEGIN
     --      VALUES (k.nls, k.kv, dat_, kodp_, k.znap, k.rnk, k.acc);
     --   end loop;
     --end if;
+
+    -- 17/01/2019  формування нового показника "B4"
+    IF dat_ >= to_date('18012019','ddmmyyyy') THEN
+       select sum(znap)
+          into s04_
+       from rnbu_trace 
+       where kodp like '04%';
+
+       if s04_ > ROUND (sum_k_ * k1_, 0) then
+          insert into rnbu_trace(nls, odate, kodp, znap )
+          VALUES ('показник B4', dat_, 'B400000', to_char(s04_ - ROUND (sum_k_ * k1_, 0)));
+       end if; 
+    END IF;
 
     IF type_ = 0
     THEN
