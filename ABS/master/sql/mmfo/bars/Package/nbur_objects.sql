@@ -1,4 +1,4 @@
-create or replace package NBUR_OBJECTS 
+CREATE OR REPLACE PACKAGE BARS.NBUR_OBJECTS
 is
 
   --
@@ -17,7 +17,7 @@ is
   -- body_version - возвращает версию тела пакета
   function body_version return varchar2;
 
-  -- 
+  --
   procedure SET_CRN_VRSN
   ( p_vrsn_id      in     nbur_lst_versions.version_id%type
   );
@@ -480,7 +480,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 20.2  2018.06.12';
+  g_body_version  constant varchar2(64) := 'version 20.3  2019.01.04';
   fmt_dt          constant varchar2(10) := 'dd.mm.yyyy';
   fmt_tm          constant varchar2(21) := 'dd.mm.yyyy hh24:mi:ss';
 
@@ -604,11 +604,11 @@ is
   begin
     select count(1)
       into l_qty
-      from DBA_TABLESPACES 
+      from DBA_TABLESPACES
      where TABLESPACE_NAME like 'BRS_DM%';
     return case l_qty when 0 then FALSE else TRUE end;
   end CHK_DM_TBLSPS;
-  
+
   --
   --
   --
@@ -808,7 +808,7 @@ is
       копіювання статистики
       з субпартиції архівної    таблиці NBUR_DM_%_ARCH
       в партицію    оперативної таблиці NBUR_DM_%
-      1) 
+      1)
 */
       l_ptsn_nm := 'P_'||p_kf;
 
@@ -1304,7 +1304,7 @@ is
             using p_vrsn_id;
           end if;
         else
-          execute immediate 'insert /*+ APPEND */'
+          execute immediate 'insert '
                 ||chr(10)|| '  into '||l_arc_tab_nm
                 ||chr(10)|| '     ( '||l_arc_col_lst||' )'
                 ||chr(10)|| 'select /*+ PARALLEL( 8 ) */ '||l_obj_col_lst
@@ -1446,7 +1446,7 @@ is
   end CHECK_OBJECT_EXISTENCE;
 
   --
-  -- перевірка 
+  -- перевірка
   --
   function DATA_RELEVANCE
   ( p_arch_obj_id  in     nbur_lst_objects.object_id%type
@@ -2507,7 +2507,7 @@ is
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
-    if ( trunc(sysdate) <= dat_next_u(trunc(sysdate,'MM'),6) )
+    if ( trunc(sysdate) <= dat_next_u(trunc(sysdate,'MM'),10) )
     then -- в період формування коригуючих проводок (по 6-й роб. день міс.) знімки переформовуємо безумовно
       CRT_MO_SNPST
       ( p_report_date => p_report_date
@@ -5780,7 +5780,7 @@ is
            , DE#C9, D1#D3, D1#F1, D1#27, D1#39, D1#44, D1#73, D2#73
            , D020,  BM__C, KURS,  D1#2D, KOD_B, KOD_G, KOD_N, TRF_R, TRF_D
            , DOC_T, DOC_A, DOC_S, DOC_N, DOC_D, REZID, NATIO, OKPO,  POKPO, OOKPO )
-      select /*+ PARALLEL( 16 ) */ 
+      select /*+ PARALLEL( 16 ) */
              dtl.REPORT_DATE, dtl.KF, dtl.REF
            , D1#70, D2#70, D3#70, D4#70, D5#70, D6#70, D7#70, D8#70, D9#70
            , DA#70, DB#70, DD#70, D1#E2, D6#E2, D7#E2, D8#E2, D1#E9, D1#C9, D6#C9
@@ -5918,7 +5918,7 @@ is
            , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
            , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
            , ASP_K, ASP_N, ASP_S )
-      select /*+ PARALLEL( 16 ) */ 
+      select /*+ PARALLEL( 16 ) */
              dtl.REPORT_DATE, dtl.KF, dtl.REF
            , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
            , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
@@ -6922,7 +6922,7 @@ $end
         begin
           DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
         exception
-          when e_task_not_found 
+          when e_task_not_found
           then null;
         end;
 
@@ -6953,7 +6953,7 @@ $end
         begin
           DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
         exception
-          when e_task_not_found 
+          when e_task_not_found
           then null;
         end;
 
