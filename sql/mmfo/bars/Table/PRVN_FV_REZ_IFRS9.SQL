@@ -66,12 +66,6 @@ end;
 /
 PROMPT ADD COMMENTS AND GRANTS FOR PRVN_FV_REZ_IFRS9
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON PRVN_FV_REZ_IFRS9 TO BARS_ACCESS_DEFROLE;
-grant SELECT                         on PRVN_FV_REZ_IFRS9 to BARSREADER_ROLE;
-grant SELECT                         on PRVN_FV_REZ_IFRS9 to BARS_DM;
-grant SELECT                         on PRVN_FV_REZ_IFRS9 to START1;
-grant SELECT                         on PRVN_FV_REZ_IFRS9 to UPLD;
-
 COMMENT ON COLUMN BARS.PRVN_FV_REZ_IFRS9.ID_CALC_SET          IS 'Ідентифікатор розрахунку';
 COMMENT ON COLUMN BARS.PRVN_FV_REZ_IFRS9.ID_CONTRACT          IS 'Ідентифікатор договору';
 COMMENT ON COLUMN BARS.PRVN_FV_REZ_IFRS9.ID_COMMITMENT        IS 'Ідентифікатор генерального договору';
@@ -117,3 +111,19 @@ end;
 /
 COMMENT ON COLUMN PRVN_FV_REZ_IFRS9.DELTA_FV_CCY IS 'Переоцінка';
 
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_PRVN_FV_REZ_IFRS9 ON BARS.PRVN_FV_REZ_IFRS9 (ID_CALC_SET, ID_BRANCH) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON PRVN_FV_REZ_IFRS9 TO BARS_ACCESS_DEFROLE;
+grant SELECT                         on PRVN_FV_REZ_IFRS9 to BARSREADER_ROLE;
+grant SELECT                         on PRVN_FV_REZ_IFRS9 to BARS_DM;
+grant SELECT                         on PRVN_FV_REZ_IFRS9 to START1;
+grant SELECT                         on PRVN_FV_REZ_IFRS9 to UPLD;

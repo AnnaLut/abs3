@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/DEB_351.sql =========*** Run *** =
 PROMPT ===================================================================================== 
@@ -9,8 +11,8 @@ PROMPT *** Create  procedure DEB_351 ***
 
 /*   Розрахунок кредитного ризику по дебіторці
      -----------------------------------------
-    Версия 7.7      23-10-2018  29-01-2018  25-10-2017  03-10-2017  28-09-2017  25-09-2017  
-
+    Версия 7.8      16-01-2019  29-01-2018  25-10-2017  03-10-2017  28-09-2017  25-09-2017  18-09-2017 11-07-2017  16-05-2017   
+14) 16.01.2019(7.8) - (ND_VAL через ОКПО)
 13) 23-10-2018(7.7) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 12) 29-01-2018(7.6) - Определение типа XOZ через ф-цию f_tip_xoz (если нет в картотеке заносится в таблицу rez_xoz_tip)
 11) 25-10-2017(7.5) - Хоз.дебиторка из архива XOZ_REF ==> XOZ_REF_ARC
@@ -48,7 +50,7 @@ PROMPT *** Create  procedure DEB_351 ***
  l_fin23  number;  l_kol  number;  l_CR      number;  l_EADQ    number ;  l_CRQ  number ;  l_RCQ  NUMBER;  l_xoz_new  number;
  l_pd_0  INTEGER;  l_nd  integer;  l_MAX    integer;  l_deb     integer;  l_LGD  integer;
 
- l_Text  varchar2(250) := '' ;  l_deb_bez varchar2(1) := '0';  l_txt  varchar2(1000);  l_tx  varchar2(30);  l_RNK_FIN char(1);
+ l_Text  varchar2(250) := '' ;  l_deb_bez varchar2(1) := '0';  l_txt  varchar2(1000);  l_tx  varchar2(30);  l_RNK_FIN char(1); l_kf char(6);
 
  l_dat31  date;  l_sdate  date;  l_wdate  date;
 
@@ -62,6 +64,8 @@ begin
    else            l_tx := ' (госп.з модуля) ';
    end if;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало Дебиторка 351' || l_tx );
+   l_kf := sys_context('bars_context','user_mfo');
+   dbms_application_info.set_client_info('CR_351_JOB:'|| l_kf ||':Дебіторка');
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    pul_dat(to_char(p_dat01,'dd-mm-yyyy'),'');
    --delete from REZ_CR where tipa=17 and fdat = p_dat01;
@@ -104,7 +108,7 @@ begin
             union  all
             select 17 tipa,decode(c.custtype,3,3,2) custtype, c.custtype cus, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK,
                    c.PRINSIDER, c.COUNTRY, c.ISE, nvl(nbs,substr(nls,1,4)) nbs, a.tip, a.nls, a.kv, a.acc, a.ob22, -ost_korr(a.acc,l_dat31,null,a.nbs) bv,
-                   a.rnk, a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, a.acc nd, null sdate,1 deb, F_RNK_gcif (c.okpo, c.rnk) okpo
+                   a.rnk, a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, a.acc nd, null sdate,1 deb, F_RNK_gcif (c.okpo, c.rnk) okpo  
             from   accounts a, cp_deal cp, customer c
             where  (cp.active=1 or cp.active = -1 and cp.dazs >= p_dat01) and substr(a.nls,1,4)='3541'  and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and  a.acc in  (cp.accr,cp.acc) and
                    a.rnk = c.rnk  and a.acc not in ( select accc from accounts where nbs is null  and  substr(nls,1,4)='3541'  and accc is not null);
@@ -112,7 +116,7 @@ begin
          OPEN c0 FOR
             select 21 tipa, decode(c.custtype,3,3,2) custtype, c.custtype cus, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK,
                    c.PRINSIDER, c.COUNTRY, c.ISE, a.nbs, a.tip, a.nls, a.kv, a.acc, a.ob22, x.s0 bv,a.rnk, a.branch,
-                   DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, x.id nd, x.fdat sdate, d.deb, F_RNK_gcif (c.okpo, c.rnk) okpo
+                   DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, a.mdate wdate, x.id nd, x.fdat sdate, d.deb, F_RNK_gcif (c.okpo, c.rnk) okpo  
             from   xoz_ref_arc x, accounts a, customer c, rez_deb d
             where  x.mdat = p_dat01 and a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (x.datz >= p_dat01 or x.datz is null) and s0<>0 and s<>0 and x.acc=a.acc
                    and  ( f_tip_xoz(p_dat01, a.acc, a.tip) in ('XOZ','W4X')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
@@ -143,7 +147,7 @@ begin
 
             l_ddd := f_ddd_6B(k.nbs);
             --l_tip_fin := f_get_nd_tip_fin (k.nd, p_dat01,k.rnk, k.tipa);
-            l_tip_fin := f_get_nd_val_n ('TIP_FIN',k.nd, p_dat01, k.tipa, k.rnk);
+            l_tip_fin := f_get_nd_val_n ('TIP_FIN',k.nd, p_dat01, k.tipa, k.okpo);
              if l_tip_fin is null THEN
                if k.deb in (1,2) THEN l_tip_fin := 0; end if;
                  -- если не нашло реальный TIP_FIN нельзя переопеределять как ЮЛ или ФЛ (причины: Изменили РНК, внесли остаток корректирующими)
@@ -160,8 +164,8 @@ begin
             if l_RNK_FIN = '0' THEN l_MAX := 0 ; -- не враховувати в єдину категорію
             end if;
 
-            l_kol    := f_get_nd_val_n ('KOL', k.nd  , p_dat01  , k.tipa, k.rnk);
-            l_fin    := f_rnk_maxfin (p_dat01, k.okpo, l_tip_fin, k.nd  , l_max);
+            l_kol    := f_get_nd_val_n ('KOL', k.nd, p_dat01, k.tipa, k.okpo);
+            l_fin    := f_rnk_maxfin (p_dat01, k.okpo , l_tip_fin, k.nd, l_max);
             --logger.info('XOZ 1 : acc = ' || k.acc || 'k.deb = ' || k.deb || ' k.nbs = ' || k.nbs  ) ;
             case WHEN k.deb = 1 and l_s250 = 8 THEN l_deb := 3; l_fin:=1;
             else                                    l_deb := k.deb;
@@ -194,12 +198,12 @@ begin
             l_LGD  := 1;
             l_CR   := round(greatest(0,l_pd * (l_EAD - (l_CV + l_RC))),2);
             l_CRQ  := p_icurval(k.kv,L_CR*100,l_dat31)/100;
-            INSERT INTO REZ_CR (fdat   , RNK  , NMK   , ND   , SDATE   , KV    , NLS   , ACC      , EAD   , EADQ   , FIN  , PD      , BV     ,
-                                CR     , CRQ  , TIPA  , bv02 , bv02q   , s180  , pd_0  , rz       , RC    , RCQ    , nbs  , custtype, BVQ    ,
-                                okpo   , LGD  , s250  , grp  , istval  , s080  , ddd_6B, tip_fin  , ob22  , wdate  , tip  , KOL     , FIN23  , TEXT  )
-                        VALUES (p_dat01, k.RNK, k.NMK , k.nd , l_sdate , k.kv  , k.nls , k.acc    , l_ead , l_eadq , l_fin, l_pd    , l_ead  ,
-                                l_CR   , l_CRQ, k.tipa, l_ead, l_eadq  , l_s180, l_pd_0, k.rz     , l_RC  , l_RCQ  , k.nbs, k.cus   , l_eadq ,
-                                k.okpo , l_LGD, l_s250, l_grp, l_istval, l_s080, l_ddd , l_tip_fin, k.ob22, k.wdate, k.tip, l_kol   , l_fin23, l_TEXT || ' Фин.= ' || l_fin);
+            INSERT INTO REZ_CR (fdat   , RNK   , NMK   , ND      , SDATE   , KV    , NLS   , ACC      , EAD   , EADQ   , FIN  , PD      , BV    ,
+                                CR     , CRQ   , TIPA  , bv02    , bv02q   , s180  , pd_0  , rz       , RC    , RCQ    , nbs  , custtype, BVQ   ,
+                                okpo   , LGD   , s250  , grp     , istval  , s080  , ddd_6B, tip_fin  , ob22  , wdate  , tip  , KOL     , FIN23   , TEXT  )
+                        VALUES (p_dat01, k.RNK , k.NMK , k.nd    , l_sdate , k.kv  , k.nls , k.acc    , l_ead , l_eadq , l_fin, l_pd    , l_ead ,
+                                l_CR   , l_CRQ , k.tipa, l_ead   , l_eadq  , l_s180, l_pd_0, k.rz     , l_RC  , l_RCQ  , k.nbs, k.cus   , l_eadq,
+                                k.okpo , l_LGD , l_s250, l_grp   , l_istval, l_s080, l_ddd , l_tip_fin, k.ob22, k.wdate, k.tip, l_kol   , l_fin23 , l_TEXT || ' Фин.= ' || l_fin);
          end if;
       END loop;
       z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Дебиторка 351 ');

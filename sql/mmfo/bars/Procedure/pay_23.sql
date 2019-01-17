@@ -84,12 +84,9 @@ end;
 ---------------------------------------
 
 begin
-
-   if MODE_ = 1 THEN
-      --logger.info('PAY23 0 : mode_ = ' || mode_) ;
-      DELETE FROM srezerv_errors;
-      commit;
-   end if;
+   dbms_application_info.set_client_info(':'|| gl.aMfo ||':8) ARE: Формування проводок по МСФЗ-9');
+   DELETE FROM srezerv_errors;
+   commit;
 
    IF P_DAT01_ IS NULL then  dat01_ := ROUND(SYSDATE,'MM');
    else                      dat01_ := p_dat01_;
@@ -158,6 +155,7 @@ begin
          raise_application_error(-20003,'Після розрахунку забезпечення не виконано 1.1. Розрахунок кредитного ризику по постанові 351 на '||dat01_);
       end if;
 
+ /*
       begin
          select max(row_id), user_id into l_row_id18,l_user_id from rez_log
          where  fdat=dat01_ and kod=-18  and rownum=1 group by user_id ;
@@ -167,6 +165,7 @@ begin
             raise_application_error(-20004,'Не виконан 98. Макет проводок на '||dat01_);
          end if;
       END;
+*/
       --выборка счетов для которых нет информации в справочнике
       insert into srezerv_errors (dat,userid, error_type, nbs, s080, custtype, kv, branch,  sz, error_txt, nbs_7f)
       select dat01_, user_id, 3, r.nbs||'/'||r.ob22, null,null ,r.kv,
@@ -206,7 +205,7 @@ begin
       update rez_protocol set crc = null where dat=dat31_;
    END IF;
    -- определение параметров
-   rezerv_23(dat01_);
+   --rezerv_23(dat01_); --  делается в распределении резерва
    -- 
    begin
       for k in ( select * from accounts where tip = 'REZ' and ostc < 0 and pap <> 1 ) 

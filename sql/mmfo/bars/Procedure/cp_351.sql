@@ -40,7 +40,7 @@ CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0
  l_BVQ      NUMBER ;  l_bv02    NUMBER ;  l_BV02q     NUMBER ;  cp_acc_     number ;  cp_accp_  number ;  cp_accd_   number ;  
  cp_accs_   number ;  cp_accr_  number ;  cp_accr2_   number ;  l_accexpr   number ;  l_accr3   number ;  l_RCQ      number ;  
  l_dv       NUMBER ;  l_CR_LGD  NUMBER ;  l_RZ        NUMBER ;  l_zal_lgd   NUMBER ;  l_fin_351 NUMBER ;  l_pd_351   NUMBER ;  
- l_fin_okpo NUMBER ;  l_s       NUMBER ;  l_lgd_51    NUMBER := 0.3;
+ l_fin_okpo NUMBER ;  l_s       NUMBER ;  l_lgd_51    NUMBER ;
 
  VKR_  varchar2(3);  l_txt  varchar2(1000); l_vkr  varchar2(50); l_nbs  char(4); l_kf varchar2(6);
 
@@ -54,7 +54,8 @@ begin
    dbms_application_info.set_client_info('CR_351_JOB:'|| l_kf ||': ÷ѕ 351');
    l_tipa := 15;
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день мес€ца
-   delete from REZ_CR where fdat=p_Dat01 and tipa = l_tipa;
+   --delete from REZ_CR where fdat=p_Dat01 and tipa = l_tipa;
+   l_lgd_51 := GET_REZ_PAR( 'LGD' );
    for d in ( SELECT a.rnk, a.acc, a.kv, d.id,  d.REF,  d.erat, a.nls, a.tobo, d.accs,kk.vncrr,kk.emi,kk.fin23,kk.cp_id,kk.datp,kk.dox,
                      c.custtype, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, 
                      DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo  

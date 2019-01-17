@@ -1,9 +1,12 @@
-create or replace package PRVN_FLOW
+CREATE OR REPLACE PACKAGE BARS.PRVN_FLOW
 is
+/*  
+  27.12.2018 Сухова. Для отладки Добавила  procedure D_XXX   ( p_dat01 date, p_ND number ) ; -- Обработка витрины по 1 дог
+*/
   --
   -- constants
   --
-  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'version 3.5  30.08.2018';
+  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'version 3.6  27.12.2018';
   G_SHOW_LOG                 BOOLEAN      := false;
 
   --
@@ -22,7 +25,7 @@ is
   type c_cur_type is ref cursor return r_cur_type;
 
   type r_shd_type is record ( ND        number(38)  -- Agreement id ( AGRM_ID )
-                            , FDAT      date        -- 
+                            , FDAT      date        --
                             , LMT_INPT  number(24)  -- limit input  ( LMT_AMNT_IN )
                             , LMT_OTPT  number(24)  -- limit output ( LMT_AMNT_OUT )
                             , SS        number(24)  --
@@ -37,7 +40,7 @@ is
                             );
 
   type t_shd_type is table of r_shd_type;
-  
+
   --
   -- cursors
   --
@@ -81,15 +84,15 @@ is
   , p_dat01 date
   , p_ZO    int
   ) return number;
-  
+
   --
-  -- получение дельты PV по дате ректркутуризации 
+  -- получение дельты PV по дате ректркутуризации
   --
   function F_DEL_PV
   ( p_id   number
   , p_Rdat date
   ) return number;
-  
+
   --
   -- получение номера лиц.счета
   --
@@ -97,7 +100,7 @@ is
   ( p_nd   number
   , p_tip  accounts.tip%type
   ) return varchar2;
-  
+
   --
   -- =1 - берем с архива ND_ACC_ARC
   -- =0 - берем прямо из ND_ACC
@@ -116,12 +119,13 @@ is
   ------------------------------------
   procedure bal0    ( p_mode int, p_nd number, p_tip accounts.tip%type, p_dat01 date, p_ZO int )           ; -- балансировка - по дон. по типу счета
   ------------------------------------
-  procedure p60     ( p_tipA IN int, p_ND IN number, p_acc_sna IN number, a6 OUT accounts%rowtype ) ;  
+  procedure p60     ( p_tipA IN int, p_ND IN number, p_acc_sna IN number, a6 OUT accounts%rowtype ) ;
   procedure u_SNA   ( p_dat   date ) ; -- урегулирование НЕВИЗНАНИХ. Уменьшение SNA := LEAST ( SNA, -(SN+SPN) )
+  procedure D_XXX   ( p_dat01 date, p_ND number ) ; -- Обработка витрины по 1 дог
   procedure D_SNA   ( p_dat01 date ) ; -- SNA от Делойта
   procedure heir39  ( p_dat01 date ) ; -- наследование рез-МСФЗ от промлого месяца
-  procedure opl     ( oo IN OUT oper%rowtype ) ; 
-  function  BAD_CP  ( p_OSA VARCHAR2, z_dat01 date )  return varchar2 ;  
+  procedure opl     ( oo IN OUT oper%rowtype ) ;
+  function  BAD_CP  ( p_OSA VARCHAR2, z_dat01 date )  return varchar2 ;
   procedure div39   ( p_mode int, p_dat01 date ); -- разделение рез-39 по КД в НБУ-23-РЕЗ.
   procedure del0    ( p_mode int)               ; -- отладочная процедура очистки всех таблиц
   procedure FROM_SRR_XLS (p_ID_CALC_SET srr_xls.id_calc_set%type);
@@ -130,20 +134,20 @@ is
 -- ( p_dat01 date
 -- , p_mode  int     default 0
 -- , p_nd    number  default null );
--- 
+--
 -- -- Построение ден.потоков по требованию
 -- procedure add2( p_mode int, p_id number, p_dat01 date, p_zo int  );
--- 
--- -- Построение ден.потоков по КП 
--- procedure ADD2_SS ( x0 prvn_flow_deals_const%rowtype, 
---                     xx prvn_flow_deals_var%rowtype, 
---                     p_dat31 date, 
---                     p_dat01 date, 
+--
+-- -- Построение ден.потоков по КП
+-- procedure ADD2_SS ( x0 prvn_flow_deals_const%rowtype,
+--                     xx prvn_flow_deals_var%rowtype,
+--                     p_dat31 date,
+--                     p_dat01 date,
 --                     p_fla   int ,  p_fl_nd_acc int , p_zo int );
 
   ---- Для изменений во вюшке-гляделке но НОСТРО (по счетам !)------------------------------------
   procedure nos_ins( p_kv int, p_nls varchar2 );
-  
+
   procedure nos_upd( p_nd    number, p_sos   int, p_CC_ID varchar2, p_SDATE date, p_WDATE   date , p_LIMIT number
                    , p_FIN23 int   , p_OBS23 int, p_KAT23 int     , p_pd    int , p_FIN_351 int );
   procedure nos_del( p_nd number);
@@ -167,7 +171,7 @@ is
   result_cache;
 
   --
-  -- 
+  --
   --
   function GET_ADJ_SHD
   ( p_cur              prvn_flow.c_cur_type
@@ -192,11 +196,18 @@ end PRVN_FLOW;
 
 show errors;
 
-----------------------------------------------------------------------------------------------------
-
-create or replace package body PRVN_FLOW
+CREATE OR REPLACE PACKAGE BODY BARS.PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 11.5  30.08.2018';
+/*
+
+ 09.01.2019 Sta разове вирівнювання зал грош.дисконту по залученням
+ 27.12.2018 Sta Поменяль порядокобработки полей S(i) , S(i+1) по дисконтам
+ 22.12.2018 Sta +Vika Амортизация по БС=162%, 270%, 360% (COBUDWHIFRS-11)
+*/
+
+  g_body_version  constant varchar2(64) := 'version 11.6  09.01.2019';
+
+-- 25.09.2018(11.6) Sta Добавила во все эксепшены gl.aMfo
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -280,7 +291,7 @@ is
 begin
   -- GL.PL_DAT( p_bDAT );
   set_bankdate(p_bDAT);
-  PRVN_FLOW.SeND_MSG( p_txt => 'Установлено ЛОКальну Банк.Дату='||to_char(p_bDAT,'dd.mm.yyyy') );
+  --PRVN_FLOW.SeND_MSG( p_txt => 'Установлено ЛОКальну Банк.Дату='||to_char(p_bDAT,'dd.mm.yyyy') );
 end LOC_DAT;
 
 -----------------------------------------------------------
@@ -290,9 +301,9 @@ procedure F02 ( p_dat31 date ) is     l_dat31  date ;  l_msg varchar(250) ;
           end if;
 
      l_msg:= '7 ) #02 *Формування #02 '||l_dat31;
-     PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
+     --PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
      P_F02_NC ( l_dat31 ) ;
-     PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
+     --PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
 
  end F02;
 
@@ -301,9 +312,9 @@ procedure DRAPS02( p_dat31 date  )  is      l_dat31 date;
  begin
      l_dat31 := NVL ( p_dat31, trunc( z23.DAT_END,'M' ) ) ;
      l_msg:= '*) SNP: Пере-Формування місячного знімоку '||l_dat31;
-     PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
+     --PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
      MDRAPS ( l_dat31 ) ;
-     PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
+     --PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
  end DRAPS02 ;
 
 procedure REC_23  ( p_dat01 date)  is
@@ -311,7 +322,7 @@ procedure REC_23  ( p_dat01 date)  is
    l_dat31   date        ; l_msg   varchar2(250);
 begin
    l_msg:= '3) CR-351: *Пере-Формування Кредитного ризику НБУ-351';
-   PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
+   --PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
    l_res_kf := trim('RESERVE'||sys_context('bars_context','user_mfo'));
    -- защита от двойного старта
    SYS.DBMS_SESSION.CLEAR_IDENTIFIER;
@@ -320,14 +331,14 @@ begin
 
    begin
       select sid into sid_ from v$session    where  sid=sid_ and sid<>SYS_CONTEXT ('USERENV', 'SID');
-      raise_application_error(-20000,'Формування резерву вже виконується SID '|| sid_);
+      raise_application_error(-20000,gl.aMfo||':Формування резерву вже виконується SID '|| sid_);
    exception  when no_data_found THEN NULL;
    end;
 
    l_dat31 := p_dat01-1 ;
-   PRVN_FLOW.SeND_MSG (p_txt => 'BEG DRAPS:'||l_dat31||l_msg );
+   --PRVN_FLOW.SeND_MSG (p_txt => 'BEG DRAPS:'||l_dat31||l_msg );
    MDRAPS ( l_dat31 ) ;
-   PRVN_FLOW.SeND_MSG (p_txt => 'END DRAPS:'||l_dat31||l_msg );
+   --PRVN_FLOW.SeND_MSG (p_txt => 'END DRAPS:'||l_dat31||l_msg );
 
    -------------------------
    -- установка флага
@@ -350,7 +361,7 @@ begin
    gl.setp(l_res_kf,'',NULL);
    COMMIT;
 
-   PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
+   --PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
 
 -------------------------------------------------------------------
 end REC_23;
@@ -567,30 +578,22 @@ begin
 
 end u_SNA;
 
+procedure D_XXX   ( p_dat01 date, p_ND number ) IS -- Обработка витрины по 1 дог
+begin pul.PUT( 'D_XXX', to_char (p_ND)  ); 
+      PRVN_FLOW.D_SNA ( p_Dat01);
+end D_XXX;
+
 procedure D_SNA  ( p_dat01 date ) is -- SDM + SDF + SDI  + SDA  + SNA + SRR от Делойта
--- 06.07.2018 15.40
-      x_RI varchar2 (100);   
-      X1 TEST_PRVN_OSA%ROWtype ;   
-      p4_ int;   
+-- 27.12.2018 
+      x_ND number ;
+      x_RI varchar2 (100);
+      X1 TEST_PRVN_OSA%ROWtype ;
+      p4_ int;
       OO OPER%ROWTYPE ;
       ----------------------------
-/*
-FUNCTION OSTM ( p_acc number, -- ACC счета
-                p_dat date   -- ЛюБАЯ дата отч месяца MM.YYYY  (  от 01.MM.YYYY до    31.MM.YYYY )
-               )  return number  is  l_OSTM number ;  z_Dat date := TRUNC ( p_dat, 'MM'); 
--- получение остатки по месячному снимку данной даты или (при отсутствии снимка ) - на заданную датуостатка
-BEGIN
-    begin  select ost + CRkos-CRdos   into l_OSTM    From  AGG_MONBALS    where acc = p_ACC and fdat = z_Dat ;
-    EXCEPTION WHEN NO_DATA_FOUND THEN      l_OSTM := Fost( p_ACC , p_Dat);
-    End;
-    RETURN l_OSTM ;
-END ;    --- OSTM ;
-----------------
-*/
 
-
-procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPER%ROWtype)  iS    
-  aa accounts%rowtype   ; 
+procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPER%ROWtype)  iS
+  aa accounts%rowtype   ;
   a6 accounts%rowtype   ;
   l_acc number ;
   SR_   number ;
@@ -599,13 +602,14 @@ procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPE
   dd  cc_deal%rowtype   ;
   kk  cck_ob22%rowtype  ;
   kk9 cck_ob22_9%rowtype;
-  p4_ int ; 
+  p4_ int ;
+  l_PAP int ;
   --------------------
   procedure ACC2   is
     p4_ int;  b3_ char(3); b4_ char(1);    SPC specparam%rowtype;
   begin ------------------------  Определение/Открытие  счета SDF + SDM + SDI + SDA .... + SRR + SNA
     begin  select a.* into aa from accounts a, nd_acc n   where n.nd = dd.nd and n.acc= a.acc and a.tip = aa.tip  and a.dazs is null and a.kv = xx.kv ; --- and rownum = 1 ;
-    EXCEPTION WHEN NO_DATA_FOUND THEN 
+    EXCEPTION WHEN NO_DATA_FOUND THEN
          aa.ACC := NULL ;
     ---- SAVEPOINT do_op;
          BEGIN b3_ := substr(dd.prod,1,3) ;                                      aa.ob22 := null ;
@@ -620,16 +624,16 @@ procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPE
                aa.NBS := B3_ || b4_ ;
                aa.nls := Get_NLS( xx.KV, aa.NBS );
                aa.nms := Substr ( aa.nms||'Угода='|| dd.cc_id || ' від '|| to_char(dd.sdate, 'dd.mm.yyyy'), 1,50);
-    
+
                op_reg (1, XX.nd, 0, 0, p4_, dd.Rnk, aa.nls, xx.kv, aa.nms, aa.tip, gl.auid, aa.acc);
-    
+
                update accounts set DAOS = oo.VDAT , pap = 3, tobo = dd.branch,  mdate = dd.wdate where acc = aa.acc;
 
                If aa.ob22 is not null then Accreg.setAccountSParam(aa.Acc, 'OB22', aa.ob22 ); end if;
                select * into aa from accounts where acc= aa.acc;
                --спецпарам ------------------------------------------------------
                If AA.tip in ( 'SDM' , 'SDA' ,  'SDF') then           -- Все дисконты с одним и тем же об22 как и SDI
-                  begin select s.*  into spc   from specparam s, accounts a, nd_acc n  
+                  begin select s.*  into spc   from specparam s, accounts a, nd_acc n
                         where n.nd = XX.nd and n.acc = a.acc and a.tip ='SDI' and a.acc=s.acc and rownum = 1 ;
                         Delete from accountsW where acc = aa.acc ;  insert into accountsw (acc,tag,value) select aa.acc,tag,value from accountsw where acc = spc.acc ;
                         Delete from specparam where acc = aa.acc ;  spc.acc := aa.acc ;    insert into specparam values spc;
@@ -661,17 +665,17 @@ procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPE
 
 
   end if ;
-            
+
       -- EXCEPTION WHEN OTHERS THEN
-      --       ROLLBACK TO do_op;  
-      --       erm_ := null;  
-      --       deb.trap(SQLERRM, code_, erm_, status_); 
-      --       p_Err := 'Рах.'||aa.tip||'*'||Substr (erm_, 1,90) ;   
+      --       ROLLBACK TO do_op;
+      --       erm_ := null;
+      --       deb.trap(SQLERRM, code_, erm_, status_);
+      --       p_Err := 'Рах.'||aa.tip||'*'||Substr (erm_, 1,90) ;
       --       goto RET_ ;
          end ;
     END  ;  --    SAVEPOINT do_op;
     -----------------------------------
-    If aa.ACC is  NULL  then aa.nls := null ;  end if;  
+    If aa.ACC is  NULL  then aa.nls := null ;  end if;
     RETURN ;
   end ;    -- ACC2
   -----------------------------------
@@ -679,7 +683,7 @@ procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPE
   begin  a6.nls := null ; a6.acc := null ;
      If  p_Mode in (6,9) then -- ПРОЦЕНТНЫЕ ДОХ 60*  - Для невызнаныз + Амортизация всех дисконтов + Возникновение SDA
          begin select nbs6 into a6.nbs from NBS_SS_SD where NBS2 = substr(dd.prod,1,4);
-         EXCEPTION WHEN NO_DATA_FOUND  Then raise_application_error(-20000,'НЕ знайдено в NBS_SS_SD '||substr(dd.prod,1,4) );       
+         EXCEPTION WHEN NO_DATA_FOUND  Then raise_application_error(-20000,gl.aMfo||':НЕ знайдено в NBS_SS_SD '||substr(dd.prod,1,4) );
          end ;
 
          If    aa.tip ='SNA'  and aa.kv  = gl.baseval then a6.ob22 :=  kk.SD_N ;
@@ -687,20 +691,20 @@ procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPE
          ElsIf aa.kv  = gl.baseval                    then a6.ob22 :=  kk.SD_M ;
          else                                              a6.ob22 :=  kk.SD_J ;
          end if ;                                          a6.ob22 := NVL( a6.ob22, kk.SD_N );
-  
+
      Elsif p_Mode =  7 then -- Для переоценки
            a6.nbs  := NVL( Substr (kk9.R6R,1,4), '6224') ;   a6.ob22 := NvL( Substr (kk9.R6R,5,2), '02'   ) ; -- IS 'БС+Об22~6 кл.Переоц.~XLS' ??? R7R IS 'БС+Об22~7 кл.Переоц.~XLS';
-  
+
      Elsif p_Mode =  -1 then -- Для -S1
            If aa.kv = gl.baseVal then a6.nbs := Substr (kk9.S1NM,1,4);  a6.ob22 := Substr (kk9.S1NM,5,2); -- IS 'БС+Об22~NEW_FEE~мінус S1 грн~до спрв~FV_ADJ';
            Else                       a6.nbs := Substr (kk9.S1VM,1,4);  a6.ob22 := Substr (kk9.S1VM,5,2); -- IS 'БС+Об22~NEW_FEE~мінус S1 вал~до спрв~FV_ADJ';
            end if;
-  
+
      Elsif p_Mode =  +1 then -- Для +S1
            If aa.kv = gl.baseVal then a6.nbs := Substr (kk9.S1NP,1,4);  a6.ob22 := Substr (kk9.S1NP,5,2); -- IS 'БС+Об22~NEW_FEE~плюс S1 грн~до спрв~FV_ADJ';
            Else                       a6.nbs := Substr (kk9.S1VP,1,4);  a6.ob22 := Substr (kk9.S1VP,5,2); -- IS 'БС+Об22~NEW_FEE~плюс S1 вал~до спрв~FV_ADJ';
            end if;
-  
+
      Elsif p_Mode =  -3 then -- Для -S3
            If aa.kv = gl.baseVal then a6.nbs := Substr (kk9.S3NM,1,4);  a6.ob22 := Substr (kk9.S3NM,5,2); -- IS 'БС+Об22~NEW_FEE~мінус S3 грн~від модф~MODIF
            Else                       a6.nbs := Substr (kk9.S3VM,1,4);  a6.ob22 := Substr (kk9.S3VM,5,2); -- IS 'БС+Об22~NEW_FEE~мінус S3 вал~від модф~MODIF'
@@ -718,7 +722,7 @@ procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPE
              (select * from accounts where  nbs= a6.nbs and ob22 = a6.ob22 and dazs is null  order by decode (BRANCH, Substr(dd.BRANCH,1,15) ,1,2 ) )
              where rownum = 1 ;
 
-        EXCEPTION WHEN NO_DATA_FOUND  Then 
+        EXCEPTION WHEN NO_DATA_FOUND  Then
            OP_BS_OB1( PP_BRANCH => substr( dd.branch,1,15), P_BBBOO => a6.nbs||a6.ob22) ;
            a6.nls := nbs_ob22_null (nbs_  => a6.nbs,  ob22_ => a6.ob22,  p_branch => substr( dd.branch,1,15) ) ;
            If a6.nls is not null then select * into a6 from accounts  where kv = gl.baseval and nls = a6.nls   ; end if;
@@ -727,13 +731,13 @@ procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPE
      end if;
 
      If a6.nls is null then
-        raise_application_error(-20000, 'ND='||dd.ND||',prod='||dd.prod||',vidd='||dd.VIDD||',tip='||aa.TIP||',p_mode='||p_mode ||', a6.nbs='||a6.nbs||',a6.ob22='|| a6.ob22||'*');       
+        raise_application_error(-20000, gl.aMfo||':ND='||dd.ND||',prod='||dd.prod||',vidd='||dd.VIDD||',tip='||aa.TIP||',p_mode='||p_mode ||', a6.nbs='||a6.nbs||',a6.ob22='|| a6.ob22||'*');
      end if ;
-   
+
   end  ;  --- ACC6
   -------------------------------------------------------------------------------------------------
 
-procedure PROVODKA (x_RI varchar2, XX in out TEST_PRVN_OSA%ROWtype, OO in out OPER%ROWtype) is 
+procedure PROVODKA (x_RI varchar2, XX in out TEST_PRVN_OSA%ROWtype, OO in out OPER%ROWtype) is
   l_comm varchar2(250);
   begin  oo.ref := null ;
     iF OO.S <> 0 and l_comm is null then
@@ -745,7 +749,7 @@ procedure PROVODKA (x_RI varchar2, XX in out TEST_PRVN_OSA%ROWtype, OO in out OP
 
 --     SAVEPOINT do_XXX;
        declare	code_ INTEGER ;  Erm_ VARCHAR2 (1000);  status_	VARCHAR2 (1000) ;
-       BEGIN 
+       BEGIN
           If ABS(oo.s) < 1 then RETURN ; end if ;
           gl.ref (oo.REF);
           gl.in_doc3 (ref_ => oo.REF  , tt_  => oo.tt  , vob_ => oo.vob ,   nd_ =>oo.nd   , pdat_=>SYSDATE, vdat_ =>oo.vdat, dk_ =>oo.dk,
@@ -755,9 +759,9 @@ procedure PROVODKA (x_RI varchar2, XX in out TEST_PRVN_OSA%ROWtype, OO in out OP
           gl.payv(0, oo.ref, oo.vdat, oo.tt, oo.dk, oo.kv, oo.nlsa , oo.s, oo.kv2    ,oo.nlsb, oo.s2);
           gl.pay (2, oo.ref, gl.bdate);  -- по факту
        EXCEPTION WHEN OTHERS THEN  ----ROLLBACK TO do_XXX;
-          erm_ := null;  deb.trap(SQLERRM, code_, erm_, status_);       
+          erm_ := null;  deb.trap(SQLERRM, code_, erm_, status_);
           l_comm  := substr('*'||oo.NLSA||'*'||oo.NLSB||'*'||aa.tip||'*'||xx.ND||Substr (erm_, 1,100),1,250) ;
-          raise_application_error(-20000, l_comm  );       
+          raise_application_error(-20000, gl.aMfo||':'||l_comm  );
        END;
        If l_Comm is not null then  update TEST_PRVN_OSA  set comm = l_comm            where rowid = x_RI ; RETURN ; end if ;
        If oo.ref is not null then  update TEST_PRVN_OSA  set comm = comm||aa.tip||',' where rowid = x_RI ;          end if ;
@@ -765,16 +769,32 @@ procedure PROVODKA (x_RI varchar2, XX in out TEST_PRVN_OSA%ROWtype, OO in out OP
 
   end ;  --- procedure PROVODKA  ---------------------------------------------
   ---------------------------------------------
+
+  Procedure Get_SA (p_ost IN     number   ,  -- фактический остаток, какой есть в АБС,  на входе 
+                    p_B   IN     number   ,  -- плановый остаток, каким он должен быть, на выходе ( по версии FV)
+                    p_SV  IN     number   ,  -- Без/оговорочная сумма возникновения 
+                    P_SA  IN OUT number   )  -- Сумма амортизации входящая , которая подлежит пересчету 
+                 IS l_SA         number   ;  -- Сумма амортизации исходящая, уже пересчитанная
+
+  begin 
+      l_SA := p_OST  - p_B + p_SV ;
+      If p_SA <> l_SA then 
+         insert into PRVN_DEL_SD ( KF, ND, Tip, OST, B, SV, SA, XA ) values ( gl.aMfo, xx.ND, aa.tip, p_ost, p_B, p_SV, p_SA, l_SA ) ;           
+         p_SA := l_SA ;
+      end if ; 
+  end ;  --Procedure Get_SA
+
+  ---------------------------------------------
 begin
   update TEST_PRVN_OSA  set comm = null  where rowid = x_RI;
 
   If xx.tip = 9  then
-     declare L_ACC number    ;  
+     declare L_ACC number    ;
         cpD  cp_deal%rowtype ;
         cpA  cp_accc%rowtype ;
         sn1  accounts%rowtype;
         sn2  accounts%rowtype;
-     begin 
+     begin
         If ( xx.AIRC_CCY <> 0 or xx.IRC_CCY <> 0 ) then
            select * into cpD from cp_deal where ref = xx.nd;
            If cpD.ACCUNREC is null then ------------------------------ Неприз дох по ЦБ
@@ -795,21 +815,21 @@ begin
            sn2.OSTC := OSTM ( p_acc => sn2.acc,   p_dat => oo.vdat );
 
            oo.s := round ( xx.AIRC_CCY *100 - sn2.OSTC ,0) ;
-           if ABS(oo.s) >= 1 then         
+           if ABS(oo.s) >= 1 then
               oo.kv := xx.kv ;      prvn_flow.p60 ( xx.tip, xx.ND, sn2.acc, a6 ) ;
               oo.nlsB := a6.nls  ; oo.nam_a :=  Substr(a6.nms,1,38)  ; -- рабочее значение
               If a6.acc is null then    update TEST_PRVN_OSA  set  comm = 'NOT 60**' where rowid = x_RI ;            RETURN ;     end if;
            end if;
            oo.KV := sn2.KV ; oo.nlsa := sn2.nls ; oo.nam_a :=  substr(sn2.nms, 1,38);
-           If oo.s > 0 then oo.dk := 0 ; 
+           If oo.s > 0 then oo.dk := 0 ;
            else             oo.dk := 1 ;  oo.s := - oo.s ;
            end if ;
-           PROVODKA (x_RI, XX, OO) ;  
+           PROVODKA (x_RI, XX, OO) ;
         end if;
      EXCEPTION WHEN NO_DATA_FOUND THEN    update TEST_PRVN_OSA  set  comm = 'NOT in ACC.CP_deal' where rowid = x_RI ;        return;
      end;
      RETURN;  --Ценные бумаги только SNA
-  end if ; 
+  end if ;
   -------------------------------------------------------------------
   begin select d.* into dd from cc_deal  d where  d.nd = xx.nd ;
   EXCEPTION WHEN NO_DATA_FOUND THEN update TEST_PRVN_OSA  set comm ='Угоду НЕ знайдено' where rowid = x_RI ; RETURN ;
@@ -818,20 +838,20 @@ begin
   If dd.prod  like '9%' then  update TEST_PRVN_OSA   set    comm = 'Внеб.дог.'|| dd.prod|| ' НЕ обрабатываем' where rowid = x_RI ;  RETURN ;      end if;
 
   dd.prod := substr(dd.prod,1,6) ;
-
-  -- Искривленный код продукта 
-  If dd.vidd =  150 and dd.prod like '1508%'   THEN 
+  l_PAP   := 1;
+  -- Искривленный код продукта
+  If dd.vidd =  150 and dd.prod like '1508%'   THEN
 
      dd.prod := '150000' ;
      kk.NBS  := '1500' ;
      kk.ob22 := '00'   ;
 
-  ElsIf dd.vidd     in (2701,1623,3660, 150 )  THEN 
-     begin select a.nbs||a.ob22, a.NBS,  a.ob22 
-             into dd.prod,      kk.NBS, kk.ob22  
-             from accounts a, nd_acc n 
+  ElsIf dd.vidd     in (2701,1623,3660, 150 )  THEN
+     begin select a.pap, a.nbs||a.ob22, a.NBS,  a.ob22 
+             into l_PAP, dd.prod,      kk.NBS, kk.ob22  
+             from accounts a, nd_acc n
             where n.nd = dd.nd and n.acc = a.acc and dazs is null   and a.NBS in ( to_char(dd.VIDD), '1500', '1502' )  ;
-     EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20000,'НЕ знайдено осн.рах по дог.'|| dd.ND ||', vidd='|| dd.vidd );       
+     EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20000,gl.aMfo||':НЕ знайдено осн.рах по дог.'|| dd.ND ||', vidd='|| dd.vidd );
      end ;
   end if ;
 
@@ -840,26 +860,26 @@ begin
         If kk.d_close is not null then
            select r020_new||ob_new into dd.prod from TRANSFER_2017 where r020_old||ob_old =  dd.prod ;
            --update cc_deal set prod  = dd.prod where nd = dd.nd ;
-           select k.* into kk from cck_ob22 k where  nbs||ob22  = dd.prod;        
+           select k.* into kk from cck_ob22 k where  nbs||ob22  = dd.prod;
         end if ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN  -- по группе КРГ* - первый попавший открытый продукт 
+  EXCEPTION WHEN NO_DATA_FOUND THEN  -- по группе КРГ* - первый попавший открытый продукт
         begin select k.* into kk from cck_ob22 k where  substr(nbs,1,3) = substr(dd.prod,1,3) and rownum = 1 and  kk.d_close is null ;
               dd.prod := kk.NBS||kk.OB22 ;
-        EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000,'ND='||xx.ND||'*НЕ знайдено cck_ob22.PROD='|| dd.prod );       
+        EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000,gl.aMfo||':ND='||xx.ND||'*НЕ знайдено cck_ob22.PROD='|| dd.prod );
         end ;
   end;
 
   begin  select k.* into kk9 from cck_ob22_9 k where nbs||ob22 = dd.prod ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'1) НЕ знайдено cck_ob22_9.PROD='|| dd.prod );       
+  EXCEPTION WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,gl.aMfo||':1) НЕ знайдено cck_ob22_9.PROD='|| dd.prod );
   end ;
-  
-  ----------------------  
+
+  ----------------------
 
   If xx.Irr is not null  then
      begin              --(2701,1624,3660)
         If dd.vidd not in (1,2,3,11,12,13) then select a.acc into L_ACC from accounts a, nd_acc n  where n.ND = DD.ND and n.acc = a.acc and a.nbs = kk.nbs  ;
         Else                                    select a.acc into L_ACC from accounts a, nd_acc n  where n.ND = DD.ND and n.acc = a.acc and a.tip = decode ( Substr(dd.prod,1,1) , '2', 'LIM', 'SS ') ;
-        end if ; 
+        end if ;
      EXCEPTION WHEN NO_DATA_FOUND THEN update TEST_PRVN_OSA  set comm ='Рах.для збереж ЕПС НЕ знайдено' where rowid = x_RI ; RETURN ;
      end ;
 
@@ -875,80 +895,160 @@ begin
    xx.b3 := round ( NVL( xx.b3,0),2 ) ;  xx.s3 := round ( NVL( xx.s3,0),2 ) ;  xx.s4 :=  round (  NVL( xx.s4,0),2 );
    xx.b5 := round ( NVL( xx.b5,0),2 ) ;  xx.s5 := round ( NVL( xx.s5,0),2 ) ;  xx.s6 :=  round (  NVL( xx.s6,0),2 );
    xx.b7 := round ( NVL( xx.b7,0),2 ) ;  xx.s7 := round ( NVL( xx.s7,0),2 ) ;  xx.s8 :=  round (  NVL( xx.s8,0),2 );
-   XX.AIRC_CCY := round ( NVL( XX.AIRC_CCY, 0 ) ,2) ;  
+   XX.AIRC_CCY := round ( NVL( XX.AIRC_CCY, 0 ) ,2) ;
    XX.FV_CCY   := round ( NVL( XX.FV_CCY  , 0 ) ,2) ;
+
+   -- 22.12.2018 Амортизация по БС=162%, 270%, 360% (COBUDWHIFRS-11)
+   If l_PAP = 2 then  xx.b1 := - xx.b1 ;
+                      xx.b3 := - xx.b3 ;
+                      xx.b5 := - xx.b5 ;
+                      xx.b7 := - xx.b7 ;
+   end if ;
    ----------------------------------------------------------
 
    For t in ( select * from tips where tip in ( 'SDI', 'SDF', 'SDM', 'SDA', 'SNA', 'SRR' )  order by decode ( tip , 'SDF', 1,  'SDM',2,  'SDI',3,  'SDA', 4, 'SNA', 5 , 'SRR',6, 7 )  )
    loop aa.tip  := t.tip ;
        ------------------ A Есть ли такой счет ?
        begin select a.* into aa from accounts a, nd_acc n where n.nd = xx.nd and n.acc = a.acc and a.tip = aa.tip and a.kv = xx.kv and a.dazs is null ;
-             If aa.daos > oo.vdat then update accounts set daos = oo.vdat where acc = aa.acc ;   aa.daos := oo.vdat ; end if ; 
+             If aa.daos > oo.vdat then update accounts set daos = oo.vdat where acc = aa.acc ;   aa.daos := oo.vdat ; end if ;
              aa.OSTC := OSTM ( p_acc =>  aa.acc,   p_dat => oo.vdat ) ;
        exception when no_data_found then aa.OSTC := 0; aa.ACC := null ; aa.tip := t.tip ; -- счета еще нет
        end;
 
 -------B1=SDF = Неамортиз.Д/П~за кориг.BV.~до справедливої~B1
-       If aa.tip = 'SDF' then          SR_  := NVL( xx.b1, aa.ostc/100 ) + xx.s2 - aa.ostc/100 ;        Del_ := xx.s1 - SR_ ;         xx.s1:= SR_;
-          If xx.s1 <> 0 OR xx.S2 <> 0  then ACC2 ; -- Найти/Открыть счет SDF
-             If xx.s1 <> 0 then ACC6(SIGN(xx.s1)); oo.nazn := 'Виникнення '||aa.tip ||'(Балансування до S1='||Del_||'). Дог.'||xx.ND; oo.dk:= 0; oo.s:= xx.s1*100; PROVODKA(x_RI,XX,OO); end if;
-             If xx.s2 <> 0 then ACC6(6) ;          oo.nazn :='Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;                              oo.dk:= 1; oo.s:= xx.s2*100; PROVODKA(x_RI,XX,OO); end if;                        
+
+       If aa.tip = 'SDF' then
+          If xx.B1 = aa.ostc/100  then  goto EXIT_ ;  end if ;
+          Get_SA ( p_ost => aa.ostc/100,  p_B => xx.b1, p_SV => xx.s1, P_SA =>xx.s2 );
+
+          If xx.s1 <> 0 OR xx.S2 <> 0  then 
+             ACC2 ; -- Найти/Открыть счет SDF
+             If xx.s1 <> 0 then 
+                ACC6(SIGN(xx.s1)); 
+                oo.nazn := 'Виникнення '||aa.tip ||'. Дог.'||xx.ND; 
+                oo.dk   := 0; 
+                oo.s    := xx.s1*100; 
+                PROVODKA(x_RI,XX,OO); 
+             end if;
+             If xx.s2 <> 0 then 
+                ACC6(6) ;
+                oo.nazn :='Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;   
+                oo.dk   := 1 ; 
+                oo.s    := xx.s2*100; 
+                PROVODKA(x_RI,XX,OO); 
+             end if;                        
           Else  update TEST_PRVN_OSA   set   comm = comm||aa.tip||'-' where rowid = x_RI ;    -- Расчетное S1=0  и S2=0 => comm not null
           end if;
 
 -------B3=SDM Неамортиз.Д/П~за модиф.договору           ~B3
-       ElsIf aa.tip = 'SDM' then       SR_  := NVL( xx.b3, aa.ostc/100 )+ xx.s4 - aa.ostc/100 ;         Del_ := xx.s3 - SR_ ;         xx.s3:= SR_;
-          If xx.s3 <> 0 OR xx.S4 <> 0  then ACC2 ; -- Найти/Открыть счет SDM
-             If xx.s3 <> 0 then ACC6(3*Sign(xx.S3)); oo.nazn:= 'Виникнення '||aa.tip ||'(Балансування до S3='||Del_||'). Дог.'||xx.ND; oo.dk:= 0; oo.s:= xx.s3*100; PROVODKA(x_RI,XX,OO); end if;
-             If xx.s4 <> 0 then ACC6(6) ;            oo.nazn:='Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;                              oo.dk:= 1; oo.s:= xx.s4*100; PROVODKA(x_RI,XX,OO); end if;
+       ElsIf aa.tip = 'SDM' then 
+          If xx.B3 = aa.ostc/100  then  goto EXIT_ ;  end if ;
+
+          Get_SA ( p_ost => aa.ostc/100,  p_B => xx.b3, p_SV => xx.s3, P_SA =>xx.s4 );
+
+          If xx.s3 <> 0 OR xx.S4 <> 0  then 
+             ACC2 ; -- Найти/Открыть счет SDM
+             If xx.s3 <> 0 then 
+                ACC6(3*Sign(xx.S3)); 
+                oo.nazn:= 'Виникнення '||aa.tip ||'. Дог.'||xx.ND; 
+                oo.dk  := 0; 
+                oo.s   := xx.s3*100; 
+                PROVODKA(x_RI,XX,OO); 
+             end if;
+             If xx.s4 <> 0  then 
+                ACC6(6) ;  
+                oo.nazn :='Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;  
+                oo.dk   := 1; 
+                oo.s    := xx.s4*100; 
+                PROVODKA(x_RI,XX,OO); 
+             end if;
           else  update TEST_PRVN_OSA   set   comm =  comm||aa.tip||'-' where rowid = x_RI ;    -- Расчетное S3=0  и S4=0 => comm not null
           end if;
 
--------R5 = SDO = Неамортиз.Д/П~"грошовий"                  ~B5
+-------B5 = SDI = Неамортиз.Д/П~"грошовий"                  ~B5
+       ElsIf aa.tip = 'SDI' then 
+          If xx.B5 = aa.ostc/100  then  goto EXIT_ ;  end if ; -- если ост равны
+          If aa.ACC is null       then  goto EXIT_ ;  end if ;     -- если нет счета, то ничего не делаем 
 
-       ElsIf aa.tip = 'SDI' then   
+          oo.nazn := 'Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;    
 
-          If aa.ACC is null  OR  
-             aa.OSTC < xx.b5*100 and xx.b5 > 0  OR  
-             aa.OSTC > xx.b5*100 and xx.b5 <0  then   -- если нет счета или остаток уже меньше B5 , то ничего не делаем 
-             goto EXIT_ ;
-          end if;
+          If l_Pap = 2 and oo.vdat < to_date ('01/01/2019', 'dd/mm/yyyy' )  then
+             oo.nazn := 'Разове вирівнювання залишку (запозичення) '||aa.tip ||'. Дог.'|| xx.ND ;    
+             Get_SA ( p_ost => aa.ostc/100,  p_B => xx.b5, p_SV => xx.s5, P_SA =>xx.s6 );
+   
+       elsIf aa.OSTC < xx.b5*100 and xx.b5 > 0  OR   aa.OSTC > xx.b5*100 and xx.b5 <0  then   -- если остаток уже меньше B5 , то ничего не делаем 
+               goto EXIT_ ; 
+          end if ;
 
-          ACC6(6) ;    oo.nazn := 'Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;    oo.dk   := 1 ;        
-          oo.s := aa.OSTC - xx.b5*100 ;
+          ACC6(6) ;    
+          oo.dk   := 1 ;        
+          oo.s    := aa.OSTC - xx.b5*100 ;
           PROVODKA (x_RI, XX, OO) ; 
 
 -------B7= SDA =  -- Неамортиз.Д/П~"технічний"                 ~B7
-       ElsIf aa.tip = 'SDA' then  SR_  := NVL( xx.b7, aa.ostc/100 )+ xx.s8 - aa.ostc/100 ;   Del_ := xx.s7 - SR_ ;     xx.s7:= SR_;           -- балансировка SDA 
-          If xx.s7 <> 0 OR xx.S8 <> 0  then  ACC2 ;  ACC6(6) ;   -- Найти/Открыть счет SDA -- Подобрать счет для Амортизации 
-             If xx.s7 <> 0  then oo.nazn := 'Виникнення '||aa.tip ||'(Балансування до S7='|| Del_||'). Дог.'|| xx.ND ; oo.dk:= 0 ; oo.s := xx.s7 *100 ; PROVODKA (x_RI, XX, OO) ;  end if;
-             If xx.s8 <> 0  then oo.nazn :='Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;                                 oo.dk:= 1 ; oo.s := xx.s8 *100 ; PROVODKA (x_RI, XX, OO) ;  end if;
+       ElsIf aa.tip = 'SDA' then 
+          If xx.B7 = aa.ostc/100  then  goto EXIT_ ;  end if ;
+
+          Get_SA ( p_ost => aa.ostc/100,  p_B => xx.b7, p_SV => xx.s7, P_SA =>xx.s8 );
+
+          If xx.s7 <> 0 OR xx.S8 <> 0  then  
+             ACC2 ;      -- Найти/Открыть счет SDA 
+             ACC6(6) ;   -- Подобрать счет для Амортизации 
+             If xx.s7 <> 0  then 
+                oo.nazn := 'Виникнення '||aa.tip ||'. Дог.'|| xx.ND ; 
+                oo.dk   := 0 ; 
+                oo.s    := xx.s7 *100 ; 
+                PROVODKA (x_RI, XX, OO) ;  
+             end if;
+             If xx.s8 <> 0  then 
+                oo.nazn :='Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;  
+                oo.dk   := 1 ; 
+                oo.s    := xx.s8 *100 ; 
+                PROVODKA (x_RI, XX, OO) ;  
+             end if;
           else  update TEST_PRVN_OSA   set   comm = comm||aa.tip||'-' where rowid = x_RI ;    -- Расчетное S7=0  и S8=0 => comm not null
           end if;
 
 -------AIRC_CCY~Итого~НЕприз.дох
        ElsIf aa.tip = 'SNA' and aa.ostc <> XX.AIRC_CCY *100  then  -- найти/Открыть счет SNA -- найти/Открыть счет 60**
-          ACC2 ; ACC6(9) ;  oo.nazn := 'Корегування Невизн.проц.дох.'||aa.tip ||'. Дог.'|| xx.ND ;  oo.DK := 0 ;  oo.S := XX.AIRC_CCY *100 - aa.OSTC ;  PROVODKA (x_RI, XX, OO) ;  
+          ACC2 ; ACC6(9) ;  oo.nazn := 'Корегування Невизн.проц.дох.'||aa.tip ||'. Дог.'|| xx.ND ;  oo.DK := 0 ;  oo.S := XX.AIRC_CCY *100 - aa.OSTC ;  PROVODKA (x_RI, XX, OO) ;
 
--------XX.FV_CCYПереоценка, остаток       
+-------XX.FV_CCYПереоценка, остаток
        ElsIf aa.tip = 'SRR' and aa.ostc <> XX.FV_CCY * 100   Then -- найти/Открыть счет SRR
-          ACC2 ; ACC6(7) ;  oo.nazn := 'Переоцінка '||aa.tip ||'. Дог.'|| xx.ND ;                   oo.DK := 0 ;  oo.S := XX.FV_CCY  *100  - aa.OSTC ;  PROVODKA (x_RI, XX, OO) ; 
+          ACC2 ; ACC6(7) ;  oo.nazn := 'Переоцінка '||aa.tip ||'. Дог.'|| xx.ND ;                   oo.DK := 0 ;  oo.S := XX.FV_CCY  *100  - aa.OSTC ;  PROVODKA (x_RI, XX, OO) ;
 -------------------------------------------------------
        end if;
-     <<EXIT_>> null ; 
+     <<EXIT_>> null ;
    END LOOP ; -- T
 end ;
 -----------------------------
-begin oo.ND   := 'FV9' ;
+begin 
+      dbms_application_info.set_client_info(':'|| gl.aMfo ||':2) IRR: Формування проводок  по SD*, SNA, SRR');
+      z23.to_log_rez (user_id , 4 , p_dat01 ,'2) IRR: Формування проводок  по SD*, SNA, SRR');
+      oo.ND   := 'FV9' ;
       oo.vdat := DAT_NEXT_U(p_dat01, -1);
       oo.tt   := 'IRR'     ;
-      oo.DATD := gl.Bdate  ; 
-      oo.kv2  := gl.baseval;  
+      oo.DATD := gl.Bdate  ;
+      oo.kv2  := gl.baseval;
       oo.mfoa := gl.aMfo   ;
-      oo.mfob := gl.aMfo   ; 
+      oo.mfob := gl.aMfo   ;
       oo.vob  := 96 ;
-      For x in (select RowId RI  from TEST_PRVN_OSA where comm is null and tip in (3,9)  )
-      loop      select * into X1 from TEST_PRVN_OSA where  RowId = x.RI;  D_SNA1 ( x.RI, X1, OO ) ;    end loop; -- x
+      Delete from PRVN_DEL_SD where kf = gl.Amfo ; 
+
+      x_ND    := to_number ( Pul.GET ('D_XXX')) ;
+      pul.PUT ('D_XXX', null);
+      If x_ND > 0 then
+
+         begin  select RowId into x_RI from TEST_PRVN_OSA where comm is null and tip in (3,9) and nd = x_ND; 
+                select *     into   X1 from TEST_PRVN_OSA where RowId = x_RI ;
+                D_SNA1 ( x_RI, X1, OO ) ; 
+         EXCEPTION WHEN NO_DATA_FOUND THEN   raise_application_error(-20000,'НЕ знайдено: select * from PRVN_OSAQ where comm is null and tip in (3,9) and nd='|| x_ND );       
+         end ;
+
+      Else
+         For x in (select RowId RI  from TEST_PRVN_OSA where comm is null and tip in (3,9) ) ---- and nd = 167115501 )
+         loop      select * into X1 from TEST_PRVN_OSA where  RowId = x.RI;  D_SNA1 ( x.RI, X1, OO ) ;    end loop; -- x
+      end if ;
 end D_SNA ;
 
 --------------------------------------------------
@@ -966,7 +1066,7 @@ begin
    if p_dat01 is null then
       s_dat01 := pul.get_mas_ini_val('sFdat1') ;
       if s_dat01 is null then
-         raise_application_error( -20333,'   PRVN_FLOW.heir39 : Не задано звітну дату = 01.mm.yyyy');
+         raise_application_error( -20333,gl.aMfo||':prvn_flow.heir39 : Не задано звітну дату = 01.mm.yyyy');
       end if;
       z_dat01 := to_date( s_dat01, 'dd.mm.yyyy') ;
    else  z_dat01 := p_dat01;
@@ -1037,7 +1137,7 @@ begin
    for xls in (select x.* from SRR_XLS x, regions r  where x.id_branch = r.id and r.kf = sys_context('bars_context','user_mfo') and x.id_calc_set = p_id_calc_set)
    loop
       insert into PRVN_FV_REZ_IFRS9 (     ID_CALC_SET,     UNIQUE_BARS_IS,     ID_BRANCH,     ID_CURRENCY,     DELTA_FV_CCY, ID_CONTRACT,     RNK_CLIENT)
-                             values ( xls.ID_CALC_SET, xls.UNIQUE_BARS_IS, xls.ID_BRANCH, xls.ID_CURRENCY, xls.FV_CCY      , 'PREMIY'   , xls.RNK_CLIENT);          
+                             values ( xls.ID_CALC_SET, xls.UNIQUE_BARS_IS, xls.ID_BRANCH, xls.ID_CURRENCY, xls.FV_CCY      , 'PREMIY'   , xls.RNK_CLIENT);
    end LOOP;
 end FROM_SRR_XLS;
 -------------------------------------------------------------
@@ -1058,7 +1158,7 @@ procedure div39 ( p_mode int, p_dat01 date )   is   -- разделение рез-39 по КД в
 begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
 
    If p_mode = 12 and gl.amfo <> '300465' then
-      raise_application_error(-20000,'Дана опція - лише для ЦА,  МФО = 300045 ');
+      raise_application_error(-20000,gl.aMfo||':Дана опція - лише для ЦА,  МФО = 300045 ');
    end if;
 
    if p_dat01 is null then   s_dat01 := pul.get_mas_ini_val('sFdat1')   ; z_dat01 := to_date( s_dat01, 'dd.mm.yyyy') ;
@@ -1072,7 +1172,9 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       -- p_mode = 1 -- только принять файл
 
       l_msg := '1) OSA: Прийом та стиснення '||z_dat01 ;
-      PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
+      dbms_application_info.set_client_info(':'|| gl.aMfo ||':1) Прийом та стиснення інформації від FINEVARE');
+      z23.to_log_rez (user_id , 4 , p_dat01 ,'1) Прийом та стиснення інформації від FINEVARE');
+      --PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
 
       l_min := to_number ( to_char( l_dat31_fv , 'YYMMDD')||'00') ;
       l_max := to_number ( to_char( l_dat31_fv , 'YYMMDD')||'99') ;
@@ -1083,7 +1185,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
 
       if l_num is null
       then
-        raise_application_error( -20333,'Вітрини з рез.МСФЗ PRVN_FV_REZ_IFRS9 на дату='||to_char(l_dat31_fv,'dd.mm.yyyy') ||
+        raise_application_error( -20333,gl.aMfo||':Вітрини з рез.МСФЗ PRVN_FV_REZ_IFRS9 на дату='||to_char(l_dat31_fv,'dd.mm.yyyy') ||
                                 'по ф-лу:'|| sys_context('bars_context','user_mfo') ||' не знайдено');
         return;
       end if;
@@ -1098,17 +1200,17 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       end ;
       FROM_SRR_XLS(l_num);  -- Прием XLS переоценки
       -- сжатие витрины делойта по дог Выбрасывание нулей
-    
+
       delete PRVN_OSAq;
-      
-      if l_MMFO = 1 THEN 
+
+      if l_MMFO = 1 THEN
          insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,  REZB,    REZ9,  AIRC_CCY, IRC_CCY,  ID_PROV_TYPE, vidd ,
                                  s1, s2, b1, s3, s4, b3, s5, s6, b5, s7, s8, b7, IRR , F1, FV_CCY)
-                          select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY, 
+                          select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY,
                                  min (f.ID_PROV_TYPE ) ID_PROV_TYPE, decode(f.tip,3,d.vidd,null) vidd,
-                                 sum(f.s1) s1, sum(f.s2) s2, sum(f.b1) b1, sum(f.s3)  s3 , sum(f.s4) s4, sum(f.b3)     b3, sum(f.s5) s5, sum(f.s6) s6, sum(f.b5) b5, 
+                                 sum(f.s1) s1, sum(f.s2) s2, sum(f.b1) b1, sum(f.s3)  s3 , sum(f.s4) s4, sum(f.b3)     b3, sum(f.s5) s5, sum(f.s6) s6, sum(f.b5) b5,
                                  sum(f.s7) s7, sum(f.s8) s8, sum(f.b7) b7, max(f.IRR) irr, max(f.F1) f1, sum(f.FV_CCY) FV_CCY
-                       from  (select Id_currency LCV, Rnk_client  RNK, 
+                       from  (select Id_currency LCV, Rnk_client  RNK,
                                      substr(Unique_Bars_is , 1 , instr(Unique_Bars_is, '/',1) -1 ) TIP,
                                      --substr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), instr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), '/',1) +1 ) ND,
                                      substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND,
@@ -1117,17 +1219,17 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
                                      nvl(AIRC_CCY,0) AIRC_CCY,
                                      nvl(IRC_CCY,0)  IRC_CCY ,
                                      ID_PROV_TYPE, -- Метка расчета резерва на индивидуальной или коллективной основе. "С" - колл, "І" - индивид
-                                     nvl(FV_ADJ_NEW_FEE,0)    s1 , nvl(FV_ADJ_AMORT,0)      s2, nvl(FV_ADJ_BALANCE,0)      b1 , 
-                                     nvl(MODIF_NEW_FEE,0)     s3 , nvl(MODIF_AMORT,0)       s4, nvl(MODIF_BALANCE,0)       b3, 
-                                     nvl(GENERAL_NEW_FEE,0)   s5 , nvl(GENERAL_FEE_AMORT,0) s6, nvl(GENERAL_FEE_BALANCE,0) b5, 
-                                     nvl(ACCRUAL_ADJ_DELTA,0) s7 , nvl(ACCRUAL_ADJ_AMORT,0) s8, nvl(ACCRUAL_ADJ_BALANCE,0) b7, 
+                                     nvl(FV_ADJ_NEW_FEE,0)    s1 , nvl(FV_ADJ_AMORT,0)      s2, nvl(FV_ADJ_BALANCE,0)      b1 ,
+                                     nvl(MODIF_NEW_FEE,0)     s3 , nvl(MODIF_AMORT,0)       s4, nvl(MODIF_BALANCE,0)       b3,
+                                     nvl(GENERAL_NEW_FEE,0)   s5 , nvl(GENERAL_FEE_AMORT,0) s6, nvl(GENERAL_FEE_BALANCE,0) b5,
+                                     nvl(ACCRUAL_ADJ_DELTA,0) s7 , nvl(ACCRUAL_ADJ_AMORT,0) s8, nvl(ACCRUAL_ADJ_BALANCE,0) b7,
                                      EIR                      irr, DERECOGNITION_FLAG       f1, DELTA_FV_CCY               FV_CCY
                               from PRVN_FV_REZ_IFRS9 o, regions r
                               where o.id_branch = r.id and r.kf = sys_context('bars_context','user_mfo') and
-                                  ( Prov_Balance_CCY     > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY           > 0  or  IRC_CCY             <> 0 
-                                or  nvl(FV_ADJ_NEW_FEE,0)      <> 0  or  nvl(FV_ADJ_AMORT,0)       <> 0 or nvl(FV_ADJ_BALANCE,0)    <> 0  or  nvl(MODIF_NEW_FEE,0)       <> 0  
-                                or  nvl(MODIF_AMORT,0)         <> 0  or  nvl(MODIF_BALANCE,0)      <> 0 or nvl(GENERAL_NEW_FEE,0)   <> 0  or  nvl(GENERAL_FEE_AMORT,0)   <> 0      
-                                or  nvl(GENERAL_FEE_BALANCE,0) <> 0  or  nvl(ACCRUAL_ADJ_DELTA,0)  <> 0 or nvl(ACCRUAL_ADJ_AMORT,0) <> 0  or  nvl(ACCRUAL_ADJ_BALANCE,0) <> 0     
+                                  ( Prov_Balance_CCY     > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY           > 0  or  IRC_CCY             <> 0
+                                or  nvl(FV_ADJ_NEW_FEE,0)      <> 0  or  nvl(FV_ADJ_AMORT,0)       <> 0 or nvl(FV_ADJ_BALANCE,0)    <> 0  or  nvl(MODIF_NEW_FEE,0)       <> 0
+                                or  nvl(MODIF_AMORT,0)         <> 0  or  nvl(MODIF_BALANCE,0)      <> 0 or nvl(GENERAL_NEW_FEE,0)   <> 0  or  nvl(GENERAL_FEE_AMORT,0)   <> 0
+                                or  nvl(GENERAL_FEE_BALANCE,0) <> 0  or  nvl(ACCRUAL_ADJ_DELTA,0)  <> 0 or nvl(ACCRUAL_ADJ_AMORT,0) <> 0  or  nvl(ACCRUAL_ADJ_BALANCE,0) <> 0
                                 or  nvl(DELTA_FV_CCY,0)        <> 0  or  nvl(DERECOGNITION_FLAG,0) <> 0 or nvl(EIR,0)               <> 0 ) and ID_CALC_SET = l_num
                               ) F, tabval T,cc_deal d
                         where t.lcv = f.lcv and f.nd=d.nd (+)
@@ -1135,11 +1237,11 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       else
          insert into PRVN_OSAq ( rnk,   tip,   ND,   kv, REZB, REZ9,AIRC_CCY, IRC_CCY, ID_PROV_TYPE,  vidd,
                                  s1, s2, b1, s3, s4, b3, s5, s6, b5, s7, s8, b7, IRR , F1, FV_CCY)
-                          select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY, 
+                          select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY,
                                  min (f.ID_PROV_TYPE ) ID_PROV_TYPE, decode(f.tip,3,d.vidd,null) vidd,
-                                 sum(f.s1) s1, sum(f.s2) s2, sum(f.b1) b1, sum(f.s3)  s3 , sum(f.s4) s4, sum(f.b3) b3, sum(f.s5) s5, sum(f.s6) s6, sum(f.b5) b5, 
+                                 sum(f.s1) s1, sum(f.s2) s2, sum(f.b1) b1, sum(f.s3)  s3 , sum(f.s4) s4, sum(f.b3) b3, sum(f.s5) s5, sum(f.s6) s6, sum(f.b5) b5,
                                  sum(f.s7) s7, sum(f.s8) s8, sum(f.b7) b7, max(f.IRR) irr, max(f.F1) f1, sum(f.FV_CCY) FV_CCY
-                       from  (select Id_currency LCV, Rnk_client  RNK, 
+                       from  (select Id_currency LCV, Rnk_client  RNK,
                                      substr(Unique_Bars_is , 1 , instr(Unique_Bars_is, '/',1) -1 ) TIP,
                                      substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND,
                                      nvl(Prov_Balance_CCY,0)    REZB,
@@ -1147,16 +1249,16 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
                                      nvl(AIRC_CCY,0) AIRC_CCY,
                                      nvl(IRC_CCY,0)  IRC_CCY ,
                                      ID_PROV_TYPE, -- Метка расчета резерва на индивидуальной или коллективной основе. "С" - колл, "І" - индивид
-                                     nvl(FV_ADJ_NEW_FEE,0)    s1 , nvl(FV_ADJ_AMORT,0)      s2, nvl(FV_ADJ_BALANCE,0)      b1, 
-                                     nvl(MODIF_NEW_FEE,0)     s3 , nvl(MODIF_AMORT,0)       s4, nvl(MODIF_BALANCE,0)       b3,   
-                                     nvl(GENERAL_NEW_FEE,0)   s5 , nvl(GENERAL_FEE_AMORT,0) s6, nvl(GENERAL_FEE_BALANCE,0) b5, 
-                                     nvl(ACCRUAL_ADJ_DELTA,0) s7 , nvl(ACCRUAL_ADJ_AMORT,0) s8, nvl(ACCRUAL_ADJ_BALANCE,0) b7,                                     
+                                     nvl(FV_ADJ_NEW_FEE,0)    s1 , nvl(FV_ADJ_AMORT,0)      s2, nvl(FV_ADJ_BALANCE,0)      b1,
+                                     nvl(MODIF_NEW_FEE,0)     s3 , nvl(MODIF_AMORT,0)       s4, nvl(MODIF_BALANCE,0)       b3,
+                                     nvl(GENERAL_NEW_FEE,0)   s5 , nvl(GENERAL_FEE_AMORT,0) s6, nvl(GENERAL_FEE_BALANCE,0) b5,
+                                     nvl(ACCRUAL_ADJ_DELTA,0) s7 , nvl(ACCRUAL_ADJ_AMORT,0) s8, nvl(ACCRUAL_ADJ_BALANCE,0) b7,
                                      EIR                      irr, DERECOGNITION_FLAG       f1, nvl(DELTA_FV_CCY,0)        FV_CCY
                               from PRVN_FV_REZ_IFRS9 o
-                              where ( Prov_Balance_CCY   > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY           > 0  or  IRC_CCY             <> 0 
-                                or  FV_ADJ_NEW_FEE      <> 0  or  FV_ADJ_AMORT       <> 0 or FV_ADJ_BALANCE    <> 0  or  MODIF_NEW_FEE       <> 0  
-                                or  MODIF_AMORT         <> 0  or  MODIF_BALANCE      <> 0 or GENERAL_NEW_FEE   <> 0  or  GENERAL_FEE_AMORT   <> 0      
-                                or  GENERAL_FEE_BALANCE <> 0  or  ACCRUAL_ADJ_DELTA  <> 0 or ACCRUAL_ADJ_AMORT <> 0  or  ACCRUAL_ADJ_BALANCE <> 0     
+                              where ( Prov_Balance_CCY   > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY           > 0  or  IRC_CCY             <> 0
+                                or  FV_ADJ_NEW_FEE      <> 0  or  FV_ADJ_AMORT       <> 0 or FV_ADJ_BALANCE    <> 0  or  MODIF_NEW_FEE       <> 0
+                                or  MODIF_AMORT         <> 0  or  MODIF_BALANCE      <> 0 or GENERAL_NEW_FEE   <> 0  or  GENERAL_FEE_AMORT   <> 0
+                                or  GENERAL_FEE_BALANCE <> 0  or  ACCRUAL_ADJ_DELTA  <> 0 or ACCRUAL_ADJ_AMORT <> 0  or  ACCRUAL_ADJ_BALANCE <> 0
                                 or  nvl(DELTA_FV_CCY,0) <> 0  or  DERECOGNITION_FLAG <> 0 or EIR               <> 0 ) and ID_CALC_SET = l_num )  F, tabval T,cc_deal d
                         where t.lcv = f.lcv and f.nd=d.nd (+)
                         group by f.rnk, f.tip, f.ND, t.kv, d.vidd ;
@@ -1164,7 +1266,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
 
       commit;
 
-      PRVN_FLOW.SeND_MSG (p_txt => 'END-KV:'||l_msg );
+      --PRVN_FLOW.SeND_MSG (p_txt => 'END-KV:'||l_msg );
 
       -- сжатие витрины делойта в целом по дог в экв. для vidd not in (3,13)
 --    execute immediate 'truncate table PRVN_OSAQ';
@@ -1209,10 +1311,16 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       --update PRVN_OSAq set comm = null where rezb <> 0 or rez9<> 0;
       --commit;
 
-      If p_mode = 2 then l_msg:= '4) RR-351:  Тільки Розподіл + Рівчачок для проводок';
-      else               l_msg :='4.1 для ЦА =  Тільки ПЕРЕ-Розподіл ручних + Рівчачок';
+      If p_mode = 2 then 
+         dbms_application_info.set_client_info(':'|| gl.aMfo ||':7) Розподіл МСФЗ-9');
+         l_msg:= '4) RR-351:  Тільки Розподіл + Рівчачок для проводок';
+         z23.to_log_rez (user_id , 7 , p_dat01 ,'7) Розподіл МСФЗ-9');
+      else
+         dbms_application_info.set_client_info(':'|| gl.aMfo ||':7) ПЕРЕ-Розподіл ручних МСФЗ-9');
+         l_msg :='4.1 для ЦА =  Тільки ПЕРЕ-Розподіл ручних + Рівчачок';
+         z23.to_log_rez (user_id , 7 , p_dat01 ,'7) ПЕРЕ-Розподіл ручних МСФЗ-9');
       end if;
-      PRVN_FLOW.SeND_MSG (p_txt => 'BEG-eqv:'||l_msg );
+      --PRVN_FLOW.SeND_MSG (p_txt => 'BEG-eqv:'||l_msg );
 
       -- p_mode = 2 -- только разнести по НБУ23
       -- p_mode = 12 -- -- Технічний пункт =  Тільки ПЕРЕ-Розподіл ручних в ЦА
@@ -1349,7 +1457,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
      end loop;
      ----------------
      commit;  LOGGER.INFO('OSA-2.2:Обработано ВСЕГО '||l_all||' дог ' || to_char( z_dat01, 'dd.mm.yyyy' ) );
-     PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
+     --PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
   end if;
 
   If p_mode in (12,2 ) then ---------------------------------- разнести по НБУ23
@@ -1357,10 +1465,10 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
      --Рівчачок
 
      l_msg:= ' ... Рівчачок для проводок';
-     PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
+     --PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
      Rezerv_23 ( z_dat01 );
      commit;
-     PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
+     --PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
  end if;
 
 end div39;
@@ -1619,7 +1727,7 @@ begin
   end if;
 
   if to_char(l_dat01 , 'DD' ) <> '01'   then -- 14.05.2015 Сухова. Пока работаем только с числами 01. Остатки с корр
-    raise_application_error( -20333,'Пока работаем только с числами 01. Ост с корр');
+    raise_application_error( -20333,gl.aMfo||':Пока работаем только с числами 01. Ост с корр');
   end if;
 
   select max(fdat)   into l_dat31  from fdat    where fdat < l_dat01 ;
@@ -2406,12 +2514,12 @@ begin
   begin
     select * into aa1 from accounts where kv =p_kv and nls = p_nls;
   exception
-    when no_data_found then   raise_application_error( -20333,'Рах.'||p_nls ||'/'|| p_kv || ' НЕ знайдено ');
+    when no_data_found then   raise_application_error( -20333,gl.aMfo||':Рах.'||p_nls ||'/'|| p_kv || ' НЕ знайдено ');
   end;
 
   begin
     select d.* into dd1 from cc_deal d, nd_acc n where d.vidd = 150 and n.acc= aa1.acc and d.nd = n.nd ;
-    raise_application_error( -20333,'Рах.'||p_nls ||'/'|| p_kv || ' уже прив"язан до угоди ' || dd1.nd);
+    raise_application_error( -20333,gl.aMfo||':Рах.'||p_nls ||'/'|| p_kv || ' уже прив"язан до угоди ' || dd1.nd);
   exception
     when no_data_found then   null;
   end;
@@ -3543,9 +3651,9 @@ end nos_del;
                   agr.sar_dtl(a).SNO_SHD.delete(agr.sar_dtl(a).SNO_SHD.first);
 
                 else
-                
-                  r_shd.SNO := 0; 
-                
+
+                  r_shd.SNO := 0;
+
                 end if;
 
                  -- SN
@@ -3675,7 +3783,7 @@ end nos_del;
                   r_shd.SNP := agr.sar_dtl(a).int_odue;
 
                   if ( agr.sar_dtl(a).int_dfr > 0)
-                  then -- 
+                  then --
                     r_shd.SNO := r_shd.SNO + agr.sar_dtl(a).int_dfr;
                   end if;
 
@@ -3713,9 +3821,9 @@ end nos_del;
                                        ||', r_shd.FDAT='    ||to_char(r_shd.FDAT,'dd/mm/yyyy')
                                        ||', r_shd.LMT_OTPT='||to_char(r_shd.LMT_OTPT)
                                        ||', r_shd.SS='      ||to_char(r_shd.SS)
-                                       ||', r_shd.SSP='     ||to_char(r_shd.SSP) 
-                                       ||', r_shd.SN='      ||to_char(r_shd.SN) 
-                                       ||', r_shd.SNO='     ||to_char(r_shd.SNO) 
+                                       ||', r_shd.SSP='     ||to_char(r_shd.SSP)
+                                       ||', r_shd.SN='      ||to_char(r_shd.SN)
+                                       ||', r_shd.SNO='     ||to_char(r_shd.SNO)
                                        ||', r_shd.SNP='     ||to_char(r_shd.SNP)
                                        ||', r_shd.SN1='     ||to_char(r_shd.SN1)
                                        ||', r_shd.SN2='     ||to_char(r_shd.SN2) );
@@ -3809,7 +3917,7 @@ end nos_del;
 
     if ( sys_context('bars_context','user_branch') = '/' )
     then
-      raise_application_error( -20666, 'Забрононено виконання на рівні "/"!', true );
+      raise_application_error( -20666, gl.aMfo||':Забрононено виконання на рівні "/"!', true );
     end if;
 
     l_rpt_dt := trunc(nvl(p_rpt_dt,GL.GBD()),'MM');
