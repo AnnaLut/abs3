@@ -213,6 +213,8 @@ comment on column MSP_FILE_RECORDS.state_comment
 comment on column MSP_FILE_RECORDS.validation_state
   is 'Стан валідації';
 
+alter table MSP.MSP_FILE_RECORDS modify pers_acc_num VARCHAR2(9);
+
 -- Grant/Revoke object privileges 
 grant update on MSP_FILE_RECORDS to BARS;
 grant update on MSP_FILE_RECORDS to BARS_ACCESS_DEFROLE;
