@@ -222,7 +222,7 @@ function showRefer(ID) {
                     } else {
                         $('#DocsVerified').prop('checked', false);
                         $('#DocsVerified').prop('disabled', false);
-                        $('#selectNewCardBtn').prop('disabled', true);
+                        // $('#selectNewCardBtn').prop('disabled', true);
                     }
                 },
                 complete: function (jqXHR, textStatus) {
@@ -247,7 +247,7 @@ function showRefer(ID) {
 
 function onItemSelected(data, ID) {
     var value4save = data[0][REFER_SETTINGS[ID].value4save];
-    var cb = $('#DocsVerified:checked').length;
+    //var cb = $('#DocsVerified:checked').length;
     //&& cb > 0
 
     if (value4save !== g_deal[REFER_SETTINGS[ID].deal]) {
@@ -267,7 +267,7 @@ function onItemSelected(data, ID) {
         print(data[0]);
         print(g_deal);
 
-        if (!cb && getCusttype() == 1) return;
+        //if (!cb && getCusttype() == 1) return;
         visibilityErrorNewCard();
     }
 };
