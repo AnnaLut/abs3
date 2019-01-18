@@ -4926,9 +4926,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         l_nbsa := substr(l_doc.nls_a, 1, 4);
         l_nbsb := substr(l_doc.nls_b, 1, 4);
 
-        if (substr(l_doc.nls_b,1,4) in ('2605','2625','2655')) then
+        /*if (substr(l_doc.nls_b,1,4) in ('2605','2625','2655')) then
           raise_application_error(-20000, ' Номери карт. рах. 2625, 2605, 2655 змінено у зв''язку з вимогами Постанови НБУ № 89 від 11.09.2017!!!');
-        end if;
+        end if;*/
 
 
 
