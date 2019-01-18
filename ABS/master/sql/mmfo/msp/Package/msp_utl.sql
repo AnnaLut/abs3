@@ -967,7 +967,7 @@ create or replace package body msp.msp_utl is
            trim(substr(line, 147, 10)), --numident,
            trim(substr(line, 157, 2)), --pay_day,
            trim(substr(line, 159, 1)), --displaced
-           trim(substr(line, 160, 6)) --pers_acc_num
+           trim(substr(line, 160, 9)) --pers_acc_num
     from bars.tmp_imp_file t where id <> 0;
   exception
     when others then
@@ -1153,7 +1153,7 @@ create or replace package body msp.msp_utl is
           rpad(coalesce(c_rec.numident,' '),10,' ')||
           rpad(coalesce(c_rec.pay_day,' '),2,' ')||
           coalesce(c_rec.displaced,' ')||
-          to_char(c_rec.pers_acc_num,'FM000000')||
+          to_char(c_rec.pers_acc_num,'FM000000000')||
           to_char(case when c_rec.state_id < 6 then c_rec.state_id else 0 end ,'FM0')||
           l_crlp;
       end loop;
@@ -1268,7 +1268,7 @@ create or replace package body msp.msp_utl is
           rpad(coalesce(c_rec.numident,' '),10,' ')||
           rpad(coalesce(c_rec.pay_day,' '),2,' ')||
           coalesce(c_rec.displaced,' ')||
-          to_char(c_rec.pers_acc_num,'FM000000')||
+          to_char(c_rec.pers_acc_num,'FM000000000')||
           case c_rec.state_id
                when  1 then '1'
                when  2 then '2'
