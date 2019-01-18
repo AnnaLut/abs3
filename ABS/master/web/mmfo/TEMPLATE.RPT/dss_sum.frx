@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/20/2018 10:42:45" ReportInfo.Modified="11/27/2018 11:35:22" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQErCIt/Qih5JjQ2lEs+Mxe8=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand=" select to_date(char00,'dd.mm.yyyy') dat1,&#13;&#10;        to_date(char01,'dd.mm.yyyy') dat2,&#13;&#10;        num00 dos,&#13;&#10;        num01 kos,&#13;&#10;        num02 dayost,&#13;&#10;        dat00 fdat,&#13;&#10;        num03 inost,&#13;&#10;        num04 outost&#13;&#10;  from rs_tmp_report_data rd&#13;&#10;where rd.session_id=:session_id">
+        <Column Name="DOS" DataType="System.Decimal"/>
+        <Column Name="KOS" DataType="System.Decimal"/>
+        <Column Name="DAYOST" DataType="System.Decimal"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="INOST" DataType="System.Decimal"/>
+        <Column Name="OUTOST" DataType="System.Decimal"/>
+        <Column Name="DAT1" DataType="System.DateTime"/>
+        <Column Name="DAT2" DataType="System.DateTime"/>
+        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="814494"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sysdate" DataType="System.String" Expression="FormatDateTime((DateTime)Report.GetVariableValue(&quot;Date&quot;))"/>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="85.05">
+      <TextObject Name="Text1" Left="18.9" Top="28.35" Width="510.3" Height="56.7" Text="Сводная выписка DSS&#13;&#10;Валюта  980 - Гривня України              &#13;&#10;За период с [Table.DAT1] по [Table.DAT2]&#13;&#10;Входящий остаток на [Table.DAT1] [Table.INOST]&#13;&#10;" HideZeros="true" Font="Courier New, 9pt">
+        <Formats>
+          <DateFormat/>
+          <DateFormat/>
+          <DateFormat/>
+          <NumberFormat UseLocale="false" GroupSeparator=" "/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="89.05" Width="718.2" Height="85.05" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TableObject Name="Table2" Left="18.9" Width="463.05" Height="85.05">
+        <TableColumn Name="Column11" Width="179.55"/>
+        <TableColumn Name="Column12" Width="132.3"/>
+        <TableColumn Name="Column13" Width="151.2"/>
+        <TableRow Name="Row4" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell16" Border.Lines="Top" Text="Дата [Table.FDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell17" Border.Lines="Top" Text="Дт" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell18" Border.Lines="Top" Text="Кт" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell21" Text="Обороты за день" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell22" Text="[Table.DOS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell23" Text="[Table.KOS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell26" Border.Lines="Bottom" Text="Промежуточный остаток" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell27" Border.Lines="Bottom" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell28" Border.Lines="Bottom" Text="[Table.DAYOST]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="178.1" Width="718.2" Height="28.35">
+      <TableObject Name="Table1" Left="18.9" Width="463.05" Height="28.35">
+        <TableColumn Name="Column6" Width="179.55"/>
+        <TableColumn Name="Column7" Width="132.3"/>
+        <TableColumn Name="Column9" Width="151.2"/>
+        <TableRow Name="Row3" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell11" Border.Lines="Top, Bottom" Text="Исходящий остаток на" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell12" Border.Lines="Top, Bottom" Text="[Table.DAT2]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          <TableCell Name="Cell14" Border.Lines="Top, Bottom" Text="[Table.OUTOST]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>
