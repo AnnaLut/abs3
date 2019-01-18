@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/20/2018 10:42:45" ReportInfo.Modified="12/11/2018 18:37:12" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQLqU3uBTlGqowl3yY7U7tLw=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select char00  card_code,&#13;&#10;       char01  NLS, &#13;&#10;       char02  dat1,&#13;&#10;       char03  dat2, &#13;&#10;       char04  kv, &#13;&#10;       char05  owner,  &#13;&#10;       num00  inost,&#13;&#10;       char06  NAZN,&#13;&#10;       char07  owdat,&#13;&#10;       num01  sq,&#13;&#10;       num02  s,&#13;&#10;       dat00  fdat,&#13;&#10;       num03  outost,&#13;&#10;       char08 nazn2&#13;&#10;  from rs_tmp_report_data rd&#13;&#10;  where rd.session_id=:session_id">
+        <Column Name="CARD_CODE" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="OWNER" DataType="System.String"/>
+        <Column Name="INOST" DataType="System.Decimal"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="OWDAT" DataType="System.String"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="OUTOST" DataType="System.Decimal"/>
+        <Column Name="NAZN2" DataType="System.String"/>
+        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="815720"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sysdate" DataType="System.String" Expression="FormatDateTime((DateTime)Report.GetVariableValue(&quot;Date&quot;))"/>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+    <Total Name="Total" Expression="[Table.S]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <GroupHeaderBand Name="GroupHeader1" Width="718.2" Height="179.55" CanGrow="true" Condition="[Table.NLS]">
+      <TextObject Name="Text2" Left="18.9" Top="47.25" Width="378" Height="113.4" Text="[sysdate]&#13;&#10;Выписка по карточному счету:  [Table.NLS]&#13;&#10;за период с     [Table.DAT1]   пo  [Table.DAT2]&#13;&#10;&#13;&#10;код валюты:          [Table.KV]&#13;&#10;владелец счета:      [Table.OWNER]&#13;&#10;&#13;&#10;Входящий остаток:                   [Table.INOST]&#13;&#10;" HideZeros="true" Format="Date" Format.Format="f" AutoWidth="true" Font="Courier New, 9pt"/>
+      <DataBand Name="Data1" Top="225.35" Width="718.2" Height="18.9" CanGrow="true" DataSource="Table">
+        <TableObject Name="Table1" Left="18.9" Width="652.05" Height="18.9">
+          <TableColumn Name="Column1" Width="245.7"/>
+          <TableColumn Name="Column2" Width="85.05"/>
+          <TableColumn Name="Column3" Width="94.5"/>
+          <TableColumn Name="Column4" Width="113.4"/>
+          <TableColumn Name="Column5" Width="113.4"/>
+          <TableRow Name="Row2" AutoSize="true">
+            <TableCell Name="Cell6" Text="[Table.NAZN]&#13;&#10;[Table.NAZN2]" HideZeros="true" VertAlign="Center" Font="Courier New, 9pt"/>
+            <TableCell Name="Cell7" Text="[Table.OWDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+            <TableCell Name="Cell8" Text="[Table.SQ]" HideZeros="true" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+            <TableCell Name="Cell9" Text="[Table.S]" HideZeros="true" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+            <TableCell Name="Cell10" Text="[Table.FDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="DataHeader1" Top="183.55" Width="718.2" Height="37.8">
+          <TableObject Name="Table1" Left="18.9" Width="652.05" Height="37.8">
+            <TableColumn Name="Column11" Width="245.7"/>
+            <TableColumn Name="Column12" Width="85.05"/>
+            <TableColumn Name="Column13" Width="94.5"/>
+            <TableColumn Name="Column14" Width="113.4"/>
+            <TableColumn Name="Column15" Width="113.4"/>
+            <TableRow Name="Row4" Height="37.8">
+              <TableCell Name="Cell16" Border.Lines="Top, Bottom" Text="Описание транзакции" VertAlign="Center" Font="Courier New, 9pt"/>
+              <TableCell Name="Cell17" Border.Lines="Top, Bottom" Text="Дата транзакции" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+              <TableCell Name="Cell18" Border.Lines="Top, Bottom" Text="Сумма (в валюте)" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+              <TableCell Name="Cell19" Border.Lines="Top, Bottom" Text="Сумма (в валюте счета)" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+              <TableCell Name="Cell20" Border.Lines="Top, Bottom" Text="Дата проводки в ОДБ" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+            </TableRow>
+          </TableObject>
+        </DataHeaderBand>
+        <DataFooterBand Name="DataFooter1" Top="248.25" Width="718.2" Height="28.35" CanGrow="true">
+          <TableObject Name="Table1" Left="18.9" Width="652.05" Height="28.35">
+            <TableColumn Name="Column6" Width="245.7"/>
+            <TableColumn Name="Column7" Width="85.05"/>
+            <TableColumn Name="Column8" Width="94.5"/>
+            <TableColumn Name="Column9" Width="113.4"/>
+            <TableColumn Name="Column10" Width="113.4"/>
+            <TableRow Name="Row3" Height="28.35" AutoSize="true">
+              <TableCell Name="Cell11" Border.Lines="Top, Bottom" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell12" Border.Lines="Top, Bottom" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell13" Border.Lines="Top, Bottom" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell14" Border.Lines="Top, Bottom" Text="[Total]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Courier New, 9pt"/>
+              <TableCell Name="Cell15" Border.Lines="Top, Bottom" HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+        </DataFooterBand>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="280.6" Width="718.2" Height="37.8">
+        <TextObject Name="Text5" Left="18.9" Width="255.15" Height="18.9" Text="Исходящий остаток: [Table.OUTOST]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" AutoWidth="true" WordWrap="false" Font="Courier New, 9pt" Trimming="EllipsisCharacter"/>
+        <TextObject Name="Text3" Left="18.9" Top="18.9" Width="689.85" Height="18.9" Text="====================================================================================="/>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>
