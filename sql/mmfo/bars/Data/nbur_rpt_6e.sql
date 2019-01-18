@@ -50,7 +50,7 @@ begin
   NBUR_FILES.SET_FILE_PROC
   ( p_proc_id => l_proc_id
    , p_file_id => l_file_id
-   , p_proc_type => 'F'
+   , p_proc_type => 'O'
    , p_proc_active => 'Y'
    , p_scheme => 'BARS'
    , p_proc_name => 'NBUR_P_F6EX_NC'
@@ -58,6 +58,7 @@ begin
    , p_version => '1.0'
    , p_date_start => date '2015-01-01'
    );
+
 
   NBUR_FILES.SET_OBJECT_DEPENDENCIES
   ( p_file_id => l_file_id
@@ -67,3 +68,21 @@ begin
 end;
 /
 commit;
+
+begin
+    delete from NBUR_REF_PREPARE_XML where file_code = '#6E';
+    Insert into NBUR_REF_PREPARE_XML
+       (FILE_CODE, DESC_XML, DATE_START, ATTR_NIL)
+     Values
+       ('#6E', 'select EKP
+          , R030
+          , sum(T100) as T100
+    from   NBUR_LOG_F6EX
+    where  report_date = :p_rpt_dt
+          and kf = :p_kf
+    group by EKP, R030
+    order by 1, 2 ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'), NULL);
+    COMMIT;
+
+end;
+/
