@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_check_sp.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE FUNCTION BARS.F_CHECK_SP (
+CREATE OR REPLACE FUNCTION f_check_sp(
  p_nbs        VARCHAR2,
  p_spid       VARCHAR2,
  p_val        VARCHAR2
@@ -24,7 +24,25 @@ BEGIN
    		res := 1;
    		return res;
    end if;
-
+   --- check IFRS,SPPI parameters
+  if (p_nsiname in('IFRS','SPPI')) then 
+       if p_nsiname ='IFRS' then
+          p_tabcolumn_check:='IFRS_ID';
+       elsif p_nsiname ='SPPI' then
+             p_tabcolumn_check:='SPPI_ID';
+       end if; 
+       sql_str := 'select count(*) from ' || p_nsiname || ' where ' || p_tabcolumn_check || '=:val';
+     begin
+     if instr(sql_str,':NBS') > 0 then
+       execute immediate sql_str into res using p_val, p_nbs;
+     else
+       execute immediate sql_str into res using p_val;
+     end if;
+     exception when no_data_found then res := 0;
+     end;
+   ----- check IFRS,SPPI parameters
+  else
+  
    sql_str := 'select count(*) from ' || p_nsiname || ' where ' || p_tabcolumn_check || '=:val';
    begin
      if instr(sql_str,':NBS') > 0 then
@@ -34,6 +52,7 @@ BEGIN
      end if;
    exception when no_data_found then res := 0;
    end;
+  end if ;
 
    RETURN res;
 END f_check_sp;
