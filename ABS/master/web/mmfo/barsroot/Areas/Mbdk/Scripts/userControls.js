@@ -163,18 +163,23 @@
 
     function loadingDealType() {
         $("#dealType").data("kendoDropDownList").dataSource.data([]);
+        var _val = $("#agreementType").val();
 
-        if (!$("#agreementType").val() || ($("#agreementType").val() == 1 && !$("#clasMsfz").val())) {
+        $("#productType").removeAttr('required');
+
+
+        if (!_val || (_val == 1 && !$("#clasMsfz").val())) {
             $("#dealType").data("kendoDropDownList").enable(false);
             return;
         }
 
-        if ($("#agreementType").val() == 1) {
+        if (_val == 1) {
             loadingDeals();
             return;
         }
 
-        if ($("#agreementType").val() == 2) {
+        if (_val == 2) {
+            $("#productType").prop("required", true);
             $.ajax({
                 type: "GET",
                 url: bars.config.urlContent("/api/mbdk/getdata/GetAgreements?tipdVal=2"),
