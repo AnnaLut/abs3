@@ -76,6 +76,21 @@ namespace BarsWeb.Areas.Crkr.Controllers.Api
 
         [HttpPost]
         [WebMethod]
+        public HttpResponseMessage StornoAll(PaymentsList item)
+        {
+            try
+            {
+                _sight.StornoAllDbProc(item);
+                return Request.CreateResponse(HttpStatusCode.OK, _sight.Deposit(item.TabIndex, item.UserType));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [WebMethod]
         public HttpResponseMessage Error(PaymentsList item)
         {
             try

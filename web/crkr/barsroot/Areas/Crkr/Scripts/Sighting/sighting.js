@@ -25,6 +25,7 @@ $(document).ready(function () {
         items: [
             { template: "<button type='button' class='k-button right-pos' id='visaBtn'><span class='k-sprite pf-icon pf-16 pf-key'></span> Візування</button>" },
             { template: "<button type='button' class='k-button right-pos' id='stornoBtn'><span class='k-sprite pf-icon pf-16 pf-arrow_left'></span> Повернути виконавцю</button>" },
+            { template: "<button type='button' class='k-button right-pos' id='stornoAllBtn'><span class='k-sprite pf-icon pf-16 pf-delete'></span> Повернути та сторнувати</button>" },
             //{ template: "<button type='button' class='k-button right-pos' id='errorBtn'><span class='k-sprite pf-icon pf-16 pf-undo_green'></span> Виявлена помилка</button>" },
 
             { template: "<div class='legend-green'></div><label class='legend-label-nonact'>- існують виплати</label>" },
@@ -789,6 +790,32 @@ $(document).ready(function () {
         }
     });
 
+    $("#stornoAll").click(function () {
+        var selectedIndex = tabstrip.select().index();
+        var gridId = currentGrid();
+        var idsToSend = checkedItems(gridId);
+
+        if (idsToSend.length > 0) {
+
+            var model = {
+                id: idsToSend,
+                TabIndex: selectedIndex,
+                Reason: $("#reason").val(),
+                UserType: userType.getType
+            }
+            var obj = {};
+            obj.confirm = "Виконати сторнування?";
+            obj.success = "Документи сторновано!";
+
+            bars.ui.confirm({ text: obj.confirm }, function () {
+                multiRequest(model, "stornoAll", obj.success);
+                $("#reasonWindow").data("kendoWindow").close();
+            });
+        } else {
+            bars.ui.notify("Увага!", "Оберіть хоча б один запис", "error");
+        }
+    });
+
     $(function () {
         function onClose() {
             $("#reasonWindow").fadeIn();
@@ -803,11 +830,28 @@ $(document).ready(function () {
             actions: ["Close"],
             close: onClose
         });
+
+        $("#reasonBackAllWindow").kendoWindow({
+            width: "500px",
+            title: "Вкажіть причину сторнування для виділених операцій",
+            resizable: false,
+            visible: false,
+            modal: true,
+            actions: ["Close"],
+            close: function () {
+                $("#reasonBackAllWindow").fadeIn();
+            }
+        });
     });
 
     $("#stornoBtn").click(function () {
         $("#reasonWindow").data("kendoWindow").center().open();
     });
+
+    $("#stornoAllBtn").click(function () {
+        $("#reasonBackAllWindow").data("kendoWindow").center().open();
+    });
+    
     //-----------------------------------------------------------------------------------------------------
 
     //----------------------------------Вікно для вказання виявленої помилки-------------------------------
