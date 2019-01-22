@@ -52,26 +52,35 @@ namespace BarsWeb.Areas.Crkr.Infrastructure.DI.Implementation
             if (item.UserType == UserType.Back)
                 procName = "crkr_compen_web.refuse_act_visa_bk";
 
-            var connection = OraConnector.Handler.UserConnection;
-            try
+            using (var connection = OraConnector.Handler.UserConnection)
             {
-                var command = new OracleCommand(procName, connection);
-                command.CommandType = CommandType.StoredProcedure;
+                using (var command = new OracleCommand(procName, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
 
-                var approveListParam = new OracleParameter("p_oper_list", OracleDbType.Array, item.id.Length, item.id, ParameterDirection.Input);
-                approveListParam.UdtTypeName = "NUMBER_LIST";
-                command.Parameters.Add(approveListParam);
-                command.Parameters.Add("p_reason", OracleDbType.Varchar2, item.Reason, ParameterDirection.Input);
-                command.ExecuteNonQuery();
+                    var approveListParam = new OracleParameter("p_oper_list", OracleDbType.Array, item.id.Length, item.id, ParameterDirection.Input);
+                    approveListParam.UdtTypeName = "NUMBER_LIST";
+                    command.Parameters.Add(approveListParam);
+                    command.Parameters.Add("p_reason", OracleDbType.Varchar2, item.Reason, ParameterDirection.Input);
+                    command.ExecuteNonQuery();
+                }
             }
-            catch (Exception ex)
+        }
+
+        public void StornoAllDbProc(PaymentsList item)
+        {
+            using (var connection = OraConnector.Handler.UserConnection)
             {
-                throw new Exception(ex.Message);
-            }
-            finally
-            {
-                connection.Close();
-                connection.Dispose();
+                using (var command = new OracleCommand("crkr_compen_web.refuse_act_visa_all_bk", connection))
+                {
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        var approveListParam = new OracleParameter("p_oper_list", OracleDbType.Array, item.id.Length, item.id, ParameterDirection.Input);
+                        approveListParam.UdtTypeName = "NUMBER_LIST";
+                        command.Parameters.Add(approveListParam);
+                        command.Parameters.Add("p_reason", OracleDbType.Varchar2, item.Reason, ParameterDirection.Input);
+                        command.ExecuteNonQuery();
+                }
             }
         }
 
