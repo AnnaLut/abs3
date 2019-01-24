@@ -7,6 +7,7 @@ create or replace force view v_nbur_3MX
        , KF
        , VERSION_ID
        , NBUC
+         , FIELD_CODE
        , EKP
        , KU
        , T071
@@ -31,7 +32,8 @@ as
 select t.REPORT_DATE
        , t.KF
        , t.VERSION_ID
-       , t.KF   as NBUC
+       , lpad(trim(to_char(t.KU)),2,'0')   as NBUC
+         , substr(trim(t.Q003_1),1,3)   as FIELD_CODE
        , t.EKP
        , t.KU
        , t.T071
@@ -89,7 +91,8 @@ comment on table  v_nbur_3mx is 'Файл 3MX - Надходження та перекази безготівково
 comment on column v_nbur_3mx.REPORT_DATE is 'Звiтна дата';
 comment on column v_nbur_3mx.KF is 'Фiлiя';
 comment on column v_nbur_3mx.VERSION_ID is 'Номер версії файлу';
-comment on column v_nbur_3mx.NBUC is 'Код МФО';
+comment on column v_nbur_3mx.NBUC is 'Код розрізу даних';
+comment on column v_nbur_3mx.FIELD_CODE is 'Код показника';
 comment on column v_nbur_3mx.EKP is 'XML Код показника';
 comment on column v_nbur_3mx.KU is 'Код території';
 comment on column v_nbur_3mx.T071 is 'Сума';
