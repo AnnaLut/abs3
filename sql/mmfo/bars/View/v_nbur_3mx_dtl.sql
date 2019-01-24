@@ -6,7 +6,7 @@ CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_3MX_DTL
 AS
 select p.REPORT_DATE
          , p.KF
-         , p.NBUC
+         , p.ku       as NBUC
          , p.VERSION_ID
          , p.Q003_1   as FIELD_CODE
          , p.EKP

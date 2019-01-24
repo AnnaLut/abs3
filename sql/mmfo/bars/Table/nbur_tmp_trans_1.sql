@@ -42,6 +42,7 @@ begin
 	P55 VARCHAR2(1), 
 	P62 VARCHAR2(1), 
 	REFD NUMBER, 
+	D1#2D VARCHAR2(2), 
 	D1#E2 VARCHAR2(2), 
 	D6#E2 VARCHAR2(3), 
 	D7#E2 VARCHAR2(10), 
@@ -98,6 +99,14 @@ COMMENT ON COLUMN BARS.NBUR_TMP_TRANS_1.NMK IS '';
 COMMENT ON COLUMN BARS.NBUR_TMP_TRANS_1.BAL_UAH IS '';
 
 
+begin
+    execute immediate 'alter table BARS.NBUR_TMP_TRANS_1 add (D1#2D  varchar2(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.NBUR_TMP_TRANS_1.D1#2D IS '';
 
 
 PROMPT *** Create  constraint SYS_C00139918 ***
