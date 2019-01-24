@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ======= Scripts /Sql/BARS/Procedure/NBUR_P_F4PX.sql ======= *** Run *** =
+PROMPT ===================================================================================== 
+
 CREATE OR REPLACE PROCEDURE BARS.nbur_p_f4px (
                                            p_kod_filii          varchar2
                                            , p_report_date      date
@@ -10,9 +14,9 @@ is
 % DESCRIPTION : Процедура формирования 4PX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.006       03.12.2018
+% VERSION     :  v.19.001       24.01.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_               char(30)  := ' v.18.006   03.12.2018';
+  ver_               char(30)  := ' v.19.001   24.01.2019';
   c_title            constant varchar2(100 char) := $$PLSQL_UNIT || '. ';
 
   --Константы определяющие форматы данных
@@ -184,7 +188,8 @@ BEGIN
                    , l_version_id
                    , substr(nbuc, 3) as b040
                    , (case when seg_01 = '31' then 'A4P007' else 'A4P006' end) as ekp
-                   , (case when seg_03 in ('100', '230', '262', '271', '272', '273', '279', '311', '312', '320', '330', '341', '342', '350', '361', '362') 
+                   , (case when seg_03 in ('100','311','312','320','341','342','350','361',
+                                             '230', '262', '271', '272', '273', '279', '330', '362') 
                            then '#' 
                            else substr(acc_num, 1, 4) 
                       end) as r020
@@ -198,7 +203,10 @@ BEGIN
                            else lpad(c.country, 3, '0') 
                       end) as k040
                    , (case when seg_01 = '21' then '2' else '1' end) as s050
-                   , nvl(k.s184, '#') as s184
+                   , (case when seg_03 in ('230', '262', '271', '272', '273', '279', '330', '362')
+                           then '#' 
+                           else nvl(k.s184, '#') 
+                      end) as s184
                    , (case
                           when substr(acc_num, 1, 4) like '___8' and 
                                substr(acc_num, 1, 4) <> '3548' then '2'
@@ -209,10 +217,13 @@ BEGIN
                            then '#' 
                            else '2'
                       end) as f045
-                   , '2' as f046
+                   , (case when seg_01 ='31'  or  seg_03 in ('230','262','271','272','273','279','330','362')
+                              then '#'  else '2' end) as f046    --# для A4P007
                    , '#' as f047
-                   , '3' as f048
-                   , '1' as f049
+                   , (case when seg_01 ='31'  or  seg_03 in ('230','262','271','272','273','279','330','362')
+                              then '#'  else '3' end) as f048    --# для A4P007
+                   , (case when seg_01 ='31'  or  seg_03 in ('230','262','271','272','273','279','330','362')
+                              then '#'  else '1' end) as f049    --# для A4P007
                    , '#' as f050
                    , '#' as f052
                    , '#' as f053
@@ -298,14 +309,27 @@ BEGIN
                   when substr(EKP, 1,6) ='A4P006' and r030_2 is null and
                        (F057 is null or F057 not in ('230','262','271','272','273','279','330','362'))
                     then        r030_1
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
                   else          r030_2   
                 end)         as  R030_2, 
-            K040,
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         K040
+                end)         as  K040, 
             substr(ekp, 7,1) as  S050,
-            S184,
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(S184))
+                end)         as  S184, 
             substr(ekp, 8,1) as  F028,
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                     then       '#'
                   else         trim(to_char(F045))
@@ -313,59 +337,65 @@ BEGIN
               (case
                   when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
                                          and  F057 in ('230','262','271','272','273','279','330','362')
-                    then       '#'
+                     then       '#'
+                  when substr(EKP, 1,6) ='A4P007'
+                     then       '#'
                   else         trim(to_char(F046))
                 end)         as  F046, 
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                     then       '#'
-                  else         trim(to_char(F047))
+                  else         substr('123456789AB',F047,1)
                 end)         as  F047, 
               (case
                   when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
                                          and  F057 in ('230','262','271','272','273','279','330','362')
-                    then       '#'
+                     then       '#'
+                  when substr(EKP, 1,6) ='A4P007'
+                     then       '#'
                   else         trim(to_char(F048))
                 end)         as  F048, 
               (case
                   when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
                                          and  F057 in ('230','262','271','272','273','279','330','362')
-                    then       '#'
+                     then       '#'
+                  when substr(EKP, 1,6) ='A4P007'
+                     then       '#'
                   else         trim(to_char(F049))
                 end)         as  F049, 
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                     then       '#'
                   else         trim(to_char(F050))
                 end)         as  F050, 
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                     then       '#'
                   else         trim(to_char(F052))
                 end)         as  F052, 
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                     then       '#'
                   else         trim(to_char(F053))
                 end)         as  F053, 
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                     then       '#'
                   else         trim(to_char(F054))
                 end)         as  F054, 
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                      then      '#'
                   else         trim(to_char(F055))
                 end)         as  F055, 
               (case
-                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
                                          and  F057 in ('230','262','271','272','273','279','330','362')
                      then      '#'
                   else         trim(to_char(F056))
@@ -376,7 +406,13 @@ BEGIN
                    then                  trim(to_char(F070))
                  else                    '#'
               end)           as  F070, 
-            K020, Q001_1, Q001_2, Q003_1, Q003_2, Q003_3,  Q006, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '0000000000'
+                  else         K020
+                end)         as  K020, 
+            Q001_1, Q001_2, Q003_1, Q003_2, Q003_3,  Q006, 
             to_char(Q007_1, 'dd.mm.yyyy') as Q007_1, to_char(Q007_2, 'dd.mm.yyyy') as Q007_2, 
             to_char(Q007_3, 'dd.mm.yyyy') as Q007_3, Q010_1, Q010_2, Q012, Q013, Q021, Q022, value as T071,
             'F503' DESCRIPTION, ND, BRANCH
@@ -540,14 +576,80 @@ BEGIN
              end)        as  R020,
             R030_1,
             R030_2, 
-            K040, S050, S184, F028, F045, 
-            F046, F047, F048, F049, F050, 
-            F052, F053, F054, F055, F056, F057,
-            (case
-                when EKP ='A4P005'  then F070
-                 else                    '#'
-              end)              F070, 
-            K020, Q001_1, Q001_2, Q003_1, Q003_2, Q003_3,  Q006, to_char(Q007_1, 'dd.mm.yyyy') as Q007_1, 
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         K040
+                end)         as  K040, 
+            S050,
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(S184))
+                end)         as  S184, 
+            F028,
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F045))
+                end)         as  F045, 
+            (case  when EKP ='A4P007'  then '#'  else  trim(to_char(F046))   end)         F046,
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         substr('123456789AB',F047,1)
+                end)         as  F047, 
+            (case  when EKP ='A4P007'  then '#'  else  trim(to_char(F048))   end)         F048,
+            (case  when EKP ='A4P007'  then '#'  else  trim(to_char(F049))   end)         F049,
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F050))
+                end)         as  F050, 
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F052))
+                end)         as  F052, 
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F053))
+                end)         as  F053, 
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F054))
+                end)         as  F054, 
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F055))
+                end)         as  F055, 
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F056))
+                end)         as  F056, 
+            F057,
+            (case  when EKP ='A4P005'  then F070  else  '#'   end)         F070, 
+              (case
+                  when F057 is not null  and  EKP in ('A4P006','A4P007')
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '0000000000'
+                  else         K020
+                end)         as  K020, 
+            Q001_1, Q001_2, Q003_1, Q003_2, Q003_3,  Q006, to_char(Q007_1, 'dd.mm.yyyy') as Q007_1, 
             to_char(Q007_2, 'dd.mm.yyyy') as Q007_2,  to_char(Q007_3, 'dd.mm.yyyy') as Q007_3, 
             Q010_1, Q010_2, Q012, Q013, Q021, Q022, T071,
             'F504' DESCRIPTION, ND, BRANCH
@@ -688,3 +790,8 @@ BEGIN
   logger.info(c_title ||' end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END;
 /
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ======= Scripts /Sql/BARS/Procedure/NBUR_P_F4PX.sql ======= *** End *** =
+PROMPT ===================================================================================== 
+
