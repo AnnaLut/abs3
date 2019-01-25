@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования 8BX в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001 10/12/2018 
+% VERSION     :  v.18.002    24/01/2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.001    10/12/2018';
+  ver_                     char(30)  := 'v.18.002    24/01/2019';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -93,7 +93,7 @@ select p_report_date, p_kod_filii, version_id, nvl(trim(nbuc), l_nbuc), EKP, F10
 	      , agg.version_id
 	      , (case 
 	            when agg.seg_01 in ('01', '72', '92')             then 'A8B001'
-	            when agg.seg_01 in ('02', '97', 'A7', 'B1', 'B2') then 'A8B001'
+	            when agg.seg_01 in ('02', '97', 'A7', 'B1', 'B2') then 'A8B002'
 	            else 'A8B001'
 	         end)  as EKP
 	      , agg.seg_01 as F103
