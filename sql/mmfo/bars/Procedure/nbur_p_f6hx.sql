@@ -13,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6HX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 6HX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.001    26.11.2018
+ VERSION     :    v.18.002    24.01.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.001  26.11.2018';
+  ver_              char(30)  := 'v.18.002  24.01.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -74,7 +74,7 @@ begin
        ND, AGRM_NUM, BEG_DT, END_DT, BRANCH)
   select p_report_date, p_kod_filii, nvl(trim(xd.nbuc), l_nbuc),l_version_id,xd.version_id, 
        xd.EKP, xd.K020, xd.K021, xd.Q003_2, xd.Q003_4, xd.R030, 
-       xd.Q007_1, xd.Q007_2, xd.S210, xd.S083, xd.S080_1, xd.S080_2, xd.F074, xd.F077, 
+       xd.Q007_1, xd.Q007_2, xd.S210, vs.S083, xd.S080_1, xd.S080_2, xd.F074, xd.F077, 
        xd.F078, xd.F102, xd.Q017, xd.Q027, xd.Q034, xd.Q035, xd.T070_2, xd.T090, xd.T100_1, xd.T100_2, xd.T100_3, 
        vd.DESCRIPTION, vd.ACC_ID, vd.ACC_NUM, vd.KV, vd.CUST_ID, vd.CUST_CODE, vd.CUST_NAME,
        vd.ND, vd.AGRM_NUM, vd.BEG_DT, vd.END_DT, vd.BRANCH
@@ -89,7 +89,7 @@ begin
              , to_date(regexp_replace(trim(Q007_1),'(\d{2})(\d{2})(\d{4})','\1.\2.\3'),'dd.mm.yyyy') as Q007_1
              , to_date(regexp_replace(trim(Q007_2),'(\d{2})(\d{2})(\d{4})','\1.\2.\3'),'dd.mm.yyyy') as Q007_2
              , S210
-             , S083
+             --, S083
              , DECODE(NVL(S080_1,'0'),'0','#',S080_1) as S080_1
              , DECODE(NVL(S080_2,'0'),'0','#',S080_2) as S080_2
              , (case 
@@ -118,7 +118,7 @@ begin
                         , v.seg_03  as  Q003_2 -- NNNN (Q003_2)
                         , v.seg_07  as  K021   -- A (K021)
                         , v.seg_05  as  R030
-                        , v.seg_10  as  S083
+                       -- , v.seg_10  as  S083
                         , v.seg_06  as  Q003_4
                         , v.FIELD_VALUE
                  from V_NBUR_#D8 v
@@ -146,6 +146,15 @@ begin
                         and xd.Q003_2=vd.SEG_03
                         and xd.Q003_4=vd.SEG_06
                         and xd.R030=vd.SEG_05
+                        )
+      left join (select seg_02, seg_03, max(seg_10) S083
+                    from V_NBUR_#D8
+                   where report_date = p_report_date
+                    and kf = p_kod_filii
+                 group by seg_02, seg_03
+                    ) vs -- дані для обчислення s083
+                    on (xd.K020=vs.SEG_02
+                        and xd.Q003_2=vs.SEG_03
                         );
 
     commit;
