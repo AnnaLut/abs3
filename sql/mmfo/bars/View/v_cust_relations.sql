@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CUST_RELATIONS.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CUST_RELATIONS ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CUST_RELATIONS ("RNK", "REL_INTEXT", "RELEXT_ID", "RELCUST_RNK", "NAME", "DOC_TYPE", "DOC_NAME", "DOC_SERIAL", "DOC_NUMBER", "DOC_DATE", "DOC_ISSUER", "BIRTHDAY", "BIRTHPLACE", "SEX", "SEX_NAME", "ADR", "TEL", "EMAIL", "CUSTTYPE", "OKPO", "COUNTRY", "COUNTRY_NAME", "REGION", "FS", "FS_NAME", "VED", "VED_NAME", "SED", "SED_NAME", "ISE", "ISE_NAME", "NOTES") AS 
-  select cr.rnk,
+create or replace view v_cust_relations as
+select cr.rnk,
        cr.rel_intext,
        decode(cr.rel_intext, 0, cd.relcust_code, null) as relext_id,
        decode(cr.rel_intext, 1, cd.relcust_code, null) as relcust_rnk,
@@ -39,7 +30,10 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
        s.name        as sed_name,
        cd.ise,
        i.name        as ise_name,
-       cd.notes
+       cd.notes,
+       cd.date_photo,
+       cd.eddr_id,
+       cd.actual_date
   from (select rnk, rel_intext, rel_rnk
           from customer_rel
          group by rnk, rel_intext, rel_rnk) cr,
@@ -65,7 +59,10 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
                ce.ved,
                ce.sed,
                ce.ise,
-               ce.notes
+               ce.notes,
+               ce.date_photo,
+               ce.eddr_id,
+               ce.actual_date
           from customer_extern ce
         union all
         select c.rnk as relcust_code,
@@ -90,7 +87,10 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
                c.ved,
                c.sed,
                c.ise,
-               f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes
+               f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes,
+               p.date_photo,
+               p.eddr_id,
+               p.actual_date
           from customer c, person p
          where c.custtype = 3
            and c.rnk = p.rnk(+)
@@ -117,7 +117,10 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
                c.ved,
                c.sed,
                c.ise,
-               f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes
+               f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes,
+               null date_photo,
+               null eddr_id,
+               null actual_date
           from customer c, corps cp
          where c.custtype = 2
            and c.rnk = cp.rnk(+)
@@ -144,7 +147,10 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
                c.ved,
                c.sed,
                c.ise,
-               f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes
+               f_get_custw_h(c.rnk, 'RCOMM', sysdate) as notes,
+               null date_photo,
+               null eddr_id,
+               null actual_date
           from customer c, custbank cb
          where c.custtype = 1
            and c.rnk = cb.rnk(+)

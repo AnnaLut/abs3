@@ -692,6 +692,11 @@
                         field: "ERR_MSG",
                         title: "Найменування  помилки",
                         width: "250px"
+                    },
+                    {
+                        field: "Is_close_acc_only",
+                        title: "Файл містить тільки рах на закр.",
+                        width: "100px"
                     }
             ]
         }
@@ -1807,7 +1812,7 @@
                         url: bars.config.urlContent("/api/Dpa/RegisterCountsDpaApi/GetFormedFilesF0Grid") + "?file_type=" + file_type,
                     }
                 },
-                serverFiltering: true,
+                serverFiltering: false,
                 serverSortering: true,
                 schema: {
                     data: "Data",
@@ -1833,6 +1838,9 @@
                                 type: 'string'
                             },
                             ERR_MSG: {
+                                type: 'string'
+                            },
+                            Is_close_acc_only: {
                                 type: 'string'
                             }
                         }

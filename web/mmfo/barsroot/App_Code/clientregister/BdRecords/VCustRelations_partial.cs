@@ -46,7 +46,7 @@ namespace clientregister
                 kl.SETCUSTOMEREXTERN(ref EXT_ID, Item.NAME, Item.DOC_TYPE, Item.DOC_SERIAL, Item.DOC_NUMBER,
                     Item.DOC_DATE, Item.DOC_ISSUER, Item.BIRTHDAY, Item.BIRTHPLACE, Item.SEX, Item.ADR, Item.TEL,
                     Item.EMAIL, Item.CUSTTYPE, Item.OKPO, Item.COUNTRY, Item.REGION, Item.FS, Item.VED, Item.SED,
-                    Item.ISE, Item.NOTES);
+                    Item.ISE, Item.NOTES, Item.DATE_PHOTO, Item.EDDR_ID, Item.ACTUAL_DATE);
             }
         }
         public new void Insert(VCustRelationsRecord Item)
@@ -63,7 +63,7 @@ namespace clientregister
                 kl.SETCUSTOMEREXTERN(ref EXT_ID, Item.NAME, Item.DOC_TYPE, Item.DOC_SERIAL, Item.DOC_NUMBER,
                     Item.DOC_DATE, Item.DOC_ISSUER, Item.BIRTHDAY, Item.BIRTHPLACE, Item.SEX, Item.ADR, Item.TEL,
                     Item.EMAIL, Item.CUSTTYPE, Item.OKPO, Item.COUNTRY, Item.REGION, Item.FS, Item.VED, Item.SED,
-                    Item.ISE, Item.NOTES);
+                    Item.ISE, Item.NOTES, Item.DATE_PHOTO, Item.EDDR_ID, Item.ACTUAL_DATE);
                 kl.SETCUSTOMERREL(Item.RNK, RELID, EXT_ID, Item.REL_INTEXT, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
             }
             else

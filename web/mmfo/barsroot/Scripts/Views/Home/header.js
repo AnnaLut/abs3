@@ -312,4 +312,39 @@ $(document).ready(function () {
         }
     });
 
+    //для вычисения выпадющего списка
+    var element_treeview = document.getElementById("userBranches");
+    var Height = document.documentElement.offsetHeight - 100;
+    element_treeview.style.maxHeight = Height + "px";
+   // alert(document.documentElement.offsetHeight);
+
 });
+
+/* ****Teller messages**** */
+
+function TellerMessages() {
+    var url = '/barsroot/messagesctrl/TellerMessages/';
+    $.ajax({
+        type: 'POST',
+        url: url,
+        success: function (data) {
+            if (data.message)
+                ShowTellerMessages(data.message);
+        },
+        error: function (err) {
+
+        }
+    });
+}
+
+function ShowTellerMessages(message) {
+    $('#teller-message-text').html(message);
+    $('#teller-preloader').show().css('zIndex', '1050');
+    $('#teller-messages-window').show('fast');
+}
+
+function ConfirmReadTellerMessages() {
+    $('#teller-messages-window').hide('fast');
+    $('#teller-preloader').hide().css('zIndex', '500');
+    TellerMessages();
+}

@@ -191,7 +191,12 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
         }
         public void LogOutUser()
         {
+            
             var context = HttpContext.Current;
+            var session = context.Session;
+            if (session != null && session["called_logout"] != null && session["called_logout"].ToString() == "true")
+                return;
+
             if (ConfigurationSettings.AppSettings["CustomAuthentication.UseSession"] != "On")
             {
                 string port = (context.Request.ServerVariables["SERVER_PORT"] == "80") ? ("") : (context.Request.ServerVariables["SERVER_PORT"]);
@@ -204,7 +209,7 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
                 }
             }
             ClearSessionTmpDir();
-            HttpContext.Current.Session["called_logout"] = "true";
+            session["called_logout"] = "true";
             // clear session in db
             _entities.ExecuteStoreCommand("begin bars.bars_login.logout_user; end;");
             // clear context user
@@ -215,11 +220,18 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
         {
             if (session == null || (session["called_logout"] != null && session["called_logout"].ToString() == "true"))
                 return;
-            
             ClearSessionTmpDir();
-            string connStr = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
-            using (OracleConnection conn = new OracleConnection())
-            using (OracleCommand cmd = new OracleCommand())
+            string connStr = string.Empty;
+            string isTurnCloseWindowLogout = System.Configuration.ConfigurationManager.AppSettings["turnCloseWindowLogout"] as String ?? "";
+            string timeStopLogoutFrom = System.Configuration.ConfigurationManager.AppSettings["timeStopLogoutFromHH:mm:ss"] as String ?? "";
+            string timeStopLogoutTo = System.Configuration.ConfigurationManager.AppSettings["timeStopLogoutToHH:mm:ss"] as String  ?? "";
+            if(isTurnCloseWindowLogout == "true" && (string.IsNullOrEmpty(timeStopLogoutFrom) || string.IsNullOrEmpty(timeStopLogoutTo) 
+                || !DateTimeHelper.IsTimeBetween(timeStopLogoutFrom, timeStopLogoutTo)))
+            {
+                
+                connStr = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
+                using (OracleConnection conn = new OracleConnection())
+                using (OracleCommand cmd = new OracleCommand())
                 {
                     conn.ConnectionString = connStr;
                     conn.Open();
@@ -229,9 +241,15 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
                     cmd.CommandText = "bars.bars_login.logout_user";
                     cmd.ExecuteNonQuery();
                 }
+                session["called_logout"] = "true";
+            }
             
+           
 
+          
         }
+
+   
         public string GetHostName()
         {
             string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];

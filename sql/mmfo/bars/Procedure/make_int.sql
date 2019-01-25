@@ -136,6 +136,10 @@ create or replace procedure MAKE_INT
   l_is8            number := 0;
   l_adj_f          boolean;
 
+  -- COBUMMFO-9690 Begin
+  l_module         varchar2(64);
+  l_action         varchar2(64);
+  -- COBUMMFO-9690 End
   --
   -- инициализация записи "заготовка платежа"
   --
@@ -564,6 +568,7 @@ create or replace procedure MAKE_INT
       then
         return g_taxnls_list( SubStr(p_branch,1,15) );
       else
+        dbms_application_info.set_action( l_action ); -- COBUMMFO-9690
         raise_application_error( -20666, 'Не знадено рахунок утримання прибуткового податку для відділення '||p_branch, true );
       end if;
     end if;
@@ -587,6 +592,7 @@ create or replace procedure MAKE_INT
       then
         return g_taxnls_list_military( SubStr(p_branch,1,15) );
       else
+        dbms_application_info.set_action( l_action ); -- COBUMMFO-9690
         raise_application_error( -20666, 'Не знадено рахунок утримання прибуткового податку для відділення '||p_branch, true );
       end if;
     end if;
@@ -599,6 +605,7 @@ begin
   bars_audit.trace( '%s старт, начисление по %s, режим %s, запуск № %s', title
                   , to_char(p_dat2, 'dd.mm.yy'), to_char(p_runmode), to_char(p_runid));
 
+  dbms_application_info.read_module( l_module, l_action ); -- COBUMMFO-9690
   dbms_application_info.set_action( 'MAKE_INT' );
 
   if ((p_runmode = 1) and (l_tax_method = 2 or l_tax_method = 3))
@@ -1747,7 +1754,7 @@ begin
     l_rwlist.delete;
   end loop;
 
-  dbms_application_info.set_action( null );
+  dbms_application_info.set_action( l_action /*null -- COBUMMFO-9690*/ );
 
   bars_audit.trace( '%s финиш, начисление по %s, режим %s, запуск № %s'
                   , title, to_char(p_dat2, 'dd.mm.yy'), to_char(p_runmode), to_char(p_runid) );

@@ -6284,11 +6284,16 @@ is
     l_vrsn_id             nbur_lst_versions.version_id%type;
     l_iot                 all_tables.iot_type%type;
 
+    -- COBUMMFO-9690 Begin
+    l_module    varchar2(64);
+    l_action    varchar2(64);
+    -- COBUMMFO-9690 End
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s ).'
                     , title, to_char(p_report_date,fmt_dt), p_kf );
 
+    dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
     -- check and lock
     if ( p_vrsn_id Is Null )
     then
@@ -6394,7 +6399,7 @@ $end
     t_tbl_lst.delete();
 
     dbms_application_info.set_client_info( null );
-    dbms_application_info.set_action( null );
+    dbms_application_info.set_action( l_action /*null -- COBUMMFO-9690*/ );
 
     bars_audit.trace( '%s: Exit.', title );
 

@@ -93,7 +93,8 @@ begin
       into l_extrnval
       from meta_extrnval e, meta_columns c
      where e.srctabid = l_tabid
-       and e.srctabid = c.tabid and e.srccolid = c.colid;
+       and e.srctabid = c.tabid and e.srccolid = c.colid
+       and  exists (select 1 from meta_columns where tabid = e.tabid and colid = e.colid); -- кто то нахомутал с описанием для 1011748	REZ_CR
 
     -- сохраняем ссылки для условий фильтра полей других таблиц на поля нашей таблицы
     select b.hosttabid, b.hostcolkeyid, c.colname, v.colname, b.addtabalias, v.semantic
@@ -126,6 +127,7 @@ begin
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 1, 'PAWN', 'N', 'Код виду~забезпечення~(внутрiшнiй)', '', 10, 1, 1, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Найменування~виду забезпечення', '', 250, 3, 1, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'R013', 'C', 'R013', '', 2, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'NBSZ', 'C', 'Бал.рах.забезп.~(знаход.у заст-давця)', '', 4, 20, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'NBSZ2', 'C', 'Бал.рах.забезп.~(передано банку)', '', 4, 21, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'NBSZ3', 'C', 'Бал.рах.забезп.~(у третiх осiб)', '', 4, 22, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);

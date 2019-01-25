@@ -4801,6 +4801,34 @@ is
   l_accpf    accounts.acc%type;
   l_nls_pf   accounts.nls%type;
 
+procedure chk_acc (p_nls accounts.nls%type,p_acc_role number )
+  /* перевірка, чи не картковий рахунок p_nls ? ZAY11/12 --9550*/ 
+  is
+  i number;
+  l_acc_role varchar(50);
+begin
+  if     p_acc_role=1 then l_acc_role:='Т/р для списання'   ;    
+   elsif p_acc_role=2 then l_acc_role:='Р/р для зарахування';    
+   elsif p_acc_role=3 then l_acc_role:='Р/р для повернення грн.';
+  end if;
+       begin
+          select 1 into i 
+          from accounts 
+          where nls = p_nls and rnk = p_rnk and rownum = 1
+          and tip  like 'W4%' 
+          and (CASE WHEN nbs=2600 AND ob22='14' THEN 1 
+                    when nbs=2600 THEN 0 
+                    else 0 END) = 1 ;  
+       
+          msg  := 'Р/С не может быть карточным' || p_nls ;
+          ern  := 65;
+          prm  := l_acc_role;
+          prm1 := p_nls;
+          bars_audit.trace('%s %s ERROR - p_rnk=>%s, p_nls=>%s', l_title, l_tmode, to_char(p_rnk), to_char(p_nls26));
+          raise err;                               
+       exception when no_data_found then null;
+       end;   
+end;  
 
 begin
 ------------------------
@@ -4818,6 +4846,8 @@ begin
          bars_audit.trace('%s %s ERROR - p_rnk=>%s, p_nls29=>%s', l_title, l_tmode, to_char(p_rnk), to_char(p_nls29));
          raise err;
     end;
+--COBUMMFO-9550 1    
+         chk_acc(p_nls29,1);    
     end if;
 
     if p_mfo26 is not null and p_nls26 is not null then
@@ -4832,6 +4862,8 @@ begin
             bars_audit.trace('%s %s ERROR - p_rnk=>%s, p_nls26=>%s', l_title, l_tmode, to_char(p_rnk), to_char(p_nls26));
             raise err;
        end;
+--COBUMMFO-9550 2    
+         chk_acc(p_nls26,2);
      end if;
     end if;
 
@@ -4857,6 +4889,8 @@ begin
             raise err;
        end if;
      end if;
+--COBUMMFO-9550 3    
+         chk_acc(p_nls26,3);
     end if;
 
     if p_NLS_KOM is not null then
@@ -4932,6 +4966,8 @@ begin
          bars_audit.trace('%s %s ERROR - p_rnk=>%s, p_nls29=>%s', l_title, l_tmode, to_char(p_rnk), to_char(p_nls29));
          raise err;
     end;
+--COBUMMFO-9550 1    
+         chk_acc(p_nls29,1);
     end if;
 
     if p_mfo26 is not null and p_nls26 is not null and (p_mfo26<>l_mfo26 or p_nls26<>l_nls26) then
@@ -4946,6 +4982,9 @@ begin
             bars_audit.trace('%s %s ERROR - p_rnk=>%s, p_nls26=>%s', l_title, l_tmode, to_char(p_rnk), to_char(p_nls26));
             raise err;
        end;
+--COBUMMFO-9550 2
+     chk_acc(p_nls26,2);
+                
      end if;
     end if;
 
@@ -4971,6 +5010,8 @@ begin
             raise err;
        end if;
      end if;
+--COBUMMFO-9550 3     
+     chk_acc(p_nlsv,3); 
     end if;
 
     if p_NLS_KOM is not null and p_nls_kom<>l_nls_kom  then

@@ -842,19 +842,18 @@ function showOB22(tabName, showFields, whereClause) {
     });
 }
 
-function showR013(tabName, showFields, whereClause) {
+function showR013(tabName) {
     var grid = $("#gridExistProvide").data("kendoGrid");
     var selected = grid.select();
     bars.ui.handBook(tabName, function (data) {
         $("#r013").val(data[0].R013);
     },
     {
-        columns: [{ field: "R013", width: 50 }, { field: "TXT", width: 450 }],
+        columns: [{ field: "R013", width: 50 }],
         multiSelect: false,
-        clause: selected.length > 0 ? "where R020 = substr(" + grid.dataItem(selected).NLS + ", 1, 4) and d_close is null" :
-            "where d_close is null AND R020 = (select NBSZ from cc_pawn where d_Close IS NULL AND pawn = " + $("#pawn_list").data("kendoDropDownList").value() + ")",
+        clause: "where d_close is null AND pawn = " + $("#pawn_list").data("kendoDropDownList").value(),
         ResizedColumns: true
-
+ 
     });
 }
 

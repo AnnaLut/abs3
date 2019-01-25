@@ -7768,10 +7768,16 @@ procedure AUTO_PAYOUT_INTEREST
   l_errflg     boolean;
   l_errmsg     sec_audit.rec_message%type;
   error_       exception;
+  -- COBUMMFO-9690 Begin
+  l_module     varchar2(64);
+  l_action     varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   bars_audit.trace( '%s start with: p_bdate=>%s.', title, to_char(p_bdate,'dd.mm.yyyy') );
 
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
+  
   if ( sys_context('bars_context','policy_group') = 'FILIAL' )
   then
 
@@ -8019,7 +8025,7 @@ begin
   -- фіксація успішного завершення автоматичного завдання в журналі
   dpt_jobs_audit.p_finish_job( modcode, l_runid );
 
-  dbms_application_info.set_module(NULL, NULL);
+  dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
   dbms_application_info.set_client_info(NULL);
 
   bars_audit.trace( '%s exit.', title );
@@ -8032,12 +8038,13 @@ exception
     bars_audit.error( title||chr(10)||dbms_utility.format_error_stack()
                                     ||dbms_utility.format_error_backtrace() );
 
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
     if ( l_runid is Not Null )
     then -- фіксація завершення автоматичного завдання з помилкою в журналі
 
       dpt_jobs_audit.p_finish_job( modcode, l_runid, SubStr(dbms_utility.format_error_stack(), 1, 3000) );
 
-      dbms_application_info.set_module(NULL, NULL);
+      -- dbms_application_info.set_module(NULL, NULL); -- Comment COBUMMFO-9690
       dbms_application_info.set_client_info(NULL);
 
     else -- генерація повідомлення про помилку виконання
@@ -8066,9 +8073,16 @@ procedure AUTO_PAYOUT_DEPOSIT
   l_errflg     boolean;
   l_errmsg     sec_audit.rec_message%type;
   error_       exception;
+  
+  -- COBUMMFO-9690 Begin
+  l_module     varchar2(64);
+  l_action     varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   bars_audit.trace( '%s start with: p_bdate=>%s.', title, to_char(p_bdate,'dd.mm.yyyy') );
+
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
 
   l_errmsg := check_running_task('AUTO_PAYOUT_DEPOSIT');
 
@@ -8230,7 +8244,7 @@ $end
   -- фіксація успішного завершення автоматичного завдання в журналі
   dpt_jobs_audit.p_finish_job( modcode, l_runid );
 
-  dbms_application_info.set_module(NULL, NULL);
+  dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
   dbms_application_info.set_client_info(NULL);
 
   bars_audit.trace( '%s exit.', title );
@@ -8243,7 +8257,7 @@ exception
     -- фіксація завершення автоматичного завдання з помилкою в журналі
     dpt_jobs_audit.p_finish_job( modcode, l_runid, SubStr(dbms_utility.format_error_stack(), 1, 3000) );
 
-    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
     dbms_application_info.set_client_info(NULL);
 
     ROLLBACK;
@@ -8513,9 +8527,16 @@ is
   type t_dputab is table of t_dpurec;
   l_dpu         t_dputab;
   err_close     exception;
+
+  -- COBUMMFO-9690 Begin
+  l_module     varchar2(64);
+  l_action     varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   bars_audit.trace( '%s entry, bdate=>%s', title, to_char(p_bdate, 'dd.mm.yyyy') );
+
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
 
   l_errmsg := check_running_task('AUTO_MOVE2ARCHIVE');
 
@@ -8620,7 +8641,7 @@ begin
   -- фіксація успішного завершення автоматичного завдання в журналі
   dpt_jobs_audit.p_finish_job( modcode, l_runid );
 
-  dbms_application_info.set_module(NULL, NULL);
+  dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
   dbms_application_info.set_client_info(NULL);
 
   commit;
@@ -8628,6 +8649,7 @@ begin
 exception
   when TASK_ALREADY_RUNNING
   then
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
     null;
 
   when OTHERS
@@ -8638,7 +8660,7 @@ exception
     -- фіксація завершення автоматичного завдання з помилкою в журналі
     dpt_jobs_audit.p_finish_job( modcode, l_runid, SubStr(dbms_utility.format_error_stack(), 1, 3000) );
 
-    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
     dbms_application_info.set_client_info(NULL);
 
     ROLLBACK;
@@ -8660,9 +8682,16 @@ procedure AUTO_MAKE_INT_FINALLY
   l_amount     oper.s%type;                                -- Сума
   l_errflg     boolean;                                    --
   l_errmsg     sec_audit.rec_message%type;
+
+  -- COBUMMFO-9690 Begin
+  l_module     varchar2(64);
+  l_action     varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   bars_audit.trace( '%s start with: p_bdate=>%s.', title, to_char(p_bdate,'dd.mm.yyyy') );
+
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
 
   l_errmsg := check_running_task('AUTO_MAKE_INT_FINALLY');
 
@@ -8721,7 +8750,7 @@ begin
   -- фіксація успішного завершення автоматичного завдання в журналі
   bars.dpt_jobs_audit.p_finish_job( modcode, l_runid );
 
-  dbms_application_info.set_module(NULL, NULL);
+  dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
   dbms_application_info.set_client_info(NULL);
 
   bars_audit.trace( '%s exit.', title );
@@ -8729,6 +8758,7 @@ begin
 exception
   when TASK_ALREADY_RUNNING
   then
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
     null;
 
   when OTHERS
@@ -8740,7 +8770,7 @@ exception
     -- фіксація завершення автоматичного завдання з помилкою в журналі
     dpt_jobs_audit.p_finish_job( modcode, l_runid, SubStr(dbms_utility.format_error_stack(), 1, 3000) );
 
-    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
     dbms_application_info.set_client_info(NULL);
 
     ROLLBACK;
@@ -8769,9 +8799,16 @@ procedure AUTO_MAKE_INTEREST
   l_amount     number;
   l_error      boolean;
   l_errmsg     sec_audit.rec_message%type;
+
+  -- COBUMMFO-9690 Begin
+  l_module     varchar2(64);
+  l_action     varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   bars_audit.trace( '%s p_bdate=%s, p_dpuid=%s', title, to_char(p_bdate,'dd.mm.yyyy'), to_char(p_dpuid) );
+
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
 
   if ( p_dpuid = 0 )
   then -- Нарахування по всьому портфелю
@@ -8882,13 +8919,15 @@ begin
             p_intamount => l_amount,   -- сума нарахованих відсотків
             p_errflg    => l_error);   -- ознака помилки
 
+  dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
+
   if ( p_dpuid = 0 )
   then
 
     -- фіксація успішного завершення автоматичного завдання в журналі
     dpt_jobs_audit.p_finish_job( modcode, l_runid );
 
-    dbms_application_info.set_module(NULL, NULL);
+    -- dbms_application_info.set_module(NULL, NULL); -- Comment COBUMMFO-9690
     dbms_application_info.set_client_info(NULL);
 
     -- bars_audit.info( bars_msg.get_msg( 'DPT', 'AUTOMAKEINTMNTH_DONE' ) );
@@ -8913,12 +8952,14 @@ exception
     bars_audit.error( title||chr(10)||dbms_utility.format_error_stack()
                            ||chr(10)||dbms_utility.format_error_backtrace() );
 
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
+  
     If ( p_dpuid = 0 AND l_runid is Not Null)
     Then
       -- фіксація завершення автоматичного завдання з помилкою в журналі
       dpt_jobs_audit.p_finish_job( modcode, l_runid, SubStr( dbms_utility.format_error_stack(), 1, 3000 ) );
 
-      dbms_application_info.set_module(NULL, NULL);
+      -- dbms_application_info.set_module(NULL, NULL); -- Comment COBUMMFO-9690
       dbms_application_info.set_client_info(NULL);
 
     Else
@@ -8943,9 +8984,16 @@ is
   l_mindatend   dpu_deal.dat_end%type;        -- попередній банківський день
   l_maxdatend   dpu_deal.dat_end%type;        -- поточний банківский день
   l_errmsg      sec_audit.rec_message%type;   --
+
+  -- COBUMMFO-9690 Begin
+  l_module     varchar2(64);
+  l_action     varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   bars_audit.trace( '%s start with: p_bdate=>%s.', title, to_char(p_bdate,'dd.mm.yyyy') );
+
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
 
   l_errmsg := check_running_task('AUTO_EXTENSION');
 
@@ -9082,7 +9130,7 @@ $end
   -- фіксація успішного завершення автоматичного завдання в журналі
   dpt_jobs_audit.p_finish_job( modcode, l_runid );
 
-  dbms_application_info.set_module(NULL, NULL);
+  dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
   dbms_application_info.set_client_info(NULL);
 
   bars_audit.trace( '%s exit.', title );
@@ -9095,7 +9143,7 @@ exception
     -- фіксація завершення автоматичного завдання з помилкою в журналі
     dpt_jobs_audit.p_finish_job( modcode, l_runid, SubStr(dbms_utility.format_error_stack(), 1, 3000) );
 
-    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL -- COBUMMFO-9690*/);
     dbms_application_info.set_client_info(NULL);
 
     ROLLBACK;

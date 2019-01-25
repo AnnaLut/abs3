@@ -115,7 +115,39 @@ exception when others then
  end;
 /
 
+PROMPT *** ADD COLUMN KOMB6 ***
+begin 
+   EXECUTE IMMEDIATE 'alter TABLE BARS.MONEX_MV_UO add ( KOMB6 VARCHAR2(15 BYTE) )';
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      IF SQLCODE = -01430
+      THEN
+         NULL;
+      ELSE
+         RAISE;
+      END IF;         -- ORA-01430: column being added already exists in table
+END;
+/
 
+PROMPT *** ADD COLUMN  KOMB7 ***
+begin 
+   EXECUTE IMMEDIATE 'alter TABLE BARS.MONEX_MV_UO add ( KOMB7      VARCHAR2(15 BYTE) )';
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      IF SQLCODE = -01430
+      THEN
+         NULL;
+      ELSE
+         RAISE;
+      END IF;         -- ORA-01430: column being added already exists in table
+END;
+/
+
+COMMENT ON COLUMN BARS.MONEX_MV_UO.KOMB6 IS 'рах.дох  посередника по комісії Системи суб.агента ';
+
+COMMENT ON COLUMN BARS.MONEX_MV_UO.KOMB7 IS 'рах.витр посередника по комісії Системи суб.агента ';
 
 PROMPT *** Create  grants  MONEX_MV_UO ***
 grant SELECT                                                                 on MONEX_MV_UO     to BARSREADER_ROLE;

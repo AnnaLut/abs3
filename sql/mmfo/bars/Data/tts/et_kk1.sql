@@ -179,7 +179,7 @@ begin
   delete from tts_vob where tt='KK1';
   begin
     insert into tts_vob(vob, tt, ord)
-    values (1, 'KK1', null);
+    values (1, 'KK1', 6);
   exception
     when dup_val_on_index then null;
     when others then
@@ -190,7 +190,7 @@ begin
   end;
   begin
     insert into tts_vob(vob, tt, ord)
-    values (6, 'KK1', null);
+    values (6, 'KK1', 1);
   exception
     when dup_val_on_index then null;
     when others then
@@ -201,7 +201,7 @@ begin
   end;
   begin
     insert into tts_vob(vob, tt, ord)
-    values (46, 'KK1', null);
+    values (46, 'KK1', 2);
   exception
     when dup_val_on_index then null;
     when others then
@@ -212,7 +212,7 @@ begin
   end;
   begin
     insert into tts_vob(vob, tt, ord)
-    values (124, 'KK1', null);
+    values (124, 'KK1', 3);
   exception
     when dup_val_on_index then null;
     when others then

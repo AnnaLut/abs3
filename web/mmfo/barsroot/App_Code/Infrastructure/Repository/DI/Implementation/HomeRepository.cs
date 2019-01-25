@@ -49,7 +49,21 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
                                 (select listagg(column_value, ',') within group (order by column_value) role_list 
                                     from table(user_adm_ui.get_user_role_codes(user_id))) as ROLES
                           from dual";
-            return _entities.ExecuteStoreQuery<USER_PARAM>(sql).FirstOrDefault();
+            USER_PARAM user_param = _entities.ExecuteStoreQuery<USER_PARAM>(sql).FirstOrDefault();
+            String tellerSql = @"select 
+                                    bars.teller_tools.is_teller() as HAS_TELLER_ROLE,
+                                    bars.teller_tools.get_teller() as IS_TELLER_ON
+                                 from dual";
+            try
+            {
+                user_param.TELLER_USER_PARAM = _entities.ExecuteStoreQuery<TELLER_USER_PARAM>(tellerSql).FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                user_param.TELLER_USER_PARAM = new TELLER_USER_PARAM();
+            }
+
+            return user_param;
         }
 
         public string DbName()

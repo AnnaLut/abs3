@@ -8854,7 +8854,8 @@ end if;
                                 'S9N',
                                 'S8V',
                                 'S36') OR
-                     a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26')
+                     (a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26'))
+                     or a.nbs in ('9601','9611')
                  AND (a.ostc <> 0 OR a.ostb <> 0 OR a.ostf <> 0 OR
                      a.dos + a.kos > 0 AND a.dapp >= gl.bdate)) LOOP
       serr_ := serr_ || ' Ñ÷ ' || k.nls || '/' || k.kv ||
@@ -9046,8 +9047,10 @@ end if;
                                 'S9N',
                                 'S8V',
                                 'S36') OR
-                     a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26')) LOOP
-      IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
+                     (a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26')
+                      )
+                 ) LOOP
+IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
         NULL;
       ELSE
         UPDATE accounts SET dazs = gl.bdate WHERE acc = k.acc;

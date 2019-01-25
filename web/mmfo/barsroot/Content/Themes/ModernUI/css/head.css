@@ -248,6 +248,9 @@ div.search .icon{
   font-size: 10px;
 }
 
+.btn_sbon { background-image: url('images/24/teller-money.png'); }
+.btn_teller_on { background-image: url('images/24/teller-user.png'); }
+.btn_teller_off { background-image: url('images/24/teller-off-user.png'); }
 .btn_mypage { background-image: url('images/24/user.png'); }
 .btn_gatges{background-image: url('images/24/gatges.png'); }
 .btn_toolkit{background-image: url('images/24/tools.png'); }

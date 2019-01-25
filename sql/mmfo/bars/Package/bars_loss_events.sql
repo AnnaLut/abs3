@@ -935,8 +935,14 @@ is
     l_dat31       date  := p_date - 1;
     l_RNK         number;
     l_ZO          int   := nvl(p_ZO,1);
+    
+    -- COBUMMFO-9690
+    l_module      varchar2(64);
+    l_action      varchar2(64);
+    -- COBUMMFO-9690
 begin
 
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
   dbms_application_info.set_action( 'LOSS_EVENTS' );
   dbms_application_info.set_client_info( 'Start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') || 'with p_ZO=' || to_char(p_ZO) );
 
@@ -1158,7 +1164,7 @@ begin
     dbms_application_info.set_client_info( 'LOSS_RESTRUCTURING: start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') );
     loss_restructuring( p_date, l_create_date , l_ZO );
 
-    dbms_application_info.set_action(NULL);
+    dbms_application_info.set_action(l_action /*NULL -- COBUMMFO-9690*/);
     dbms_application_info.set_client_info(NULL);
 
 end loss_events;

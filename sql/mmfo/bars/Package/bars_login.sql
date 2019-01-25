@@ -1138,7 +1138,13 @@ $end
         l_programs_with_finite_session string_list;
         last_activity_at date;
         l_cleared boolean;
+        
+        -- COBUMMFO-9690 Begin
+        l_module varchar2(64);
+        l_action varchar2(64);
+        -- COBUMMFO-9690 End
     begin
+        dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690 
         dbms_application_info.set_action( 'BARS_LOGIN.CLEAR_EXPIRED_SESSION');
         --ddl_utl.refresh_mview_autonomous('mv_global_context');
 
@@ -1212,11 +1218,11 @@ $end
                 end if;
             end if;
         end loop;
-        dbms_application_info.set_action(null);
+        dbms_application_info.set_action(l_action /*null -- COBUMMFO-9690*/);
         
     exception
         when others then
-            dbms_application_info.set_action(null);
+            dbms_application_info.set_action(l_action /*null -- COBUMMFO-9690*/);
 
             -- Восстанавливаем свой кл. идентификатор
             set_user_clientid(l_client_identifier);

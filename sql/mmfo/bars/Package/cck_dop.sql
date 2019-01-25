@@ -182,9 +182,35 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
   -- Авторизация КД
   procedure cc_autor(p_nd   in number,
                      p_saim in varchar2 default null,
-                     p_urov in varchar2 default null);
+                     p_urov in varchar2 default null
+                     );
+
+-- редагування довідника "Торговці-партнери"
+procedure edit_partner (p_id       in wcs_partners_all.id%type
+                       ,p_name     in wcs_partners_all.name%type
+                       ,p_type     in wcs_partners_all.type_id%type
+                       ,p_branch   in wcs_partners_all.branch%type
+                       ,p_p_mfo    in wcs_partners_all.ptn_mfo%type
+                       ,p_p_nls    in wcs_partners_all.ptn_nls%type
+                       ,p_p_okpo   in wcs_partners_all.ptn_okpo%type
+                       ,p_p_name   in wcs_partners_all.ptn_name%type
+                       ,p_mother   in wcs_partners_all.id_mather%type
+                       ,p_flag     in wcs_partners_all.flag_a%type
+                       ,p_comps    in wcs_partners_all.compensation%type
+                       ,p_perc     in wcs_partners_all.percent%type);
+
 
 function get_prod_old(p_prod varchar2) return varchar2;
+
+procedure paym_comission (p_nd       in cc_deal.nd%type
+                         ,p_amount   in number
+                         ,p_dealno   in cc_deal.cc_id%type
+                         ,p_dealdate in cc_deal.wdate%type
+                         ,p_txt      out varchar2);
+
+procedure paym_limit (p_nd     in cc_deal.nd%type
+                     ,p_amount in cc_deal.limit%type
+                     ,p_txt    out varchar2);
 
 function get_kk1_crd (p_nls  in accounts.nls%type
                      ,p_kv   in accounts.kv%type
@@ -214,7 +240,7 @@ END CCK_DOP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.06 13/07/2018';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.09 11/10/2018';
 
    /*
  13/07/2018 COBUMMFO-8410 Проверки и наследование обеспечения при авторизации
@@ -353,7 +379,8 @@ BEGIN
       else
         Vid_ := 1;
       end if;
-    else                                 Vid_ := 11;
+    else                                 
+      Vid_ := 11;
     end if;
 
     logger.trace('CCK_DOP.CC_OPEN  Вызов процедуры cck.CC_OPEN');
@@ -1455,6 +1482,7 @@ return; -- cobuprvnix-161
     l_nls accounts.nls%type;
 
     l_isp staff$base.id%type; -- ответ. исполнитель по счетам КД
+    l_vidd cc_deal.vidd%type;
   begin
     -- если счет даного типа уже открыт то выходим
     declare
@@ -1473,8 +1501,8 @@ return; -- cobuprvnix-161
     end;
 
     -- параметры КД
-    select cd.prod, cd.rnk, cd.user_id, cd.wdate, a.acc, a.kv, a.grp
-      into l_prod, l_rnk, l_user_id, l_wdate, l_acc8, l_kv, l_grp
+    select cd.prod, cd.rnk, cd.user_id, cd.wdate, a.acc, a.kv, a.grp, cd.vidd
+      into l_prod, l_rnk, l_user_id, l_wdate, l_acc8, l_kv, l_grp, l_vidd
       from cc_deal cd, nd_acc na, accounts a
      where cd.nd = p_nd
        and cd.nd = na.nd
@@ -1516,6 +1544,16 @@ return; -- cobuprvnix-161
     -- открываем в зависимости от типа счета
     case p_tip
       when 'SD ' then
+        cck.cc_op_nls(p_nd,
+                      gl.baseval,
+                      l_nls,
+                      p_tip,
+                      l_isp,
+                      l_grp,
+                      null,
+                      l_wdate,
+                      l_acc);
+      when 'S36' then
         cck.cc_op_nls(p_nd,
                       gl.baseval,
                       l_nls,
@@ -1578,6 +1616,11 @@ return; -- cobuprvnix-161
   l_ES001   nd_txt.txt%type;
   l_SDI     number := 0;
   l_SDI_add number := 0;
+  v_num     integer;
+  v_sal     number;
+  v_7467_flag number;
+  v_err_text varchar2(1000);
+  v_r013 cc_pawn.r013%type;
 begin
 
   -- проверка на уже проведенную авторизацию
@@ -1591,27 +1634,63 @@ begin
   -- COBUSUPABS-4863
   If l_cd_row.vidd in (11,12,13) then
 
+    If CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PARTN') is null  then
+      raise_application_error(  -20203, 'НЕ заповнно параметр «Наявність партнера» (обов"язкове поле відповідно до SV-0848497)' );
+    end if;
+
      -- 3.1. Для кредитів ФО, забезпечити контроль обов’язковості заповнення додаткового параметру кредитного договору «Наявність партнера»
      If CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PARTN') in ('YES','Taк')  then
 
         -- У випадку заповнення параметру «Наявність партнера» - «Так»,
         -- параметр «Партнер» теж повинен бути обов’язковим для заповнення
         l_PAR_N := CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PAR_N') ;
-        If l_PAR_N is null then raise_application_error(  -20203, 'НЕ заповнно параметр «Партнер» ' );  end if;
+        If l_PAR_N is null then raise_application_error(  -20203, 'НЕ заповнно параметр «Партнер» ' );
+        else
+          begin
+            select * into ww
+              from wcs_partners_all
+              where to_char (id) = trim(l_PAR_N);
+          exception
+            when no_data_found then
+              raise_application_error(-20201,'Не знайдено партнера з ID = '||l_par_n);
+          end;
+        end if;
 
         --У випадку, якщо в параметрі «Партнер» заповнено «ТОВ Ромстал Україна» (TABLE - WCS_PARTNERS_ALL, PTN_NLS = 26002003045900, PTN_OKPO = 32346937)
         -- контролюється обов’язковість заповнення полів:
-        Begin select * into ww from  WCS_PARTNERS_ALL where to_char (id) = trim(l_PAR_N) and PTN_OKPO = '32346937' ;
+        Begin select * into ww from  WCS_PARTNERS_ALL where to_char (id) = trim(l_PAR_N) and  nvl(compensation,0) = 1 ;
+                                                        --COBUMMFO-7118 к Ромсталь добавляем любого партнера, по которому есть признак компенсации
 
            --ES001    Вартість товару (держ.програма)
            l_ES001 := CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'ES001') ;
-           If l_ES001 is null then raise_application_error(  -20203, 'НЕ заповнно параметр «Вартість товару (держ.програма)»' );  end if;
+           If l_ES001 is null then 
+             v_err_text := 'НЕ заповнено параметр «Вартість товару (держ.програма)»';  
+           end if;
 
            ---«Енергоефективний захід» (одного із - ES104 or ES110 or ES116 or …)
-           begin select 1 into l_RomStal from nd_txt
-                 where nd =  l_cd_row.ND and rownum = 1  and tag in (select tag from cc_tag where tag like 'ES1%' AND TABLE_NAME = 'VW_ESCR_EVENTS_CENTURA' );
-           EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(  -20203, 'НЕ заповнно жодний параметр «Енергоефективний захід»' );
+           begin 
+             select 1 
+               into l_RomStal 
+               from nd_txt
+                 where nd =  l_cd_row.ND 
+                   and rownum = 1  
+                   and tag in (select tag from cc_tag where tag like 'ES1%' AND TABLE_NAME = 'VW_ESCR_EVENTS_CENTURA' );
+           EXCEPTION 
+             WHEN NO_DATA_FOUND THEN 
+               v_err_text:= v_err_text||' НЕ заповнено жодний параметр «Енергоефективний захід»' ;
            end;
+          
+          if v_err_text is not null then
+            raise_application_error(-20203,v_err_text);
+          end if;
+
+          select count(1)
+            into v_num
+            from customer c
+              where c.okpo = ww.ptn_okpo;
+          if v_num = 0 then
+            raise_application_error(  -20203, 'Клієнта з ОКПО ['||ww.ptn_okpo||']не знайдено' );
+          end if;
 
         EXCEPTION WHEN NO_DATA_FOUND THEN  l_RomStal  := 0;
         end ;
@@ -1620,13 +1699,52 @@ begin
 
 
 
+/*COBUMMFO-7618
+запрет авторизации если существует залоги, по которым не указаны R013 и OB22
+*/
+
+  v_err_text := null;
+  for r in (select a.acc, a.nls, a.kv, a.ob22, (select r013 from specparam sp where sp.acc = a.acc) R013
+              from nd_acc n,
+                   accounts a
+              where n.nd = l_cd_row.nd
+                and n.acc = a.acc
+                and a.tip = 'ZAL'
+           )
+  loop
+    if r.r013 is null then
+      v_err_text := case v_err_text
+                      when null then ''
+                      else v_err_text||', '
+                    end || 'рахунок '||r.nls||'.'||r.kv;
+    end if;
+  end loop;
+  if v_err_text is not null then
+    raise_application_error(-20203,'Рахунки застави мають не заповнений параметр R013! Авторизація неможлива. ('||v_err_text||')');
+  end if;
 /*  -- Если это дог гарантий выходим (защита от дурака)
   if substr (l_cd_row.prod,1,1)='9' then    return;  end if;*/
 
   If l_RomStal  = 1 then  ---- COBUSUPABS-4863 увеличим сумму дисконта на расчетную
      --Сума даної комісії повинна враховуватись при розрахунку ЕПС, разом з сумою комісії за надання, яку сплачує позичальник та в подальшому амортизуватись.
      --Сума комісії розраховується за формулою:    0,5/6 * Вт , де: Вт - значення параметру «Вартість товару(держ. програма)».
-     begin l_SDI_add := round(to_number (l_ES001) * 1/12 ,2) ;
+     begin
+
+/*
+COBUMMFO-7118
+Сума комісії, на яку повинен формуватися документ згідно п.3.3., повинна розраховуватись за формулою:
+
+ПБ/120 * Вт ,
+де:
+Вт - значення параметру «Вартість товару (держ. програма)».
+ПБ – комісія за послуги, надані банком продавцю товару (у відсотковому значенні) (з довідника «Торговці партнери» - «% комісії», після реалізації п. 3.1.).*/
+        if nvl(ww.compensation,0) = 1 then
+           l_SDI_add := round(to_number (l_ES001) * ww.percent / 120,2);
+        else
+
+-- логику для Ромсталь оставляем...
+           l_SDI_add := round(to_number (l_ES001) * 1/12 ,2) ;
+        end if;
            l_SDI     := to_number (CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG => 'S_SDI' ) );
            l_SDI     := Nvl(l_SDI,0);
            l_SDI     := l_SDI + l_SDI_add;
@@ -1803,10 +1921,7 @@ begin
      -- поочередно перебираем сохраненніе в допреквизитах параметры обеспечения
      for k in
          (SELECT cck_app.to_number2 (txt) AS PAWN,
-                   (SELECT nbsz
-                      FROM cc_pawn
-                     WHERE pawn = TO_NUMBER (n.txt))
-                      AS NBSZ,
+                    nbsz, nvl(c.r013,0) r013,
                      100
                    * cck_app.to_number2 (
                         cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'S'))
@@ -1818,8 +1933,9 @@ begin
                    cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'U') ZAYU,
                    cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'V') ZAYV,
                    (select name from cc_tag where tag = n.tag and n.tag like 'ZAY_P') NAMEP
-              FROM nd_txt n
+              FROM nd_txt n, cc_pawn c
              WHERE n.nd = p_nd AND tag LIKE 'ZAY_P'
+               and n.txt = to_char(c.pawn(+))
          )
 
      LOOP
@@ -1839,10 +1955,10 @@ begin
            if k.ZAYV is null then
               l_mes := 'Не заповнено параметр "Дата укладення договору забезпечення/поруки" для '||k.NAMEP||chr(13)||chr(10);
            end if;
-           
+
            if l_mes is not null then
             l_mes := 'Увага :'||l_mes||' заповніть у параметрах договору!';
-            raise_application_error(-20203,l_mes);  
+            raise_application_error(-20203,l_mes);
            end if;
        end;
        -- открываем счет обеспечения
@@ -1900,7 +2016,10 @@ begin
 
        end if;
 
+       
        Accreg.setAccountSParam( l_new_acc, 'OB22', l_ob22 );
+       -- cobummfo-7618
+       Accreg.setAccountSParam( l_new_acc, 'R013', k.r013 );
 
       if k.ZAYT is not null then
          Accreg.setAccountwParam( l_new_acc, 'Z_POLIS', case when k.ZAYT = 'Taк' then 1 else 0 end );
@@ -1986,7 +2105,80 @@ begin
          CCK_DOP.cc_autor_ex (dd.nd ,  p_saim,  p_urov );
     end loop ;
 end cc_autor ;
------------------------------------
+
+
+procedure edit_partner (p_id       in wcs_partners_all.id%type
+                       ,p_name     in wcs_partners_all.name%type
+                       ,p_type     in wcs_partners_all.type_id%type
+                       ,p_branch   in wcs_partners_all.branch%type
+                       ,p_p_mfo    in wcs_partners_all.ptn_mfo%type
+                       ,p_p_nls    in wcs_partners_all.ptn_nls%type
+                       ,p_p_okpo   in wcs_partners_all.ptn_okpo%type
+                       ,p_p_name   in wcs_partners_all.ptn_name%type
+                       ,p_mother   in wcs_partners_all.id_mather%type
+                       ,p_flag     in wcs_partners_all.flag_a%type
+                       ,p_comps    in wcs_partners_all.compensation%type
+                       ,p_perc     in wcs_partners_all.percent%type)
+  is
+    v_err varchar2(2000);
+    v_progname varchar2(50) := 'CCK_DOP.Edit_partner';
+  begin
+
+    if p_comps is null then
+      raise_application_error(-20100,v_progname||': параметр "Наявність компенсації" є обов`язковим!');
+    elsif p_comps = 1 and p_perc is null then
+      raise_application_error(-20100,v_progname||': параметр "Наявність компенсації" =1, необхідно вказати відсоток!');
+    end if;
+
+    if p_id is null then
+      insert into wcs_partners_all (name,
+                                    type_id,
+                                    branch,
+                                    ptn_mfo,
+                                    ptn_nls,
+                                    ptn_okpo,
+                                    ptn_name,
+                                    id_mather,
+                                    flag_a,
+                                    compensation,
+                                    percent)
+        values (p_name,
+                p_type,
+                p_branch,
+                p_p_mfo,
+                p_p_nls,
+                p_p_okpo,
+                p_p_name,
+                p_mother,
+                p_flag,
+                p_comps,
+                case p_comps
+                  when 1 then p_perc
+                  when 0 then null
+                end);
+    else
+      update wcs_partners_all
+        set name = p_name,
+            type_id = p_type,
+            branch = p_branch,
+            ptn_mfo = p_p_mfo,
+            ptn_nls = p_p_nls,
+            ptn_okpo = p_p_okpo,
+            ptn_name = p_p_name,
+            id_mather = p_mother,
+            flag_a = p_flag,
+            compensation = p_comps,
+            percent = case p_comps
+                        when 1 then p_perc
+                        when 0 then null
+                      end
+        where id = p_id;
+    end if;
+  exception
+    when others then
+      bars_audit.info('CCK_DOP.Edit_partner: Помилка при виконанні процедури: '||sqlerrm||chr(10)||dbms_utility.format_error_stack);
+      raise_application_error(-20001, 'CCK_DOP.Edit_partner: Помилка при виконанні процедури: '||sqlerrm);
+  end edit_partner;
 
 function get_prod_old(p_prod varchar2) return varchar2 is
 l_prod_old varchar2(6);
@@ -2002,6 +2194,168 @@ begin
    end;
 return l_prod_old;
 end get_prod_old;
+
+procedure paym_comission (p_nd       in cc_deal.nd%type
+                         ,p_amount   in number
+                         ,p_dealno   in cc_deal.cc_id%type
+                         ,p_dealdate in cc_deal.wdate%type
+                         ,p_txt      out varchar2)
+  is
+  v_rec oper%rowtype;
+  v_acrb number;
+  v_tt   char(3) := '%%1';
+  v_num  integer;
+begin
+  select count(1) into v_num
+    from accounts a, nd_acc n
+    where n.nd = p_nd
+      and n.acc = a.acc
+      and a.tip = 'S36';
+  if v_num = 0 then
+    raise_application_error(-20210,'Рахунок типу S36 не відкрито. Авторизацію виконати неможливо.');
+  end if;
+  for r in (select a.acc, c.sour, a.kv, a.tobo
+              from nd_acc n, accounts a, cc_add c
+              where n.nd = p_nd
+                and n.acc = a.acc
+                and a.tip = 'S36'
+                and n.nd = c.nd
+           )
+  loop
+    v_rec.kv := r.kv;
+  end loop;
+
+  GL.REF (v_rec.ref);
+
+  v_rec.tt := 'KC0';
+
+  select substr(a.nms,1,38),
+       a.nls,
+       c.okpo
+    into v_rec.nam_a,
+         v_rec.nlsa,
+         v_rec.id_a
+    from nd_acc n,
+         accounts a,
+         customer c
+    where n.nd = p_nd
+      and n.acc = a.acc
+      and substr(a.nls,1,4) = '2620'
+      and a.dazs is null
+      and a.blkd = 0
+      and a.rnk = c.rnk
+      and rownum = 1;
+
+  select substr(a.nms,1,38),
+       a.nls
+    into v_rec.nam_b,
+         v_rec.nlsb
+    from nd_acc n,
+         accounts a
+    where n.nd = p_nd
+      and n.acc = a.acc
+      and a.nbs = '3600'
+      and a.dazs is null
+      and a.blkd = 0
+      and rownum = 1;
+
+  gl.in_doc3(ref_  => v_rec.ref,
+             tt_   => v_rec.tt,
+             vob_  => 6,
+             nd_   => p_nd,
+             pdat_ => SYSDATE,
+             vdat_ => gl.BDATE,
+             dk_   => 1,
+             kv_   => v_rec.kv,
+             s_    => p_amount,
+             kv2_  => v_rec.kv,
+             s2_   => p_amount,
+             sk_   => null,
+             data_ => gl.BDATE,
+             datp_ => gl.bdate,
+             nam_a_=> v_rec.nam_a,
+             nlsa_ => v_rec.nlsa,
+             mfoa_ => gl.aMfo,
+             nam_b_=> v_rec.nam_b,
+             nlsb_ => v_rec.nlsb,
+             mfob_ => gl.aMfo ,
+             nazn_ => 'Погашення разової комісії по договору '||p_dealno||' від '||to_char(p_dealdate,'dd.mm.yyyy'),
+             d_rec_=> null,
+             id_a_ => v_rec.id_a,
+             id_b_ => v_rec.id_b ,
+             id_o_ => null,
+             sign_ => null,
+             sos_  => 1,
+             prty_ => null,
+             uid_  => null);
+  gl.payV (0, v_rec.REF, gl.BDATE , v_rec.tt, 1, v_rec.kv, v_rec.nlsa, p_amount, v_rec.kv, v_rec.nlsb, p_amount);
+  gl.pay  (2, v_rec.REF, gl.BDATE);
+
+  p_txt := 'Створено проведення по погашенню комісії, ref = '||to_char(v_rec.ref);
+end paym_comission;
+
+procedure paym_limit (p_nd     in cc_deal.nd%type
+                     ,p_amount in cc_deal.limit%type
+                     ,p_txt    out varchar2)
+  is
+  v_rec oper%rowtype;
+begin
+  gl.ref(v_rec.ref);
+  select a.kv, a.nls, substr(a.nms,1,38), c.okpo, 'Облік зобов"язань по договору № '||cd.cc_id||' від '||cd.sdate
+    into v_rec.kv, v_rec.nlsa, v_rec.nam_a, v_rec.id_a, v_rec.nazn
+    from accounts a, nd_acc n, customer c, cc_deal cd
+    where n.nd = p_nd
+      and n.acc = a.acc
+      and a.tip = 'CR9'
+      and a.rnk = c.rnk
+      and n.nd = cd.nd;
+
+  select a.nls, a.nms
+    into v_rec.nlsb, v_rec.nam_b
+    from accounts a
+    where a.nls = tobopack.GetTOBOParam('NLS_9900')
+      and a.kv = v_rec.kv;
+  gl.in_doc3(ref_   => v_rec.ref,
+             tt_    => 'CR9',
+             vob_   => 6,
+             nd_    => p_nd,
+             vdat_  => gl.bdate,
+             dk_    => 1,
+             kv_    => v_rec.kv,
+             s_     => p_amount,
+             kv2_   => v_rec.kv,
+             s2_    => p_amount,
+             sk_    => NULL,
+             data_  => gl.bdate,
+             datp_  => gl.bdate,
+             nam_a_ => v_rec.nam_a,
+             nlsa_  => v_rec.nlsa,
+             mfoa_  => gl.amfo,
+             nam_b_ => v_rec.nam_b,
+             nlsb_  => v_rec.nlsb,
+             mfob_  => gl.amfo,
+             nazn_  => v_rec.nazn,
+             d_rec_ => NULL,
+             id_a_  => v_rec.id_a,
+             id_b_  => null,
+             id_o_  => NULL,
+             sign_  => NULL,
+             sos_   => 0,
+             prty_  => NULL);
+  gl.payv(1,
+          v_rec.ref,
+          gl.bdate,
+          'CR9',
+          1,
+          v_rec.kv,
+          v_rec.nlsa,
+          p_amount,
+          v_rec.kv,
+          v_rec.nlsb,
+          p_amount);
+
+  p_txt := 'Сформовано проведення ref = '||v_rec.ref;
+end paym_limit;
 
 
 function get_kk1_crd (p_nls  in accounts.nls%type
@@ -2048,7 +2402,7 @@ begin
     if r.tt = 'KK1' and r.tip like 'W4%' then
       logger.info('s = '||r.s);
       return r.s;
-    else 
+    else
       logger.info('s = 0');
       return 0;
     end if;

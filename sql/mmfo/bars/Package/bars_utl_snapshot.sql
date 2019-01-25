@@ -181,6 +181,10 @@ is
   G_SNP_RUNNING            number;
   G_ALGORITHM              varchar2(30);
 
+  -- COBUMMFO-9690 Begin
+  g_module                 varchar2(64);
+  g_action                 varchar2(64);
+  -- COBUMMFO-9690 End
   ------------------------------------------------------------------
   -- HEADER_VERSION
   --
@@ -325,7 +329,7 @@ is
   is
   begin
 --  dbms_application_info.set_module(Null,Null);
-    dbms_application_info.set_action(Null);
+    dbms_application_info.set_action(g_action /*Null -- COBUMMFO-9690*/);
     dbms_application_info.set_client_info(Null);
   end purge_running_flag;
 
@@ -1240,6 +1244,8 @@ is
 
 
 begin
+   dbms_application_info.read_module(g_module, g_action); -- COBUMMFO-9690
+
   load_algorithm();
 end BARS_UTL_SNAPSHOT;
 /

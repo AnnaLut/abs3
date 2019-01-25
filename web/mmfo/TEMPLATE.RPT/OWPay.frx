@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="07/30/2018 17:18:47" ReportInfo.Modified="10/22/2018 17:22:29" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/30/2018 17:18:47" ReportInfo.Modified="12/10/2018 10:58:47" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQNOngWWMwivRb1Ot58H5oHo=" CommandTimeout="4000">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQK91hdGz73A+JC6Lje3YOlc=" CommandTimeout="4000">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select num00 ref, char00 tt,  char01 nam_a, char02 nam_b, num01 debit ,num02 credit , char03 nazn, dat00 pdat, dat01 vdat, char04 value, char05 datd, char06 nd  from rs_tmp_report_data where&#13;&#10;session_id=:SESSION_ID order by id">
         <Column Name="REF" DataType="System.String"/>
         <Column Name="DEBIT" DataType="System.Decimal"/>
@@ -51,7 +51,7 @@
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="Data2" Top="43.13" Width="1625.4" Height="66.15" DataSource="Table">
+    <DataBand Name="Data2" Top="41.8" Width="1625.4" Height="66.15" DataSource="Table">
       <TableObject Name="Table1" Left="18.9" Width="1341.87" Height="66.15">
         <TableColumn Name="Column87" Width="108.83"/>
         <TableColumn Name="Column88" Width="52.13"/>
@@ -70,8 +70,8 @@
           <TableCell Name="Cell256" Border.Lines="All" Text="[Table.TT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell257" Border.Lines="All" Text="[Table.NAM_A]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell258" Border.Lines="All" Text="[Table.NAM_B]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell259" Border.Lines="All" Text="[Table.DEBIT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell260" Border.Lines="All" Text="[Table.CREDIT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell259" Border.Lines="All" Text="[Table.DEBIT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell260" Border.Lines="All" Text="[Table.CREDIT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell261" Border.Lines="All" Text="[Table.NAZN]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell262" Border.Lines="All" Text="[Table.PDAT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell263" Border.Lines="All" Text="[Table.VDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>

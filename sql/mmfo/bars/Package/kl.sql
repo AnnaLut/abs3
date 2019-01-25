@@ -287,7 +287,10 @@ procedure setCustomerExtern (
   p_ved               customer_extern.ved%type,
   p_sed               customer_extern.sed%type,
   p_ise               customer_extern.ise%type,
-  p_notes             customer_extern.notes%type );
+  p_notes             customer_extern.notes%type,
+  p_date_photo        customer_extern.date_photo%type default null,
+  p_eddr_id           customer_extern.eddr_id%type default null,
+  p_actual_date       customer_extern.actual_date%type default null );
 
 --***************************************************************************--
 -- procedure 	: setCustomerRel
@@ -1482,7 +1485,7 @@ BEGIN
          buh     = Buh_,
          telb    = TelB_,
          k190    = k190_
-   WHERE rnk = Rnk_;
+     WHERE rnk = Rnk_;
   IF SQL%rowcount = 0 THEN
      bars_audit.trace('%s 3. регистрация параметров банка РНК=%s', l_title, Rnk_);
      INSERT INTO Custbank(rnk, mfo, bic, alt_bic, rating, kod_b, ruk, telr, buh, telb, K190)
@@ -2017,7 +2020,10 @@ procedure setCustomerExtern (
   p_ved               customer_extern.ved%type,
   p_sed               customer_extern.sed%type,
   p_ise               customer_extern.ise%type,
-  p_notes             customer_extern.notes%type )
+  p_notes             customer_extern.notes%type,
+  p_date_photo        customer_extern.date_photo%type default null,
+  p_eddr_id           customer_extern.eddr_id%type default null,
+  p_actual_date       customer_extern.actual_date%type default null)
 is
   l_title varchar2(30) := 'kl.setCustomerExtern: ';
   l_id    number;
@@ -2052,6 +2058,12 @@ begin
        || ' p_ise=>%s',
        l_title, to_char(p_country), p_region, p_fs, p_ved, p_sed, p_ise);
 
+  bars_audit.trace('%s 4.params:'
+       || ' p_date_photo=>%s,'
+       || ' p_eddr_id=>%s,'
+       || ' p_actual_date=>%s',
+       l_title, to_char(p_date_photo,'dd/MM/yyyy'), p_eddr_id, to_char(p_actual_date,'dd/MM/yyyy'));
+
   if p_id is not null then
      bars_audit.trace('%s 4. обновление реквизитов связанного лица id=%s', l_title, to_char(p_id));
      update customer_extern
@@ -2075,7 +2087,10 @@ begin
             ved         = p_ved,
             sed         = p_sed,
             ise         = p_ise,
-            notes       = p_notes
+            notes       = p_notes,
+            date_photo  = p_date_photo,
+            EDDR_ID     = p_eddr_id,
+            actual_date = p_actual_date
       where id = p_id;
      bars_audit.trace('%s 5. завершено обновление реквизитов связанного лица id=%s', l_title, to_char(p_id));
   else
@@ -2084,11 +2099,11 @@ begin
      insert into customer_extern ( id, name,
         doc_type, doc_serial, doc_number, doc_date, doc_issuer,
         birthday, birthplace, sex, adr, tel, email,
-        custtype, okpo, country, region, fs, ved, sed, ise, notes )
+        custtype, okpo, country, region, fs, ved, sed, ise, notes,date_photo,eddr_id,actual_date )
      values ( l_id, p_name,
         p_doctype, p_docserial, p_docnumber, p_docdate, p_docissuer,
         p_birthday, p_birthplace, p_sex, p_adr, p_tel, p_email,
-        p_custtype, p_okpo, p_country, p_region, p_fs, p_ved, p_sed, p_ise, p_notes ) ;
+        p_custtype, p_okpo, p_country, p_region, p_fs, p_ved, p_sed, p_ise, p_notes,p_date_photo,p_eddr_id,p_actual_date ) ;
      p_id := l_id;
      bars_audit.trace('%s 7. завершена регистрация связанного лица, id=%s', l_title, to_char(p_id));
   end if;

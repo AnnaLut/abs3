@@ -1,12 +1,8 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_OPERAPP.sql =========*** Run *** ====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_OPERAPP ***
-
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/view/v_operapp.sql =========*** Run *** ====
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE FORCE VIEW BARS.V_OPERAPP ("CODEOPER", "APPNAME", "CODEAPP", "OPERNAME", "FUNCNAME", "SEMANTIC", "PARENTID", "RUNABLE", "OPFLDLEVEL", "FRONTEND", "DATE_START", "DATE_FINISH") AS 
   select unique o.codeoper, a.name appname, a.codeapp, o.name opername,
        o.funcname, o.semantic, o.parentid, o.runable, null opfldlevel, a.frontend, null, null
@@ -33,8 +29,11 @@ PROMPT *** Create  view V_OPERAPP ***
                     where par = 'LOSECURE'), 0, nvl(s.approve, 0), 1)
    and 1 = decode((select nvl(min(to_number(val)), 0)
                      from params
-                    where par = 'LOSECURE'), 0, nvl(r.approve, 0), 1);
-
+                    where par = 'LOSECURE'), 0, nvl(r.approve, 0), 1)
+   and teller_utils.teller_arms(a.codeapp) = 1
+;
+ show err;
+ 
 PROMPT *** Create  grants  V_OPERAPP ***
 grant SELECT                                                                 on V_OPERAPP       to ABS_ADMIN;
 grant SELECT                                                                 on V_OPERAPP       to BARSREADER_ROLE;
@@ -46,8 +45,9 @@ grant SELECT                                                                 on 
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPERAPP       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_OPERAPP       to WR_DIAGNOSTICS;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_OPERAPP.sql =========*** End *** ====
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/view/v_operapp.sql =========*** End *** ====
+ PROMPT ===================================================================================== 
+ 

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" StartReportEvent="_StartReport" ReportInfo.Created="02/25/2016 14:01:45" ReportInfo.Modified="09/18/2018 11:24:35" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" StartReportEvent="_StartReport" ReportInfo.Created="02/25/2016 14:01:45" ReportInfo.Modified="10/04/2018 16:06:14" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,8 +25,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="MMFO6" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
-      <TableDataSource Name="Table" Alias="QMain" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 NUM_DOC, NUM00 ID, NUM01 DK, NUM02 KB, CHAR01 BEGIN_DATE, NUM03 AMOUNT_IN, NUM04 BASE_AMOUNT_IN, NUM05 CURRENCY, NUM06 CURRENCY_CONV, CHAR02 CURRENCY_NAME, CHAR03 CURRENCY_CONV_NAME, NUM07 KURS_DILER, CHAR04 DETAILS, NUM08 COMMISS, CHAR05 FIO, CHAR06 TEL, CHAR07 NAME_CUSTOMER, CHAR08 OKPO, CHAR09 ADR, CHAR10 NLS29, CHAR11 PHONE, CHAR12 BANK_NAME, CHAR13 BANK_MFO, CHAR14 ADR_BRANCH, CHAR15 ACCOUNT_CUSTOMER, CHAR16 BANK_MFO_CUSTOMER, CHAR17 BANK_NAME_CUSTOMER, CHAR18 ACCOUNT_CUSTOMER_UAH, CHAR19 BANK_MFO_CUSTOMER_UAH, CHAR20 BANK_NAME_CUSTOMER_UAH, CHAR21 VK_FIO, CHAR22 VK_DATE, CHAR23 VK_TIME, CHAR24 VV_FIO, CHAR25 VV_DATE, CHAR26 VV_TIME, CHAR27 POST_KB_DATE, CHAR28 POST_KB_TIME, CHAR29 POST_KB_FIO, CHAR30 SIGN01, CHAR31 SIGN02 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+    <OracleDataConnection Name="MMFO6" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7Wcm8YIFSVG9oFjB526WIAGzg==">
+      <TableDataSource Name="Table" Alias="QMain" DataType="System.Int32" Enabled="true" SelectCommand="SELECT CHAR00     NUM_DOC,&#13;&#10;         NUM00      ID,&#13;&#10;         NUM01      DK,&#13;&#10;         NUM02      KB,&#13;&#10;         CHAR01     BEGIN_DATE,&#13;&#10;         NUM03      AMOUNT_IN,&#13;&#10;         NUM04      BASE_AMOUNT_IN,&#13;&#10;         NUM05      CURRENCY,&#13;&#10;         NUM06      CURRENCY_CONV,&#13;&#10;         CHAR02     CURRENCY_NAME,&#13;&#10;         CHAR03     CURRENCY_CONV_NAME,&#13;&#10;         NUM07      KURS_DILER,&#13;&#10;         CHAR04     DETAILS,&#13;&#10;         NUM08      COMMISS,&#13;&#10;         CHAR05     FIO,&#13;&#10;         CHAR06     TEL,&#13;&#10;         CHAR07     NAME_CUSTOMER,&#13;&#10;         CHAR08     OKPO,&#13;&#10;         CHAR09     ADR,&#13;&#10;         CHAR10     NLS29,&#13;&#10;         CHAR11     PHONE,&#13;&#10;         CHAR12     BANK_NAME,&#13;&#10;         CHAR13     BANK_MFO,&#13;&#10;         CHAR14     ADR_BRANCH,&#13;&#10;         CHAR15     ACCOUNT_CUSTOMER,&#13;&#10;         CHAR16     BANK_MFO_CUSTOMER,&#13;&#10;         CHAR17     BANK_NAME_CUSTOMER,&#13;&#10;         CHAR18     ACCOUNT_CUSTOMER_UAH,&#13;&#10;         CHAR19     BANK_MFO_CUSTOMER_UAH,&#13;&#10;         CHAR20     BANK_NAME_CUSTOMER_UAH,&#13;&#10;         CHAR21     VK_FIO,&#13;&#10;         CHAR22     VK_DATE,&#13;&#10;         CHAR23     VK_TIME,&#13;&#10;         CHAR24     VV_FIO,&#13;&#10;         CHAR25     VV_DATE,&#13;&#10;         CHAR26     VV_TIME,&#13;&#10;         CHAR27     POST_KB_DATE,&#13;&#10;         CHAR28     POST_KB_TIME,&#13;&#10;         CHAR29     POST_KB_FIO,&#13;&#10;         CHAR30     SIGN01,&#13;&#10;         CHAR31     SIGN02&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :SESSION_ID&#13;&#10;ORDER BY id">
         <Column Name="DETAILS" DataType="System.String"/>
         <Column Name="NUM_DOC" DataType="System.String"/>
         <Column Name="BEGIN_DATE" DataType="System.String"/>
@@ -77,7 +77,7 @@ namespace FastReport
     <DataBand Name="Data1" Width="718.2" Height="396.9" CanGrow="true" StartNewPage="true" DataSource="Table">
       <TextObject Name="Text9" Left="198.45" Top="37.8" Width="321.3" Height="18.9" Border.Lines="Top" Text="(найменування та місцезнаходження уповноваженого банку)" HorzAlign="Center" Font="Times New Roman, 8pt"/>
       <TextObject Name="Text11" Left="548.1" Top="56.7" Width="94.5" Height="18.9" Border.Lines="All" Text="0408005" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
-      <TextObject Name="Text71" Top="245.7" Width="718.2" Height="151.2" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="  Найменування клієнта/ прізвище, ім’я, по батькові [QMain.NAME_CUSTOMER]&#13;&#10;  Місцезнаходження/місце проживання [QMain.ADR]&#13;&#10;  № тел./факсу  [QMain.PHONE]  &#13;&#10;  Прізвище, ім’я, по батькові працівника, який уповноважений вирішувати питання щодо продажу іноземної валюти або банківських металів, [QMain.FIO],     &#13;&#10;  № тел. [QMain.TEL],______________________________________________ (зразок підпису)&#13;&#10;  Рахунок в іноземній валюті або банківських металах [QMain.ACCOUNT_CUSTOMER_UAH]  у – [QMain.BANK_NAME], код банку [QMain.BANK_MFO]&#13;&#10;  Доручаємо продати іноземну валюту або банківські метали на умовах, що зазначені нижче.&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text71" Top="245.7" Width="718.2" Height="151.2" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="  Найменування клієнта/ прізвище, ім’я, по батькові [QMain.NAME_CUSTOMER]&#13;&#10;  Місцезнаходження/місце проживання [QMain.ADR]&#13;&#10;  № тел./факсу  [QMain.PHONE]  &#13;&#10;  Прізвище, ім’я, по батькові працівника, який уповноважений вирішувати питання щодо продажу іноземної валюти або банківських металів, [QMain.FIO],     &#13;&#10;  № тел. [QMain.TEL],______________________________________________ (зразок підпису)&#13;&#10;  Рахунок в іноземній валюті або банківських металах  [IIf([QMain.KB] == 1, [QMain.ACCOUNT_CUSTOMER_UAH], [QMain.ACCOUNT_CUSTOMER])] у – [QMain.BANK_NAME], код банку [QMain.BANK_MFO]&#13;&#10;  Доручаємо продати іноземну валюту або банківські метали на умовах, що зазначені нижче.&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
       <TextObject Name="Text72" Left="198.45" Width="321.3" Height="18.9" CanGrow="true" Text="[QMain.BANK_NAME]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Underline"/>
       <TextObject Name="Text73" Left="198.45" Top="18.9" Width="321.3" Height="18.9" CanGrow="true" Text="[QMain.ADR_BRANCH]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
       <TextObject Name="Text45" Top="207.9" Width="718.2" Height="37.8" CanBreak="false" Text="Заява* про продаж іноземної валюти або банківських металів &#13;&#10;№ [QMain.NUM_DOC] від [QMain.BEGIN_DATE]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
@@ -123,7 +123,7 @@ namespace FastReport
           <TableCell Name="Cell150"/>
         </TableRow>
       </TableObject>
-      <ChildBand Name="Child1" Top="400.9" Width="718.2" Height="94.5" CanGrow="true">
+      <ChildBand Name="Child1" Top="400.44" Width="718.2" Height="94.5" CanGrow="true">
         <TableObject Name="Table1" Width="718.2" Height="94.5">
           <TableColumn Name="Column31" Width="170.1"/>
           <TableColumn Name="Column32" Width="170.1"/>
@@ -142,15 +142,15 @@ namespace FastReport
             <TableCell Name="Cell159" Border.Lines="All" Text="[QMain.BASE_AMOUNT_IN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9.75pt, style=Bold"/>
           </TableRow>
         </TableObject>
-        <ChildBand Name="Child2" Top="499.4" Width="718.2" Height="198.45" CanGrow="true">
-          <TextObject Name="Text70" Top="9.45" Width="718.2" Height="189" CanGrow="true" GrowToBottom="true" Text="  Зобов'язуємося перерахувати на рахунок №  [QMain.NLS29] у [QMain.BANK_NAME], код банку [QMain.BANK_MFO] суму іноземної валюти або масу банківських металів, що підлягає продажу.&#13;&#10;  Доручаємо уповноваженому банку перерахувати гривневий еквівалент проданої іноземної валюти або банківських металів на поточний рахунок № [QMain.ACCOUNT_CUSTOMER_UAH] у [QMain.BANK_NAME_CUSTOMER_UAH], код банку [QMain.BANK_MFO_CUSTOMER_UAH].&#13;&#10;  Надаємо право на утримання комісійної винагороди в гривнях у розмірі [QMain.COMMISS]% без зарахування цієї комісійної винагороди на наш поточний рахунок в національній валюті.&#13;&#10;  У разі неможливості виконання заяви просимо уповноважений банк повернути іноземну валюту або банківські метали на рахунок   [QMain.ACCOUNT_CUSTOMER_UAH], у [QMain.BANK_NAME_CUSTOMER], код банку [QMain.BANK_MFO_CUSTOMER]." HorzAlign="Justify" Font="Times New Roman, 10pt"/>
-          <ChildBand Name="Child3" Top="701.85" Width="718.2" Height="103.95">
+        <ChildBand Name="Child2" Top="498.48" Width="718.2" Height="198.45" CanGrow="true">
+          <TextObject Name="Text70" Top="9.45" Width="718.2" Height="189" CanGrow="true" GrowToBottom="true" Text="  Зобов'язуємося перерахувати на рахунок №  [QMain.NLS29] у [QMain.BANK_NAME], код банку [QMain.BANK_MFO] суму іноземної валюти або масу банківських металів, що підлягає продажу.&#13;&#10;  Доручаємо уповноваженому банку перерахувати гривневий еквівалент проданої іноземної валюти або банківських металів на поточний рахунок № [QMain.ACCOUNT_CUSTOMER_UAH] у [QMain.BANK_NAME_CUSTOMER_UAH], код банку [QMain.BANK_MFO_CUSTOMER_UAH].&#13;&#10;  Надаємо право на утримання комісійної винагороди в гривнях у розмірі [QMain.COMMISS]% без зарахування цієї комісійної винагороди на наш поточний рахунок в національній валюті.&#13;&#10;  У разі неможливості виконання заяви просимо уповноважений банк повернути іноземну валюту або банківські метали на рахунок   [IIf([QMain.KB] == 1, [QMain.ACCOUNT_CUSTOMER_UAH], [QMain.ACCOUNT_CUSTOMER])] у [QMain.BANK_NAME_CUSTOMER], код банку [QMain.BANK_MFO_CUSTOMER]." HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <ChildBand Name="Child3" Top="700.47" Width="718.2" Height="103.95">
             <TextObject Name="Text12" Left="264.6" Top="9.45" Width="66.15" Height="18.9" Text="Підписи" VertAlign="Center" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text13" Left="340.2" Top="28.35" Width="103.95" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text14" Left="340.2" Top="75.6" Width="103.95" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text29" Left="444.15" Top="9.45" Width="274.05" Height="18.9" Text="[QMain.SIGN01], Директор" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text32" Left="444.15" Top="56.7" Width="274.05" Height="18.9" Text="[QMain.SIGN02]" Font="Times New Roman, 10pt"/>
-            <ChildBand Name="Child4" Top="809.8" Width="718.2" Height="103.95" CanGrow="true">
+            <ChildBand Name="Child4" Top="807.96" Width="718.2" Height="103.95" CanGrow="true">
               <TextObject Name="Text66" Left="359.1" Top="18.9" Width="340.2" Height="85.05" CanGrow="true" Text="Дата [QMain.VV_DATE]р. Час [QMain.VV_TIME]&#13;&#10;[QMain.VV_FIO]&#13;&#10;АТ «Ощадбанк» код [QMain.BANK_MFO]&#13;&#10;[QMain.BANK_NAME]" Font="Times New Roman, 10pt"/>
               <TextObject Name="Text67" Left="359.1" Width="340.2" Height="18.9" Text="Відмітки про виконання:" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold"/>
               <TextObject Name="Text68" Left="18.9" Top="18.9" Width="311.85" Height="85.05" CanGrow="true" Text="Дата [QMain.VK_DATE]р. Час [QMain.VK_TIME]&#13;&#10;[QMain.VK_FIO]&#13;&#10;АТ «Ощадбанк» код [QMain.BANK_MFO]&#13;&#10;[QMain.BANK_NAME]&#13;&#10;" Font="Times New Roman, 10pt"/>
@@ -160,7 +160,7 @@ namespace FastReport
         </ChildBand>
       </ChildBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="917.75" Width="718.2" Height="18.9">
+    <PageFooterBand Name="PageFooter1" Top="915.45" Width="718.2" Height="18.9">
       <TextObject Name="Text15" Left="18.9" Width="415.8" Height="18.9" Text="* Заповнюється юридичними особами та підприємцями." VertAlign="Center" Font="Times New Roman, 10pt"/>
     </PageFooterBand>
   </ReportPage>

@@ -1,0 +1,129 @@
+﻿@model BarsWeb.Areas.Teller.Model.TellerWindowStatusModel
+@{
+    Layout = null;
+}
+<div id="atm-window">
+
+    @if (Model.Status != "ERR")
+    {
+        <div id="atm-header">
+            <div id="atm-close-button" onclick="CloseAtmForm(true)"></div>
+            <label>Робота з терміналом</label>
+        </div>
+        <div class="atm-block">
+            <div class="atm-info-title">Дані по операції: </div>
+            <div class="atm-info-block">
+                <div id="atm-info-txt">@Html.Raw(Model.OperDesc)</div>
+            </div>
+            
+            <div class="atm-block1" style="float: right; height: 40px; display: inline-block; position:relative;">
+                <div class="atm-block2" >
+                    <a class="atm-button atm-color-red" onclick="CancelOperation()">Відмінити</a>
+                </div>
+            </div>
+        </div>
+        <div class="atm-block" style="white-space: nowrap;">
+            <div class="atm-info-title">Сума операції: </div>
+            <div class="atm-info-block-small" style="width: 400px; white-space: nowrap;">
+                <span class="atm-sum-txt" id="atm-sum-txt">@Model.Amount.ToString().Replace(',', '.')</span>
+                &nbsp;
+                <span class="atm-sum-txt">[</span><span class="atm-sum-txt" id="atm-currency-txt">@Model.Currency</span><span class="atm-sum-txt">]</span>
+            </div>
+        </div>
+        <div class="atm-block" id="atm-buttons-block">
+            @{
+                if (Model.Status == "OUT")
+                {
+                    <div class="atm-info-title">Видана сума: </div>
+                }
+                else if (Model.Status == "IN")
+                {
+                    <div class="atm-info-title">Внесена сума: </div>
+                }
+                else
+                {
+                    <div class="atm-info-title"> </div>
+                }
+            }
+            <div class="atm-info-block-small">
+                @if (Model.Status == "OUT" || Model.Status == "IN")
+                {
+                    <span class="atm-sum-txt" id="atm-in-out-sum">0</span>
+                }
+                else
+                {
+                    <span class="atm-sum-txt" id="atm-in-out-sum"></span>
+                }
+            </div>
+            @{
+                if (Model.Status == "OUT")
+                {
+                    <a class="atm-button atm-color-blue" onclick="CashInputConfirm()">Отримати готівку</a>
+                }
+                else if (Model.Status == "IN")
+                {
+                    <a class="atm-button atm-color-blue" onclick="BeginCashInput()">Внести готівку</a>
+                    <a class="atm-button atm-color-blue" onclick="CashInputConfirm()">Підтвердити</a>
+                    <a class="atm-button atm-color-blue" id="teller-change-button" onclick="GiveChange()">Видати решту</a>
+                }
+            }
+            
+        </div>
+        <div class="atm-block">
+            <div class="atm-info-title">Темпокаса: </div>
+            <div class="atm-info-block-small">
+                <span class="atm-sum-txt" id="atm-sum-tempo">@Model.Amount.ToString("0.00").Replace(',', '.')</span>
+            </div>
+            <div>
+                @if (Model.Status == "OUT")
+                {
+                    <span id="atm-tempo-in-out-info">Видати з темпокаси</span>
+                }
+                else if (Model.Status == "IN")
+                {
+                    <span id="atm-tempo-in-out-info">Внести в темпокасу</span>
+                }
+
+            </div>
+        </div>
+        <div class="atm-block" style="height: auto; min-height: 60px;">
+            <a class="atm-button atm-color-green" onclick="AtmTempo()">Завершити операцію</a>
+            <p class="info-style" id="atm-p-err-text"></p>
+            @if (String.IsNullOrEmpty(Model.Message) || Model.Message == "OK")
+            {
+                <p class="info-style" id="atm-info"></p>
+            }
+            else
+            {
+                <p class="info-style" id="atm-info">@Model.Message</p>
+            }
+        </div>
+        <input type="hidden" id="atm-window-status" value="@Model.Status" />
+        <input type="hidden" id="atm-sum-dif" value="@Model.Amount.ToString().Replace(',', '.')" />
+        <input type="hidden" id="sbon-id" value="@Model.Ref" />
+        <input type="hidden" id="cant-cancel" value="0" />
+    }
+    else
+    {
+        <div id="atm-header">
+             <div id="atm-close-button" onclick="CloseAtmErrWindow()"></div>
+             <label>Робота з терміналом</label>
+         </div>
+        <div class="atm-block-err">
+             @Model.Message
+         </div>
+        <a class="atm-button atm-color-green" id="atm-close-err-button" onclick="CloseAtmErrWindow()">Завершити</a>
+    }
+</div>
+
+<div id="atm-confirm">
+    <div id="atm-header">
+        <label id="confirm-head-txt">Підтвердження операції</label>
+    </div>
+    <div id="atm-confirm-txt"></div>
+    <div id="atm-confirm-button-area">
+        <a class="atm-button atm-color-green atm-confirm-button-width" id="atm-confirm-close">ОК</a>
+        <a class="atm-button atm-color-red atm-confirm-button-width" id="atm-cancel-close" onclick="CancelCloseAtmWindow()">Відміна</a>
+    </div>
+</div>
+

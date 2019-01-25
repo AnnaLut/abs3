@@ -84,6 +84,11 @@ IS
   l_pos2          pls_integer;
   l_delim         varchar2(1);
 
+  -- COBUMMFO-9690 Begin
+  g_module        varchar2(64);
+  g_action        varchar2(64);
+  -- COBUMMFO-9690 End
+
   --
   --
   --
@@ -249,7 +254,7 @@ IS
 
     DBMS_SESSION.FREE_UNUSED_USER_MEMORY();
 
-    dbms_application_info.set_module(NULL,NULL);
+    dbms_application_info.set_module(g_module, g_action /*NULL,NULL -- COBUMMFO-9690*/);
     dbms_application_info.set_client_info(NULL);
 
     bars_audit.trace( '%s: Exit.', title );
@@ -508,6 +513,8 @@ IS
 BEGIN
 
   t_file_rows := t_csv_file_rows_type();
+
+  Dbms_Application_Info.read_module(g_module, g_action); -- COBUMMFO-9690
 
   t_handler_list('LOAD_CUSTOMER_SEGMENTATION') := 'Завантаження сегментації клієнтів ЮО та ФОП';
 --t_handler_list('LOAD_SOMETHING_ELSE')        := 'Завантаження';

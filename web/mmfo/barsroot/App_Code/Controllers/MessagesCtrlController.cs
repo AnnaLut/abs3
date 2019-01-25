@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web.Configuration;
 using System.Web.Mvc;
@@ -7,6 +8,7 @@ using barsroot;
 using BarsWeb.Models;
 using Models;
 using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
 
 namespace BarsWeb.Controllers
 {
@@ -107,6 +109,59 @@ namespace BarsWeb.Controllers
                 return View(userMessages);
             }
         }
+
+        public JsonResult TellerMessages()
+        {
+            Int32 tellerMessageTypeId = 10;
+            _entities = new EntitiesBarsCore().NewEntity();
+            String message = String.Empty;
+
+            Object[] parameters =
+            {
+                new OracleParameter("p_message_type_id",OracleDbType.Int32,tellerMessageTypeId, ParameterDirection.Input),
+                new OracleParameter("p_message",OracleDbType.Varchar2, 4000, null, ParameterDirection.Output),
+                new OracleParameter("p_sender_id",OracleDbType.Int32, ParameterDirection.Output),
+                new OracleParameter("p_enqueue_time",OracleDbType.Date, ParameterDirection.Output)
+            };
+
+            var paramCollection = OracleRequest("bars.bms.receive_message", parameters);
+            OracleString operDescRes = (OracleString)paramCollection["p_message"].Value;
+            try
+            {
+                message = operDescRes.Value;
+            }
+            catch (OracleNullValueException)
+            {
+                message = String.Empty;
+            }
+
+            return Json(new { message = message });
+        }
+
+        private OracleParameterCollection OracleRequest(String functionName, Object[] parameters)
+        {
+            //IOraConnection conn = (IOraConnection)AppDomain.CurrentDomain.GetData("OracleConnectClass");
+            OracleParameterCollection result;
+            using (OracleConnection con = GetIndependentConnection())
+            {
+                using (OracleCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = functionName;
+                    cmd.Parameters.Clear();
+                    cmd.BindByName = true;
+                    cmd.Parameters.AddRange(parameters);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        result = cmd.Parameters;
+                    }
+                }
+            }
+
+            return result;
+        }
+
 
         public ActionResult CommentAdd(decimal[] id, string comment)
         {

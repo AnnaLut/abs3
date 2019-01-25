@@ -1373,9 +1373,17 @@ is
     ( p_kf    in     fdat_kf.kf%type
     ) is
       l_bnk_dt varchar2(10);
+      
+      -- COBUMMFO-9690 Begin
+      l_module        varchar2(64);
+      l_action        varchar2(64);
+      -- COBUMMFO-9690 End
     begin
 
       bars_audit.info( $$PLSQL_UNIT||'.CLOSES_ACCESS: ( kf='||p_kf||' ).' );
+      
+      dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
+	  
 	  DBMS_APPLICATION_INFO.SET_ACTION( 'TMS_UTL.CLOSES_ACCESS' );
       -- set ban on logging in
       begin
@@ -1391,7 +1399,7 @@ is
 
       -- close all user sessions that logged in with previous bank date
       CLOSE_USER_SESSIONS( p_kf, l_bnk_dt );
-	  DBMS_APPLICATION_INFO.set_action(null);
+	  DBMS_APPLICATION_INFO.set_action(l_action /*null -- COBUMMFO-9690*/);
       -- accumulate a balance snapshot
       -- BARS_CONTEXT.SUBST_MFO( p_kf );
       -- DDRAPS( DAT_NEXT_U( to_date(l_bnk_dt,'MM/DD/YYYY'), -1 ) );

@@ -758,6 +758,11 @@ $end
   %usage   Виконання завдань в паралельному режимі (по діапазону МФО)
   */
     title            constant varchar2(64) := $$PLSQL_UNIT||'.RUN_TASK_BY_KF';
+    
+    -- COBUMMFO-9690 Begin
+    l_module         varchar2(64);
+    l_action         varchar2(64);
+    -- COBUMMFO-9690 End
   begin
 
     bars_audit.trace( '%s: Entry with ( p_start_id=%s, p_end_id=%s, p_pcd_nm=%s ).'
@@ -767,6 +772,8 @@ $end
     then
       null;
     else
+
+      dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
 
       dbms_application_info.set_action( title );
 
@@ -797,7 +804,7 @@ $end
       BARS_CONTEXT.SET_CONTEXT();
 
       dbms_application_info.set_client_info( null );
-      dbms_application_info.set_action( null );
+      dbms_application_info.set_action( l_action /*null -- COBUMMFO-9690*/ );
 
     end if;
 
@@ -831,6 +838,11 @@ $end
     l_response                wsm_mgr.t_response;
     l_rec_id                  ebk_sync_log.id%type;
     l_err_msg                 ebk_sync_log.err_msg%type;
+
+    -- COBUMMFO-9690 Begin
+    l_module         varchar2(64);
+    l_action         varchar2(64);
+    -- COBUMMFO-9690 End
 
     function get_param_webconfig
     ( par    varchar2
@@ -866,6 +878,8 @@ $end
       utl_http.set_wallet( l_wallet_path, l_wallet_pwd );
       bars_audit.trace( '%s: ( l_wallet_path=%s, l_wallet_pwd=%s ).', title, l_wallet_path, l_wallet_pwd );
     end if;
+
+    dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
 
     dbms_application_info.set_action( title );
 
@@ -931,7 +945,7 @@ $end
     BARS_CONTEXT.SET_CONTEXT();
 
     dbms_application_info.set_client_info( null );
-    dbms_application_info.set_action( null );
+    dbms_application_info.set_action( l_action /*null -- COBUMMFO-9690*/ );
 
     bars_audit.trace( '%s: Exit.', title );
 

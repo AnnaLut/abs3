@@ -112,6 +112,10 @@ is
   l_mfo                      varchar2(6);
   l_baseval                  number(3);  -- tabval$global%type;
 
+  -- COBUMMFO-9690 Begin
+  g_module                   varchar2(64);
+  g_action                   varchar2(64);
+  -- COBUMMFO-9690 End
   --
   -- повертає версію заголовка пакета
   --
@@ -391,6 +395,7 @@ $end
        where AGRMNT_ID = p_agrmnt_id;
     exception
       when NO_DATA_FOUND then
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Не знайдено ДУ з ідентифікатором # ' || to_char(p_agrmnt_id) );
     end;
 
@@ -398,14 +403,17 @@ $end
     Case
       When ( r_agrmnt.AGRMNT_STATE = 1 )
       Then
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'ДУ з ідентифікатором # ' || to_char(p_agrmnt_id) || ' уже підтверджена!' );
 
       When ( r_agrmnt.AGRMNT_CRUSER = l_userid AND CONFIRM_ALLOWED(r_agrmnt.AGRMNT_TYPE) )
       Then
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Користувачу який ввів ДУ заборонено її візування!' );
 
       When ( r_agrmnt.AGRMNT_CRUSER = l_userid AND nvl(dbms_transaction.LOCAL_TRANSACTION_ID,'AAA') <> nvl(sys_context('userenv','client_info'),'XXX') )
       Then
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Користувач, що створив ДУ немає права на її візування!' );
 
       Else
@@ -421,21 +429,26 @@ $end
        where dpu_id = r_agrmnt.DPU_ID;
     exception
       when NO_DATA_FOUND then
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Не знайдено депозитний договір # ' || to_char(r_agrmnt.DPU_ID) );
     end;
 
     Case
       When ( r_dpu.CLOSED = 1 )
       Then -- Депозит закритий
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Депозитний договір # ' || to_char(r_agrmnt.DPU_ID) || ' закритий!' );
       When ( BARS.FOST(r_dpu.ACC,gl.bdate) = 0 )
       Then -- Депозит не розміщений
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Відсутній залишок коштів по депозитного договору # ' || to_char(r_agrmnt.DPU_ID) || '!' );
       When ( DPU.CHECK_PENALIZATION( r_dpu.DPU_ID, r_dpu.DAT_BEGIN ) > 0 )
       Then -- Депозит штрафований
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Депозитний договір # ' || to_char(r_agrmnt.DPU_ID) || ' розірваний!' );
       When ( r_dpu.DAT_END Is Null AND r_agrmnt.AGRMNT_TYPE = 7 )
       Then -- ДУ про пролонгацію договору
+        dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
         bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Депозитн # ' || to_char(r_agrmnt.DPU_ID) || ' є договором "НА ВИМОГУ"!' );
       Else
         Null;
@@ -513,6 +526,7 @@ $end
 
         if ( r_dpu.VIDD Is Null )
         then
+          dbms_application_info.set_module(g_module, g_action); -- COBUMMFO-9690
           bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Не знайдено вид депозиту з періодичністю виплати відсотків = '||to_char(r_dpu.FREQV)||'!' );
         end if;
 
@@ -626,7 +640,7 @@ $end
        set ROW = r_agrmnt
      where AGRMNT_ID = p_agrmnt_id;
 
-    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_module(g_module, g_action /*NULL, NULL -- COBUMMFO-9690*/);
 
     bars_audit.trace( '%s: exit.', title );
 
@@ -729,6 +743,7 @@ BEGIN
   l_mfo     := gl.amfo;
   l_baseval := gl.baseval;
 
+  dbms_application_info.read_module(g_module, g_action); -- COBUMMFO-9690
 end DPU_AGR;
 /
  show err;

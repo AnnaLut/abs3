@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="04/25/2017 10:05:59" ReportInfo.Modified="04/25/2017 17:19:10" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/25/2017 10:05:59" ReportInfo.Modified="10/24/2018 12:40:18" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE6qDEO/12+M8mqBEDy1K+0x">
-      <TableDataSource Name="Table" Alias="Zap" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BSD, NUM00 KILK, NUM01 OST, NUM02 KV, CHAR01 LCV, CHAR02 NAME, CHAR03 DATE1, NUM03 RU, CHAR04 KVLCV, CHAR05 TEXT1 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWrXAA7A21xsmM7RTPHtKkT8zmKiXhoHWBt8lC4L79pRw==" CommandTimeout="3600">
+      <TableDataSource Name="Table" Alias="Zap" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BSD, NUM00 KV, NUM01 OST, NUM02 KILK, CHAR01 MFO, CHAR02 LCV, CHAR03 NAME, CHAR04 DATE1, NUM03 RU, CHAR05 KVLCV, CHAR06 TEXT1 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
         <Column Name="BSD" DataType="System.String"/>
         <Column Name="KILK" DataType="System.Decimal"/>
         <Column Name="OST" DataType="System.Decimal"/>
@@ -13,14 +13,15 @@
         <Column Name="RU" DataType="System.Decimal"/>
         <Column Name="KVLCV" DataType="System.String"/>
         <Column Name="TEXT1" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
         <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="session_id" DataType="System.Int32"/>
   </Dictionary>
-  <ReportPage Name="Page1" PaperWidth="2100" PaperHeight="2970" FirstPageSource="15" OtherPagesSource="15">
+  <ReportPage Name="Page1" PaperWidth="2100" PaperHeight="2970" FirstPageSource="15" OtherPagesSource="15" Guides="642.6">
     <ReportTitleBand Name="ReportTitle1" Width="7862.4" Height="37.8"/>
-    <DataBand Name="Data1" Top="39.8" Width="7862.4" Height="172.67" Guides="123">
+    <DataBand Name="Data1" Top="41.8" Width="7862.4" Height="172.67" Guides="123">
       <MatrixObject Name="Matrix1" Left="2" Top="0.85" Width="191.91" Height="152.26" Border.Lines="Bottom" FixedRows="6" FixedColumns="2" AutoSize="false" CellsSideBySide="true" DataSource="Table" ShowTitle="true">
         <MatrixColumns>
           <Header Expression="[Zap.TEXT1]" Totals="false"/>
@@ -90,6 +91,6 @@
         </TableRow>
       </MatrixObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="214.47" Width="7862.4" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="218.47" Width="7862.4" Height="18.9"/>
   </ReportPage>
 </Report>

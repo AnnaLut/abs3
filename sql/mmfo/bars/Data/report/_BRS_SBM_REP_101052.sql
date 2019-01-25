@@ -46,49 +46,15 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'Cальдова вiдомiсть Пiдроздiлу по OB22';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:nls_z=''Б/Рахунок_З_(%вс_)'',:nls_po=''Б/Рахунок_ПО_(%вс_)'',:kv=''Вал(%вс_)'',:kf=''Код_в_дд_лення(виб_р)'',:ob22=''OB22_Один__з(01,02..10)'',:tag1=''TAG in (tag1, tag2, tag3) <br> <b>tag1 </b> '',:tag2''<b>tag2 </b> '',:tag3=''<b>tag3 </b> ''';
+    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:nls_z=''Б/Рахунок_З'',:nls_po=''Б/Рахунок_ПО'',:kv=''Вал(%вс_)'',:kf=''Код_в_дд_лення(виб_р)'',:ob22=''OB22_Один__з(01,02..10)'',:tag1=''TAG in (tag1, tag2, tag3) <br> <b>tag1 </b> '',:tag2''<b>tag2 </b> '',:tag3=''<b>tag3 </b> ''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'OWPay.frx';
-    l_zpr.form_proc    := '';
-    l_zpr.default_vars := ':nls_z=''%'',:nls_po=''%'',:kf=''%'',:ob22=''%'',:kv=''%'',:tag1=''OW_DS'',:tag2=''OW_LD'',:tag3=''OWDRN''';
-    l_zpr.bind_sql     := '';
+    l_zpr.form_proc    := 'p_rep_101052(:sFdat1,:sFdat2,:tag1,:tag2,:tag3,:kf,:ob22,:nls_z,:nls_po,:kv)';
+    l_zpr.default_vars := ':nls_z='''',:nls_po='''',:kf=''%'',:ob22=''10'',:kv=''%'',:tag1=''OW_DS'',:tag2=''OW_LD'',:tag3=''OWDRN''';
+    l_zpr.bind_sql     := ':kf=''BANKS|MFO|NB'',:nls_z=''PS|NBS|NAME'',:nls_po=''PS|NBS|NAME''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select op.ref,
-       op.tt, 
-       nam_a, 
-       nam_b, 
-       --op.s,op.dk,
-       op.s*(decode(dk,0,1,0)) debit,
-       op.s*op.dk credit,
-       nazn, 
-       pdat, 
-       vdat, 
-       (select value from operw opw 
-         where opw.ref=op.ref
-               and opw.tag in (''OW_DS'')) edesc, --доп реквизит описание way4
-       (select value from operw opw 
-         where opw.ref=op.ref
-               and opw.tag in (''OW_LD'')) edate, --доп реквизит date
-       (select value from operw opw 
-         where opw.ref=op.ref
-               and opw.tag in (''OWDRN'')) eref  
-  from oper op
-       
- where op.odat between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'')
-       and op.sos = 5
-       and op.branch like :kf||''%''
-       and op.kv like :kv
-       and 0<(select count(acc) --проверка на нужный ОВ22
-                from accounts acc
-               where ((op.nlsa=acc.nls and op.kv=acc.kv) or (op.nlsb=acc.nls and acc.kv=op.kv2))
-                     and nbs between decode(:nls_z,''%'',nbs,:nls_z) and decode(:nls_po,''%'',nbs,:nls_po) 
-                     and acc.kf=op.kf
-                     and acc.ob22 like :ob22
-                     )
-       and 0<(select count(tag) --Поиск по заданым тегам
-                from operw opw 
-               where op.ref=opw.ref
-                     and opw.tag in (:tag1,:tag2,:tag3)) ';
+    l_zpr.txt          := 'select * 
+  from tmp_rep_101052';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 

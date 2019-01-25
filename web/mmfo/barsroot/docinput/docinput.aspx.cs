@@ -17,6 +17,7 @@ using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
 using Bars.LinkDocs;
 using System.Collections.Generic;
+using BarsWeb.Models;
 
 namespace DocInput
 {
@@ -65,6 +66,11 @@ namespace DocInput
         private string PAR_SYSDATE;
         private string PAR_DEPUP;
         private string PAR_BANKYPE;
+        //информация о Теллере
+        TELLER_USER_PARAM TELLER_USER_PARAM;
+        private Int32 IS_TELLER_BUTTON_VISIBLE;
+        private CultureInfo cInfo = CultureInfo.CreateSpecificCulture("en-GB");
+
         // флаг платежа через единое окно
         private bool isSWI = false;
         // признак транслитерации (реквизит 20 = +)
@@ -492,7 +498,7 @@ namespace DocInput
             foreach (string js_nam in js_list)
             {
                 if (!ClientScript.IsClientScriptBlockRegistered(js_nam))
-                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.82\"></script>");
+                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.83\"></script>");
             }
             if ("1" == parSignMixedMode)
             {
@@ -543,6 +549,20 @@ namespace DocInput
             //        }
             //    }
             //}
+
+            //если операция ТОХ и инкассационная
+            if (!String.IsNullOrEmpty(Request.Params["IsTEnc"]))
+            {
+                _IsTEnc.Value = Request.Params["IsTEnc"];
+                _TOperRef.Value = Request.Params["TOperRef"];
+                Nazn.Text = Request.Params["TPurpose"];
+            }
+            //если теллер активен, пользователь имеет роль теллера и операция является кассовой            
+            if (IfTellerActive())
+                __ISTELLERACTIVE.Value = "1";
+            else
+                __ISTELLERACTIVE.Value = "0";
+
         }
 
         private void HideControl(TextBox tb)
@@ -2271,6 +2291,54 @@ namespace DocInput
             }
         }
 
+        private Boolean IfTellerActive()
+        {
+            TELLER_USER_PARAM = new TELLER_USER_PARAM();
+            IOraConnection conn = (IOraConnection)Application["OracleConnectClass"];
+            using (con = conn.GetUserConnection(Context))
+            {
+                using (OracleCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = conn.GetSetRoleCommand("WR_DOC_INPUT");
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"begin 
+                                            :hasTellerRole := bars.teller_tools.is_teller();
+                                            :isTellerOn := bars.teller_tools.get_teller();
+                                            :isTellerButtonVisible := bars.teller_tools.is_button_visible(:p_op_code);
+                                        end;";
+                    var tellerRoleParam = new OracleParameter("hasTellerRole", OracleDbType.Int32, TELLER_USER_PARAM.HAS_TELLER_ROLE, ParameterDirection.Output);
+                    cmd.Parameters.Add(tellerRoleParam);
+                    var tellerOnParam = new OracleParameter("isTellerOn", OracleDbType.Int32, TELLER_USER_PARAM.IS_TELLER_ON, ParameterDirection.Output);
+                    cmd.Parameters.Add(tellerOnParam);
+                    var buttonVisibleParam = new OracleParameter("isTellerButtonVisible", OracleDbType.Int32, IS_TELLER_BUTTON_VISIBLE, ParameterDirection.Output);
+                    cmd.Parameters.Add(buttonVisibleParam);
+                    var operationCode = new OracleParameter("p_op_code", OracleDbType.Varchar2, TT, ParameterDirection.Input);
+                    cmd.Parameters.Add(operationCode);
+                    try
+                    {
+                        using (OracleDataReader reader = cmd.ExecuteReader())
+                        {
+                            OracleDecimal tellerRoleP = (OracleDecimal)tellerRoleParam.Value;
+                            TELLER_USER_PARAM.HAS_TELLER_ROLE = Convert.ToInt32(tellerRoleP.Value);
+
+                            OracleDecimal tellerOnP = (OracleDecimal)tellerOnParam.Value;
+                            TELLER_USER_PARAM.IS_TELLER_ON = Convert.ToInt32(tellerOnP.Value);
+
+                            OracleDecimal buttonVisibleP = (OracleDecimal)buttonVisibleParam.Value;
+                            IS_TELLER_BUTTON_VISIBLE = Convert.ToInt32(buttonVisibleP.Value);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        IS_TELLER_BUTTON_VISIBLE = 0;
+                    }
+                }
+            }
+            if (TELLER_USER_PARAM.HAS_TELLER_ROLE == 1 && TELLER_USER_PARAM.IS_TELLER_ON == 1 && IS_TELLER_BUTTON_VISIBLE == 1)
+                return true;
+            return false;
+        }
 
         private void GetNlsNameAlien(TextBox eId, TextBox eNam, string Nls, decimal Kv, string mfo)
         {

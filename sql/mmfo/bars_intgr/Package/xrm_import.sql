@@ -5,13 +5,13 @@ is
     --
     -- Работа с витринами для псевдо-онлайн выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'Version 1.1.0 16/08/2018';
+    g_header_version  constant varchar2(64)  := 'Version 1.2.0 04/12/2018';
 
     G_IMPORT_MODE_FULL  constant varchar2(5) := 'FULL';
     G_IMPORT_MODE_DELTA constant varchar2(5) := 'DELTA';
     G_STATS_ERROR constant varchar2(10) := 'ERROR';
     G_STATS_INPROCESS constant varchar2(10) := 'INPROCESS';
-    G_STATS_SUCCESS constant varchar2(10) := 'INPROCESS';
+    G_STATS_SUCCESS constant varchar2(10) := 'SUCCESS';
 
     --
     -- header_version - возвращает версию заголовка пакета
@@ -133,7 +133,7 @@ show errors;
 
 create or replace package body xrm_import
 is
-    g_body_version constant varchar2(64) := 'Version 1.1.0 16/08/2018';
+    g_body_version constant varchar2(64) := 'Version 1.2.0 04/12/2018';
     G_TRACE        constant varchar2(20) := 'xrm_import.';
     G_IS_MMFO      number(1);
     G_IS_TEST      number(1)    := 0;
@@ -1594,6 +1594,7 @@ is
                               "'W4_SEC'_CC"  as w4_sec
                          from (select w.acc, w.tag, w.value
                                  from bars.accountsw w
+                                 join delta d on w.acc = d.acc
                                 where tag in ('LIE_SUM','LIE_VAL','LIE_DATE','LIE_DOCN','LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC')
                               )
                        pivot ( max(value) cc for tag in ('LIE_SUM', 'LIE_VAL', 'LIE_DATE', 'LIE_DOCN', 'LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC'))

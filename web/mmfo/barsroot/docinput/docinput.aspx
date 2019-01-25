@@ -13,6 +13,7 @@
     <meta content="JavaScript" name="vs_defaultClientScript" />
     <meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema" />
     <link href="Styles.css" type="text/css" rel="stylesheet" />
+   	<link href="../Areas/Teller/Css/atm.min.css" rel="stylesheet" />
     <script type="text/javascript" src="/Common/Script/cross.js?v1.0"></script>
     <script type="text/javascript" src="/Common/Script/BarsIe.js?v1.0"></script>
     <script type="text/javascript" src="/Common/Script/Localization.js"></script>
@@ -22,7 +23,11 @@
 	<script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
     <script type="text/javascript" src="/barsroot/Scripts/json3.min.js"></script>
     <script type="text/javascript" src="/Common/WebEdit/RadInput.js?v.10"></script>
+    <script type="text/javascript" src="/barsroot/Areas/Teller/Scripts/TellerScript.js"></script>
     <script type="text/javascript">
+        var key = false;
+        var intervalObj = false;
+
         function chkErrMessage(str) {
             if (str.length != "") alert(str);
         }
@@ -101,6 +106,48 @@
             }
         }
 
+        //==============методы и объекты для работы ТЕЛЛЕРА
+
+        ///// изменение позиции окна АТМ при изменении ширины окна браузера
+        $('document').ready(function () {
+            if (zElementIndex) {
+                zElementIndex.down = 390;
+                zElementIndex.middle = 395;
+                zElementIndex.up = 401;
+                showHide = new ElementsVisibility();
+                intervalObj = new StatusInterval();
+            }
+            $(window).resize(function () {
+                onWindowResize();
+            });
+        });
+        function Restore(currentSum, status) {
+            if (currentSum == '-1')
+                return;
+            var dif = +parseFloat($("#atm-sum-dif").val()).toFixed(2);
+            var operSum = +parseFloat($('#atm-sum-txt').text()).toFixed(2);
+            $('#atm-in-out-sum').text(currentSum);
+            var difSum = +parseFloat(operSum - currentSum).toFixed(2);
+            $("#atm-sum-dif").val(difSum);
+            if (difSum < 0) {
+                difSum *= -1;
+                $('#atm-tempo-in-out-info').text('видати з темпокаси');
+                if (status == 'OUT')
+                    $('#atm-tempo-in-out-info').text('внести в темпокасу');
+                else if (status == 'IN')
+                    $('#atm-tempo-in-out-info').text('видати з темпокаси');
+            }
+            $('#atm-sum-tempo').text(difSum);
+        }
+
+        function GetRef() {
+            return $('#OutRef').val();
+        }
+
+        function GetSWI() {
+            return $("#_ISSWINOTIFIED").val();
+        }
+
     </script>
     <script type="text/javascript">
         // скажем обычным контролам трактовать Enter как Tab
@@ -131,6 +178,9 @@
                                         align="top" id="btDuplicate" title="Продублювати документ" style="visibility: hidden"
                                         onclick="DublicateDoc()" src="/Common/Images/COPY.gif" />
                     <span style="width: 220px; text-align: right; vertical-align: top">
+                        <img runat="server" class="outset"  id="tellerProc" title="Виконати операцію з Теллером" onclick="TellerWindow(); return;"
+                          height="16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABMElEQVQ4jaWRsUoDQRRFz8JWA/oFioWdEOwEESyiBithBguFVMIGhKTxA7bILwgKU6TZIkVgK4tAZLEQBJsgBjsLwVoQjWIRnoVkjdnNriEHhhl4c+973OeICLPgzqQGHBV4baAEOFNqo37ZbrnADuAcFYqcrh7E1TdAgPkx1WLrhJevd4AiACrwBvvXZ/Iqv1S7TVGBJyrwKiJC1nEBWhvHcYerjycavQiAftlaY0xmyokQLx5vE5/CMEwVG2P+v4V6vQ6A7/s8766w0H5In2BveY3zu07CwPf9+D0UxwaHNxa7XmEO2FRLVArb2PvLRPdUVOANVOBJtduUUT5/LrTWMgmttbhAByg1epEzTH9Iv2zzw8nb8+gEtVrtz621zhaPGoyLpzbIyiAXY8zE2jf1zTWrVFvSVAAAAABJRU5ErkJggg=="
+                             align="top" style="visibility: hidden;">
                         <asp:TextBox ID="tbZn" runat="server" Width="30px" BackColor="#E0E0E0" ReadOnly="True"
                             Style="text-align: center" Font-Names="Verdana" Font-Bold="True"></asp:TextBox>
                         <asp:TextBox ID="tbOst" runat="server" Width="140px" BackColor="#E0E0E0" ReadOnly="True"
@@ -755,6 +805,10 @@
                     <input id="__USER_KEYHASH" type="hidden" runat="server" />
                     <input id="__CRYPTO_USE_VEGA2" type="hidden" runat="server" />
                     <input id="__CRYPTO_CA_KEY" type="hidden" runat="server" />
+                	<input id="__ISTELLERACTIVE" type="hidden" runat="server" />
+                    <input type="hidden" id="_ISSWINOTIFIED" value="0" />
+                    <input type="hidden" id="_IsTEnc" value="0" runat="server" />
+                    <input type="hidden" id="_TOperRef" value="" runat="server" />
                 </td>
             </tr>
             <tr>
@@ -1080,5 +1134,27 @@
     </div>
     <div class="webservice" id="webService" showprogress="true">
     </div>
+    <div id="preloader">
+        <div id="preloader-background"></div>
+        <div class="preloader-container">
+            <div class="preloader-text" id="preloader-text">
+                <h1 id="text-oper" class="preloader-text-header animated flash">Зачекайте, виконується операція</h1>
+            </div>
+            <div class="preloader-image-container">
+                <img src="/barsroot/Content/spinners/loader.gif" alt="image/gif" id="teller-preloader-image" />
+            </div>
+        </div>
+    </div>
+    <div id="atm-window-container"></div>
+    <div id="teller-notification-window" style="display: none;">
+        <div id="atm-header">
+            <label class="teller-head-txt" id="teller-notify-head-text">Інформація</label>
+        </div>
+        <div id="teller-notofication-txt"></div>
+        <div id="atm-notify-button-area">
+            <a class="atm-button atm-color-green atm-confirm-button-width" onclick="notificationClose()">ОК</a>
+        </div>
+    </div>
+
 </body>
 </html>

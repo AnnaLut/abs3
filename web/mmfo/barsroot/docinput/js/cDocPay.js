@@ -488,6 +488,9 @@ function onPayDoc(result) {
     if (!(document.getElementById("btPayIt").disabled = getError(result, true))) return;
     DisableControls(true);
     document.getElementById("OutRef").value = result.value;
+    var isTellerEncashment = +parseInt($('#_IsTEnc').val());
+    if (isTellerEncashment === 1)
+        sendEncashTellerRef(result.value);
     document.getElementById("__DOCREF").value = result.value;
     Dialog(LocalizedString('Message3') + "<BR>" + LocalizedString('Message4') + " " + result.value, "alert");
     if (document.getElementById("__FLAGS").value.substring(46, 47) == "1") {
@@ -508,11 +511,30 @@ function onPayDoc(result) {
         catch (e) {
             return;
         }
-
+    if (document.getElementById("__ISTELLERACTIVE").value == "1") {
+        document.getElementById("tellerProc").style.visibility = "visible";
+    }
     if (document.getElementById('fvLinkedDocs')) {
         document.getElementById('fvLinkedDocs').style.visibility = 'hidden';
         hideColumn();
     }
+}
+
+function sendEncashTellerRef(ref) {
+    var operRef = $("#_TOperRef").val();
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: '/barsroot/api/teller/teller/ConfirmTox',
+        data: JSON.stringify({ DocRef: ref, OperRef: operRef }),
+        success: function (result) {
+            if (result.model)
+                alert(result.model.Result);
+        },
+        error: function (err) {
+
+        }
+    });
 }
 
 function isQdoc() {
@@ -577,6 +599,9 @@ function DisableControls(disabled) {
         if (document.getElementById("__TICTOFILE").value != '2') {
             document.getElementById("btMenuPrint").style.visibility = 'visible';
             document.getElementById("btMenuPrint").attachEvent("onclick", MenuPrint);
+        }
+        if (document.getElementById("__ISTELLERACTIVE").value == "1") {
+            document.getElementById("tellerProc").style.visibility = "visible";
         }
         if (parent.frames[0]) {
             document.getElementById("btSameDoc").style.visibility = 'visible';

@@ -416,6 +416,14 @@ namespace BarsWeb.HtmlHelpers
             }
             return new MvcHtmlString("");
         }
+
+        public static MvcHtmlString CreatePath(Decimal? amount, Decimal? code, Int32 operRef, String purpose)
+        {
+            String amD = amount.GetValueOrDefault().ToString("F");
+            String codeD = Convert.ToInt64(code.GetValueOrDefault()).ToString();
+            return new MvcHtmlString("/barsroot/docinput/docinput.aspx?tt=TOX&SumC=" + amD + "&Kv_A=" + codeD + "&IsTEnc=1&TOperRef=" + operRef + "&TPurpose=" + purpose);
+        }
+
     }
 
 }

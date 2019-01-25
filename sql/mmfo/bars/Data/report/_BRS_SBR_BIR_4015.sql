@@ -41,11 +41,11 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'Друк заяв з продажу ІВ, що надійшли через СДО';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:sFdat2=''''';
+    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:sparam=''0-Чекає на візу, 1-Всі''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'zay_4015.frx';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := '';
+    l_zpr.default_vars := ':sparam=1';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'SELECT z.nd num_doc,'||nlchr||
@@ -138,7 +138,8 @@ begin
                            '         AND z.identkb IS NOT NULL'||nlchr||
                            '         AND z.fdat BETWEEN :sFdat1 AND :sFdat2'||nlchr||
                            '         and z.id = zm.idz(+)'||nlchr||
-                           '         and z.sos >= 0'||nlchr||
+                           '         and ((z.sos >= 0 and :sparam = 1)'||nlchr||
+                           '         or (z.sos = 0 and :sparam = 0))'||nlchr||
                            'ORDER BY z.dk, z.fdat';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
@@ -172,11 +173,16 @@ begin
     l_rep.name        :='Empty';
     l_rep.description :='Друк заяв з продажу ІВ, що надійшли через СДО';
     l_rep.form        :='frm_FastReport';
-    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",FALSE,FALSE';
+    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
-    l_rep.idf         :=null;    
+    begin                                                                        
+        select idf into l_repfolder from reportsf where idf = 70; 
+    exception when no_data_found then                                            
+        l_repfolder := null;                                                     
+    end;                         
+    l_rep.idf := l_repfolder;      
 
     -- Фиксированный № печатного отчета   
     l_rep.id          := 4015;

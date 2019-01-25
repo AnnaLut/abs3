@@ -1367,6 +1367,11 @@ is
   l_ValueClob       CLOB;
   --
   l_text            clob;
+  
+  -- COBUMMFO-9690 Begin
+  l_module          varchar2(64);
+  l_action          varchar2(64);
+  -- COBUMMFO-9690 End
   --
   -- str
   --
@@ -1538,6 +1543,7 @@ begin
   bars_audit.trace( '%s: Start with ( tab_name = %s, condition = %s, offset = %s, mode = %s ).'
                   , title, nvl(p_tab_name,'null'), nvl(p_condition,'null'), to_char(p_offset), p_mode );
 
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
   dbms_application_info.set_action( 'DPT_UTILS.GET_INSERT4TABLE' );
   
   dbms_application_info.set_client_info( 'tab_name=' || nvl(p_tab_name,'null') || ', condition=' || nvl(p_condition,'null') );
@@ -1824,7 +1830,7 @@ begin
     DBMS_SQL.CLOSE_CURSOR( l_Cursor );
   END IF;
 
-  dbms_application_info.set_module(NULL,NULL);
+  dbms_application_info.set_module(l_module, l_action /*NULL,NULL -- COBUMMFO-9690*/);
   dbms_application_info.set_client_info(Null);
 
   bars_audit.trace( '%s Exit.', title );
@@ -1846,6 +1852,7 @@ exception
     DBMS_LOB.close( l_text );
     DBMS_LOB.FREETEMPORARY( l_text );
     
+    dbms_application_info.set_module(l_module, l_action); -- COBUMMFO-9690
     RAISE_APPLICATION_ERROR( -20666, dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), true );
     
 end GET_INSERT4TABLE;
@@ -2025,8 +2032,14 @@ procedure RECOVERY_CONTRACT( p_dptid  in   dpt_deposit.deposit_id%type )  -- ≥де
 is
   title   constant varchar2(32) := 'RECOVERY_CONTRACT';
   l_dpt   dpt_deposit_clos%rowtype;
+
+  -- COBUMMFO-9690 Begin
+  l_module          varchar2(64);
+  l_action          varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
+  dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
   dbms_application_info.set_action('recovery_deposit');
  
   begin
@@ -2074,10 +2087,10 @@ begin
 
   bars_audit.info( title || ': ¬клад # '||to_char(p_dptid)||' усп≥шно в≥дновлено!' ); 
 
-  dbms_application_info.set_action(null);
+  dbms_application_info.set_action(l_action /*null -- COBUMMFO-9690*/);
 exception
   when others then
-    dbms_application_info.set_action(null);
+    dbms_application_info.set_action(l_action /*null -- COBUMMFO-9690*/);
     bars_audit.error( title||': '||dbms_utility.format_error_stack()||dbms_utility.format_error_backtrace() );
     raise_application_error( -20000, dbms_utility.format_error_stack()||dbms_utility.format_error_backtrace(), true );
 end RECOVERY_CONTRACT;

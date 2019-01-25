@@ -6,6 +6,8 @@ using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
 using Bars;
 using Bars.Classes;
+using Bars.Oracle;
+using BarsWeb.Models;
 
 namespace BarsWeb.CheckInner
 {
@@ -16,6 +18,7 @@ namespace BarsWeb.CheckInner
 
         protected HtmlInputHidden __FLAGS;
         protected HtmlInputHidden __VOBCONFIRM;
+        protected Int32 IS_TELLER_BUTTON_VISIBLE = -1;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -158,6 +161,16 @@ namespace BarsWeb.CheckInner
             else throw new Exception(Resources.checkinner.LocalRes.text_StraVuzvanaBezNeobhParam);
 
             lb_GroupName.InnerText = GroupName;
+            if (IfTellerActive())
+                __ISTELLERACTIVE.Value = "1";
+            else
+            {
+                __ISTELLERACTIVE.Value = "0";
+                tellerProc.Visible = false;
+            }
+            if (IS_TELLER_BUTTON_VISIBLE == 0)
+                tellerProc.Visible = false;
+
         }
 
         #region Web Form Designer generated code
@@ -179,5 +192,50 @@ namespace BarsWeb.CheckInner
 
         }
         #endregion
+
+        private Boolean IfTellerActive()
+        {
+            IOraConnection conn = (IOraConnection)Application["OracleConnectClass"];
+            TELLER_USER_PARAM TELLER_USER_PARAM = new TELLER_USER_PARAM();
+
+            using (OracleConnection con = conn.GetUserConnection(Context))
+            {
+                using (OracleCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = conn.GetSetRoleCommand("WR_DOC_INPUT");
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"begin 
+                            :hasTellerRole := bars.teller_tools.is_teller();
+                            :isTellerOn := bars.teller_tools.get_teller();
+                            :isTellerButtonVisible := bars.teller_tools.is_button_visible(:p_op_code);
+                            end;";
+                    cmd.Parameters.Add("hasTellerRole", OracleDbType.Int32, TELLER_USER_PARAM.HAS_TELLER_ROLE, ParameterDirection.Output);
+                    cmd.Parameters.Add("IsTellerOn", OracleDbType.Int32, TELLER_USER_PARAM.IS_TELLER_ON, ParameterDirection.Output);
+                    cmd.Parameters.Add("isTellerButtonVisible", OracleDbType.Int32, IS_TELLER_BUTTON_VISIBLE, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_op_code", OracleDbType.Varchar2, "", ParameterDirection.Input);
+                    try
+                    {
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            OracleDecimal returnResult = (OracleDecimal)cmd.Parameters["hasTellerRole"].Value;
+                            TELLER_USER_PARAM.HAS_TELLER_ROLE = (int)returnResult.Value;
+                            OracleDecimal isTeller = (OracleDecimal)cmd.Parameters["isTellerOn"].Value;
+                            TELLER_USER_PARAM.IS_TELLER_ON = (int)isTeller.Value;
+                            OracleDecimal isButtonVisibleDec = (OracleDecimal)cmd.Parameters["isTellerButtonVisible"].Value;
+                            IS_TELLER_BUTTON_VISIBLE = Convert.ToInt32(isButtonVisibleDec.Value);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        IS_TELLER_BUTTON_VISIBLE = 0;
+                    }
+                }
+            }
+            if (TELLER_USER_PARAM.HAS_TELLER_ROLE == 1 && TELLER_USER_PARAM.IS_TELLER_ON == 1)
+                return true;
+            return false;
+        }
+
     }
 }

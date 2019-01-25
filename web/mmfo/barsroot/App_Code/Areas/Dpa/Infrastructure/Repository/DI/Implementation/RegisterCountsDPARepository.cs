@@ -821,15 +821,16 @@ SELECT t.rowid AS idrow
         if (file_type == "F0List")
         {
             sql = @"select fn, 
-                trunc(dat) as d_f0, 
-                case when substr(f.fnk,1,3) = '@F1' then datk else datk1 end as d_F1,
-                case when substr(f.fnk,1,3) = '@F2' then datk else null end as d_F2,
-                (select dat from zag_f l where l.fn = replace(f.fn,'@F0','@R0') and l.dat >= trunc(f.dat, 'year')) as d_R0,
-                nvl(err,' ') err, 
-                C.ERR_MSG
-                from zag_f f left join DPA_ERR_CODES c on C.ERR_CODE = f.err
-                where F.DAT > sysdate-364 and fn like '@F0%'
-                order by dat desc, fn desc";
+                    trunc(dat) as d_f0, 
+                    case when substr(f.fnk,1,3) = '@F1' then datk else datk1 end as d_F1,
+                    case when substr(f.fnk,1,3) = '@F2' then datk else null end as d_F2,
+                    (select dat from zag_f l where l.fn = replace(f.fn,'@F0','@R0') and l.dat >= trunc(f.dat, 'year')) as d_R0,
+                    nvl(err,' ') err, 
+                    C.ERR_MSG,
+                    (select coalesce(max('Ні'),'Так') from lines_f where fn = f.fn and dat = f.dat and otype not in (3,5) and rownum = 1) is_close_acc_only
+                    from zag_f f left join DPA_ERR_CODES c on C.ERR_CODE = f.err
+                    where F.DAT > sysdate-364 and fn like '@F0%'
+                    order by dat desc, fn desc";
         }
         else
             sql = @"select fn, dat, nvl(err,' ') err

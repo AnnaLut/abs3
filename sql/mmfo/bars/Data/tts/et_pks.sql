@@ -44,12 +44,34 @@ begin
   delete from ps_tts where tt='PKS';
   begin
     insert into ps_tts(nbs, tt, dk)
+    values ('2600', 'PKS', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2600'', ''PKS'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
     values ('2605', 'PKS', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2605'', ''PKS'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('2620', 'PKS', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2620'', ''PKS'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -110,6 +132,17 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
+    values ('3619', 'PKS', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3619'', ''PKS'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
     values ('3652', 'PKS', 0);
   exception
     when dup_val_on_index then null;
@@ -151,10 +184,21 @@ begin
   delete from chklist_tts where tt='PKS';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (2, 'PKS', 2, null, 'substr(NLSA,1,4) in (''3510'',''3519'',''3619'')', null);
+  exception
+    when dup_val_on_index then null;
+    when others then 
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''PKS'', 2, null, ''substr(NLSA,1,4) in (''''3510'''',''''3519'''')'', null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
     values (5, 'PKS', 1, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''PKS'', 1, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -162,15 +206,16 @@ begin
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (30, 'PKS', 2, null, 'bpk_visa30(ref, 1)=1', null);
+    values (30, 'PKS', 3, null, 'bpk_visa30(ref, 1)=1', null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 30, ''PKS'', 2, null, ''bpk_visa30(ref, 1)=1'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 30, ''PKS'', 3, null, ''bpk_visa30(ref, 1)=1'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
+
   --------------------------------
   ------------- Папки ------------
   --------------------------------

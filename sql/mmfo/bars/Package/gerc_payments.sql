@@ -1,6 +1,10 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/gerc_payments.sql =========*** Run *
+PROMPT ===================================================================================== 
+
 CREATE OR REPLACE PACKAGE BARS.GERC_PAYMENTS
 IS
-   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'v.3.63 31.01.2018';
+   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'v.3.70 21.08.2018';
 
    TYPE tBranchData IS RECORD
    (
@@ -188,16 +192,40 @@ PROCEDURE RegisterRefreshNonClient (p_isnew             IN     INTEGER DEFAULT 0
                                     p_NUMDOC            IN OUT VARCHAR2,
                                     p_OperationResult   IN OUT INTEGER,
                                     p_ErrorMessage      IN OUT VARCHAR2);
-                                    
+
   procedure GetUserBranch ( p_UserLogin    IN varchar2,
                             p_branch       OUT staff$base.branch%type,
                             p_ErrorMessage OUT varchar2);
+
+  -----------------------------------------------------------------------------------------
+  --  CheckAccountByBranch
+  --
+  --    Процедура перевіряє і повертає стан рахунка по параметрам: branch, nls, kv
+  --    Для ММФО перевірка виконується по branch, nls, kv
+  --
+ procedure CheckAccountByBranch(p_branch  in accounts.branch%type,
+                                p_nls     in accounts.nls%type,
+                                p_kv      in accounts.kv%type,
+                                p_status  out number,
+                                p_comment out varchar2);
+
+  -----------------------------------------------------------------------------------------
+  --  CheckAccountByKf
+  --
+  --    Процедура перевіряє і повертає стан рахунка по параметрам: kf, nls, kv
+  --    Для РУ перевірка виконується по kf, nls, kv
+  --
+ procedure CheckAccountByKf(p_kf      in accounts.branch%type,
+                            p_nls     in accounts.nls%type,
+                            p_kv      in accounts.kv%type,
+                            p_status  out number,
+                            p_comment out varchar2);
 
 END GERC_PAYMENTS;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.GERC_PAYMENTS IS
 
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.75 09.07.2018';
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.81 06.12.2018';
     TYPE t_cursor   IS REF CURSOR;
     function header_version return varchar2
     is
@@ -376,10 +404,10 @@ IS
     title       constant   varchar2(25) := 'GERC_PAYMENTS.CreateDoc:';
     l_tt                   oper.tt%type;
     l_rec_id               sec_audit.rec_id%type;
-    
+
     l_impdoc               xml_impdocs%rowtype;
     l_ref                  oper.ref%type;
-    
+
     l_doc                  bars_xmlklb_imp.t_doc;
     --l_dreclist             bars_xmlklb.array_drec;
     l_userid               staff.id%type;
@@ -392,20 +420,28 @@ IS
 
     l_err                  number;    -- Return code
     l_rec                  number;    -- Record number
-    -- COBUMMFO-4823    
+    -- COBUMMFO-4823
     l_datd                 date := gl.bdate;
     l_vdat                 date := case when p_date < gl.bdate then gl.bdate else p_date end;
-    -- 
-    l_addparam             varchar2(8000) := p_drec || p_operw;
-
+    l_is_incorrect_operw   boolean;
+    ex_incorrect_operw     exception;
+    l_vob                  oper.vob%TYPE;
+    ex_unique_constraint   exception;
+    pragma exception_init(ex_unique_constraint, -1);
+    l_errm                 varchar2(3000);
+    l_errcode              varchar2(256);
   begin
+    --bars_audit.set_log_level(7);--DEBUG
     bars_audit.INFO(title||': entry point');
+
+    -- читаю vob із налаштувань, якщо нема то беру з параметра
+    select coalesce(max(vob), p_vob) into l_vob from tts_vob where tt = p_tt;
 
     begin
       try_ins(p_nd, p_externalDocId, l_datd/*p_date*/
       ,p_branch, p_mfoa, p_mfob
       ,p_nlsa, p_nlsb, p_okpoa, p_okpob, p_kv, p_s
-      ,p_nama ,p_namb, p_nazn, p_sk, p_dk, p_vob, p_drec, p_sign
+      ,p_nama ,p_namb, p_nazn, p_sk, p_dk, l_vob, p_drec, p_sign
       ,p_CreatedByUserName, p_tt, p_our_buffer);
       exception
         when others then
@@ -466,7 +502,7 @@ IS
         l_tt:=p_tt;
         bars_audit.trace('%s: l_tt = %s', title, l_tt);
 
-        p_errcode := null;
+        p_errcode := 0;
         p_errmsg := null;
         p_ref := null;
 
@@ -507,7 +543,7 @@ IS
         l_impdoc.sk     := p_sk;
         l_impdoc.dk     := p_dk;
         l_impdoc.tt     := l_tt;
-        l_impdoc.vob    := p_vob;
+        l_impdoc.vob    := l_vob;
         l_impdoc.nazn   := p_nazn;
         l_impdoc.datp   := gl.bdate;
         l_impdoc.userid := l_userid;
@@ -515,27 +551,57 @@ IS
         bars_audit.INFO(title||':  l_impdoc. DONE');
         l_doc.doc  := l_impdoc;
         bars_audit.INFO(title||':  l_doc.doc  := l_impdoc. DONE');
+        -- AdditionalRequisites -- delimiter ";" -- example: ADRES=Тестовий адрес1;DT_R=01.01.1986;ADR2=Тестовий адрес2;
         begin
-            if l_addparam is not null then
-              l_length := length(l_addparam) - length(replace(l_addparam,';'));
-              l_str :=l_addparam;
-              for i in 0..l_length - 1 loop
-                l_tmp := substr(l_str, 0, instr(l_str,';')-1);
-                l_str := substr(l_str, instr(l_str,';')+1);
-                parse_str(l_tmp,l_name,l_val);
-                l_doc.drec(i).tag := l_name;
-                l_doc.drec(i).val := l_val;
-              end loop;
-             end if;
-        exception when others then raise_application_error(-20000, 'Не коректно сформовано параметр D_REC!');
+          if p_drec is not null then
+            l_length := length(p_drec) - length(replace(p_drec,';'));
+            l_str := p_drec;
+            for i in 0..l_length - 1 loop
+              l_tmp := substr(l_str, 0, instr(l_str,';')-1);
+              l_str := substr(l_str, instr(l_str,';')+1);
+              parse_str(l_tmp,l_name,l_val);
+              l_doc.drec(i).tag := l_name;
+              l_doc.drec(i).val := l_val;
+            end loop;
+          end if;
+        exception
+          when others then
+            raise_application_error(-20000, 'Не коректно сформовано параметр AdditionalRequisites!');
         end;
-        bars_audit.INFO(title||':  p_drec. DONE');
 
-        if l_tt  in ('G02','G07') then
+        -- AdditionalOperRequisites -- delimiter "{}" -- example: {ADRES=Тестовий адрес1;Вулиця адреса1;Буд1}{DT_R=01.01.1986}{ADR2=Тестовий адрес2;Вулиця адреса2;Буд2;}
+        begin
+          if p_operw is not null then
+            l_is_incorrect_operw := case when regexp_count(p_operw, '{', 1) <> regexp_count(p_operw, '}', 1) then true else false end;
+
+            -- перевірка співпадіння відкриваючих і закриваючих дужок
+            if l_is_incorrect_operw then
+              raise ex_incorrect_operw;
+            end if;
+
+            for i in (select rtrim(regexp_substr(p_operw,'[^{]+',1,level), '}') str
+                      from dual
+                      connect by regexp_substr(p_operw,'[^{]+',1,level) is not null)
+            loop
+              parse_str(i.str,l_name,l_val);
+              l_doc.drec(l_doc.drec.count).tag := l_name;
+              l_doc.drec(l_doc.drec.count-1).val := l_val;
+            end loop;
+          end if;
+        exception
+          when ex_incorrect_operw then
+             raise_application_error(-20000, 'Не коректно сформовано параметр AdditionalOperRequisites! Відсутні відкриваючі або закриваючі дужки {} пар реквізитів.');
+          when others then
+            raise_application_error(-20000, 'Не коректно сформовано параметр AdditionalOperRequisites!');
+        end;
+
+        bars_audit.INFO(title||':  p_drec, p_operw. DONE');
+
+        if l_tt in ('G02','G07') then
           gl.ref(l_ref);
           gl.in_doc3 (ref_     => l_ref,
                       tt_      => l_tt,
-                      vob_     => p_vob,
+                      vob_     => l_vob,
                       nd_      => nvl(p_nd, substr(p_externalDocId,greatest(-length(p_externalDocId),-10))),--взяти 10 останніх символів при p_nd = null,
                       pdat_    => l_datd,
                       vdat_    => l_vdat,
@@ -562,7 +628,7 @@ IS
                       sos_     => 1,
                       prty_    => NULL,
                       uid_     => l_userid);
-                      
+
           paytt( flg_  => 0,
                  ref_  => l_ref,
                  datv_ => l_vdat,
@@ -573,9 +639,9 @@ IS
                  sa_   => p_s,
                  kvb_  => p_kv,
                  nls2_ => p_nlsb,
-                 sb_   => p_s); 
-          gl.pay(2, l_ref, l_vdat);                 
-                      
+                 sb_   => p_s);
+          gl.pay(2, l_ref, l_vdat);
+
           bars.sep.in_sep(l_err,
                           l_rec,
                           p_mfoa,
@@ -584,14 +650,14 @@ IS
                           p_nlsb,
                           p_dk,
                           p_s,
-                          p_vob,
+                          l_vob,
                           nvl(p_nd, substr(p_externalDocId,greatest(-length(p_externalDocId),-10))),--взяти 10 останніх символів при p_nd = null,,
                           p_kv,
                           l_datd, --p_date,
                           trunc(l_datd), --p_date,
                           p_nama,
                           p_namb,
-                          p_nazn, 
+                          p_nazn,
                           null,
                           '10',
                           p_okpoa,
@@ -606,22 +672,27 @@ IS
                           null,--d_rec
                           0,
                           l_ref);
-            p_ref := l_ref;  
-            p_errmsg := l_err;       
-            p_errcode := l_rec;     
+            p_ref := l_ref;
+            p_errmsg := to_char(l_err);
+            p_errcode := l_err;
           else
             bars_audit.INFO(title||':  bars_xmlklb_imp.pay_extern_doc. start');
             bars_xmlklb_imp.pay_extern_doc( p_doc     => l_doc,
-                                        p_errcode => p_errcode,
+                                        p_errcode => l_errcode,
                                         p_errmsg  => p_errmsg ) ;
             bars_audit.INFO(title||':  bars_xmlklb_imp.pay_extern_doc. end');
-            log_gerc_audit(p_externalDocId,p_errmsg);
             
+            if l_errcode is not null then
+              p_errcode := to_number(l_errcode);
+            end if;
+            
+            log_gerc_audit(p_externalDocId,p_errmsg);
+
             p_ref := to_char(l_doc.doc.ref);
-        --                
-        end if;  
         --
-        
+        end if;
+        --
+
         bars_audit.trace('%s: pay_extern_doc done, l_errcode=%s, l_errmsg=%s', title, to_char(p_errcode), p_errmsg);
 
        -- возврат контекста
@@ -647,7 +718,23 @@ IS
              REQ_MESSAGE = case when p_errcode = 0 then 'Ok' else p_errmsg end
        where ExternalDocumentId = p_externalDocId
          and ref is null;
-      exception when others then bars_audit.info(title||':'||sqlcode||'/'||sqlerrm);
+       -- якщо ref вже існує то ми маєм відкатитись і не створювати оплату 
+       -- таке можливо якщо запуск виконується паралельно - відбувались задвоєння по оплаті (COBUMMFO-6530)
+       if sql%rowcount = 0 then
+         raise ex_unique_constraint;
+       end if;
+     exception 
+       when ex_unique_constraint then
+         p_ref := null;
+         p_errcode:=sqlcode;
+         p_errmsg:=substr('Існує вже ExternalDocId='||p_externalDocId||' '||sqlcode||'/'||sqlerrm,1,4000);
+         -- откат к точке начала оплаты
+         rollback to savepoint sp_paystart;
+         -- возврат контекста
+         bc.set_context;
+         return;
+       when others then 
+         bars_audit.info(title||':'||sqlcode||'/'||sqlerrm);
      end;
 
      bars_audit.info('GERC_PAYMENTS.CreateDoc(output parameters):'||chr(13)||chr(10)||
@@ -657,6 +744,11 @@ IS
 
      log_gerc_audit(p_externalDocId,' CreateDoc- Success. p_ref=>'||to_char(p_ref));
 
+  exception
+    when others then
+      l_errm := substrb(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 3000);
+      bars_audit.info('GERC_PAYMENTS.CreateDoc error '||l_errm);
+      raise_application_error(-20000, 'Помилка оплати по документу. '||l_errm);
   end CreateDoc;
 
     procedure CancelDocument (p_ExternalDocumentId    IN  gerc_orders.externaldocumentid%type  ,
@@ -703,7 +795,7 @@ IS
        bc.subst_branch(l_branch);
        exception
          when others then
-           p_errorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024); 
+           p_errorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024);
            p_statecode := null;
            bars_audit.error(title||' '||p_errorMessage);
            return;
@@ -733,7 +825,7 @@ IS
             exception when others then bars_audit.info(title||':'||sqlcode||'/'||sqlerrm);
             end;
            exception when others then
-             p_errorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024); 
+             p_errorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024);
              p_statecode := null;
              bars_audit.error(title||' '||p_errorMessage);
            end;
@@ -746,7 +838,7 @@ IS
 
      bars_audit.trace(title||' finised.');
     end CancelDocument;
-    
+
    procedure GetDocumentState ( p_ExternalDocumentID IN OUT varchar2,
                                 p_ref                   OUT oper.ref%type,
                                 p_StateCode             OUT oper.sos%type,
@@ -1201,6 +1293,7 @@ begin
 end;
 
 PROCEDURE RegisterRefreshNonClient (p_isnew             IN     INTEGER DEFAULT 0,
+
                                     p_in_RNK            IN     NUMBER DEFAULT NULL,
                                     p_in_OKPO           IN     VARCHAR2 DEFAULT NULL,
                                     p_in_NMK            IN     VARCHAR2 DEFAULT NULL,
@@ -1385,22 +1478,135 @@ end;
  procedure GetUserBranch ( p_UserLogin    IN varchar2,
                            p_branch       OUT staff$base.branch%type,
                            p_ErrorMessage OUT varchar2) is
-   title constant varchar2(40) := 'GERC_PAYMENTS.GetUserBranch:';                           
+   title constant varchar2(40) := 'GERC_PAYMENTS.GetUserBranch:';
  begin
-   select branch 
+   select branch
    into p_branch
-   from staff$base 
+   from staff$base
    where logname = upper(p_UserLogin);
    exception
-     when NO_DATA_FOUND then 
-       p_branch := null; 
+     when NO_DATA_FOUND then
+       p_branch := null;
        p_ErrorMessage := 'Користувач з логіном '||p_UserLogin||' не знайдено';
        bars_audit.error(title || p_ErrorMessage);
      when others then
-       p_branch := null; 
+       p_branch := null;
        p_ErrorMessage := substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(), 1, 1024);
-       bars_audit.error(title || p_ErrorMessage);  
- end;                               
+       bars_audit.error(title || p_ErrorMessage);
+ end;
+
+  -----------------------------------------------------------------------------------------
+  --  CheckAccountByBranch
+  --
+  --    Процедура перевіряє і повертає стан рахунка по параметрам: branch, nls, kv
+  --    Для ММФО перевірка виконується по branch, nls, kv
+  --
+ procedure CheckAccountByBranch(p_branch  in accounts.branch%type,
+                                p_nls     in accounts.nls%type,
+                                p_kv      in accounts.kv%type,
+                                p_status  out number,
+                                p_comment out varchar2)
+ is
+   l_bdate date := gl.bd;
+ begin
+   --bars_audit.info(p_branch);
+   --bars_audit.info(p_nls);
+   --bars_audit.info(p_kv);
+
+   -- рахунок не знайдено
+   p_status  := 0;
+   p_comment := 'Рахунок не знайдено';
+
+   if p_branch is null or p_nls is null or p_kv is null then
+     raise_application_error(-20000, 'Не заданий один або декілька обов`язкових параметрів для пошуку: branch, nls, kv');
+   end if;
+
+   for i in (select dazs, branch, kf
+             from accounts
+             where nls = p_nls
+                   and kv = p_kv
+             order by case when branch = p_branch or kf = p_branch then 1 else 2 end)
+   loop
+     if (i.dazs is null or i.dazs > l_bdate) and i.branch = p_branch then
+       -- рахунок відкритий
+       p_status := 1;
+       p_comment := 'Рахунок відкрито';
+     elsif (i.dazs is null or i.dazs > l_bdate) and i.branch <> p_branch then
+       -- рахунок відкрито в іншому відділенні
+       p_status := -1;
+       p_comment := 'Рахунок відкрито в іншому відділенні';
+     else
+       -- рахунок закритий
+       p_status := -1;
+       p_comment := 'Рахунок закритий';
+     end if;
+     return;
+   end loop;
+ exception
+   when others then
+     if sqlcode in (-20000) then
+       raise;
+     else
+       raise_application_error(-20000, 'Помилка в процедурі перевірки рахунку. '||dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace());
+     end if;
+ end CheckAccountByBranch;
+
+  -----------------------------------------------------------------------------------------
+  --  CheckAccountByKf
+  --
+  --    Процедура перевіряє і повертає стан рахунка по параметрам: kf, nls, kv
+  --    Для РУ перевірка виконується по kf, nls, kv
+  --
+ procedure CheckAccountByKf(p_kf      in accounts.branch%type,
+                            p_nls     in accounts.nls%type,
+                            p_kv      in accounts.kv%type,
+                            p_status  out number,
+                            p_comment out varchar2)
+ is
+   l_bdate date := gl.bd;
+ begin
+   -- рахунок не знайдено
+   p_status  := 0;
+   p_comment := 'Рахунок не знайдено';
+
+   if p_kf is null or p_nls is null or p_kv is null then
+     raise_application_error(-20000, 'Не заданий один або декілька обов`язкових параметрів для пошуку: branch, nls, kv');
+   end if;
+
+   -- додаткова перевірка для РУ
+   if length(p_kf) > 6 then
+     raise_application_error(-20000, 'Не вірно заданий параметр МФО. Повинен містити 6 цифр.');
+   end if;
+
+   for i in (select dazs, branch, kf
+             from accounts
+             where nls = p_nls
+                   and kv = p_kv
+             order by case when kf = p_kf then 1 else 2 end)
+   loop
+     if (i.dazs is null or i.dazs > l_bdate) and i.kf = p_kf then
+       -- рахунок відкритий
+       p_status := 1;
+       p_comment := 'Рахунок відкрито';
+     elsif (i.dazs is null or i.dazs > l_bdate) and i.kf <> p_kf then
+       -- рахунок відкрито в іншому відділенні
+       p_status := -1;
+       p_comment := 'Рахунок відкрито в іншому відділенні';
+     else
+       -- рахунок закритий
+       p_status := -1;
+       p_comment := 'Рахунок закритий';
+     end if;
+     return;
+   end loop;
+ exception
+   when others then
+     if sqlcode in (-20000) then
+       raise;
+     else
+       raise_application_error(-20000, 'Помилка в процедурі перевірки рахунку. '||dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace());
+     end if;
+ end CheckAccountByKf;
 
 END GERC_PAYMENTS;
 /

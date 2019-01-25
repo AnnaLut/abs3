@@ -189,6 +189,9 @@ begin
     bars_error.add_message(l_mod, 64, l_exc, l_rus, 'По заявке № %s списание средств произведено (документ REF=%s). Повторное списание средств запрещено!','');
     bars_error.add_message(l_mod, 64, l_exc, l_ukr, 'По заявці № %s списання коштів виконано (документ REF=%s). Повторне списання коштів заборонено!','');
 
+    bars_error.add_message(l_mod, 65, l_exc, l_rus, '%s %s - карточного типа !', '', 1 );
+    bars_error.add_message(l_mod, 65, l_exc, l_ukr, '%s %s - карткового типу ! ', '', 1);   
+
 
   commit;
 end;

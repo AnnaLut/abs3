@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_xmlklb_imp.sql =========*** Run
+PROMPT ===================================================================================== 
+ 
 create or replace package BARS_XMLKLB_IMP
 is
   
@@ -353,7 +357,7 @@ is
   ----------------------------------------------
   --  константы
   ----------------------------------------------
-  G_BODY_VERSION    constant varchar2(64) := 'version 13.5  20.07.2018';
+  G_BODY_VERSION    constant varchar2(64) := 'version 13.6  03.12.2018';
   G_MODULE          constant char(3)      := 'KLB';    -- код модуля
   G_TRACE           constant varchar2(50) := 'xmlklb_imp.';
 
@@ -891,7 +895,7 @@ is
             from accounts where nls = p_impdoc.nlsb and kv = p_impdoc.kv2;
 
             if l_dazs is not null then
-               bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYEE_ACCOUNT', p_impdoc.nlsa, to_char(p_impdoc.kv));
+               bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYEE_ACCOUNT', p_impdoc.nlsb, to_char(p_impdoc.kv2));
             end if;
 
 
@@ -2698,7 +2702,7 @@ grant EXECUTE                                                                on 
 
  
  
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_xmlklb_imp.sql =========*** End
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_xmlklb_imp.sql =========*** End
+PROMPT ===================================================================================== 
  

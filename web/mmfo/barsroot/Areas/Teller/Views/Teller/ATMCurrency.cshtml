@@ -1,0 +1,29 @@
+﻿@model IEnumerable<BarsWeb.Areas.Teller.Model.ATMCurrencyListModel>
+@{
+    Layout = null;
+}
+@if (Model != null && Model.Count() > 0 && ((String)ViewBag.Permission) == "1")
+{
+    <table>
+        <thead>
+            <tr>
+                <td>Валюта</td>
+                <td>Номінал</td>
+                <td>Доступно</td>
+                <td>Кількість</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Cur_code</td>
+                    <td class="available-nom">@item.Nominal</td>
+                    <td class="available-count">@item.Count</td>
+                    <td><input type="number" class="available-sum" style="width: 50px;" onblur="CalculateSum()"  min="0" step="1" value="@item.Count" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>    
+}
+<input type="hidden" id="nonAtm" value="@ViewBag.nonAtm" />

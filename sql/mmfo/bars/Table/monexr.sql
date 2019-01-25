@@ -114,7 +114,22 @@ exception when others then
  end;
 /
 
+PROMPT *** Create COLUMN RET_SEND ***
+begin 
+   EXECUTE IMMEDIATE 'alter TABLE BARS.MONEXR add ( RET_SEND  NUMBER )';
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      IF SQLCODE = -01430
+      THEN
+         NULL;
+      ELSE
+         RAISE;
+      END IF;         -- ORA-01430: column being added already exists in table
+END;
+/
 
+COMMENT ON COLUMN BARS.MONEXR.RET_SEND IS 'Сума комісії, яку утримує оператор для повернення клієнту';
 
 PROMPT *** Create  grants  MONEXR ***
 grant SELECT                                                                 on MONEXR          to BARSREADER_ROLE;

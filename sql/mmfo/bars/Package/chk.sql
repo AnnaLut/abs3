@@ -1,8 +1,10 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/package/chk.sql =========*** Run *** =======
-PROMPT ===================================================================================== 
 
-CREATE OR REPLACE PACKAGE CHK IS
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/chk.sql =========*** Run *** =======
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CHK IS
 -- ****************************************************************
 -- *            Financial cheks functions package                 *
 -- *                Unity-Bars (c) 2000-2009                          *
@@ -327,7 +329,7 @@ function get_next_visa_branches return oper.next_visa_branches%type;
 END chk;
 
 /
-CREATE OR REPLACE PACKAGE BODY CHK IS
+CREATE OR REPLACE PACKAGE BODY BARS.CHK IS
 
 -- ****************************************************************
 -- *            Financial cheks functions package                 *
@@ -340,7 +342,7 @@ CREATE OR REPLACE PACKAGE BODY CHK IS
    -- VISASIGN                         Демарк (уточнить, нужен ли макрос FM)
 */
 
-G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 3.57 2018-07-03';
+G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 3.58 2018-07-10';
 
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 
@@ -968,6 +970,9 @@ refl_     NUMBER;
 err       EXCEPTION;
 ers       varchar2(30);
 
+v_teller_flag number;
+v_status      number := status_;
+
 hasIntSign  binary_integer;
 hasExtSign  binary_integer;
 hasRespond  binary_integer;
@@ -983,6 +988,38 @@ BEGIN
    ||'sign1='||sign1_||','
    ||'sign2='||sign2_);
 
+   -- проверка Теллера
+   declare
+     v_errtxt varchar2(2000);
+     v_num number;
+   begin
+     dbms_output.put_line('branch start put_visa_out ='|| sys_context('bars_context','user_branch') );
+     begin
+     execute immediate 'begin :1 := teller_tools.validate_visa(p_visa   => '||status_||',
+                                                               p_docref => '||ref_||',
+                                          p_errtxt => :2);
+                              :3 := teller_tools.is_teller_doc('||ref_||');
+                        exception
+                          when others then
+                            :1 := 0;
+                        end;'
+       using out v_num, out v_errtxt, out v_teller_flag;
+     exception
+       when others then
+         null;
+     end;
+     if v_teller_flag = 1 then
+       v_status := 2;
+     end if;
+/*     bars_audit.info('Teller_chk: ref = '||ref_||', visa = '||status_||', v_num = '||v_num||', v_teller_flag = '||v_teller_flag||', errtxt = '||v_errtxt);
+     bars_audit.info('status_ = '||status_);
+*/     if v_teller_flag = 1 and v_num = -1 then  -- нельзя визировать!
+         bars_error.raise_nerror('TEL','TELL_DOC2',v_errtxt);
+--       raise_application_error(-20100,v_errtxt);
+     end if;
+   end;
+
+   dbms_output.put_line('branch before FM ='|| sys_context('bars_context','user_branch') );
    -- проверка ФМ
 
    -- status=0 - ввод
@@ -1117,8 +1154,38 @@ END put_visa_out;
 PROCEDURE put_visa (ref_ NUMBER, tt_ CHAR, grp_ NUMBER, status_ NUMBER,
                 keyid_ VARCHAR2, sign1_ VARCHAR2,sign2_ VARCHAR2) IS
   l_sqnc oper_visa.sqnc%type;
+  v_teller_flag number := -1;
+  v_status      number;
 BEGIN
-  put_visa_out(ref_, tt_, grp_, status_, keyid_, sign1_, sign2_, l_sqnc);
+   declare
+     v_errtxt varchar2(2000);
+     v_num number;
+   begin
+     dbms_output.put_line('branch start chk.put_visa ='|| sys_context('bars_context','user_branch') );
+     execute immediate 'begin :1 := teller_tools.validate_visa(p_visa   => '||status_||',
+                                                               p_docref => '||ref_||',
+                                          p_errtxt => :2);
+                              :3 := teller_tools.is_teller_doc('||ref_||');
+                        exception
+                          when others then
+                            :1 := 0;
+                        end;'
+       using out v_num, out v_errtxt, out v_teller_flag;
+     exception
+       when others then
+         null;
+    end;
+
+--bars_audit.info('v_teller_flag = '||v_teller_flag);
+  if v_teller_flag = 1 then
+    v_status := 2;
+  else
+    v_status := status_;
+  end if;
+  
+  dbms_output.put_line('branch before chk.put_visa_out ='|| sys_context('bars_context','user_branch') );
+  put_visa_out(ref_, tt_, grp_, v_status, keyid_, sign1_, sign2_, l_sqnc);
+  dbms_output.put_line('branch after chk.put_visa_out ='|| sys_context('bars_context','user_branch') );
 END put_visa;
 
 -- Отримання буфферу для накладання внутрішної ЕЦП
@@ -2326,6 +2393,8 @@ end make_data4visa_ext_xml;
     l_xmlECPsNode    dbms_xmldom.DOMNode;
     l_xmlECPsElement dbms_xmldom.DOMElement;
 
+    l_teller_flag number := 0;
+
     l_grp number;
     l_par number;
 
@@ -2502,9 +2571,14 @@ end make_data4visa_ext_xml;
           end if;
         end if;
 
+        begin
+          execute immediate 'begin :1 := teller_tools.is_teller_doc('||l_visadata_ecp(j).ref||'; exception when others then :1 := 0;end;'
+            using out l_teller_flag;
+          exception when others then l_teller_flag := 0;
+        end;
         l_status_tmp := l_status;
         if (l_status = 0) then
-          if (l_tmp_pay = 1) then
+          if (l_tmp_pay = 1) or (l_teller_flag = 1) then
             l_status_tmp := 2;
           else
             l_status_tmp := 1;
@@ -3373,6 +3447,8 @@ end make_data4visa_ext_xml;
 
         l_int_check number := 1;
         l_sep_check number := 1;
+
+        l_teller_flag number:=-1;
       begin
         --if(length(l_keyid) = 8) then
         --   l_keyid := substr(l_keyid, 3, 6);
@@ -3394,12 +3470,17 @@ end make_data4visa_ext_xml;
         VISAPAY - Візування та оплата
         STORNO - Cторновання
         */
+        begin
+          execute immediate 'begin :1 := teller_tools.is_teller_doc('||l_ref||'); exception when others then :1 := 0;end;'
+            using out l_teller_flag;
+          exception when others then l_teller_flag := 0;
+        end;
         case
           when (l_par = -1) then
             l_mode := 'ONEBACK';
-          when (l_par = 0 and (l_pay_flag is null or l_pay_flag != 1)) then
+          when (l_par = 0 and (l_pay_flag is null or l_pay_flag != 1) and l_teller_flag != 1) then
             l_mode := 'VISA';
-          when (l_par = 0 and l_pay_flag = 1) then
+          when (l_par = 0 and (l_pay_flag = 1 or l_teller_flag = 1)) then
             l_mode := 'VISAPAY';
           else
             l_mode := 'STORNO';
@@ -3689,6 +3770,10 @@ end make_data4visa_ext_xml;
     dbms_lob.createtemporary(outDataXml, true);
     dbms_xmldom.writeToClob(l_xmlDoc, outDataXml);
     dbms_xmldom.freeDocument(l_xmlDoc);
+exception
+  when others then
+    logger.info('chk.put_visas_xml_ext: '||sqlerrm||' '||dbms_utility.format_call_stack);
+    raise;
   end put_visas_xml_ext;
 
 

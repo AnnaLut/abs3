@@ -1,5 +1,6 @@
+
 prompt ===================================== 
-prompt == Друк заяв з купівлі ІВ, що надійшли через СДО
+prompt == Р”СЂСѓРє Р·Р°СЏРІ Р· РєСѓРїС–РІР»С– Р†Р’, С‰Рѕ РЅР°РґС–Р№С€Р»Рё С‡РµСЂРµР· РЎР”Рћ
 prompt ===================================== 
 
 set serveroutput on
@@ -16,10 +17,10 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := 'Друк заяв з купівлі ІВ, що надійшли через СДО';
+   l_zpr.name := 'Р”СЂСѓРє Р·Р°СЏРІ Р· РєСѓРїС–РІР»С– Р†Р’, С‰Рѕ РЅР°РґС–Р№С€Р»Рё С‡РµСЂРµР· РЎР”Рћ';
    l_zpr.pkey := '\BRS\SBR\BIR\4012';
 
-   l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
+   l_message  := 'РљР»СЋС‡ Р·Р°РїСЂРѕСЃР°: '||l_zpr.pkey||'  '||nlchr;
 
    begin                                                   
       select kodz, kodr into l_zpr.kodz, l_zpr.kodr        
@@ -39,19 +40,19 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := 'Друк заяв з купівлі ІВ, що надійшли через СДО';
+    l_zpr.name         := 'Р”СЂСѓРє Р·Р°СЏРІ Р· РєСѓРїС–РІР»С– Р†Р’, С‰Рѕ РЅР°РґС–Р№С€Р»Рё С‡РµСЂРµР· РЎР”Рћ';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:sFdat2=''''';
+    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:sparam=''0-Р§РµРєР°С” РЅР° РІС–Р·Сѓ, 1-Р’СЃС–''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'zay_4012.frx';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := '';
+    l_zpr.default_vars := ':sparam=1';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'SELECT z.nd num_doc,'||nlchr||
                            '         z.id,'||nlchr||
                            '         z.dk,'||nlchr||
-						   '         case when z.fnamekb = ''CL'' then 1 else 0 end kb,'||nlchr||
+                           '         case when z.fnamekb = ''CL'' then 1 else 0 end kb,'||nlchr||
                            '         f_dat_lit (z.fdat) begin_date,'||nlchr||
                            '         z.s2 / 100 amount_in,'||nlchr||
                            '         ROUND (z.s2 / 100 * z.KURS_F, 2) base_amount_in,'||nlchr||
@@ -138,14 +139,15 @@ begin
                            '         AND z.identkb IS NOT NULL'||nlchr||
                            '         AND z.fdat BETWEEN :sFdat1 AND :sFdat2'||nlchr||
                            '         and z.id = zm.idz(+)'||nlchr||
-                           '         and z.sos >= 0'||nlchr||
+                           '         and ((z.sos >= 0 and :sparam = 1)'||nlchr||
+                           '         or (z.sos = 0 and :sparam = 0))'||nlchr||
                            'ORDER BY z.dk, z.fdat';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
     if l_isnew = 1 then           
        insert into zapros values l_zpr;  
-       l_message:=l_message||'Добавлен новый кат.запрос №'||l_zpr.kodz||'.'; 
+       l_message:=l_message||'Р”РѕР±Р°РІР»РµРЅ РЅРѕРІС‹Р№ РєР°С‚.Р·Р°РїСЂРѕСЃ в„–'||l_zpr.kodz||'.'; 
     else                           
        update zapros set name         = l_zpr.name,        
                          namef        = l_zpr.namef,       
@@ -160,7 +162,7 @@ begin
                          xsl_data     = l_zpr.xsl_data,    
                          xsd_data     = l_zpr.xsd_data     
        where pkey=l_zpr.pkey;                              
-       l_message:=l_message||'Кат.запрос c таким ключем уже существует под №'||l_zpr.kodz||', его параметры изменены.'; 
+       l_message:=l_message||'РљР°С‚.Р·Р°РїСЂРѕСЃ c С‚Р°РєРёРј РєР»СЋС‡РµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РїРѕРґ в„–'||l_zpr.kodz||', РµРіРѕ РїР°СЂР°РјРµС‚СЂС‹ РёР·РјРµРЅРµРЅС‹.'; 
                                                            
     end if;                                                
 
@@ -170,31 +172,36 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Друк заяв з купівлі ІВ, що надійшли через СДО';
+    l_rep.description :='Р”СЂСѓРє Р·Р°СЏРІ Р· РєСѓРїС–РІР»С– Р†Р’, С‰Рѕ РЅР°РґС–Р№С€Р»Рё С‡РµСЂРµР· РЎР”Рћ';
     l_rep.form        :='frm_FastReport';
-    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",FALSE,FALSE';
+    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
-    l_rep.idf         :=null;    
+    begin                                                                        
+        select idf into l_repfolder from reportsf where idf = 70; 
+    exception when no_data_found then                                            
+        l_repfolder := null;                                                     
+    end;                         
+    l_rep.idf := l_repfolder;    
 
-    -- Фиксированный № печатного отчета   
+    -- Р¤РёРєСЃРёСЂРѕРІР°РЅРЅС‹Р№ в„– РїРµС‡Р°С‚РЅРѕРіРѕ РѕС‚С‡РµС‚Р°   
     l_rep.id          := 4012;
 
 
     if l_isnew = 1 then                     
        begin                                
           insert into reports values l_rep;        
-          l_message:=l_message||nlchr||'Добавлен новый печ. отчет под №'||l_rep.id;
+          l_message:=l_message||nlchr||'Р”РѕР±Р°РІР»РµРЅ РЅРѕРІС‹Р№ РїРµС‡. РѕС‚С‡РµС‚ РїРѕРґ в„–'||l_rep.id;
        exception when dup_val_on_index then  
            bars_error.raise_error('REP',14, to_char(l_rep.id));
        end;                                    
     else                                            
        begin                                        
           insert into reports values l_rep;         
-          l_message:=l_message||nlchr||'Добавлен новый печ. отчет под №'||l_rep.id;
+          l_message:=l_message||nlchr||'Р”РѕР±Р°РІР»РµРЅ РЅРѕРІС‹Р№ РїРµС‡. РѕС‚С‡РµС‚ РїРѕРґ в„–'||l_rep.id;
        exception when dup_val_on_index then         
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' изменен.';
+          l_message:=l_message||nlchr||'РџРµС‡Р°С‚РЅС‹Р№ РѕС‚С‡РµС‚ РїРѕРґ в„–'||l_rep.id||' РёР·РјРµРЅРµРЅ.';
           update reports set                
              name        = l_rep.name,       
              description = l_rep.description,
@@ -211,4 +218,4 @@ begin
 end;                                        
 /                                           
                                             
-commit;                                     
+commit;                         
