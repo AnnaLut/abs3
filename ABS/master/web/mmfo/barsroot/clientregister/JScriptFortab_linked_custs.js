@@ -241,3 +241,26 @@ function CheckGridFields(imgObj)
     
     return true;
 }
+
+// COBUMMFO-8536 --->
+var strGrIdlist = '#trACTUAL_DATE,#trEDDR_ID';
+var strGrNolist = '#trDOC_SERIAL,#trDATE_PHOTO';
+eddrShow = function (docType) {
+    if (docType === '7') {
+        $(strGrIdlist).show();
+        $(strGrNolist).hide();
+    } else {
+        $(strGrIdlist).hide();
+        $(strGrNolist).show();
+    }
+}
+
+DocTypeChanged = function (e) {
+    eddrShow(this.value);
+}
+$(document).ready(function () {
+    $('#ctl00_body_fv_DOC_TYPE_ddl').bind("change", DocTypeChanged);
+    eddrShow($('#ctl00_body_fv_DOC_TYPE_ddl').val());
+});
+
+// COBUMMFO-8536 <---

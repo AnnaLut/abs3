@@ -16,7 +16,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_HEAD      constant varchar2(64)  := 'version 6.5 15.05.2018';
+    VERSION_HEAD      constant varchar2(64)  := 'version 6.4 15.05.2018';
 
     -----------------------------------------------------------------
     -- Переменные
@@ -149,30 +149,6 @@ is
               p_branch      varchar2  default sys_context('bars_context','user_branch')
             ) ;
 
-    ------------------------------------------------------------------
-    -- MAKE_REPORT_DATA3
-    --
-    -- Подготовить данные для отчетов ЗДК по новой накопительной таблице CASH_LASTVISAS 
-    --
-    --  p_date        - операционная дата для отчета
-    --  p_shift       - номер смены  (0 - все смены)
-    --  p_visauserid  - код пользователя, который ставил визу кассира  (0-все)
-    --  p_postuserid  - код пользователя кто вводил док-т(0-все)
-    --  p_type        - тип отчета  'CJ' - кассовый журнал,
-    --                              'SD' - свод дня,
-    --                              'RD' - реестр документов
-    --                              'RO' - реєстр операцій (это сведенные вместе отчеты - 'SD' + 'RD')  - придуман позже, для слития двух отчетов
-    --  p_branch      -  бранч, за которій делают отчет
-    --
-    --
-    procedure make_report_data3
-            ( p_date date,
-              p_shift       number,
-              p_visauserid  number,
-              p_postuserid  number,
-              p_type        varchar2,
-              p_branch      varchar2  default sys_context('bars_context','user_branch')
-            );
 
     ------------------------------------------------------------------
     -- MAKE_CASH_JOURNAL_REPDATA
@@ -302,7 +278,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_BODY      constant varchar2(64)  := 'version 7.1 20.09.2018';
+    VERSION_BODY      constant varchar2(64)  := 'version 6.4 15.05.2018';
     G_MODULE          constant varchar2(4)   := 'CSH';
     G_CASH_JOURNAL    constant varchar2(4)   := 'CJ';
     G_SVOD_DAY        constant varchar2(4)   := 'SD';
@@ -689,10 +665,9 @@ is
     is
     begin
 
-       delete from cash_snapshot  where opdate < p_dat;
-       delete from cash_open      where opdate < p_dat;
-       delete from cash_lastvisa  where dat    < p_dat;
-       delete from cash_lastvisas where dat    < p_dat;
+       delete from cash_snapshot where opdate < p_dat;
+       delete from cash_open     where opdate < p_dat;
+       delete from cash_lastvisa where dat    < p_dat;
 
 
     exception when others then
@@ -1098,10 +1073,11 @@ is
                      v.kv, l.tt, l.dk,  l.s,
                      decode(o.kv, o.kv2, decode( v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)), o.s2 ) sq,
                      o.userid
-               from  oper       o,
-                     opldok     l,
-                     accounts   v,
-                     staff$base sb
+               from  oper         o,
+                     opldok       l,
+                     accounts     v,
+                     staff$base   sb,
+					 cashless_nbs cn
                where pdat between l_date and  l_next_date
                  and substr(o.nlsa,1,1) <> '1'
                  and substr(o.nlsb,1,1) <> '1'
@@ -1111,7 +1087,10 @@ is
                  and o.userid = sb.id
                  and o.branch  = sys_context('bars_context','user_branch')
                  and sb.branch = sys_context('bars_context','user_branch')
-                 and substr(v.nls,1,4) in ('2620','2628','2630','2638','9760','2909','2902'); --COBUMMFO-6936 (добавлені бал рах '2909','2902')
+                 --and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760','2909','2902'); --COBUMMFO-6936 (добавлені бал рах '2909','2902')
+                 and v.nbs = cn.nbs
+				 and o.tt not like 'CL%'
+                 and nvl(trim(cn.ob22), nvl(v.ob22,0)) = nvl(v.ob22,0);--COBUMMFO-7743(вынес список баллансовых в отдельную таблицу)
 
 
            else
@@ -1223,446 +1202,6 @@ is
                            p_postuserid => 0);
 
     end;
-
-
-
-    ------------------------------------------------------------------
-    -- MAKE_REPORT_DATA3
-    --
-    -- Подготовить данные для отчетов ЗДК по новой накопительной таблице CASH_LASTVISAS 
-    --
-    --  p_date        - операционная дата для отчета
-    --  p_shift       - номер смены  (0 - все смены)
-    --  p_visauserid  - код пользователя, который ставил визу кассира  (0-все)
-    --  p_postuserid  - код пользователя кто вводил док-т(0-все)
-    --  p_type        - тип отчета  'CJ' - кассовый журнал,
-    --                              'SD' - свод дня,
-    --                              'RD' - реестр документов
-    --                              'RO' - реєстр операцій (это сведенные вместе отчеты - 'SD' + 'RD')  - придуман позже, для слития двух отчетов
-    --  p_branch      -  бранч, за которій делают отчет
-    --
-    --
-    procedure make_report_data3
-            ( p_date date,
-              p_shift       number,
-              p_visauserid  number,
-              p_postuserid  number,
-              p_type        varchar2,
-              p_branch      varchar2  default sys_context('bars_context','user_branch')
-            )
-    is
-       l_shift_date      date;          -- дата начала указанной смены
-       l_start_date      date;          -- дата начала указанной смены, для первой смены - это 00:00. Сделано, т.е. при автоматич. открытии 1-й смены - разница в pdat и open_cash может быть в секунды
-       l_next_shift_date date;          -- дата следующей смены
-       l_visauserid      varchar2(10);
-       l_postuserid      varchar2(10);
-       l_ispretend       number := 0;
-       l_cnt             number := 0;
-       l_trace           varchar2(1000):= G_TRACE||'make_report_data: ';
-    begin
-
-       --bars.bars_cash.validate_for_cashvisa(5000);
-
-       bars_audit.trace(l_trace||'Начало работы функции, входящие параметры: p_date='||to_char(p_date,'dd/mm/yyyy')||' shift='||p_shift||' branch='||p_branch||' type='||p_type );
-
-       if p_branch <> sys_context('bars_context','user_branch') then
-          bc.subst_branch(p_branch);
-          l_ispretend := 1;
-       end if;
-
-       begin
-          select opdate, bars_cash.next_shift_date(p_shift, opdate),
-                 decode(p_shift, 1, trunc(opdate), opdate)
-            into l_shift_date, l_next_shift_date, l_start_date
-            from cash_open
-           where branch  =  sys_context('bars_context','user_branch')
-             and ( shift = p_shift or 0 = p_shift)
-             and opdate between p_date and p_date + 0.999;
-           bars_audit.trace(l_trace||
-                 'Нашли даты работы: '||
-                 ' shift_date='||to_date(l_shift_date,'dd/mm/yyyy hh24:mi:ss')||
-                 ' next_shift_date='||to_date(l_next_shift_date,'dd/mm/yyyy hh24:mi:ss')||
-                 ' start_date='||to_date(l_start_date,'dd/mm/yyyy hh24:mi:ss'));
-
-       exception when no_data_found then
-           bars_audit.trace(l_trace||'данные по cash_open не найдены');
-           make_report_data2( p_date, p_type, p_visauserid, p_postuserid);
-           if l_ispretend = 1 then
-              bc.set_context;
-           end if;
-           return;
-       end;
-
-       execute immediate 'truncate table tmp_cashpayed';
-
-
-       case p_type
-           ----------
-           -- Кассовый журнал
-           ----------
-           when 'CJ' then
-                -- Выбор документов, кот. оплачивались по нашим счетам кассы и ценностей и визировались
-                -- кассирами нашего отделения в период работы указнаой смены
-                bars_audit.trace(l_trace||'кассовй журнал');
-                insert into   tmp_cashpayed(
-                               datatype,
-                               ref, acc, nls, kv, nms, optype,
-                               s, sq,
-                               nd, dk,  sk,
-                               tt, nazn, nlsk, kv2,
-                               lastvisadat, lastvisa_userid,
-                               postdat, post_userid,
-                               stime, etime,
-                               is_ourvisa, is_dptdoc)
-                select '0',
-                       o.ref, v.acc, v.nls, v.kv, v.nms, decode(l.dk, 0, decode(v.pap, 1, 1,   0), decode(v.pap, 1, 0, 1) ),
-                       l.s, decode(v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)) sq,
-                       nd, l.dk,
-                       get_sk( v.nls, o.nlsa, o.nlsb, o.kv, o.kv2, o.sk, o.tt),
-                       l.tt,
-                       get_nazn(o.nazn, o.tt, l.tt) nazn,
-                       a2.nls, a2.kv,
-                       null,
-                       (select unique nvl(max(userid),0)                         -- если данный документ визировал не этот пользователь - то ставим 0
-                          from cash_lastvisas
-                         where ref = ov.ref and userid = decode(p_visauserid, 0,  userid, p_visauserid )
-                           and kf  = sys_context ('bars_context', 'user_mfo') 
-                        ),
-                       o.pdat, o.userid,       -- тоест на данном этапе мы не можем сказать для какого именно пользователя она последняя (например случай сховище-каса)
-                       l_shift_date, l_next_shift_date,
-                       (
-                        select unique decode(nvl(max(userid),0), 0, 0, 1)
-                          from cash_lastvisas  -- Если есть виза нашего отделения
-                         where ref = ov.ref 
-                           and branch  = sys_context('bars_context','user_branch')
-                           and kf  = sys_context ('bars_context', 'user_mfo') 
-                       ),
-                       case when (a2.nbs in ('2630','2620','2628','2638')) or
-                                 (a2.nbs like '380%' and o.nlsa = v.nls and substr(o.nlsb,1,4) in ('2630','2620','2628','2638') )  or
-                                 (a2.nbs like '380%' and o.nlsb = v.nls and substr(o.nlsa,1,4) in ('2630','2620','2628','2638') )
-                            then 1
-                            else 0
-                       end isdptdoc
-                  from oper o,
-                       opldok l,
-                       opldok l2,
-                       accounts a2,
-                       accounts v,
-                       (select unique ref, account_acc                        -- Найдем все платеди завизирвоанные в эту смену
-                          from cash_lastvisas ov                -- Берем ф-цию max, берем ф-цию MAX, поскольку на одном док-те может быть несколько виз касс (Например сховище и кассир)
-                         where kf = sys_context ('bars_context', 'user_mfo') 
-                           and ov.dat >= l_start_date  and ov.dat < l_next_shift_date
-                           -- бранч счета
-                           and account_branch = sys_context('bars_context', 'user_branch')               
-                       ) ov
-                 where ov.ref    = o.ref
-                   and o.sos     = 5
-                   and o.ref     = l.ref
-                   and ov.account_acc    = l.acc
-                   and v.acc     = l.acc
-                   and l.ref     = l2.ref
-                   and l.stmt    = l2.stmt
-                   and l.dk      = 1 - l2.dk
-                   and l2.acc    = a2.acc;
-
-
-
-                select count(*) into l_cnt from tmp_cashpayed;
-
-                bars_audit.trace(l_trace||'всего выбрано '||l_cnt||' касс. документов');
-
-                if p_visauserid <> 0 then
-                   update tmp_cashpayed set lastvisa_userid = post_userid, sk = 66
-                    where nls = nlsk and kv = kv2 and dk = 1;   -- списание касы (сдача с кассы)
-
-                   update tmp_cashpayed set sk = 39
-                    where nls = nlsk and kv = kv2 and dk = 0;   -- списание касы (сдача с кассы)
-                end if;
-
-          ----------
-          -- Свод документов дня
-          ----------
-          when 'SD' then
-               -- Выбор документов, кот. оплачивались по нашим счетам кассы и ценностей и визировались
-               -- в период работы указнаой смены
-               insert into     tmp_cashpayed(
-                      datatype, branch,
-                      acc, nls, kv, tt,
-                      optype,
-                      s, post_userid,
-                      stime, etime,
-                      is_ourvisa)
-               select 0, sys_context('bars_context','user_branch'),
-                      v.acc, v.nls, v.kv, l.tt,
-                      decode(l.dk, 0, decode(pap, 1, 1,   0), decode(pap, 1, 0, 1) ),
-                      l.s, o.userid,
-                      l_shift_date, l_next_shift_date,
-                      ( select decode(nvl(max(userid),0), 0, 0, 1)
-                         from cash_lastvisa  -- Если есть виза нашего отделения
-                        where ref = ov.ref and branch  = sys_context('bars_context','user_branch')
-                      )
-                 from
-                      oper           o,
-                      opldok         l,
-                      v_cashaccounts v,
-                      (select unique ref                 -- Найдем все платеди завизирвоанные в эту смену
-                         from cash_lastvisa ov           -- Берем ф-цию max, берем ф-цию MAX, поскольку на одном док-те может быть несколько виз касс (Например сховище и кассир)
-                        where ov.dat >= l_start_date
-                          and ov.dat < l_next_shift_date
-                      ) ov
-                where ov.ref = o.ref
-                  and o.sos  = 5
-                  and o.ref  = l.ref
-                   and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
-                  and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
-                  and l.acc= v.acc;
-
-
-
-               -- Некассовые
-               insert into     tmp_cashpayed(
-                      datatype, branch,
-                      kv, tt, optype,  s, post_userid)
-               select 1, sys_context('bars_context','user_branch'), v.kv, l.tt, l.dk,  l.s, o.userid
-                 from oper       o,
-                      opldok     l,
-                      accounts   v,
-                      staff$base sb
-                where pdat between l_start_date and  l_next_shift_date
-                  and substr(o.nlsa,1,1) <> '1'
-                  and substr(o.nlsb,1,1) <> '1'
-                  and o.ref = l.ref
-                  and o.sos = 5
-                  and l.acc = v.acc
-                  and o.userid = sb.id
-                  and o.branch  = sys_context('bars_context','user_branch')
-                  and sb.branch = sys_context('bars_context','user_branch')
-                  and substr(v.nls,1,4) in ('2620','2628','2630','2638','9760');
-
-
-           ----------
-           -- Реестр документів
-           ----------
-          when 'RD' then
-              -- документы кот. были введены исполнителями нашего отделения за указанную дату.
-              if  p_postuserid  = 0 then
-                  bars_audit.trace(l_trace||'p_postuserid='||p_postuserid||' - отчет для ТВБВ ');
-              insert into     tmp_cashpayed( datatype,
-                                             ref, post_userid, kv, tt, s, sq,
-                                             stime, etime)
-                     select '3',
-                           ref, userid, acckv, tt, s,
-                           decode(acckv, 980, s, gl.p_icurval( acckv, s, pdat)) sq,
-                           l_shift_date, l_next_shift_date
-                      from (
-                            select unique l.ref, a.kv acckv, l.tt, l.s, pdat, userid
-                              from oper o, opldok l, accounts a, staff$base sb
-                             where pdat between l_start_date and l_next_shift_date
-                               and o.sos = 5
-                               and o.ref = l.ref
-                               and l.acc = a.acc
-                               and o.userid = sb.id
-                          and o.branch = sys_context('bars_context','user_branch')
-                          and sb.branch = sys_context('bars_context','user_branch')
-                       );
-
-              else
-                 bars_audit.trace(l_trace||'p_postuserid='||p_postuserid||' - отчет для операциониста ');
-                 insert into     tmp_cashpayed( datatype, branch,
-                                            ref, post_userid, kv, tt, s, sq,
-                                            stime, etime)
-                 select '3',sys_context('bars_context','user_branch'),
-                        ref, userid, acckv, tt, s,
-                        decode(acckv, 980, s, gl.p_icurval( acckv, s, pdat)) sq,
-                        l_shift_date, l_next_shift_date
-                  from (
-                         select unique l.ref, a.kv acckv, l.tt, l.s, pdat, userid
-                           from oper o, opldok l, accounts a, staff$base sb
-                          where pdat between l_start_date and l_next_shift_date
-                            and o.sos = 5
-                            and o.ref = l.ref
-                            and l.acc = a.acc
-                            and o.userid = sb.id
-                            and o.userid = p_postuserid
-                       );
-
-
-              end if;
-
-
-
-
-
-      ----------
-      -- Реєстр операций
-      ----------
-      when 'RO' then
-         -- Выбор документов, кот. оплачивались по нашим счетам кассы и ценностей и визировались
-         -- в период работы указнаой смены
-         insert     into tmp_cashpayed(
-                datatype, branch,
-                acc, nls, kv, tt,
-                optype,
-                s,
-                sq,
-                post_userid,
-                stime, etime,
-                is_ourvisa
-                 )
-         select 0, sys_context('bars_context','user_branch'),
-                v.acc, v.nls, v.kv, l.tt,
-                decode(l.dk, 0, decode(pap, 1, 1,   0), decode(pap, 1, 0, 1) ),
-                l.s,
-                decode(v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)) sq,
-                o.userid,
-                l_shift_date, l_next_shift_date,
-                ( select decode(nvl(max(userid),0), 0, 0, 1)
-                   from cash_lastvisa  -- Если есть виза нашего отделения
-                  where ref = ov.ref and branch  = sys_context('bars_context','user_branch')
-                )
-           from oper           o,
-                opldok         l,
-                v_cashaccounts v,
-                (select unique ref                            -- в таблицe cash_lastvisa могут быть несколько
-                   from cash_lastvisa ov                                       -- записей для одного рефа (несколько виз касс для одного уровня)
-                  where ov.dat >= l_start_date and ov.dat < l_next_shift_date
-                ) ov
-          where ov.ref = o.ref
-            and o.sos  = 5
-               and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
-            and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
-            and o.ref  = l.ref
-            and l.acc= v.acc;
-
-
-
-          -- Выбор документов, кот. вводились исполнителями нашего отделения по не кассовым счетам нашего бранча
-          -- в период работы указнаой смены
-          insert into     tmp_cashpayed(
-                        datatype, branch,
-                        kv, tt, optype,  s, sq, post_userid)
-          select  1, sys_context('bars_context','user_branch'), v.kv, l.tt, l.dk,  l.s,
-                  decode(v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)) sq,
-                  o.userid
-           from   oper       o,
-                  opldok     l,
-                  accounts   v,
-                  staff$base sb
-           where pdat between l_start_date and  l_next_shift_date
-             and substr(o.nlsa,1,1) <> '1'
-             and substr(o.nlsb,1,1) <> '1'
-             and o.ref = l.ref
-             and o.sos = 5
-             and l.acc = v.acc
-             and o.userid = sb.id
-             and o.branch  = sys_context('bars_context','user_branch')
-             and sb.branch = sys_context('bars_context','user_branch')
-             and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760','2909','2902'); --COBUMMFO-6936 (добавлені бал рах '2909','2902')
-
-        else
-            bars_error.raise_nerror(G_MODULE, 'NOT_CASH_REPORT', p_type);
-
-
-      end case;
-
-
-
-      if p_type = 'SD' or  p_type = 'CJ' or p_type = 'RO' then
-
-         -- Выбор остатков и оборотов по счетам кассы и ценностям
-         -- в период работы указнаой смены
-         insert into    tmp_cashpayed(
-                 datatype, branch,
-                 acc, nls, kv, nms,
-                 ostf,
-                 obdb, obkr,
-                 obdb_dpt, obkr_dpt,
-                 obdbq, obkrq,
-                 obdbq_dpt, obkrq_dpt,
-                 ost, stime, etime)
-         select '2', sys_context('bars_context','user_branch'), a.acc, a.nls, a.kv, a.nms,
-                decode(a.pap,1,-1,1) * ks.ostf,
-                sdb, skr,
-                sdb_dpt, skr_dpt,
-                sdbq, skrq,
-                sdbq_dpt, skrq_dpt,
-                decode(a.pap,1,-1,1) * ks.ostf   - nvl((sdb+sdb_dpt),0)  +  nvl((skr+skr_dpt),0),
-                l_shift_date, l_next_shift_date
-          from (
-                 select acc,
-                        sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 0, s,  0), 0 ))   sdb,       -- дебетовые  обоороты по кассовым операциям
-                        sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 1, s,  0), 0 ))   skr,       -- кредитовые обоороты по кассовым операциям
-                        sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 0, s,  0), 0 ))   sdb_dpt,   -- дебетовые  обоороты по депозитным операциям
-                        sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 1, s,  0), 0 ))   skr_dpt,    -- кредитовые обоороты по депозитным операциям
-                        sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 0, sq, 0), 0 ))   sdbq,       -- дебетовые  екв обоороты по кассовым операциям
-                        sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 1, sq, 0), 0 ))   skrq,       -- кредитовые екв обоороты по кассовым операциям
-                        sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 0, sq, 0), 0 ))   sdbq_dpt,   -- дебетовые  екв обоороты по депозитным операциям
-                        sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 1, sq, 0), 0 ))   skrq_dpt   -- кредитовые екв обоороты по депозитным операциям
-                   from tmp_cashpayed v
-                  where datatype = '0'
-               group by v.acc
-               ) v,
-                accounts a,
-                cash_snapshot ks
-          where ks.acc = a.acc and  ks.acc = v.acc (+)
-            and ks.opdate  =  l_shift_date
-            and ks.branch  =  sys_context('bars_context','user_branch')
-            and ( ((ks.ostf <>0 or v.sdb<>0 or v.skr<>0 or a.ostc<>0 ) and substr(a.nls,1,1) = '9') or
-            ( a.ostc<>0 and substr(a.nls,1,4) = '3400' )  or
-                  ( a.ostc<>0 and substr(a.nls,1,4) = '9812' )  or
-                    substr(a.nls,1,1) = '1'
-                );
-           -- обороты по кассиру
-      if p_visauserid <> 0 then
-         for c in ( select acc,
-                               sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 0, s,  0), 0 ))   sdb,        -- дебетовые  обоороты по кассовым операциям
-                               sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 1, s,  0), 0 ))   skr,        -- кредитовые обоороты по кассовым операциям
-                               sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 0, s,  0), 0 ))   sdb_dpt,    -- дебетовые  обоороты по депозитным операциям
-                               sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 1, s,  0), 0 ))   skr_dpt,    -- кредитовые обоороты по депозитным операциям
-                               sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 0, sq, 0), 0 ))   sdbq,       -- дебетовые  екв обоороты по кассовым операциям
-                               sum( decode( nvl(is_dptdoc,0), 0, decode(optype, 1, sq, 0), 0 ))   skrq,       -- кредитовые екв обоороты по кассовым операциям
-                               sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 0, sq, 0), 0 ))   sdbq_dpt,   -- дебетовые  екв обоороты по депозитным операциям
-                               sum( decode( nvl(is_dptdoc,0), 1, decode(optype, 1, sq, 0), 0 ))   skrq_dpt    -- кредитовые екв обоороты по депозитным операциям
-                          from tmp_cashpayed v
-                         where datatype = '0' and   lastvisa_userid = p_visauserid
-                         group by v.acc) loop
-                  update tmp_cashpayed set obdbk      = c.sdb,
-                                           obkrk      = c.skr,
-                                           obdb_dptk  = c.sdb_dpt,
-                                           obkr_dptk  = c.skr_dpt,
-                                           obdbqk     = c.sdbq,
-                                           obkrqk     = c.skrq,
-                                           obdbq_dptk = c.sdbq_dpt,
-                                           obkrq_dptk = c.skrq_dpt
-           where datatype = '2' and acc = c.acc;
-         end loop;
-
-          end if;
-
-
-      end if;
-
-
-
-      if l_ispretend = 1 then
-         bc.set_context;
-      end if;
-
-      select count(*) into l_cnt from tmp_cashpayed where datatype = 0;
-      bars_audit.trace(l_trace||'всего выбрано '||l_cnt||' касс. документов');
-
-      select count(*) into l_cnt from tmp_cashpayed where datatype = 2;
-      bars_audit.trace(l_trace||'всего выбрано '||l_cnt||' счетов');
-
-   exception when others then
-      if l_ispretend = 1 then
-         bc.set_context;
-      end if;
-      bars_audit.error(l_trace||'ошибка выборки данных для отчета: '||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace);
-      raise;
-   end;
-
-
 
 
     ------------------------------------------------------------------
@@ -1782,7 +1321,7 @@ is
                        opldok l,
                        opldok l2,
                        accounts a2,
-                       v_cashaccounts v,
+                       v_cashaccounts_hist v,
                        (select unique ref                      -- Найдем все платеди завизирвоанные в эту смену
                           from cash_lastvisa ov                -- Берем ф-цию max, берем ф-цию MAX, поскольку на одном док-те может быть несколько виз касс (Например сховище и кассир)
                          where ov.dat >= l_start_date  and ov.dat < l_next_shift_date
@@ -1798,13 +1337,14 @@ is
                    and o.sos     = 5
                    and o.ref     = l.ref
                    and v.acc     = l.acc
-		           and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
-		           and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
-		           and l2.fdat   between l_shift_date - 5 and  l_shift_date + 5
+		   --and o.pdat    between l_shift_date - 10 and  l_shift_date + 10
+		   --and l.fdat    between l_shift_date - 10 and  l_shift_date + 10
+		   --and l2.fdat   between l_shift_date - 10 and  l_shift_date + 10
                    and l.ref     = l2.ref
                    and l.stmt    = l2.stmt
                    and l.dk      = 1 - l2.dk
-                   and l2.acc    = a2.acc;
+                   and l2.acc    = a2.acc
+                   and v.opdate  = l_shift_date;
 
 
 
@@ -1845,7 +1385,7 @@ is
                  from
                       oper           o,
                       opldok         l,
-                      v_cashaccounts v,
+                      v_cashaccounts_hist v,
                       (select unique ref                 -- Найдем все платеди завизирвоанные в эту смену
                          from cash_lastvisa ov           -- Берем ф-цию max, берем ф-цию MAX, поскольку на одном док-те может быть несколько виз касс (Например сховище и кассир)
                         where ov.dat >= l_start_date
@@ -1854,9 +1394,10 @@ is
                 where ov.ref = o.ref
                   and o.sos  = 5
                   and o.ref  = l.ref
- 		          and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
-		          and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
-                  and l.acc= v.acc;
+ 		  and o.pdat    between l_shift_date - 10 and  l_shift_date + 10
+		  and l.fdat    between l_shift_date - 10 and  l_shift_date + 10
+                  and l.acc= v.acc
+                  and v.opdate  = l_shift_date;
 
 
 
@@ -1970,8 +1511,8 @@ is
                 ) ov
           where ov.ref = o.ref
             and o.sos  = 5
-   	        and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
-		    and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
+   	        and o.pdat    between l_shift_date - 10 and  l_shift_date + 10
+			and l.fdat    between l_shift_date - 10 and  l_shift_date + 10
             and o.ref  = l.ref
             and l.acc= v.acc;
 
@@ -1985,10 +1526,11 @@ is
           select  1, sys_context('bars_context','user_branch'), v.kv, l.tt, l.dk,  l.s,
                   decode(v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)) sq,
                   o.userid
-           from   oper       o,
-                  opldok     l,
-                  accounts   v,
-                  staff$base sb
+           from   oper         o,
+                  opldok       l,
+                  accounts     v,
+                  staff$base   sb,
+                  cashless_nbs cn
            where pdat between l_start_date and  l_next_shift_date
              and substr(o.nlsa,1,1) <> '1'
              and substr(o.nlsb,1,1) <> '1'
@@ -1998,7 +1540,10 @@ is
              and o.userid = sb.id
              and o.branch  = sys_context('bars_context','user_branch')
              and sb.branch = sys_context('bars_context','user_branch')
-             and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760','2909','2902'); --COBUMMFO-6936 (добавлені бал рах '2909','2902')
+             --and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760','2909','2902'); --COBUMMFO-6936 (добавлені бал рах '2909','2902')
+             and v.nbs = cn.nbs
+			 and o.tt not like 'CL%'
+             and nvl(trim(cn.ob22), nvl(v.ob22,0)) = nvl(v.ob22,0);--COBUMMFO-7743(вынес список баллансовых в отдельную таблицу)
 
         else
             bars_error.raise_nerror(G_MODULE, 'NOT_CASH_REPORT', p_type);
@@ -2102,11 +1647,6 @@ is
       bars_audit.error(l_trace||'ошибка выборки данных для отчета: '||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace);
       raise;
    end;
-
-
-
-
-
 
 
     ------------------------------------------------------------------
@@ -2372,8 +1912,6 @@ is
        l_ref     number;
        l_tt      varchar2(3);
        l_refl    number;
-       l_account_branch varchar2(500); 
-	   l_account_acc    number; 
        l_trace   varchar2(1000) := G_TRACE||'validate_for_cashvisa:';
     begin
 
@@ -2397,104 +1935,46 @@ is
            l_iscash := check_for_cashvisa(c.ref, c.status, c.groupid);
 
            if l_iscash = 1 then
-              begin
-                
-                select branch into l_branch
-                  from staff$base
-                 where id = c.userid;
+             begin
+               
+               select branch into l_branch
+                 from staff$base
+                where id = c.userid;
+             
+               bars_audit.info(l_trace||'l_branch='||l_branch||' ref= '||c.ref);
+               -- есть пользователи,кто зареган на /, но они визируют, тогда віставляем бранч в код филиала из oper_visa,
+               -- поскольку невозможно узнать на каком бранче біл представлен пользователь, когда віполнял визирование
+               if l_branch = '/' then
+                  l_branch := '/'||c.kf||'/';
+               end if;
               
-                bars_audit.info(l_trace||'l_branch='||l_branch||' ref= '||c.ref);
-                -- есть пользователи,кто зареган на /, но они визируют, тогда віставляем бранч в код филиала из oper_visa,
-                -- поскольку невозможно узнать на каком бранче біл представлен пользователь, когда віполнял визирование
-                if l_branch = '/' then
-                   l_branch := '/'||c.kf||'/';
-                end if;
-              end;
+             end;
 
+             begin
+                 -- иногда один и тож чел. визирует один документ
+                 insert into cash_lastvisa(kf, ref, dat,userid, branch)
+                 values( c.KF, c.ref, c.dat, c.userid, l_branch) ;
+             exception when dup_val_on_index then
+                 bars_audit.error(l_trace||'Документ реф='||c.ref||' userid='||c.userid||' уже есть в списке виз');
+                 null;
+             end;
 
-              --
-              -- Новый метод населения 
-              --
-              -- населим подготовительную таблицу для отчетов cash_lastvisas найденным документом (так же дадим информацию
-			  -- по  кассовым счетам этого документа)
-              bars_audit.info(l_trace||'Начинаем поиск кассовых счетов для документов');
-              for k in (select unique ref, a.branch account_branch, a.acc account_acc 
-                          from bars.accounts a, bars.opldok o, bars.cash_nbs n
-                         where o.ref = c.ref 
-                           and o.acc = a.acc
-                           and a.nbs = n.nbs) loop
-                  begin
-                     bars_audit.info(l_trace||'ref = '||k.ref||', acc='||k.account_acc||', branch='||k.account_branch||', userid='|| c.userid);
-                     insert into cash_lastvisas(kf, ref, dat, userid, branch, account_acc, account_branch)
-                     values( c.KF, c.ref, c.dat, c.userid, l_branch, k.account_acc, k.account_branch);
-					 -- иногда один и тож чел. визирует один документ, поэтому можем получать dup_val_on_index
-                  exception when dup_val_on_index then
-                     bars_audit.error(l_trace||'Документ реф='||c.ref||' userid='||c.userid||' уже есть в списке виз');
-                     null;
-                  end;
-              end loop;
-		
-
-              --
-              -- Старый метод населения 
-              --
-              begin
-                  -- иногда один и тож чел. визирует один документ
-                  insert into cash_lastvisa(kf, ref, dat,userid, branch)
-                  values( c.KF, c.ref, c.dat, c.userid, l_branch) ;
-              exception when dup_val_on_index then
-                  bars_audit.error(l_trace||'Документ реф='||c.ref||' userid='||c.userid||' уже есть в списке виз');
-                  null;
-              end;
-
-
-
-             --если есть связанные с другими рефами (например, чеки)
+             --если есть связанные с другими рефами (чеки)
               select refl into l_refl
                 from oper
                where ref = c.ref;
 
-            
-             if l_refl is not null then
+              if l_refl is not null then
                  bars_audit.info(l_trace||'связанный к реф='||c.ref||' рефл='||l_refl||' userid='||c.userid);
-                 for k in (select KF, ref, c.dat, c.userid
-                             from oper
-                            where ref <> c.ref
-                            start with ref = c.ref connect by prior refl = ref
-						   ) loop
-						   
-                    --
-                    -- Старый метод 
-                    --
-                    insert into cash_lastvisa( kf, ref, dat, userid, branch )
-                    values(k.kf, k.ref, c.dat, c.userid, l_branch);
-                    					
-                    --
-                    -- Новый метод населения 
-                    --
-                    for l in (select unique ref, a.branch account_branch, a.acc account_acc 
-                                from bars.accounts a, bars.opldok o, bars.cash_nbs n
-                               where o.ref = k.ref 
-                                 and o.acc = a.acc
-                              and a.nbs = n.nbs) loop
-                        begin
-                           bars_audit.info(l_trace||'ref = '||k.ref||', acc='||l.account_acc||', branch='||l.account_branch||', userid='|| k.userid);
-                           insert into cash_lastvisas( kf, ref, dat, userid, branch, account_acc, account_branch )						   
-				   	       values (k.kf, k.ref, k.dat, k.userid, l_branch, l.account_acc, l.account_branch ); 
-                        exception when dup_val_on_index then
-                           bars_audit.error(l_trace||'Документ реф='||c.ref||' userid='||c.userid||' уже есть в списке виз');
-                           null;
-                        end;
- 			        end loop;
-                    
-                    
-			     end loop;	  
-             end if;
+                 insert into cash_lastvisa( kf, ref, dat, userid, branch )
+                 select KF, ref, c.dat, c.userid, l_branch
+                   from oper
+                  where ref <> c.ref
+                  start with ref = c.ref connect by prior refl = ref;
+              end if;
+           end if;
 
-		 end if; -- l_iscash = 1
-
-         delete from cash_refque where ref = c.ref and userid = c.userid;
-         
+           delete from cash_refque where ref = c.ref and userid = c.userid;
        end loop;
 
     exception when others then

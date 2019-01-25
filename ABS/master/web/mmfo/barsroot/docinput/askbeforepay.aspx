@@ -8,14 +8,17 @@
 		<meta content="JavaScript" name="vs_defaultClientScript">
 		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
 		<script type="text/javascript">
-		function PayDoc(){
-		  window.returnValue = true;
-		  window.close();
-		}
-		function CancelDoc(){
-		  window.returnValue = false;
-		  window.close();
-		}
+		    function PayDoc() {
+		        var value = document.getElementById('swiNotify').value === "1";
+		        window.returnValue = { result: true, swiNotified: value };
+		        window.close();
+		    }
+		    function CancelDoc() {
+		        var value = document.getElementById('swiNotify').value === "1";
+		        window.returnValue = { result: false, swiNotified: value };
+		        window.close();
+		    }
+
 		</script>
 	</HEAD>
 	<body bgColor="#f0f0f0" onload="document.getElementById('btPay').focus();window.returnValue = false;" 
@@ -29,7 +32,6 @@
 					<TR>
 						<TD style="PADDING-RIGHT: 10px" align="right"><INPUT id="btPay" meta:resourcekey="btPay" runat="server" type="button" value="Подтвердить" onclick="PayDoc();" style="WIDTH: 120px"></TD>
 						<TD style="PADDING-LEFT: 10px" align="left"><INPUT id="btCancel" meta:resourcekey="btCancel" runat="server" type="button" value="Отменить" onclick="CancelDoc();" style="WIDTH: 120px"></TD>
-						</TR>
 					</TR>
 				</TABLE>
 				<BR />
@@ -40,5 +42,6 @@
                             </asp:Panel>
 			</P>
 		</form>
+        <input type="hidden" value="0" runat="server" id="swiNotify" />
 	</body>
 </HTML>

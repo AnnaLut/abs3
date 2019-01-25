@@ -69,6 +69,8 @@ public partial class clientregister_tab_linked_custs : System.Web.UI.Page
     {
         if (fv.CurrentMode == FormViewMode.Edit || fv.CurrentMode == FormViewMode.Insert)
         {
+            try
+            {
             DDLList REL_INTEXT = fv.FindControl("REL_INTEXT") as DDLList;
             if (REL_INTEXT.Value == (Decimal?)null)
                 REL_INTEXT.Value = 0;
@@ -79,6 +81,7 @@ public partial class clientregister_tab_linked_custs : System.Web.UI.Page
             {
                 IS_NEW_ValueChanged(fv.FindControl("IS_NEW"), null);
             }
+            } catch { }
         }
     }
     protected void fv_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
@@ -181,6 +184,12 @@ public partial class clientregister_tab_linked_custs : System.Web.UI.Page
             TextBoxRefer SED = fv.FindControl("SED") as TextBoxRefer;
             TextBoxRefer ISE = fv.FindControl("ISE") as TextBoxRefer;
             TextBoxString NOTES = fv.FindControl("NOTES") as TextBoxString;
+            // COBUMMFO-8536 --->
+            TextBoxDate DATE_PHOTO = fv.FindControl("DATE_PHOTO") as TextBoxDate;
+            TextBoxString EDDR_ID = fv.FindControl("EDDR_ID") as TextBoxString;
+            TextBoxDate ACTUAL_DATE = fv.FindControl("ACTUAL_DATE") as TextBoxDate;
+            // COBUMMFO-8536 <---
+
 
             // обнуляем значения
             CUSTTYPE.Value = (Decimal?)null;
@@ -204,6 +213,11 @@ public partial class clientregister_tab_linked_custs : System.Web.UI.Page
             SED.Value = (String)null;
             ISE.Value = (String)null;
             NOTES.Value = (String)null;
+            // COBUMMFO-8536 --->
+            DATE_PHOTO.Value = (DateTime?)null;
+            EDDR_ID.Value = (String)null;
+            ACTUAL_DATE.Value = (DateTime?)null;
+            // COBUMMFO-8536 <---
 
             if (!String.IsNullOrEmpty(RELEXT_ID.Value))
             {
@@ -231,6 +245,11 @@ public partial class clientregister_tab_linked_custs : System.Web.UI.Page
                 SED.Value = rec.SED;
                 ISE.Value = rec.ISE;
                 NOTES.Value = rec.NOTES;
+                // COBUMMFO-8536 --->
+                DATE_PHOTO.Value = rec.DATE_PHOTO;
+                EDDR_ID.Value = rec.EDDR_ID;
+                ACTUAL_DATE.Value = rec.ACTUAL_DATE;
+                // COBUMMFO-8536 <---
             }
         }
     }

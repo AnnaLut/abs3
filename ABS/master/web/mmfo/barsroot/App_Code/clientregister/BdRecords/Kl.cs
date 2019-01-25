@@ -10,7 +10,9 @@ namespace clientregister
     {
         public Kl(BbConnection Connection, AutoCommit AutoCommitMode) : base(Connection, AutoCommitMode) { }
         public Kl(BbConnection Connection) : base(Connection, AutoCommit.Enabled) { }
-        public void SETCUSTOMEREXTERN(ref Decimal? P_ID, String P_NAME, Decimal? P_DOCTYPE, String P_DOCSERIAL, String P_DOCNUMBER, DateTime? P_DOCDATE, String P_DOCISSUER, DateTime? P_BIRTHDAY, String P_BIRTHPLACE, String P_SEX, String P_ADR, String P_TEL, String P_EMAIL, Decimal? P_CUSTTYPE, String P_OKPO, Decimal? P_COUNTRY, String P_REGION, String P_FS, String P_VED, String P_SED, String P_ISE, String P_NOTES)
+        public void SETCUSTOMEREXTERN(ref Decimal? P_ID, String P_NAME, Decimal? P_DOCTYPE, String P_DOCSERIAL, String P_DOCNUMBER, DateTime? P_DOCDATE, String P_DOCISSUER, DateTime? P_BIRTHDAY, String P_BIRTHPLACE, String P_SEX, String P_ADR, String P_TEL, String P_EMAIL, Decimal? P_CUSTTYPE, String P_OKPO, Decimal? P_COUNTRY, String P_REGION, String P_FS, String P_VED, String P_SED, String P_ISE, String P_NOTES
+            , DateTime? DATE_PHOTO, String EDDR_ID, DateTime? ACTUAL_DATE
+            )
         {
             List<OracleParameter> parameters = new List<OracleParameter>();
             parameters.Add(new OracleParameter("P_ID", OracleDbType.Decimal, P_ID, ParameterDirection.InputOutput));
@@ -35,6 +37,14 @@ namespace clientregister
             parameters.Add(new OracleParameter("P_SED", OracleDbType.Varchar2, P_SED, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_ISE", OracleDbType.Varchar2, P_ISE, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_NOTES", OracleDbType.Varchar2, P_NOTES, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_DATE_PHOTO", OracleDbType.Date, DATE_PHOTO, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_EDDR_ID", OracleDbType.Varchar2, EDDR_ID, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_ACTUAL_DATE", OracleDbType.Date, ACTUAL_DATE, ParameterDirection.Input));
+
+  //p_notes customer_extern.notes % type,
+  //p_date_photo customer_extern.date_photo % type,
+  //p_eddr_id customer_extern.eddr_id % type,
+  //p_actual_date customer_extern.actual_date % type  );
 
             object ReturnValue = null;
             ExecuteNonQuery("kl.setCustomerExtern", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);

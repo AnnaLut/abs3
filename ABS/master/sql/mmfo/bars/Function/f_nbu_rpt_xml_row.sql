@@ -27,11 +27,18 @@ IS
   l_ret_val            varchar2(4000 byte);
   l_rec                pls_integer := 0;
   l_rpt_code           char(2);
+
+  -- COBUMMFO-9690 begin
+  l_module             varchar2(64);
+  l_action             varchar2(64);
+  -- COBUMMFO-9690 end
+
 BEGIN
   
   bars_audit.info( $$PLSQL_UNIT||': Entry with ( p_rpt_code='||p_rpt_code||
                                  ', p_rpt_date='||to_char(p_rpt_date,g_dt_fmt)||' ).' );
   
+  dbms_application_info.read_module( l_module, l_action ); -- COBUMMFO-9690
   dbms_application_info.set_action( $$PLSQL_UNIT );
   
   l_frst_dt := add_months(trunc(p_rpt_date,'MM'),-1);
@@ -330,7 +337,7 @@ BEGIN
   pipe row ( '</NBUSTATREPORT>' );
   
   dbms_application_info.set_client_info( null );
-  dbms_application_info.set_action( null );
+  dbms_application_info.set_action( l_action /*null -- COBUMMFO-9690*/ );
   
   bars_audit.info( $$PLSQL_UNIT||': Exit.' );
   

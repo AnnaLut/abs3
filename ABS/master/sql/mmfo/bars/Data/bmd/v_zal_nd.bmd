@@ -132,9 +132,9 @@ begin
   bars_metabase.add_column(l_tabid, 6, 'MDATE', 'D', 'План-дата~заверш', '1', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'MPAWN', 'N', 'Місце~знаход', '.3', null, 42, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'ND', 'N', 'Реф КД', '1.5', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLS', 'C', 'Рах~забезп', '1.5', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLS', 'C', 'Рах~забезп', '1.5', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/viewaccounts/accountform.aspx?type=2'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'NREE', 'C', '№ в ~реєстрі', '1', null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OB22', 'C', 'Об22', '.3', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OB22', 'C', 'Об22', '.3', null, 17, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'OSTB', 'N', 'Зал~план', '1.5', null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'OSTC', 'N', 'Зал~факт', '1.5', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'PAWN', 'N', 'Вид~забезп', '.3', null, 1, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
@@ -146,6 +146,7 @@ begin
   bars_metabase.add_column(l_tabid, 20, 'DAZS', 'D', 'Дата закт~рах забезп', '1', null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 21, 'PAP', 'N', '1=Akt~2=Pas', '.3', null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 22, 'NAZN', 'C', 'Призначення', '1', null, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'R013', 'C', 'R013', '1', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('TABVAL');
@@ -163,6 +164,15 @@ begin
     bars_metabase.add_extrnval(l_tabid, 7, l_newtabid, l_newcolid, '', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица CC_MPAWN для описания сложного поля таблицы V_ZAL_ND.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('SB_OB22');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'OB22');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 11, l_newtabid, l_newcolid, '', 'sb_ob22.r020 in (9500,9501,9502)', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица SB_OB22 для описания сложного поля таблицы V_ZAL_ND.');
   end if;
 
   -- добавляем описание сложного поля
@@ -184,10 +194,10 @@ begin
   end if;
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'P_ADD_ZAl(:ND,null,:RNK,:PAWN,:ACC,:KV,:SV,:DEL,:CC_IDZ,:SDATZ,:MDATE,:NREE,:DEPID,:MPAWN,:PR_12,:NAZN)');
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'P_ADD_ZAl(:ND,null,:RNK,:PAWN,:ACC,:KV,:SV,:DEL,:CC_IDZ,:SDATZ,:MDATE,:NREE,:DEPID,:MPAWN,:PR_12,:NAZN,:OB22,:R013)');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'P_ADD_ZAl(null,null,:RNK,:PAWN,:ACC,:KV,:SV,:DEL,:CC_IDZ,:SDATZ,:MDATE,:NREE,:DEPID,:MPAWN,:PR_12,:NAZN)');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'P_ADD_ZAl(null,null,:RNK,:PAWN,:ACC,:KV,:SV,:DEL,:CC_IDZ,:SDATZ,:MDATE,:NREE,:DEPID,:MPAWN,:PR_12,:NAZN,:OB22,:R013)');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

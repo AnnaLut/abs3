@@ -1,0 +1,15 @@
+﻿@{
+    Layout = null;
+}
+
+<div id="teller-encashment-window">
+    <div id="atm-header">
+        <div id="atm-close-button" onclick="CloseEncashmentWindow(false)"></div>
+        <label>Інкасація</label>
+    </div>
+    <div id="teller-encashment-button-container">
+        <a class="atm-button atm-color-blue" onclick="loadEncashmentWindow('INPUT'); return false;">Внесення</a><br /><br />
+        <a class="atm-button atm-color-blue" onclick="loadEncashmentWindow('OUTPUT'); return false;">Вилучення (повне)</a><br /><br />
+        <a class="atm-button atm-color-blue" onclick="loadEncashmentWindow('PARTIAL'); return false;">Вилучення (часткове)</a>
+    </div>
+</div>

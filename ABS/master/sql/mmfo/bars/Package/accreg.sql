@@ -585,11 +585,17 @@ procedure OPN_ACC
   l_opn_dt                date;
   l_cls_dt                date;
   l_daos                  date;
+  
+  -- COBUMMFO-9690 Begin
+  l_module                varchar2(64);
+  l_action                varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   bars_audit.trace( '%s: Entry with ( rnk=%s, nls=%s, kv=%s, nms=%s, ob22=%s ).'
                   , title, to_char(p_rnk), p_nls, to_char(p_kv), p_nms, p_ob22 );
 
+  DBMS_APPLICATION_INFO.read_module(l_module, l_action); -- COBUMMFO-9690
   DBMS_APPLICATION_INFO.SET_ACTION( title );
 
   l_blkd := p_blkd;
@@ -604,6 +610,7 @@ begin
      where NLS = p_nls
        and KV  = p_kv;
 
+    DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
     raise_application_error( -20666, 'Рахунок '||p_nls||'/'||to_char(p_kv)||' уже існує (#'||to_char(l_acc)||')!', true );
 --  bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Недопустимий тип '||tip_||' для балансового рахунку '||l_nbs  );
 
@@ -613,6 +620,7 @@ begin
      where NLS = p_nls
        and KV  = p_kv;
 
+    DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
     raise_application_error( -20666, 'Рахунок '||p_nls||'/'||to_char(p_kv)||' зарезервовано для клієнта #'||to_char(l_acc), true );
 
   exception
@@ -725,14 +733,17 @@ $end
 
         case
           when ( l_opn_dt > gl.bd )
-          then raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" діє з '    ||to_char(l_opn_dt,'dd.MM.yyyy'), true );
+          then     DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
+                   raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" діє з '    ||to_char(l_opn_dt,'dd.MM.yyyy'), true );
           when ( l_cls_dt <= gl.bd )
-          then raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" закрито з '||to_char(l_cls_dt,'dd.MM.yyyy'), true );
+          then DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
+			   raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" закрито з '||to_char(l_cls_dt,'dd.MM.yyyy'), true );
           else null;
         end case;
 
       exception
         when NO_DATA_FOUND then
+          DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
           raise_application_error(-20666, 'Код OB22 "'||p_ob22||'" для R020 "'||l_nbs||'" відсутній в довіднику!', true );
       end;
     end if;
@@ -766,7 +777,7 @@ $then
 $end
   bars_audit.trace( '%s: Exit with acc=%s.', title, to_char(p_acc) );
 
-  DBMS_APPLICATION_INFO.SET_ACTION( null );
+  DBMS_APPLICATION_INFO.SET_ACTION( l_action /*null -- COBUMMFO-9690*/ );
 
 end OPN_ACC;
 
@@ -1810,10 +1821,17 @@ is
   l_nbs      accounts.nbs%type;
   l_tip      accounts.tip%type;
   l_rnk      accounts.rnk%type;
+  
+  -- COBUMMFO-9690 Begin
+  l_module                varchar2(64);
+  l_action                varchar2(64);
+  -- COBUMMFO-9690 End
+
 begin
 
   bars_audit.info( title||': Entry with ( p_acc=>'||to_char(p_acc)||' ).' );
 
+  DBMS_APPLICATION_INFO.read_module( l_module, l_action ); -- COBUMMFO-9690
   DBMS_APPLICATION_INFO.SET_ACTION( title );
 
   -- признак: счет закрывать нельзя
@@ -1974,7 +1992,7 @@ begin
 
   bars_audit.trace( '%s: Exit.', title );
 
-  DBMS_APPLICATION_INFO.SET_ACTION( null );
+  DBMS_APPLICATION_INFO.SET_ACTION( l_action /*null -- COBUMMFO-9690*/ );
 
 end closeAccount;
 
@@ -1991,8 +2009,14 @@ procedure P_ACC_RESTORE
   l_r020     accounts.nbs%type;
   l_rnk      accounts.rnk%type;
   l_active   number(1);
+
+  -- COBUMMFO-9690 Begin
+  l_module                varchar2(64);
+  l_action                varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
+  DBMS_APPLICATION_INFO.read_module( l_module, l_action ); -- COBUMMFO-9690
   DBMS_APPLICATION_INFO.SET_ACTION( 'ACCREG.RestoreAccount' );
 
   bars_audit.info( title||': Entry with ( p_acc=>'||to_char(p_acc)
@@ -2005,6 +2029,7 @@ begin
      where a.ACC = p_acc;
   exception
     when no_data_found then
+      DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
       bars_error.raise_nerror( g_modcode, 'ACC_NOT_FOUND' );
   end;
 
@@ -2016,6 +2041,7 @@ begin
        and DATE_OFF Is Null;
   exception
     when no_data_found then
+      DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
       bars_error.raise_error( g_modcode, 41, to_char(l_rnk) );
   end;
 
@@ -2027,6 +2053,7 @@ begin
        and lnnvl( D_CLOSE <= GL.GBD() );
   exception
     when no_data_found then
+      DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
       bars_error.raise_nerror( g_modcode, 'INVALID_R020', l_r020 );
   end;
 
@@ -2043,6 +2070,7 @@ begin
 
     if ( ( l_dapp is not null ) and ( l_dapp < p_daos ) )
     then
+      DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
       bars_error.raise_nerror( g_modcode, 'ACC_DAOS_DAPP', to_char(p_daos,'dd.MM.yyyy'), to_char(l_dapp,'dd.MM.yyyy') );
     end if;
 
@@ -2071,6 +2099,7 @@ begin
 
     if (l_active = 0)
     then
+      DBMS_APPLICATION_INFO.SET_ACTION( l_action ); -- COBUMMFO-9690
       raise_application_error( -20444, 'Заборонено реанімувати рахунок, що належить закритому депозитному договору!', TRUE );
     end if;
 
@@ -2091,7 +2120,7 @@ begin
 
   bars_audit.trace( '%s: Exit.', title );
 
-  DBMS_APPLICATION_INFO.SET_ACTION( null );
+  DBMS_APPLICATION_INFO.SET_ACTION( l_action /*null -- COBUMMFO-9690*/ );
 
 end p_acc_restore;
 

@@ -26,7 +26,8 @@ namespace clientregister
         {
             fillFields();
         }
-        public VCustExternRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? RNK, String NAME, Decimal? DOC_TYPE, String DOC_NAME, String DOC_SERIAL, String DOC_NUMBER, DateTime? DOC_DATE, String DOC_ISSUER, DateTime? BIRTHDAY, String BIRTHPLACE, String SEX, String SEX_NAME, String ADR, String TEL, String EMAIL, Decimal? CUSTTYPE, String OKPO, Decimal? COUNTRY, String COUNTRY_NAME, String REGION, String FS, String FS_NAME, String VED, String VED_NAME, String SED, String SED_NAME, String ISE, String ISE_NAME, String NOTES)
+        public VCustExternRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? RNK, String NAME, Decimal? DOC_TYPE, String DOC_NAME, String DOC_SERIAL, String DOC_NUMBER, DateTime? DOC_DATE, String DOC_ISSUER, DateTime? BIRTHDAY, String BIRTHPLACE, String SEX, String SEX_NAME, String ADR, String TEL, String EMAIL, Decimal? CUSTTYPE, String OKPO, Decimal? COUNTRY, String COUNTRY_NAME, String REGION, String FS, String FS_NAME, String VED, String VED_NAME, String SED, String SED_NAME, String ISE, String ISE_NAME, String NOTES
+            , DateTime? DATE_PHOTO, String EDDR_ID, DateTime? ACTUAL_DATE)
             : this(Parent)
         {
             this.RNK = RNK;
@@ -58,6 +59,11 @@ namespace clientregister
             this.ISE = ISE;
             this.ISE_NAME = ISE_NAME;
             this.NOTES = NOTES;
+            // COBUMMFO-8536 --->
+            this.DATE_PHOTO = DATE_PHOTO;
+            this.EDDR_ID = EDDR_ID;
+            this.ACTUAL_DATE = ACTUAL_DATE;
+            // COBUMMFO-8536 <---
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
             this.ClearChanges();
@@ -93,6 +99,11 @@ namespace clientregister
             Fields.Add( new BbField("ISE", OracleDbType.Char, true, false, false, false, false, "V_CUST_EXTERN", ObjectTypes.View, "Не клиенты банка (Представление)", "Инст. сектор экономики (K070)"));
             Fields.Add( new BbField("ISE_NAME", OracleDbType.Varchar2, true, false, false, false, false, "V_CUST_EXTERN", ObjectTypes.View, "Не клиенты банка (Представление)", "Инст. сектор экономики (K070) наименование"));
             Fields.Add( new BbField("NOTES", OracleDbType.Varchar2, true, false, false, false, false, "V_CUST_EXTERN", ObjectTypes.View, "Не клиенты банка (Представление)", "Комментарий"));        
+            // COBUMMFO-8536 --->
+            Fields.Add(new BbField("DATE_PHOTO", OracleDbType.Date, true, false, false, false, false, "V_CUST_EXTERN", ObjectTypes.View, "Не клиенты банка (Представление)", "Дата вклеювання фото"));
+            Fields.Add(new BbField("EDDR_ID", OracleDbType.Varchar2, true, false, false, false, false, "V_CUST_EXTERN", ObjectTypes.View, "Не клиенты банка (Представление)", "Унікальний номер запису в ЄДДР"));
+            Fields.Add(new BbField("ACTUAL_DATE", OracleDbType.Date, true, false, false, false, false, "V_CUST_EXTERN", ObjectTypes.View, "Не клиенты банка (Представление)", "Термін дії паспорту у вигляді ID-картки"));
+            // COBUMMFO-8536 <---
         }
         public Decimal? RNK { get { return (Decimal?)FindField("RNK").Value; } set {SetField("RNK", value);} }
         public String NAME { get { return (String)FindField("NAME").Value; } set {SetField("NAME", value);} }
@@ -123,6 +134,16 @@ namespace clientregister
         public String ISE { get { return (String)FindField("ISE").Value; } set {SetField("ISE", value);} }
         public String ISE_NAME { get { return (String)FindField("ISE_NAME").Value; } set {SetField("ISE_NAME", value);} }
         public String NOTES { get { return (String)FindField("NOTES").Value; } set {SetField("NOTES", value);} }
+
+        // COBUMMFO-8536 --->
+
+        // Доопрацювання картки клієнта-ЮО в частині паспортних даних пов'язаних осіб
+        // ---> Добавлено 3 поля по аналогії з Person 
+        public DateTime? DATE_PHOTO { get { return (DateTime?)FindField("DATE_PHOTO").Value; } set { SetField("DATE_PHOTO", value); } }
+        public String EDDR_ID { get { return (String)FindField("EDDR_ID").Value; } set { SetField("EDDR_ID", value); } }
+        public DateTime? ACTUAL_DATE { get { return (DateTime?)FindField("ACTUAL_DATE").Value; } set { SetField("ACTUAL_DATE", value); } }
+        // COBUMMFO-8536 <---
+
     }
 
     public sealed class VCustExternFilters : BbFilters
@@ -158,6 +179,11 @@ namespace clientregister
             ISE = new BBCharFilter(this, "ISE");
             ISE_NAME = new BBVarchar2Filter(this, "ISE_NAME");
             NOTES = new BBVarchar2Filter(this, "NOTES");
+            // COBUMMFO-8536 --->
+            DATE_PHOTO = new BBVarchar2Filter(this, "NOTES");
+            EDDR_ID = new BBVarchar2Filter(this, "NOTES");
+            ACTUAL_DATE = new BBVarchar2Filter(this, "NOTES");
+            // COBUMMFO-8536 <---
         }
         public BBDecimalFilter RNK;
         public BBVarchar2Filter NAME;
@@ -188,6 +214,11 @@ namespace clientregister
         public BBCharFilter ISE;
         public BBVarchar2Filter ISE_NAME;
         public BBVarchar2Filter NOTES;
+        // COBUMMFO-8536 --->
+        public BBVarchar2Filter DATE_PHOTO;
+        public BBVarchar2Filter EDDR_ID;
+        public BBVarchar2Filter ACTUAL_DATE;
+        // COBUMMFO-8536 <---
     }
 
     public partial class VCustExtern : BbTable<VCustExternRecord, VCustExternFilters>
@@ -241,7 +272,13 @@ namespace clientregister
                         rdr.IsDBNull(26) ?  (String)null : Convert.ToString(rdr[26]), 
                         rdr.IsDBNull(27) ?  (String)null : Convert.ToString(rdr[27]), 
                         rdr.IsDBNull(28) ?  (String)null : Convert.ToString(rdr[28]), 
-                        rdr.IsDBNull(29) ?  (String)null : Convert.ToString(rdr[29]))
+                        rdr.IsDBNull(29) ?  (String)null : Convert.ToString(rdr[29]),
+                        // COBUMMFO-8536 --->
+                        rdr.IsDBNull(30) ? (DateTime?)null : Convert.ToDateTime(rdr[30]),
+                        rdr.IsDBNull(31) ? (String)null : Convert.ToString(rdr[31]),
+                        rdr.IsDBNull(32) ? (DateTime?)null : Convert.ToDateTime(rdr[32])
+                        // COBUMMFO-8536 <---
+                        )
                     );
                 }
             }

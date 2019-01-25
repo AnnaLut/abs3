@@ -83,7 +83,15 @@ namespace BarsWeb.Models
         public string TOBONAME { get; set; }
         public string IDOPER { get; set; }
         public string ROLES { get; set; }
+        public TELLER_USER_PARAM TELLER_USER_PARAM { get; set; }
     }
+
+    public class TELLER_USER_PARAM
+    {
+        public int HAS_TELLER_ROLE { get; set; }
+        public int IS_TELLER_ON { get; set; }
+    }
+    
     public class BP_REASON
     {
         public decimal ID { get; set; }

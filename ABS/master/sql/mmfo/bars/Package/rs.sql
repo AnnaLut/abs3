@@ -401,6 +401,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.rs as
     G_RES_ERR constant number := -1;
     G_RES_OK_MSG constant varchar2(2) := 'OK';
 
+    -- COBUMMFO-9690 Begin
+    l_module      varchar2(64);
+    l_action      varchar2(64);
+    -- COBUMMFO-9690 End
+    
     -- получение номера колонки
     function col_no(p_no number) return varchar2 is
     begin
@@ -458,6 +463,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.rs as
     end build_stmts;
 
   begin
+    -- COBUMMFO-9690 Begin
+    dbms_application_info.read_module( l_module, l_action);
+    dbms_application_info.set_module( 'REPORT', 'EXECUTE');
+    -- COBUMMFO-9690 End
+    
     -- параметры заявки
     begin
       select cq.*
@@ -665,6 +675,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.rs as
                           0,
                           4000));
     end;
+
+    dbms_application_info.set_module( l_module, l_action); -- COBUMMFO-9690
+  exception
+     when others then
+          dbms_application_info.set_module( l_module, l_action); -- COBUMMFO-9690
+          raise;
   end exec_report_query;
 
   -- Удаление данных каталогизированного запроса из временной таблицы

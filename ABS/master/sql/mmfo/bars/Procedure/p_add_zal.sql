@@ -47,6 +47,7 @@
   p4_    NUMBER;
   acc8_  NUMBER;
   l_pawn NUMBER;
+  v_r013 varchar2(2) := p_R013;
   v_flag integer := 0;
   v_err  varchar2(4000);
 BEGIN
@@ -58,12 +59,16 @@ BEGIN
     end if;
   elsif  p_acc is  null then
       if    p_sv is not null  then
-       v_err := 'При додаванні нового забезпечення поле [Справ.варт.забезп] повинне буде пусте!<br/>';
-    end if;
+        v_err := 'При додаванні нового забезпечення поле [Справ.варт.забезп] повинне буде пусте!<br/>';
+      elsif p_del is null then
+        v_err := 'При додаванні нового забезпечення поле [Сума застави] має бути заповненим!<br/>';
+      end if;
   end if;
 
   -- ob22 должен быть заполнен обязательно!
-  if p_ob22 is not null then
+  if p_ob22 is null then
+    v_err := v_err|| 'Параметр OB22 має бути обов"язково заповнений!<br/>';
+  else
     az.ob22 := p_ob22;
   end if;
 
@@ -71,9 +76,6 @@ BEGIN
     v_err := v_err||'Всі три поля ("№ дог.заб","Дата дог. забез","Страхування застави") мають бути заповнені!<br/>';
   end if;
 
-  if v_err is not null then
-    raise_application_error(g_errn,'<br/><b>'||v_err||'</b><br/>');
-  end if;
 
   bars.bars_audit.info('P_ADD_ZAl params.p_nd=' || p_nd || ' ,p_ACCS' ||
                        p_accs || ' ,p_RNK=' || p_rnk || ' ,p_pawn=' ||
@@ -205,41 +207,15 @@ BEGIN
           ,az.acc);
 
     UPDATE accounts
-       SET mdate = p_mdate, tobo = az.branch
-     WHERE acc = az.acc;
-    if p_ob22 is not null then
-      az.ob22 := p_ob22;
-    else
-      SELECT MIN(ob22)
-        INTO az.ob22
-        FROM sb_ob22
-       WHERE d_close IS NULL
-         AND r020 = substr(az.nls, 1, 4);
-    end if;
+      SET mdate = p_mdate, tobo = az.branch
+      WHERE acc = az.acc;
+
     accreg.setaccountsparam(az.acc, 'OB22', az.ob22);
     IF l_nd > 0 THEN
       INSERT INTO nd_acc (nd, acc) VALUES (l_nd, az.acc);
     END IF;
 
   END IF;
- if p_R013 is not null then
-       accreg.setAccountSParam(az.acc, 'R013', p_R013);
- end if;
- UPDATE PAWN_ACC SET pawn=l_pawn WHERE acc=az.acc;
- if p_ob22 is not null then
- /*BEGIN
-   INSERT INTO specparam_int (acc, ob22) VALUES (az.acc, p_ob22);
- EXCEPTION
-   WHEN dup_val_on_index THEN
-     UPDATE specparam_int SET ob22 = p_ob22 WHERE acc = az.acc;
- END;*/
-      accreg.setAccountSParam(az.acc, 'OB22', p_ob22);
-end if;
-
-if p_strahz is not null then
-  accreg.setAccountwParam(az.acc, 'Z_POLIS', p_strahz);
-end if;
-
 
   BEGIN
     SELECT * INTO az FROM accounts WHERE acc = az.acc;
@@ -250,11 +226,37 @@ end if;
                               az.acc);
   END;
 
+  if v_R013 is null then
+    select count(1) into v_flag
+      from kl_r013 r
+      where r.r020 = substr(az.nls,1,4)
+        and r.d_close is null;
+    if v_flag>0 then
+      v_err :=  v_err||'Параметр R013 має бути заповнений!<br/>';
+    end if;
+  end if;
+
+
+  if v_err is not null then
+    raise_application_error(g_errn,'<br/><b>'||v_err||'</b>');
+  end if;
+
+  UPDATE PAWN_ACC SET pawn=l_pawn WHERE acc=az.acc;
+
+  if v_R013 is not null then
+        accreg.setAccountSParam(az.acc, 'R013', v_R013);
+  end if;
+
+  if p_strahz is not null then
+    accreg.setAccountwParam(az.acc, 'Z_POLIS', p_strahz);
+  end if;
+
+  v_flag := 0;
   FOR k IN (SELECT *
               FROM accounts
              WHERE accc = acc8_
-                OR acc = l_accs
-                or (tip = 'CR9' and acc in (select acc from nd_acc where nd = p_nd))
+                OR acc = l_accs/*
+                or (tip = 'CR9' and acc in (select acc from nd_acc where nd = p_nd))*/
            )
   LOOP
     p_pawn_nd(l_nd

@@ -1986,7 +1986,8 @@ is
          payroll_date   date,
          nazn           varchar2 (160),
          nls_2909       varchar2 (15),
-         err            varchar2 (4000)
+         err            varchar2 (4000),
+         id             number
       );
 
 
@@ -2114,7 +2115,8 @@ is
             l_zp_payroll.pr_date := l_payroll_row.payroll_date;
             l_zp_payroll.payroll_num := l_payroll_row.payroll_num;
             l_zp_payroll.nazn := l_payroll_row.nazn;
-
+            l_payroll_row.id := l_zp_payroll.id;
+            
             insert into zp_payroll
                  values l_zp_payroll;
 
@@ -2246,6 +2248,8 @@ is
          dbms_lob.append (l_clob_data, '<payroll>');
          dbms_lob.append (l_clob_data,
                           '<payroll_id>' || l_payroll_row.payroll_id || '</payroll_id>');
+         dbms_lob.append (l_clob_data,
+                          '<id>' || l_payroll_row.id || '</id>');
          dbms_lob.append (
             l_clob_data,
                '<payroll_response>'

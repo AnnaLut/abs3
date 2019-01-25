@@ -105,7 +105,22 @@ exception when others then
  end;
 /
 
+PROMPT ***  add NLS_KOM  ***
+begin 
+   EXECUTE IMMEDIATE 'alter TABLE BARS.MONEX_UO add ( NLS_KOM varchar2(15) )';
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      IF SQLCODE = -01430
+      THEN
+         NULL;
+      ELSE
+         RAISE;
+      END IF;         -- ORA-01430: column being added already exists in table
+END;
+/
 
+COMMENT ON COLUMN BARS.MONEX_UO.nls_KOM IS 'Альтерн.рах.суб.агента(викороистовувати для комісії)';
 
 PROMPT *** Create  grants  MONEX_UO ***
 grant SELECT                                                                 on MONEX_UO        to BARSREADER_ROLE;

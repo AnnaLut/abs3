@@ -1,7 +1,11 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/bars/Table/zp_deals.sql =========*** Run **
+PROMPT ===================================================================================== 
+
 exec bars.bpa.alter_policy_info( 'ZP_DEALS', 'WHOLE' , null, null, null, null ); 
-/
+
 exec bars.bpa.alter_policy_info( 'ZP_DEALS', 'FILIAL', 'M', 'M', 'M', 'M' );
-/
+
 begin execute immediate'create table bars.zp_deals  (
    id            number                  constraint cc_zp_deals_id not null,
    deal_id       varchar2(60)                                      not null,
@@ -37,7 +41,7 @@ exception when others then
 end;
 /
 exec  bars.bpa.alter_policies('ZP_DEALS'); 
-/
+
 comment on table  bars.ZP_DEALS is 'Договора зарплатных проектов';
 comment on column bars.ZP_DEALS.id is 'id договора';
 comment on column bars.ZP_DEALS.deal_id is 'Номер договора';
@@ -49,7 +53,7 @@ comment on column bars.ZP_DEALS.sos is 'Состоятение договора';
 comment on column bars.ZP_DEALS.deal_premium is 'Премиальность договора';
 comment on column bars.ZP_DEALS.central is 'Признак централизации договора';
 comment on column bars.ZP_DEALS.kod_tarif is 'Код тарифа';
-/
+
 begin
     execute immediate 'alter table ZP_DEALS add fs number';
  exception when others then 
@@ -64,5 +68,17 @@ begin
     end if; 
 end;
 /
-grant select,delete,update,insert on bars.ZP_DEALS to bars_access_defrole;
+
+begin
+    execute immediate 'create index i_zp_deals_rnk on BARS.zp_deals (rnk)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
 /
+
+grant select,delete,update,insert on bars.ZP_DEALS to bars_access_defrole;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/bars/Table/zp_deals.sql =========*** End **
+PROMPT ===================================================================================== 

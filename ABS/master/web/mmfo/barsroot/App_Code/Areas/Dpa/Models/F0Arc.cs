@@ -11,5 +11,6 @@ namespace BarsWeb.Areas.Dpa.Models
         public DateTime? D_r0 { get; set; }
         public string ERR { get; set; }
         public string ERR_MSG { get; set; }
+        public string Is_close_acc_only { get; set; }
     }
 }

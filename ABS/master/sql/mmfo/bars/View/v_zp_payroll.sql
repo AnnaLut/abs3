@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/bars/View/v_zp_payroll.sql =========*** Run **
+PROMPT ===================================================================================== 
+
 create or replace view v_zp_payroll as
 select   id,
    payroll_num,
@@ -24,7 +28,10 @@ select   id,
     ostc_2909,
     reject_fio,
     crt_date,
-    imp_date
+    imp_date,
+    nazn,
+    corp2_id,
+    nls_2909
 from
  (select r.id,
           r.payroll_num,
@@ -58,30 +65,33 @@ from
                       end cms,
           s.name sos_name,
           s.sos,
-          case
-             when r.source = 1 then 'Ручне введення'
-             when r.source = 2 then 'Імпорт файлу'
-             when r.source = 3 then 'Ручне введення'--'Клонування відомості'
-             when r.source = 4 then 'Змішаний тип'
-             when r.source = 5 then 'Інтернет банк'
-
-          end
-             src_name,
-             r.source src,
-             r.comm_reject,
-             a2.ostc/100 ostc_2909,
-             d.deal_premium,
-             ss.fio,
-             a3.ostc/100 ostc_3570,
-             r.signed,
-             (select count (*)
-             from zp_payroll_doc z,oper o
-            where z.id_pr = r.id and o.ref=z.ref and o.sos = 1 )
-             cnt_on_visa,
-             f.fio signed_fio,
-             rj.fio reject_fio,
-             r.crt_date,
-             case when r.source not in (2) then r.crt_date else (select max(f.imp_date) from zp_payroll_imp_files f where f.id_pr = r.id) end imp_date
+          case r.source
+             when 1 then 'Ручне введення'
+             when 2 then 'Імпорт файлу'
+             when 3 then 'Ручне введення'--'Клонування відомості'
+             when 4 then 'Змішаний тип'
+             when 5 then 'Інтернет банк'
+             when 6 then 'corplight'
+             else '?'
+          end src_name,
+          r.source src,
+          r.comm_reject,
+          a2.ostc/100 ostc_2909,
+          d.deal_premium,
+          ss.fio,
+          a3.ostc/100 ostc_3570,
+          r.signed,
+          (select count (*)
+          from zp_payroll_doc z,oper o
+          where z.id_pr = r.id and o.ref=z.ref and o.sos = 1 )
+          cnt_on_visa,
+          f.fio signed_fio,
+          rj.fio reject_fio,
+          r.crt_date,
+          case when r.source not in (2) then r.crt_date else (select max(f.imp_date) from zp_payroll_imp_files f where f.id_pr = r.id) end imp_date,
+          r.nazn,
+          r.corp2_id,
+          a2.nls nls_2909
      from zp_payroll r, zp_payroll_sos s, zp_deals d, staff$base ss , staff$base f ,staff$base rj,customer c, accounts a2, accounts a3, oper o
     where     r.sos = s.sos
           and d.id = r.zp_id
@@ -95,5 +105,7 @@ from
           and r.branch like sys_context ('bars_context', 'user_branch_mask')) t;
 /
 grant delete, insert, select, update on bars.v_zp_payroll to bars_access_defrole;
-/
 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/bars/View/v_zp_payroll.sql =========*** End **
+PROMPT ===================================================================================== 

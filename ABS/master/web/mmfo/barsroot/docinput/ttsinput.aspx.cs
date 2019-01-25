@@ -22,16 +22,17 @@ namespace DocInput
 					OracleCommand cmd = con.CreateCommand();
 
 					cmd.CommandText = conn.GetSetRoleCommand("WR_DOC_INPUT");
-					cmd.ExecuteNonQuery();			
-			
-					cmd.CommandText = @"SELECT DISTINCT REPLACE(NVL(f.name,'...'),'""',''''), t.tt,
-								REPLACE(t.tt||'-'||t.name,'""',''''),decode(substr(t.flags,38,1),'0','RO','RW')
-                                FROM tts t, folders f, folders_tts ft, staff_tts s 
-                               where ft.tt(+)=t.tt and ft.idfo=f.idfo(+) and s.tt=t.tt and 
-                        			  s.id in (select bars.user_id  from dual union all select id_whom from staff_substitute where id_who=user_id and date_is_valid(date_start, date_finish, null, null)=1 )  and
-                                   t.fli<3 and substr(flags,1,1)='1' and substr(flags, 63, 1)='0' order by 1,2";
-			
-					OracleDataReader rdr = cmd.ExecuteReader();
+					cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = "select * from v_tts_4_input";
+                    //cmd.CommandText = @"SELECT DISTINCT REPLACE(NVL(f.name,'...'),'""',''''), t.tt,
+                    //			REPLACE(t.tt||'-'||t.name,'""',''''),decode(substr(t.flags,38,1),'0','RO','RW')
+                    //                           FROM tts t, folders f, folders_tts ft, staff_tts s 
+                    //                          where ft.tt(+)=t.tt and ft.idfo=f.idfo(+) and s.tt=t.tt and 
+                    //                   			  s.id in (select bars.user_id  from dual union all select id_whom from staff_substitute where id_who=user_id and date_is_valid(date_start, date_finish, null, null)=1 )  and
+                    //                              t.fli<3 and substr(flags,1,1)='1' and substr(flags, 63, 1)='0' order by 1,2";
+
+                    OracleDataReader rdr = cmd.ExecuteReader();
 					string sGroup = "", sFold, sTT, sName;
 					int i = -1;
 					int j = -1;

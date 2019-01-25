@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/23/2018 11:12:08" ReportInfo.Modified="12/04/2018 16:06:25" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQHeTmTryyrSTwIaUf8862kg=">
+      <TableDataSource Name="Table" Alias="MainTab" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 DAT1, CHAR01 DAT2, CHAR02 KF, CHAR03 NBS, CHAR04 OB22, NUM00 KOL, NUM01 S, NUM02 KOL1, NUM03 S1, CHAR05 NAME_RU, CHAR06 TXT from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="OB22" DataType="System.String"/>
+        <Column Name="KOL" DataType="System.Decimal"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="KOL1" DataType="System.Decimal"/>
+        <Column Name="S1" DataType="System.Decimal"/>
+        <Column Name="NAME_RU" DataType="System.String"/>
+        <Column Name="TXT" DataType="System.String"/>
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TableObject Name="Table3" Width="718.2" Height="37.8">
+        <TableColumn Name="Column11" Width="143.64"/>
+        <TableColumn Name="Column12" Width="143.64"/>
+        <TableColumn Name="Column13" Width="143.64"/>
+        <TableColumn Name="Column14" Width="143.64"/>
+        <TableColumn Name="Column15" Width="143.64"/>
+        <TableRow Name="Row3" Height="37.8">
+          <TableCell Name="Cell11" Text="Звіт щодо сплати сум до бюджету за період" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell12"/>
+          <TableCell Name="Cell13" Text="з [MainTab.DAT1] по [MainTab.DAT2]" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell14"/>
+          <TableCell Name="Cell15"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="40.83" Width="718.2" Height="37.8">
+      <TableObject Name="Table1" Width="718.2" Height="37.8">
+        <TableColumn Name="Column1" Width="143.64"/>
+        <TableColumn Name="Column2" Width="143.64"/>
+        <TableColumn Name="Column3" Width="143.64"/>
+        <TableColumn Name="Column4" Width="143.64"/>
+        <TableColumn Name="Column5" Width="143.64"/>
+        <TableRow Name="Row1" Height="37.8">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Найменування РУ" VertAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Балансовий рахунок" VertAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="ОБ22" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Перераховано до бюджету" VertAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Поверненуто з бюджету" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="81.66" Width="718.2" Height="28.35" DataSource="Table">
+      <TableObject Name="Table2" Width="718.2" Height="28.35">
+        <TableColumn Name="Column6" Width="143.64"/>
+        <TableColumn Name="Column7" Width="143.64"/>
+        <TableColumn Name="Column8" Width="143.64"/>
+        <TableColumn Name="Column9" Width="143.64"/>
+        <TableColumn Name="Column10" Width="143.64"/>
+        <TableRow Name="Row2" Height="28.35">
+          <TableCell Name="Cell6" Border.Lines="All" Text="[MainTab.NAME_RU]"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="[MainTab.NBS]"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[MainTab.OB22]"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[MainTab.S]"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="[MainTab.S1]"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="113.04" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

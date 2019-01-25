@@ -43,7 +43,8 @@ begin
 	OB22_UO CHAR(2), 
 	OB22_U0 CHAR(2), 
 	NAME_351 VARCHAR2(500), 
-	KOD_351 VARCHAR2(4)
+	KOD_351 VARCHAR2(4), 
+	R013 VARCHAR2(1)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -54,6 +55,54 @@ end;
 /
 
 
+declare
+  v_num integer;
+begin
+  select count(1) into v_num
+    from user_tab_columns 
+    where table_name = 'CC_PAWN'
+      and column_name = 'R013';
+  if v_num = 0 then
+    execute immediate 'alter table cc_pawn add r013 varchar2(1)';
+  end if;
+end;
+/
+
+update cc_pawn set r013 = 1 where pawn = 156 and d_close is null;
+update cc_pawn set r013 = 3 where pawn = 231 and d_close is null;
+update cc_pawn set r013 = 2 where pawn = 244 and d_close is null;
+update cc_pawn set r013 = 2 where pawn = 245 and d_close is null;
+update cc_pawn set r013 = 3 where pawn = 235 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 38 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 39 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 339 and d_close is null;
+update cc_pawn set r013 = 2 where pawn = 233 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 591 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 592 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 58 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 61 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 62 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 63 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 640 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 307 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 21 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 90 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 33 and d_close is null;
+update cc_pawn set r013 = 3 where pawn = 23 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 15 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 28 and d_close is null;
+update cc_pawn set r013 = 1 where pawn = 11 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 30 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 34 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 301 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 302 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 303 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 304 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 305 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 321 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 322 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 323 and d_close is null;
+update cc_pawn set r013 = 9 where pawn = 3214 and d_close is null;
 
 
 PROMPT *** ALTER_POLICIES to CC_PAWN ***
@@ -61,8 +110,7 @@ PROMPT *** ALTER_POLICIES to CC_PAWN ***
 
 
 COMMENT ON TABLE BARS.CC_PAWN IS 'Виды обеспечения';
-COMMENT ON COLUMN BARS.CC_PAWN.NAME_351 IS 'Найменування виду забезпечення згідно пост.№351';
-COMMENT ON COLUMN BARS.CC_PAWN.KOD_351 IS 'Код виду забезпечення згідно пост.№351';
+COMMENT ON COLUMN BARS.CC_PAWN.R013 IS 'Код параметру R013';
 COMMENT ON COLUMN BARS.CC_PAWN.PAWN IS 'код вида обеспечения (внутренний может отличаться от кода НБУ)';
 COMMENT ON COLUMN BARS.CC_PAWN.NAME IS 'наименование вида обесечения';
 COMMENT ON COLUMN BARS.CC_PAWN.PR_REZ IS 'не используется';
@@ -81,6 +129,8 @@ COMMENT ON COLUMN BARS.CC_PAWN.GRP23 IS '';
 COMMENT ON COLUMN BARS.CC_PAWN.OB22_FO IS 'Значення ОБ22 для ФО';
 COMMENT ON COLUMN BARS.CC_PAWN.OB22_UO IS 'Значення ОБ22 для ЮО';
 COMMENT ON COLUMN BARS.CC_PAWN.OB22_U0 IS '';
+COMMENT ON COLUMN BARS.CC_PAWN.NAME_351 IS 'Найменування виду забезпечення згідно пост.№351';
+COMMENT ON COLUMN BARS.CC_PAWN.KOD_351 IS 'Код виду забезпечення згідно пост.№351';
 
 
 
@@ -102,7 +152,7 @@ exception when others then
 PROMPT *** Create  constraint NK_CC_PAWN_PAWN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_PAWN MODIFY (PAWN CONSTRAINT NK_CC_PAWN_PAWN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_PAWN MODIFY (PAWN CONSTRAINT NK_CC_PAWN_PAWN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;

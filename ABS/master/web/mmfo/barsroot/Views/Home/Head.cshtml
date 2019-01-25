@@ -70,6 +70,7 @@ else
                       if (count == 0) {
                           messCount.remove();
                       } else {
+                          TellerMessages();
                           if (messCount.length == 0) {
                               messCount = $('<div/>', { 'class': 'count', id: '#btnMessageCount' });
                               buttMess.prepend(messCount);
@@ -98,6 +99,53 @@ else
     </script>
 }
 <script src="@Url.Content("~/Scripts/Views/Home/header.js")"></script>
+
+@if (Model.TELLER_USER_PARAM.HAS_TELLER_ROLE == 1)
+{
+    <link rel="stylesheet" href="@Url.Content("~/Areas/Teller/Css/atm.min.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerScript.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerEncashment.js")"></script>
+    <script>
+        function Restore(currentSum, status) {
+            if (currentSum === '-1')
+                return;
+            var dif = +parseFloat($("#atm-sum-dif").val()).toFixed(2);
+            var operSum = +parseFloat($('#atm-sum-txt').text()).toFixed(2);
+            $('#atm-in-out-sum').text(currentSum);
+            var difSum = +parseFloat(operSum - currentSum).toFixed(2);
+            $("#atm-sum-dif").val(difSum);
+            if (difSum < 0) {
+                difSum *= -1;
+                $('#atm-tempo-in-out-info').text('видати з темпокаси');
+                if (status === 'OUT')
+                    $('#atm-tempo-in-out-info').text('внести в темпокасу');
+                else if (status === 'IN')
+                    $('#atm-tempo-in-out-info').text('видати з темпокаси');
+            }
+            $('#atm-sum-tempo').text(difSum);
+        }
+        $('document').ready(function () {
+            if (zElementIndex) {
+                zElementIndex.down = 380;
+                zElementIndex.middle = 495;
+                zElementIndex.up = 501;
+                showHide = new ElementsVisibility();
+                intervalObj = new StatusInterval();
+            }
+            $(window).resize(function () {
+                onWindowResize();
+            });
+        });
+
+        function GetRef() {
+            return -1;
+        }
+
+        function GetSWI() {
+            return 0;
+        }
+    </script>
+}
 
 @if (!isKendo)
 {
@@ -182,6 +230,32 @@ else
             #userToolkit .toolbar a:hover {
                 background-color: #bdbdbd;
             }
+
+        #userTeller {
+            padding: 15px;
+            text-align: left;
+        }
+
+        #atm-menu {
+            left: 40px !important;
+        }
+
+        .atm-nav {
+            top: 56px !important;
+        }
+
+        .atm-info-block-small {
+            margin-right: 35px !important;
+        }
+
+        #atm-admin-button > img {
+            height: 20px !important;
+            width: 20px !important;
+        }
+
+        #atm-info {
+            margin-top: -10px;
+        }
     </style>
     <div>
 
@@ -221,6 +295,25 @@ else
                     <span class="label">Відділення</span>
                 </div>
             </a>
+            @if (Model.TELLER_USER_PARAM.HAS_TELLER_ROLE == 1)
+            {
+                if (Model.TELLER_USER_PARAM.IS_TELLER_ON == 1)
+                {
+                    <a id="btnTeller" class="btn_teller_on" onclick="showTeller();return false;">
+                        <div>
+                            <span class="label">Теллер</span>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <a id="btnTeller" class="btn_teller_off" onclick="showTeller();return false;">
+                        <div>
+                            <span class="label">Теллер</span>
+                        </div>
+                    </a>
+                }
+            }
         </div>
 
         <div class="logo">
@@ -351,19 +444,105 @@ else
         </div>
     </div>
 
-    <div id="userBranches" style="width: 350px; height: 400px; padding: 0; display: none;overflow-y: scroll;">
+    <div id="userBranches" style="width: 350px; min-height:180px; padding: 0; display: none;overflow-y: scroll;">
         <div class="branchPanel">
             <h4>Доступні відділення</h4>
             <div id="treeview"></div>
         </div>
     </div>
-
+    <div id="userTeller" style="width: 155px; height: 80px; display: none; margin-right: 0px">
+        <div class="teller-toolbar">
+            <div class="teller-toolbar-block">
+                <table id="teller-table">
+                    <tr>
+                        <td><span class="bf_w">Теллер:</span></td>
+                        <td><span class="bf_bold" id="tellerLabelOn" style="color:green">Увімкнено</span></td>
+                        <td><a href="#" id="deactivate-teller" onclick="showActivateTellerWindow();return false;">Деактивація Теллера</a></td>
+                    </tr>
+                </table>
+            </div><br />
+            <div class="teller-toolbar-block" id="teller-main-buttons">
+                <a id="btnSbon" class="btn_sbon teller-btn" href="#" onclick="showATMWindow();return false; ">
+                    <div>
+                        <span class="label">SBON</span>
+                    </div>
+                </a>
+                <a class="btn_sbon teller-btn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showEncashmentWindow('list');return false; ">
+                    <div>
+                        <span class="label">Проведення</span>
+                    </div>
+                </a>
+                <a class="btn_sbon teller-btn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showEncashmentWindow('form');return false; ">
+                    <div>
+                        <span class="label">Інкасація</span>
+                    </div>
+                </a>
+                <a class="btn_sbon teller-btn" id="technicalBtn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showTechnicalButtons();return false; ">
+                    <div>
+                        <span class="label">Технічні</span>
+                    </div>
+                </a>
+            </div><br />
+            <div class="teller-toolbar-block">
+                <div><span class="bf_w">Теллер інформація:</span></div>
+                <div><span><pre class="info-style" id="teller-info"></pre></span></div>
+            </div><br />
+            <div class="teller-toolbar-block">
+                <div><span class="bf_w">Теллер статус:</span></div>
+                <div><span><pre class="info-style" id="teller-status"></pre></span></div>
+            </div>
+        </div>
+    </div>
     <style>
         .branchPanel {
             margin-left: 20px;
         }
     </style>
-
+    <div id="preloader" style="display: none;">
+        <div id="preloader-background"></div>
+        <div class="preloader-container">
+            <div class="preloader-text" id="preloader-text">
+                <h1 id="text-oper" class="preloader-text-header animated flash">Зачекайте, виконується операція</h1>
+            </div>
+            <div class="preloader-image-container">
+                <img src="/barsroot/Content/spinners/loader.gif" alt="image/gif" id="teller-preloader-image" style="left: 48%;" />
+            </div>
+        </div>
+    </div>
+    <div id="atm-window-container"></div>
+    <div id="atm-confirm" style="display: none;">
+        <div id="atm-header">
+            <label id="confirm-head-txt">Підтвердження операції</label>
+        </div>
+        <div id="atm-confirm-txt"></div>
+        <div id="atm-confirm-button-area">
+            <a class="atm-button atm-color-green atm-confirm-button-width" id="atm-confirm-close">ОК</a>
+            <a class="atm-button atm-color-red atm-confirm-button-width" id="atm-cancel-close" onclick="CancelCloseAtmWindow()">Відміна</a>
+        </div>
+    </div>
+    <div id="teller-notification-window" style="display: none;">
+        <div id="atm-header">
+            <label class="teller-head-txt" id="teller-notify-head-text">Інформація</label>
+        </div>
+        <div id="teller-notofication-txt"></div>
+        <div id="atm-notify-button-area">
+            <a class="atm-button atm-color-green atm-confirm-button-width" onclick="notificationClose()">ОК</a>
+        </div>
+    </div>
+    <div id="teller-messages-container">
+        <div id="teller-messages-window" style="display: none;">
+            <div id="tell-mess-head"></div>
+            <div class="tell-mess-container">
+                <div id="teller-message-text">text</div>
+            </div>
+            <div id="teller-message-button-container">
+                <a class="atm-button atm-color-blue" id="teller-messages-read-confirm" onclick="ConfirmReadTellerMessages(); return false;">ОК</a>
+            </div>
+        </div>
+    </div>
+    <div id="teller-encashment-window-container"></div>
+    <div id="encashment-window-container"></div>
+    <div id="teller-technical-btn-container"></div>
 }
 else
 {

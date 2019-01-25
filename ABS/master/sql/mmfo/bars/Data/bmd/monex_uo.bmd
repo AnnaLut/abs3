@@ -126,10 +126,20 @@ begin
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 1, 'NAME', 'C', 'Назва ЮО,~ що працює в СТП~БРАНЧІ ЮО', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=BRANCH_UO[CONDITIONS=>BRANCH_UO.IDPDR=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("BRANCH_UO" , 0 , "IDPDR=" || Str( :ID )   )', 0);
   bars_metabase.add_column(l_tabid, 2, 'ID', 'N', '№ ~п/п ЮО~СТП ЮО', '', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=MONEX_MV_UO[CONDITIONS=>MONEX_MV_UO.UO=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("MONEX_MV_UO" , 0 , "UO=" || Str( :ID )   )', 0);
-  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'ПЛ.рекв ЮО:~МФО', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'ПЛ.рекв ЮО:~Рахунок', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'ПЛ.рекв ЮО:~Ід.код', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК,~ (за наявності)', '', null, 50, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'ПЛ.рекв ЮО:~МФО', '', null, 10, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'ПЛ.рекв ЮО:~Рахунок-1~основний', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'ПЛ.рекв ЮО:~Ід.код', '', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК,~ (за наявності)', '', null, 50, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLS_KOM', 'C', 'ПЛ.рекв ЮО:~Рахунок-2~дод, для ком', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('BANKS');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'MFO');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 3, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица BANKS для описания сложного поля таблицы MONEX_UO.');
+  end if;
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

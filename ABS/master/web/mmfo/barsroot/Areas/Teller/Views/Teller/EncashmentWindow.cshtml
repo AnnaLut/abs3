@@ -1,0 +1,168 @@
+﻿@model BarsWeb.Areas.Teller.Model.EncashmentClientModel
+@{
+    Layout = null;
+    String nonAtm = "";
+    if(Model.EncashmentType == "OUTPUT" && Model.NonAtmAmount != null)
+    {
+        foreach(var nonAtmAmount in Model.NonAtmAmount)
+        {
+            nonAtm += String.Format("Валюта: {0}, Сума: {1}<br/>", nonAtmAmount.Cur_code, nonAtmAmount.Non_atm_amount.ToString().Replace(',', '.'));   
+        }
+    }
+    String tempoTmp = Model.NonAmount.Replace(',', '.');
+    if (tempoTmp == "")
+    {
+        tempoTmp = "0";
+    }
+    String tempo = String.Format("0.00",tempoTmp);
+    String messageText = Model.ToxFlag == 1 ? "" : "Не надано доступ на проведення інкасації готівкових коштів через АТМ! Зверніться, будь ласка, до адміністратора, для надання доступу!";
+}
+<div id="encashment-window">
+    <div id="atm-header">
+        <div id="atm-close-button" onclick="CloseEncashmentWindow('@Model.EncashmentType')"></div>
+        @if (Model.EncashmentType == "INPUT")
+        {
+            <label>Внесення коштів</label>
+        }
+        else if (Model.EncashmentType == "PARTIAL")
+        {
+            <label>Вилучення коштів (ЧАСТКОВЕ)</label>
+        }
+        else if (Model.EncashmentType == "OUTPUT")
+        {
+            <label>Вилучення коштів</label>
+        }
+    </div>
+    <div id="input-enc-form-body">
+        <table>
+            <thead>
+                <tr>
+                    <td style="width: 100px;"></td>
+                    <td class="pad-left"></td>
+                </tr>
+            </thead>
+            <tbody id="ancash-table">
+                @if (Model.EncashmentType != "OUTPUT")
+                {
+                    <tr class="tr-height">
+                        <td>
+                            <span>
+                                <pre class="info-style">Вибір валюти</pre>
+                            </span>
+                        </td>
+                        <td class="pad-left">
+                            <select name="Currency" id="currency-dropdown">
+                                @foreach (BarsWeb.Areas.Teller.Model.TellerCurrency currency in Model.Currency)
+                                {
+                                    if (currency.Lcv == "UAH")
+                                    {
+                                        <option value='@currency.Lcv' selected>@currency.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value='@currency.Lcv'>@currency.Name</option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="tr-height">
+                        <td>
+                            <span>
+                                <pre class="info-style">Темпокаса</pre>
+                            </span>
+                        </td>
+                        <td class="form-group pad-left">
+                            <input type="number" id="tempo-input" class="form-control" value="@tempo" onblur="countTempo('@Model.EncashmentType')" />
+                        </td>
+                    </tr>
+                }
+                @if(Model.ToxFlag == 1)
+                {
+                    if (Model.EncashmentType == "PARTIAL")
+                    {
+                        <tr>
+                            <td>
+                                <span>
+                                    <pre class="info-style">Вибір номіналів</pre>
+                                </span>
+                            </td>
+                            <td>
+                                <div id="nominals-container"></div>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="tr-height">
+                        <td>
+                            <span>
+                                <pre class="info-style" style="width: 80px;">АТМ</pre>
+                            </span>
+                        </td>
+                        <td class="pad-left">
+                            @if (Model.EncashmentType == "INPUT")
+                            {
+                                <a class="atm-button atm-color-blue" id="cashin-btn" style="padding-bottom: 8px; padding-top: 8px;" onclick="OnCashinClick(); return false;">Внести</a>
+                            }
+                            else if (Model.EncashmentType == "PARTIAL")
+                            {
+                                <a class="atm-button atm-color-blue" id="cashin-btn" style="padding-bottom: 8px; padding-top: 8px;" onclick="OnPartialCashin(); return false;">Вилучити</a>
+                            }
+                            else if (Model.EncashmentType == "OUTPUT" && !String.IsNullOrEmpty(nonAtm))
+                            {
+                                <a class="atm-button atm-color-blue" id="cashin-btn" style="padding-bottom: 8px; padding-top: 8px; margin-left: -300px;" onclick="OnCashin(); return false;">Вилучити</a>
+                            }
+                            else if (Model.EncashmentType == "OUTPUT" && String.IsNullOrEmpty(nonAtm))
+                            {
+                                <a class="atm-button atm-color-blue" id="cashin-btn" style="padding-bottom: 8px; padding-top: 8px;" onclick="OnCashin(); return false;">Вилучити</a>
+                            }
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <div id="nominals-container"></div>
+                }
+                <tr style="margin-top: 10px;">
+                    <td>
+                        @if (Model.EncashmentType == "INPUT")
+                        {
+                            <a class="atm-button atm-color-green" style="margin-right: 0px; margin-top: 20px;" id="end-cashin-btn" onclick="endCashin('@Model.EncashmentType')">Підтвердити</a>
+                        }
+                        else
+                        {
+                            <a class="atm-button atm-color-green" style="margin-right: 0px; margin-top: 20px;" id="end-cashin-btn" onclick="endCashout('@Model.EncashmentType')">Підтвердити</a>
+                        }
+                    </td>
+                    <td class="pad-left">
+                        <span>
+                            @if (Model.EncashmentType == "OUTPUT" && !String.IsNullOrEmpty(nonAtm))
+                            {
+                                <pre class="info-style" style="width: 390px; min-height: 20px; left: -300px; position: relative;" id="encash-info">@messageText</pre>
+                            }
+                            else
+                            {
+                                <pre class="info-style" style="width: 390px; min-height: 20px;" id="encash-info">@messageText</pre>
+                            }
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span>
+                            @if (Model.EncashmentType == "OUTPUT" && !String.IsNullOrEmpty(nonAtm))
+                            {
+                                <pre class="info-style" style="width: 390px; min-height: 20px;">@Html.Raw(nonAtm)</pre>
+                            }
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <input type="hidden" value="0" id="in-cashin-started" />
+    <input type="hidden" id="nonAmount_tempo" value="@Model.NonAmount.Replace(',', '.')" />
+    <input type="hidden" id="encashment-type" value="@Model.EncashmentType"/>
+    <input type="hidden" id="t-role" value="@Model.Role"/>
+    <input type="hidden" id="t-conversion" value="0" />
+    <input type="hidden" id="t-permission" value="@Model.ToxFlag" />
+</div>

@@ -11,6 +11,7 @@
     <script language="javascript" type="text/javascript" src="/Common/WebGrid/Grid2005.js?v1.0.1"></script>
     <script language="javascript" type="text/javascript" src="/Common/Script/Localization.js"></script>
     <link href="/Common/WebGrid/Grid.css" type="text/css" rel="stylesheet">
+    <link href="../Areas/Teller/Css/atm.min.css" rel="stylesheet" />
     <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.min.js"></script>
     <script language="javascript" type="text/javascript" src="/Common/jquery/jquery-ui.js"></script>
 	<script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
@@ -19,7 +20,7 @@
     <script language="javascript" type="text/javascript" src="JScript/Script_Documents.js?v=1.10"></script>
     <script language="JavaScript" type="text/javascript" src="/Common/Script/Sign.js?v=1.1"></script>
     <script type="text/javascript" src="/barsroot/Scripts/json3.min.js"></script>
-
+    <script type="text/javascript" src="/barsroot/Areas/Teller/Scripts/TellerScript.js"></script>
     <script type="text/javascript" src="/Common/Script/BarsIe.js?v1.2"></script>
 
     <link type="text/css" rel="stylesheet" href="/Common/CSS/jquery/jquery.css" />
@@ -105,12 +106,17 @@
             cursor: col-resize;
         }
 
-
-
-
+        #teller_button_container img{
+            border: gray 1px double;
+            padding: 2px;
+            width: 20px;
+            cursor: pointer;
+        }
     </style>
     <script language="javascript" type="text/javascript">
         var ShowDocDialog = 0;
+        var key = false;
+        var intervalObj = false;
 
         function showToolTip(evt, ctrlID, p_nd, p_datd, p_namea, p_mfoa, p_ida, p_nlsa, p_nameb, p_mfob, p_nb_b, p_idb, p_nlsb, p_s, p_kv, p_nazn, ref) {
             return;
@@ -183,6 +189,10 @@
             if (printTrnModel) {
                 document.getElementById("cbPrintTrnModel").checked = (printTrnModel == 1) ? (true) : (false);
             }
+
+            $(window).resize(function () {
+                onWindowResize();
+            });
 
         });
 
@@ -373,9 +383,115 @@
             location.replace('/barsroot/checkinner/default.aspx?type=2');
         }
 
+        ////========================== Teller ===========================////
+
+        function GetRef() {
+            var chks = $('input[name=cnkbox][type=checkbox]');
+            if (!getSelectedCount(chks))
+                return;
+            var element = getSelectedObject(chks);
+            if (!element) {
+                showNotification("", 'error');
+                return;
+            }
+            var first = $(element).parent().parent();
+            var list = $(first).children();
+            var ref = $(list[3]).text();
+            if (!ref) {
+                showNotification("", 'error');
+                return;
+            }
+            return ref;
+        }
+
+        function GetSWI() {
+            return '0';
+        }
+
+        function Restore(currentSum, status) {
+            if (currentSum == '-1')
+                return;
+            var dif = +parseFloat($("#atm-sum-dif").val()).toFixed(2);
+            var operSum = +parseFloat($('#atm-sum-txt').text()).toFixed(2);
+            $('#atm-in-out-sum').text(currentSum);
+            var difSum = +parseFloat(operSum - currentSum).toFixed(2);
+            $("#atm-sum-dif").val(difSum);
+            if (difSum < 0) {
+                difSum *= -1;
+                $('#atm-tempo-in-out-info').text('видати з темпокаси');
+                if (status == 'OUT')
+                    $('#atm-tempo-in-out-info').text('внести в темпокасу');
+                else if (status == 'IN')
+                    $('#atm-tempo-in-out-info').text('видати з темпокаси');
+            }
+            $('#atm-sum-tempo').text(difSum);
+        }
+
+        function getSelectedObject(elements) {
+            var obj = null;
+            for (var i = 0; i < elements.length; ++i) {
+                if (elements[i].checked) {
+                    obj = elements[i];
+                    break;
+                }
+            }
+            return obj;
+        }
+
+        function getSelectedCount(elements) {
+            var count = 0;
+            for (var i = 0; i < elements.length; ++i)
+                if (elements[i].checked)
+                    ++count;
+            if (count === 0) {
+                showNotification('Жодної строки не було вибрано!');
+                return false;
+            }
+            else if (count > 1) {
+                showNotification('Вибрано забагато строк!');
+                return false;
+            }
+            return true;
+        }
+
+        $('document').ready(function () {
+            if (zElementIndex) {
+                zElementIndex.down = 390;
+                zElementIndex.middle = 395;
+                zElementIndex.up = 401;
+                showHide = new ElementsVisibility();
+                intervalObj = new StatusInterval();
+            }
+            $(window).resize(function () {
+                onWindowResize();
+            });
+        });
+
     </script>
 </head>
 <body>
+    <div id="preloader">
+    <div id="preloader-background"></div>
+        <div class="preloader-container">
+            <div class="preloader-text" id="preloader-text">
+                <h1 id="text-oper" class="preloader-text-header animated flash">Зачекайте, виконується операція</h1>
+            </div>
+            <div class="preloader-image-container">
+                <img src="/barsroot/Content/spinners/loader.gif" alt="image/gif" id="teller-preloader-image" />
+            </div>
+        </div>
+    </div>
+    <div id="teller-notification-window" style="display: none;">
+        <div id="atm-header">
+            <label class="teller-head-txt" id="teller-notify-head-text">Інформація</label>
+        </div>
+        <div id="teller-notofication-txt"> Тест Тест Тест Тест Тест Тест Тест Тест Тест Тест Тест Тест</div>
+        <div id="atm-notify-button-area">
+            <a class="atm-button atm-color-green atm-confirm-button-width" onclick="notificationClose()">ОК</a>
+        </div>
+    </div>
+    <div id="atm-window-container"></div>
+
     <form id="Form1" runat="server">
         <asp:ScriptManager ID="sm" runat="server">
             <Services>
@@ -463,6 +579,12 @@
                                     text="Фильтр" tooltip="Установить фильтр" imageurl="/Common/Images/default/16/filter.png"
                                     onclientclick="FilterButtonPressed();return false;" />
                             </td>
+                            <td  style="padding-right: 5px; width: 1px">
+                                <bars:imagetextbutton meta:resourcekey="tellerProc" runat="server" class="outset" id="tellerProc" title="Виконати операцію з Теллером" 
+                                    onclientclick="TellerWindow();return false;" align="top" style="visibility: visible;" Text="Теллер"
+                                    imageurl="/barsroot/Content/images/PureFlat/16/Hot/money_banknote-server.png" tooltip="Виконати операцію з Теллером"/>
+                            </td>
+
                             <td style="padding-right: 5px; width: 1px">
                                 <bars:separator id="sprt1" runat="server" />
                             </td>
@@ -581,6 +703,7 @@
                     <input id="__USER_KEYHASH" type="hidden" runat="server" />
                     <input id="__CRYPTO_USE_VEGA2" type="hidden" runat="server" />
                     <input id="__CRYPTO_CA_KEY" type="hidden" runat="server" />
+                    <input id="__ISTELLERACTIVE" type="hidden" runat="server" />
                 </td>
             </tr>
         </table>

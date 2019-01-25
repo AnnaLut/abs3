@@ -50,6 +50,11 @@ CREATE OR REPLACE PROCEDURE BARS.RNK2RNK -- передача данных одного клиента друго
   l_dkbo_acc_list  number_list;
   l_acc_list_union number_list;
   lc_acc_list      CONSTANT attribute_kind.attribute_code%TYPE := 'DKBO_ACC_LIST';
+  
+  -- COBUMMFO-9690 Begin
+  l_module        varchar2(64);
+  l_action        varchar2(64);
+  -- COBUMMFO-9690 End
 begin
 
   begin
@@ -325,6 +330,8 @@ begin
                  where  rnk='||p_rnkfrom;
         open cur_ for sql_;
 
+        dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
+        
         DBMS_APPLICATION_INFO.SET_ACTION( $$PLSQL_UNIT );
 
         loop
@@ -342,7 +349,7 @@ begin
                where ACC = acc_;
             exception
               when OTHERS then
-                DBMS_APPLICATION_INFO.SET_ACTION( NULL );
+                DBMS_APPLICATION_INFO.SET_ACTION( l_action /*NULL -- COBUMMFO-9690*/ );
                 raise_application_error( -20738, 'RNK2RNK: помилка - '||sqlerrm, TRUE );
             end;
 
@@ -395,7 +402,7 @@ begin
 
           exception
             when OTHERS then
-              DBMS_APPLICATION_INFO.SET_ACTION( NULL );
+              DBMS_APPLICATION_INFO.SET_ACTION( l_action /*NULL -- COBUMMFO-9690*/ );
               raise_application_error( -20735, 'RNK2RNK: помилка - '||sqlerrm,TRUE);
           end;
 
@@ -416,7 +423,7 @@ begin
                           user_id);
         end loop;
 
-        DBMS_APPLICATION_INFO.SET_ACTION( NULL );
+        DBMS_APPLICATION_INFO.SET_ACTION( l_action /*NULL -- COBUMMFO-9690*/ );
 
         close cur_;
 

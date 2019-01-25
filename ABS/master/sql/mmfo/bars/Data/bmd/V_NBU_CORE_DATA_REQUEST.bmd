@@ -160,6 +160,9 @@ begin
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 8, 'Консолідовані дані_Застави', '', '', 'ONCE', '', '', '', '', 'sPar=V_NBU_CONS_PLEDGE[NSIFUNCTION]', null);
 
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 9, 'Значення Мінімальної ЗП', 'UPDATE  BRANCH_ATTRIBUTE_VALUE R  SET  ATTRIBUTE_VALUE = :P_ATTRIBUTE_VALUE WHERE  R.attribute_code = ''$BASE'' AND R.BRANCH_CODE = ''/300465/''', 'FROM_CUSTOM_OPTIONS', 'ONCE', '', '', '', '', '', 116);
+
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);

@@ -282,9 +282,9 @@ public partial class DepositFile : Bars.BarsPage
         {
             Deposit.SaveException(ex);
             Random r = new Random();
-            Response.Write("<script> window.showModalDialog('dialog.aspx?type=err&rcode=" + 
+            Response.Write("<script> window.showModalDialog('dialog.aspx?type=err&rcode=" +
                 Convert.ToString(r.Next()) +
-                "','','dialogWidth:800px;center:yes;edge:sunken;help:no;status:no;'); " +
+                "','','dialogWidth:800px;dialogHeight:700px;center:yes;edge:sunken;help:no;status:no;'); " +
                 "</script>");
             Response.Flush();
         }

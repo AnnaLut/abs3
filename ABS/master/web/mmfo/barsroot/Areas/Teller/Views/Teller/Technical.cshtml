@@ -1,0 +1,17 @@
+﻿@model List<BarsWeb.Areas.Teller.Model.ATMTechnicalButtonsModel>
+@{
+    Layout = null;
+}
+
+<div id="technical-buttons-window">
+    <div id="atm-header">
+        <div id="atm-close-button" onclick="CloseTechnicalWindow(); return false;"></div>
+        <label>Технічні функції</label>
+    </div>
+    @foreach (var item in Model)
+    {
+        <div style="width: 50%; float: left;">
+            <a href="#" class="atm-nav-item atm-tech-button atm-color-blue" onclick="TellerTechnicalButtonSubmit('@item.Func_name')">@item.Op_name</a>
+        </div>
+    }
+</div>

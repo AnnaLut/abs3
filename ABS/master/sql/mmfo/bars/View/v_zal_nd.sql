@@ -1,13 +1,10 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAL_ND.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_ZAL_ND ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAL_ND ("PAP", "ND", "ND1", "PR_12", "ACC", "NLS", "KV", "OSTB", "OSTC", "PAWN", "MPAWN", "NREE", "DEPID", "CC_IDZ", "SDATZ", "RNK", "SV", "OB22", "MDATE", "DAZS", "DEL", "NAZN") AS 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/view/v_zal_nd.sql =========*** Run *** =====
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAL_ND ("PAP", "ND", "ND1", "PR_12", "ACC", "NLS", "KV", "OSTB", "OSTC", "PAWN", "MPAWN", "NREE", "DEPID", "CC_IDZ", "SDATZ", "RNK", "SV", "OB22", "R013", "MDATE", "DAZS", "DEL", "NAZN") AS 
   SELECT DISTINCT PAP,
                    nd,
                    nd1,
@@ -26,6 +23,7 @@ PROMPT *** Create  view V_ZAL_ND ***
                    rnk,
                    sv,
                    OB22,
+                   (select r013 from specparam sp where sp.acc = t.acc) R013,
                    mdate,
                    DAZS,
                    0 del,
@@ -85,14 +83,19 @@ PROMPT *** Create  view V_ZAL_ND ***
                   AND Az.acc = SZ.acc(+)
                   AND az.acc = n.acc(+)
                   AND n.ND = TO_NUMBER (pul.Get_Mas_Ini_Val ('ND'))
-                  AND pul.Get_Mas_Ini_Val ('PAP') = 2);
-
+                  AND pul.Get_Mas_Ini_Val ('PAP') = 2) t
+;
+ show err;
+ 
 PROMPT *** Create  grants  V_ZAL_ND ***
+grant SELECT                                                                 on V_ZAL_ND        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAL_ND        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ZAL_ND        to START1;
+grant SELECT                                                                 on V_ZAL_ND        to UPLD;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAL_ND.sql =========*** End *** =====
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/view/v_zal_nd.sql =========*** End *** =====
+ PROMPT ===================================================================================== 
+ 

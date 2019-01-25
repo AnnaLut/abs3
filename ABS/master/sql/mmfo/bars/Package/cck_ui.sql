@@ -302,10 +302,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
   nlchr CHAR(2) := chr(13) || chr(10);
   --------------------------------------
   PROCEDURE OP_OFR (p_ACC NUMBER) Is  -- для открытия счета OFR =Прострочена Фін.дебіторка=  для произвольного счета фин.деб ( не SK0) = p_acc
-    a8 accounts%rowtype ; 
-    a9 accounts%rowtype ; 
+    a8 accounts%rowtype ;
+    a9 accounts%rowtype ;
     s_Err1 varchar2(50) := 'ACC='|| p_ACC;
-    XX PRVN_FIN_DEB%rowtype ;    ff FIN_DEBT %rowtype;  
+    XX PRVN_FIN_DEB%rowtype ;    ff FIN_DEBT %rowtype;
     nTmp_ number ;
     l_Count int  := 1 ;
     x_nd number  ;
@@ -345,7 +345,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
            op_reg_ex(mod_=>99, p1_=>0, p2_=>0, p3_=>a8.grp, p4_=>nTmp_, rnk_=>a8.rnk, nls_=>a9.nls, kv_=>a8.kv, nms_=>a9.nms, tip_=>'OFR', isp_=>a8.isp,accR_=>a9.acc, tobo_ =>a8.branch);
            Accreg.setAccountSParam(a9.Acc, 'OB22',  a9.ob22);
 
-           If x_ND is not null then  insert into nd_acc (nd, acc) select n.nd, a9.acc from nd_acc n where acc = p_acc; end if; 
+           If x_ND is not null then  insert into nd_acc (nd, acc) select n.nd, a9.acc from nd_acc n where acc = p_acc; end if;
 
            If xx.acc_ss is not null then update PRVN_FIN_DEB set acc_sp = a9.acc, AGRM_ID = nvl(AGRM_ID, x_ND) where acc_ss = xx.acc_ss ;
            else                     Insert into PRVN_FIN_DEB(ACC_SS,acc_sp, AGRM_ID) values (p_acc, a9.acc, x_ND) ;
@@ -860,7 +860,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 bars_audit.info('6353 Check product result : '||v_ret);
     return v_ret;
   exception
-    when others then 
+    when others then
       return 0;
   end;
   ----------------------- получение № счета -----------------------------
@@ -1118,8 +1118,8 @@ bars_audit.info('6353 Check product result : '||v_ret);
 
     IF x_tip = 'SK9' or X_tip = 'OFR' THEN
 
-      BEGIN 
-        if x_tip= 'SK9' then 
+      BEGIN
+        if x_tip= 'SK9' then
            SELECT q.nls INTO stmp_ FROM accounts q, nd_acc w  WHERE w.nd = x_nd  AND q.acc = w.acc  AND q.ostc < 0 AND q.kv = x_kv AND q.dazs IS NULL   AND rownum = 1  AND  q.tip = 'SK0' ;
         else
            SELECT q.nls INTO stmp_ FROM accounts q, PRVN_FIN_DEB w, accounts x WHERE w.AGRM_ID=x_nd AND q.acc=w.acc_ss AND q.ostc<0 AND q.kv=x_kv AND q.dazs IS NULL AND w.acc_sp=x.acc and x.kv=x_kv and x.nls=x_nls ;
@@ -2760,20 +2760,20 @@ null;
 		
 	--COBUMMFO-8866
   for k in (select d.nd from cc_deal d
-		                  where d.sos >= 10 
-											  and d.sos <  15 
-												and d.wdate < gl.bDATE 
-												and d.vidd in (1,2,3,11,12,13)
-												and d.nd = l_nd or d.ndg = l_nd)
+              where d.sos >= 10 
+                and d.sos <  15 
+--                and d.wdate < gl.bDATE 
+                and d.vidd in (1,2,3,11,12,13)
+		and d.nd = l_nd or d.ndg = l_nd)
   loop 
-			 cck.cc_close(k.nd, l_err);
-			 
-			 if trim(l_err) is null then   
-					INSERT INTO cc_sob (ND,FDAT,ISP,TXT,otm) values (k.ND,gl.bDATE,gl.aUID,'Договір закритий.' ,6);
-			 elsif l_err IS NOT NULL THEN
-          raise_application_error(g_errn, g_errs || l_err);
-			 end if;  
-			  
+    cck.cc_close(k.nd, l_err);
+		 
+    if trim(l_err) is null then   
+      INSERT INTO cc_sob (ND,FDAT,ISP,TXT,otm) values (k.ND,gl.bDATE,gl.aUID,'Договір закритий.' ,6);
+    elsif l_err IS NOT NULL THEN
+      raise_application_error(g_errn, g_errs || l_err);
+    end if;  
+
   end loop;
   END cls;
   --------------

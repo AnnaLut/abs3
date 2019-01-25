@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CUST_EXTERN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CUST_EXTERN ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CUST_EXTERN ("RNK", "NAME", "DOC_TYPE", "DOC_NAME", "DOC_SERIAL", "DOC_NUMBER", "DOC_DATE", "DOC_ISSUER", "BIRTHDAY", "BIRTHPLACE", "SEX", "SEX_NAME", "ADR", "TEL", "EMAIL", "CUSTTYPE", "OKPO", "COUNTRY", "COUNTRY_NAME", "REGION", "FS", "FS_NAME", "VED", "VED_NAME", "SED", "SED_NAME", "ISE", "ISE_NAME", "NOTES") AS 
-  select ce.id         as rnk,
+create or replace view v_cust_extern as
+select ce.id         as rnk,
        ce.name,
        ce.doc_type,
        p.name        as doc_name,
@@ -36,7 +27,10 @@ PROMPT *** Create  view V_CUST_EXTERN ***
        s.name        as sed_name,
        ce.ise,
        i.name        as ise_name,
-       ce.notes
+       ce.notes,
+       ce.date_photo,
+       ce.eddr_id,
+       ce.actual_date
   from customer_extern ce,
        country         c,
        fs              f,
@@ -53,6 +47,37 @@ PROMPT *** Create  view V_CUST_EXTERN ***
    and ce.sed = s.sed(+)
    and ce.ise = i.ise(+)
  order by ce.id;
+comment on table V_CUST_EXTERN is 'Не клиенты банка (Представление)';
+comment on column V_CUST_EXTERN.RNK is 'РНК НЕ клиента';
+comment on column V_CUST_EXTERN.NAME is 'Наименование/ФИО';
+comment on column V_CUST_EXTERN.DOC_TYPE is 'Тип документа';
+comment on column V_CUST_EXTERN.DOC_NAME is 'Наименование документа';
+comment on column V_CUST_EXTERN.DOC_SERIAL is 'Серия документв';
+comment on column V_CUST_EXTERN.DOC_NUMBER is 'Номер документа';
+comment on column V_CUST_EXTERN.DOC_DATE is 'Дата выдачи документа';
+comment on column V_CUST_EXTERN.DOC_ISSUER is 'Место выдачи документа';
+comment on column V_CUST_EXTERN.BIRTHDAY is 'Дата рождения';
+comment on column V_CUST_EXTERN.BIRTHPLACE is 'Место рождения';
+comment on column V_CUST_EXTERN.SEX is 'Пол';
+comment on column V_CUST_EXTERN.SEX_NAME is 'Пол наименование';
+comment on column V_CUST_EXTERN.ADR is 'Адрес';
+comment on column V_CUST_EXTERN.TEL is 'Телефон';
+comment on column V_CUST_EXTERN.EMAIL is 'E_mail';
+comment on column V_CUST_EXTERN.CUSTTYPE is 'Признак (1-ЮЛ, 2-ФЛ)';
+comment on column V_CUST_EXTERN.OKPO is 'ОКПО';
+comment on column V_CUST_EXTERN.COUNTRY is 'Код страны';
+comment on column V_CUST_EXTERN.COUNTRY_NAME is 'Наименование страны';
+comment on column V_CUST_EXTERN.REGION is 'Код региона';
+comment on column V_CUST_EXTERN.FS is 'Форма собственности (K081)';
+comment on column V_CUST_EXTERN.FS_NAME is 'Форма собственности (K081) наименование';
+comment on column V_CUST_EXTERN.VED is 'Вид эк. деят-ти (K110)';
+comment on column V_CUST_EXTERN.VED_NAME is 'Вид эк. деят-ти (K110) наименование';
+comment on column V_CUST_EXTERN.SED is 'Орг.-правовая форма (K051)';
+comment on column V_CUST_EXTERN.SED_NAME is 'Орг.-правовая форма (K051) наименование';
+comment on column V_CUST_EXTERN.ISE is 'Инст. сектор экономики (K070)';
+comment on column V_CUST_EXTERN.ISE_NAME is 'Инст. сектор экономики (K070) наименование';
+comment on column V_CUST_EXTERN.NOTES is 'Комментарий';
+
 
 PROMPT *** Create  grants  V_CUST_EXTERN ***
 grant SELECT                                                                 on V_CUST_EXTERN   to BARSREADER_ROLE;
@@ -64,3 +89,4 @@ grant SELECT                                                                 on 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CUST_EXTERN.sql =========*** End *** 
 PROMPT ===================================================================================== 
+

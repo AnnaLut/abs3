@@ -273,11 +273,11 @@ var stpListChecked = new Array();
 function PutVisaButtonPressed(par) {
     // отчитка предыдущих ошибок
     errorData.clear();
-
     var grpId = document.getElementById('hid_grpid').value;
     var chkbList = document.getElementsByName('cnkbox');
     var chkbListChecked = new Array();
     stpListChecked = new Array();
+    var refArray = new Array();
 
     var idx = 0;
     for (i = 0; i < chkbList.length; i++) {
@@ -292,6 +292,7 @@ function PutVisaButtonPressed(par) {
                 doc.edited = (stpCheck.prty == 0 && stpCheck.checked) || (stpCheck.prty == 1 && !stpCheck.checked);
                 stpListChecked.push(doc);
             }
+            refArray.push(chkbListChecked[idx]);
             idx++;
         }
     }
@@ -301,8 +302,20 @@ function PutVisaButtonPressed(par) {
         window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
         return;
     }
-
     // продолжаем
+    var isTellerActive = $('#__ISTELLERACTIVE').val();
+    // если активен пользователь Теллера
+    if (isTellerActive === "1" && par === 0) {
+        CheckTellerDocs(refArray, chkbListChecked, grpId, par, true);
+    }
+    else if (isTellerActive === "1" && par > 0) {
+        CheckTellerDocs(refArray, chkbListChecked, grpId, par, false);
+    }
+    else {
+        PutVisa(chkbListChecked, grpId, par);
+    }
+}
+function PutVisa(chkbListChecked, grpId, par) {
     var msg = escape(LocalizedString('Message7')/*'Визировать отмеченые документы?'*/);
     if (par != 0) msg = escape(LocalizedString('Message8')/*'Сторнировать отмеченые документы?'*/);
     if (par == -1) msg = escape(LocalizedString('Message9')/*'Вернуть на одну визу отмеченые документы?'*/);
@@ -474,6 +487,28 @@ function PutVisaButtonPressed(par) {
             }
         }
     }
+}
+
+function CheckTellerDocs(refArray, chkbListChecked, grpId, par, isVisa) {
+    var method = isVisa ? "CheckVisaDocs" : "CheckStornoDocs";
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: '/barsroot/api/teller/teller/DocsAndTechnicalSubmit',
+        data: JSON.stringify({ Ref: refArray, method: method }),
+        success: function (data) {
+            if (data.Result && data.Result === 1) {
+                PutVisa(chkbListChecked, grpId, par);
+            }
+            else if (data.P_errtxt && data.P_errtxt !== '\n' && data.Result === 0) {
+                showNotification(data.P_errtxt);
+            }
+        },
+        error: function (err) {
+            alert(err.status + ' - ' + err.responseText);
+            showNotification("", 'error');
+        }
+    });
 }
 
 function SignDocsRecursive(lev, Docs, grpId, par, cbSuccess, cbError) {

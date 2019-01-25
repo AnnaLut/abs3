@@ -15,7 +15,7 @@
     TagPrefix="Bars" %>
 <%@ Register Src="../credit/usercontrols/DDLList.ascx" TagName="DDLList" TagPrefix="Bars" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-
+    <script type="text/javascript" src="JScriptFortab_linked_custs.js"></script>
     <%--<link rel="stylesheet" href="/Common/CSS/jquery/jquery.css " />--%>
 
     <%--<script type="text/javascript" src="../Scripts/jquery/jquery.min.js"></script>--%>  
@@ -89,6 +89,11 @@
                                                 SortExpression="DOC_DATE">
                                                 <ItemStyle HorizontalAlign="Center" />
                                             </asp:BoundField>
+                                            <%--COBUMMFO-8536 change start --%>
+                                            <asp:BoundField DataField="DATE_PHOTO" DataFormatString="{0:d}" HeaderText="Дата вклеювання фото" SortExpression="DATE_PHOTO"> <ItemStyle HorizontalAlign="Center" /> </asp:BoundField>
+                                            <asp:BoundField DataField="EDDR_ID" HeaderText="Унікальний номер запису в ЄДДР" SortExpression="EDDR_ID"></asp:BoundField>
+                                            <asp:BoundField DataField="ACTUAL_DATE" DataFormatString="{0:d}" HeaderText="Термін дії паспорту у вигляді ID-картки" SortExpression="ACTUAL_DATE"> <ItemStyle HorizontalAlign="Center" /> </asp:BoundField>
+                                            <%--COBUMMFO-8536 change end --%>
                                             <asp:BoundField DataField="DOC_ISSUER" HeaderText="Ким видано" SortExpression="DOC_ISSUER"></asp:BoundField>
                                             <asp:BoundField DataField="BIRTHDAY" DataFormatString="{0:d}" HeaderText="Дата народження"
                                                 SortExpression="BIRTHDAY">
@@ -213,7 +218,7 @@
                                                                                 </bars:DDLList>
                                                                             </td>
                                                                         </tr>
-                                                                        <tr>
+                                                                        <tr id="trDOC_SERIAL"> <%--COBUMMFO-8536--%>
                                                                             <td>
                                                                                 <asp:Label ID="DOC_SERIALTitle" runat="server" Text="Серія: "></asp:Label>
                                                                             </td>
@@ -247,6 +252,33 @@
                                                                             <td>
                                                                                 <bars:TextBoxString ID="DOC_ISSUER" runat="server" Width="300px" IsRequired="false"
                                                                                     ValidationGroup="Params" Value='<%# Bind("DOC_ISSUER") %>' />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr id="trACTUAL_DATE"> <%--COBUMMFO-8536--%>
+                                                                            <td>
+                                                                                <asp:Label ID="ACTUAL_DATETitle" runat="server" Text="Термін дії паспорту у вигляді ID-картки: "></asp:Label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <bars:TextBoxDate ID="ACTUAL_DATE" runat="server" IsRequired="false" ValidationGroup="Params"
+                                                                                    Value='<%# Bind("ACTUAL_DATE") %>' />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr id="trEDDR_ID"> <%--COBUMMFO-8536--%>
+                                                                            <td>
+                                                                                <asp:Label ID="EDDR_IDTitle" runat="server" Text="Унікальний номер запису в ЄДДР: "></asp:Label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <bars:TextBoxString ID="EDDR_ID" runat="server" Width="300px" IsRequired="false"
+                                                                                    ValidationGroup="Params" Value='<%# Bind("EDDR_ID") %>' />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr id="trDATE_PHOTO"> <%--COBUMMFO-8536--%>
+                                                                            <td>
+                                                                                <asp:Label ID="DATE_PHOTOTitle" runat="server" Text="Дата вклеювання фото: "></asp:Label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <bars:TextBoxDate ID="DATE_PHOTO" runat="server" IsRequired="false" ValidationGroup="Params"
+                                                                                    Value='<%# Bind("DATE_PHOTO") %>' />
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
@@ -469,7 +501,7 @@
                                                                                 </bars:DDLList>
                                                                             </td>
                                                                         </tr>
-                                                                        <tr>
+                                                                        <tr id="trDOC_SERIAL"> <%--COBUMMFO-8536--%>
                                                                             <td>
                                                                                 <asp:Label ID="DOC_SERIALTitle" runat="server" Text="Серія: "></asp:Label>
                                                                             </td>
@@ -503,6 +535,33 @@
                                                                             <td>
                                                                                 <bars:TextBoxString ID="DOC_ISSUER" runat="server" Width="300px" IsRequired="false"
                                                                                     ValidationGroup="Params" Value='<%# Bind("DOC_ISSUER") %>' />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr id="trACTUAL_DATE"> <%--COBUMMFO-8536--%>
+                                                                            <td>
+                                                                                <asp:Label ID="ACTUAL_DATETitle" runat="server" Text="Термін дії паспорту у вигляді ID-картки: "></asp:Label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <bars:TextBoxDate ID="ACTUAL_DATE" runat="server" IsRequired="false" ValidationGroup="Params"
+                                                                                    Value='<%# Bind("ACTUAL_DATE") %>' />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr id="trEDDR_ID"> <%--COBUMMFO-8536--%>
+                                                                            <td>
+                                                                                <asp:Label ID="EDDR_IDTitle" runat="server" Text="Унікальний номер запису в ЄДДР: "></asp:Label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <bars:TextBoxString ID="EDDR_ID" runat="server" Width="300px" IsRequired="false"
+                                                                                    ValidationGroup="Params" Value='<%# Bind("EDDR_ID") %>' />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr id="trDATE_PHOTO"> <%--COBUMMFO-8536--%>
+                                                                            <td>
+                                                                                <asp:Label ID="DATE_PHOTOTitle" runat="server" Text="Дата вклеювання фото: "></asp:Label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <bars:TextBoxDate ID="DATE_PHOTO" runat="server" IsRequired="false" ValidationGroup="Params"
+                                                                                    Value='<%# Bind("DATE_PHOTO") %>' />
                                                                             </td>
                                                                         </tr>
                                                                         <tr>

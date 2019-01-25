@@ -1,3 +1,4 @@
+
 set serveroutput on
 
 declare
@@ -124,16 +125,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Відділення', '', 30, 4, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', 'Ідентификатор', '', 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NAME', 'C', 'Наименование торговца-партнера', '', 255, 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'PTN_MFO', 'C', 'МФО банка партнера', '', 6, 5, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'PTN_NAME', 'C', 'Найменування партнера', '', 38, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'PTN_NLS', 'C', 'Рахунок партнера', '', 14, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'PTN_OKPO', 'C', 'Код партнера', '', 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'TYPE_ID', 'C', 'Тип торговца-партнера', '', 100, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ID_MATHER', 'N', 'Ідентифікатор материнської компанії', '', 22, 9, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'FLAG_A', 'N', 'Флаг активности', '', 22, 10, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Відділення', '', 30, 4, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', 'Ід.~партнера', '', 6, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 3, 'NAME', 'C', 'Найменування торговця-партнера', '', 255, 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 4, 'PTN_MFO', 'C', 'МФО банка~партнера', '', 6, 5, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 5, 'PTN_NAME', 'C', 'Найменування партнера', '', 38, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 6, 'PTN_NLS', 'C', 'Рахунок~партнера', '', 14, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 7, 'PTN_OKPO', 'C', 'Код~партнера', '', 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 8, 'TYPE_ID', 'C', 'Тип торговця-~партнера', '', 15, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 9, 'ID_MATHER', 'N', 'Ід. матер.~компанії', '', 22, 9, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 1);
+  bars_metabase.add_column(l_tabid, 10, 'FLAG_A', 'N', 'Флаг~ активності', '', 22, 10, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 1);
+  bars_metabase.add_column(l_tabid, 11, 'COMPENSATION', 'C', 'Наявність~компенсації', '', 3, 11, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 1);
+  bars_metabase.add_column(l_tabid, 12, 'PERCENT', 'N', '%  комісії', '', 10, 12, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 1);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BRANCH_OUR_MFO');
@@ -175,10 +178,25 @@ begin
   l_newtabid := bars_metabase.get_tabid('V_YESNO');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
   if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 11, l_newtabid, l_newcolid, 'TC', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица V_YESNO для описания сложного поля таблицы WCS_PARTNERS.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('V_YESNO');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
     bars_metabase.add_extrnval(l_tabid, 10, l_newtabid, l_newcolid, '', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица V_YESNO для описания сложного поля таблицы WCS_PARTNERS.');
   end if;
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'cck_dop.edit_partner(:ID,:NAME,:TYPE_ID,:BRANCH,:PTN_MFO,:PTN_NLS,:PTN_OKPO,:PTN_NAME,:ID_MATHER,:FLAG_A,:COMPENSATION,:PERCENT)');
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'cck_dop.edit_partner(:ID,:NAME,:TYPE_ID,:BRANCH,:PTN_MFO,:PTN_NLS,:PTN_OKPO,:PTN_NAME,:ID_MATHER,:FLAG_A,:COMPENSATION,:PERCENT)');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

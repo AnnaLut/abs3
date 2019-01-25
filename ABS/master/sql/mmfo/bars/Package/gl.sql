@@ -523,7 +523,6 @@ function USR_ID return number;
 END gl;
 /
 
-show errors;
 
 ----------------------------------------------------------------------
 
@@ -932,8 +931,33 @@ IS
 
 BEGIN
 
-
-
+-- блок проверки документов на разрешенность по условию Теллера.
+/*   declare
+       v_err varchar2(2000);
+       v_ret integer;
+       v_sql varchar2(2000);
+   begin
+      begin
+        v_sql := 'begin :1 := teller_tools.check_doc('''||tt_||''','||s_||','||sq_||','''||kv_||''','||ref_||', :2); end;';
+        bars_audit.info('Teller: start check ('||v_sql||')');
+        execute immediate v_sql using out v_ret, out v_err;
+      exception when others then
+        bars_audit.info('Teller: check error = '||sqlerrm);
+        v_ret := 0;
+      end;
+      bars_audit.info('Teller: result check ('||v_ret||','||v_err||')');
+      case v_ret
+        when -1 then
+          bars_error.raise_nerror('TEL','TELL_DOC1',v_err);
+        when -2 then
+          bars_error.raise_nerror('TEL','TELL_DOC2',v_err);
+        when -3 then
+          bars_error.raise_nerror('TEL','TELL_DOC3',v_err);
+        else
+          null;
+      end case;
+   end;
+*/
    IF uid_ IS NULL THEN
       id_ := gl.aUID;
    ELSE

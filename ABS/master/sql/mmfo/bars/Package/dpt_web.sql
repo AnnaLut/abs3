@@ -8297,6 +8297,12 @@ is
     t_dpt        t_dptacclist;
     l_branch     dpt_deposit.branch%type;
     l_errmsg     sec_audit.rec_message%type;
+
+    -- COBUMMFO-9690 Begin
+    l_module     varchar2(64);
+    l_action     varchar2(64);
+    -- COBUMMFO-9690 End
+
     cursor c_dpt
         is select d.DEPOSIT_ID, d.ND, d.VIDD, d.RNK, d.ACC
                 , i.ACRA, case when v.amr_metr > 0 then i.ACRB else null end
@@ -8343,6 +8349,8 @@ is
     bars_audit.trace( '%s: Entry, runid=>%s, bdate=>%s', title, to_char(p_runid), to_char(p_bdate,'dd.mm.yyyy') );
 
     l_branch := sys_context('bars_context','user_branch');
+
+    dbms_application_info.read_module(l_module, l_action); --COBUMMFO-9690
 
     if ( length(l_branch)=8 )
     then
@@ -8476,7 +8484,7 @@ is
 
     bars_audit.info( bars_msg.get_msg( g_modcode, 'AUTOCLOS_DONE', l_branch ) );
 
-    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_module(l_module, l_action /*NULL, NULL --COBUMMFO-9690*/);
     dbms_application_info.set_client_info(NULL);
 
     --exception
@@ -8872,6 +8880,7 @@ is
     l_bonusval  number;
     l_arest11   number := 0;
     l_type_cod  dpt_vidd.type_cod%type;
+    l_check_brid int_ratn.br%type;
 
     function get_bonusval(p_deposit_id in dpt_deposit.deposit_id%type)
       return number is
@@ -9042,9 +9051,20 @@ is
                       ', p_dptdata.cntdubl= ' ||
                       to_char(p_dptdata.cntdubl));
                                       
+      -- проверка!!!! COBUMMFO-10335
+      select max(v.br_id) keep (dense_rank last order by v.dateu, v.idu) 
+      into l_check_brid
+      from dpt_vidd_update v
+      where v.vidd =  p_dptdata.dptype
+      and v.dateu < p_dptdata.dptdat + 1;
+      
+      bars_audit.info(title||' l_check_br_id => '||to_char(l_check_brid));
+      ----- 
+                                      
       for ext in (select indv_rate indv_rate,
                          oper_id oper_id,
                          base_rate base_rate,
+                         old_base_rate old_base_rate, -- так раньше определялось
                          method_id method_id,
                          dpt.get_datend_uni(p_dptdata.datbeg,
                                             term_mnth,
@@ -9072,6 +9092,19 @@ is
                                       where v.vidd =  p_dptdata.dptype
                                       and v.dateu < p_dptdata.dptdat + 1)
                                  end base_rate,
+                                 case
+                                   when method_id not in (5, 9) then
+                                    base_rate
+                                   else
+                                     (select v.br_id
+                                       from dpt_vidd_update v
+                                      where v.vidd = p_dptdata.dptype
+                                        and dateu = (select max(dateu)
+                                                   from dpt_vidd_update v
+                                                   where v.vidd = p_dptdata.dptype
+                                                     and dateu <= p_dptdata.dptdat + 0.99999)
+                                        and rownum = 1)
+                                 end old_base_rate,
                                  method_id,
                                  ext_num,
                                  lead(ext_num) over(partition by type_id order by ext_num) - 1 next_num,

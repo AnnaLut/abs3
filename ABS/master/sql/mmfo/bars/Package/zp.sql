@@ -132,6 +132,9 @@ procedure set_central(p_mfo varchar2,p_nls varchar2, p_central number);
                            p_pass_num    out person.numdoc%type,
                            p_pass_card   out person.numdoc%type,
                            p_actual_date out person.actual_date%type);
+
+  -- пошук рахунка 6510. функція для використання у view (подавляються всі exception)
+  function get_nls_6510(p_fs in zp_deals.fs%type) return accounts.nls%type;
 end;
 /
 create or replace package body bars.zp
@@ -486,6 +489,20 @@ begin
 exception when no_data_found
     then  raise_application_error(-20000, 'По данному ЗП договору не знайдено OB22 для вказаної форми власності');
 end;
+
+  -- пошук рахунка 6510. функція для використання у view (подавляються всі exception)
+  function get_nls_6510(p_fs in zp_deals.fs%type) return accounts.nls%type
+  is
+    l_nls accounts.nls%type;
+  begin
+
+      l_nls := bars.nbs_ob22('6510', get_6510_ob22(p_fs));
+      return l_nls;
+
+  exception 
+    when others then
+      return null;
+  end get_nls_6510;
 
 --==============================
 --Запрос  буферa документа

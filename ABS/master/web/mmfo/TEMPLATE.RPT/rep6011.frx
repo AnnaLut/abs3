@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="10/18/2018 09:46:50" ReportInfo.Modified="12/21/2018 12:13:46" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQCMXwM5pBGCAsN825bIhcbE=" CommandTimeout="7000">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 NUMBERPLEDGE, CHAR01 PLEDGE_CODE, DAT00 PLEDGEDAY, CHAR02 S031, CHAR03 R030, NUM00 SUMPLEDGE, NUM01 PRICEPLEDGE, DAT01 LASTPLEDGEDAY, NUM02 CODREALTY, CHAR04 ZIPREALTY, NUM03 SQUAREREALTY, NUM04 REAL6INCOME, NUM05 NOREAL6INCOME, CHAR05 FLAGINSURANCEPLEDGE, NUM06 SUMBAIL, NUM07 SUMGUARANTEE, CHAR06 SCREDIT, CHAR07 STR_DAT1, CHAR08 STR_DAT2, CHAR09 BRANCH from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="STR_DAT1" DataType="System.String"/>
+        <Column Name="STR_DAT2" DataType="System.String"/>
+        <Column Name="NUMBERPLEDGE" DataType="System.String"/>
+        <Column Name="PLEDGE_CODE" DataType="System.String"/>
+        <Column Name="PLEDGEDAY" DataType="System.DateTime"/>
+        <Column Name="S031" DataType="System.String"/>
+        <Column Name="R030" DataType="System.String"/>
+        <Column Name="SUMPLEDGE" DataType="System.Decimal"/>
+        <Column Name="PRICEPLEDGE" DataType="System.Decimal"/>
+        <Column Name="LASTPLEDGEDAY" DataType="System.DateTime"/>
+        <Column Name="CODREALTY" DataType="System.Decimal"/>
+        <Column Name="ZIPREALTY" DataType="System.String"/>
+        <Column Name="SQUAREREALTY" DataType="System.Decimal"/>
+        <Column Name="REAL6INCOME" DataType="System.Decimal"/>
+        <Column Name="NOREAL6INCOME" DataType="System.Decimal"/>
+        <Column Name="FLAGINSURANCEPLEDGE" DataType="System.String"/>
+        <Column Name="SUMBAIL" DataType="System.Decimal"/>
+        <Column Name="SUMGUARANTEE" DataType="System.Decimal"/>
+        <Column Name="SCREDIT" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="540" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1965.6" Height="66.15">
+      <TableObject Name="Tabl" Width="1937.25" Height="66.15" Border.Lines="All">
+        <TableColumn Name="Column50" Width="47.25"/>
+        <TableColumn Name="Column51" Width="132.3"/>
+        <TableColumn Name="Column52" Width="132.3"/>
+        <TableColumn Name="Column53" Width="75.6"/>
+        <TableColumn Name="Column54" Width="56.7"/>
+        <TableColumn Name="Column55" Width="56.7"/>
+        <TableColumn Name="Column56" Width="189"/>
+        <TableColumn Name="Column57" Width="132.3"/>
+        <TableColumn Name="Column58" Width="103.95"/>
+        <TableColumn Name="Column59" Width="132.3"/>
+        <TableColumn Name="Column60" Width="94.5"/>
+        <TableColumn Name="Column61" Width="103.95"/>
+        <TableColumn Name="Column62" Width="179.55"/>
+        <TableColumn Name="Column63" Width="198.45"/>
+        <TableColumn Name="Column64" Width="151.2"/>
+        <TableColumn Name="Column65" Width="151.2"/>
+        <TableRow Name="Row10" Height="28.35">
+          <TableCell Name="Cell131" Text="Звіт про кредитні операції банку з боржником - фізичною/юридичною особою" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="13"/>
+          <TableCell Name="Cell132" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell133" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell134" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell135" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell136" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell137" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell138" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell139" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell140" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell141" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell142" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell143" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell144" Text="Надруковано [Date]" ColSpan="3"/>
+          <TableCell Name="Cell145" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell146" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell147" Text="Інформація щодо забезпечення за кредитною операцією з боржником - юридичною особою" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="13"/>
+          <TableCell Name="Cell148" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell149" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell150" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell151" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell152" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell153" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell154" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell155" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell156" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell157" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell158" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell159" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell160" ColSpan="3" RowSpan="2"/>
+          <TableCell Name="Cell161"/>
+          <TableCell Name="Cell162"/>
+        </TableRow>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell163" Text="Останній звіт сформований в період з [Table.STR_DAT1] по [Table.STR_DAT2] по відділенню [Table.BRANCH]" HorzAlign="Center" VertAlign="Center" ColSpan="13"/>
+          <TableCell Name="Cell164" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell165" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell166" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell167" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell168" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell169" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell170" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell171" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell172" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell173" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell174" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell175" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell176"/>
+          <TableCell Name="Cell177"/>
+          <TableCell Name="Cell178"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="187.55" Width="1965.6" Height="28.35" DataSource="Table">
+      <TableObject Name="Table2" Width="1937.25" Height="28.35" Border.Lines="All">
+        <TableColumn Name="Column39" Width="47.25"/>
+        <TableColumn Name="Column2" Width="132.3"/>
+        <TableColumn Name="Column3" Width="132.3"/>
+        <TableColumn Name="Column4" Width="75.6"/>
+        <TableColumn Name="Column5" Width="56.7"/>
+        <TableColumn Name="Column6" Width="56.7"/>
+        <TableColumn Name="Column7" Width="189"/>
+        <TableColumn Name="Column8" Width="132.3"/>
+        <TableColumn Name="Column9" Width="103.95"/>
+        <TableColumn Name="Column10" Width="132.3"/>
+        <TableColumn Name="Column11" Width="94.5"/>
+        <TableColumn Name="Column12" Width="103.95"/>
+        <TableColumn Name="Column13" Width="179.55"/>
+        <TableColumn Name="Column14" Width="170.1"/>
+        <TableColumn Name="Column17" Width="151.2"/>
+        <TableColumn Name="Column18" Width="179.55"/>
+        <TableRow Name="Row5" Height="28.35">
+          <TableCell Name="Cell58" Border.Lines="All" Text="[Row#]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[Table.NUMBERPLEDGE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[Table.PLEDGE_CODE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[Table.PLEDGEDAY]" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="[Table.S031]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell6" Border.Lines="All" Text="[Table.R030]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="[Table.SUMPLEDGE]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[Table.PRICEPLEDGE]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[Table.LASTPLEDGEDAY]" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="[Table.CODREALTY]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell11" Border.Lines="All" Text="[Table.ZIPREALTY]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell12" Border.Lines="All" Text="[Table.SQUAREREALTY]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="[Table.SUMBAIL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell14" Border.Lines="All" Text="[Table.SUMGUARANTEE]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="[IIf([Table.scredit]==&quot;true&quot;, &quot;1&quot;, (IIf([Table.scredit]==&quot;false&quot;, &quot;2&quot;, &quot; &quot;)))]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="[IIf([Table.FLAGINSURANCEPLEDGE]==&quot;true&quot;, &quot;1&quot;, (IIf([Table.FLAGINSURANCEPLEDGE]==&quot;false&quot;, &quot;2&quot;, &quot; &quot;)))]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="70.15" Width="1965.6" Height="113.4">
+        <TableObject Name="Table1" Width="1937.25" Height="113.4" Border.Lines="All">
+          <TableColumn Name="Column20" Width="47.25"/>
+          <TableColumn Name="Column21" Width="132.3"/>
+          <TableColumn Name="Column22" Width="132.3"/>
+          <TableColumn Name="Column23" Width="75.6"/>
+          <TableColumn Name="Column24" Width="56.7"/>
+          <TableColumn Name="Column25" Width="56.7"/>
+          <TableColumn Name="Column26" Width="189"/>
+          <TableColumn Name="Column27" Width="132.3"/>
+          <TableColumn Name="Column28" Width="103.95"/>
+          <TableColumn Name="Column29" Width="132.3"/>
+          <TableColumn Name="Column30" Width="94.5"/>
+          <TableColumn Name="Column31" Width="103.95"/>
+          <TableColumn Name="Column32" Width="179.55"/>
+          <TableColumn Name="Column33" Width="170.1"/>
+          <TableColumn Name="Column36" Width="151.2"/>
+          <TableColumn Name="Column37" Width="179.55"/>
+          <TableRow Name="Row2" Height="66.15">
+            <TableCell Name="Cell39" Border.Lines="All" Text="N з/п" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell40" Border.Lines="All" Text="Номер договору застави/іпотеки, гарантії, поруки, грошового покриття" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell41" Border.Lines="All" Text="Номер кредитного договору" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell42" Border.Lines="All" Text="Дата укладання договору застави/іпотеки, гарантії, поруки, грошового покриття" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell43" Border.Lines="All" Text="Вид забезпечення" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell44" Border.Lines="All" Text="Код валюти забезпечення" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell45" Border.Lines="All" Text="Вартість забезпечення згідно з договором" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell46" Border.Lines="All" Text="Вартість забезпечення згідно з висновком суб'єкта оціночної діяльності" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell47" Border.Lines="All" Text="Дата останньої оцінки забезпечення" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell48" Border.Lines="All" Text="Вид нерухомого майна" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell49" Border.Lines="All" Text="Поштовий індекс місця розташування нерухомого майна" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell50" Border.Lines="All" Text="Загальна площа нерухомого майна" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell51" Border.Lines="All" Text="Сума поруки" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell52" Border.Lines="All" Text="Сума гарантії" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell55" Border.Lines="All" Text="Страхування кредиту" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell56" Border.Lines="All" Text="Страхування забезпечення" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          </TableRow>
+          <TableRow Name="Row4" Height="47.25">
+            <TableCell Name="Cell20" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell21" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell22" Border.Lines="All" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell23" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell24" Border.Lines="All" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell25" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell26" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell27" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell28" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell29" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell30" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell31" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell32" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell33" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell36" Border.Lines="Left, Right, Bottom" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell37" Border.Lines="Left, Right, Bottom" HorzAlign="Center" VertAlign="Center"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>

@@ -61,6 +61,7 @@ function Validate(form) {
         if (!chkSUM("SumA")) return false;
         if (!chkSUM("SumB")) return false;
         if (!chkSUM("SumC")) return false;
+        checkSumForSmall("SumA");
         // временно убрал проверки на дату документа и две даты валютирования(+/- 10 дней от банковской)
         // Сергею Горобцу необходимо реализовать корректную работу с корректирующими проводками,
         // после чего восстановить проверки, см. Centura
@@ -429,6 +430,27 @@ function chkSUM(id) {
     document.getElementById(id).select();
     return false;
 }
+
+//Проверка на необходимость ввода малых купюр и монеток
+function checkSumForSmall(id) {
+    var result;
+    var sum = GetValue(id);
+    if (document.getElementById(id).style.visibility == 'hidden') return true;
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: '/barsroot/api/Teller/Teller/CheckSmall',
+        data: JSON.stringify(sum),
+        success: function (e) {
+            result = e;
+        },
+        error: function (result) {
+
+        }
+    });
+}
+
 //Проверка обязательных допреквизитов
 function chkMandDrec(form) {
     //Обязательные поля
@@ -634,6 +656,8 @@ function AskBeforePay() {
     var kop_a = Math.pow(10, document.getElementById("__DIGA").value);
     var kop_b = Math.pow(10, document.getElementById("__DIGB").value);
     var elem = GetValue("SumC");
+    var swi = document.getElementById("__ISSWI").value;
+    var tt = document.getElementById("__TT").value;
     var height = 250;
     if (elem > 0) {
         paramlist += "Sum=" + Math.round(elem * kop_a)
@@ -651,6 +675,13 @@ function AskBeforePay() {
             return false;
         }
     }
+    //SWI and TELLER params
+    if (swi)
+        paramlist += "&SWI=" + swi;
+    else
+        paramlist += "&SWI=" + "0";
+    if (tt)
+        paramlist += "&TT=" + tt;
     // не проверять красное сальдо и блокировку
     var flag38 = document.getElementById("__FLAGS").value.substr(38, 1);
     if (document.getElementById("__WARNPAY").value != "" && flag38 == "0") {
@@ -664,7 +695,14 @@ function AskBeforePay() {
     }
     var result = window.showModalDialog("AskBeforePay.aspx" + paramlist, null,
         "dialogWidth:500px; dialogHeight:" + height + "px; center:yes; status:no; resizable:yes; help:no;");
-    return result;
+    if (result && result.result) {
+        var notified = result.swiNotified === true ? "1" : "0";
+        if ($("#_ISSWINOTIFIED").length)
+            $("#_ISSWINOTIFIED").val(notified);
+    }
+    if (result === undefined || result === null || result === 'undefined')
+        return result;
+    return result.result;
 }
 
 // проверка символа кассового плана
@@ -874,9 +912,13 @@ function selectDopReq(evt, name, fl) {
             window,
             "dialogWidth:600px;dialogHeight:600px;center:yes;edge:sunken;help:no;status:no;");
         if (result != null) {
-            if (name === "reqv_INK_I")
+            if (name === "reqv_INK_I") {
                 BindIncasatorsData(result[0]);
-            elem.value = result[0];
+                elem.value = result[1];
+            }
+            else
+                elem.value = result[0];
+
             elem.fireEvent("onchange");
             // COBUSUPABS-4641
             if ("reqw_D9#70" === name) {
