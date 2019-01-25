@@ -105,7 +105,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.30 07/12/2018';
+g_body_version constant varchar2(64)  := 'Version 1.31 25/01/2019';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -1649,7 +1649,7 @@ is
    i  number := 0;
    l_lines_count number;
    l_trace   varchar2(1000) := 'get_cvk_file';
-
+   l_iban    varchar2(29) := lpad(' ',29);
 begin
    bars_audit.info(l_trace||'старт формирования файлов');
    delete from dpa_lob where userid = user_id;
@@ -1742,8 +1742,8 @@ begin
              dbms_lob.append(l_clob, l_system_info||l_header_info);
           end if;
 
-          l_file_line :=  lpad(c.mfoa, 9) || lpad(c.nlsa,14) ||
-                          lpad(c.mfob, 9) || lpad(c.nlsb,14) ||
+          l_file_line :=  lpad(c.mfoa, 9) || lpad(c.nlsa,14) || l_iban ||
+                          lpad(c.mfob, 9) || lpad(c.nlsb,14) || l_iban ||
                           to_char(c.dk)||
                           lpad(c.s,16) ||
                           lpad(c.vob, 2)||
