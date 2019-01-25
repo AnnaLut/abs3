@@ -117,13 +117,14 @@ END XOZ;
 
 /
  
-CREATE OR REPLACE PACKAGE BODY BARS.XOZ IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 4  24.09.2018-1';
+CREATE OR REPLACE PACKAGE BODY XOZ IS
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 4  11.01.2019';
 --------------------------------------------
-
 /*
-  21.09.2018 Sta Контроль логики функции и уровня пользователя
+  11.01.2019 Sta В проводке по відшкодуванню(xoz.XOZ7) ид.коді ЦА + РУ.
+                 В назн.пл добавлено название РУ
 
+  21.09.2018 Sta Контроль логики функции и уровня пользователя
   19.09.2018 Sta Отказываемся от деб.запрсов через ВПС
   20.04.2018 Sta Протоколирование закрытия хоз.деб вs sec_AUDIT c принзаком XOZ_AUDIT
   29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
@@ -299,6 +300,9 @@ procedure XOZ7   ( p_mode int,  -- 2 - разметка для проводок. 77 - проверка бала
    o1 oper%rowtype;
    oo oper%rowtype;
    xx xoz_ref%rowtype;
+
+   Nam_RU varchar2(38);
+
 begin
    bc.go('/');
 
@@ -346,18 +350,22 @@ If p_mode = 77 then  -- оплатить
 
    bc.go('300465');
    begin select * into aa from accounts where kf ='300465' and kv = 980 and dazs is null and nls = aa.nls ;
+         select okpo, substr(name,1,38) into oo.id_b, oo.nam_b from banks_ru where mfo = o1.Mfoa;
+         Nam_RU := oo.nam_b ;
    EXCEPTION WHEN NO_DATA_FOUND THEN     bc.go('/');  raise_application_error(-20000, 'XOZ7 НЕ знайдено транз.рах.300465/'|| aa.nls );
    end;
 
-   oo.nam_a := Substr(aa.nms,1,38) ;  --\  транзитник
-   oo.nlsa  := aa.nls   ;  -- \
-   oo.mfoa  := aa.KF    ;  -- /
    oo.id_a  := gl.aOkpo ;  --/
+   oo.nam_a := Substr( GetGlobalOption('GLB-NAME'),1,38) ;
+   oo.nlsa  := aa.nls   ;  -- \
+   oo.mfoa  := gl.aMfo  ;  -- /
+
    oo.nd    := Substr(xx.REFD,1,10) ;
    oo.mfob  := o1.Mfoa  ;
-   oo.nazn  := p_NAZN   ;
+   oo.nazn  := Substr(p_NAZN ||' '||oo.nam_b,1,160) ;
    oo.vob   := 6 ;
    oo.vdat  := gl.bdate ; 
+
    ----------------
    oo.dk    := 1  ;
    oo.tt := 'MNK' ;
@@ -392,7 +400,7 @@ If p_mode = 77 then  -- оплатить
          oo.s2    := k.s7  ;
          oo.nam_b := substr(k.nms,1,38) ;
          oo.nlsb  := k.nls ;
-         oo.nazn  := NVL( k.nazn, p_nazn);
+         oo.nazn  := Substr(NVL( k.nazn, p_nazn)||' '||Nam_RU,1,160) ;
 
          gl.in_doc3 (ref_ => oo.REF  , tt_   => oo.tt   ,  vob_ => oo.vob ,  nd_ => oo.nd, pdat_ =>SYSDATE, vdat_=>oo.vdat ,  dk_ =>oo.dk,
                       kv_ => oo.kv   , s_    => oo.S    ,  kv2_ => oo.kv2 ,  s2_ => oo.S2, sk_   => null  , data_=>gl.BDATE, datp_=>gl.bdate,
@@ -1001,7 +1009,11 @@ end REZ;
 
 --------------
 END XOZ;
+
 /
 show err;
  
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/xoz.sql =========*** End *** =======
+ PROMPT ===================================================================================== 
  
