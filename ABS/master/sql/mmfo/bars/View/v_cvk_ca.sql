@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CVK_CA ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CVK_CA ("MFO", "NB", "NLS", "DAOS", "VID", "TVO", "NAME_BLOK", "FIO_BLOK", "FIO_ISP", "INF_ISP", "ADDR", "OKPO") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CVK_CA ("MFO", "NB", "NLS", "DAOS", "VID", "TVO", "NAME_BLOK", "FIO_BLOK", "FIO_ISP", "INF_ISP", "ADDR", "OKPO", "INF_ISP2") AS 
   WITH ps264
         AS (SELECT nbs
               FROM ps
@@ -44,9 +44,15 @@ PROMPT *** Create  view V_CVK_CA ***
              FROM branch_parameters
             WHERE tag = 'ADR_BRANCH' AND branch = s.branch)
              addr,
-          c.okpo
+          c.okpo,
+          (SELECT MIN (SUBSTR (VALUE, 1, 38))
+             FROM accountsw
+            WHERE acc = s.acc AND tag = 'CVK_INF2')
+             inf_isp2
      FROM accounts s, ps264, customer c
     WHERE s.nbs = ps264.nbs AND s.dazs IS NULL AND s.rnk = c.rnk;
+
+comment on column BARS.V_CVK_CA.inf_isp2 is 'Інформація про працівника банку, відповідального за ведення рахунка виборчого фонду кандидата (номер телефону, адреса електронної пошти)';
 
 PROMPT *** Create  grants  V_CVK_CA ***
 grant SELECT                                                                 on V_CVK_CA        to BARSREADER_ROLE;

@@ -1662,7 +1662,7 @@ begin
          select  row_number() over (order by nls) rown,
                             count(*)     over()  cnt,
                             MFO,   NB,   NLS,   DAOS,   VID,   TVO,   NAME_BLOK as name_block,   FIO_BLOK as fio_block,
-                            FIO_ISP,   INF_ISP,   ADDR,   OKPO
+                            FIO_ISP,   INF_ISP,   ADDR,   OKPO, INF_ISP2
                       from  v_cvk_ca
                    ) loop
 
@@ -1689,7 +1689,8 @@ begin
                          rpad (c.name_block, 38)||
                          lpad (c.okpo, 10)||
                          rpad (c.fio_block, 76)||
-                         rpad (c.inf_isp, 38)||l_nl;
+                         rpad (c.inf_isp, 38)||
+                         rpad (c.inf_isp2, 38)||l_nl;
 
            dbms_lob.append(l_clob, l_file_line);
            bars_audit.info(l_trace||'строка:'||l_file_line);
