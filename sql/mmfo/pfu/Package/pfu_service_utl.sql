@@ -5155,8 +5155,11 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
           into l_file_lines
         from pfu_epp_line_bnk_state2 s
              inner join pfu_epp_line e on e.id = s.epp_line_id
-        where s.state_id = 20
-              and e.bank_mfo = rec_mfo.mfo
+        where -- COBUMMFO-10632 -- закоментував s.state_id = 20 бо банк править на стороні барса вручну дані
+              -- і звідти можуть приходити коректні дані по тим строкам, по яким тут помилки 
+              -- таким чином відправляєм запрос на стан по всім строкам за останніх 5 днів
+              -- s.state_id = 20
+              e.bank_mfo = rec_mfo.mfo
               and trunc(sysdate) - 5 >= s.create_date;
 
       if (l_file_lines.count > 0) then
