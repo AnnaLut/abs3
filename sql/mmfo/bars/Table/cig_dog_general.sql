@@ -316,6 +316,19 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index IDX_CIGDOGGENERAL_CUSTID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIGDOGGENERAL_CUSTID ON BARS.CIG_DOG_GENERAL (CUST_ID, BRANCH) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
 PROMPT *** Create  grants  CIG_DOG_GENERAL ***
 grant SELECT                                                                 on CIG_DOG_GENERAL to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CIG_DOG_GENERAL to BARS_ACCESS_DEFROLE;
