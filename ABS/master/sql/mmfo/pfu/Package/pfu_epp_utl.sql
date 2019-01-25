@@ -675,7 +675,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
              p_state_id,
              p_create_date,
              p_comm,
-             case when p_state_id not in (20) then 1 else null end,
+             -- stage_ticket = null -- в любому випадку статуси піднімуться після 5 днів по всім строкам (pfu_service_utl.prepare_checkissuecard)
+             null, -- case when p_state_id not in (20) then 1 else null end, -- 
              l_error_stack,
              e.epp_number,
              /*case when p_type_card like '%NSMEP%' and e.displaced_person_flag = '1' and e.pens_type in ('1','2') then '1'
