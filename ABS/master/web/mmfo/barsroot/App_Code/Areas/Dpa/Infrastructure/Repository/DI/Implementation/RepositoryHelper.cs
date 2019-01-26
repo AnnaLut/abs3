@@ -7,6 +7,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
 
 public class RepositoryHelper
 {
@@ -27,13 +28,13 @@ public class RepositoryHelper
         List<FileResponse> fileList = new List<FileResponse>();
         for (int j = 1; j < count + 1; j++)
         {
-            var  p = new  OracleParameter[4];
+            var p = new OracleParameter[4];
             FileResponse file = new FileResponse();
 
-            p[0] = new OracleParameter("p_filetype", OracleDbType.Varchar2,  4000,  fileType,  ParameterDirection.Input);
-            p[1] = new OracleParameter("p_file_number", OracleDbType.Int32,  j, direction: ParameterDirection.Input);
-            p[2] = new OracleParameter("p_filename", OracleDbType.Varchar2,  4000,  ParameterDirection.Output);
-            p[3] = new OracleParameter("l_clob", OracleDbType.Clob,    ParameterDirection.ReturnValue);
+            p[0] = new OracleParameter("p_filetype", OracleDbType.Varchar2, 4000, fileType, ParameterDirection.Input);
+            p[1] = new OracleParameter("p_file_number", OracleDbType.Int32, j, direction: ParameterDirection.Input);
+            p[2] = new OracleParameter("p_filename", OracleDbType.Varchar2, 4000, ParameterDirection.Output);
+            p[3] = new OracleParameter("l_clob", OracleDbType.Clob, ParameterDirection.ReturnValue);
 
             //var sql = @"bars_dpa.get_cvk_file";
 
@@ -45,11 +46,43 @@ public class RepositoryHelper
                 oraCommand.Parameters.AddRange(p);
                 oraCommand.ExecuteNonQuery();
             }
-        
+
             file.fileName = p[2].Value.ToString();// p.Get<string>("p_filename");
             file.fileBody = p[3].Value.ToString();// p.Get<string>("l_clob");
 
         }
+        return fileList;
+    }
+
+    public List<FileResponse> SaveCAFiles(decimal id, string fileType)
+    {
+        List<FileResponse> fileList = new List<FileResponse>();
+        var p = new OracleParameter[4];
+        FileResponse file = new FileResponse();
+
+        p[0] = new OracleParameter("p_filetype", OracleDbType.Varchar2, 4000, fileType, ParameterDirection.Input);
+        p[1] = new OracleParameter("p_file_number", OracleDbType.Int32, id, direction: ParameterDirection.Input);
+        p[2] = new OracleParameter("p_filename", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+        p[3] = new OracleParameter("l_clob", OracleDbType.Clob, ParameterDirection.ReturnValue);
+
+        using (var connection = OraConnector.Handler.UserConnection)
+        using (OracleCommand oraCommand = connection.CreateCommand())
+        {
+            oraCommand.BindByName = true;
+            oraCommand.CommandText = "bars_dpa.get_cvk_file";
+            oraCommand.CommandType = CommandType.StoredProcedure;
+            oraCommand.Parameters.AddRange(p);
+            oraCommand.ExecuteNonQuery();
+
+            file.fileName = p[2].Value.ToString();// p.Get<string>("p_filename");
+            using (OracleClob data = (OracleClob)p[3].Value)
+            {
+                file.fileBody = data.Value;
+            }
+        }
+
+        fileList.Add(file);
+
         return fileList;
     }
 
