@@ -13,6 +13,7 @@ using Oracle.DataAccess.Types;
 using Bars.Oracle;
 using System.Web;
 using Bars.Web.Report;
+using System.Text.RegularExpressions;
 
 public class RegisterCountsDPARepository : IRegisterCountsDPARepository
 {
@@ -381,7 +382,7 @@ SELECT t.rowid AS idrow
             List<CVFile> gridList = grid.ToObject<List<CVFile>>();
             List<FileResponse> filesList = new List<FileResponse>();
 
-            path = _helper.GetDirectoryPathAndCheckIt(branch,  "cvo_", fileType);
+            path = _helper.GetDirectoryPathAndCheckIt(branch, "cvo_", fileType);
 
             //выполняем insert grid во временную таблицу
             for (int i = 0; i < gridList.Count; i++)
@@ -406,6 +407,39 @@ SELECT t.rowid AS idrow
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.LoadXml(file.fileBody);
                 xdoc.Save(path + '/' + file.fileName);
+            }
+        }
+        else if (fileType == "CA")
+        {
+            List<CVFile> gridList = grid.ToObject<List<CVFile>>();
+            List<FileResponse> filesList = new List<FileResponse>();
+
+            path = _helper.GetDirectoryPathAndCheckIt(branch, "cao_", fileType);
+
+            //выполняем insert grid во временную таблицу
+            for (int i = 0; i < gridList.Count; i++)
+            {
+                p = new DynamicParameters();
+                p.Add("p_ref", dbType: DbType.Decimal, value: gridList[i].OPLDOC_REF, direction: ParameterDirection.Input);
+
+                sql = @"begin
+                        bars_dpa.insert_data_to_temp(:p_ref);
+                     end;";
+
+                using (var connection = OraConnector.Handler.UserConnection)
+                {
+                    connection.Execute(sql, p);
+                }
+            }
+
+            filesList = GetList(fileType, entereddate);
+
+            foreach (var file in filesList)
+            {
+                //XmlDocument xdoc = new XmlDocument();
+                //xdoc.LoadXml(file.fileBody);
+                //xdoc.Save(path + '/' + file.fileName);
+                File.WriteAllText(path + Path.DirectorySeparatorChar + CheckPath(file.fileName), file.fileBody);
             }
         }
         else if (fileType == "K")
@@ -452,9 +486,18 @@ SELECT t.rowid AS idrow
         return new { path = path, filename = filename };
     }
 
+    private string CheckPath(string _path)
+    {
+        string regexSearch = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+        Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+        return r.Replace(_path, "");
+    }
+
     public List<FileResponse> GetList(string fileType, string entereddate)
     {
         var count = _helper.FormCVFilesAndGetCount(fileType, entereddate);
+        if (fileType == "CA")
+            return _helper.SaveCAFiles(count, fileType);
         return _helper.SaveCVFiles(count, fileType);
     }
 
@@ -649,8 +692,8 @@ SELECT t.rowid AS idrow
         if (fileType == "F")
         {
             p = new OracleParameter[2];
-            p[0] =  new OracleParameter("p_filename", OracleDbType.Varchar2,  100, fileName,  ParameterDirection.Input);
-            p[1] =  new OracleParameter("p_filedata", OracleDbType.Clob, fileBody, ParameterDirection.Input);
+            p[0] = new OracleParameter("p_filename", OracleDbType.Varchar2, 100, fileName, ParameterDirection.Input);
+            p[1] = new OracleParameter("p_filedata", OracleDbType.Clob, fileBody, ParameterDirection.Input);
 
             //sql = @"begin
             //            bars_dpa.ins_ticket(:p_filename, :p_filedata);
@@ -670,21 +713,21 @@ SELECT t.rowid AS idrow
             p = new OracleParameter[3];
             p[0] = new OracleParameter("p_filename", OracleDbType.Varchar2, 100, fileName, ParameterDirection.Input);
             p[1] = new OracleParameter("p_filedata", OracleDbType.Clob, fileBody, ParameterDirection.Input);
-            p[2] = new OracleParameter("p_tickname", OracleDbType.Varchar2,4000,null, direction: ParameterDirection.Output);
-            
+            p[2] = new OracleParameter("p_tickname", OracleDbType.Varchar2, 4000, null, direction: ParameterDirection.Output);
+
             //sql = @"begin
             //            bars_dpa.ins_r0(:p_filename, :p_filedata, :p_tickname);
             //         end;";
-           
+
             using (var connection = OraConnector.Handler.UserConnection)
             {
-                OracleCommand oraCommand  =  connection.CreateCommand();
+                OracleCommand oraCommand = connection.CreateCommand();
                 oraCommand.CommandText = "bars_dpa.ins_r0";
                 oraCommand.CommandType = CommandType.StoredProcedure;
                 oraCommand.Parameters.AddRange(p);
                 oraCommand.ExecuteNonQuery();
             }
-           
+
             string p_tickname = p[2].Value.ToString();// p.Get<string>("p_tickname");
 
             sql = @"select 

@@ -2172,6 +2172,9 @@
             },
             {
                 text: "Файл @K - ДПА", value: "K"
+            },
+            {
+                text: "Файл CA - ДПА", value: "CA"
             }
         ];
     }
@@ -2185,6 +2188,9 @@
             },
             {
                 text: "Файл CV - ДПА", value: "CV"
+            },
+            {
+                text: "Файл CA - ДПА", value: "CA"
             }
         ];
     }
@@ -2518,7 +2524,7 @@
         var gridElement = angular.element("#formFilesReportsGrid").data("kendoGrid");
         var gridData = gridElement.dataSource.view();
 
-        $scope.CloseWindow("Accept")
+        $scope.CloseWindow("Accept");
         if (!handleSaveChanges(gridElement))
             return false;
 
