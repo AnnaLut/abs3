@@ -1792,8 +1792,15 @@ end;
 function get_cvk_file(p_filetype varchar2, p_file_number number, p_filename out varchar2) return clob
 is
    l_clob clob;
+   l_filename varchar2(4000);
 begin
-   select file_data, file_name into l_clob,  p_filename from dpa_lob where id = p_file_number and userid = user_id;
+   select file_data, file_name 
+   into l_clob,  l_filename 
+   from dpa_lob 
+   where id = p_file_number and userid = user_id;
+
+   p_filename := l_filename;
+
    return l_clob;
 end;
 
