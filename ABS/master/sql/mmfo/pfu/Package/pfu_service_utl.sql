@@ -5160,7 +5160,9 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
               -- таким чином відправляєм запрос на стан по всім строкам за останніх 5 днів
               -- s.state_id = 20
               e.bank_mfo = rec_mfo.mfo
-              and trunc(sysdate) - 5 >= s.create_date;
+              and trunc(sysdate) - 5 >= s.create_date
+              and s.state_id in (7,20)
+              and pfu_result is null;
 
       if (l_file_lines.count > 0) then
 
