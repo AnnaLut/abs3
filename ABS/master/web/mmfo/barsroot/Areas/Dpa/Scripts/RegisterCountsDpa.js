@@ -1280,10 +1280,10 @@
                                 }
                             },
                             FIO_ISP: {
-                                type: 'string',
-                                validation: {
-                                    required: { message: "Поле ФІО обов'язкове!" }
-                                }
+                                type: 'string'
+                                //validation: {
+                                //    required: { message: "Поле ФІО обов'язкове!" }
+                                //}
                             },
                             INF_ISP: {
                                 type: 'string',
