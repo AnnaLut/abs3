@@ -196,8 +196,8 @@ SELECT t.rowid AS idrow
         }
         else if (fileType == "CA")
         {
-            var sql = @"select mfo, nb, nls, daos, vid, tvo, name_blok,
-                    fio_blok, fio_isp, inf_isp, addr, okpo
+            var sql = @"select mfo, nb, nls, daos, vid, tvo, name_blok name_block,
+                    fio_blok fio_block, fio_isp, inf_isp, addr, okpo
                     from v_cvk_ca
                       where daos = to_date(:entereddate,'dd/mm/yyyy')";
             using (var connection = OraConnector.Handler.UserConnection)
