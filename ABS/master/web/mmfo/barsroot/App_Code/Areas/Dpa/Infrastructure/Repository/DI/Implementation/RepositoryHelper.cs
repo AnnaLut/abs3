@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
+using Bars.Oracle;
+using System.Globalization;
 
 public class RepositoryHelper
 {
@@ -86,26 +88,79 @@ public class RepositoryHelper
         return fileList;
     }
 
-    public decimal FormCVFilesAndGetCount(string fileType, string entereddate)
+    public List<FileResponse> SaveCaCvFiles(List<decimal> idList, string fileType)
     {
-        var p = new DynamicParameters();
+        List<FileResponse> fileList = new List<FileResponse>();
 
-        p.Add("p_filetype", dbType: DbType.String, value: fileType, direction: ParameterDirection.Input);
-        p.Add("p_filedate", dbType: DbType.String, value: entereddate, direction: ParameterDirection.Input);
-        p.Add("p_file_count", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-
-        var sql = @"begin
-                        bars_dpa.form_cvk_file(:p_filetype, to_date(:p_filedate, 'dd/mm/yyyy'), :p_file_count);
-                     end;";
-
-        using (var connection = OraConnector.Handler.UserConnection)
+        using (OracleConnection con = OraConnector.Handler.UserConnection)
+        using (OracleCommand cmd = con.CreateCommand())
         {
-            connection.Execute(sql, p);
+            cmd.BindByName = true;
+            cmd.CommandText = "bars_dpa.get_cvk_file";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Clear();
+            foreach (decimal id in idList)
+            {
+                OracleParameter[] p = new OracleParameter[4];
+                FileResponse file = new FileResponse();
+
+                p[0] = new OracleParameter("p_filetype", OracleDbType.Varchar2, 4000, fileType, ParameterDirection.Input);
+                p[1] = new OracleParameter("p_file_number", OracleDbType.Int32, id, direction: ParameterDirection.Input);
+                p[2] = new OracleParameter("p_filename", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+                p[3] = new OracleParameter("l_clob", OracleDbType.Clob, ParameterDirection.ReturnValue);
+
+                cmd.Parameters.AddRange(p);
+                cmd.ExecuteNonQuery();
+
+                file.fileName = p[2].Value.ToString();
+                using (OracleClob data = (OracleClob)p[3].Value)
+                {
+                    file.fileBody = data.Value;
+                }
+
+                fileList.Add(file);
+            }
         }
+        return fileList;
+    }
 
-        Decimal count = p.Get<Decimal>("p_file_count");
+    public List<decimal> FormCVFilesAndGetIds(string fileType, string entereddate)
+    {
+        CultureInfo _ci;
+        _ci = CultureInfo.CreateSpecificCulture("en-GB");
+        _ci.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
+        _ci.DateTimeFormat.DateSeparator = ".";
 
-        return count;
+
+        List<decimal> res = new List<decimal>();
+
+        using (OracleConnection con = OraConnector.Handler.UserConnection)
+        using (OracleCommand cmd = con.CreateCommand())
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            //procedure form_cvk_file(p_filetype varchar2, p_filedate date, p_file_count out number, p_ids out number_list)
+            //cmd.CommandText = @"begin
+            //                        bars_dpa.form_cvk_file(:p_filetype, to_date(:p_filedate, 'dd/mm/yyyy'), :p_file_count);
+            //                    end;";
+            cmd.CommandText = "bars_dpa.form_cvk_file";
+
+            cmd.Parameters.Add(new OracleParameter("p_filetype", OracleDbType.Varchar2, fileType, ParameterDirection.Input));
+            cmd.Parameters.Add(new OracleParameter("p_filedate", OracleDbType.Date, Convert.ToDateTime(entereddate, _ci), ParameterDirection.Input));
+            cmd.Parameters.Add(new OracleParameter("p_file_count", OracleDbType.Decimal, ParameterDirection.Input));
+            OracleParameter retVal = new OracleParameter("p_ids", OracleDbType.Array, ParameterDirection.Output);
+            retVal.UdtTypeName = "BARS.NUMBER_LIST";
+            cmd.Parameters.Add(retVal);
+
+            cmd.ExecuteNonQuery();
+
+            if (null != retVal.Value)
+            {
+                NumberList _retVal = (NumberList)retVal.Value;
+                if (!_retVal.IsNull)
+                    res = _retVal.Value.ToList();
+            }
+            return res;
+        }
     }
 
     public void CheckAndCreateDirectory(string path)
