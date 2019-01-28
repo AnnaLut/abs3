@@ -403,44 +403,16 @@ SELECT t.rowid AS idrow
             filesList = GetList(fileType, entereddate);
 
             foreach (var file in filesList)
-            {
-                XmlDocument xdoc = new XmlDocument();
-                xdoc.LoadXml(file.fileBody);
-                xdoc.Save(path + '/' + file.fileName);
-            }
+                File.WriteAllText(path + Path.DirectorySeparatorChar + CheckPath(file.fileName), file.fileBody);
         }
         else if (fileType == "CA")
         {
-            List<CVFile> gridList = grid.ToObject<List<CVFile>>();
             List<FileResponse> filesList = new List<FileResponse>();
-
             path = _helper.GetDirectoryPathAndCheckIt(branch, "cao_", fileType);
-
-            //выполняем insert grid во временную таблицу
-            for (int i = 0; i < gridList.Count; i++)
-            {
-                p = new DynamicParameters();
-                p.Add("p_ref", dbType: DbType.Decimal, value: gridList[i].OPLDOC_REF, direction: ParameterDirection.Input);
-
-                sql = @"begin
-                        bars_dpa.insert_data_to_temp(:p_ref);
-                     end;";
-
-                using (var connection = OraConnector.Handler.UserConnection)
-                {
-                    connection.Execute(sql, p);
-                }
-            }
-
             filesList = GetList(fileType, entereddate);
 
             foreach (var file in filesList)
-            {
-                //XmlDocument xdoc = new XmlDocument();
-                //xdoc.LoadXml(file.fileBody);
-                //xdoc.Save(path + '/' + file.fileName);
                 File.WriteAllText(path + Path.DirectorySeparatorChar + CheckPath(file.fileName), file.fileBody);
-            }
         }
         else if (fileType == "K")
         {
@@ -495,10 +467,12 @@ SELECT t.rowid AS idrow
 
     public List<FileResponse> GetList(string fileType, string entereddate)
     {
-        var count = _helper.FormCVFilesAndGetCount(fileType, entereddate);
-        if (fileType == "CA")
-            return _helper.SaveCAFiles(count, fileType);
-        return _helper.SaveCVFiles(count, fileType);
+        List<decimal> idList = _helper.FormCVFilesAndGetIds(fileType, entereddate);
+        //if (fileType == "CA")
+        //    return _helper.SaveCAFiles(idList, fileType);
+        //return _helper.SaveCVFiles(idList, fileType);
+
+        return _helper.SaveCaCvFiles(idList, fileType);
     }
 
     public string GetFileName(string fileType)
