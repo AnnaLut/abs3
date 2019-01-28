@@ -275,7 +275,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
     */
   begin
     p_code := 0;
-    if substr(p_okpo, 1, 5) = '99999' or substr(p_okpo, 1, 5) = '00000' then
+    if substr(p_okpo, 1, 5) = '99999' or substr(p_okpo, 1, 5) = '00000' or p_okpo is null then
 
       select count(*), sum(decode(p.bday, p_bdate, 1, 0))
         into l_count_passp, l_count_passpd
