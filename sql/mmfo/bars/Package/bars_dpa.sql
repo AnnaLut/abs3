@@ -105,7 +105,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.31 25/01/2019';
+g_body_version constant varchar2(64)  := 'Version 1.32 28/01/2019';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -1636,7 +1636,6 @@ end;
 -- form_cvk_file
 -- сформировать файлы и поместить во временное хранилище dpa_lob
 -- в переменную p_file_count вернуть кол-во файлов
-
 procedure form_cvk_file(p_filetype varchar2, p_filedate date, p_file_count out number)
 is
    l_clob clob;
@@ -1648,8 +1647,9 @@ is
    l_system_info varchar2(32000);
    i  number := 0;
    l_lines_count number;
-   l_trace   varchar2(1000) := 'get_cvk_file';
-   l_iban    varchar2(29) := lpad(' ',29);
+   l_trace       varchar2(1000) := 'form_cvk_file';
+   l_iban        varchar2(29) := lpad(' ',29);
+   l_dpa_lob_id  dpa_lob.id%type;
 begin
    bars_audit.info(l_trace||'старт формирования файлов');
    delete from dpa_lob where userid = user_id;
@@ -1697,9 +1697,11 @@ begin
          end loop;
 
 
-        insert into dpa_lob(file_data, file_name, userid) values(l_clob, l_file_name, user_id);
+        insert into dpa_lob (file_data, file_name, userid) 
+        values (l_clob, l_file_name, user_id)
+        returning id into l_dpa_lob_id;
         bars_audit.trace(l_trace||'вставлен файл размером :'||dbms_lob.getlength(l_clob));
-        p_file_count := 1;
+        p_file_count := l_dpa_lob_id;
 
    else
 
@@ -1779,12 +1781,9 @@ begin
 
          p_file_count := i;
          bars_audit.info(l_trace||'на выходе процедуры возвращаем кол-во файлов::'||p_file_count);
-
-
     end if;
 
 end;
-
 
 -------------------------------------------------------------------------------
 -- get_cvk_file
