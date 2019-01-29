@@ -248,22 +248,16 @@
         };
 
         vm.showDocument = function (id) {
-
-            bars.ui.dialog({
-                content: '/barsroot/documentview/default.aspx?ref=' + id,
-                iframe: true,
-                maximize: true,
-                width: 720,
-                height: 504 //optimal size of window
-            });
-            //NewForm without swift messages
-            /*bars.ui.dialog({
-                width: 720,
-                height:515,
-                content: {
-                    url: bars.config.urlContent('/documents/item/' + id + '?partial=true')
-                }
-            });*/
+            var frameUrl = '/barsroot/documentview/default.aspx?ref=' + id;
+            //bars.ui.dialog({
+            //    content: frameUrl,
+            //    iframe: true,
+            //    maximize: true,
+            //    width: 720,
+            //    height: 504 //optimal size of window
+            //});
+            //window.showModalDialog(frameUrl, "", "dialogHeight:" + window.screen.height + ";dialogwidth:" + window.screen.width + ";dialogtop:0;dialogleft:0;edge:sunken;help:0;status:0;resizable:1;scroll:1");
+            window.open(frameUrl, '_blank');
         };
 
         vm.lineToolbarOptions = {

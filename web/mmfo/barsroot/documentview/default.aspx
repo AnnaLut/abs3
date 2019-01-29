@@ -10,6 +10,7 @@
             behavior: url(/Common/WebService/js/WebService.htc);
         }
     </style>
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8">
     <meta name="DownloadOptions" content="nosave">
     <link href="CSS/AppCSS.css" type="text/css" rel="stylesheet" />
     <link href="/Common/WebTab/WebTab.css" type="text/css" rel="stylesheet" />
