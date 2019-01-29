@@ -778,6 +778,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                             '^[À-ß²¯¥]{2} [0-9]{6}$') then
             l_epp(i).document_type := 1;
           end if;
+        elsif l_epp(i).document_type = 2 then 
+          if regexp_like(trim(l_epp(i).document_id), '^[0-9]{9}$') then
+            l_epp(i).document_type := 7;    
+          end if;
         end if;
         l_rnk := get_client(p_okpo    => l_epp(i).tax_registration_number,
                             p_paspser => case when  l_epp(i).document_type = 1 then substr(l_epp(i).document_id, 1, 2) else null end,
