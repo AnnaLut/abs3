@@ -374,6 +374,31 @@ begin
 
          --if dbms_lob.isopen(l_clob) = 1 then dbms_lob.close(l_clob); end if;
 
+         -- навіть якщо нема руху то формуєм порожній файл
+         -- (інформація від цвк)
+         if i = 0 then
+             l_file_name   := get_file_name(p_filetype, l_file_num);
+             l_system_info  := lpad(' ', 100) || l_nl;
+             l_header_info :=  substr(l_file_name,1,12)||to_char(sysdate,'yymmddhhmi')||lpadchr(/*c.cnt_vid*/0, '0', 6)||lpadchr('',' ', 166)||l_nl;
+
+             dbms_lob.createtemporary(l_clob,FALSE);
+             dbms_lob.append(l_clob, l_system_info||l_header_info);
+
+             bars_audit.info(l_trace||'зформовано ім`я порожнього файла '||l_file_name);
+             -- вставка записи в заголовок
+             insert into zag_tb(fn, dat, n) values(l_file_name, sysdate,0);
+
+             p_ids.extend;
+
+             insert into dpa_lob(file_data, file_name, userid)
+             values(l_clob, l_file_name, user_id)
+             returning id into p_ids(p_ids.last);
+
+             l_lines_count := 0;
+
+             i := i+1;
+         end if;
+
          p_file_count := i;
          bars_audit.info(l_trace||'на выходе процедуры возвращаем кол-во файлов::'||p_file_count);
 
@@ -381,7 +406,6 @@ begin
     end if;
 
 end;
-
 -------------------------------------------------------------------------------
 -- get_cvk_file
 -- Получить количество сформированных файлов ЦВК по типу файла
