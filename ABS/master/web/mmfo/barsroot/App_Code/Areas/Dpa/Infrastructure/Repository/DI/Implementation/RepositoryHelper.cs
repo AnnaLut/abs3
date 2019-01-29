@@ -52,7 +52,7 @@ public class RepositoryHelper
                 file.fileName = p[2].Value.ToString();
                 using (OracleClob data = (OracleClob)p[3].Value)
                 {
-                    file.fileBody = data.Value;
+                    file.fileBody = data.IsNull ? "" : data.Value;
                 }
 
                 fileList.Add(file);
