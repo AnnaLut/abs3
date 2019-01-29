@@ -320,6 +320,13 @@
 
 
 <script>
+    $(document).ready(function () {
+        var mfo = '@ViewBag.MFO';
+        if (mfo != '300465')
+            $("#stpFlag").attr("disabled", true);
+    });
+
+
     function Waiting(flag) {
         WaitingForID(flag, ".search-main");
     }
