@@ -1560,22 +1560,22 @@
                                     }
                                 },
                                 D_REC: {
-                                    type: 'string',
-                                    validation: {
-                                        required: { message: "Поле Додатковий реквізит обов'язкове!" }
-                                    }
+                                    type: 'string'
+                                    //validation: {
+                                    //    required: { message: "Поле Додатковий реквізит обов'язкове!" }
+                                    //}
                                 },
                                 NAZNK: {
-                                    type: 'string',
-                                    validation: {
-                                        required: { message: "Поле Призн. до обов'язкове!" }
-                                    }
+                                    type: 'string'
+                                    //validation: {
+                                    //    required: { message: "Поле Призн. до обов'язкове!" }
+                                    //}
                                 },
                                 NAZNS: {
-                                    type: 'string',
-                                    validation: {
-                                        required: { message: "Поле Призн. з обов'язкове!" }
-                                    }
+                                    type: 'string'
+                                    //validation: {
+                                    //    required: { message: "Поле Призн. з обов'язкове!" }
+                                    //}
                                 },
                                 ID_D: {
                                     type: 'string',
