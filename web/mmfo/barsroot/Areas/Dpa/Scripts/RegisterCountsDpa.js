@@ -423,7 +423,7 @@
                     {
                         field: "FDAT",
                         title: "Дата",
-                        template: "#= kendo.toString(kendo.parseDate(FDAT, 'yyyy-MM-dd'), 'dd/MM/yyyy') #",
+                        template: "#= FDAT ? kendo.toString(kendo.parseDate(FDAT, 'yyyy-MM-dd'), 'dd/MM/yyyy') : '' #",
                         width: columns_width
                     },
                     {
@@ -486,13 +486,13 @@
                     {
                         field: "DATD",
                         title: "Дата документу",
-                        template: "#= kendo.toString(kendo.parseDate(DATD, 'yyyy-MM-dd'), 'dd/MM/yyyy') #",
+                        template: "#= DATD ? kendo.toString(kendo.parseDate(DATD, 'yyyy-MM-dd'), 'dd/MM/yyyy') : '' #",
                         width: columns_width
                     },
                     {
                         field: "DATP",
                         title: "Дата сплати",
-                        template: "#= kendo.toString(kendo.parseDate(DATP, 'yyyy-MM-dd'), 'dd/MM/yyyy') #",
+                        template: "#= DATP ? kendo.toString(kendo.parseDate(DATP, 'yyyy-MM-dd'), 'dd/MM/yyyy') : '' #",
                         width: columns_width
                     },
                     {
@@ -544,13 +544,13 @@
                     {
                         field: "DAT_A",
                         title: "Дата А",
-                        template: "#= kendo.toString(kendo.parseDate(DAT_A, 'yyyy-MM-dd'), 'dd/MM/yyyy') #",
+                        template: "#= DAT_A ? kendo.toString(kendo.parseDate(DAT_A, 'yyyy-MM-dd'), 'dd/MM/yyyy') : '' #",
                         width: columns_width
                     },
                     {
                         field: "DAT_B",
                         title: "Дата Б",
-                        template: "#= kendo.toString(kendo.parseDate(DAT_B, 'yyyy-MM-dd'), 'dd/MM/yyyy') #",
+                        template: "#= DAT_B ? kendo.toString(kendo.parseDate(DAT_B, 'yyyy-MM-dd'), 'dd/MM/yyyy') : '' #",
                         width: columns_width
                     }
                 ];
