@@ -19,7 +19,7 @@
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.custom.js"></script>
 
     <script language="javascript" src="Scripts/AccHistory.js?v1.4"></script>
-    <script language="JavaScript" src="Scripts/Common.js"></script>
+    <script language="JavaScript" src="Scripts/Common.js?v.1.6"></script>
     <script language="javascript" src="/Common/Script/Localization.js"></script>
     <script language="javascript" src="/Common/WebEdit/RadInput.js"></script>
     <script language="javascript">
@@ -29,6 +29,7 @@
                 document.all.btPrintHtml.style.visibility = "hidden";
                 document.all.btPrintRtf.style.visibility = "hidden";
             }
+            document.getElementById("ed_strDt_TextBox").focus();
         }
         function keyPressInEdit(evnt) {
             if (evnt.keyCode == 13) {
@@ -130,12 +131,12 @@
                             <td class="BodyCell" runat="server" meta:resourcekey="tdFrom" width="20" style="height: 24px">С :
                             </td>
                             <td onkeypress="keyPressInEdit(event)" width="102" style="height: 24px">
-                                <input id="ed_strDt" type="hidden"><input id="ed_strDt_Value" type="hidden" name="ed_strDt"><asp:TextBox ID="ed_strDt_TextBox" Style="text-align: center" TabIndex="1" runat="server" Width="100px"
+                                <input id="ed_strDt" type="hidden"><input id="ed_strDt_Value" type="hidden" name="ed_strDt"><asp:TextBox ID="ed_strDt_TextBox" Style="text-align: center" TabIndex="2" runat="server" Width="100px"
                                     EnableViewState="False" BorderStyle="Solid" BorderWidth="1px" BorderColor="Black"></asp:TextBox>
                             <td class="BodyCell" runat="server" meta:resourcekey="tdTill" style="width: 20px; height: 24px;">По :
                             </td>
                             <td onkeypress="keyPressInEdit(event)" width="102" style="height: 24px">
-                                <input id="ed_endDt" type="hidden"><input id="ed_endDt_Value" type="hidden" name="ed_endDt"><asp:TextBox ID="ed_endDt_TextBox" Style="text-align: center" TabIndex="2" runat="server" Width="100px"
+                                <input id="ed_endDt" type="hidden"><input id="ed_endDt_Value" type="hidden" name="ed_endDt"><asp:TextBox ID="ed_endDt_TextBox" Style="text-align: center" TabIndex="1" runat="server" Width="100px"
                                     EnableViewState="False" BorderStyle="Solid" BorderWidth="1px" BorderColor="Black"></asp:TextBox>
                             <td style="padding-left: 4px; height: 24px;">
                                 <%--<input onkeypress="keyPressInEdit(event)" 

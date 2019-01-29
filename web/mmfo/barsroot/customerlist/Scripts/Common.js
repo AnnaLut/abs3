@@ -18,6 +18,19 @@ function Dialog(message,type)
 {
   return window.showModalDialog("dialog.aspx?type="+type+"&message="+escape(message),"","dialogHeight:160px;center:yes;edge:sunken;help:no;status:no;");
 }
+
+function OpenInNewWindow(frameUrl) {
+	var ldr = document.getElementById("loader");
+
+	if(ldr) 
+		ldr.style.display = "block";
+
+    //window.showModalDialog(frameUrl, "", "dialogHeight:"+window.screen.height+";dialogwidth:"+window.screen.width+";dialogtop:0;dialogleft:0;edge:sunken;help:0;status:0;resizable:1;scroll:1");
+    window.open(frameUrl, '_blank');
+
+	if(ldr) 
+		ldr.style.display = "none";
+}
 //---------------------------------------------------------------------
 //Обработка ошибок от веб-сервиса
 function getError(result)

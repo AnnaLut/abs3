@@ -11,7 +11,7 @@
     <link href="Styles.css" type="text/css" rel="stylesheet">
     <link href="\Common\WebGrid\Grid.css" type="text/css" rel="stylesheet">
 	<script language="JavaScript" src="Scripts\CloseNBSAccInfo.js"></script>
-    <script language="JavaScript" src="Scripts\CustAcc.js?v1.15"></script>
+    <script language="JavaScript" src="Scripts\CustAcc.js?v1.16"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery-ui.1.8.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.alerts.js"></script>
