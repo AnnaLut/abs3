@@ -89,13 +89,14 @@ end body_version;
 /*отримання значення атрибута STP_AUTO */
 function get_stp_auto return number
   is
-  l_value number;
-begin  
-  select branch_attribute_utl.get_attribute_value(
-        p_branch_code=>'/300465/',--bars_context.current_branch_code,
-        p_attribute_code=>'STP_AUTO') into l_value
-        from dual;
-   return  l_value;    
+begin
+ return  
+     branch_attribute_utl.get_attribute_value(
+        p_branch_code=>bars_context.current_branch_code,
+        p_attribute_code=>'STP_AUTO',
+        p_raise_expt=>0,
+        p_def_value=>0
+        ) ;        
 end;
 ----
 procedure getT00_902(
