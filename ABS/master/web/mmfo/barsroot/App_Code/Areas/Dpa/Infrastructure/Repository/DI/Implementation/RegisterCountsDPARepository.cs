@@ -14,6 +14,7 @@ using Bars.Oracle;
 using System.Web;
 using Bars.Web.Report;
 using System.Text.RegularExpressions;
+using System.Text;
 
 public class RegisterCountsDPARepository : IRegisterCountsDPARepository
 {
@@ -403,7 +404,7 @@ SELECT t.rowid AS idrow
             filesList = GetList(fileType, entereddate);
 
             foreach (var file in filesList)
-                File.WriteAllText(path + Path.DirectorySeparatorChar + CheckPath(file.fileName), file.fileBody);
+                File.WriteAllText(path + Path.DirectorySeparatorChar + CheckPath(file.fileName), file.fileBody, Encoding.GetEncoding(1251));
         }
         else if (fileType == "CA")
         {
@@ -412,7 +413,7 @@ SELECT t.rowid AS idrow
             filesList = GetList(fileType, entereddate);
 
             foreach (var file in filesList)
-                File.WriteAllText(path + Path.DirectorySeparatorChar + CheckPath(file.fileName), file.fileBody);
+                File.WriteAllText(path + Path.DirectorySeparatorChar + CheckPath(file.fileName), file.fileBody, Encoding.GetEncoding(1251));
         }
         else if (fileType == "K")
         {
