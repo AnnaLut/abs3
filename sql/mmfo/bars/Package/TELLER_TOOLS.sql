@@ -305,7 +305,7 @@ end teller_tools;
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
 
   g_min_banknote constant  number := 10;
-  g_body_version constant  varchar2(64)  := 'version 3.6 11/12/2018';
+  g_body_version constant  varchar2(64)  := 'version 3.7 29/01/2019';
   g_ws_name      varchar2(100) := sys_context('bars_global', 'host_name');
   g_eq_url       constant  varchar2(100) := case get_teller
                                               when 0 then null
@@ -1061,7 +1061,8 @@ bars_audit.info('Teller. p_user = '||p_user);
       teller_utils.clear_context;
 --      role_switch(0);
     elsif v_sta = 'C' and p_switch = 1 then  -- пользователь с "закрытой на сегодня" ролью Теллера и ее хотят включить
-      v_err := v_progname||'. Спроба включити роль Теллера користувачу, який вже припинив працювати з цією роллю в банкіській даті '||to_char(g_bars_dt,'dd.mm.yyyy');
+      v_err := 'УВАГА Можливість повторної активації теллера в банківському дні '||to_char(g_bars_dt,'dd.mm.yyyy')||' заборонена!';
+--      v_err := v_progname||'. Спроба включити роль Теллера користувачу, який вже припинив працювати з цією роллю в банкіській даті '||to_char(g_bars_dt,'dd.mm.yyyy');
       bars_audit.info(v_err);
       raise_application_error(-20100,v_err);
       update teller_state
@@ -1861,7 +1862,7 @@ logger.info('teller step1. v_in_flag= '||v_in_flag||', v_out_flag = '||v_out_fla
     if p_user_ip is not null then
       g_ws_name := p_user_ip;
     end if;
-    
+
     begin
       select user_id
         into v_user
@@ -2216,7 +2217,8 @@ logger.info('End_request: p_doc_ref = '||p_docref||', p_atm = '||p_atm_amount||'
     select state, id
       into v_next_state, v_oper_id
       from teller_opers
-      where doc_ref = p_docref;
+      where doc_ref = p_docref
+        or  (oper_ref = 'SBN' and id = teller_utils.get_active_oper());
     if v_next_state in ('RO','RJ','RX') then
       p_errtxt := 'Операція вже відмінена';
       return 0;
@@ -2328,7 +2330,7 @@ logger.info('End_request: p_doc_ref = '||p_docref||', p_atm = '||p_atm_amount||'
     v_docref number := p_docref;
     v_curcode varchar2(3) := trim(replace(p_curcode,'[]'));
   begin
-  
+
 logger.info('Teller.change_request p_docref = '||p_docref||', p_curcode = '||p_curcode||', p_amount = '||p_amount);
     if p_docref = -1 then
       v_docref := teller_utils.get_active_oper();
@@ -2363,7 +2365,7 @@ logger.info('Teller.change_request p_docref = '||p_docref||', p_curcode = '||p_c
       if v_ret != 0 then
        p_errtxt := 'Через АТМ видано суму '||v_ret||' ['||v_curcode||']';
       end if;
-        
+
 --      v_ret := 1;
     else
       p_errtxt := 'Помилка при виконанні операції';
@@ -2563,6 +2565,7 @@ logger.info('Teller.change_request p_docref = '||p_docref||', p_curcode = '||p_c
                     order by id)
       loop
         v_docref := doc.doc_ref;
+        v_oper_code := 'SBN';
         exit;
       end loop;
       if v_docref = 0 then
@@ -2910,12 +2913,20 @@ logger.info('step1');
       from teller_opers op
       where op.doc_ref = v_doc_ref or (op.id = v_doc_ref and op.oper_ref = 'SBN');
 logger.info('step2');
-    v_op_type := get_type_operation(p_docref);
-    if v_op_type = 'NONE' then 
-      v_op_type := get_type_operation(v_op_tt);
+    if v_op_tt = 'SBN' then
+      if v_state like 'I%' or v_state = 'RI' then
+        v_op_type := 'IN';
+      elsif (v_state like 'O%' and v_state != 'OK') or v_state = 'RO' then
+        v_op_type := 'OUT';
+      end if;
+    else
+      v_op_type := get_type_operation(p_docref);
+      if v_op_type = 'NONE' then
+        v_op_type := get_type_operation(v_op_tt);
+      end if;
     end if;
 --    get_type_operation(v_op_tt);
-logger.info('step3');
+logger.info('step3, v_op_type = '||v_op_type);
     for r in (select *
                     from (select * from teller_ws_define where op_type = v_op_type) wd
                     connect by prior oper_end_state = oper_start_state
@@ -3260,7 +3271,7 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
              (v_eq_type = 'M' and ts.user_ref = user_id)
             )
         and ts.work_date = v_dt
-        and ts.user_ref = op.user_ref 
+        and ts.user_ref = op.user_ref
         and op.work_date = ts.work_date
         and op.amount != 0
         and (nvl(op.doc_ref,op.id) = tco.doc_ref or op.id = tco.doc_ref)
@@ -3533,7 +3544,7 @@ logger.info('Teller: p_cur_code = '||p_cur_code);
     v_oper_id number := teller_utils.get_active_oper();
     v_cur_code varchar2(3) := p_curcode;--teller_utils.get_active_curcode();
   begin
-logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curcode = '||p_curcode); 
+logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curcode = '||p_curcode);
     if p_non_atm_amount != 0 then
 
       if p_non_atm_amount>get_user_amount() then
@@ -4035,7 +4046,7 @@ bars_audit.info('Teller: cash_oper after end cashout (3) request');
     v_flag integer :=1;
   begin
     update teller_collection_opers
-      set state = 'RJ' 
+      set state = 'RJ'
       where state = 'IN'
         and last_dt<trunc(sysdate);
     for r in (select teller_utils.get_r030(cur_code) cur_code, sum(op.amount) amount,  state, listagg(op.id,',') within group (order by state) ids
@@ -4293,23 +4304,30 @@ dbms_output.put_line(v_sw_flag);
     if v_num>0 then
       p_errtxt := 'У користувача є незавізовані (або несторновані) проведення!';
     end if;
-    select sum(case tco.op_type
-                 when 'IN' then 1
-                 when 'RIN' then 1
-                 when 'OUT' then -1
-                 when 'ROUT' then -1
-                 else 0
-              end * round((tco.atm_amount + tco.non_atm_amount) * decode(tco.cur_code,980,1,rato(tco.cur_code,g_bars_dt)),2)
-             )
-      into v_num
-      from teller_cash_opers tco, teller_opers op
-      where op.user_ref = g_user_id
-        and op.work_date = g_bars_dt
-        and op.id = tco.doc_ref
-        and op.state = 'OK';
-    if v_num != 0 then
-      p_errtxt := p_errtxt ||' Залишок коштів Теллера не нульовий. Необхідно зробити повне вилучення!';
-    end if;
+
+    for cur in (select tco.cur_code, sum(case tco.op_type
+                             when 'IN' then 1
+                             when 'RIN' then 1
+                             when 'OUT' then -1
+                             when 'ROUT' then -1
+                             else 0
+                          end * (tco.atm_amount + tco.non_atm_amount)
+                         ) as diff
+                  from teller_cash_opers tco, teller_opers op
+                  where op.user_ref = g_user_id
+                    and op.work_date = g_bars_dt
+                    and op.id = tco.doc_ref
+                    and op.state = 'OK'
+                  group by tco.cur_code)
+    loop
+      if cur.diff != 0 then
+         p_errtxt := p_errtxt ||case 
+                                 when length(p_errtxt)> 0 then '<br/>'
+                                 else ''
+                               end||
+          'Залишок коштів Теллера в валюті '||cur.cur_code||' не нульовий: '||to_char(cur.diff)||'. Необхідно зробити повне вилучення!';
+     end if;
+    end loop;
 
     if p_errtxt is not null then
       return 0;
