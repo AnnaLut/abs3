@@ -50,7 +50,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS_DPA2 is
 
-g_body_version constant varchar2(64)  := 'Version 1.0 29/01/2019';
+g_body_version constant varchar2(64)  := 'Version 1.1 29/01/2019';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -153,7 +153,7 @@ begin
        select n_isep into l_sab from rcukru where mfo = gl.amfo;
      l_filename := p_filetype||'O'||l_sab||
                    f_chr36(extract(month from sysdate)) ||
-                 f_chr36(extract(day from sysdate))||'.'|| lpadchr(l_filenum, '0',3);
+                 f_chr36(extract(day from sysdate))||'.'|| lpad(f_conv36(l_filenum),3,'0');
 
   else
          l_filename := upper('@' || p_filetype || '0' ||
@@ -235,6 +235,7 @@ is
    l_lines_count number;
    l_trace       varchar2(1000) := 'form_cvk_file';
    l_iban        varchar2(29) := lpad(' ',29);
+   l_kf          varchar2(6) :=sys_context('bars_context','user_mfo');
 begin
    bars_audit.info(l_trace||'старт формирования файлов');
 
@@ -290,25 +291,30 @@ begin
         insert into dpa_lob (file_data, file_name, userid)
         values (l_clob, l_file_name, user_id)
         returning id into p_ids(p_ids.last);
+
+        update dpa_file_counters
+           set taxca_date = trunc(sysdate), --trunc(p_filedate),
+               taxca_seq  = l_file_num
+         where kf = l_kf;
+
         bars_audit.trace(l_trace||'вставлен файл размером :'||dbms_lob.getlength(l_clob));
         p_file_count := 1;
 
    else
 
       for c in (
-                 select count(v.nls) over (partition by decode(vid, 13, '1', 14, '2', '3') ) cnt_vid,
-                        row_number() over (partition by decode(vid, 13, '1', 14, '2', '3') order by v.nls ) vid_rank,
+                 select --count(v.nls) over (partition by decode(vid, 13, '1', 14, '2', '3') ) cnt_vid,
+                        --row_number() over (partition by decode(vid, 13, '1', 14, '2', '3') order by v.nls ) vid_rank,
+                        -- відключив розбивку по типам рахунків. хз чого було так
+                        count(v.nls) over () cnt_vid,
+                        row_number() over (order by v.nls) vid_rank,
                         v.nls, decode(vid, 13, '1', 14, '2', '3') vid, fdat, mfo_d as mfoa, nls_d as nlsa, mfo_k as mfob, nls_k as nlsb,
                         dk, s, vob, nd,
                         v.kv, datd, datp, nam_a, nam_b, nazn, d_rec, naznk, nazns, id_d as id_a, id_k as id_b, v.ref, dat_a, dat_b
                    from v_dpa_cv v
-                         --,
-                         --( select ref from dpa_acc_userid d where userid = user_id) d
-                  where
-                  --d.ref = v.opldok_ref
-                     --and
-                     v.fdat = p_filedate
-                  order     by vid, nls
+                  where v.fdat = p_filedate
+                  order by 2
+                  --order     by vid, nls
                ) loop
 
 
@@ -322,11 +328,6 @@ begin
              bars_audit.info(l_trace||'сформировано имя файла '||l_file_name);
              -- вставка записи в заголовок
              insert into zag_tb(fn, dat, n) values(l_file_name, sysdate,c.cnt_vid );
-
-             -- если клоб наполнен предыдущим файлом
-             --    if dbms_lob.isopen(l_clob) = 1 and dbms_lob.getlength(l_clob) > 0 then
-             --       dbms_lob.close(l_clob);
-             --    end if;
 
              -- кол-во файлов
              i := i+1;
@@ -367,7 +368,12 @@ begin
             values(l_clob, l_file_name, user_id)
             returning id into p_ids(p_ids.last);
 
-             l_lines_count := 0;
+            update dpa_file_counters
+               set taxcv_date = trunc(sysdate), --trunc(p_filedate),
+                   taxcv_seq  = l_file_num
+             where kf = l_kf;
+
+            l_lines_count := 0;
           end if;
 
          end loop;
@@ -393,6 +399,11 @@ begin
              insert into dpa_lob(file_data, file_name, userid)
              values(l_clob, l_file_name, user_id)
              returning id into p_ids(p_ids.last);
+
+             update dpa_file_counters
+                set taxcv_date = trunc(sysdate), --trunc(p_filedate),
+                    taxcv_seq  = l_file_num
+              where kf = l_kf;
 
              l_lines_count := 0;
 
