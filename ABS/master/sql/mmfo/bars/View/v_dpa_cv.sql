@@ -37,9 +37,9 @@ PROMPT *** Create  view V_DPA_CV ***
              id_d,
           DECODE (r.dk, 1, NVL (r.id_b, arc.id_b), NVL (r.id_a, arc.id_a))
              id_k,
-          NVL (arc.ref_a, r.REF) REF,
-          DECODE (p.dk, 1, NVL(ARC.dat_a, r.vdat), null) as DAT_A,
-          DECODE (p.dk, 1, null, NVL(ARC.dat_b, r.vdat)) as DAT_B
+          NVL (arc.ref_a, to_char(r.REF)) REF,
+          DECODE (p.dk, 1, NVL(ARC.dat_a, r.vdat), to_date(null)) as DAT_A,
+          DECODE (p.dk, 1, to_date(null), NVL(ARC.dat_b, r.vdat)) as DAT_B
      FROM operlst p,
           acclist s,
           oper r,
