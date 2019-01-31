@@ -18,7 +18,7 @@ is
 
     CRLF              constant char(2)       := chr(13) || chr(10);
 
-    g_headerVersion   constant varchar2(64)  := 'version 3.44 13.04.2018';
+    g_headerVersion   constant varchar2(64)  := 'version 3.45 28.01.2019';
     g_headerDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -1585,7 +1585,7 @@ is
 --**************************************************************--
 
 
-    g_bodyVersion   constant varchar2(64)  := 'version 3.93onlytest 05.10.2018';
+    g_bodyVersion   constant varchar2(64)  := 'version 3.94 28.01.2019';
     g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -3007,6 +3007,7 @@ IS
         (l.swref=s.swref(+)) AND
         (a.sos=5) AND
         (a.acc=acc_) AND
+        s.IO_IND='I' AND 
         (a.fdat BETWEEN priod_start AND period_finish)
       ORDER BY
         a.dk, a.s;
@@ -7853,7 +7854,7 @@ END DayFractionToSwift;
                    flags = null
              where swref = p_swref;
 
---            bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
+            bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
 
         exception
             when NO_DATA_FOUND then
@@ -7984,7 +7985,7 @@ begin
         -- delete from sw_procque
         --  where swref = p_swref;
 
---        bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
+        bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
 
 
 
@@ -8704,7 +8705,7 @@ begin
 
     end if;
 
---    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Выполнено ручная коррекция SWIFT сообщения с реф. ' || p_swRef);
+    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Выполнено ручная коррекция SWIFT сообщения с реф. ' || p_swRef);
 
 end update_message;
 --**************************************************************--
@@ -9056,14 +9057,7 @@ begin
     loop
 
         -- выделяем отдельную строку
---        l_pos   := instr(l_value, l_crln); /COBUMMFO-9695
-        if instr(l_value, chr(13) || chr(10))>0 then 
-             l_crln := chr(13) || chr(10);
-             else  l_crln := chr(10);
-           l_pos   := instr(l_value, l_crln);            
-        end if;
-----        
-
+        l_pos   := instr(l_value, l_crln);
 
         if (l_pos != 0) then
             l_row   := substr(l_value, 1, l_pos-1);
@@ -10619,7 +10613,7 @@ begin
     delete from sw_procque
      where swref = p_swref;
 
---    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Разблокировано SWIFT сообщение с реф. ' || p_swRef);
+    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Разблокировано SWIFT сообщение с реф. ' || p_swRef);
 
 end unlock_message;
 
