@@ -7233,6 +7233,8 @@ begin
    for i in 1..l_atrn.count loop
 
    begin
+   
+   savepoint sp1;
 
    if l_atrn(i).inst_chain_idt is not null then
    
@@ -7253,8 +7255,6 @@ begin
        int_move_to_hist(l_atrn(i).inst_chain_idt);
    end if;
     end if;
-       
-      savepoint sp1;
 
       bPay  := true;
       l_err := null;
