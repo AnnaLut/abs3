@@ -286,8 +286,10 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: (OLD)Формування Форми DGP_F007 за період (Y/H/Q/D) ********** ');
-          --  Створюємо функцію ЦП: Формування Форми DGP_F007 за період (Y/H/Q/D)
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: (OLD)Формування Форми DGP_F007 за період (Y/H/Q/D) ********** ');
+      delete from list_funcset where  func_id  in (select codeoper from operlist a where  a.name = 'ЦП: (OLD)Формування Форми DGP_F007 за період (Y/H/Q/D)');
+      delete from operlist a where  a.name = 'ЦП: (OLD)Формування Форми DGP_F007 за період (Y/H/Q/D)';
+/*          --  Створюємо функцію ЦП: Формування Форми DGP_F007 за період (Y/H/Q/D)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -296,7 +298,7 @@ begin
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
-
+*/
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Формування Форми DGP_007 за період ********** ');
       l := l +1;
       l_function_ids.extend(l);      
@@ -308,7 +310,9 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: (OLD)Формування Форми DGP_F008 за період (Y/H/Q/D) ********** ');
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: (OLD)Формування Форми DGP_F008 за період (Y/H/Q/D) ********** ');
+      delete from operlist a where  a.name = 'ЦП: (OLD)Формування Форми DGP_F008 за період (Y/H/Q/D)';
+/*
           --  Створюємо функцію ЦП: Формування Форми DGP_F008 за період (Y/H/Q/D)
       l := l +1;
       l_function_ids.extend(l);
@@ -318,6 +322,7 @@ begin
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Формування Форми DGP_008 за період ********** ');
       l := l +1;
@@ -342,8 +347,9 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Перегляд форми DGP_F007 (Q-квартальна) ********** ');
-          --  Створюємо функцію ЦП: Перегляд форми DGP_F007 (Q-квартальна)
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Перегляд форми DGP_F007 (Q-квартальна) ********** ');
+      delete from operlist a where  a.name = 'ЦП: Перегляд форми DGP_F007 (Q-квартальна)';
+/*          --  Створюємо функцію ЦП: Перегляд форми DGP_F007 (Q-квартальна)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -352,10 +358,11 @@ begin
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Перегляд форми DGP_F008 (Q-квартальна) ********** ');
-          --  Створюємо функцію ЦП: Перегляд форми DGP_F008 (Q-квартальна)
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Перегляд форми DGP_F008 (Q-квартальна) ********** ');
+      delete from operlist a where  a.name = 'ЦП: Перегляд форми DGP_F008 (Q-квартальна)';
+/*          --  Створюємо функцію ЦП: Перегляд форми DGP_F008 (Q-квартальна)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -364,10 +371,11 @@ begin
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Перегляд форми DGP_F008 (Y-річна) ********** ');
-          --  Створюємо функцію ЦП: Перегляд форми DGP_F008 (Y-річна)
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Перегляд форми DGP_F008 (Y-річна) ********** ');
+      delete from operlist a where  a.name = 'ЦП: Перегляд форми DGP_F008 (Y-річна)';
+/*          --  Створюємо функцію ЦП: Перегляд форми DGP_F008 (Y-річна)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -376,7 +384,7 @@ begin
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
-
+*/
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП. Модифікація грошових потоків по ЦП (WEB)  ********** ');
           --  Створюємо функцію ЦП. Модифікація грошових потоків по ЦП (WEB) 
@@ -486,8 +494,10 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Переформування Форм DGP_F... (V_CP_ZV) Y/H/Q/M/D ********** ');
-          --  Створюємо функцію ЦП: Переформування Форм DGP_F... (V_CP_ZV) Y/H/Q/M/D
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Переформування Форм DGP_F... (V_CP_ZV) Y/H/Q/M/D ********** ');
+      delete from list_funcset where  func_id  in (select codeoper from operlist a where  a.name = 'ЦП: Переформування Форм DGP_F... (V_CP_ZV) Y/H/Q/M/D');
+      delete from operlist a where  a.name = 'ЦП: Переформування Форм DGP_F... (V_CP_ZV) Y/H/Q/M/D';
+/*          --  Створюємо функцію ЦП: Переформування Форм DGP_F... (V_CP_ZV) Y/H/Q/M/D
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -496,6 +506,7 @@ begin
                                                   p_rolename => 'bars_access_defrole' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП: Форма для розр-ку переоцінки (CP_PEREOC_V) ********** ');
           --  Створюємо функцію ЦП: Форма для розр-ку переоцінки (CP_PEREOC_V)
@@ -537,32 +548,9 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП - Архів угод ВАЛ ********** ');
-          --  Створюємо функцію ЦП - Архів угод ВАЛ
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ЦП - Архів угод ВАЛ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_CP_ARCH_META&accessCode=1&sPar=[CONDITIONS=> kv != 980]',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП - Архів угод ГРН ********** ');
-          --  Створюємо функцію ЦП - Архів угод ГРН
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ЦП - Архів угод ГРН',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_CP_ARCH_META&accessCode=1&sPar=[CONDITIONS=> kv = 980]',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП - Архів угод ВАЛ ********** ');
-          --  Створюємо функцію ЦП - Архів угод ВАЛ
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП - Архів угод ВАЛ ********** ');
+      delete from operlist a where  a.name = 'ЦП - Архів угод ВАЛ';
+/*          --  Створюємо функцію ЦП - Архів угод ВАЛ
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -571,10 +559,11 @@ begin
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП - Архів угод ГРН ********** ');
-          --  Створюємо функцію ЦП - Архів угод ГРН
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП - Архів угод ГРН ********** ');
+      delete from operlist a where  a.name = 'ЦП - Архів угод ГРН';
+/*          --  Створюємо функцію ЦП - Архів угод ГРН
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -584,7 +573,7 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
-
+*/
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Додатковi реквiзити до портфелю ЦП ********** ');
           --  Створюємо функцію Додатковi реквiзити до портфелю ЦП
       l := l +1;
@@ -633,8 +622,9 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель Власної емісії ********** ');
-          --  Створюємо функцію ЦП Портфель Власної емісії
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель Власної емісії ********** ');
+      delete from operlist a where  a.name = 'ЦП Портфель Власної емісії';
+/*          --  Створюємо функцію ЦП Портфель Власної емісії
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -643,10 +633,11 @@ begin
                                                   p_rolename => 'CP_ROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель. Інші емітенти ********** ');
-          --  Створюємо функцію ЦП Портфель. Інші емітенти
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель. Інші емітенти ********** ');
+      delete from operlist a where  a.name = 'ЦП Портфель. Інші емітенти';
+/*          --  Створюємо функцію ЦП Портфель. Інші емітенти
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -655,10 +646,11 @@ begin
                                                   p_rolename => 'CP_ROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель ГРН ********** ');
-          --  Створюємо функцію ЦП Портфель ГРН
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель ГРН ********** ');
+      delete from operlist a where  a.name = 'ЦП Портфель ГРН';
+/*          --  Створюємо функцію ЦП Портфель ГРН
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -667,10 +659,13 @@ begin
                                                   p_rolename => 'CP_ROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель ВАЛ ********** ');
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ЦП Портфель ВАЛ ********** ');
           --  Створюємо функцію ЦП Портфель ВАЛ
+      delete from operlist a where  a.name = 'ЦП Портфель ВАЛ';
+/*
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -679,6 +674,7 @@ begin
                                                   p_rolename => 'CP_ROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
+*/
 
 --    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо ТИМЧАСОВО функцію ЦП Нарахування дивидентів по угоді ********** ');
     --
@@ -694,12 +690,12 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 */
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо ТИМЧАСОВО функцію ЦП Переміщення по угодам (МСФЗ9) ********** ');
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо ТИМЧАСОВО функцію ЦП Переміщення по угодам (МСФЗ9) ********** ');
 
     delete from operlist a where  a.name = 'ЦП Переміщення угод МСФЗ9 (тимчасово)';
           --  Створюємо функцію ЦП 
 
-      l := l +1;
+/*      l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ЦП Переміщення угод МСФЗ9 (тимчасово)',
@@ -707,7 +703,7 @@ begin
                                                   p_rolename => 'CP_ROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
-
+*/
 
 
 

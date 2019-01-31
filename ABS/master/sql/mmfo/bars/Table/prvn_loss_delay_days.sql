@@ -98,6 +98,15 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index IDX_PRVNLOSSDELAYDYS_REF_AGR ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_PRVNLOSSDELAYDYS_REF_AGR ON BARS.PRVN_LOSS_DELAY_DAYS (REF_AGR)  TABLESPACE BRSDYNI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 
 PROMPT *** Create  grants  PRVN_LOSS_DELAY_DAYS ***
