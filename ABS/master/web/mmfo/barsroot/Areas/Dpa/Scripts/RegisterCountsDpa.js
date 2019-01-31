@@ -1604,10 +1604,10 @@
                                     }
                                 },
                                 DAT_A: {
-                                    type: 'date',
-                                    validation: {
-                                        required: { message: "Поле Дата А обов'язкове!" }
-                                    }
+                                    type: 'date'
+                                    //validation: {
+                                    //    required: { message: "Поле Дата А обов'язкове!" }
+                                    //}
                                 },
                                 DAT_B: {
                                     type: 'date'
