@@ -251,6 +251,8 @@ procedure pk_repay_card (p_pk_nd number);
 -- процедура закрытия счетов PK
 procedure pk_close_card (p_pk_nd number);
 
+procedure int_move_to_hist(p_chain_idt in ow_inst_totals.chain_idt%type);
+
 --Закриття рахунків Instolment
 procedure close_inst_acc;
 
@@ -7166,6 +7168,7 @@ is
    l_atrn         t_atrn;
    l_nlsa         ow_oic_atransfers_data.debit_anlaccount%type;
    l_nlsb         ow_oic_atransfers_data.credit_anlaccount%type;
+   l_inst_totals  ow_inst_totals%rowtype;
    l_nam_a        oper.nam_a%type;
    l_nam_b        oper.nam_b%type;
    l_id_a         oper.id_a%type;
@@ -7232,13 +7235,23 @@ begin
    begin
 
    if l_atrn(i).inst_chain_idt is not null then
-   update ow_inst_totals t 
-      set t.posting_date = l_atrn(i).anl_postingdate,
-          t.pay_b_date = gl.bdate
-   where t.chain_idt = l_atrn(i).inst_chain_idt
-     and t.document_id = l_atrn(i).doc_drn
-     and t.posting_date is null
-     and t.pay_b_date is null;
+   
+   select * 
+     into l_inst_totals 
+     from ow_inst_totals t
+   where t.chain_idt = l_atrn(i).inst_chain_idt;
+   
+   if (l_inst_totals.document_id = l_atrn(i).doc_drn 
+      and l_inst_totals.posting_date is null 
+      and l_inst_totals.pay_b_date is null) then
+       
+       update ow_inst_totals t 
+          set t.posting_date = l_atrn(i).anl_postingdate,
+              t.pay_b_date = gl.bdate
+       where t.chain_idt = l_atrn(i).inst_chain_idt;
+       
+       int_move_to_hist(l_atrn(i).inst_chain_idt);
+   end if;
     end if;
        
       savepoint sp1;
@@ -15557,6 +15570,76 @@ begin
 
 end pk_repay_card;
 
+ procedure int_move_to_hist(p_chain_idt in ow_inst_totals.chain_idt%type) is
+ l_plans_in_history number:=1;
+ l_total ow_inst_totals_hist%rowtype;
+ type t_ow_inst_sub_p is table of ow_inst_sub_p%rowtype;
+ type t_ow_inst_portions is table of ow_inst_portions%rowtype;
+ type t_ow_inst_sub_t is table of ow_inst_sub_t%rowtype;
+ l_ow_inst_sub_p t_ow_inst_sub_p:=t_ow_inst_sub_p();
+ l_ow_inst_portions t_ow_inst_portions:=t_ow_inst_portions();
+ l_ow_inst_sub_t t_ow_inst_sub_t:=t_ow_inst_sub_t();
+ begin
+      update ow_inst_totals t 
+         set t.plans_in_history = t.plans_in_history+1
+       where t.chain_idt = p_chain_idt;
+ 
+        select w.id,
+               w.idn,
+               w.nd,
+               w.contract,
+               w.contract_idt,
+               w.scheme,
+               w.plan_id,
+               w.chain_idt,
+               w.document_id,
+               w.status,
+               w.total_amount,
+               w.amount_to_pay,
+               w.written_off_amount,
+               w.overdue_amount,
+               w.sub_int_rate,
+               w.sub_fee_rate,
+               w.eff_rate,
+               w.tenor,
+               w.posting_date,
+               w.pay_b_date,
+               w.end_date_p,
+               w.end_date_f,
+               w.ovd_90_days,
+               w.plans_in_history,
+               gl.bd,
+               w.kf
+               into l_total
+              from ow_inst_totals w
+             where w.chain_idt = p_chain_idt; 
+        
+        insert into ow_inst_totals_hist values l_total;            
+        l_plans_in_history:=l_total.plan_num; 
+      
+    select * bulk collect into l_ow_inst_sub_p from ow_inst_sub_p a where a.chain_idt = p_chain_idt;
+      
+    select * bulk collect into l_ow_inst_portions from ow_inst_portions a where a.chain_idt = p_chain_idt;
+      
+    select * bulk collect into l_ow_inst_sub_t from ow_inst_sub_t a where a.chain_idt = p_chain_idt;
+    
+    forall j in l_ow_inst_sub_t.first .. l_ow_inst_sub_t.last
+      insert into ow_inst_sub_t_hist a values
+      (l_ow_inst_sub_t(j).chain_idt, l_plans_in_history, l_ow_inst_sub_t(j).type, l_ow_inst_sub_t(j).code, l_ow_inst_sub_t(j).status, l_ow_inst_sub_t(j).total_amount,
+      l_ow_inst_sub_t(j).amount_to_pay, l_ow_inst_sub_t(j).written_off_amount, l_ow_inst_sub_t(j).overdue_amount, l_ow_inst_sub_t(j).kf);
+      
+    forall j in l_ow_inst_portions.first .. l_ow_inst_portions.last
+      insert into ow_inst_portions_hist values 
+      (l_ow_inst_portions(j).chain_idt, l_plans_in_history, l_ow_inst_portions(j).status, l_ow_inst_portions(j).eff_date, 
+       l_ow_inst_portions(j).due_date, l_ow_inst_portions(j).rep_date, l_ow_inst_portions(j).seq_number, l_ow_inst_portions(j).total_amount, 
+       l_ow_inst_portions(j).amount_to_pay, l_ow_inst_portions(j).written_off_amount, l_ow_inst_portions(j).overdue_amount, l_ow_inst_portions(j).kf);
+      
+    forall j in l_ow_inst_sub_p.first .. l_ow_inst_sub_p.last
+      insert into ow_inst_sub_p_hist values
+      (l_ow_inst_sub_p(j).chain_idt, l_plans_in_history, l_ow_inst_sub_p(j).idp, l_ow_inst_sub_p(j).type, l_ow_inst_sub_p(j).code, l_ow_inst_sub_p(j).status,
+      l_ow_inst_sub_p(j).total_amount, l_ow_inst_sub_p(j).amount_to_pay, l_ow_inst_sub_p(j).written_off_amount, l_ow_inst_sub_p(j).overdue_amount, l_ow_inst_sub_p(j).kf);  
+  end;
+
 
 procedure close_inst_acc is
 l_info varchar2(4000);
@@ -15609,7 +15692,8 @@ for i in (select t.chain_idt
      if l_noclose_acc = 0 then
          update ow_inst_totals t
             set t.end_date_f = l_bd
-          where t.chain_idt = i.chain_idt; 
+          where t.chain_idt = i.chain_idt;
+          int_move_to_hist(i.chain_idt);
      else
      rollback to bef_close;
      end if;
@@ -15641,7 +15725,7 @@ for i in (select t.chain_idt , ai.acc, t.kf
            set t.ovd_90_days = l_dat_dat_spz
          where t.kf = i.kf
            and t.chain_idt = i.chain_idt;
-    
+        int_move_to_hist(i.chain_idt);    
     end if;
 
 end loop;
