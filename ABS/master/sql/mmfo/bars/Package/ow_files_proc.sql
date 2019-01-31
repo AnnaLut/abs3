@@ -2309,79 +2309,17 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
     bars_audit.info(h || 'Finish.');
   end iparse_roic_doc_rev;
   
-  --Процедура вставки ефективної ставки Instolment
-
+  --Процедура вставки ефективної ставки Instolment  
+  
   procedure int_plan_add_eff_r(p_chain_idt in ow_inst_totals.chain_idt%type,
                                p_eff_rate  in ow_inst_totals.eff_rate%type) is
- l_plans_in_history number:=1;
- l_total ow_inst_totals_hist%rowtype;
- type t_ow_inst_sub_p is table of ow_inst_sub_p%rowtype;
- type t_ow_inst_portions is table of ow_inst_portions%rowtype;
- type t_ow_inst_sub_t is table of ow_inst_sub_t%rowtype;
- l_ow_inst_sub_p t_ow_inst_sub_p:=t_ow_inst_sub_p();
- l_ow_inst_portions t_ow_inst_portions:=t_ow_inst_portions();
- l_ow_inst_sub_t t_ow_inst_sub_t:=t_ow_inst_sub_t();
  begin
       update ow_inst_totals t 
-         set t.eff_rate = p_eff_rate,
-             t.plans_in_history = t.plans_in_history+1
+         set t.eff_rate = p_eff_rate
        where t.chain_idt = p_chain_idt;
- 
-        select w.id,
-               w.idn,
-               w.nd,
-               w.contract,
-               w.contract_idt,
-               w.scheme,
-               w.plan_id,
-               w.chain_idt,
-               w.document_id,
-               w.status,
-               w.total_amount,
-               w.amount_to_pay,
-               w.written_off_amount,
-               w.overdue_amount,
-               w.sub_int_rate,
-               w.sub_fee_rate,
-               w.eff_rate,
-               w.tenor,
-               w.posting_date,
-               w.pay_b_date,
-               w.end_date_p,
-               w.end_date_f,
-               w.ovd_90_days,
-               w.plans_in_history,
-               gl.bd,
-               w.kf
-               into l_total
-              from ow_inst_totals w
-             where w.chain_idt = p_chain_idt; 
-        
-        insert into ow_inst_totals_hist values l_total;            
-        l_plans_in_history:=l_total.plan_num; 
-      
-    select * bulk collect into l_ow_inst_sub_p from ow_inst_sub_p a where a.chain_idt = p_chain_idt;
-      
-    select * bulk collect into l_ow_inst_portions from ow_inst_portions a where a.chain_idt = p_chain_idt;
-      
-    select * bulk collect into l_ow_inst_sub_t from ow_inst_sub_t a where a.chain_idt = p_chain_idt;
-    
-    forall j in l_ow_inst_sub_t.first .. l_ow_inst_sub_t.last
-      insert into ow_inst_sub_t_hist a values
-      (l_ow_inst_sub_t(j).chain_idt, l_plans_in_history, l_ow_inst_sub_t(j).type, l_ow_inst_sub_t(j).code, l_ow_inst_sub_t(j).status, l_ow_inst_sub_t(j).total_amount,
-      l_ow_inst_sub_t(j).amount_to_pay, l_ow_inst_sub_t(j).written_off_amount, l_ow_inst_sub_t(j).overdue_amount, l_ow_inst_sub_t(j).kf);
-      
-    forall j in l_ow_inst_portions.first .. l_ow_inst_portions.last
-      insert into ow_inst_portions_hist values 
-      (l_ow_inst_portions(j).chain_idt, l_plans_in_history, l_ow_inst_portions(j).status, l_ow_inst_portions(j).eff_date, 
-       l_ow_inst_portions(j).due_date, l_ow_inst_portions(j).rep_date, l_ow_inst_portions(j).seq_number, l_ow_inst_portions(j).total_amount, 
-       l_ow_inst_portions(j).amount_to_pay, l_ow_inst_portions(j).written_off_amount, l_ow_inst_portions(j).overdue_amount, l_ow_inst_portions(j).kf);
-      
-    forall j in l_ow_inst_sub_p.first .. l_ow_inst_sub_p.last
-      insert into ow_inst_sub_p_hist values
-      (l_ow_inst_sub_p(j).chain_idt, l_plans_in_history, l_ow_inst_sub_p(j).idp, l_ow_inst_sub_p(j).type, l_ow_inst_sub_p(j).code, l_ow_inst_sub_p(j).status,
-      l_ow_inst_sub_p(j).total_amount, l_ow_inst_sub_p(j).amount_to_pay, l_ow_inst_sub_p(j).written_off_amount, l_ow_inst_sub_p(j).overdue_amount, l_ow_inst_sub_p(j).kf);  
+       bars_ow.int_move_to_hist(p_chain_idt);
   end;
+  
   -------------------------------------------------------------------------------
   -- iparse_oic_instplan
   -- процедура разбора файла OIC_InstPlan*LOCPAYREV*.xml
