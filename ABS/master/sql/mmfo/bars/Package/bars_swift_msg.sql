@@ -402,7 +402,7 @@ END bars_swift_msg;
 
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.64 10.01.2019';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.65 31.01.2019';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -9630,7 +9630,7 @@ IS
         for c in(select w.value from oper o
                 inner join operw w on o.ref=w.ref and w.tag ='UETR'
                 where o.pdat>=trunc(sysdate)-1
-                and o.nlsa='373971503'
+                and o.nlsa in ('373971503','373711505')
                 and substr(o.nlsb,1,4)='1500'
                 and o.sos=5)
         loop
