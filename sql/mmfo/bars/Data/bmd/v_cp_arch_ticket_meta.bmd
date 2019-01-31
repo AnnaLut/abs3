@@ -133,11 +133,11 @@ begin
   bars_metabase.add_column(l_tabid, 8, 'NMS1', 'C', 'Назва рах.~(дочірній)', '', 70, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 9, 'NMS2', 'C', 'Назва рах.~(батьківський)', '', 70, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'REF', 'N', 'Реф', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SOS', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SOS', 'N', 'SOS', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'TT', 'C', 'Оп.', '.8', 3, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'TXT', 'C', 'Деталі проводки', '3', 70, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'DK', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'STMT', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'DK', 'N', 'DK', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'STMT', 'N', 'STMT', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 16, 'DOC_DATE', 'D', 'Дата', '', 10, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки

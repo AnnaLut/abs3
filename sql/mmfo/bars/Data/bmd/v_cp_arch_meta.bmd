@@ -142,7 +142,7 @@ begin
   bars_metabase.add_column(l_tabid, 17, 'OP', 'N', 'Код~оп.', '.8', 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 18, 'P', 'N', 'Сума~Премiї~по угодi', '', 22, 20, 0, 0, 0, 0, '', '#0 000.00', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 19, 'R', 'N', 'Сума~Купону~угоди', '', 22, 22, 0, 0, 0, 0, '', '#0 000.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'REF', 'N', 'Основний~реф', '', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_CP_ARCH_TICKET_META[ACCESSCODE=>1][CONDITIONS=> REF in (SELECT * FROM TABLE(TOOLS.STRING_TO_NUMBER_LIST(:STR_REF,'','')))]', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'REF', 'N', 'Основний~реф', '', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_CP_ARCH_TICKET_META[ACCESSCODE=>1][CONDITIONS=> REF in (SELECT * FROM TABLE(TOOLS.STRING_TO_NUMBER_LIST(:STR_REF,null,null,'','')))]', '', 0);
   bars_metabase.add_column(l_tabid, 21, 'REF_MAIN', 'N', 'Реф.~початкової~угоди', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 22, 'REF_REPO', 'N', 'REPO~реф', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 23, 'RNK_EMI', 'N', 'RNK_EMI', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
