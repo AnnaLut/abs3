@@ -14,9 +14,9 @@ is
 % DESCRIPTION : Процедура формирования 4PX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.001       24.01.2019
+% VERSION     :  v.19.002       31.01.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_               char(30)  := ' v.19.001   24.01.2019';
+  ver_               char(30)  := ' v.19.002   31.01.2019';
   c_title            constant varchar2(100 char) := $$PLSQL_UNIT || '. ';
 
   --Константы определяющие форматы данных
@@ -180,11 +180,11 @@ BEGIN
         insert /*+ APPPEND */ 
         into nbur_log_f4px(report_date, kf, nbuc, version_id, b040, ekp, r020, r030_1, r030_2, 
             k040, s050, s184, f028, f045, f046, f047, f048, f049, f050, f052, f053, f054, f055, f056, f057, f070, k020, 
-            q001_1, q001_2, q003_1, q003_2, q003_3, q006, q007_1, q007_2, q007_3, q010_1, q010_2, q012, q013, q021, q022, 
+            q001_1, q001_2, q003_1, q003_2, q003_3, q006, q007_1, q007_2, q007_3, q010_1, q010_2, q012, q013, q021, q022a, 
             t071, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
         select   p_report_date as report_date
                    , p_kod_filii as kf
-                   , nbuc
+                   , '/' || p_kod_filii || '/'       --nbuc
                    , l_version_id
                    , substr(nbuc, 3) as b040
                    , (case when seg_01 = '31' then 'A4P007' else 'A4P006' end) as ekp
@@ -263,7 +263,7 @@ BEGIN
                    , cust_id
                    , null as ref
                    , t.nd
-                   , t.branch
+                   , '/' || p_kod_filii || '/'   --t.branch
             from v_nbur_#1a_dtl t
             join customer c
             on (t.kf = c.kf and t.cust_id = c.rnk)
@@ -293,7 +293,7 @@ BEGIN
             r030_1, r030_2, k040, s050, s184, f028, f045, f046, f047, f048, f049, 
             f050, f052, f053, f054, f055, f056, f057, f070, k020, q001_1, q001_2, 
             q003_1, q003_2, q003_3, q006, q007_1, q007_2, q007_3, q010_1, q010_2, 
-            q012, q013, q021, q022, t071, description, nd, branch)
+            q012, q013, q021, q022a, t071, description, nd, branch)
         select unique p_report_date as report_date, p_kod_filii as kf, branch as nbuc, 
             l_version_id as version_id, B040, substr(ekp, 1,6) EKP,
             (case 
@@ -436,7 +436,7 @@ BEGIN
                    P1200 as Q007_2,
                    P1800 as F056,
                    T as Q003_3,
-                   to_char(P9500, '90.000') as Q022,
+                   trim(to_char(P9500, '9990.0000')) as Q022,
                    P9600 as F050,
                    P3100 as Q007_3,
                    P9900 as Q006,
@@ -563,7 +563,7 @@ BEGIN
             r030_1, r030_2, k040, s050, s184, f028, f045, f046, f047, f048, f049, 
             f050, f052, f053, f054, f055, f056, f057, f070, k020, q001_1, q001_2, 
             q003_1, q003_2, q003_3, q006, q007_1, q007_2, q007_3, q010_1, q010_2, 
-            q012, q013, q021, q022, t071, description, nd, branch)
+            q012, q013, q021, q022a, t071, description, nd, branch)
         select unique p_report_date as report_date, p_kod_filii as kf, branch as nbuc, 
             l_version_id as version_id, 
             B040, EKP,
@@ -674,7 +674,7 @@ BEGIN
                    c.P103     as Q007_2,
                    c.P143     as F056,
                    c.T        as Q003_3,
-                   to_char(c.P950, '90.000') as Q022,
+                   trim(to_char(c.P950, '9990.0000')) as Q022,
                    c.P960     as F050,
                    c.P310     as Q007_3,
                    c.P999     as Q006,
@@ -747,7 +747,7 @@ BEGIN
                                    (CASE
                                        WHEN RRRR IN ('9999', '8888')
                                             OR TO_NUMBER (RRRR)
-                                               - TO_NUMBER (TO_CHAR (last_day(p_report_date), 'yyyy')) < 2
+                                               - TO_NUMBER (TO_CHAR (last_day(p_report_date)+1, 'yyyy')) < 2
                                        THEN
                                           W
                                        ELSE
