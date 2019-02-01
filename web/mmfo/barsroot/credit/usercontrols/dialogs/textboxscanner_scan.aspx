@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="/barsroot/content/themes/modernui/css/style.css">
 <script src="/barsroot/scripts/jquery/jquery.min.js" type="text/javascript"></script>
 <script src="/barsroot/scripts/jquery/jquery-ui.js" type="text/javascript"></script>
+<script src="/barsroot/scripts/json3.min.js" type="text/javascript"></script>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -510,6 +511,13 @@
                 
                 //признак что текущий скан добавлен в память
                 ScanAddedToMemory = true;
+
+                //кидаємо запит на сервер, щоб сесія була активна, поки працюємо виключно з js
+                $.ajax({
+                    type: "POST",
+                    async: true,
+                    url: location.protocol + '//' + location.host + '/barsroot/api/Upload/UploadApi/CheckMesssage'
+                });
             }
         }
         
