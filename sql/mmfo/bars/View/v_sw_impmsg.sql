@@ -33,7 +33,8 @@ CREATE OR REPLACE FORCE VIEW BARS.V_SW_IMPMSG
    ID,
    FIO,
    TRANSIT,
-   TAG20
+   TAG20,
+   is_pde
 )
 AS
    SELECT /*+ FIRST_ROWS(100)*/
@@ -64,7 +65,10 @@ AS
           (SELECT SUBSTR (VALUE, 1, 150)
              FROM sw_operw
             WHERE tag = '21' AND swref = j.swref)
-             tag20
+             tag20,
+          (select 1 from sw_messages swm
+            where  swm.swref= j.swref and  regexp_like (BODY,  '{5:.*?{PDE:') )  as is_pde
+ 
      FROM sw_journal j,
           tabval t,
           staff i,
