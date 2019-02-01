@@ -1562,6 +1562,7 @@ function initMainGrid() {
                 }
             }
 
+            markDuplicatedRows();
             //this.expandRow(this.tbody.find("tr.k-master-row").first());
         },
 
@@ -1592,6 +1593,17 @@ function initMainGrid() {
         g_sUserF === 1 ? "#mainUserTitle-template" : "#mainTitle-template"
     );
     setGridNavigationChbx("#gridMain");
+}
+
+function markDuplicatedRows() {
+    var grid = $('#gridMain').data("kendoGrid");
+    grid.tbody.find('>tr').each(function () {
+        var dataItem = grid.dataItem(this);
+
+        if (dataItem.IS_PDE == 1) {
+            $(this).addClass('k-row_red-yellow');
+        }
+    });
 }
 
 function selectLinkUsers() {

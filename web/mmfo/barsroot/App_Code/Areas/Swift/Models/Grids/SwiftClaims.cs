@@ -35,6 +35,8 @@ namespace Areas.Swift.Models
 
         public string NLSA { get; set; }
         public string NLSB { get; set; }
+
+        public int? IS_PDE { get; set; }
     }
 
 }
