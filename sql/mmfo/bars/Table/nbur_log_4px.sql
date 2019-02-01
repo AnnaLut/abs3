@@ -183,7 +183,7 @@ comment on column NBUR_LOG_F4PX.Q010_2 is 'період по роках, на які надається про
 comment on column NBUR_LOG_F4PX.Q012 is 'база для обчислення плаваючої ставки за кредитом';
 comment on column NBUR_LOG_F4PX.Q013 is 'розмір маржі процентної ставки за кредитом';
 comment on column NBUR_LOG_F4PX.Q021 is 'загальна сума кредиту за договором з нерезидентом';
-comment on column NBUR_LOG_F4PX.Q022 is 'величина процентної ставки за основною сумою боргу';
+comment on column NBUR_LOG_F4PX.Q022  is 'величина процентної ставки за основною сумою боргу';
 comment on column NBUR_LOG_F4PX.T071 is 'сума';
 comment on column NBUR_LOG_F4PX.DESCRIPTION is 'Опис (коментар)';
 comment on column NBUR_LOG_F4PX.ACC_ID is 'Ід. рахунка';
@@ -194,6 +194,16 @@ comment on column NBUR_LOG_F4PX.CUST_ID is 'Ід. клієнта';
 comment on column NBUR_LOG_F4PX.REF is 'Ід. платіжного документа';
 comment on column NBUR_LOG_F4PX.ND is 'Ід. договору';
 comment on column NBUR_LOG_F4PX.BRANCH is 'Код підрозділу';
+
+begin
+    execute immediate 'alter table bars.nbur_log_f4px add (Q022A  VARCHAR2(15))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+comment on column NBUR_LOG_F4PX.Q022A is 'процентна ставка за основною сумою боргу';
+
 
 prompt -- ======================================================
 prompt -- Grants

@@ -1,5 +1,5 @@
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/v_nbur_4px_dtl.sql =========*** Run *** =
+PROMPT *** Run *** ======== Scripts /Sql/BARS/View/v_nbur_4px_dtl.sql ======== *** Run *** =
 PROMPT ===================================================================================== 
 
 PROMPT *** Create  view v_nbur_4px_dtl ***
@@ -47,7 +47,7 @@ select p.REPORT_DATE
          , p.Q012
          , p.Q013
          , p.Q021
-         , p.Q022
+         , p.Q022a   as Q022
          , p.T071
          , p.DESCRIPTION
          , p.ACC_ID
@@ -118,7 +118,7 @@ comment on column V_NBUR_4PX_DTL.Q010_2 is 'період по роках, на які надається пр
 comment on column V_NBUR_4PX_DTL.Q012 is 'база для обчислення плаваючої ставки за кредитом';
 comment on column V_NBUR_4PX_DTL.Q013 is 'розмір маржі процентної ставки за кредитом';
 comment on column V_NBUR_4PX_DTL.Q021 is 'загальна сума кредиту за договором з нерезидентом';
-comment on column V_NBUR_4PX_DTL.Q022 is 'величина процентної ставки за основною сумою боргу';
+comment on column V_NBUR_4PX_DTL.Q022 is 'процентна ставка за основною сумою боргу';
 comment on column V_NBUR_4PX_DTL.T071 is 'сума';
 comment on column V_NBUR_4PX_DTL.DESCRIPTION is 'Опис (коментар)';
 comment on column V_NBUR_4PX_DTL.ACC_ID is 'Ід. рахунка';
@@ -136,5 +136,5 @@ comment on column V_NBUR_4PX_DTL.REF is 'Ід. платіжного документа';
 comment on column V_NBUR_4PX_DTL.BRANCH is 'Код підрозділу';
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_nbur_4px_dtl.sql =========*** End *** =
+PROMPT *** End *** ======== Scripts /Sql/BARS/View/v_nbur_4px_dtl.sql ======== *** End *** =
 PROMPT ===================================================================================== 
