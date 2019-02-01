@@ -14,12 +14,11 @@ namespace BarsWeb.Areas.Upload.Controllers.Api
     {
         readonly IUploadRepository _repo;
         public UploadApiController(IUploadRepository repo) { _repo = repo; }
-
         #region Photo
         const string imageSessionKey = "BYTES_IMAGE_DATA_KEY_{0}";
         const int imgW = 480;
         const int imgH = 640;
-        const int imgSize = 150*1000;   // bytes
+        const int imgSize = 150 * 1000;   // bytes
 
         [HttpPost]
         public HttpResponseMessage PhotoUpload()
@@ -37,7 +36,7 @@ namespace BarsWeb.Areas.Upload.Controllers.Api
                 if (bytes.Length > imgSize)
                 {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError,
-                        string.Format("Розмір має бути меньшим {0} кб", imgSize/1000));
+                        string.Format("Розмір має бути меньшим {0} кб", imgSize / 1000));
                 }
 
                 Bitmap newBitmap;
@@ -45,7 +44,7 @@ namespace BarsWeb.Areas.Upload.Controllers.Api
                 using (Image newImage = Image.FromStream(memoryStream))
                     newBitmap = new Bitmap(newImage);
 
-                if(newBitmap != null)
+                if (newBitmap != null)
                 {
                     if (newBitmap.Width > imgW || newBitmap.Height > imgH)
                     {
@@ -56,10 +55,10 @@ namespace BarsWeb.Areas.Upload.Controllers.Api
                     {
                         HttpContext.Current.Session[string.Format(imageSessionKey, rnk)] = bytes;
                         return new HttpResponseMessage() { StatusCode = HttpStatusCode.OK };
-                    } 
-                }                
+                    }
+                }
             }
-            return Request.CreateResponse(HttpStatusCode.InternalServerError,  "Невірний формат");
+            return Request.CreateResponse(HttpStatusCode.InternalServerError, "Невірний формат");
         }
 
         [HttpPost]
@@ -82,6 +81,12 @@ namespace BarsWeb.Areas.Upload.Controllers.Api
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
                 return response;
             }
+        }
+
+        [HttpPost]
+        public void CheckMesssage()
+        {
+            //пустий метод для виклику з js , щоб не падала сесія
         }
 
         [HttpPost]
