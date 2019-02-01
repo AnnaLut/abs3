@@ -1,5 +1,33 @@
-CREATE OR REPLACE VIEW V_CCKDPK AS
-SELECT    RNK,
+CREATE OR REPLACE FORCE VIEW BARS.V_CCKDPK
+(
+   RNK,
+   CC_ID,
+   SDATE,
+   BRANCH,
+   KV,
+   NLS,
+   ACCOUNT_BRANCH,
+   ND,
+   NBS,
+   WDATE,
+   NMK,
+   KN_DPK,
+   Z1,
+   Z2,
+   Z3,
+   SUM_COM,
+   Z4,
+   Z5,
+   R1,
+   R2,
+   K0,
+   K1,
+   MES,
+   DAT_MOD,
+   TIP
+)
+AS
+   SELECT RNK,
           CC_ID,
           SDATE,
           BRANCH,
@@ -15,19 +43,20 @@ SELECT    RNK,
                     'ccid',
                     nd)
              KN_DPK,
-          nvl(Z1,0) Z1,
-          nvl(Z2,0) Z2,
-          nvl(Z3,0) Z3,
-          nvl(sum_com,0) sum_com,
-          nvl((Z1 + Z2 + Z3+sum_com),0) Z4,
-          nvl((LIM - Z3) ,0) Z5,
-          nvl(R1,0) R1,
-          nvl(R1 - (Z1 + Z2 + Z3),0) R2,
-          nvl(K0,0) K0,
-          nvl(LEAST ( (LIM - Z3), (R1 - (Z1 + Z2 + Z3))),0) K1,
+          NVL (Z1, 0) Z1,
+          NVL (Z2, 0) Z2,
+          NVL (Z3, 0) Z3,
+          NVL (sum_com, 0) sum_com,
+          NVL ( (Z1 + Z2 + Z3 + sum_com), 0) Z4,
+          NVL ( (LIM - Z3), 0) Z5,
+          NVL (R1, 0) R1,
+          NVL (R1 - (Z1 + Z2 + Z3), 0) R2,
+          NVL (K0, 0) K0,
+          NVL (LEAST ( (LIM - Z3), (R1 - (Z1 + Z2 + Z3))), 0) K1,
           --(Z1 + Z2 + Z3) as K1,
           ROUND (MONTHS_BETWEEN (wdate, gl.bd), 1) MES,
-          cck_dpk.DAT_MOD (ND) DAT_MOD
+          cck_dpk.DAT_MOD (ND) DAT_MOD,
+          TIP
      FROM (SELECT d.branch,
                   d.ND,
                   d.CC_ID,
@@ -45,7 +74,9 @@ SELECT    RNK,
                   cck_dpk.sum_SP_ALL (d.nd) / 100 Z1,
                   cck_dpk.sum_SN_all (a8.vid, d.nd) / 100 Z2,
                   cck_dpk.sum_SS_next (d.nd) / 100 Z3,
-                  /*cck_dpk.sum_SK_all ( d.nd) / 100*/ null  sum_com
+                  /*cck_dpk.sum_SK_all ( d.nd) / 100*/
+                  NULL sum_com,
+                  A.TIP as tip
              FROM customer c,
                   (SELECT *
                      FROM cc_deal
@@ -66,3 +97,5 @@ SELECT    RNK,
                   AND n8.acc = a8.acc)
 --where NOT ( Z1> 0 and  NBS ='2525') --  НЕ выполнять досрочное погашение с 2625 с перестроением ГПК при наличии ПРОСРОЧЕК.
 ;
+
+GRANT SELECT, FLASHBACK ON BARS.V_CCKDPK TO BARS_ACCESS_DEFROLE;
