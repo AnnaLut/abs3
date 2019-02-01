@@ -37,6 +37,10 @@
     width: 200px;
 }
 
+.k-row_red-yellow {
+    background-color: #FF5733;
+}
+
 /*.k-grid {
     font-size: 12px;
 }

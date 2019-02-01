@@ -84,7 +84,8 @@ namespace BarsWeb.Areas.Swift.Infrastructure.DI.Implementation {
                                     v.DATE_IN,v.DATE_OUT,v.DATE_REC,v.DATE_PAY,v.VDATE, NVL(v.ID, 0) as ID, v.FIO,v.TRANSIT,
                                     v.TAG20,
                                     (select AC.NLS from accounts ac where v.accd = ac.acc) nlsa,
-                                    (select AC.NLS from accounts ac where v.acck = ac.acc) nlsb 
+                                    (select AC.NLS from accounts ac where v.acck = ac.acc) nlsb,
+                                    v.IS_PDE
                                 from v_sw_impmsg v
                                 where {0}
                                 v.io_ind = :io_ind
