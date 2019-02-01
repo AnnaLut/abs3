@@ -1690,7 +1690,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                 join pfu_epp_line_processing p
                   on value(t) = p.id
                 join accounts a
-                  on p.nls = a.nls)
+                  on p.nls = a.nls
+              union
+              select value(t) f_id, p.*, a.acc
+                from table(p_acc_list) t
+                join pfu_epp_line_processing p
+                  on value(t) = p.id
+                join accounts a
+                  on p.nls = a.nlsat and a.tip like 'W4%')
     loop
       l_accreclist.extend;
       begin
