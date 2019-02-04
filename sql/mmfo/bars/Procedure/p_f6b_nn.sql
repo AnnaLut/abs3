@@ -12,7 +12,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.19.001      22.01.2019
+ % VERSION     :   v.19.003      29.01.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -28,6 +28,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+29.01.2019  дисконты,не входящие в список #6D, и имеющие резерв в nbu23_rez
 22.01.2019  дисконты с типом SDF: расширен список балансовых для обработки
 27.12.2018  обработка дисконтов 2396/SDF без учета r013
 09.10.2018  SNA отсутсвующие в nbu23_rez: изменен скрипт отбора остатков
@@ -102,7 +103,7 @@ BEGIN
 
    EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
-   logger.info ('P_F6B_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy')||' v.18.012');
+   logger.info ('P_F6B_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy')||' v.19.003');
 -------------------------------------------------------------------
    userid_ := user_id;
 
@@ -154,7 +155,8 @@ BEGIN
                        2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
                        NVL(nb.s250_23,'0') s250,
                        NVL(Trim(sp.s031),'90') S031, NVL(nb.r013,'0') R013,
-                       NVL(nb.tip,'ODB') TIP
+                       NVL(nb.tip,'ODB') TIP,
+                       nb.nls_rez
                   from nbu23_rez nb, customer c, specparam sp
                  where nb.fdat = z.fdat1
                    and nb.rnk = z.rnk1
@@ -444,8 +446,8 @@ BEGIN
 
           else
 
-             if k.tip ='SRR' and k.BV <0  then     ---зміна знаку та СС для рахунків типу SRR
-
+             if k.tip ='SRR' and k.nbs ='2397' and k.BV <0  then     ---зміна знаку та СС для рахунків типу SRR
+                                                                   ---2397 1405 1415 3015 3115
                 kodp_:= '40'|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
                 znap_:= TO_CHAR(abs(k.BV));
 
@@ -590,13 +592,13 @@ BEGIN
           kodp_:= CC_|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
           znap_:= TO_CHAR(k.rezq);
 
-             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
-             VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc, ref)
+             VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc, k.nls_rez);
 
           if ddd_ = '121' and k.pd_0 =1 then
 
-             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
-             VALUES (k.nls, k.kv, dat_, '120'||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc, ref)
+             VALUES (k.nls, k.kv, dat_, '120'||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc, k.nls_rez);
           end if;
        end if;
 
@@ -742,7 +744,7 @@ BEGIN
 
      end loop;
 
----------------------------------------------------------------    обработка счетов дисконтов
+--------------------------------------------------------    обработка счетов дисконтов SDF, остатки
      for k in ( select /*+leading(nb) index(nb I3_NBU23REZ)*/
                        nb.acc, NVL(nb.rnk,0) RNK, nb.nbs, nb.nls, nb.kv,
                        nb.nd, nb.id, nvl(nb.r013,'0') r013,
@@ -868,15 +870,8 @@ BEGIN
           I_ := 'M';
        end if;
 
---     if    k.pd_0 =1  and
---           k.nbs in ('1500','1502','1508','1600','1607')
---     then
---         ddd_ :='120';
---         H_ := '0';
---
---     end if;
        if    k.pd_0 =1  and
-             k.nbs in ('1406', '3016')
+             k.nbs in ('1406','1416','1426', '3016','3116','3216')
        then
            ddd_ :='130';
            H_ := '0';
@@ -885,6 +880,146 @@ BEGIN
 
           kodp_:= CC_|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
           znap_:= TO_CHAR(ABS(k.bv));
+
+             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
+             VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+
+     end loop;
+
+--------------------------------------------------------    дисконты SDF,SDI,SDM,SDA, резервы
+     for k in ( select /*+leading(nb) index(nb I3_NBU23REZ)*/
+                       nb.acc, NVL(nb.rnk,0) RNK, nb.nbs, nb.nls, nb.kv,
+                       nb.nd, nb.id, nvl(nb.r013,'0') r013,
+                       NVL(round(nb.bvq*100,0),0) BV,
+                       NVL(round(nb.rezq*100,0),0) rezq,
+                       nb.s080 FIN, nvl(nb.pd_0,0) pd_0,
+                       c.codcagent, c.custtype,
+                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                       NVL(nb.s250_23,'0') s250, nb.tip
+                  from nbu23_rez nb, customer c
+                 where nb.fdat = z.fdat1
+                   and nb.rnk = z.rnk1
+                   and nb.nd = z.nd1
+                   and nb.kat = z.kat1
+                   and nb.kv = z.kv1
+                   and nvl(nb.rz,0) = z.rz1
+                   and nvl(nb.rezq,0) !=0
+                   and nvl(nb.ddd_6b,'000') ='000'
+                   and nb.rnk = c.rnk
+                   and nb.tip in ('SDF','SDI','SDM','SDA')
+                   and nb.nbs in ( select r020 from kl_r020
+                                    where txt like '%дисконт%'
+                                      and d_close is null
+                                       and trim(prem) ='КБ' )
+     ) loop
+
+         select max(ddd) into ddd_
+           from kl_f3_29
+          where kf='6B' and r020 like substr(k.nbs,1,3)||'%';
+
+         kv_ := lpad(to_char(k.kv),3,'0');
+
+         IF typ_>0 THEN
+            nbuc_ := NVL(F_Codobl_Tobo (k.acc, typ_), nbuc1_);
+         ELSE
+            nbuc_ := nbuc1_;
+         END IF;
+
+         comm_ := 'ID='||k.id||' RNK='||k.rnk||' ND='||k.nd||' DDD='||ddd_||' TIP='||k.tip||' R013='||k.r013;
+
+         CC_ := '40';
+
+       if k.codcagent in (1, 2)               -- банки
+       then
+             N_ := '3';
+       elsif k.codcagent in (3, 4)            -- юр.лица
+       then
+
+--   проверка наличия доп.параметра ISSPE
+          begin
+            select nvl(trim(value),'0')   into is_spe_
+              from customerw
+             where rnk =k.rnk
+               and tag ='ISSPE';
+          exception
+            when others
+               then is_spe_ :='0';
+          end;
+
+          if is_spe_ ='1'  then
+
+             N_ := '5';
+          else
+
+             if k.nls like '21%'    or
+                k.nls like '236%'   or
+                k.nls like '237%'   or
+                k.nls like '238%'
+             then
+                     is_budg_ := 1;
+             else    is_budg_ := 0;
+             end if;
+
+             -- для контрагента Министерство финансов ........
+             if    is_budg_ !=0  or
+                   ( mfo_ = 300465 and k.rnk in (90092301, 94312801) ) then
+
+                  N_ := '4';                  --бюджет
+             elsif k.sed = '56'  then
+                  N_ := '6';                  --юр.лицо ОСББ
+             else
+                  N_ := '2';                  --юр.лицо
+             end if;
+
+          end if;
+
+       elsif k.codcagent in (5,6) and k.sed <> '91'
+       then
+          N_ := '1';                          --физ.лицо
+       elsif k.codcagent in (5,6) and k.sed = '91'
+       then
+          N_ := '7';                    --физ.лицо предприниматель
+       else
+
+          if    k.custtype ='1'  then   N_ := '3';
+          elsif k.custtype ='2'  then   N_ := '2';
+          elsif k.custtype ='3'  then   N_ := '1';
+          else
+               N_ := 'X';
+          end if;
+
+       end if;
+
+       H_ := '0';
+
+       if k.pd_0 !=1 and k.s250 = '8' then
+          H_ := '2';
+       elsif k.pd_0 !=1  then
+          H_ := '1';
+       else
+          H_ := '0';
+       end if;
+
+       I_ := k.fin;
+       if ddd_ like '15%'  and  trim(I_) is null  then
+          I_ := 'K';
+       end if;
+       -- для контрагента Министерство финансов ........
+       if mfo_ = 300465 and k.rnk in (90092301, 94312801)  and ddd_ not in ('152','153')
+       then
+          I_ := 'M';
+       end if;
+
+       if    k.pd_0 =1  and
+             k.nbs in ('1406','1416','1426', '3016','3116','3216')
+       then
+           ddd_ :='130';
+           H_ := '0';
+
+       end if;
+
+          kodp_:= CC_|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
+          znap_:= TO_CHAR(ABS(k.rezq));
 
              INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
              VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
@@ -955,6 +1090,7 @@ BEGIN
                        '2407','2417','2427','2437','2457',
                        '1535','1545','1405','1415','1435','1455',
                        '3007','3015','3107','3115' )
+                  and ref is null
              ) r, accounts a, agg_monbals m
        where r.acc = a.acc
          and a.accc = m.acc
