@@ -3,11 +3,14 @@ CREATE OR REPLACE PROCEDURE BARS.P_F07_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #07 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 11/01/2019 (11/12/2018)
+% VERSION     :   v.19.006     31.01.2019  (11/01/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+    l_ver    varchar2(24)      := 'v.19.006  31.01.2019'; 
+/*
+25.01.2019 резервы: добавлена разбивка в разрезе R011 (по основным счетам)
 09.01.2019 - з 10/01/2019 для код_в S240 in ('6','7','8','A','B') не буде 
              виконуватися зам_на на значення "J" 
              з 10/01/2019 введено нов_ значення S240 ("O","N","P") 
@@ -102,6 +105,7 @@ cp_id_   Varchar2(20);
 KIL_     Number;
 recid_   Number;
 sum_zal_ Number;
+sign_cc_ number;
 
 ---Значение R011 из кл-ра KL_R011
 CURSOR SCHETA IS
@@ -151,7 +155,7 @@ BEGIN
 
 EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
-logger.info ('P_F07_NN: Begin ');
+logger.info ('P_F07_NN: Begin   '||l_ver);
 -------------------------------------------------------------------
 userid_ := user_id;
 
@@ -274,7 +278,7 @@ end if;
          sql_acc_ :=
                 'insert into otcn_f42_cp (fdat, acc, nls, kv, sum_zal, dat_zal, rnk, kodp) '
               ||'select c.fdat, a.acc, a.nls, a.kv, nvl(c.sum_zal, 0), c.dat_zal, a.rnk, null '
-              ||'from accounts a, cp_v_zal_acc c '
+              ||'from accounts a, cp_v_zal_acc_k c '
               ||'where a.acc = c.acc '
               ||'  and c.fdat = :dat_ '
               ||'  and substr(a.nls,1,4) like ''14__%''' ;
@@ -473,18 +477,30 @@ LOOP
             else
                 sum_zal_ := 0;
             end if;
-
-            sum_zal_ := gl.p_icurval(kv_, sum_zal_, dat_);
-
             if sum_zal_ <> 0 then
-               -- необтяжен_ ЦП
+-----
+               sum_zal_ := gl.p_icurval(kv_, sum_zal_, dat_);
+
+/*               sign_cc_ := 0;
+               select sign(fostdt_snpf (nvl((select accc from accounts
+                                             where acc =acc_ and rownum=1), 0), trunc(dat_,'MM') ))
+                 into sign_cc_
+                 from dual; 
+
+               if sign_cc_ !=0 and sign_cc_ != sign(se_)  then
+                    sum_zal_ :=(-1)*sum_zal_;
+               end if;     */
+-----
+               -- необтяженi ЦП
                if se_ - sum_zal_ <> 0 
                then
+                  dk_ := IIF_N(se_ -sum_zal_, 0,'1','2','2');
+
                   p_ins(data_, dk_, nls_, nbs_, kv_, country_, r011_, k072_, s183_,
                         s130_, s240_, nnnn_, acc_, rnk_, TO_CHAR(ABS(se_ - sum_zal_)), nbuc_);
                end if;
 
-               -- обтяжен_ ЦП
+               -- обтяженi ЦП
                r011_n := r011_;
                if r011_ = 'C'
                then
@@ -496,6 +512,7 @@ LOOP
                else
                   null;
                end if;
+               dk_ := IIF_N(sum_zal_,0,'1','2','2');
 
                p_ins(data_, dk_, nls_, nbs_, kv_, country_, r011_n, k072_, s183_,
                      s130_, s240_, nnnn_, acc_, rnk_, TO_CHAR(ABS(sum_zal_)), nbuc_);
@@ -587,7 +604,9 @@ begin
             end;
          end ;
 
-         update rnbu_trace set comm = cp_id_ where acc = k.acc;
+         update rnbu_trace
+            set comm = cp_id_, ref =nvl((select accc from accounts where acc =k.acc and rownum=1), 0)
+          where acc = k.acc;
 
       end loop;
 
@@ -667,27 +686,31 @@ then
 
    for k in (select /*+ leading(r) */
                     t.nls, t.kv, t.dat, t.szq, t.sz, gl.p_icurval(t.kv, t.sz, dat_) sz1,
-                    t.s080, t.rnk, t.nd nd, t.tobo,
-                    r.acc, r.odate, r.kodp, r.comm, r.nd ndr, t.id,
-                    substr(r.kodp,7,1) r011
-             from v_tmp_rez_risk t, rnbu_trace r, agg_monbals m
-             where t.dat=Dat23_
+                    t.s080, t.rnk, t.nd nd, t.tobo, t.id,
+                    r.acc, r.kodp, r.comm, substr(r.kodp,7,1) r011,
+                    r.znap, r.znap_acc
+             from v_tmp_rez_risk t, agg_monbals m,
+                  ( select acc, kodp, comm, znap,
+                           sum(znap) over (partition by acc) znap_acc
+                      from rnbu_trace 
+                     where kodp not like '3%'
+                       and kodp not like '9%'
+                       and substr(kodp,3,4) not in ('1419','1429','3107','3119','3219')
+                  ) r
+             where t.dat = Dat23_
                and t.acc = r.acc
-               and substr(r.kodp,3,4) not in ('1419','1429','3107','3119','3219')
-               and r.kodp not like '3%'
-               and r.kodp not like '9%'
                and t.acc = m.acc
                and m.fdat = dats_
                and m.ost - m.crdos + m.crkos <> 0
             )
    loop
-      se_ := NVL(k.sz1, k.szq);
+--                  если есть разбивка по R011 основных счетов, то разобьются и резервы 
+      se_ := round( NVL(k.sz1, k.szq) * (k.znap / k.znap_acc), 0);
       dk_ := '2';
       rnk_ := k.rnk;
       acc_ := k.acc;
       nls_ := k.nls;
       kv_ := k.kv;
-      data_ := k.odate;
 
       IF typ_ > 0 THEN
          nbuc_ := NVL(F_Codobl_Tobo(k.acc,typ_), nbuc1_);
@@ -771,14 +794,14 @@ then
 
 end if;
 ---------------------------------------------------
--- блок для згортання рахунк_в переоц_нки 1415, 3115
-for k in ( select comm, substr(kodp,20,4) NOMCP,
+-- блок для згортання рахункiв переоцiнки 1415, 3115  ( ref =accc -acc основного рахунку)
+for k in ( select comm, ref, substr(kodp,20,4) NOMCP,
                   sum(decode(substr(kodp,1,2), '11', znap, 0)) sum_a,
                   sum(decode(substr(kodp,1,2), '12', znap, 0)) sum_p
            from rnbu_trace
-           where substr(kodp,3,4) in ('1415','3115')
+           where substr(kodp,3,4) in ('1415','3115','3016')
              and kodp like '1%'
-           group by comm, substr(kodp,20,4)
+           group by comm, ref, substr(kodp,20,4)
            order by 1, 2
          )
 
@@ -787,14 +810,22 @@ for k in ( select comm, substr(kodp,20,4) NOMCP,
        if k.sum_a > k.sum_p and k.sum_a <> 0 and k.sum_p <> 0
        then
           znap_ := k.sum_a - k.sum_p;
+-- консолидированный счет =актив :  для расшифровки в пассиве меняем знак остатка и kodp
+          update rnbu_trace 
+             set znap = to_char((-1)*to_number(znap)),
+                 kodp = '11'||substr(kodp,3)
+          where comm = k.comm   and ref = k.ref
+            and substr(kodp,20,4) = k.nomcp
+            and substr(kodp,3,4) in ('1415','3115','3016')
+            and kodp like '12%';
 
-          begin
+/*          begin
              select min(recid)
                 into recid_
              from rnbu_trace
-             where comm = k.comm
+             where comm = k.comm   and ref = k.ref
                and substr(kodp,20,4) = k.nomcp
-               and substr(kodp,3,4) in ('1415','3115')
+               and substr(kodp,3,4) in ('1415','3115','3016')
                and kodp like '11%';
           exception when no_data_found then
              null;
@@ -802,37 +833,45 @@ for k in ( select comm, substr(kodp,20,4) NOMCP,
 
           update rnbu_trace r set r.znap = znap_
           where r.recid = recid_
-            and r.comm = k.comm
+            and r.comm = k.comm   and ref = k.ref
             and substr(r.kodp,20,4) = k.nomcp
-            and substr(r.kodp,3,4) in ('1415','3115')
+            and substr(r.kodp,3,4) in ('1415','3115','3016')
             and r.kodp like '11%';
 
           delete from rnbu_trace r
           where r.recid <> recid_
-            and r.comm = k.comm
+            and r.comm = k.comm   and ref = k.ref
             and substr(r.kodp,20,4) = k.nomcp
-            and substr(r.kodp,3,4) in ('1415','3115')
+            and substr(r.kodp,3,4) in ('1415','3115','3016')
             and r.kodp like '11%';
 
           delete from rnbu_trace r
-          where r.comm = k.comm
+          where r.comm = k.comm   and ref = k.ref
             and substr(r.kodp,20,4) = k.nomcp
-            and substr(r.kodp,3,4) in ('1415','3115')
+            and substr(r.kodp,3,4) in ('1415','3115','3016')
             and r.kodp like '12%';
-
+*/
        end if;
 
        if k.sum_p > k.sum_a and k.sum_a <> 0 and k.sum_p <> 0
        then
           znap_ := k.sum_p - k.sum_a;
 
-          begin
+-- консолидированный счет =пассив :  для расшифровки в активе меняем знак остатка и kodp
+          update rnbu_trace 
+             set znap = to_char((-1)*to_number(znap)),
+                 kodp = '12'||substr(kodp,3)
+          where comm = k.comm   and ref = k.ref
+            and substr(kodp,20,4) = k.nomcp
+            and substr(kodp,3,4) in ('1415','3115','3016')
+            and kodp like '11%';
+/*          begin
              select min(recid)
                 into recid_
              from rnbu_trace
-             where comm = k.comm
+             where comm = k.comm   and ref = k.ref
                and substr(kodp,20,4) = k.nomcp
-               and substr(kodp,3,4) in ('1415','3115')
+               and substr(kodp,3,4) in ('1415','3115','3016')
                and kodp like '12%';
           exception when no_data_found then
              null;
@@ -840,24 +879,24 @@ for k in ( select comm, substr(kodp,20,4) NOMCP,
 
           update rnbu_trace r set r.znap = znap_
           where r.recid = recid_
-            and r.comm = k.comm
+            and r.comm = k.comm   and ref = k.ref
             and substr(r.kodp,20,4) = k.nomcp
-            and substr(r.kodp,3,4) in ('1415','3115')
+            and substr(r.kodp,3,4) in ('1415','3115','3016')
             and r.kodp like '12%';
 
           delete from rnbu_trace r
           where r.recid <> recid_
-            and r.comm = k.comm
+            and r.comm = k.comm   and ref = k.ref
             and substr(r.kodp,20,4) = k.nomcp
-            and substr(r.kodp,3,4) in ('1415','3115')
+            and substr(r.kodp,3,4) in ('1415','3115','3016')
             and r.kodp like '12%';
 
           delete from rnbu_trace r
-          where r.comm = k.comm
+          where r.comm = k.comm   and ref = k.ref
             and substr(r.kodp,20,4) = k.nomcp
-            and substr(r.kodp,3,4) in ('1415','3115')
+            and substr(r.kodp,3,4) in ('1415','3115','3016')
             and r.kodp like '11%';
-
+*/
        end if;
 
      end loop;
