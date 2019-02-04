@@ -3007,7 +3007,7 @@ IS
         (l.swref=s.swref(+)) AND
         (a.sos=5) AND
         (a.acc=acc_) AND
-        s.IO_IND='I' AND 
+--        s.IO_IND='I' AND 
         (a.fdat BETWEEN priod_start AND period_finish)
       ORDER BY
         a.dk, a.s;
