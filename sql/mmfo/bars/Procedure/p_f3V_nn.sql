@@ -1,12 +1,22 @@
-CREATE OR REPLACE PROCEDURE BARS.p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
+CREATE OR REPLACE PROCEDURE p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #3V для
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 21.02.2018 
+% VERSION     : 04.02.2019 (01.02.2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 21.02.2018 новый файл отчетности
+31.01.2019 Заявка COBUMMFO-10759
+           значення S190 згідно довідника kl_s190 (було дні)
+           точність показника 09 до 3 знаків (було 2)
+           змінено формування показника 06 (дані беруться з кредитного ризику)
+           змінено формування показника 11. Розраховується по NBU23_REZ.TIPA (було по NBU23_REZ.DDD)
+01.02.2019 Заявка COBUMMFO-10759
+           до формування показника 09 додали умову: and r.TIPA not in (15,17,30) (виключили некредити)
+04.02.2019 Заявка COBUMMFO-10759
+           показник P вираховується зі заначення за найбільшу дату в періоді звітності (таблиця fin_fm)
+           (раніше вираховувалось   зі заначення за  останню дати періоду) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
     kodf_    varchar2(2) := '3V';
     userid_  number;
@@ -18,7 +28,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G
     dte_     date;
     znap_    number;
     p04_     varchar2(1);
-    fmt_     varchar2 (10)  := '9990D00';
+    fmt_     varchar2 (10)  := '9990D000';
+    gr_yo    varchar2(1);
+
 BEGIN
     userid_ := user_id;
     mfo_:=F_OURMFO();
@@ -174,11 +186,12 @@ BEGIN
                            ) a
                            left join (select okpo, '00' k160, max(nvl(k,0)) k,
                                              max(nvl(pd,0)) koef_k,
-                                             max(nvl(kol_351,1)) s190
+                                             max(f_nbur_get_s190(dte_,kol_351)) s190
                                       from (select n.okpo, n.k, n.kat, n.kol_351, r.pd
                                             from bars.nbu23_rez n, rez_cr r
                                             where n.fdat = dte_
-                                              and n.ddd like '12%'
+                                              and n.TIPA in (3,10,4,23) --ddd like '12%'
+                                              and r.TIPA not in (15,17,30)
                                               and r.fdat = n.fdat
                                               and r.rnk = n.rnk
                                             --  union all
@@ -201,11 +214,12 @@ BEGIN
                                         and c.ved = kl.k110
                                      ) c
                               on a.okpo = c.okpo
-                           left join (select f1.okpo,
-                                             nvl(f1.fm,'R') fm,
+                           left join (select distinct f1.okpo,
+                                             --nvl(f1.fm,'R') fm,
+                                             nvl(FIRST_VALUE (f1.fm) over (partition by f1.okpo order by f1.fdat desc),'R') fm,
                                              decode(f1.fdat,dte_,1,2) m
                                       from bars.fin_fm f1
-                                      where f1.fdat = dte_
+                                      where f1.fdat <= dte_ -- f1.fdat = dte_
                                      ) d
                               on a.okpo = d.okpo
                            left join (select f2.okpo,
@@ -274,7 +288,7 @@ BEGIN
              -- KODP = LL+P+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
                      '09'||k.P||LPAD(k.okpo, 10,'0'),
-                         LTRIM (to_char (ROUND (k.koef_k, 2), fmt_)), 'OKPO='||k.OKPO, k.rnk);
+                         LTRIM (to_char (ROUND (k.koef_k, 3), fmt_)), 'OKPO='||k.OKPO, k.rnk);
 
           INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+ZZZZZZZZZZ
@@ -285,25 +299,25 @@ BEGIN
        end loop;
     --------------------------------------------------------
     -- блок для зміни значення показника 11PZZZZZZZZZZ
-    for k in ( select * 
-               from rnbu_trace 
+    for k in ( select *
+               from rnbu_trace
                where kodp like '11%'
              )
        loop
 
           select NVL(sum(bvq*100), 0)
              into ost_
-          from nbu23_rez 
+          from nbu23_rez
           where fdat = dte_
-            and ddd like '12%'
+            and TIPA in (3,10,4,23) --ddd like '12%'
             and rnk = k.rnk;
-          
-          if ost_ = 0 
+
+          if ost_ = 0
           then
              select NVL(sum(ost), 0)
                 into ost_96_
              from sal
-             where fdat = dat_  
+             where fdat = dat_
                and nls like '96%'
                and rnk = k.rnk;
           end if;
@@ -322,16 +336,34 @@ BEGIN
 
     end loop;
 
-    -- LL=02, 03, 04, 05, 06, 07, 08, 09 
+    --------------------------------------------------------
+    -- блок для зміни значення показника 06PZZZZZZZZZZ -- Заявка COBUMMFO-10759
+      for k in ( select *
+               from rnbu_trace
+               where kodp like '06%'
+             )
+       loop
+           select DECODE(max(distinct kol24), '100', 1, '0')  into gr_yo
+             from REZ_CR rc
+            where rc.fdat = dte_
+              and rc.rnk = k.rnk
+              and rc.TIPA not in (15,17,30);
+
+             update rnbu_trace  set znap = gr_yo
+             where kodp like '06%' and rnk = k.rnk;
+       end loop;
+
+
+    -- LL=02, 03, 04, 05, 06, 07, 08, 09
     -- формируем только если LL=11 - принимает значение "0".
-    for k in ( select * 
-               from rnbu_trace 
+    for k in ( select *
+               from rnbu_trace
                where kodp like '11%'
                  and znap <> '0'
              )
 
        loop
- 
+
           delete from rnbu_trace r
           where substr(r.kodp,3,11) = substr(k.kodp,3,11)
             and substr(r.kodp,1,2) in ('02','03','04','05','06','07','08','09');

@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
 % DESCRIPTION :	Процедура формирования #3B для
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : 24.05.2018 (23.05.2018, 17.05.2018)
+% VERSION     : 04.02.2019 (24.05.2018, 23.05.2018, 17.05.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_    - отчетная дата
                sheme_  - код схемы
@@ -18,6 +18,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
  11    ZZZZZZZZZZ   ОКПО предприятия
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+04.02.2019 Заявка COBUMMFO-10759
+	   змінено формування показника 06 (дані беруться з кредитного ризику)
+           точність показника 09 до 3 знаків (було 2)
+           до формування показника 09 додали умову: and r.TIPA not in (15,17,30) (виключили некредити)
+           змінено формування показника 11. Розраховується по NBU23_REZ.TIPA (було по NBU23_REZ.DDD)
 24.05.2018 добавлено удаление показателя 10PMKDDDDDZZZZZZZZZZ с нулевым
            значением
 23.05.2018 не включаем контрагентов у которых сумма кредитов равна нулю
@@ -48,7 +53,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
     znap_    number;
     p06_     varchar2(1);
     p04_     varchar2(1);
-    fmt_     varchar2 (10)  := '9990D00';
+    fmt_     varchar2 (10)  := '9990D000';
+    gr_yo    varchar2(1);
 BEGIN
     userid_ := user_id;
     mfo_:=F_OURMFO();
@@ -209,7 +215,8 @@ BEGIN
                                       from (select n.okpo, n.k, n.kat, n.kol_351, r.pd, r.kol24
                                             from bars.nbu23_rez n, rez_cr r
                                             where n.fdat = dte_
-                                              and n.ddd like '12%'
+                                              and n.TIPA in (3,10,4,23) --ddd like '12%'
+                                              and r.TIPA not in (15,17,30)
                                               and r.fdat = n.fdat
                                               and r.acc = n.acc 
                                               and r.rnk = n.rnk
@@ -337,7 +344,7 @@ BEGIN
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
                      '09'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'),
-                         LTRIM (to_char (ROUND (k.koef_k, 2), fmt_)), 'OKPO='||k.OKPO, k.rnk);
+                         LTRIM (to_char (ROUND (k.koef_k, 3), fmt_)), 'OKPO='||k.OKPO, k.rnk);
           -- код 11
           INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
@@ -382,7 +389,7 @@ BEGIN
                                       from (select okpo, k, kat, obs
                                             from bars.nbu23_rez
                                             where fdat = dte_
-                                              and ddd like '12%'
+					      and TIPA in (3,10,4,23) --ddd like '12%'
                                             --  union all
                                             --select edrpou okpo, k, kat, obs
                                             --from bars.okpof659
@@ -570,6 +577,24 @@ BEGIN
                          where substr(r1.kodp, 11, 10) = substr(r.kodp, 11, 10)
                            and r1.kodp like '10_1______' || substr(r.kodp, 11, 10) || '%'
                        );
+
+    --------------------------------------------------------
+    -- блок для зміни значення показника 06PZZZZZZZZZZ -- Заявка COBUMMFO-10759
+      for k in ( select *
+               from rnbu_trace
+               where kodp like '06%'
+             )
+       loop
+           select DECODE(max(distinct kol24), '100', 1, '0')  into gr_yo
+             from REZ_CR rc
+            where rc.fdat = dte_
+              and rc.rnk = k.rnk
+              and rc.TIPA not in (15,17,30);
+
+             update rnbu_trace  set znap = gr_yo
+             where kodp like '06%' and rnk = k.rnk;
+       end loop;
+
 
     ---------------------------------------------------
     delete from tmp_nbu where kodf=kodf_ and datf= dat_;
