@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.17  23.01.2019';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.18  05.02.2019';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -1233,7 +1233,7 @@ create or replace package body cp_rep_dgp is
                  p_date_to   cp_dgp_zv.date_to%type) is
     l_title         constant varchar2(25) := 'dgp8: ';
     l_cp_dgp_zv_row cp_dgp_zv%rowtype;
-    l_nlsb_arr      string_list := string_list('1410', '1411', '1412', '1415', '1416', '1418', '1419', '1420', '1421','1426', '1428', '1429','1430', '1435', '1436', '1438','1440', '1446', '1448');
+    l_nlsb_arr      string_list := string_list('1400','1410', '1411', '1412', '1415', '1416', '1418', '1419', '1420', '1421','1426', '1428', '1429','1430', '1435', '1436', '1438','1440', '1446', '1448');
     l_cnt           pls_integer := 0;
 
     --блок змінних для залишків на рахунках по даті або суми оборотів
