@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.17.047  17/01/2019 (15/01/2019)
+% VERSION : v.19.002  28/01/2019 (17/01/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -22,18 +22,18 @@ IS
  17 K K077 код сектору економiки
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 17/01/2019 відкореговано перелік бал.рах. і їч параметрів для наповнення 
+ 17/01/2019 відкореговано перелік бал.рах. і їч параметрів для наповнення
             табл. OTC_C5_PROC яка використовується для формування #42
             для контрагента 10009201 параметр S580_ = '1' для необхідних
             бал.рах. і визначених параметрів R011, R013< S245
- 15/01/2019 для дочерних счетов по ЦБ будет формироваться код остатка 
-            родительского счета и значение показателя с противоположным 
+ 15/01/2019 для дочерних счетов по ЦБ будет формироваться код остатка
+            родительского счета и значение показателя с противоположным
             знаком если типы остаков не совпадают
  10/01/2019 для бал.рах. 1415, 3015, 3115 будуть включатися доч_рн_ особов_
-            рахунки зам_сть консол_дованих 
+            рахунки зам_сть консол_дованих
  08.01.2019 бал.рах. 2396 буде оброблятися аналог_чно як _ 2046
-            (в VIEW V_TMP_REZ_RISK_C5 для цього бал.рах. буде заповнено 
-             поле ZPR) 
+            (в VIEW V_TMP_REZ_RISK_C5 для цього бал.рах. буде заповнено
+             поле ZPR)
  03.01.2019 в OTC_C5_PROC будут включаться бал.сч. 1536,2386,2396,2456,3016
  27.11.2018 вир_внювання 2049
  15.11.2018 добавлен_ новые бал.счета 1426,1428 lkz выравнивания с балансом
@@ -267,27 +267,27 @@ IS
      end if;
 
      IF rnk_ = 10009201 THEN
-        if    r020_ in ('1200','1203') and s245_ in ('0')  
+        if    r020_ in ('1200','1203') and s245_ in ('0')
            or r020_ in ('1207') and s245_ in ('1','2')
            or r020_ in ('1208','1211','1212','1216','1218','1430',
                         '1435','1436','1438','1440','1446','1448',
-                        '1450','1455','1456','1458') and s245_ in ('1') 
+                        '1450','1455','1456','1458') and s245_ in ('1')
            or r020_ in ('1502','1508','1509') and r011_ in ('4','5') and s245_ in ('1')
-           or r020_ in ('1819','1890') and r011_ in ('5') and s245_ in ('1')  
-           or r020_ in ('2800','2890') and r011_ in ('2') and s245_ in ('1')  
-           or r020_ in ('3040') and r011_ in ('5') and s245_ in ('1')  
-           or r020_ in ('3041','3042','3043','3044','3049') and r011_ in ('3') and s245_ in ('1')  
-           or r020_ in ('3541') and r011_ in ('5') and s245_ in ('1')  
-           or r020_ in ('3548') and r011_ in ('B') and s245_ in ('1')  
-           or r020_ in ('3599') and r011_ in ('3') and r013_ in ('A') and s245_ in ('1')  
-           or r020_ in ('3540') and r011_ in ('1') and s245_ in ('1')  
-           or r020_ in ('3599') and r011_ in ('2') and r013_ in ('5') and s245_ in ('1')       
-           or r020_ in ('9200') and r013_ in ('3','9') and s245_ in ('1','2')  
-           or r020_ in ('9202','9204','9207','9208','9350') and r013_ in ('3') and s245_ in ('1','2')  
+           or r020_ in ('1819','1890') and r011_ in ('5') and s245_ in ('1')
+           or r020_ in ('2800','2890') and r011_ in ('2') and s245_ in ('1')
+           or r020_ in ('3040') and r011_ in ('5') and s245_ in ('1')
+           or r020_ in ('3041','3042','3043','3044','3049') and r011_ in ('3') and s245_ in ('1')
+           or r020_ in ('3541') and r011_ in ('5') and s245_ in ('1')
+           or r020_ in ('3548') and r011_ in ('B') and s245_ in ('1')
+           or r020_ in ('3599') and r011_ in ('3') and r013_ in ('A') and s245_ in ('1')
+           or r020_ in ('3540') and r011_ in ('1') and s245_ in ('1')
+           or r020_ in ('3599') and r011_ in ('2') and r013_ in ('5') and s245_ in ('1')
+           or r020_ in ('9200') and r013_ in ('3','9') and s245_ in ('1','2')
+           or r020_ in ('9202','9204','9207','9208','9350') and r013_ in ('3') and s245_ in ('1','2')
         then
            s580_ := '1';
         end if;
-     END IF; 
+     END IF;
  end;
 
  procedure p_add_rec(p_recid rnbu_trace.recid%type, p_userid rnbu_trace.userid%type, p_nls rnbu_trace.nls%type,
@@ -482,7 +482,7 @@ BEGIN
    from rez_protocol
    where dat_bank is not null and
          dat_bank <= dat_ and
-         dat <= dat_  ;
+         dat <= dat_    and  crc =1;
 
    if datb_ is null then
       datr_ := add_months(last_day(dat_)+1,-1);
@@ -974,17 +974,28 @@ BEGIN
                     p_set_s580_def(nbs_, dk_, r011_, s245_);
 
                     if sum_zal <> 0 then
-                       -- необтяжен_ ЦП
+                       -- необтяженi ЦП
                        kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
                        znap_ := TO_CHAR (ABS (se_ - sum_zal));
+
+                          if dk_k is not null and dk_ <> dk_k
+                          then                                --змiна знаку по основному рах-ку ЦП
+                             kodp_ := dk_k || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
+                             znap_ := 0 - znap_;
+                          end if;
 
                        p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
                                      nd_, acc_, mdate_, nbuc_, tobo_);
 
-                       -- обтяжен_ ЦП
+                       -- обтяженi ЦП
                        kodp_ := dk_ || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
-
                        znap_ := TO_CHAR (ABS (sum_zal));
+
+                          if dk_k is not null and dk_ <> dk_k
+                          then                                --змiна знаку по основному рах-ку ЦП
+                             kodp_ := dk_k || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
+                             znap_ := 0 - znap_;
+                          end if;
 
                        p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
                                      nd_, acc_, mdate_, nbuc_, tobo_);
@@ -993,7 +1004,7 @@ BEGIN
                           kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'0'||k077_;
                           znap_ := TO_CHAR (ABS (sum_z0));
 
-                          if dk_k is not null and dk_ <> dk_k 
+                          if dk_k is not null and dk_ <> dk_k
                           then
                              kodp_ := dk_k || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'0'||k077_;
                              znap_ := 0 - znap_;
@@ -1007,7 +1018,7 @@ BEGIN
                           kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'1'||k077_;
                           znap_ := TO_CHAR (ABS (sum_z1));
 
-                          if dk_k is not null and dk_ <> dk_k 
+                          if dk_k is not null and dk_ <> dk_k
                           then
                              kodp_ := dk_k || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'1'||k077_;
                              znap_ := 0 - znap_;
@@ -1021,7 +1032,7 @@ BEGIN
                           kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'2'||k077_;
                           znap_ := TO_CHAR (ABS (sum_z2));
 
-                          if dk_k is not null and dk_ <> dk_k 
+                          if dk_k is not null and dk_ <> dk_k
                           then
                              kodp_ := dk_k || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||'2'||k077_;
                              znap_ := 0 - znap_;
@@ -1213,13 +1224,13 @@ BEGIN
                      kodp = substr(kodp,1,10) || '9' || substr(kodp,12)
                  where recid = p.recid;
              else -- забезпечення не перекриває актив
-                 for k in (select r.s580a, 
+                 for k in (select r.s580a,
                                   sum(T.OST_EQV) ost,
                                   nvl((count(*) over (partition by r.s580a)), 0) cnt,
                                   row_number() over (partition by r.s580a order by r.s580a) rnum
-                           from otcn_f42_temp t, 
-                               (select distinct acc, substr(kodp,11,1) s580a 
-                                from rnbu_trace 
+                           from otcn_f42_temp t,
+                               (select distinct acc, substr(kodp,11,1) s580a
+                                from rnbu_trace
                                 where acc in (select accc from otcn_f42_temp where acc = p.acc)) r
                            where t.acc = p.acc and
                                  t.accc = r.acc
@@ -1346,11 +1357,11 @@ BEGIN
              else
                 kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              end if;
-             
+
              sakt_ := k.suma;
 
              srez_ := abs(k.szq);
-             
+
              srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
 
              sum_ := round(srez_ * k.koef);
@@ -1630,12 +1641,11 @@ BEGIN
       if      nbs_ in ('2029','2039','2079','2209','2219','2229')
       then
             r011_ :='1';
- elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
+      elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
             r011_ :='2';
       end if;
 
       if r011_ ='0' then
-
          if      nbs_ in ('2239','2249','3599')
          then
                r011_ :='1';
@@ -1654,7 +1664,6 @@ BEGIN
          else
                NULL;
          end if;
-
       end if;
 
       if    k.nbs like '1%'
@@ -1752,6 +1761,14 @@ BEGIN
 
           if srezp_ <> 0 and not TP_SND then
              r012_ :='B';
+             
+             if nbs_ = '3599'then 
+                if substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
+                   r011_ := '2';
+                else
+                   r011_ := '1';
+                end if;
+             end if; 
 
              kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
              znap_ := to_char(sign(k.szq) * srezp_);
@@ -1927,7 +1944,7 @@ BEGIN
                 where report_date = dat_ and
                       nbs like '___9') a
                     join
-                (select acc, substr(kodp, 16, 1) s245, 
+                (select acc, substr(kodp, 16, 1) s245,
                         substr(kodp, 2, 4) nbs, sum(znap) ost
                 from rnbu_trace
                 where kodp like '____9%'
@@ -1954,7 +1971,7 @@ BEGIN
                        join
                     (select acc, substr(kodp, 16, 1) s245, substr(kodp, 2, 4) nbs, sum(znap) ost
                      from rnbu_trace
-                     where (kodp like '_2046%' or kodp like '_2396%')  
+                     where (kodp like '_2046%' or kodp like '_2396%')
                      group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
                      on (a.acc = b.acc and
                          a.s245 = b.s245 and
@@ -2193,8 +2210,8 @@ BEGIN
          v.seg_02 not in ('2806','3116','3216')
          or
          v.seg_02 in ('1535','2387','2397','2457')
-         or 
-         v.seg_02 in ('1536','2386','2396','2456') 
+         or
+         v.seg_02 in ('1536','2386','2396','2456')
          ) and
          v.seg_04 in ('2', '4')
          or
@@ -2258,13 +2275,13 @@ BEGIN
         v.seg_02  = '2800' and v.seg_03 in ('1')
         or
         v.seg_02  = '2801' and v.seg_03 in ('3')
-        or 
+        or
         v.seg_02  = '2805' and v.seg_03 in ('4')
-        or 
+        or
         v.seg_02  = '2806' and v.seg_03 in ('5')
         or
         v.seg_02  = '2809' and v.seg_03 in ('6')
-        or 
+        or
         v.seg_02  = '2890' and v.seg_03 in ('1','3','4','5','6')
         )
     order by seg_02, seg_01, acc_num;
@@ -2301,7 +2318,7 @@ BEGIN
         v.seg_02 = '3015' and v.seg_03 in ('A','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
         v.seg_02 = '3015' and v.seg_03 in ('A','K','N') and v.seg_04 in ('4')
-        or 
+        or
         v.seg_02 = '3015' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
         v.seg_02 = '3016' and v.seg_03 in ('A','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
@@ -2375,7 +2392,7 @@ BEGIN
         or
         v.seg_02 = '3119' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
         or
-        v.seg_02  in ('3140','3141','3142','3143','3144') and v.seg_03 in ('2') 
+        v.seg_02  in ('3140','3141','3142','3143','3144') and v.seg_03 in ('2')
         )
     order by seg_02, seg_01, acc_num;
     commit;
@@ -2430,7 +2447,7 @@ BEGIN
         (v.seg_01 = k.r012 or k.r012 = '3') and
         (
         v.seg_02 in ('3510', '3511', '3519','3590')
-        or 
+        or
         v.seg_02 = '3540' and v.seg_03 in ('2','3')
         or
         v.seg_02 = '3541' and v.seg_03 in ('2','4')
@@ -2455,9 +2472,9 @@ BEGIN
         or
         v.seg_02 = '9129' and v.seg_04 in ('1')
         or
-        v.seg_02 = '3690' and v.seg_03 in ('2','4','6','8') 
+        v.seg_02 = '3690' and v.seg_03 in ('2','4','6','8')
         or
-        v.seg_02 = '3692' and v.seg_03 in ('2','3','4') 
+        v.seg_02 = '3692' and v.seg_03 in ('2','3','4')
         )
     order by seg_02, seg_01, acc_num;
     commit;
@@ -2489,16 +2506,16 @@ BEGIN
         v.seg_02  = '9000' and v.seg_03 in ('2')
         or
         v.seg_02  = '9001' and v.seg_03 in ('4')
-        or 
+        or
         v.seg_02  = '9002' and v.seg_03 in ('6')
-        or 
+        or
         v.seg_02  = '9003' and v.seg_03 in ('8')
         or
         v.seg_02  = '9100' and v.seg_03 in ('2')
-        or 
+        or
         v.seg_02  = '9122' and v.seg_03 in ('3')
-        or 
-        v.seg_02  = '9129' and v.seg_03 in ('4') and v.seg_04 in ('1') 
+        or
+        v.seg_02  = '9129' and v.seg_03 in ('4') and v.seg_04 in ('1')
         )
     order by seg_02, seg_01, acc_num;
     commit;
