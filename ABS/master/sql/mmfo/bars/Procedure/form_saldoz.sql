@@ -1,13 +1,15 @@
 CREATE OR REPLACE PROCEDURE BARS.FORM_SALDOZ
 ( z_dat31 DATE
 , p_acc   number default null
+, p_korr  boolean default false
 ) IS
   /**
   <b>FORM_SALDOZ</b> - перенакопиченн€ коригуючих оборот≥в за зв≥тну дату
-  %param p_dat31 -
-  %param p_acc   -
+  %param p_dat31 - останн≥й робочий деньзв≥тного  м≥с€ц€
+  %param p_acc  - ≥дентиф≥катор конкретного рахунку
+  %param p_korr  - виправит, €кщо нев≥рна дата валютуванн€ дл€ м≥с€чних коригуючих
 
-  %version 3.1  16/01/2019
+  %version 3.2   01/02/2019 (18/01/2019)
   %usage   перенакопиченн€ м≥с€чних виправних оборот≥в.
   */
   l_dat    DATE := trunc( z_dat31, 'MM' ); -- 1e число зв≥тного м≥с€ц€
@@ -18,12 +20,28 @@ BEGIN
 
   bars_audit.info( $$PLSQL_UNIT||': Start '  ||to_char(l_dat, 'dd/mm/yyyy')||' по '||to_char(z_dat31,'dd/mm/yyyy') );
   bars_audit.info( $$PLSQL_UNIT||': обороти '||to_char(l_dat0,'dd/mm/yyyy')||' < ' ||to_char(l_dat1, 'dd/mm/yyyy') );
-
+    
+  -- виправл€Їмо нев≥ну дату валютуванн€ дл€ м≥с€чних коригуючих
+  if p_korr then
+     for k in (select *
+               from oper
+               where vob = 96 and
+                     vdat between l_dat0 and l_dat1 and
+                     sos = 5 and
+                     vdat <> z_dat31)
+     loop
+         update oper o
+         set o.vdat = z_dat31
+         where o.ref = k.ref;    
+         commit;
+     end loop;
+  end if;
+          
   if ( p_acc is null )
   then
 
     bars_audit.info( $$PLSQL_UNIT||': for all accounts.' );
-
+    
     delete SALDOZ
      where FDAT = l_dat;
 

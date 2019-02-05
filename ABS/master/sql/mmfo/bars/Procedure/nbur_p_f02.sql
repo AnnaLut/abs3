@@ -9,9 +9,9 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F02 (p_kod_filii        varchar2,
 % DESCRIPTION : Процедура формирования #02 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.009 14/01/2019 (06/12/2018)
+% VERSION     :  v.16.010  05/02/2019 (14/01/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.009  146.01.2019';
+  ver_          char(30)  := 'v.16.010  05.02.2019';
 /*
    Структура показника    DD BBBB VVV Y
 
@@ -115,41 +115,48 @@ BEGIN
                                      DECODE (SIGN (b.adj_bal), 1, 0, -adj_bal) P11,
                                      DECODE (SIGN (b.adj_bal), 1, adj_bal, 0) P21,
                                      (CASE
-                                         WHEN b.dosq - b.cudosq < 0 AND b.kosq - b.cukosq < 0
-                                            THEN ABS (b.kosq - b.cukosq)
-                                         WHEN b.kosq - b.cukosq < 0 
-                                            THEN b.dosq - b.cudosq + ABS (b.kosq - b.cukosq)
-                                         WHEN b.dosq - b.cudosq < 0 
+                                         WHEN b.dosq - b.cudosq - b.yr_dos_uah < 0 AND b.kosq - b.cukosq - b.yr_kos_uah < 0
+                                            THEN ABS (b.kosq - b.cukosq - b.yr_kos_uah)
+                                         WHEN b.kosq - b.cukosq - b.yr_kos_uah < 0 
+                                            THEN b.dosq - b.cudosq - b.yr_dos_uah + ABS (b.kosq - b.cukosq - b.yr_kos_uah)
+                                         WHEN b.dosq - b.cudosq - b.yr_dos_uah < 0 
                                             THEN 0
-                                         ELSE b.dosq - b.cudosq
+                                         ELSE b.dosq - b.cudosq - b.yr_dos_uah 
                                       END)
                                      P50,
                                      (CASE
-                                         WHEN b.kosq - b.cukosq < 0 AND b.dosq - b.cudosq < 0 
-                                            THEN ABS (b.dosq - b.cudosq)
-                                         WHEN b.dosq - b.cudosq < 0 
-                                            THEN b.kosq - b.cukosq + ABS (b.dosq - b.cudosq)
-                                         WHEN b.kosq - b.cukosq < 0 
+                                         WHEN b.kosq - b.cukosq - b.yr_kos_uah < 0 AND b.dosq - b.cudosq - b.yr_dos_uah < 0 
+                                            THEN ABS (b.dosq - b.cudosq - b.yr_dos_uah)
+                                         WHEN b.dosq - b.cudosq - b.yr_dos_uah < 0 
+                                            THEN b.kosq - b.cukosq - b.yr_kos_uah + ABS (b.dosq - b.cudosq - b.yr_dos_uah)
+                                         WHEN b.kosq - b.cukosq - b.yr_kos_uah < 0 
                                             THEN 0
-                                         ELSE b.kosq - b.cukosq
+                                         ELSE b.kosq - b.cukosq - b.yr_kos_uah
                                       END)
                                      P60,
                                      (CASE
-                                         WHEN b.kos - b.cukos < 0 THEN b.dos - b.cudos + ABS (b.kos - b.cukos)
-                                         WHEN b.dos - b.cudos < 0 THEN 0
-                                         ELSE b.dos - b.cudos
+                                         WHEN b.kos - b.cukos - b.yr_kos < 0 THEN b.dos - b.cudos - b.yr_dos + ABS (b.kos - b.cukos - b.yr_kos)
+                                         WHEN b.dos - b.cudos - b.yr_dos < 0 THEN 0
+                                         ELSE b.dos - b.cudos - b.yr_dos
                                       END)
                                         P51,
                                      (CASE
-                                         WHEN b.dos - b.cudos < 0 THEN b.kos - b.cukos + ABS (b.dos - b.cudos)
-                                         WHEN b.kos - b.cukos < 0 THEN 0
-                                         ELSE b.kos - b.cukos
+                                         WHEN b.dos - b.cudos - b.yr_dos < 0 THEN b.kos - b.cukos - b.yr_kos + ABS (b.dos - b.cudos - b.yr_dos)
+                                         WHEN b.kos - b.cukos - b.yr_kos < 0 THEN 0
+                                         ELSE b.kos - b.cukos - b.yr_kos
                                       END)
                                         P61,
+                                     -- місячні коригуючі   
                                      b.crdosq P70,
                                      b.crkosq P80,
                                      b.crdos  P71,
                                      b.crkos  P81,
+                                     -- річні коригуючі
+                                     b.yr_dos_uah P90,
+                                     b.yr_kos_uah P00,
+                                     b.yr_dos P91,
+                                     b.yr_kos P01,    
+                                     --                                 
                                      a.branch,
                                      a.nbuc,
                                      c.K041
@@ -178,7 +185,11 @@ BEGIN
                                                                             P70,
                                                                             P80,
                                                                             P71,
-                                                                            P81))) d
+                                                                            P81,
+                                                                            P90,
+                                                                            P00,
+                                                                            P91,
+                                                                            P01))) d
            where (d.kv!='980' or d.colname like 'P_0') and d.field_value!=0;
         EXCEPTION
            WHEN OTHERS
