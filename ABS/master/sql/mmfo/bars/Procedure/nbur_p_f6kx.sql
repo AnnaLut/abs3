@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 6KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.005  18/12/2018 (11/12/2018)
+% VERSION     :  v.1.006       30/01/2019 (18/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.005   18/12/2018';
+  ver_          char(30)  := 'v.1.006   30/01/2019';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title              constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_base_currency_id   constant varchar2(3 char) := '980';
@@ -153,8 +153,7 @@ BEGIN
                    , t.cust_id /*cust_id*/
                    , t.nd /*nd*/
                    , t.branch /*branch*/
-            from   (
-                      select
+            from   (select
                               t.T020
                               , t.nbs
                               , t.r011
@@ -177,7 +176,7 @@ BEGIN
                               , t.k030
                               , case
                                   when t.MATURITY_DATE is null
-                                       or t.MATURITY_DATE <= p_report_date + 30 
+                                       or t.MATURITY_DATE <= p_report_date + 29 
                                   then '1'
                                 else
                                   '0'
@@ -414,7 +413,7 @@ BEGIN
                                   , t.k030
                                   , case
                                       when t.MATURITY_DATE is null
-                                           or t.MATURITY_DATE <= p_report_date + 30 
+                                           or t.MATURITY_DATE <= p_report_date + 29
                                       then '1'
                                     else
                                       '0'
