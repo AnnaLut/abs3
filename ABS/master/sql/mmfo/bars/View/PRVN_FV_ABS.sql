@@ -11,6 +11,6 @@ select kf  ,
 from prvn_osaq 
 where fv_abs <> 0  order by fv_abs desc;
 
-grant SELECT on FV9P       to BARS_ACCESS_DEFROLE;
+grant SELECT on PRVN_FV_ABS       to BARS_ACCESS_DEFROLE;
 
 

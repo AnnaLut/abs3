@@ -36,9 +36,9 @@ begin
                     from ( select acc, nls, -ost_korr (acc,l_dat31,null,nbs) BA,
                                  (select  nvl(sum(ost_korr (acc,l_dat31,null,nbs)),0) from  accounts
                                   where acc in (select cp_acc from cp_accounts c where c.cp_ref = p_nd and c.cp_acctype in ('N','EXPN','EXPR','P','R','RD','R2','R3','S','S2') )
-                                    and f_get_tip (substr(nls,1,4), tip) <> 'SPI' and nls not like '8%' and  ost_korr (acc,l_dat31,null,nbs)>0) ss
+                                    and f_get_tip (substr(nls,1,4), tip) not in ('SPI','SDI') and nls not like '8%' and  ost_korr (acc,l_dat31,null,nbs)>0) ss
                            from  accounts where acc in (select cp_acc from cp_accounts c where c.cp_ref = p_nd and c.cp_acctype in ('N','EXPN','EXPR','P','R','RD','R2','R3','S','S2','UNREC')) 
-                                            and f_get_tip (substr(nls,1,4), tip) <> 'SPI'  and  nls not like '8%' and ost_korr (acc,l_dat31,null,nbs)<0
+                                            and f_get_tip (substr(nls,1,4), tip) not in ('SPI','SDI')  and  nls not like '8%' and ost_korr (acc,l_dat31,null,nbs)<0
                          )
                    )
              )

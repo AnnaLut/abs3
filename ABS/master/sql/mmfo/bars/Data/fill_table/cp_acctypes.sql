@@ -13,14 +13,12 @@ exception when dup_val_on_index then
   null;
 end;
 /
-
 begin 
   execute immediate 
-    ' insert into cp_acctypes(type,name) values (''SDM'',''Дисконт/Премія модифікації'')';
+    ' insert into cp_acctypes(type,name) values (''SR'',''Рахунок переоцінки за рах. резерву'')';
 exception when dup_val_on_index then 
   null;
 end;
 /
-
 
 commit;

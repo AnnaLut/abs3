@@ -19,7 +19,7 @@ l_fin number; l_rating number; p_fin number; l_istval number; l_RNK_FIN char(1);
 begin
    begin
       begin
-         select fin,istval into p_fin,l_istval from nd_val n where n.fdat = P_dat01 and okpo = p_okpo and nd = p_nd;
+         select max(fin),istval into p_fin,l_istval from nd_val n where n.fdat = P_dat01 and okpo = p_okpo and nd = p_nd group by istval;
       EXCEPTION  WHEN NO_DATA_FOUND  THEN p_fin := null; l_istval := 1;
          p_error_351( P_dat01, p_nd, user_id, 33, null, null, null, null, 'Не нашла fin в nd_val, OKPO = ' || p_okpo , 999, null);
       end;

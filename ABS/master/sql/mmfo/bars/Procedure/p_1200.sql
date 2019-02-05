@@ -38,8 +38,8 @@ l_bv     number; l_bvq number; l_idf    number; l_pd   number; l_dat31  date; l_
 
 begin
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день мес€ца
-   for k in ( select p_dat01 fdat,c.custtype,substr(c.nmk,1,35) nmk, 'NEW/' || acc id, - ost_korr(a.acc,l_dat31,null,a.nbs) bv, 1 fin, 1 kat,
-                     F_RNK_gcif (c.okpo, c.rnk) okpo, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, case when d.tipa in (12, 93) then 1 else 0 end PD_0,
+   for k in ( select p_dat01 fdat,c.custtype,substr(c.nmk,1,35) nmk, 'NEW/' || acc id, - ost_korr(a.acc,l_dat31,null,a.nbs) bv, 1 fin, 1 kat, c.okpo okpo,
+                     F_RNK_gcif (c.okpo, c.rnk) okpo_gcif, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, case when d.tipa in (12, 93) then 1 else 0 end PD_0,
                      d.tipa, a.*, d.tipa_FV
               from accounts a, customer c, rez_deb d
               where d.tipa in (12, 30, 92, 93) and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and a.rnk = c.rnk and d.nbs = a.nbs )
@@ -85,16 +85,16 @@ begin
       if k.tipa in (30,12) THEN  l_CCF := 100;  end if;
       INSERT INTO NBU23_REZ ( ob22   , tip  , acc   , FDAT   , branch    , nls       , nmk   , RNK      , NBS      , KV    , ND    , ID    ,
                               BV     , BVQ  , FIN   , KAT    , sdate     , custtype  , rez   , rezq     , REZ23    , REZQ23, cr    , crq   ,
-                              vkr    , ead  , eadq  , fin_351, s080      , DDD_6B    , OKPO  , pd_0     , tipa     )
+                              vkr    , ead  , eadq  , fin_351, s080      , DDD_6B    , OKPO  , pd_0     , tipa     , okpo_gcif)
                      values ( k.ob22 , k.tip, k.acc , p_dat01, k.branch  , k.nls     , k.nmk , k.rnk    , k.nbs    , k.kv  , k.acc , k.id  ,
                               l_BV   , l_BVQ, l_fin , k.kat  , k.daos    , k.custtype, l_cr  , l_crq    , l_cr     , l_crq ,l_cr   , l_crq ,
-                              par.vkr, l_ead, l_eadq, l_fin  , l_s080    , l_DDD_6B  , k.OKPO, k.pd_0   , k.tipa_fv);
+                              par.vkr, l_ead, l_eadq, l_fin  , l_s080    , l_DDD_6B  , k.OKPO, k.pd_0   , k.tipa_fv, k.okpo_gcif);
       INSERT INTO REZ_CR    ( fdat   , RNK  , NMK   , ND     , KV        , NLS       , ACC   , EAD      , EADQ     , FIN   , PD    , CR    ,
                               CRQ    , bv   , bvq   , LGD    , CUSTTYPE  , nbs       , tip   , sdate    , RZ       , s080  , ob22  , pd_0  ,
                               vkr    , idf  , ccf   , istval , wdate     , ddd_6B    , OKPO  ,tip_fin   , tipa     )
                   VALUES    ( p_dat01, k.RNK, k.NMK , k.acc  , k.kv      , k.nls     , k.acc , l_ead    , l_eadq   , l_fin , l_pd  , l_cr  ,
                               l_crq  , l_bv , l_bvq , l_lgd  , k.CUSTTYPE, k.nbs     , k.tip , k.daos   , k.RZ     , l_s080, k.ob22, k.pd_0,
-                              par.vkr, l_idf, l_ccf , 0      , k.mdate   , l_ddd_6B  , k.OKPO, l_tip_fin, k.tipa   );
+                              par.vkr, l_idf, l_ccf , 0      , k.mdate   , l_ddd_6B  , k.OKPO_gcif, l_tip_fin, k.tipa   );
 
    end LOOP;
    commit;
