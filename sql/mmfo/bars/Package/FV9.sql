@@ -24,12 +24,13 @@ end FV9 ;
 /
 
 CREATE OR REPLACE PACKAGE BODY BARS.FV9  IS
-  g_body_version   CONSTANT VARCHAR2(64) := 'version 0  25.09.2018';
+  g_body_version   CONSTANT VARCHAR2(64) := 'version 1.1  31.01.2019';
 /*
- 14.01.2019 Sta Отключила контроль на макс.дельту для 2018 года  / Работает только для :sysdate > to_date ('01.02.2019', 'dd.mm.yyyy');           
- 25.09.2018 Sta Добавила во все эксепшены gl.aMfo
- 21.09.2018 Разное по замечаниям Фастовановой
- 10.09.2018 Sta добавлены процедуры отката операций( procedure BEK  ) и  и Переплаты в другом дне (procedure REPAY) - частые ош при работе в вых.день
+ 31-01-2019(1.1) БЕК уценки за счет резерва 
+ 14.01.2019 Sta  Отключила контроль на макс.дельту для 2018 года  / Работает только для :sysdate > to_date ('01.02.2019', 'dd.mm.yyyy');           
+ 25.09.2018 Sta  Добавила во все эксепшены gl.aMfo
+ 21.09.2018      Разное по замечаниям Фастовановой
+ 10.09.2018 Sta  добавлены процедуры отката операций( procedure BEK  ) и  и Переплаты в другом дне (procedure REPAY) - частые ош при работе в вых.день
 */
   g_errN  number  := -20203;
   nlchr   char(2) := chr(13)||chr(10);
@@ -160,8 +161,18 @@ P9	P9
              end ;
           end if ;
 
-          If p_PX < 'P09'  then 
+          If p_PX < 'P10'  then 
              begin 
+                if sys_context('bars_context','user_mfo')='300465' THEN
+                   delete from nbu23_rez where fdat=p_dat01 and nbs in ('1415','3115') and tip='SRR';
+                end if; 
+                begin
+                   select fdat into FDAT_ from opldok p, oper o where o.ref= p.ref and o.tt='FXP' and o.vdat= DAT31_ and o.vob= 96 and o.sos=5 and p.fdat> DAT31_ and rownum= 1;
+                   dbms_application_info.set_client_info(':'|| gl.aMfo ||':БЕК документів FXP');
+                   FV9.BEK ( 'FXP', FDAT_, zz.KF )   ; 
+                   l_Run := 1;
+                EXCEPTION WHEN NO_DATA_FOUND THEN Null;
+                end ;
                 select fdat into FDAT_ from opldok p, oper o where o.ref= p.ref and o.tt='ARE' and o.vdat= DAT31_ and o.vob= 96 and o.sos=5 and p.fdat> DAT31_ and rownum= 1;
                 dbms_application_info.set_client_info(':'|| gl.aMfo ||':БЕК документів ARE');
                 FV9.BEK ( 'ARE', FDAT_, zz.KF )   ; 
@@ -169,7 +180,7 @@ P9	P9
                 commit ;  ----  	:TT(SEM=Код_ОП: IRR або ARE,TYPE=С),:D(SEM=Банківська_дата,TYPE=D)
                 l_Run := 1;
              EXCEPTION WHEN NO_DATA_FOUND THEN Null;
-              end ;
+             end ;
           end if  ;
 
           l_Upd   := ' update PRVN_FV9 set '||  

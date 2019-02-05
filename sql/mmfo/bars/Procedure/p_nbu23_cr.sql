@@ -208,7 +208,14 @@ BEGIN
       l_spec   := rez.id_specrez(k.sdate, k.istval, k.kv, l_idr, k.custtype);
       --p_par_23(to_date('01-01-2017','dd-mm-yyyy'), k.acc, k.nd, l_ta, p_fin, p_obs, p_kat, p_k, p_irr);
       p_par_accounts(k.acc, p_isp, p_branch, p_ob22);
-      p_par_zalog(p_dat01, k.acc, p_zal_bl, p_zal_blq, p_zal, p_zalQ, p_SUM_IMP, p_SUMQ_IMP, p_zal_sv, p_zal_svq);
+      if k.zal_bv<>0 THEN
+         p_par_zalog(p_dat01, k.acc, p_zal_bl, p_zal_blq, p_zal, p_zalQ, p_SUM_IMP, p_SUMQ_IMP, p_zal_sv, p_zal_svq);
+      else    
+         p_zal_bl  := 0;  p_zal_blq := 0; 
+         p_zal     := 0;  p_zalQ    := 0;
+         p_SUM_IMP := 0;  p_SUMQ_IMP:= 0; 
+         p_zal_sv  := 0;  p_zal_svq := 0;
+      end if;
 
       begin
       INSERT INTO NBU23_REZ 

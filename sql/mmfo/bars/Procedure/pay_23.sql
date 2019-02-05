@@ -84,6 +84,7 @@ end;
 ---------------------------------------
 
 begin
+
    dbms_application_info.set_client_info(':'|| gl.aMfo ||':8) ARE: Формування проводок по МСФЗ-9');
    DELETE FROM srezerv_errors;
    commit;
@@ -155,7 +156,7 @@ begin
          raise_application_error(-20003,'Після розрахунку забезпечення не виконано 1.1. Розрахунок кредитного ризику по постанові 351 на '||dat01_);
       end if;
 
- /*
+/*
       begin
          select max(row_id), user_id into l_row_id18,l_user_id from rez_log
          where  fdat=dat01_ and kod=-18  and rownum=1 group by user_id ;
@@ -238,6 +239,12 @@ begin
    PAY_23_ob22(dat01_, mode_, p_user,'7');
    -- заполнение счетов резерва
    P_2400_23(dat01_);
+
+   if mode_ = 0 and l_kf = '300465' THEN
+      z23.to_log_rez (user_id , 35 , dat01_ ,'Начало Переоцінка ЦП ');
+      pereocenka_cp(dat01_,0);
+      pereocenka_cp(dat01_,1);
+   end if; 
 
    if mode_ = 0 THEN
       l_ref := bars_sqnc.get_nextval('s_REZ_OTCN');

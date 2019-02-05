@@ -5,18 +5,16 @@ PROMPT =========================================================================
 
 PROMPT *** ALTER_POLICY_INFO to ND_VAL ***
 
-
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''ND_VAL'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''ND_VAL'', ''WHOLE''  , null, null, null, null);
+               bpa.alter_policy_info(''ND_VAL'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''ND_VAL'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
 END; 
 /
-
 
 PROMPT *** Create  table ND_VAL ***
 begin 
