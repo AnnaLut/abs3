@@ -9,7 +9,7 @@ is
   -- Purpose : Службовий пакет роботи зі знімками балансу
 
   -- Public constant declarations
-  VERSION_HEAD         constant varchar2(64) := 'version 1.5  16.08.2018';
+  VERSION_HEAD         constant varchar2(64) := 'version 1.6  31.01.2019';
 
   -- алгоритмы наполнения accm_snap_balances
   ALGORITHM_OLD        constant varchar2(30) := 'OLD';
@@ -108,6 +108,13 @@ is
   -- ==================================================================================================
   Procedure sync_snap_period (p_fdat1 date, p_fdat2 date);
 
+
+  -- ==================================================================================================
+  -- get_snap_scn - возвращает scn последней генерации снимка баланса по партиции указанной таблицы
+  -- ==================================================================================================
+  function get_snp_scn(p_table in varchar2, p_date in date
+  ) return number;
+  
   -- ==================================================================================================
   -- set_snap_scn - устанавливает scn последней генерации снимка баланса по партиции указанной таблицы
   -- =================================================================================================
@@ -154,10 +161,9 @@ is
 
 end BARS_UTL_SNAPSHOT;
 /
-
 show errors;
 
-create or replace package body BARS_UTL_SNAPSHOT
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_UTL_SNAPSHOT
 is
   --
   -- constants
@@ -270,7 +276,7 @@ is
   ) return varchar2
   is
     l_errmsg  varchar2(500);
-    l_client_identifier_my  varchar2(64); 
+    l_client_identifier_my  varchar2(64);
   begin
 
     case
@@ -292,7 +298,7 @@ is
 
       if sys_context('BARS_CONTEXT', 'USER_MFO') = p_kf then
         l_errmsg := i.USERNAME || ' (' || i.machine || '/' || i.osuser || ')';
-        sys.dbms_session.set_identifier(l_client_identifier_my);    
+        sys.dbms_session.set_identifier(l_client_identifier_my);
         exit;
       else
         l_errmsg := null;
@@ -1249,7 +1255,6 @@ begin
   load_algorithm();
 end BARS_UTL_SNAPSHOT;
 /
-
 show errors;
 
 grant EXECUTE on BARS_UTL_SNAPSHOT to BARSUPL;

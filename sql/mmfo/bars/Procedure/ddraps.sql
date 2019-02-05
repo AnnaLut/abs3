@@ -1,37 +1,39 @@
-create or replace procedure DDRAPS
+CREATE OR REPLACE PROCEDURE BARS.DDRAPS
 ( dat_    in      DATE
 , mode_   in      SMALLINT DEFAULT 0
 ) IS
   /**
   <b>CREATE_DAILY_SNAPSHOT</b> - процедура створення денних знімків балансу
-  %param 
-  
-  %version 2.2 (06.03.2018)
+  %param
+
+  %version 2.3  31/01/2019 (06.03.2018)
   %usage   створення денних знімків балансу.
   */
   l_errmsg          varchar2(500);
-  
+
   dat#              DATE;
   l_mode            SMALLINT := mode_;
-  
+
   l_pvp_uid         NUMBER(38);
   uid#              NUMBER := gl.aUID;
   l_bank_dt         DATE   := gl.bDATE;
-  
+
   dlta_             accounts.ostc%type;
   ost1_             accounts.ostc%type;
   ost2_             accounts.ostc%type;
   dosq_             accounts.dos%type;
   kosq_             accounts.kos%type;
-  
+
   l_acc             accounts.acc%type;
   l_ref             NUMBER;
   l_allowed_dt      DATE; -- Дата раніше якої заборонено формування
   l_kf              snap_balances.kf%type;
-  l_condition       varchar2(200); 
-  
+  l_condition       varchar2(200);
+
   x                 SYS_REFCURSOR;
-  
+
+  l_cur_scn         NUMBER;
+             
   -- тип для вичитки вхідних даних
   TYPE imp_rec IS RECORD( kf    char(6)
                         , acc   NUMBER
@@ -44,7 +46,7 @@ create or replace procedure DDRAPS
                         , dos   NUMBER(24)
                         , kos   NUMBER(24) );
   c imp_rec;
-  
+
   -- типы для накопления вешалок в Нових драпсах
   TYPE ves_rec IS RECORD( kf   char(6),
                           acc  NUMBER,     rnk  NUMBER,
@@ -52,10 +54,10 @@ create or replace procedure DDRAPS
                           ost0 NUMBER(24), dos0 NUMBER(24), kos0 NUMBER(24),
                           ostq NUMBER(24), dosq NUMBER(24), kosq NUMBER(24) );
   TYPE ves_tab IS TABLE OF ves_rec INDEX BY BINARY_INTEGER;
-  
+
   ves  ves_tab;
   i                   BINARY_INTEGER;
-  
+
   -- Вирахування еквівалентів
   TYPE rat_rec IS RECORD( dig  SMALLINT
                         , rat1 NUMBER
@@ -68,11 +70,11 @@ create or replace procedure DDRAPS
   IS
   BEGIN
      FOR x IN ( select kv, dig
-                     , ( SELECT rate_o/bsum 
-                           FROM cur_rates 
+                     , ( SELECT rate_o/bsum
+                           FROM cur_rates
                           WHERE ( kv,vdate ) = ( SELECT kv,MAX(vdate) FROM cur_rates WHERE vdate <  dat_ AND kv = t.kv GROUP BY kv )
                        ) rat1
-                     , ( SELECT rate_o/bsum 
+                     , ( SELECT rate_o/bsum
                            FROM cur_rates
                           WHERE ( kv,vdate ) = ( SELECT kv,MAX(vdate) FROM cur_rates WHERE vdate <= dat_ AND kv = t.kv GROUP BY kv )
                        ) rat2
@@ -95,7 +97,7 @@ create or replace procedure DDRAPS
     s := ROUND(q(kv_).rat1*s_*POWER(10,2-q(kv_).dig));
     RETURN CASE s WHEN 0 THEN SIGN(s_) ELSE s END;
   END;
-  
+
   -- Еквівалент по курсу2
   FUNCTION eqv2
   ( kv_    SMALLINT
@@ -109,48 +111,48 @@ create or replace procedure DDRAPS
   END;
 
 BEGIN
-  
+
   BARS_AUDIT.INFO( $$PLSQL_UNIT||': Start running with (dat_='||to_char(dat_,'dd.mm.yyyy')||', mode_='||to_char(mode_)||').' );
-  
+
   IF ( sys_context('bars_global','application_name') = 'BARSWEB_JOBS' )
   THEN -- При запуску з ВЕБ формування драпсів не виконуємо (мовчки)
     RETURN;
   END IF;
-  
+
   if ( dat_ Is Null )
   then
     raise_application_error( -20666, 'Не вказано дату для формування знімку!' );
   end if;
-  
+
   l_kf := sys_context('bars_context','user_mfo');
-  
+
   if ( l_kf Is Null )
   then
     raise_application_error( -20666, 'Не вказано МФО ( l_kf Is Null ) для формування знімку!' );
   end if;
-  
+
   begin
-    
+
     select to_date(val,'DDMMYYYY')
-      into l_allowed_dt 
-      from PARAMS 
+      into l_allowed_dt
+      from PARAMS
      where PAR = 'DATRAPS';
-    
+
     if ( l_allowed_dt > dat_ )
     then
       raise_application_error( -20666, 'Заборонено формування знімків за дату меншу ніж '||to_char(l_allowed_dt,'dd.mm.yyyy') );
     end if;
-    
+
   exception
-    when NO_DATA_FOUND then 
+    when NO_DATA_FOUND then
       NULL;
   end;
-  
+
   -- Перевірка на операційну дату
   begin
-    select FDAT 
+    select FDAT
       into l_allowed_dt
-      from FDAT 
+      from FDAT
      where FDAT = dat_;
   exception
     when NO_DATA_FOUND then
@@ -172,12 +174,12 @@ BEGIN
   -- Отримати дату попередніх драпсів для прискореного режиму mode=1
   IF ( l_mode = 1 )
   THEN
-    
+
     SELECT MAX(FDAT)
       INTO dat#
       FROM FDAT
      WHERE FDAT < dat_;
-    
+
     l_mode := CASE WHEN dat# IS NULL THEN 0 ELSE 1 END;
 
   END IF;
@@ -223,7 +225,7 @@ BEGIN
               , NVL(s.dos, 0) dos
               , NVL(s.kos, 0) kos
            from ACCOUNTS a
-           left 
+           left
            join ( SELECT sa1.KF,
                          sa1.ACC,
                          DECODE(sa1.fdat, :l_dt, sa1.ostf, sa1.OSTF-sa1.DOS+sa1.KOS) ostf,
@@ -240,7 +242,7 @@ BEGIN
                      AND sa1.acc  = sa2.acc
                 ) s
              on ( s.KF = a.KF and s.ACC = a.ACC )
-          WHERE a.KF = :l_kf 
+          WHERE a.KF = :l_kf
             and a.DAOS <= :l_dt
             AND ( a.dazs is null OR a.dazs >= :l_dt )'
     USING dat_, dat_, dat_, dat_, l_kf, l_kf, dat_, dat_;
@@ -259,21 +261,21 @@ BEGIN
                           NVL(c.ostf, b.ost) as OSTF,
                           NVL(c.dos,  0    ) as DOS,
                           NVL(c.kos,  0    ) as KOS
-                     from ( select * 
+                     from ( select *
                               from SNAP_BALANCES
                              where FDAT = :1
                                and KF   = :p_kf
                           ) b
-                     full 
-                     join ( select * 
+                     full
+                     join ( select *
                               from SALDOA
                              where FDAT = :2
                                and KF   = :p_kf
-                          ) c 
+                          ) c
                        on ( c.KF = b.KF and c.ACC = b.ACC )
                 ) s
              on ( s.KF = a.KF and s.ACC = a.ACC )
-            WHERE a.KF = :p_kf 
+            WHERE a.KF = :p_kf
               and a.DAOS <= :3
               and ( a.dazs is null OR a.dazs >= :4 )'
     USING dat#, l_kf, dat_, l_kf, l_kf, dat_, dat_;
@@ -283,13 +285,13 @@ BEGIN
   GET_RAT(dat_);
 
   LOOP
-    
+
     FETCH x INTO c;
-    
+
     EXIT WHEN x%NOTFOUND;
-    
+
     -- Вычисление эквивалента остатка и обортов
-    
+
     IF ( c.kv = 980 )
     THEN
       ost1_ := c.ostf;
@@ -300,29 +302,29 @@ BEGIN
       ost2_ := eqv2 (c.kv, c.ostf - c.dos + c.kos);
       dosq_ := eqv2 (c.kv, c.dos);
       kosq_ := eqv2 (c.kv, c.kos);
-      
+
       dlta_ := ost2_ - (ost1_ - dosq_ + kosq_);
-      
+
       IF dlta_ < 0 THEN
          dosq_ := dosq_ - dlta_;
       ELSE
          kosq_ := kosq_ + dlta_;
       END IF;
-         
+
     END IF;
-    
+
     -- Опеределение номера вешалки
-    i := CASE 
-           WHEN c.nbs BETWEEN '1000' and '7999' 
+    i := CASE
+           WHEN c.nbs BETWEEN '1000' and '7999'
            THEN c.kv*10+1
            WHEN c.nbs BETWEEN '9000' and '9599' OR c.nbs IN ('9900','9920')
            THEN c.kv*10+2
-           WHEN c.nbs BETWEEN '9600' and '9899' OR c.nbs ='9910' 
-           THEN c.kv*10+3 ELSE 9999 
+           WHEN c.nbs BETWEEN '9600' and '9899' OR c.nbs ='9910'
+           THEN c.kv*10+3 ELSE 9999
          END;
-    
+
     -- Накопление вешалок
-    IF ves.EXISTS(i) 
+    IF ves.EXISTS(i)
     THEN
        ves(i).ostq:=ves(i).ostq - (ost1_-dosq_+kosq_);
        ves(i).dosq:=ves(i).dosq+kosq_;
@@ -332,7 +334,7 @@ BEGIN
        ves(i).dosq:= kosq_;
        ves(i).kosq:= dosq_;
     END IF;
-    
+
     -- Запомнить счет вешалки (tip VE1-3)
     IF c.tip LIKE 'VE_'
     THEN
@@ -358,19 +360,19 @@ BEGIN
     END IF;
 
   END LOOP;
-  
+
   -- Теперь повесить ошибки округления на вешалки4
   i := ves.FIRST;
-  
+
   WHILE i IS NOT NULL
   LOOP
     IF i > 2 AND TRUNC(i/10) NOT IN (980,999)
              AND (ves(i).ost<>0  OR ves(i).dos<>0  OR ves(i).kos<>0  OR
                   ves(i).ost0<>0 OR ves(i).dos0<>0 OR ves(i).kos0<>0 OR
-                  ves(i).ostq<>0 OR ves(i).dosq<>0 OR ves(i).kosq<>0) 
+                  ves(i).ostq<>0 OR ves(i).dosq<>0 OR ves(i).kosq<>0)
     THEN
-      
-      IF ves(i).acc IS NOT NULL 
+
+      IF ves(i).acc IS NOT NULL
       THEN
         insert -- вставка вешалок
           into SNAP_BALANCES_INTR_TBL
@@ -384,33 +386,33 @@ BEGIN
       ELSE
         raise_application_error(-20666, 'Не знайдно рахунок "вішалки" VE'||MOD(i,10)||' для вал. '||TRUNC(i/10));
       END IF;
-      
+
     END IF;
-    
+
     i := ves.NEXT(i);
-    
+
   END LOOP;
-  
+
   --
   -- переоцінка валютних позицій (коригуючі проводки + корекція даних в AGG_MONBALS_EXCHANGE)
   -- BARS_SNAPSHOT.DAILY_CURRENCY_REVALUATION;
   --
-  
+
   -- Код юзера для проведень переоцінки ВП
   begin
-    select trim(VAL) 
-      into l_pvp_uid 
-      from PARAMS 
+    select trim(VAL)
+      into l_pvp_uid
+      from PARAMS
      where PAR = 'PVPUSER';
   exception
-    when NO_DATA_FOUND then 
+    when NO_DATA_FOUND then
       l_pvp_uid := gl.aUID;
   end;
 
   if ( dat_ = DAT_NEXT_U( GL.GBD(), -1 ) )
-  then -- 
+  then --
     gl.bDATE := dat_;
-  else -- 
+  else --
     GL.PL_DAT( dat_ );
   end if;
 
@@ -437,7 +439,7 @@ BEGIN
 
     GL.REF( l_ref );
 
-    insert 
+    insert
       into OPER
       ( REF,  TT,   VOB,   ND,  DK, PDAT
       , VDAT, DATD, USERID
@@ -454,17 +456,17 @@ BEGIN
            , 980, TRIM(SUBSTR(v.nls3801,1,14)), v.s
            , 980, TRIM(SUBSTR(v.nls6204,1,14)), v.s );
 
-    FOR i IN 0..1 
+    FOR i IN 0..1
     LOOP
-      
-      if i=0 
-      then 
+
+      if i=0
+      then
         l_acc:= v.acc3801;
-      else 
+      else
         v.dk := 1-v.dk;
         l_acc:= v.acc6204;
       end if;
-      
+
       update SNAP_BALANCES_INTR_TBL
          set OST  = OST  + CASE WHEN v.dk = 1 THEN 0-v.s ELSE v.s END
            , OSTQ = OSTQ + CASE WHEN v.dk = 1 THEN 0-v.s ELSE v.s END
@@ -475,13 +477,13 @@ BEGIN
        where FDAT = dat_
          and KF   = v.KF
          and ACC  = l_acc;
-      
+
       if ( sql%rowcount = 0 )
       then
         insert
           into SNAP_BALANCES_INTR_TBL
           ( FDAT, KF, ACC, RNK, OST, DOS, KOS, OSTQ, DOSQ, KOSQ )
-        values 
+        values
           ( dat_, v.KF, l_acc, v.rnk,
             CASE WHEN v.dk=1 THEN 0-v.s ELSE v.s END,
             CASE WHEN v.dk=1 THEN v.s   ELSE 0   END,
@@ -509,6 +511,9 @@ BEGIN
   end if;
 
   COMMIT;
+
+  -- Фіксуємо SCN , що був до формування знімку балансу для можливого відкату
+  l_cur_scn := BARS_UTL_SNAPSHOT.GET_SNP_SCN(p_table => 'SALDOA', p_date  => dat_); 
 
   -- Фіксуємо SCN на якому формуємо знімок балансу по табл. SALDOA
   BARS_UTL_SNAPSHOT.SET_TABLE_SCN( p_table => 'SALDOA'
@@ -552,6 +557,15 @@ BEGIN
 EXCEPTION
   WHEN OTHERS THEN
     -- Back to
+    if l_cur_scn is not null then
+        -- відкочуємо зміни по збереженим SCN
+        BARS_UTL_SNAPSHOT.SET_TABLE_SCN( p_table => 'SALDOA'
+                                     , p_date  => dat_
+                                     , p_kf    => l_kf
+                                     , p_scn   => l_cur_scn );    
+        commit;
+    end if;
+    
     GL.PL_DAT( l_bank_dt );
     gl.aUID  := uid#;
     BARS_UTL_SNAPSHOT.PURGE_RUNNING_FLAG();
@@ -560,5 +574,4 @@ EXCEPTION
     raise;
 END DDRAPS;
 /
-
 show errors;
