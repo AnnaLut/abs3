@@ -13,7 +13,8 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3VX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 3VX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.001    26.10.2018
+ VERSION     :    v.18.002    30.01.2019(26.10.2018)
+30.01.2019	параметр S190 з файлу #3v (раніше вираховувався в залежності від терміну)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -69,7 +70,7 @@ begin
              , NVL(LL05,'#')  as K031
              , NVL(LL04,'#')  as F063
              , NVL(LL06,'#')  as F064
-             , case 
+/*             , case 
                     when LL03 = 0                 then '0'
                     when LL03 between 1   and 7   then 'A'
                     when LL03 between 8   and 30  then 'B'
@@ -80,6 +81,8 @@ begin
                     when LL03 > 360               then 'G'
                     else '#'
                end  S190
+*/	     
+             , NVL(LL03,'#')  as S190
              , NVL(LL08,'#')  as F073
              , NVL(LL11,'#')  as F003
              , NVL(LL01,' ')  as Q001
