@@ -588,9 +588,21 @@ namespace Bars.WebServices
             {
                 InitOraConnection(Context);
                 SetRole(Role);
-                SetParameters("tag_name", DB_TYPE.Char, ReqName, DIRECTION.Input);
-                ArrayList list = SQL_reader("select browser,name from op_field where tag=:tag_name");
-                string tag_browser = Convert.ToString(list[0]).Trim();
+                string tag_browser = "";
+                ArrayList list = new ArrayList();
+                if (ReqName == "PASPV") //COBUMMFO-10624
+                {
+                    tag_browser = (reqsValues.Length > 5 && reqsValues[5].ToString() == "1") ? 
+                        "TagBrowse('SELECT name, passp FROM passp order by passp')" : "TagBrowse('SELECT name, passp FROM passpv where rezid = 2 order by passp')";
+                    list.Add(tag_browser);
+                    list.Add(ReqName);
+                }
+                else
+                {
+                    SetParameters("tag_name", DB_TYPE.Char, ReqName, DIRECTION.Input);
+                    list = SQL_reader("select browser,name from op_field where tag=:tag_name");
+                    tag_browser = Convert.ToString(list[0]).Trim();
+                }
                 if (tag_browser.StartsWith("TagBrowse"))
                 {
                     tag_browser = tag_browser.Remove(0, 11);

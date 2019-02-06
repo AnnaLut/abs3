@@ -904,6 +904,17 @@ function selectDopReq(evt, name, fl) {
     var reqvalue = escape(elem.value);
     reqname += "[split]dfNlsA[split]dfNlsB[split]dfKvA[split]dfKvB";
     reqvalue += "[split]" + document.getElementById("Nls_A").value + "[split]" + document.getElementById("Nls_B").value + "[split]" + document.getElementById("Kv_A").value + "[split]" + document.getElementById("Kv_B").value;
+
+    if (name === "reqv_PASPV") {
+        if (document.getElementById("reqv_REZID").value !== "") {
+            reqvalue += "[split]" + document.getElementById("reqv_REZID").value;
+        }
+        else {
+            alert("Спочатку оберіть тип контагента");
+            return;
+        }
+    }
+
     var charCode = getCharCode(evt);
     var VK_F12 = 123;
     if (VK_F12 == charCode || 1 == fl) {
