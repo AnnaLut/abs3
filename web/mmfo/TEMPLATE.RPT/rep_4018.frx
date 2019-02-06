@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/18/2019 16:10:03" ReportInfo.Modified="02/06/2019 10:51:23" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    string okpo;    
+    string doc;
+    string ident;
+    string date_zay;
+    string nmk;
+    private void Page1_StartPage(object sender, EventArgs e)
+    {
+
+      /*   
+      if (((Int16)Report.GetColumnValue(&quot;qryCust.CUSTTYPE&quot;))==2) 
+        okpo=&quot;РНОКПП/ЄДРПОУ: &quot;+((String)Report.GetParameterValue(&quot;Param0&quot;));
+      else if  (((Int16)Report.GetColumnValue(&quot;qryCust.CUSTTYPE&quot;))==3)
+        okpo=&quot;ЄДРПОУ: &quot;+((String)Report.GetParameterValue(&quot;Param0&quot;));;
+        */
+      okpo=&quot; РНОКПП/ЄДРПОУ: &quot;+((String)Report.GetParameterValue(&quot;Param0&quot;));      
+      doc= &quot; документ: &quot;+ ((String)Report.GetParameterValue(&quot;Param1&quot;))+((String)Report.GetParameterValue(&quot;Param2&quot;));
+    
+    //  ident =okpo+doc;
+      
+      //if (myValue == 1 || myValue == 2 || myValue == 3)
+      if (((String)Report.GetParameterValue(&quot;Param0&quot;))==&quot;0000000000&quot; ) 
+       ident=doc;      
+      else 
+       ident=okpo; 
+    }
+      
+    private void Data1_BeforePrint(object sender, EventArgs e)
+    {
+      date_zay=((DateTime)Report.GetColumnValue(&quot;Table.ZAY_DATE&quot;)).ToString(&quot;dd.MM.yyyy&quot;);
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQOyanODZDAtkVwmd0qmLVNs=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="    select z.*, b.name kf_name&#13;&#10;    , bars.f_zay_get_state(p_sos =&gt; z.sos,p_viza =&gt; z.viza,&#13;&#10;                           p_priority =&gt;(select zz.priority from v_zay zz where zz.id=z.zay_id) &#13;&#10;                          ) state&#13;&#10;    from zay_val_control z&#13;&#10;        inner join banks_ru b on B.MFO=z.mfo &#13;&#10;        inner join tabval tv  on tv.kv=z.kv2 and tv.prv=1 /*metall*/ &#13;&#10;    where     &#13;&#10;      z.okpo  = :Param0&#13;&#10;      and ( (z.SER_PASP  like nvl(:Param1,z.SER_PASP) )   or z.ser_pasp is null)&#13;&#10;      and ( (z.NOM_PASP like nvl(:Param2,z.NOM_PASP) ) or z.nom_pasp is null)&#13;&#10;      and z.sos in (0,1) and z.viza in (1,2)&#13;&#10;      and (z.zay_date_v = trunc(sysdate) or z.zay_date_v is null)&#13;&#10;      and Z.ZAY_DATE &gt;=trunc(sysdate)-30">
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="KV2" DataType="System.Decimal"/>
+        <Column Name="RATE_O" DataType="System.Decimal"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="ZAY_ID" DataType="System.Decimal"/>
+        <Column Name="ZAY_DATE" DataType="System.DateTime"/>
+        <Column Name="SOS" DataType="System.Single"/>
+        <Column Name="VIZA" DataType="System.Decimal"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="SER_PASP" DataType="System.String"/>
+        <Column Name="NOM_PASP" DataType="System.String"/>
+        <Column Name="SUMMA_VAL" DataType="System.Decimal"/>
+        <Column Name="SUMMA" DataType="System.Decimal"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="ZAY_DATE_V" DataType="System.DateTime"/>
+        <Column Name="STATE" DataType="System.String"/>
+        <Column Name="KF_NAME" DataType="System.String"/>
+        <CommandParameter Name="Param0" DataType="126" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="Param1" DataType="126" Expression="[Param1]" DefaultValue="%"/>
+        <CommandParameter Name="Param2" DataType="126" Expression="[Param2]" DefaultValue="%"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="qryCust" DataType="System.Int32" Enabled="true" SelectCommand="    select z.nmk&#13;&#10;    from zay_val_control z&#13;&#10;    where     &#13;&#10;      z.okpo  = :Param0&#13;&#10;      and ( (z.SER_PASP  like nvl(:Param1,z.SER_PASP) )   or z.ser_pasp is null)&#13;&#10;      and ( (z.NOM_PASP like nvl(:Param2,z.NOM_PASP) ) or z.nom_pasp is null)&#13;&#10;      and z.sos in (0,1) and z.viza in (1,2)&#13;&#10;      and (z.zay_date_v = trunc(sysdate) or z.zay_date_v is null)&#13;&#10;      and Z.ZAY_DATE &gt;=trunc(sysdate)-30&#13;&#10;      and rownum=1&#13;&#10;">
+        <Column Name="NMK" DataType="System.String"/>
+        <CommandParameter Name="Param0" DataType="126" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="Param1" DataType="126" Expression="[Param1]" DefaultValue="0"/>
+        <CommandParameter Name="Param2" DataType="126" Expression="[Param2]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="Param0" DataType="System.String"/>
+    <Parameter Name="Param1" DataType="System.String"/>
+    <Parameter Name="Param2" DataType="System.String"/>
+    <Total Name="Total" Expression="[Table.SUMMA]" Evaluator="Data1" PrintOn="DataFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="350" StartPageEvent="Page1_StartPage">
+    <ReportTitleBand Name="ReportTitle1" Width="1247.4" Height="75.6">
+      <TextObject Name="Text1" Top="22.68" Width="695.52" Height="52.92" Text="  [ident]&#13;&#10;  клієнт [qryCust.NMK]" VertAlign="Center"/>
+      <TextObject Name="Text2" Width="695.52" Height="22.68" Text="  Звіт з купівлі  банківських металів  без підтверджуючих документів ФО/ФОП/ЮО  (4018) " VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="79.68" Width="1247.4" Height="90.72">
+      <TextObject Name="Text23" Left="1028.16" Width="173.88" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="ТВБВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text13" Left="400.68" Width="90.72" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Кількість унцій" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text15" Left="491.4" Width="98.28" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Код банківського металу" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text17" Left="589.68" Width="105.84" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Грн. &#13;&#10;еквівалент за офіц.курсом НБУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text19" Left="695.52" Width="98.28" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Офіц. курс НБУ на дату створення заявки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text21" Left="793.8" Width="234.36" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Найменування РУ, у якому створено заявку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text25" Width="83.16" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата створення заявки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text26" Left="83.16" Width="317.52" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Статус заявки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="174.48" Width="1247.4" Height="22.68" BeforePrintEvent="Data1_BeforePrint" DataSource="Table">
+      <TextObject Name="Text12" Left="400.68" Width="90.72" Height="22.68" Border.Lines="Right, Bottom" Text="[[Table.SUMMA_VAL]/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text14" Left="491.4" Width="98.28" Height="22.68" Border.Lines="Right, Bottom" Text="[Table.KV2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text16" Left="589.68" Width="105.84" Height="22.68" Border.Lines="Right, Bottom" Text="[[Table.SUMMA]/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text18" Left="695.52" Width="98.28" Height="22.68" Border.Lines="Right, Bottom" Text="[Table.RATE_O]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="6" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text20" Left="793.8" Width="234.36" Height="22.68" Border.Lines="Right, Bottom" Text="[Table.KF_NAME]" VertAlign="Center"/>
+      <TextObject Name="Text22" Left="1028.16" Width="173.88" Height="22.68" Border.Lines="Right, Bottom" Text="[Table.BRANCH]" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="Text24" Width="83.16" Height="22.68" Border.Lines="Left, Right, Bottom" Text="[date_zay]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text27" Left="83.16" Width="317.52" Height="22.68" Border.Lines="Right, Bottom" Text="[Table.STATE]" Format="Date" Format.Format="d" VertAlign="Center"/>
+      <DataFooterBand Name="DataFooter1" Top="201.24" Width="1247.4" Height="22.68">
+        <TextObject Name="Text3" Left="589.68" Width="105.84" Height="22.68" Border.Lines="All" Text="[[Total]/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text28" Width="589.68" Height="22.68" Border.Lines="All" Text="ВСЬОГО :  " HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text29" Left="695.52" Width="506.52" Height="22.68" Border.Lines="All"/>
+      </DataFooterBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="228.01" Width="1247.4" Height="18.9"/>
+  </ReportPage>
+</Report>
