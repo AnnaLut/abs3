@@ -1,8 +1,8 @@
 CREATE OR REPLACE PROCEDURE p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DESCRIPTION :	Процедура формирования #3V для
-% COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 04.02.2019 (01.02.2019)
+% DESCRIPTION :  Процедура формирования #3V для
+% COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
+% VERSION     : 05.02.2019 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,7 +16,9 @@ CREATE OR REPLACE PROCEDURE p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr
            до формування показника 09 додали умову: and r.TIPA not in (15,17,30) (виключили некредити)
 04.02.2019 Заявка COBUMMFO-10759
            показник P вираховується зі заначення за найбільшу дату в періоді звітності (таблиця fin_fm)
-           (раніше вираховувалось   зі заначення за  останню дати періоду) 
+           (раніше вираховувалось   зі заначення за  останню дати періоду)
+05.02.2019 Заявка COBUMMFO-10759
+	   додано дату dtbp_ (беремо до уваги звітність клієнта за дату, що на 1 рік ментша за початкову)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
     kodf_    varchar2(2) := '3V';
     userid_  number;
@@ -25,6 +27,7 @@ CREATE OR REPLACE PROCEDURE p_f3V_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr
     ost_     number;
     ost_96_  number;
     dtb_     date;
+    dtbp_    date; -- дата на 1 рік менша за dtb_
     dte_     date;
     znap_    number;
     p04_     varchar2(1);
@@ -51,8 +54,8 @@ BEGIN
              WHERE userid = userid_ AND kodf = kodf_;
     -------------------------------------------------------------------
 
-    select trunc(dat_,'yyyy'), add_months(trunc(dat_,'yyyy'),12)
-       into dtb_, dte_
+    select trunc(dat_,'yyyy'), add_months(trunc(dat_,'yyyy'),12), add_months(trunc(dat_,'yyyy'),-12)
+       into dtb_, dte_, dtbp_
     from dual;
 
     INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')||' Протокол формирования файла #3V за '||to_char(dat_,'dd.mm.yyyy'));
@@ -99,7 +102,7 @@ BEGIN
                                               from fin_rnk
                                               where okpo = edrpou
                                                 and idf in (1, 2, 3)
-                                                and fdat in (dtb_, dte_)
+                                                and fdat in (dtb_, dte_, dtbp_)
                                                 and branch like '/'||mfo_||'/'
                                              )
                 and zvitdate = to_date('01012017','ddmmyyyy')
@@ -128,7 +131,7 @@ BEGIN
                                                   from fin_rnk
                                                   where okpo = edrpou
                                                     and idf in (1, 2, 3)
-                                                    and fdat in (dtb_, dte_)
+                                                    and fdat in (dtb_, dte_, dtbp_)
                                                     and branch like '/'||mfo_||'/'
                                                  )
                                       and zvitdate = to_date('01012017','ddmmyyyy')
@@ -174,12 +177,19 @@ BEGIN
                                             and okpo = edrpou
                                             and (date_off is null or date_off > dte_)
                                          )
-                              and exists (select 1
-                                          from fin_rnk
-                                          where okpo = edrpou
-                                            and fdat in (dtb_, dte_)
-                                            and branch like '/'||mfo_||'/'
-                                          )
+                              and ( exists (select 1
+                                              from fin_rnk
+                                             where okpo = edrpou
+                                               and fdat in (dtb_, dte_, dtbp_)
+                                               and branch like '/'||mfo_||'/'
+                                            )
+                                    or
+			            exists (select 1
+                                              from fin_forma3_dm
+                                             where okpo = edrpou
+                                               and fdat in (dtb_, dte_, dtbp_)
+                                            )
+                                   )
                               and zvitdate = to_date('01012017','ddmmyyyy')
                               and (mfo_ = 300465 or k is null)
                             order by nnnnn
