@@ -1,12 +1,3 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_SW_IMPMSG.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_SW_IMPMSG ***
-
 CREATE OR REPLACE FORCE VIEW BARS.V_SW_IMPMSG
 (
    SWREF,
@@ -34,7 +25,7 @@ CREATE OR REPLACE FORCE VIEW BARS.V_SW_IMPMSG
    FIO,
    TRANSIT,
    TAG20,
-   is_pde
+   IS_PDE
 )
 AS
    SELECT /*+ FIRST_ROWS(100)*/
@@ -66,9 +57,10 @@ AS
              FROM sw_operw
             WHERE tag = '21' AND swref = j.swref)
              tag20,
-          (select 1 from sw_messages swm
-            where  swm.swref= j.swref and  regexp_like (BODY,  '{5:.*?{PDE:') )  as is_pde
- 
+          (SELECT 1
+             FROM sw_messages swm
+            WHERE swm.swref = j.swref AND REGEXP_LIKE (BODY, '{5:.*?{PDE:'))
+             AS is_pde
      FROM sw_journal j,
           tabval t,
           staff i,
@@ -79,19 +71,15 @@ AS
           AND j.sender = sb1.bic
           AND j.receiver = sb2.bic
           AND j.mt NOT IN (SELECT mt FROM sw_stmt)
-          AND J.MT !=199
+          AND J.MT not in ('199','299')
           AND t.lcv(+) = j.currency
    WITH READ ONLY;
 
-PROMPT *** Create  grants  V_SW_IMPMSG ***
-grant SELECT                                                                 on V_SW_IMPMSG     to BARS013;
-grant SELECT                                                                 on V_SW_IMPMSG     to BARSREADER_ROLE;
-grant SELECT                                                                 on V_SW_IMPMSG     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_IMPMSG     to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_IMPMSG     to WR_ALL_RIGHTS;
+
+--
+-- V_SW_IMPMSG  (Synonym) 
+--
+CREATE OR REPLACE PUBLIC SYNONYM V_SW_IMPMSG FOR BARS.V_SW_IMPMSG;
 
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_SW_IMPMSG.sql =========*** End *** ==
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_SW_IMPMSG TO BARS_ACCESS_DEFROLE;
