@@ -4414,6 +4414,11 @@ is
         insert into zayavka  values r_rt;
         -- потому как триггер tbi_zayavka затирает другими значениями, а нам необходимы первоначальные
         update zayavka set isp = r_rt.isp, tobo = r_rt.tobo where id = l_id;
+        --оскільки тут вставляються заявки, які отримали від розбиття однієї
+        --ми суму не чекаємо а просто пишемо в контроль.
+        if (r_rt.dk = 1 and r_rt.basis=F_ZAY_GET_BCONTL) then
+                p_zay_val_control_do(p_iddo=>'I',p_zay_id =>r_rt.id);
+        end if;
  end;
 
 begin
@@ -4490,6 +4495,11 @@ begin
                                       p_wallet_pass => gWallet_pass);
 
     select req_id into l_req_id from zayavka_ru where id = p_id and branch = l_branch;
+
+
+
+    --знімаємо заявку з контролю (sos =-1/viza = 2)
+    P_zay_val_control_do('UM', l_req_id);
 
     soap_rpc.add_parameter(l_request, 'req_id', to_char(nvl(l_req_id,0)));
     soap_rpc.add_parameter(l_request, 'sum1', to_char(nvl(p_sum1,0)));
@@ -5159,6 +5169,107 @@ begin
     l_upd := l_upd||' where id = '||p_id;
     execute immediate l_upd;
 end;
+-------------------------------------------------------------------------------
+procedure check_lim (p_id number,p_mode varchar2 ) as
+ l_dk zayavka.dk%type;
+ l_basis zayavka.basis%type;
+ l_check_result_m number;
+ l_check_result_d number;
+ l_check_result   number;
+ l_custtype customer.custtype%type;
+ l_kv2 tabval.kv%type;
+ l_prv tabval.prv%type; --признак металу
+ l_branch branch.branch%type;
+ l_reqid number;
+begin
+  --дані заявки
+    --    select z.dk,z.basis,z.kv2,c.custtype ,tv.prv
+    --    into l_dk,l_basis,l_kv2,l_custtype,l_prv
+    --    from --zayavka z
+    --         (select id, dk,basis,kv2,rnk from zayavka union all
+    --           select id, dk,basis,kv2,rnk from zayavka_ru  ) z
+    --         inner join customer  c on c.rnk=z.rnk
+    --         inner join tabval tv on tv.kv=z.kv2
+    --    where z.id=p_id;
+    
+    begin
+    --пошук заявки на рівні РУ+ЦА(300465) (zay21)
+    select z.dk,z.basis,z.kv2, c.custtype, tv.prv
+        into l_dk,l_basis,l_kv2, l_custtype, l_prv
+         from  zayavka z
+          inner join tabval tv on tv.kv=z.kv2
+          inner join customer  c on c.rnk=z.rnk
+          where z.id=p_id;
+     exception when no_data_found 
+        then 
+        begin
+         --пошук РУ заявки на рівні ЦА (zay52)
+         select z.dk,z.basis,z.kv2, tv.prv
+          into l_dk,l_basis,l_kv2, l_prv
+            from  zayavka_ru z
+              inner join tabval tv on tv.kv=z.kv2
+              where z.id=p_id;
+        
+        select req_id into l_reqid from zayavka_ru where id = p_id;
+        
+        select custtype into l_custtype from zay_val_control where zay_id = l_reqid;  
+        
+        end;
+    end;  
+    
+    
+  -------------------------------
+  --якщо заявка на купівлю ,базис=9.9.9., ФО купує все або ЮЛ купує метал
+  if (l_dk=1
+       and l_basis=F_ZAY_GET_BCONTL --9,9,9
+       and (l_custtype=3 --фізик/ФОП
+             or (l_custtype=2 and l_prv=1)/* ЮО метал*/ ) )
+   then
+    if p_mode='ZAY52' then
+      l_check_result:=F_zay_eqv_check(p_zay_id =>p_id,p_mode=>'D');--перевірка за день
+      if  l_check_result <0 then
+       raise_application_error (-20001, 'Помилка! <br> Перевищення ліміту купівлі валюти/БМ <br>Перевищено на '||abs(l_check_result/100)||' грн.<br> Відмовлено в операції');
+      else
+       begin
+       -- Определяем, чья заявка: ЦА или РУ
+              select branch into l_branch from v_zay where id = p_id and sos<2 and sos>-1;
+              --заявка ЦА
+              select id into l_reqid from zayavka where id = p_id and branch = l_branch;
+              --проставляємо статуси оплачено для заявки на контролі + дату оплати (підтвердження ділером в zay52)
+              p_zay_val_control_do (p_iddo=>'E',p_zay_id =>l_reqid); 
+           exception when no_data_found then
+            --заявка РУ
+            select req_id into l_reqid from zayavka_ru where id = p_id and branch = l_branch;
+            --проставляємо статуси оплачено для заявки на контролі + дату оплати (підтвердження ділером в zay52)
+            p_zay_val_control_do (p_iddo=>'E',p_zay_id =>l_reqid);
+       end;
+      end if;
+   end if;
+
+   if p_mode='ZAY21' then
+       l_check_result_m:=F_zay_eqv_check(p_zay_id =>p_id,p_mode=>'M');--перевірка за місяць , яка включає перевірку за день. 
+        if  l_check_result_m <0 then
+             raise_application_error (-20001, 'Помилка! <br> Перевищення ліміту купівлі валюти/БМ <br>Перевищено на '||abs(l_check_result_m/100)||' грн.<br> Відмовлено в операції');
+            --         else
+            --            l_check_result_d:=F_zay_eqv_check(p_zay_id =>p_id,p_mode=>'D');--перевірка за день
+            --             if  l_check_result_d <0 then
+            --               raise_application_error (-20001, 'Помилка! <br> Перевищення ліміту купівлі валюти/БМ <br>Перевищено на '||abs(l_check_result_d/100)||' грн.<br> Відмовлено в операції');
+            --             
+        else p_zay_val_control_do (p_iddo=>'I',p_zay_id =>p_id); --додаємо заявку в таблицю контролю
+             
+        end if;
+               
+   end if;               
+            
+         --  raise_application_error(-20000,'check_lim:if p_mode=ZAY21:'||l_check_result);
+        --    if  l_check_result <0 then
+        --       raise_application_error (-20001, 'Помилка! <br> Перевищення ліміту купівлі валюти/БМ <br>Перевищено на '||abs(l_check_result/100)||' грн.<br> Відмовлено в операції');
+        --    else
+        --       p_zay_val_control_do (p_iddo=>'I',p_zay_id =>p_id);
+        --    end if;
+  end if;
+
+end;
 
 -------------------------------------------------------------------------------
 --
@@ -5175,6 +5286,12 @@ is
  l_trace varchar2(500):='bars_zay.set_visa';
 begin
   bars_audit.info(l_trace||'.1.'||p_id||'.'||p_viza);
+
+/************ якщо віза =1 (ZAY21) перевірка на ліміти **************/
+  if p_viza=1 then
+     check_lim(p_id,'ZAY21');
+  end if;
+/*-------------------------------------------*/
   update zayavka
      set viza      = p_viza,
          priority  = nvl(p_priority, priority),
@@ -5493,8 +5610,17 @@ is
   l_trackid  integer;
   l_viza     zayavka_ru.viza%type;
   l_branch   zayavka.branch%type;
+  l_dk    zayavka.id%type ;
+  l_basis zayavka.basis%type;
+  l_check_result number;
+
 begin
 
+/**v. 4 **********  перевірка на ліміти **************/
+ if gZAYMODE = 1 then
+     check_lim(p_id,'ZAY52'); --ділер остаточно візує заявку. Ставимо додаткову перевіркку на ліміт на день.
+  end if;
+/*-------------------------------------*/
   select branch into l_branch from v_zay where id = p_id and sos<2 and sos>-1;
 
   if gZAYMODE = 0 then
@@ -5601,22 +5727,28 @@ begin
 
   select branch into l_branch from v_zay where id = p_id and sos<2 and sos>-1;
 
-  if p_mode < 4 then
+  if p_mode < 4 then -- 4 - с удовлетворения дилером (visa=>2)
      update zayavka
         set viza   = -1,
             idback = p_idback,
             reason_comm = p_comm
       where id = p_id and branch = l_branch;
+      --знімаємо заявку з контролю(фізично видаляємо з таблиці контролю), 
+      --коли вертає zay3, вона попадає на zay21,де її знову можуть завізувати.
+      P_zay_val_control_do(p_iddo => 'D',p_zay_id =>p_id);
   else
      -- Определяем, чья заявка: ЦА или РУ
      begin
-        select id into l_reqid from zayavka where id = p_id and branch = l_branch;
+     --ЦА
+      select id into l_reqid from zayavka where id = p_id and branch = l_branch;
         if p_mode = 4 then
            update zayavka
               set viza   = 1,
                   idback = p_idback,
                   reason_comm = p_comm
             where id = p_id and branch = l_branch;
+            --повертаємо  з zay42,заявка з контроля не знімається (оновлюємо статус) 
+            P_zay_val_control_do(p_iddo => 'R',p_zay_id =>p_id,p_viza =>1 );
         elsif p_mode = 5 then
            update zayavka
               set viza   = 2,
@@ -5625,14 +5757,20 @@ begin
                   vdate  = null,
                   datz   = null
             where id = p_id and branch = l_branch;
+            --повертаємо  з zay52,заявка з контроля не знімається (оновлюємо статус)
+            --не лишаємо статус 2 ставимоviza =1 оскільки заявка вилітала з контролю
+            P_zay_val_control_do(p_iddo => 'R',p_zay_id =>p_id,p_viza =>1 );
         end if;
      exception when no_data_found then
+       --РУ
         if p_mode = 4 then
            update zayavka_ru
               set viza   = 1,
                   idback = p_idback,
                   reason_comm = p_comm
             where id = p_id and branch = l_branch;
+            --оновлення статусу заявки 
+            P_zay_val_control_do(p_iddo => 'R',p_zay_id =>p_id,p_viza =>1 ); 
            l_send_request_ru := true;
         elsif p_mode = 5 then
            update zayavka_ru
@@ -5642,6 +5780,8 @@ begin
                   vdate  = null,
                   datz   = null
             where id = p_id and branch = l_branch;
+            --оновлення статусу заявки
+            P_zay_val_control_do(p_iddo => 'R',p_zay_id =>p_id,p_viza =>1 );
         end if;
      end;
   end if;
