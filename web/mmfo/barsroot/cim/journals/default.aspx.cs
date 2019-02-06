@@ -37,7 +37,7 @@ public partial class cim_journals_default : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         Master.SetPageTitle(this.Title, true);
-        Master.AddScript("/barsroot/cim/journals/script/journal.js");
+		Master.AddScript(String.Format("/barsroot/cim/journals/script/journal.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
         //ScriptManager.GetCurrent(this).RegisterPostBackControl(btBuildReport);
 
         dsBranches.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();

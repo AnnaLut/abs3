@@ -25,6 +25,9 @@
     <bars:BarsSqlDataSourceEx runat="server" ID="dsCreditAdaptive" ProviderName="barsroot.core"
         SelectCommand="select id,name from cim_credit_adaptive order by 1">
     </bars:BarsSqlDataSourceEx>
+    <bars:BarsSqlDataSourceEx runat="server" ID="dsDeadline" ProviderName="barsroot.core"
+        SelectCommand="select deadline, comments from cim_contract_deadlines where delete_date is null order by deadline">
+    </bars:BarsSqlDataSourceEx>
     <bars:BarsSqlDataSourceEx runat="server" ID="dsBorgReason" ProviderName="barsroot.core"
         SelectCommand="select id,name from cim_borg_reason order by 1">
     </bars:BarsSqlDataSourceEx>
@@ -158,6 +161,14 @@
                     <td class="ctrl-td-lb">Код ЄДРПОУ:</td>
                     <td class='ctrl-td-val'>
                         <asp:Label runat="server" ID="lbClientOkpo" Font-Bold="true"></asp:Label>
+                    </td>
+
+                    <td class="ctrl-td-lb" runat="server" id="tdIsFRAGMENT1">Ознака дроблення:</td>
+                    <td class='ctrl-td-val' runat="server" id="tdIsFRAGMENT2">
+                        <asp:Label runat="server" ID="lbIsFRAGMENT" Font-Bold="true"></asp:Label>
+                    </td>                
+                    <td class="ctrl-td-lb" runat="server" id="tdIsFRAGMENT3">Історія змін Ознаки дроблення:
+                        <asp:ImageButton ToolTip="вигрузка Історії змін Ознаки дроблення в excel" ID="btFragment2excel" ImageUrl="/barsroot/cim/style/img/ms-excel.gif" runat="server" OnClick="btFragment2excel_OnServerClick" />
                     </td>
                 </tr>
                 <tr>
@@ -1008,6 +1019,8 @@
                             <asp:BoundField DataField="zs_vk" HeaderText="Неприв`язаний залишок у валюті контракту" SortExpression="zs_vk" DataFormatString="{0:N}">
                                 <ItemStyle HorizontalAlign="Right" />
                             </asp:BoundField>
+                            <asp:BoundField DataField="ZSQ_VP" HeaderText="Гривневий еквівалент" SortExpression="ZSQ_VP" DataFormatString="{0:N}"><HeaderStyle HorizontalAlign="Center" /><ItemStyle HorizontalAlign="Right" /></asp:BoundField>
+                            <asp:BoundField DataField="DEADLINE_DOC" HeaderText="Контрольний строк" SortExpression="DEADLINE_DOC"/>
                             <asp:BoundField DataField="control_date" HeaderText="Контрольна дата " SortExpression="control_date" DataFormatString="{0:dd/MM/yyyy}">
                                 <ItemStyle HorizontalAlign="Center" />
                             </asp:BoundField>
@@ -1092,12 +1105,17 @@
                             <asp:BoundField DataField="z_vk" HeaderText="Заборгованість по платежах у валюті контракту" SortExpression="z_vk" DataFormatString="{0:N}">
                                 <ItemStyle HorizontalAlign="Right" />
                             </asp:BoundField>
+                            <asp:BoundField DataField="ZQ_VT" HeaderText="Гривневий еквівалент" SortExpression="ZQ_VT" DataFormatString="{0:N}"><HeaderStyle HorizontalAlign="Center" /><ItemStyle HorizontalAlign="Right" /></asp:BoundField>
+                            <asp:BoundField DataField="DEADLINE_DOC" HeaderText="Контрольний строк" SortExpression="DEADLINE_DOC">
+                                <ItemStyle HorizontalAlign="Center" VerticalAlign="Middle" />
+                            </asp:BoundField>
                             <asp:BoundField DataField="control_date" HeaderText="Контрольна дата " SortExpression="control_date" DataFormatString="{0:dd/MM/yyyy}">
                                 <ItemStyle HorizontalAlign="Center" />
                             </asp:BoundField>
                             <asp:BoundField DataField="s_pl_after_vk" HeaderText="Сума пов’язаних платежів після контрольної дати" SortExpression="s_pl_after_vk" DataFormatString="{0:N}">
                                 <ItemStyle HorizontalAlign="Right" />
                             </asp:BoundField>
+                            <asp:BoundField DataField="IS_DOC" HeaderText="Документи наявні?" SortExpression="IS_DOC"><ItemStyle HorizontalAlign="Center" /></asp:BoundField>
                             <asp:BoundField DataField="file_name" HeaderText="№ реєстру" SortExpression="file_name">
                                 <ItemStyle HorizontalAlign="Right" />
                             </asp:BoundField>
@@ -1569,6 +1587,31 @@
                                     <td colspan="3">
                                         <div id="dvApeError" style="float: left; clear: left; color: Red;">
                                         </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="dialogDeadline" style="display: none; text-align: left">
+                            <table>
+                                <tr>
+                                    <td>Контрольний строк
+                                    </td>
+                                    <td class="field">
+                                        <asp:DropDownList runat="server" ID="ddDeadline" DataSourceID="dsDeadline" DataValueField="deadline" DataTextField="deadline" Width="50px" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="dialogIsDoc" style="display: none; text-align: left">
+                            <table>
+                                <tr>
+                                    <td>Документи наявні?
+                                    </td>
+                                    <td class="field">
+                                        <asp:DropDownList runat="server" ID="ddIsDoc" Width="50px" >
+                                            <asp:ListItem Value="1">Так</asp:ListItem>
+                                            <asp:ListItem Value="0">Ні</asp:ListItem>
+                                        </asp:DropDownList>
                                     </td>
                                 </tr>
                             </table>

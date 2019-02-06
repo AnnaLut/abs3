@@ -29,7 +29,7 @@ public partial class cim_contracts_other_contract_card : System.Web.UI.Page
         }
 
         //ScriptManager.GetCurrent(this).Scripts.Add(new ScriptReference("/barsroot/cim/contracts/scripts/cim_contact_card.js?v" + CimManager.Version + Master.BuildVersion));
-            Master.AddScript("/barsroot/cim/contracts/scripts/cim_contact_card.js");
+        Master.AddScript(String.Format("/barsroot/cim/contracts/scripts/cim_contact_card.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
         Master.AddScript("/barsroot/Scripts/kendo/kendo.all.min.js");
         ScriptManager.GetCurrent(this).RegisterPostBackControl(btFormFile);
         if (!ClientScript.IsStartupScriptRegistered(this.GetType(), "init"))

@@ -23,7 +23,7 @@ public partial class cim_payments_link_form : System.Web.UI.Page
         dsLinks.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
 
         string mode = Request["mode"];
-        Master.AddScript("/barsroot/cim/payments/scripts/cim_link_form.js");
+		Master.AddScript(String.Format("/barsroot/cim/payments/scripts/cim_link_form.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
 
         dvBack.Visible = (Request["back"] != "0");
         decimal s = 0;

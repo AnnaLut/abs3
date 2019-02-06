@@ -26,7 +26,8 @@ namespace cim
         {
             fillFields();
         }
-        public VCimTradePaymentsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BOUND_ID, Decimal? CONTR_ID, Decimal? PAY_FLAG, Decimal? REF, Decimal? DIRECT, Decimal? TYPE_ID, String TYPE, DateTime? VDAT, String ACCOUNT, String NAZN, Decimal? V_PL, Decimal? S_VPL, Decimal? SK_VPL, Decimal? RATE, Decimal? S_VK, Decimal? S_PD, Decimal? ZS_VP, Decimal? ZS_VK, DateTime? CONTROL_DATE, Decimal? OVERDUE, Decimal? S_PD_AFTER, String SERVICE_CODE, DateTime? CREATE_DATE, DateTime? MODIFY_DATE, Decimal? BORG_REASON, String EA_URL)
+        public VCimTradePaymentsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BOUND_ID, Decimal? CONTR_ID, Decimal? PAY_FLAG, Decimal? REF, Decimal? DIRECT, Decimal? TYPE_ID, String TYPE, DateTime? VDAT, String ACCOUNT, String NAZN, Decimal? V_PL, Decimal? S_VPL, Decimal? SK_VPL, Decimal? RATE, Decimal? S_VK, Decimal? S_PD, Decimal? ZS_VP, Decimal? ZS_VK, DateTime? CONTROL_DATE, Decimal? OVERDUE, Decimal? S_PD_AFTER, String SERVICE_CODE, DateTime? CREATE_DATE, DateTime? MODIFY_DATE, Decimal? BORG_REASON, String EA_URL
+            , Decimal? DEADLINE_DOC, Decimal? ZSQ_VP)
             : this(Parent)
         {
             this.BOUND_ID = BOUND_ID;
@@ -55,6 +56,9 @@ namespace cim
             this.MODIFY_DATE = MODIFY_DATE;
             this.BORG_REASON = BORG_REASON;
             this.EA_URL = EA_URL;
+            this.DEADLINE_DOC = DEADLINE_DOC;
+            this.ZSQ_VP = ZSQ_VP;
+
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
             this.ClearChanges();
@@ -86,7 +90,10 @@ namespace cim
             Fields.Add( new BbField("CREATE_DATE", OracleDbType.Date, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.01", "Дата створення"));
             Fields.Add( new BbField("MODIFY_DATE", OracleDbType.Date, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.01", "Дата модифікації"));
             Fields.Add( new BbField("BORG_REASON", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.01", "Причина заборгованості"));
-            Fields.Add( new BbField("EA_URL", OracleDbType.Varchar2, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.01", "Адреса сервера електронного архіву ВК"));        
+            Fields.Add( new BbField("EA_URL", OracleDbType.Varchar2, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.01", "Адреса сервера електронного архіву ВК"));
+
+            Fields.Add(new BbField("DEADLINE_DOC", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.04", "Контрольний строк по документу"));
+            Fields.Add(new BbField("ZSQ_VP", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.04", "Грн.екв.останньої події незавершеного розрахунку"));
         }
         public Decimal? BOUND_ID { get { return (Decimal?)FindField("BOUND_ID").Value; } set {SetField("BOUND_ID", value);} }
         public Decimal? CONTR_ID { get { return (Decimal?)FindField("CONTR_ID").Value; } set {SetField("CONTR_ID", value);} }
@@ -114,6 +121,8 @@ namespace cim
         public DateTime? MODIFY_DATE { get { return (DateTime?)FindField("MODIFY_DATE").Value; } set {SetField("MODIFY_DATE", value);} }
         public Decimal? BORG_REASON { get { return (Decimal?)FindField("BORG_REASON").Value; } set {SetField("BORG_REASON", value);} }
         public String EA_URL { get { return (String)FindField("EA_URL").Value; } set {SetField("EA_URL", value);} }
+        public Decimal? DEADLINE_DOC { get { return (Decimal?)FindField("DEADLINE_DOC").Value; } set { SetField("DEADLINE_DOC", value); } }
+        public Decimal? ZSQ_VP { get { return (Decimal?)FindField("ZSQ_VP").Value; } set { SetField("ZSQ_VP", value); } }
     }
 
     public sealed class VCimTradePaymentsFilters : BbFilters
@@ -146,6 +155,8 @@ namespace cim
             MODIFY_DATE = new BBDateFilter(this, "MODIFY_DATE");
             BORG_REASON = new BBDecimalFilter(this, "BORG_REASON");
             EA_URL = new BBVarchar2Filter(this, "EA_URL");
+            DEADLINE_DOC = new BBDecimalFilter(this, "DEADLINE_DOC");
+            ZSQ_VP = new BBDecimalFilter(this, "ZSQ_VP");
         }
         public BBDecimalFilter BOUND_ID;
         public BBDecimalFilter CONTR_ID;
@@ -173,6 +184,8 @@ namespace cim
         public BBDateFilter MODIFY_DATE;
         public BBDecimalFilter BORG_REASON;
         public BBVarchar2Filter EA_URL;
+        public BBDecimalFilter DEADLINE_DOC;
+        public BBDecimalFilter ZSQ_VP;
     }
 
     public partial class VCimTradePayments : BbTable<VCimTradePaymentsRecord, VCimTradePaymentsFilters>
@@ -197,34 +210,36 @@ namespace cim
                 {
                     res.Add(new VCimTradePaymentsRecord(
                         this,
-                        rdr.IsDBNull(0) ? OracleDecimal.Null : rdr.GetOracleDecimal(0),
-                        rdr.IsDBNull(1) ?  (Decimal?)null : Convert.ToDecimal(rdr[1]), 
-                        rdr.IsDBNull(2) ?  (Decimal?)null : Convert.ToDecimal(rdr[2]), 
-                        rdr.IsDBNull(3) ?  (Decimal?)null : Convert.ToDecimal(rdr[3]), 
-                        rdr.IsDBNull(4) ?  (Decimal?)null : Convert.ToDecimal(rdr[4]), 
-                        rdr.IsDBNull(5) ?  (Decimal?)null : Convert.ToDecimal(rdr[5]), 
-                        rdr.IsDBNull(6) ?  (Decimal?)null : Convert.ToDecimal(rdr[6]), 
-                        rdr.IsDBNull(7) ?  (String)null : Convert.ToString(rdr[7]), 
-                        rdr.IsDBNull(8) ?  (DateTime?)null : Convert.ToDateTime(rdr[8]), 
-                        rdr.IsDBNull(9) ?  (String)null : Convert.ToString(rdr[9]), 
-                        rdr.IsDBNull(10) ?  (String)null : Convert.ToString(rdr[10]), 
-                        rdr.IsDBNull(11) ?  (Decimal?)null : Convert.ToDecimal(rdr[11]), 
-                        rdr.IsDBNull(12) ?  (Decimal?)null : Convert.ToDecimal(rdr[12]), 
-                        rdr.IsDBNull(13) ?  (Decimal?)null : Convert.ToDecimal(rdr[13]), 
-                        rdr.IsDBNull(14) ?  (Decimal?)null : Convert.ToDecimal(rdr[14]), 
-                        rdr.IsDBNull(15) ?  (Decimal?)null : Convert.ToDecimal(rdr[15]), 
-                        rdr.IsDBNull(16) ?  (Decimal?)null : Convert.ToDecimal(rdr[16]), 
-                        rdr.IsDBNull(17) ?  (Decimal?)null : Convert.ToDecimal(rdr[17]), 
-                        rdr.IsDBNull(18) ?  (Decimal?)null : Convert.ToDecimal(rdr[18]), 
-                        rdr.IsDBNull(19) ?  (DateTime?)null : Convert.ToDateTime(rdr[19]), 
-                        rdr.IsDBNull(20) ?  (Decimal?)null : Convert.ToDecimal(rdr[20]), 
-                        rdr.IsDBNull(21) ?  (Decimal?)null : Convert.ToDecimal(rdr[21]), 
-                        rdr.IsDBNull(22) ?  (String)null : Convert.ToString(rdr[22]), 
-                        rdr.IsDBNull(23) ?  (DateTime?)null : Convert.ToDateTime(rdr[23]), 
-                        rdr.IsDBNull(24) ?  (DateTime?)null : Convert.ToDateTime(rdr[24]), 
-                        rdr.IsDBNull(25) ?  (Decimal?)null : Convert.ToDecimal(rdr[25]), 
-                        rdr.IsDBNull(26) ?  (String)null : Convert.ToString(rdr[26]))
-                    );
+                        rdr.IsDBNull(0) ? OracleDecimal.Null : rdr.GetOracleDecimal(0),         //   
+                        rdr.IsDBNull(1) ?  (Decimal?)null : Convert.ToDecimal(rdr[1]),          // "BOUND_ID", OracleDbType.Decimal
+                        rdr.IsDBNull(2) ?  (Decimal?)null : Convert.ToDecimal(rdr[2]),          // "CONTR_ID", OracleDbType.Decimal
+                        rdr.IsDBNull(3) ?  (Decimal?)null : Convert.ToDecimal(rdr[3]),          // "PAY_FLAG", OracleDbType.Decimal
+                        rdr.IsDBNull(4) ?  (Decimal?)null : Convert.ToDecimal(rdr[4]),          // "REF", OracleDbType.Decimal
+                        rdr.IsDBNull(5) ?  (Decimal?)null : Convert.ToDecimal(rdr[5]),          // "DIRECT", OracleDbType.Decimal
+                        rdr.IsDBNull(6) ?  (Decimal?)null : Convert.ToDecimal(rdr[6]),          // "TYPE_ID", OracleDbType.Decimal
+                        rdr.IsDBNull(7) ?  (String)null : Convert.ToString(rdr[7]),             // "TYPE", OracleDbType.Varchar2
+                        rdr.IsDBNull(8) ?  (DateTime?)null : Convert.ToDateTime(rdr[8]),        // "VDAT", OracleDbType.Date
+                        rdr.IsDBNull(9) ?  (String)null : Convert.ToString(rdr[9]),             // "ACCOUNT", OracleDbType.Varchar2
+                        rdr.IsDBNull(10) ?  (String)null : Convert.ToString(rdr[10]),           // "NAZN", OracleDbType.Varchar2
+                        rdr.IsDBNull(11) ?  (Decimal?)null : Convert.ToDecimal(rdr[11]),        // "V_PL", OracleDbType.Decimal
+                        rdr.IsDBNull(12) ?  (Decimal?)null : Convert.ToDecimal(rdr[12]),        // "S_VPL", OracleDbType.Decimal
+                        rdr.IsDBNull(13) ?  (Decimal?)null : Convert.ToDecimal(rdr[13]),        // "SK_VPL", OracleDbType.Decimal
+                        rdr.IsDBNull(14) ?  (Decimal?)null : Convert.ToDecimal(rdr[14]),        // "RATE", OracleDbType.Decimal
+                        rdr.IsDBNull(15) ?  (Decimal?)null : Convert.ToDecimal(rdr[15]),        // "S_VK", OracleDbType.Decimal
+                        rdr.IsDBNull(16) ?  (Decimal?)null : Convert.ToDecimal(rdr[16]),        // "S_PD", OracleDbType.Decimal                               
+                        rdr.IsDBNull(17) ?  (Decimal?)null : Convert.ToDecimal(rdr[17]),        // "ZS_VP", OracleDbType.Decimal
+                        rdr.IsDBNull(18) ?  (Decimal?)null : Convert.ToDecimal(rdr[18]),        // "ZS_VK", OracleDbType.Decimal
+                        rdr.IsDBNull(19) ?  (DateTime?)null : Convert.ToDateTime(rdr[19]),      // "CONTROL_DATE", OracleDbType.Date
+                        rdr.IsDBNull(20) ?  (Decimal?)null : Convert.ToDecimal(rdr[20]),        // "OVERDUE", OracleDbType.Decimal
+                        rdr.IsDBNull(21) ?  (Decimal?)null : Convert.ToDecimal(rdr[21]),        // "S_PD_AFTER", OracleDbType.Decimal
+                        rdr.IsDBNull(22) ?  (String)null : Convert.ToString(rdr[22]),           // "SERVICE_CODE", OracleDbType.Varchar2  
+                        rdr.IsDBNull(23) ?  (DateTime?)null : Convert.ToDateTime(rdr[23]),      // "CREATE_DATE", OracleDbType.Date
+                        rdr.IsDBNull(24) ?  (DateTime?)null : Convert.ToDateTime(rdr[24]),      // "MODIFY_DATE", OracleDbType.Date
+                        rdr.IsDBNull(25) ?  (Decimal?)null : Convert.ToDecimal(rdr[25]),        // "BORG_REASON", OracleDbType.Decimal
+                        rdr.IsDBNull(26) ?  (String)null : Convert.ToString(rdr[26]),           // "EA_URL", OracleDbType.Varchar2
+                        rdr.IsDBNull(27) ? (Decimal?)null : Convert.ToDecimal(rdr[27]),         // "DEADLINE_DOC", OracleDbType.Decimal
+                        rdr.IsDBNull(28) ? (Decimal?)null : Convert.ToDecimal(rdr[28])          // "ZSQ_VP", OracleDbType.Decimal
+                    ));                                                                         
                 }
             }
             finally

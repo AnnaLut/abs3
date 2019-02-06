@@ -26,7 +26,7 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
         if (Session[Constants.StateKeys.VisaId] == null)
             Session[Constants.StateKeys.VisaId] = (new CimManager(true)).VisaId;
 
-        Master.AddScript("/barsroot/cim/payments/scripts/cim_payments.js?v.1.0.1");
+		Master.AddScript(String.Format("/barsroot/cim/payments/scripts/cim_payments.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
         Master.AddScript("/barsroot/Scripts/Bars/bars.config.js");
         if (!ClientScript.IsStartupScriptRegistered(this.GetType(), "init"))
             ClientScript.RegisterStartupScript(this.GetType(), "init", "CIM.setVariables('" + gvVCimUnboundPayments.ClientID + "', '" + Request["contr_id"] + "','" + Request["direct"] + "','" + Request["payflag"] + "','" + Convert.ToString(Session["CIM.VisaId"]) + "','" + DateTime.Now.ToString("yyyyMMdd") + "','" + ((DateTime)Session[Constants.StateKeys.BankDate]).ToString("dd/MM/yyyy") + "'); ", true);

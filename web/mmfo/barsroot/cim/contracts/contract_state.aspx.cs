@@ -61,6 +61,11 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
         tdOthers09.Visible = isOthers;
         tdOthers10.Visible = isOthers;
         tdOthers11.Visible = isOthers;
+
+        tdIsFRAGMENT1.Visible = isTrade;
+        tdIsFRAGMENT2.Visible = isTrade;
+        tdIsFRAGMENT3.Visible = isTrade;
+
     }
 
     protected void Page_Load(object sender, EventArgs e)
@@ -74,6 +79,8 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
         dsConclOrgan.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
         dsVCimConclusion.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
         dsBorgReason.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
+        dsDeadline.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
+
 
         if (!IsPostBack)
         {
@@ -90,12 +97,14 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
         this.Title += " #" + contract.ContrId;
         Master.SetPageTitle(this.Title, true);
         //ScriptManager.GetCurrent(this).Scripts.Add(new ScriptReference("/barsroot/cim/contracts/scripts/cim_contact_state.js?v" + CimManager.Version + Master.BuildVersion));
-        Master.AddScript("/barsroot/cim/contracts/scripts/cim_contact_state.js");
+        Master.AddScript(String.Format("/barsroot/cim/contracts/scripts/cim_contact_state.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
         ScriptManager.GetCurrent(this).RegisterPostBackControl(btExportGraph);
         ScriptManager.GetCurrent(this).RegisterPostBackControl(btExp_pl);
         ScriptManager.GetCurrent(this).RegisterPostBackControl(btExp_md);
-        ScriptManager.GetCurrent(this).RegisterPostBackControl(btExpJournalExcel);
+        ScriptManager.GetCurrent(this).RegisterPostBackControl(btExpJournalExcel); 
         ScriptManager.GetCurrent(this).RegisterPostBackControl(btExpJournalWord);
+        ScriptManager.GetCurrent(this).RegisterPostBackControl(btFragment2excel);
+
 
         if (!ClientScript.IsStartupScriptRegistered(this.GetType(), "init"))
             ClientScript.RegisterStartupScript(this.GetType(), "init", "CIM.setVariables('" + Request["contr_id"] + "', '" + gvVCimCredgraphPayments.ClientID.Replace("_", "$") + "'); ", true);
@@ -132,7 +141,7 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
             lbTradeZPL.Text = CimManager.NumberFormat(tcc.ZPl);
             lbTradeZVMD.Text = CimManager.NumberFormat(tcc.ZVmd);
             lbTradeSVMD.Text = CimManager.NumberFormat(tcc.SumVmd);
-
+            
             // прячем колонки, если не мультивалютные
             if (!tcc.HasMultiValutsPayments)
             {
@@ -154,6 +163,7 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
                 gvCimBoundPrimVmd.Columns[10].Visible = false;
                 //gvCimBoundPrimVmd.Columns[13].Visible = false;
             }
+            lbIsFRAGMENT.Text = tcc.IsFRAGMENT;
         }
         else if (contract.ContrType == 2)
         {
@@ -282,6 +292,10 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
                     // borg reason 
                     if (gridId == "gvCimTradePrimPayments")
                     {
+                        e.Row.Cells[e.Row.Cells.Count - 9].Text =
+                            "<img src='/Common/Images/default/16/document.png' title='Редагувати Контрольний строк' onclick='curr_module.EditDeadline(0, " +
+                            bi + "," + ti + ")'></img>&nbsp;&nbsp;" + e.Row.Cells[e.Row.Cells.Count - 9].Text;
+
                         decimal overdue = Convert.ToDecimal(DataBinder.Eval(e.Row.DataItem, "OVERDUE"));
 
                         if (overdue > 0)
@@ -346,18 +360,24 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
             // borg reason 
             if (gridId == "gvCimBoundPrimVmd")
             {
+                // DEADLINE_DOC
+                e.Row.Cells[e.Row.Cells.Count - 12].Text = "<img src='/Common/Images/default/16/document.png' title='Редагувати Контрольний строк' onclick='curr_module.EditDeadline(1, " + bi + "," + ti + ")'></img>&nbsp;&nbsp;"
+              + e.Row.Cells[e.Row.Cells.Count - 12].Text;
+                
+                // IS_DOC
+                e.Row.Cells[e.Row.Cells.Count - 9].Text = "<img src='/Common/Images/default/16/document.png' title='Редагувати ознаку наявності документів' onclick='curr_module.EditIsDoc(" + bi + "," + ti + ")'></img>&nbsp;&nbsp;" 
+              + e.Row.Cells[e.Row.Cells.Count - 9].Text;
+
                 decimal overdue = Convert.ToDecimal(DataBinder.Eval(e.Row.DataItem, "OVERDUE"));
                 if (overdue > 0)
                 {
 
-                    e.Row.Cells[e.Row.Cells.Count - 2].Text =
-                        "<img src='/Common/Images/default/16/document.png' title='Редагувати причину заборгованості' onclick='curr_module.EditBorgReason(1, " +
-                        bi + "," + ti + ")'></img>&nbsp;&nbsp;" + e.Row.Cells[e.Row.Cells.Count - 2].Text;
+                    e.Row.Cells[e.Row.Cells.Count - 2].Text = "<img src='/Common/Images/default/16/document.png' title='Редагувати причину заборгованості' onclick='curr_module.EditBorgReason(1, " + bi + "," + ti + ")'></img>&nbsp;&nbsp;" 
+                  + e.Row.Cells[e.Row.Cells.Count - 2].Text;
                 }
             }
-            e.Row.Cells[e.Row.Cells.Count - 1].Text =
-                                "<img src='/Common/Images/default/16/document.png' title='Змінити дату реєстрації в журналі' onclick='curr_module.EditRegDate(1, " +
-                                bi + "," + ti + "," + di + ",\"" + Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "CREATE_DATE")).ToString("dd/MM/yyyy") + "\")'></img>&nbsp;&nbsp;" + e.Row.Cells[e.Row.Cells.Count - 1].Text;
+            e.Row.Cells[e.Row.Cells.Count - 1].Text = "<img src='/Common/Images/default/16/document.png' title='Змінити дату реєстрації в журналі' onclick='curr_module.EditRegDate(1, " + bi + "," + ti + "," + di + ",\"" + Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "CREATE_DATE")).ToString("dd/MM/yyyy") + "\")'></img>&nbsp;&nbsp;"
+          + e.Row.Cells[e.Row.Cells.Count - 1].Text;
         }
     }
 
@@ -513,6 +533,20 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
     }
 
     [WebMethod(EnableSession = true)]
+    public static void SaveDeadline(int boundType, decimal boundId, int docType, decimal deadline)
+    {
+        Contract contractInfo = new Contract();
+        contractInfo.SaveDeadline(boundType, boundId, docType, deadline);
+    }
+
+    [WebMethod(EnableSession = true)]
+    public static void SaveIsDoc(decimal boundId, int docType, string isDoc) // isDoc - "0"|"1"
+    {
+        Contract contractInfo = new Contract();
+        contractInfo.SaveIsDoc(boundId, docType, isDoc);
+    }
+
+    [WebMethod(EnableSession = true)]
     public static void SaveBorgReason(int boundType, decimal boundId, int docType, decimal borgReason)
     {
         Contract contractInfo = new Contract();
@@ -653,6 +687,25 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
         pars.Add(new FrxParameter("p_contr_id", TypeCode.String, Request["contr_id"]));
         FrxDoc doc = new FrxDoc(templatePath, pars, null);
         string tmpFileName = doc.Export(FrxExportTypes.Word2007);
+        string fileName = string.Format("report{0}{1}", Request["contr_id"], Path.GetExtension(tmpFileName));
+        Response.ClearContent();
+        Response.ClearHeaders();
+        Response.Charset = "windows-1251";
+        Response.AppendHeader("content-disposition", "attachment;filename=" + fileName);
+        Response.ContentType = "application/octet-stream";
+        Response.WriteFile(tmpFileName, true);
+        Response.Flush();
+        Response.End();
+    }
+
+    protected void btFragment2excel_OnServerClick(object sender, EventArgs e)
+    {
+        FrxParameters pars = new FrxParameters();
+        string fileFrx = "CONTRACTS_FRAGMENTATION.frx";
+        string templatePath = Path.Combine(Server.MapPath("/barsroot/cim/tools/templates"), fileFrx);
+        pars.Add(new FrxParameter("p_contr_id", TypeCode.String, Request["contr_id"]));
+        FrxDoc doc = new FrxDoc(templatePath, pars, null);
+        string tmpFileName = doc.Export(FrxExportTypes.Excel2007);
         string fileName = string.Format("report{0}{1}", Request["contr_id"], Path.GetExtension(tmpFileName));
         Response.ClearContent();
         Response.ClearHeaders();

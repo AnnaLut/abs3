@@ -99,6 +99,7 @@
 
             <input id="btBindAct" type="button" onclick="curr_module.ActBind();" value="Створити акт" style="display: none" />
             <input id="btSendToBank" type="button" onclick="curr_module.PrepareSendToBank();" value="Передача в інший банк" />
+            <input id="btStrangeMD" type="button" onclick="curr_module.ToStrangeMD();" value="Чужа МД" title="Включити у 531 форму" />
         </div>
     </fieldset>
     <bars:BarsSqlDataSourceEx runat="server" ID="dsCimTypes" ProviderName="barsroot.core"
@@ -191,6 +192,10 @@
                 </td>
             </tr>
         </table>
+    </div>
+    <div id="dialog2form531" style="display: none; text-align: left">
+        <h2>Ви дійсно хочете включити цю МД у 531 форму?</h2>
+        <h4>Після виконання цієї дії вказана МД зникне з цього списку</h4>
     </div>
     <div id="dialogBindDecl" style="display: none; text-align: left">
         <table class="ctrl-table">

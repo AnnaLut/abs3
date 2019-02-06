@@ -18,7 +18,7 @@ public partial class cim_forms_ape_servicecodes : System.Web.UI.Page
         if (!string.IsNullOrEmpty(tbName.Text))
             filter += " and code_name like '%" + tbName.Text + "%'";
         dsServiceCodes.SelectCommand = string.Format(sql, filter);
-        Master.AddScript("/barsroot/cim/forms/scripts/ape_servicecodes.js");
+		Master.AddScript(String.Format("/barsroot/cim/forms/scripts/ape_servicecodes.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
     }
     
     protected void btSearch_Click(object sender, EventArgs e)

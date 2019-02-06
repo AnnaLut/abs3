@@ -4,6 +4,7 @@ var diagPayment = null;
 var diagPeriod = null;
 var diagConclusion = null;
 var dialogApe = null;
+var dialogDeadline = null;
 var dialogBorgReason = null;
 var dialogRegDate = null;
 var activeTab = 0;
@@ -41,6 +42,7 @@ CIM.contract_state_module = function () {
     var ctrlPeriodPercentNbu = $("#tbPeriodPercentNbu");
     var ctrlPerCrBase = $('select[name$="ddCreditBase"]');
     var ctrlPerPercentPeriod = $('select[name$="ddPercentPeriod"]');
+    var ctrlDeadline = $('select[name$="ddDeadline"]');
     var ctrlBorgReason = $('select[name$="ddBorgReason"]');
     var ctrlPerGetDay = $('select[name$="ddGetDay"]');
     var ctrlPerPayDay = $('select[name$="ddPayDay"]');
@@ -151,6 +153,24 @@ CIM.contract_state_module = function () {
             });
         }
 
+        if (!dialogDeadline) {
+            dialogDeadline = $('#dialogDeadline');
+            dialogDeadline.dialog({
+                autoOpen: false,
+                resizable: false,
+                modal: false,
+                width: 270,
+                buttons: {
+                    "Зберегти": function () {
+                        if (saveDeadline()) $(this).dialog("close");
+                    },
+                    "Відміна": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        }
+
         if (!dialogBorgReason) {
             dialogBorgReason = $('#dialogBorgReasonInfo');
             dialogBorgReason.dialog({
@@ -246,6 +266,8 @@ CIM.contract_state_module = function () {
     module.LinkPrimVMDConclusion = linkPrimVMDConclusion;
     module.LinkPrimApePay = linkPrimApePay;
     module.ShowLicenses = showLicenses;
+    module.EditIsDoc = editIsDoc;
+    module.EditDeadline = editDeadline;
     module.EditBorgReason = editBorgReason;
     module.EditRegDate = editRegDate;
 
@@ -1061,6 +1083,41 @@ CIM.contract_state_module = function () {
 
     function showLicenses() {
         $(location).attr('href', 'licenses.aspx?contr_id=' + contrID + "&taxcode=" + ContractClass.ClientInfo.Okpo);
+    }
+
+    //#endregion
+	
+    function editDeadline(boundType, boundId, docType) {
+        refObj = {};
+        refObj.boundType = boundType;
+        refObj.boundId = boundId;
+        refObj.docType = docType;
+        dialogDeadline.dialog('option', 'title', 'Редагування контрольного строку');
+        dialogDeadline.dialog('open');
+    }
+
+    function saveDeadline() {
+        PageMethods.SaveDeadline(refObj.boundType, refObj.boundId, refObj.docType, ctrlDeadline.val(), CIM.reloadPage, CIM.onPMFailed);
+    }
+
+    //#region Oзнакa наявності документів
+
+    function editIsDoc(boundId, docType) {
+        refObj = {};
+        refObj.boundId = boundId;
+        refObj.docType = docType;
+
+        var dialogIsDoc = $('#dialogIsDoc');
+        var ctrlIsDoc = $('select[name$="ddIsDoc"]');
+        dialogIsDoc.dialog({ autoOpen: true, resizable: false, modal: false, width: 400, title: "Редагувати ознаку наявності документів",
+            buttons: {
+                "Зберегти": function () {
+                    PageMethods.SaveIsDoc(refObj.boundId, refObj.docType, ctrlIsDoc.val(), CIM.reloadPage, CIM.onPMFailed);
+                    $(this).dialog("close");
+                },
+                "Відміна": function () { $(this).dialog("close"); }
+            }
+        });
     }
 
     //#endregion

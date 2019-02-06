@@ -24,7 +24,7 @@ public partial class cim_contracts_other_contracts_list : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         Master.SetPageTitle(this.Title, true);
-        Master.AddScript("/barsroot/cim/contracts/scripts/cim_contacts.js");
+        Master.AddScript(String.Format("/barsroot/cim/contracts/scripts/cim_contacts.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
 
         if (!IsPostBack)
         {
