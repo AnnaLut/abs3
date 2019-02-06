@@ -313,11 +313,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('AA8', 'AA8-Зворотній обмін невикористаних готівкових грн на інвалюту', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 1, 0, null, null, 30, null, '#(nbs_ob22 (''3800'',''10''))', null, '1001110001010000000000000000000000010000000000000000000000010000', 'Зворотний обмін невикористаних готівкових гривень на інвалюту');
+    values ('AA8', 'AA8-Зворотній обмін невикористаних готівкових грн на інвалюту', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 1, 0, null, null, 30, null, '#(nbs_ob22 (''3800'',''10''))', null, '0001110001010000000000000000000000010000000000000000000000010000', 'Зворотний обмін невикористаних готівкових гривень на інвалюту');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='AA8', name='AA8-Зворотній обмін невикористаних готівкових грн на інвалюту', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=30, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='1001110001010000000000000000000000010000000000000000000000010000', nazn='Зворотний обмін невикористаних готівкових гривень на інвалюту'
+         set tt='AA8', name='AA8-Зворотній обмін невикористаних готівкових грн на інвалюту', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=30, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0001110001010000000000000000000000010000000000000000000000010000', nazn='Зворотний обмін невикористаних готівкових гривень на інвалюту'
        where tt='AA8';
   end;
   --------------------------------

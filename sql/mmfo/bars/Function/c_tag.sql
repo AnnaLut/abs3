@@ -304,7 +304,7 @@ BEGIN
             SELECT 1
               INTO n1_
               FROM passpv
-             WHERE TRIM (name) = TRIM (val_) AND rezid = 1;
+             WHERE TRIM (name) = TRIM (val_);   -- AND rezid = 1;  COBUMMFO-10624
          EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
