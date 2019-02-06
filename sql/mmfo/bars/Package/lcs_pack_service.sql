@@ -1,16 +1,10 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/lcs_pack_service.sql =========*** Ru
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.LCS_PACK_SERVICE is
+CREATE OR REPLACE PACKAGE BARS.lcs_pack_service is
 
   -- Author  : RYTA.SHYGYDA
   -- Created : 07/07/2014 10:27:42
   -- Purpose :
 
-  g_header_version constant varchar2(64) := 'version 2.2.3 24/12/2015';
+  g_header_version constant varchar2(64) := 'version 2.2.4 21/01/2018';
 
   g_awk_header_defs constant varchar2(512) := '';
 
@@ -40,7 +34,7 @@
   /*
   * Формування запиту до веб сервісу щодо ліміту
   */
-  function get_eqv(p_date varchar2, p_source_type varchar2, p_src_trans_id varchar2, p_mfo varchar2, p_branch varchar2, p_trans_crt_date varchar2, p_trans_bank_date varchar2, p_trans_code varchar2, p_s number, p_sq number, p_currency_code number, p_ex_rate_official number, p_ex_rate_sale number, p_doc_type_id varchar2, p_serial_doc varchar2, p_numb_doc varchar2, p_fio varchar2, p_birth_date varchar2, p_resident_flag number, p_cash_acc_flag number, p_approve_docs_flag number, p_exception_flag number, p_exception_description varchar2, p_staff_logname varchar2, p_staff_fio varchar2)
+  function get_eqv(p_date varchar2, p_source_type varchar2, p_src_trans_id varchar2, p_mfo varchar2, p_branch varchar2, p_trans_crt_date varchar2, p_trans_bank_date varchar2, p_trans_code varchar2, p_s number, p_sq number, p_currency_code number, p_ex_rate_official number, p_ex_rate_sale number, p_doc_type_id varchar2, p_serial_doc varchar2, p_numb_doc varchar2, p_fio varchar2, p_birth_date varchar2, p_resident_flag number, p_cash_acc_flag number, p_approve_docs_flag number, p_exception_flag number, p_exception_description varchar2, p_staff_logname varchar2, p_staff_fio varchar2, p_recipient varchar2, p_purpose varchar2)
    return varchar2;
   /*
   *  Відміна транзакції
@@ -74,9 +68,10 @@
 
 end lcs_pack_service;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.LCS_PACK_SERVICE is
 
- g_body_version constant varchar2(64) := 'version 3.5.0 24/03/2016';
+CREATE OR REPLACE PACKAGE BODY BARS.lcs_pack_service is
+
+ g_body_version constant varchar2(64) := 'version 3.4.0 21/01/2018';
  g_awk_body_defs constant varchar2(512) := '';
  g_cur_rep_id number := -1;
  g_cur_block_id number := -1;
@@ -92,8 +87,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.LCS_PACK_SERVICE is
  g_account_tansit varchar2(5) := '2909%';
  g_account_bpk varchar2(5) := '2625%';
 
- -- > 15 тис грн, перевырка на пыдтверджувальны документи
- g_approve_sum number := 1500000;
+ -- > 150 тис грн, перевырка на пыдтверджувальны документи
+ g_approve_sum number := 15000000;
 
  /*
  * header_version - возвращает версию заголовка пакета
@@ -419,7 +414,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.LCS_PACK_SERVICE is
                    p_exception_flag number,
                    p_exception_description varchar2,
                    p_staff_logname varchar2,
-                   p_staff_fio varchar2)
+                   p_staff_fio varchar2,
+                   p_recipient varchar2,
+                   p_purpose varchar2)
     return varchar2 IS
     l_request  soap_rpc.t_request;
     l_response soap_rpc.t_response;
@@ -483,6 +480,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.LCS_PACK_SERVICE is
       soap_rpc.add_parameter(l_request, 'exceptionDescription', to_char(encode_row_to_base(p_exception_description)));
       soap_rpc.add_parameter(l_request, 'staffLogname', to_char(p_staff_logname));
       soap_rpc.add_parameter(l_request, 'staffName', to_char(encode_row_to_base(p_staff_fio)));
+      soap_rpc.add_parameter(l_request, 'recipient', to_char(encode_row_to_base(p_recipient)));
+      soap_rpc.add_parameter(l_request, 'purpose', to_char(encode_row_to_base(p_purpose)));
        --  позвать метод веб-сервиса (nb:invoke  - есть ограничения по размеру сообщения)
      bars_audit.info ('LCS_PACK_SERVICE : l_request '||l_request.body);
      -- l_request := '<Request><Method>GetEquivalent</Method><documentTypeId>1</documentTypeId><Status>50</Status><exchangeRateOfficial>1</exchangeRateOfficial><exchangeRateSale>1</exchangeRateSale><documentSumEquivalent>1</documentSumEquivalent><branch>/304665/000000/060000/</branch><staffName>U1RQRk9nbXQ=</staffName><staffLogname>STPFOgmt</staffLogname><mfo>304665</mfo></Request>';
@@ -643,6 +642,9 @@ function f_stop(p_ref in number) return number is
   l_country        customer.country%type;
   l_ido            operw.value%type;
   l_atr            operw.value%type;
+  l_fio2           operw.value%type := 'Не введено'; --Отримувач
+  l_fio3           operw.value%type;
+  l_nazn2          operw.value%type;
 
   l_passpt_resid passpt.resid%type;
   l_res_transit varchar2(4000):=' ';
@@ -692,6 +694,12 @@ begin
         l_ido := i.value;
       when 'ATRT ' then
         l_atr := i.value;
+      when  'FIO2 '  then
+        l_fio2 := i.value;
+      when  '59   '  then
+        l_fio3 := i.value; 
+      when  '70   '  then
+        l_nazn2 := i.value;
       else
         null;
     end case;
@@ -930,7 +938,6 @@ end if;
     begin
       l_doc_number := substr(replace(trim(l_doc), ' '), 3, 17);
       l_doc_series := upper(substr(replace(trim(l_doc), ' '), 1, 2));
-      bars_audit.info('LCS_PASSP l_doc_number = '||l_doc_number||' l_doc_series= '||l_doc_series);
       l_doc_series := kl.recode_passport_serial(p_serial => l_doc_series);
       l_doc_number := kl.recode_passport_number(p_number => l_doc_number);
       exception
@@ -1042,7 +1049,7 @@ end if;
  end;
 
  -- Перевірка підтв документів
- if (l_approve_docs = 0 and l_resid = 2) then
+ if (l_approve_docs = 0 and l_resid = 2 and  to_number(r_oper.s) * l_kuro > g_approve_sum) then
    bars_error.raise_error('DOC',
                           47,
                           'Відсутні підтверджуючі документи для нерезидента !');
@@ -1076,15 +1083,17 @@ end if;
 
  end if;
 
+if (to_number(r_oper.s) * l_kuro > g_approve_sum) then
  p_check_approve_docs(p_trans_code   => r_oper.tt,
                       p_resid        => l_resid,
                       p_approve_docs => l_approve_docs);
+end if;
 
  if (to_number(r_oper.s) * l_kuro > g_approve_sum and l_approve_docs = 0 and
     (g_is_account = true or r_oper.tt in ('436', 'CVS', 'CVB'))) then
    bars_error.raise_error('DOC',
                           47,
-                          'Відсутні підтверджуючі документи при проведенні одноразово операції  більш ніж 15000 грн.!');
+                          'Відсутні підтверджуючі документи при проведенні одноразово операції  більш ніж '||g_approve_sum/100||' грн.!');
  end if;
 
   -- Переказ в межах України не отображаем
@@ -1094,6 +1103,14 @@ end if;
                              'Переказ не є в межах України!  Код країни перерахування/надходження переказу '||to_char(l_country_tran));
   end if;*/
 
+  if (to_number(r_oper.s) * l_kuro > g_approve_sum 
+      and l_exception_flag = 0 
+      and r_oper.tt in ('CFS', 'CFO', 'CFB', 'CVB', 'CVO', 'CVS')) then
+   bars_error.raise_error('DOC',
+                          47,
+                          'Відсутня ознака винятку при проведенні операції  більш ніж '||g_approve_sum/100||' грн.!');
+  end if;
+  
   if (l_exception_flag = 1 and
      (lower(l_exception_desc) like lower('%переказ в межах україни%') or  lower(l_exception_desc) like lower('%Переказ ФО - повернення інвестиції%')) ) then
     return 0;
@@ -1132,7 +1149,9 @@ end if;
                    nvl(l_exception_flag, 0), -- p_exception_flag number,
                    nvl(l_exception_desc, ' '), -- p_exception_description varchar2,
                    r_staff.logname, -- p_staff_logname varchar2,
-                   r_staff.fio); -- p_staff_fio varchar2
+                   r_staff.fio,
+                   nvl(l_fio3,l_fio2), -- Отримувач
+                   nvl(l_nazn2,r_oper.nazn));
   logger.info('l_res: ' || l_res);
 
   if (l_res = 'OK') then
@@ -1192,6 +1211,9 @@ function lcs_transfer_doc_silent(p_ref in number) return number is
   l_rate           operw.value%type;
   l_sq             operw.value%type;
   l_fio            operw.value%type;
+  l_fio2           operw.value%type := 'Не введено';
+  l_fio3           operw.value%type;
+  l_nazn2          operw.value%type;
   l_resid          number;
   r_oper           oper%rowtype;
   r_staff          staff$base%rowtype;
@@ -1262,6 +1284,12 @@ begin
         l_flag_trans := i.value;
       when 'LCSDE' then
         l_exception_desc := i.value;
+      when  'FIO2 '  then
+        l_fio2 := i.value;
+      when  '59   '  then
+        l_fio3 := i.value; 
+      when  '70   '  then
+        l_nazn2 := i.value;
       else
         null;
     end case;
@@ -1344,6 +1372,7 @@ begin
       end if;
 
       g_is_account := true;
+
 
       exception
 
@@ -1518,7 +1547,9 @@ if ( r_oper.tt in ('CN3','CN4','MUB') )
                    nvl(l_exception_flag, 0), -- p_exception_flag number,
                    nvl(l_exception_desc, ' '), -- p_exception_description varchar2,
                    r_staff.logname, -- p_staff_logname varchar2,
-                   r_staff.fio); -- p_staff_fio varchar2
+                   r_staff.fio,
+                   nvl(l_fio3,l_fio2), -- Отримувач
+                   nvl(l_nazn2,r_oper.nazn));
   logger.info('l_res: ' || l_res);
 
   if (l_res = 'OK') then
@@ -1591,4 +1622,3 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/lcs_pack_service.sql =========*** En
  PROMPT ===================================================================================== 
- 
