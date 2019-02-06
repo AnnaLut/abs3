@@ -161,7 +161,7 @@ namespace BarsWeb.CheckInner
                         result.Status = 100;
                         result.ErrorMessage = "Помилка протоколювання підписів. " + ex.Message;
                     }
-                    if (verifyModeOn) // проверка не прошла, сохранили в очередь, пускаем дальше 
+                    if (verifyModeOn && result.Status != 2) // проверка не прошла, сохранили в очередь, пускаем дальше 
                     {
                         result.Status = 0;
                         result.ErrorMessage = string.Empty;
