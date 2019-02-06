@@ -1152,7 +1152,7 @@ procedure div39 ( p_mode int, p_dat01 date )   is   -- разделение рез-39 по КД в
    l_SNA01  number; q_Rez   number; s_k9       number; n_Rez number; l_r9     number; l_r     number;
    s_KV     int   ; l_MMFO  int   ; l_count    int   ;
    l_id  varchar2(25);  sErr_   varchar2(100) := ''  ;  l_msg varchar2(250);  s_dat01   varchar2(10);
-   s_nls varchar2(15);  s_RI    varchar2(254) ;         s_tp  varchar2(1)  ;  s_tp_next varchar2(2) ;
+   s_nls varchar2(15);  s_RI    varchar2(254) ;         s_tp  varchar2(1)  ;  s_tp_next varchar2(3) ;
    s1         SYS_REFCURSOR;
 
 begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
@@ -1337,7 +1337,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       commit;
       LOGGER.INFO('OSA-1:Цикл по ND' );
       l_commit := 0; l_all := 0 ;
-      for x in ( select kv, rnk, tip, ND, REZB, REZ9, ID_PROV_TYPE, IS_DEFAULT, rowid RI, REZB_R, REZ9_R, FV_ABS from PRVN_OSAq  )
+      for x in ( select kv, rnk, tip, ND, REZB, REZ9, ID_PROV_TYPE, IS_DEFAULT, rowid RI, REZB_R, REZ9_R, FV_ABS from PRVN_OSAq order by nd  )
       loop
         If p_mode = 12 then
            If x.REZB_R is     null and x.REZ9_R is     null then   goto NEXT_;       end if;
@@ -1349,38 +1349,47 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
         l_SNA01 := 0 ;
 
         if   x.TIP = 3 and x.kv is null     THEN
-             OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
+             OPEN s1 FOR select lead(substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),1,-1) 
+                       over(order by substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9',    0, BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,    0 )) over (partition by 1))
-                         from nbu23_rez where fdat = z_dat01 and BVu >= 0 and tip not in ('SDI','SDA','SDM','SDF','SNA') and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
+                         from nbu23_rez where fdat =z_dat01 and BVu > 0 and tip not in ('SDI','SDA','SDM','SDF','SNA') and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
                           AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9000%' or id like '9122%' or id like 'DEBF%' )
-                          and tipa = 3 ;
+                          and tipa = 3; 
+
        ElsIf x.TIP = 3 and x.kv is not null THEN
-             OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
+             OPEN s1 FOR select lead(substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),1,-1) 
+                       over(order by substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  , BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,    0)) over (partition by 1))
-                         from nbu23_rez where fdat = z_dat01 and BVu >= 0  and tip not in ('SDI','SDA','SDM','SDF','SNA') and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
+                         from nbu23_rez where fdat = z_dat01 and BVu > 0  and tip not in ('SDI','SDA','SDM','SDF','SNA') and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
                           AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9000%' or id like '9122%' or id like 'DEBF%' )
                           and tipa = 3 and kv=x.kv ;
        ElsIf x.TIP = 9   then
-             OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu, Div0( BVu , sum(BVu) over (partition by 1)), 0
+             OPEN s1 FOR select lead(substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),1,-1) 
+                       over(order by substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu, 
+                                      Div0( BVu , sum(BVu) over (partition by 1)), 0
                          from nbu23_rez where fdat = z_dat01 and BVu >= 0 and nd =  x.ND    and ( rez9 = 0 or p_mode = 12)
                           AND ( id like 'CACP%' or id like 'DEBF%' )      and tipa = 9 ;
 
        ElsIf x.TIP = 4   then
-             OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
+             OPEN s1 FOR select lead(substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),1,-1) 
+                       over(order by substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  ,BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,   0)) over (partition by 1))
                          from nbu23_rez where fdat= z_dat01 and BVu >= 0 and ( rez9 = 0 or p_mode = 12 )
                           and tipa = 4  and nd = x.ND  AND (id like 'W4%'  or id like 'BPK%' or id like 'DEBF%') ;
        ElsIf x.TIP = 23   then   --  Instalment  COBUINST-8
-             OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
+             OPEN s1 FOR select lead(substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),1,-1) 
+                       over(order by substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  ,BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,   0)) over (partition by 1))
                          from nbu23_rez where fdat= z_dat01 and BVu >= 0 and ( rez9 = 0 or p_mode = 12 )
                           and tipa = 23  and nd = x.ND  AND (id like 'INS%' or id like 'DEBF%') ;
+
        ElsIf x.TIP = 10  then
-             OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
+             OPEN s1 FOR select lead(substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),1,-1) 
+                       over(order by substr(nls,1,1)||decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  ,BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,  0 )) over (partition by 1))
                          from nbu23_rez
@@ -1413,20 +1422,20 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
        x.FV_ABS := 0;
        l_r9:= x.rez9;
        l_r := x.rezb;
-
+       --LOGGER.INFO('PRV_OSA- 1 ND = ' ||x.nd );
        LOOP FETCH s1 into s_tp_next, s_tp, s_RI , s_nls,  s_BV, s_KV, s_BVN, s_KB , s_k9 ;
        EXIT WHEN s1%NOTFOUND;
 
-            If s_tp = '9' then nTmp_ := round ( x.REZ9 * s_K9, 2) ;
-            else               nTmp_ := round ( x.REZb * s_Kb, 2) ;
+            If s_tp = '9' then nTmp_ := round ( x.REZ9 , 2) ;
+            else               nTmp_ := round ( x.REZb , 2) ;
             end if;
             --LOGGER.INFO('PRV_OSA- 1 ND = ' ||x.nd || ' nls = ' || s_nls || ' nTmp_ = ' ||nTmp_ );
             n_REZ := LEAST ( nTmp_, s_BVn)  ;                       -- приблизительны экв
             --LOGGER.INFO('PRV_OSA- 2 ND = ' ||x.nd || ' nls = ' || s_nls || ' n_REZ = ' ||n_REZ );
-            If s_tp = '9' then l_r9 := l_r9 - n_rez;
-            else               l_r  := l_r  - n_rez;
+            If s_tp = '9' then l_r9 := l_r9 - n_rez; x.rez9 := x.rez9 - n_rez; 
+            else               l_r  := l_r  - n_rez; x.rezb := x.rezb - n_rez; 
             end if;
-            --LOGGER.INFO('PRV_OSA- 3 ND = ' ||x.nd || ' nls = ' || s_nls || ' l_r9 = ' ||l_r9 || ' l_r = ' ||l_r);
+            --LOGGER.INFO('PRV_OSA- 3 ND = ' ||x.nd || ' nls = ' || s_nls || ' l_r9 = ' ||l_r9 || ' l_r = ' ||l_r || ' x.rez9 = ' ||x.rez9 || ' x.rezb = ' ||x.rezb);
             if    s_tp_next in ('9','-1') and s_tp not in ('9') and l_r  <> 0 THEN n_rez := LEAST ( n_rez + l_r , s_BVn) ;
             elsif s_tp_next in ('-1')     and s_tp     in ('9') and l_r9 <> 0 THEN n_rez := LEAST ( n_rez + l_r9, s_BVn) ;
             end if;
@@ -1448,7 +1457,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
        else                 sErr_ := 'NOT NBU23_rez'  ; x.FV_ABS := 0;
        end if ;
 
-       update  prvn_osaq  SET COMM = substr(sErr_ || ' => '||comm,1,100), FV_ABS = (x.REZB + x.REZ9) - x.FV_ABS  where rowid = x.RI  ;
+       update  prvn_osaq  SET COMM = substr(sErr_ || ' => '||comm,1,100), FV_ABS = (x.REZB + x.REZ9)   where rowid = x.RI  ;
 
        l_commit := l_commit + 1; l_all := l_all    + 1 ;
        If l_commit >= 1000 then  commit;  l_commit:= 0 ;  LOGGER.INFO('OSA-2.1:Обработано '||l_all||' дог.');    end if;
@@ -1472,6 +1481,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
  end if;
 
 end div39;
+
 
 ------------------------------
 procedure del0 ( p_mode int)
