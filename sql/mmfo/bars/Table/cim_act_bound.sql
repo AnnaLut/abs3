@@ -207,6 +207,24 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table bars.CIM_ACT_BOUND add (DEADLINE NUMBER)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_ACT_BOUND.DEADLINE IS 'Контрольний строк по документу';
+
+begin
+    execute immediate 'alter table bars.CIM_ACT_BOUND add (IS_DOC NUMBER(1) default 0)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_ACT_BOUND.IS_DOC IS 'Наявність документів у Банку:  1 - Так';
+
 
 PROMPT *** Create  grants  CIM_ACT_BOUND ***
 grant SELECT                                                                 on CIM_ACT_BOUND   to BARSREADER_ROLE;

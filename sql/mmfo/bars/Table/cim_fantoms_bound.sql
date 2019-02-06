@@ -223,6 +223,17 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table bars.CIM_FANTOMS_BOUND add (DEADLINE NUMBER)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_FANTOMS_BOUND.DEADLINE IS 'Контрольний строк по документу';
+
+
+
 
 PROMPT *** Create  grants  CIM_FANTOMS_BOUND ***
 grant SELECT                                                                 on CIM_FANTOMS_BOUND to BARSREADER_ROLE;

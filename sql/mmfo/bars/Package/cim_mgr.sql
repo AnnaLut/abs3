@@ -15,13 +15,13 @@ is
 -- g_header_version    constant varchar2 (64) := 'version 1.00.02 16/11/2015';
 -- g_header_version    constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_header_version    constant varchar2 (64) := 'version 1.00.04 08/08/2016';
-   g_header_version    constant varchar2 (64) := 'version 1.01.03 23/08/2018';
+   g_header_version    constant varchar2 (64) := 'version 1.02.01 25/01/2019';
    g_awk_header_defs   constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
    -- Типи
    --
-
+   TYPE T_FRAGMENT IS TABLE OF cim_contracts_fragmentation%ROWTYPE;
    --------------------------------------------------------------------------------
    -- Константи
    --
@@ -663,7 +663,8 @@ function check_bound(p_doc_kind in number, --вид документу (0 - платіж, 1 - МД)
                      p_s_vc in number, -- Сума прив'язки у валюті контракту
                      p_val_date in date, -- Дата валютування
                      p_subject in number := null, -- Предмет оплати (0 - товари, 1 - послуги)
-                     p_service_code in varchar2 :=null -- Код класифікатора послуг
+                     p_service_code in varchar2 :=null, -- Код класифікатора послуг
+                     p_kv in number :=null -- Код валюти платежу
                     ) return varchar2;
 
 -- get_control_date - Розрахунок контрольної дати
@@ -768,6 +769,10 @@ function val_convert(p_dat in date , -- Дата конмертації
                      p_kv_b in number default 980 -- Код валюти Б
                     ) return number;
 
+-- «Чужа МД. Включити у 531 форму».
+--
+function add_into_f36(p_vmd_id in number, p_vmd_type in number default 0) return varchar2;
+
 END cim_mgr;
 /
 CREATE OR REPLACE PACKAGE BODY cim_mgr
@@ -777,7 +782,7 @@ is
    --  Currency Inspection Module - Модуль валютного контролю
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.01.09 26/09/2018';
+   g_body_version      constant varchar2 (64) := 'version 1.02.03 06/02/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -889,7 +894,6 @@ is
 
    function check_visa_condition_by_ref(p_ref in number) return number
    is
-       l_res number;
        l_doc oper%rowtype;
    begin
        select * into l_doc from oper where ref = p_ref;
@@ -928,6 +932,233 @@ is
          when others then return null;
    end;
 
+-- check_fragmentation- Перевірка на дроблення
+--
+function check_fragmentation(p_contr_id        in number, -- Ідентифікатор контракту
+                             p_doc_kind        in number, --вид документу (0 - платіж, 1 - МД)
+                             p_payment_type    in number, -- Тип платежу
+                             p_ref             in number, -- Референс документу
+                             p_s_vp            in number, -- Сума прив'язки у валюті платежу
+                             p_val_date        in date, -- Дата валютування
+                             p_kv              in number, -- Код валюти платежу
+                             p_row_contract    in cim_contracts%rowtype, --Данні поточного контракту
+                             p_list_doc        out T_FRAGMENT, --Вихідний: повертає список документів
+                             p_check_type      out varchar2    --Вихідний: повертає тижд/міс
+                             )return boolean
+is
+  l_res      boolean := false;
+  l_fragm    T_FRAGMENT := T_FRAGMENT();
+  l_lim_day  number := F_get_CURR_LIM_DAY1;--Добовий ліміт купівлі безготівкової валюти(коп)
+  l_kv       number;
+  l_sq       number;
+  l_mon_st   date := trunc(sysdate, 'MM'); --з першого дня місяця
+  l_wee_st   date := trunc(sysdate, 'IW'); --з понеділка
+begin
+  /*
+БАНК:
+Лесняк Сергій Богданович :
+При розрахунку ознаки дроблення до уваги беруться тільки первинні платежі, незакриті вторинними документами (або їх незакриті частини).
+Наприклад, при послідовних операціях по імпортному контракту:
+Прив’язка первинних документів до контракту:
+1) 01.02.2019 5 000 USD екв 140 000 грн озн. др. – НІ (екв. за тиждень 140 000)
+2) 01.02.2019 5 000 USD екв 140 000 грн озн. др. – НІ (екв. за тиждень 280 000)
+3) 01.02.2019 1 000 USD екв 28 000 грн озн. др. – ТАК (екв. за тиждень 308 000)
+Прив’язка вторинного до первинного на 500 USD:
+Модифікований платіж 3): 3) 01.02.2019 1 000-500=500 USD екв 14 000 грн озн. др. – НІ (екв. за тиждень 294 000)
+Аналогічно по експортних контрактах.
+Ходаковська Діна Валентинівна:
+Підтверджую.
+*/
+
+/*каледнарний тиждень: 
+   неповний тиждень може бути ... тобіш береться тільки тиждень поточного місяця
+*/
+ if to_char(trunc(sysdate, 'IW'), 'MM') != to_char(sysdate, 'MM') then
+   l_wee_st := trunc(sysdate, 'MM');
+ end if;  
+
+  bars_audit.info('cim_mgr.check_fragmentation START:  p_contr_id='||p_contr_id||' l_lim_day='||l_lim_day||' p_s_vp='||p_s_vp||' p_ref='||p_ref );
+  --Знайти валюту платежу/товару коли не передають для реальних платежів та МДешок
+  if (p_payment_type >= 1  and (p_doc_kind = 1 or p_doc_kind = 0)) then
+    if p_kv is null then
+      bars_error.raise_error(g_module_name, 105);
+    end if;
+    l_kv := p_kv;
+  end if;
+  if p_row_contract.contr_type = 0 then /*Експортний*/
+    if p_doc_kind = 1 then /*МД/Акт*/
+      if p_payment_type = 0 then
+        select kv into l_kv from customs_decl where cim_id = p_ref;
+      end if;
+      else --вторічка не цікавить
+        return false;
+    end if;
+    elsif p_row_contract.contr_type = 1 then /*Імпортний*/
+      if p_doc_kind = 0 then /*Платіж/Фантом*/
+        if p_payment_type = 0 then
+          select kv into l_kv from oper where ref = p_ref;
+        end if;
+        else --вторічка не цікавить
+          return false;
+      end if;
+    else --Інші види контрактів не цікаві
+      return false;
+  end if;
+  --
+  --Якщо це торговий контракт то валюта платежу/товару є, можна переходити до алгоритму обчислення
+  --
+  if p_row_contract.contr_type = 0 then /*Експортний*/
+    if l_kv is null then
+        bars_error.raise_error(g_module_name, 105);
+    end if;
+    l_sq := gl.p_icurval(l_kv, p_s_vp * 100, p_val_date);--єквівалент нової привязки
+    if l_sq > l_lim_day then --ігнор суми
+      l_sq := 0;
+    end if;
+    for cur in (select c.contr_id, v.vt, v.s_vt, v.allow_date, v.type_id, v.bound_id, v.zq_vt * 100 as zq_vt
+                  from cim_contracts c, v_cim_bound_vmd v
+                  where c.contr_id = v.contr_id
+                    and c.rnk in (select rnk from cim_contracts where okpo = p_row_contract.okpo)
+                    and c.benef_id = p_row_contract.benef_id
+                    and c.num = p_row_contract.num and c.open_date = p_row_contract.open_date
+                    and v.allow_date >= l_mon_st
+                    and v.zq_vt * 100 <= l_lim_day)
+    loop
+      l_fragm.extend;
+      l_fragm(l_fragm.last).bound_contr_id := cur.contr_id;
+      l_fragm(l_fragm.last).sq             := cur.zq_vt;
+      l_fragm(l_fragm.last).bound_id       := cur.bound_id;
+      l_fragm(l_fragm.last).kind_doc_id    := 1;
+      l_fragm(l_fragm.last).type_doc_id    := cur.type_id;
+      l_fragm(l_fragm.last).date_doc       := cur.allow_date;
+
+      l_sq := l_sq + cur.zq_vt;
+    end loop;
+    bars_audit.info('cim_mgr.check_fragmentation :  p_contr_id='||p_contr_id||' p_check_type=місяць l_sq='||l_sq);    
+    if l_sq > l_lim_day * 10 then
+      p_list_doc   := l_fragm;
+      l_res        := true;
+      p_check_type := 'місяць';
+      bars_audit.info('cim_mgr.check_fragmentation :  p_contr_id='||p_contr_id||' p_check_type='||p_check_type||' l_res=true');    
+      return true;
+    end if;
+  end if;
+  if p_row_contract.contr_type = 1 then /*Імпортний*/
+    if l_kv is null then
+        bars_error.raise_error(g_module_name, 105);
+    end if;
+    --тижд
+    l_sq := gl.p_icurval(l_kv, p_s_vp * 100, p_val_date);--єквівалент нової привязки
+    bars_audit.info('cim_mgr.check_fragmentation :  p_contr_id='||p_contr_id||' l_kv='||l_kv||' l_sq='||l_sq);    
+    if l_sq > l_lim_day then --ігнор суми
+      l_sq := 0;
+    end if;
+    for cur in (select c.contr_id, v.v_pl, v.s_vpl, v.vdat, v.type_id, v.bound_id, v.zsq_vp * 100 as zsq_vp
+                  from cim_contracts c, v_cim_trade_payments v
+                  where c.contr_id = v.contr_id
+                    and c.rnk in (select rnk from cim_contracts where okpo = p_row_contract.okpo)
+                    and c.benef_id = p_row_contract.benef_id
+                    and c.num = p_row_contract.num and c.open_date = p_row_contract.open_date
+                    and v.vdat >= l_wee_st
+                    and v.zsq_vp * 100 <= l_lim_day)
+    loop
+      l_fragm.extend;
+      l_fragm(l_fragm.last).bound_contr_id := cur.contr_id;
+      l_fragm(l_fragm.last).sq             := cur.zsq_vp;
+      l_fragm(l_fragm.last).bound_id       := cur.bound_id;
+      l_fragm(l_fragm.last).kind_doc_id    := 0;
+      l_fragm(l_fragm.last).type_doc_id    := cur.type_id;
+      l_fragm(l_fragm.last).date_doc       := cur.vdat;
+
+      l_sq := l_sq + cur.zsq_vp;
+    end loop;
+    if l_sq > l_lim_day * 2 then
+      p_list_doc   := l_fragm;
+      l_res        := true;
+      p_check_type := 'тиждень';
+      bars_audit.info('cim_mgr.check_fragmentation :  p_contr_id='||p_contr_id||' p_check_type='||p_check_type||' l_res=true');    
+      return true;
+    end if;
+    --кінець тиждень
+    l_fragm := T_FRAGMENT();
+    --місяць
+    l_sq := gl.p_icurval(l_kv, p_s_vp * 100, p_val_date);--єквівалент нової привязки
+    if l_sq > l_lim_day then --ігнор суми
+      l_sq := 0;
+    end if;
+    for cur in (select c.contr_id, v.v_pl, v.s_vpl, v.vdat, v.type_id, v.bound_id, v.zsq_vp * 100 as zsq_vp
+                  from cim_contracts c, v_cim_trade_payments v
+                  where c.contr_id = v.contr_id
+                    and c.rnk in (select rnk from cim_contracts where okpo = p_row_contract.okpo)
+                    and c.benef_id = p_row_contract.benef_id
+                    and c.num = p_row_contract.num and c.open_date = p_row_contract.open_date
+                    and v.vdat >= l_mon_st
+                    and v.zsq_vp * 100 <= l_lim_day)
+    loop
+      l_fragm.extend;
+      l_fragm(l_fragm.last).bound_contr_id := cur.contr_id;
+      l_fragm(l_fragm.last).sq             := cur.zsq_vp;
+      l_fragm(l_fragm.last).bound_id       := cur.bound_id;
+      l_fragm(l_fragm.last).kind_doc_id    := 0;
+      l_fragm(l_fragm.last).type_doc_id    := cur.type_id;
+      l_fragm(l_fragm.last).date_doc       := cur.vdat;
+
+      l_sq := l_sq + cur.zsq_vp;
+    end loop;
+    if l_sq > l_lim_day * 8 then
+      p_list_doc   := l_fragm;
+      l_res        := true;
+      p_check_type := 'місяць';
+      bars_audit.info('cim_mgr.check_fragmentation :  p_contr_id='||p_contr_id||' p_check_type='||p_check_type||' l_res=true');    
+      return true;
+    end if;
+  end if;
+  return l_res;
+
+  exception
+    when others then
+      bars_audit.error(g_trace_module||' check_fragmentation. '||sqlerrm||' - '||dbms_utility.format_error_backtrace);
+      raise;
+end check_fragmentation;
+
+-- change_fragmentation- Зміна ознаки дроблення
+--
+procedure change_fragmentation(p_isfragment          in cim_contracts_trade.is_fragment%type,
+                               p_row_contract        in cim_contracts%rowtype,
+                               p_fragm               in T_FRAGMENT,
+                               p_check_type          in varchar2)
+is
+  l_number_change              cim_contracts_fragcheck.ID_CHECK%type; 
+  l_fragm                      T_FRAGMENT := p_fragm;
+begin
+  
+  for cur in (select c.contr_id
+                    from cim_contracts c
+                    where c.rnk in (select rnk from cim_contracts where okpo = p_row_contract.okpo)
+                      and c.benef_id = p_row_contract.benef_id
+                      and c.num = p_row_contract.num and c.open_date = p_row_contract.open_date) 
+  loop
+    l_number_change :=  s_cim_contracts_fragcheck.nextval;                 
+    insert into cim_contracts_fragcheck(id_check,        contr_id,   is_fragment,  type_check,  bdate, sdate, user_id)
+                                 values(l_number_change, cur.contr_id, p_isfragment, p_check_type, gl.bd,sysdate,user_id());
+
+    update cim_contracts_trade c
+       set c.is_fragment         = p_isfragment
+     where c.contr_id = cur.contr_id;
+
+    if l_fragm is not null then
+      for i in 1..l_fragm.COUNT loop
+        l_fragm(i).id_check := l_number_change;
+        insert into cim_contracts_fragmentation
+        values l_fragm(i);
+      end loop;
+    end if;
+  
+  end loop;
+
+end change_fragmentation;
+
+
 --------------------------------------------------------------------------------
    -- check_contract_status - Статус контрагента
    --
@@ -935,25 +1166,23 @@ is
 procedure check_contract_status(p_contr_id in number /*id контракту*/)
 
 is
-  l_type number;
   l_status number;
-  l_old_status number;
-  l_branch varchar2(30);
-  l_rnk number;
-  l_dog_num varchar2(60);
-  l_open_date date;
-  l_close_date date;
   l_n number;
   l_s_pl number;
   l_s_vmd number;
+
+  l_row_contract  cim_contracts%rowtype;
+  l_fragm         T_FRAGMENT;
+  l_check_type    varchar2(20);
+  l_isfragment    cim_contracts_trade.is_fragment%type;
 begin
   if p_contr_id !=0 then
-    select status_id, contr_type, branch,   rnk,   num,       open_date,   close_date
-      into l_old_status,  l_type,     l_branch, l_rnk, l_dog_num, l_open_date, l_close_date
+    select  *
+      into  l_row_contract
       from cim_contracts where contr_id=p_contr_id and (kf = sys_context('bars_context','user_mfo') or sys_context('bars_context','user_mfo') is null);
-    if l_type<2  and l_old_status != 1 and l_old_status<9 then
+    if l_row_contract.contr_type<2  and l_row_contract.status_id != 1 and l_row_contract.status_id<9 then
       l_s_pl:=0; l_s_vmd:=0; l_status:=0;
-      if l_type = 1 then
+      if l_row_contract.contr_type = 1 then
         for l in (select * from v_cim_trade_payments where zs_vk>0 and contr_id=p_contr_id) loop
           if bankdate>l.control_date then
             if g_create_borg_message = 1 then
@@ -961,18 +1190,18 @@ begin
                 where doc_kind=0 and doc_type=l.type_id and bound_id=l.bound_id and control_date=l.control_date;
               if l_n=0 then
                 insert into cim_borg_message (branch, rnk, nom_dog, date_dog, date_plat, doc_kind, doc_type, bound_id, control_date)
-                  values (l_branch, l_rnk, l_dog_num, l_open_date, l.vdat, 0, l.type_id, l.bound_id, l.control_date);
+                  values (l_row_contract.branch, l_row_contract.rnk, l_row_contract.num, l_row_contract.open_date, l.vdat, 0, l.type_id, l.bound_id, l.control_date);
               end if;
             end if;
             l_status:=4;
           elsif l_status != 4 and (trunc(l.control_date)-bankdate)<g_alert_term then l_status:=5;
-          elsif l_status != 4 and l_status != 5 and l_close_date is not null and l.vdat>l_close_date then l_status:=6;
+          elsif l_status != 4 and l_status != 5 and l_row_contract.close_date is not null and l.vdat>l_row_contract.close_date then l_status:=6;
           else
             l_s_pl:=l_s_pl+l.zs_vk;
           end if;
         end loop;
         select sum(z_vk) into l_s_vmd from v_cim_bound_vmd where contr_id=p_contr_id;
-      elsif l_type = 0 then
+      elsif l_row_contract.contr_type = 0 then
         for l in (select * from v_cim_bound_vmd where z_vk>0 and contr_id=p_contr_id) loop
           if bankdate>l.control_date then
             if g_create_borg_message = 1 then
@@ -980,12 +1209,12 @@ begin
                 where doc_kind=1 and doc_type=l.type_id and bound_id=l.bound_id and control_date=l.control_date;
               if l_n=0 then
                 insert into cim_borg_message (branch, rnk, nom_dog, date_dog, date_plat, doc_kind, doc_type, bound_id, control_date)
-                  values (l_branch, l_rnk, l_dog_num, l_open_date, nvl(l.allow_date,l.doc_date), 1, l.type_id, l.bound_id, l.control_date);
+                  values (l_row_contract.branch, l_row_contract.rnk, l_row_contract.num, l_row_contract.open_date, nvl(l.allow_date,l.doc_date), 1, l.type_id, l.bound_id, l.control_date);
               end if;
             end if;
             l_status:=4;
           elsif l_status != 4 and (trunc(l.control_date)-bankdate)<g_alert_term then l_status:=5;
-          elsif l_status != 4 and l_status != 5 and l_close_date is not null and  nvl(l.allow_date,l.doc_date)>l_close_date then l_status:=6;
+          elsif l_status != 4 and l_status != 5 and l_row_contract.close_date is not null and  nvl(l.allow_date,l.doc_date)>l_row_contract.close_date then l_status:=6;
           else
             l_s_vmd:=l_s_vmd+l.z_vk;
           end if;
@@ -995,10 +1224,30 @@ begin
       if l_status != 4 and l_status != 5 and l_status != 6 then
         if l_s_pl=0 and l_s_vmd=0 then l_status:=8; else l_status:=0; end if;
       end if;
-      if l_old_status != l_status then
+      if l_row_contract.status_id != l_status then
         update cim_contracts set status_id=l_status where contr_id=p_contr_id;
       end if;
     end if;
+    if l_row_contract.contr_type = 0 /*Експортний*/  or l_row_contract.contr_type = 1 /*Імпортний*/ then
+      select nvl(is_fragment, 0) into l_isfragment from cim_contracts_trade where contr_id = p_contr_id;
+      begin
+        if check_fragmentation(p_contr_id, case when l_row_contract.contr_type = 0 then 1 when l_row_contract.contr_type = 1 then 0 end, 1, null, 0, gl.bd, 980, l_row_contract, l_fragm, l_check_type) then
+          if l_isfragment = 0 then
+            change_fragmentation(1, l_row_contract, l_fragm, l_check_type);
+            bars_audit.info(g_module_name||' check_contract_status . p_contr_id:'||p_contr_id||' Встановлення Ознаки дроблення. Документів '||l_fragm.COUNT);
+          end if;
+         else --якщо раніше вдруг була проставлена , а зараз вже немає то зняти дроблення
+           if l_isfragment = 1 then
+             change_fragmentation(0, l_row_contract,null, null);
+           end if;
+        end if;
+        exception
+          when others then
+            bars_audit.error(g_module_name||' check_contract_status . p_contr_id:'||p_contr_id||' '||sqlerrm);
+      end;
+    end if;
+
+
   end if;
 end check_contract_status;
 
@@ -2435,6 +2684,7 @@ begin
   end if;
 end get_credcontract_info;
 
+
 -- bound_payment- Прив'язка платежу до контракту
 --
 function bound_payment(p_payment_type in number, -- Тип платежу
@@ -2461,22 +2711,14 @@ function bound_payment(p_payment_type in number, -- Тип платежу
                         p_c_num varchar2 :=null, --Номер контракту
                         p_c_date date :=null --Дата контракту
                        ) return number
-is l_vc                      number; -- Валюта контракту
-   l_contr_type              number; -- Тип контракту
-   l_rnk                     number; -- rnk клієнта
-   l_benef_id                number; -- id бенефіціара
-   l_branch                  varchar2(30); -- Код установи
-   l_contr_s                 number; --сума контракту
-   l_status                  number; --статус контрату
-
-
+is
    l_s                       number; -- Cума платежу
    l_vp                      number; -- Валюта платежу
    l_sos                     number; -- Стан документа
 
    l_sum_bound               number; -- Сума привязаних
    l_s_limit                 number; -- Ліміт для типу контракту 4
-   l_open_date               date;   -- Дата видачі е-ліцензії (дата відкриття)
+--   l_open_date               date;   -- Дата видачі е-ліцензії (дата відкриття)
 
    l_n                       number;
    l_bound_id                number; -- id зв'язку
@@ -2489,41 +2731,47 @@ is l_vc                      number; -- Валюта контракту
    l_val_date                date; -- Дата валютування
 
    l_fantom_id               number; -- id фантома
-   l_okpo                    varchar2(14 byte);
+
 
    l_ape_id                  number;
    l_txt                     varchar2(4000);
+
+   l_deadline                cim_contracts_trade.deadline%type;
+   l_row_contract            cim_contracts%rowtype;
+
 begin
   if p_contr_id=0 then
     if p_payment_type>0 or p_ref is null then bars_error.raise_error(g_module_name, 44); end if;
-    l_branch:=sys_context('bars_context', 'user_branch'); l_contr_type:=3;
+    l_row_contract.branch:=sys_context('bars_context', 'user_branch'); l_row_contract.contr_type:=3;
   else
-    select max(rnk), max(benef_id), max(kv), max(contr_type), max(branch), max(okpo), max(s), max(status_id), max(open_date)
-      into l_rnk, l_benef_id, l_vc, l_contr_type, l_branch, l_okpo, l_contr_s, l_status, l_open_date
+    select *
+      into l_row_contract
       from cim_contracts where contr_id=p_contr_id;
-    if l_branch != sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
-    if l_status=1 or l_status>8 then bars_error.raise_error(g_module_name, 6); end if;
-    if p_direct=1 and p_comiss != 0 and l_contr_type != 2 and p_pay_flag != 3 then bars_error.raise_error(g_module_name, 51); end if;
+    if l_row_contract.branch != sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
+    if l_row_contract.status_id=1 or l_row_contract.status_id>8 then bars_error.raise_error(g_module_name, 6); end if;
+    if p_direct=1 and p_comiss != 0 and l_row_contract.contr_type != 2 and p_pay_flag != 3 then bars_error.raise_error(g_module_name, 51); end if;
 
-    if p_s_vp <=0 or l_contr_type != 2 and p_pay_flag>1 or
-      l_contr_type=2 and (p_pay_flag<2 or p_pay_flag=3 and p_direct=0) or
-      l_contr_type=0 and p_pay_flag=0 and p_direct=1 or l_contr_type=1 and p_pay_flag=0 and p_direct=0
+    if p_s_vp <=0 or l_row_contract.contr_type != 2 and p_pay_flag>1 or
+      l_row_contract.contr_type=2 and (p_pay_flag<2 or p_pay_flag=3 and p_direct=0) or
+      l_row_contract.contr_type=0 and p_pay_flag=0 and p_direct=1 or l_row_contract.contr_type=1 and p_pay_flag=0 and p_direct=0
       or p_s_vc<=0 or p_rate<=0 or p_direct is null or p_direct>1
     then bars_error.raise_error(g_module_name, 41); end if;
     if round((p_s_vp+p_comiss)*p_rate,2) != p_s_vc and round(p_s_vc/(p_s_vp+p_comiss),8) != p_rate then
       bars_error.raise_error(g_module_name, 47);
     end if;
-    if l_contr_type=2 and p_direct=1 and p_pay_flag=2 then
+    if l_row_contract.contr_type=2 and p_direct=1 and p_pay_flag=2 then
       select nvl(sum(decode(direct, 0, s_vk,0)),0)-nvl(sum(decode(direct, 1, s_vk,0)),0) into l_contr_arrears
         from v_cim_bound_payments where pay_flag = 2 and contr_id = p_contr_id;
       if (p_s_vp+p_comiss)*p_rate-l_contr_arrears>=0.01 then bars_error.raise_error(g_module_name, 50); end if;
     end if;
---    if l_contr_type<2 and (p_subject is null or p_subject=1 and p_service_code is null) then bars_error.raise_error(g_module_name, 48); end if;
-    if l_contr_type=1 then select max(subject_id) into l_subject_id from cim_contracts_trade where contr_id=p_contr_id; end if;
+--    if l_row_contract.contr_type<2 and (p_subject is null or p_subject=1 and p_service_code is null) then bars_error.raise_error(g_module_name, 48); end if;
+    if l_row_contract.contr_type=1 then
+      select max(subject_id), max(deadline) into l_subject_id, l_deadline from cim_contracts_trade where contr_id=p_contr_id;
+    end if;
   end if;
 
   l_txt:='';
-  if l_contr_type=2 then
+  if l_row_contract.contr_type=2 then
     if p_direct=0 and p_pay_flag=2 then l_txt:=' Надходження. ';
     elsif p_pay_flag=2 then l_txt:=' Погашення тіла. ';
     elsif p_pay_flag=3 then l_txt:=' Погашення процентів. ';
@@ -2536,14 +2784,14 @@ begin
     else -- Створення та прив'язка фантому
       select bars_sqnc.get_nextval('s_cim_fantom_payments') into l_fantom_id from dual;
       insert into cim_fantom_payments (fantom_id, rnk, benef_id, direct, payment_type, oper_type, val_date, kv, s, details)
-        values (l_fantom_id, l_rnk, l_benef_id, p_direct, p_payment_type, p_top_id,p_val_date, p_kv, round(p_s_vp*100,0)/*<>*/,
+        values (l_fantom_id, l_row_contract.rnk, l_row_contract.benef_id, p_direct, p_payment_type, p_top_id,p_val_date, p_kv, round(p_s_vp*100,0)/*<>*/,
                 p_details);
       select bars_sqnc.get_nextval('s_cim_fantoms_bound') into l_bound_id from dual;
-      insert into cim_fantoms_bound (bound_id, direct, fantom_id, contr_id, pay_flag, s, s_cv, rate, comiss, comments, journal_num)
+      insert into cim_fantoms_bound (bound_id, direct, fantom_id, contr_id, pay_flag, s, s_cv, rate, comiss, comments, journal_num, deadline)
         values (l_bound_id, p_direct, l_fantom_id, p_contr_id, p_pay_flag, round(p_s_vp*100,0),
-               p_s_vc*100, (case when l_vc=p_kv then 1 else p_rate end),
+               p_s_vc*100, (case when l_row_contract.kv=p_kv then 1 else p_rate end),
                round(p_comiss*100,0), l_txt||decode(p_payment_type, 5, 'Взаємозалік. ','')||p_comments,
-               decode(l_contr_type, 0, 1, 1, 2, 2, decode(p_payment_type, 11, null, 4), 4));
+               decode(l_row_contract.contr_type, 0, 1, 1, 2, 2, decode(p_payment_type, 11, null, 4), 4), l_deadline);
       l_val_date:=p_val_date;
     end if;
   else -- Прив'язка реального платежку або фантому
@@ -2557,7 +2805,7 @@ begin
       l_comments:=p_comments;
       if p_s_vp*100>l_s_unbound or p_s_vp=0 then bars_error.raise_error(g_module_name, 43);
       else
-        if l_contr_type = 4 then
+        if l_row_contract.contr_type = 4 then
           select nvl(sum(b.s_cv),0)
           into   l_sum_bound
           from cim_payments_bound b
@@ -2566,7 +2814,7 @@ begin
           begin
             select to_number(par_value)*100 into l_s_limit from cim_params where par_name='LIMIT_CONTR_EL_LIC';
             bars_audit.debug(g_module_name||' Прив`язка платежу. bound_id:'||l_bound_id||' l_sum_bound+p_s_vc: '||(l_sum_bound+p_s_vc*100)||' l_s_limit: '||l_s_limit);
-            if val_convert(l_open_date, l_sum_bound+p_s_vc*100, l_vc, 840) > l_s_limit then
+            if val_convert(l_row_contract.open_date, l_sum_bound+p_s_vc*100, l_row_contract.kv, 840) > l_s_limit then
               bars_error.raise_error(g_module_name, 104);
             end if;
             exception
@@ -2576,8 +2824,8 @@ begin
           --if l_sum_bound+
         end if;
         if p_s_vp*100<l_s_unbound and (l_sos=5 or f_check_visa_status(p_ref)=0) then
-            insert into cim_payments_bound (direct, ref, s, branch, pay_flag)
-              values (p_direct, p_ref, round((l_s_unbound-p_s_vp*100),0), l_branch, 0);
+            insert into cim_payments_bound (direct, ref, s, branch, pay_flag, deadline)
+              values (p_direct, p_ref, round((l_s_unbound-p_s_vp*100),0), l_row_contract.branch, 0, l_deadline);
     --      l_comments:='Загальна сума платежу:'||to_char(l_s/100,'999999999999.99')||'; '||p_comments;
         end if;
         if p_s_vp*100<l_s then
@@ -2587,17 +2835,17 @@ begin
           update cim_payments_bound
             set contr_id=p_contr_id, pay_flag=decode(p_contr_id,0,0,p_pay_flag), s=round(p_s_vp*100,0),
                 s_cv=decode(p_contr_id, 0, 0, p_s_vc*100),
-                rate=decode(p_contr_id,0,null,(case when l_vc=l_vp then 1 else p_rate end)), comiss=round(p_comiss*100,0),
-                create_date=bankdate, modify_date=bankdate, branch=l_branch,
-                comments=l_comments, journal_num=decode(l_contr_type, 0, 1, 1, 2, 4)
+                rate=decode(p_contr_id,0,null,(case when l_row_contract.kv=l_vp then 1 else p_rate end)), comiss=round(p_comiss*100,0),
+                create_date=bankdate, modify_date=bankdate, branch=l_row_contract.branch,
+                comments=l_comments, journal_num=decode(l_row_contract.contr_type, 0, 1, 1, 2, 4)
             where bound_id=l_bound_id;
         else -- Реальні платежі без неприв`язаного залишку
           select bars_sqnc.get_nextval('s_cim_payments_bound') into l_bound_id from dual;
-          insert into cim_payments_bound (bound_id, direct, ref, contr_id, pay_flag, s, s_cv, rate, comiss, comments, branch, journal_num)
+          insert into cim_payments_bound (bound_id, direct, ref, contr_id, pay_flag, s, s_cv, rate, comiss, comments, branch, journal_num, deadline)
             values (l_bound_id, p_direct, p_ref, p_contr_id, decode(p_contr_id,0,0,p_pay_flag), round(p_s_vp*100,0),
             decode(p_contr_id,0,0, round(p_s_vc*100,0)), --(case when l_vc=l_vp then round(p_s_vp*100,0) else round(p_s_vc*100,0) end)),
-            decode(p_contr_id,0,null,(case when l_vc=l_vp then 1 else p_rate end)), round(p_comiss*100,0), l_comments, l_branch,
-            decode(l_contr_type, 0, 1, 1, 2, 4));
+            decode(p_contr_id,0,null,(case when l_row_contract.kv=l_vp then 1 else p_rate end)), round(p_comiss*100,0), l_comments, l_row_contract.branch,
+            decode(l_row_contract.contr_type, 0, 1, 1, 2, 4), l_deadline);
         end if;
         if l_sos != 5 then insert into cim_unheld_que (bound_id, ref, contr_id, vdat) values (l_bound_id, p_ref, p_contr_id, l_val_date); end if;
       end if;
@@ -2621,18 +2869,19 @@ begin
       if p_s_vp>l_s_unbound then bars_error.raise_error(g_module_name, 43);
       else
         if p_s_vp*100<l_s_unbound then
-            insert into cim_fantoms_bound (direct, fantom_id, s, branch, pay_flag)
-              values (p_direct, p_ref, round((l_s_unbound-p_s_vp*100),0), l_branch, 0);
+            insert into cim_fantoms_bound (direct, fantom_id, s, branch, pay_flag, deadline)
+              values (p_direct, p_ref, round((l_s_unbound-p_s_vp*100),0), l_row_contract.branch, 0, l_deadline);
             l_comments:='Загальна сума платежу:'||to_char(l_s/100,'999999999999.99')||'; '||p_comments;
         else l_comments:=p_comments;
         end if;
         update cim_fantoms_bound
           set contr_id=p_contr_id, pay_flag=p_pay_flag, s=round(p_s_vp*100,0),
               s_cv=round(p_s_vc*100,0),--(case when l_vc=l_vp then round(p_s_vp*100,0) else round(p_s_vc*100,0) end),
-              rate=(case when l_vc=l_vp then 1 else p_rate end), comiss=round(p_comiss*100,0), create_date=bankdate, modify_date=bankdate,
-              branch=l_branch,
-              journal_num=decode(l_contr_type, 0, 1, 1, 2, 2, decode(p_payment_type, 11, null, 4), 4),
-              comments=decode(p_payment_type, 5, 'Взаємозалік. ','')||l_comments
+              rate=(case when l_row_contract.kv=l_vp then 1 else p_rate end), comiss=round(p_comiss*100,0), create_date=bankdate, modify_date=bankdate,
+              branch=l_row_contract.branch,
+              journal_num=decode(l_row_contract.contr_type, 0, 1, 1, 2, 2, decode(p_payment_type, 11, null, 4), 4),
+              comments=decode(p_payment_type, 5, 'Взаємозалік. ','')||l_comments,
+              deadline = l_deadline
           where bound_id=l_bound_id;
       end if;
       update cim_fantom_payments set oper_type=p_top_id where fantom_id=p_ref;
@@ -2641,21 +2890,21 @@ begin
     end if;
   end if;
 
- if p_contr_id!=0 and l_contr_type=2 and p_pay_flag=2 then
+ if p_contr_id!=0 and l_row_contract.contr_type=2 and p_pay_flag=2 then
     delete from cim_credgraph_payment where s>0 and dat<=l_val_date and contr_id=p_contr_id;
     select sum(s) into l_s_unbound from cim_credgraph_payment where pay_flag=2 and dat>l_val_date and contr_id=p_contr_id;
     select s_in_pl-s_out_pl into l_s from v_cim_credit_contracts where contr_id=p_contr_id;
     if p_direct=0 then l_s:=l_s+p_s_vc; else l_s:=l_s-p_s_vc; end if;
-    if (l_s+l_s_unbound)<0 or (l_s+l_s_unbound)>l_contr_s then
+    if (l_s+l_s_unbound)<0 or (l_s+l_s_unbound)>l_row_contract.s then
       delete from cim_credgraph_payment where pay_flag=2 and dat>l_val_date and contr_id=p_contr_id;
     end if;
   end if;
 
   if p_direct=1 then
     update cim_license_link set payment_id=decode(p_payment_type,0,l_bound_id,null), fantom_id=decode(p_payment_type,0,null,l_bound_id)
-      where delete_date is null and payment_id is null and fantom_id is null and okpo=l_okpo;
+      where delete_date is null and payment_id is null and fantom_id is null and okpo=l_row_contract.okpo;
   end if;
-  if l_contr_type=1 and p_subject=1 and p_direct=1 then
+  if l_row_contract.contr_type=1 and p_subject=1 and p_direct=1 then
     select count(*), max(l.ape_id) into l_n, l_ape_id
       from cim_ape_link l, (select ape_id from cim_contracts_ape where contr_id=p_contr_id) a
       where l.delete_date is null and l.payment_id is null and l.fantom_id is null and l.ape_id=a.ape_id;
@@ -2672,10 +2921,11 @@ begin
     where payment_id is null and fantom_id is null
           and ape_id in (select ape_id from cim_contracts_ape where contr_id=p_contr_id);
   end if;
-  if p_contr_id != 0 and l_contr_type<2 then check_contract_status(p_contr_id); end if;
+  if p_contr_id != 0 and l_row_contract.contr_type<2 then check_contract_status(p_contr_id); end if;
   bars_audit.info(g_module_name||' Прив`язка платежу. bound_id:'||l_bound_id||' payment_type:'||p_payment_type||' ref: '||p_ref||
                   ' contr_id:'||p_contr_id||' s_vp:'||p_s_vp||' comiss:'||p_comiss||' rate:'||p_rate||' s_vc:'||p_s_vc||' val_date: '||l_val_date||
                   ' pay_flag:'||p_pay_flag);
+
   return l_bound_id;
 end bound_payment;
 
@@ -2699,6 +2949,7 @@ is
   l_visa number;
   l_txt varchar2(4000);
 begin
+  bars_audit.info(g_module_name||' unbound_payment  START Відв`язка платежу. bound_id:'||p_bound_id||' payment_type:'||p_payment_type);
   if p_payment_type=0 then
     select count(*), max(ref), max(s), max(branch), max(direct), max(contr_id) into l_n, l_ref, l_s, l_branch, l_direct, l_contr_id
       from cim_payments_bound where delete_date is null and bound_id=p_bound_id;
@@ -2813,16 +3064,7 @@ function bound_vmd(p_vmd_type in number, -- Тип ВМД
                    p_file_date date :=null --Дата файлу реєстру
                   ) return number
 is
-  l_n number;
-  l_vc number; -- Валюта контракту
-  l_contr_type number; -- Тип контракту
-  l_rnk number; -- rnk клієнта
-  l_benef_id number; -- id бенефіціара
-  l_contract_num varchar2(60); --Номер контракту
-  l_contract_date date; --Дата контракту
-  l_branch varchar2(30); -- Код установи
   l_act_kind number; -- Вид Акту
-  l_status number;
 
   l_act_id number; -- id Акту
   l_bound_id number; -- id зв'язку
@@ -2833,46 +3075,53 @@ is
   l_direct number; -- Тип ВМД (0 - вхідні, 1 - вихідні
   l_vmd_branch varchar2(30);
   l_set_doc_date varchar2(2);
+
+  l_deadline                cim_contracts_trade.deadline%type;
+  l_row_contract            cim_contracts%rowtype;
+
 begin
   if p_vmd_type is null or p_contr_id is null or p_contr_id=0 or p_s_vt is null or p_rate is null or p_s_vc is null
     then bars_error.raise_error(g_module_name, 64); end if;
-  select count(*), max(rnk), max(benef_id), max(kv), max(contr_type), max(branch),       max(num), max(open_date),  max(status_id)
-    into      l_n,    l_rnk,    l_benef_id,    l_vc,    l_contr_type,    l_branch, l_contract_num, l_contract_date, l_status
+  select   *
+    into   l_row_contract
     from cim_contracts where contr_id=p_contr_id;
-  if l_n!=1 or p_s_vt<=0 or p_rate<=0 then bars_error.raise_error(g_module_name, 41); end if;
-  if l_status=1 or l_status>8 then bars_error.raise_error(g_module_name, 6); end if;
-  if l_branch!=sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
+  if p_s_vt<=0 or p_rate<=0 then bars_error.raise_error(g_module_name, 41); end if;
+  if l_row_contract.status_id=1 or l_row_contract.status_id>8 then bars_error.raise_error(g_module_name, 6); end if;
+  if l_row_contract.branch!=sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
   if round(p_s_vt*p_rate,2) != p_s_vc and round(p_s_vc/p_rate,2) != p_s_vt then bars_error.raise_error(g_module_name, 47); end if;
   select kind into l_act_kind from cim_act_types where type_id=p_vmd_type;
+  if l_row_contract.contr_type = 0 /*Експортний*/ then
+    select deadline into l_deadline from cim_contracts_trade where contr_id = p_contr_id;
+  end if;
   if p_ref is null then
     if p_vmd_type=0 then bars_error.raise_error(g_module_name, 61);
     else -- Створення та прив'язка Акту
-      if l_contr_type=0 then l_direct:=1; elsif l_contr_type=1 then l_direct:=0; else bars_error.raise_error(g_module_name, 60); end if;
+      if l_row_contract.contr_type=0 then l_direct:=1; elsif l_row_contract.contr_type=1 then l_direct:=0; else bars_error.raise_error(g_module_name, 60); end if;
       select bars_sqnc.get_nextval('s_cim_acts') into l_act_id from dual;
       insert into cim_acts (act_id, direct, act_type, rnk, benef_id, num, kv, s, bound_sum, act_date, allow_date,
                                  contract_num, contract_date, file_name, file_date)
-        values (l_act_id, l_direct, p_vmd_type, l_rnk, l_benef_id, p_num,  p_kv, round(p_s_vt*100,0), round(p_s_vt*100,0),
-                p_doc_date, p_doc_date, l_contract_num, l_contract_date, decode(p_vmd_type, 4, p_file_name, null),
+        values (l_act_id, l_direct, p_vmd_type, l_row_contract.rnk, l_row_contract.benef_id, p_num,  p_kv, round(p_s_vt*100,0), round(p_s_vt*100,0),
+                p_doc_date, p_doc_date, l_row_contract.num, l_row_contract.open_date, decode(p_vmd_type, 4, p_file_name, null),
                 decode(p_vmd_type, 4, p_file_date, null));
       select bars_sqnc.get_nextval('s_cim_act_bound') into l_bound_id from dual;
-      insert into cim_act_bound (bound_id, direct, act_id, contr_id, s_vt, rate_vk, s_vk, comments, journal_num)
-        values (l_bound_id, l_direct, l_act_id, p_contr_id, round(p_s_vt*100,0), (case when l_vc=p_kv then 1 else p_rate end),
-               (case when l_vc=p_kv then round(p_s_vt*100,0) else round(p_s_vc*100,0) end), decode(p_vmd_type, 5, 'Взаємозалік. ','')||p_comments,
-               decode(l_contr_type,0,1,null));
+      insert into cim_act_bound (bound_id, direct, act_id, contr_id, s_vt, rate_vk, s_vk, comments, journal_num, deadline)
+        values (l_bound_id, l_direct, l_act_id, p_contr_id, round(p_s_vt*100,0), (case when l_row_contract.kv=p_kv then 1 else p_rate end),
+               (case when l_row_contract.kv=p_kv then round(p_s_vt*100,0) else round(p_s_vc*100,0) end), decode(p_vmd_type, 5, 'Взаємозалік. ','')||p_comments,
+               decode(l_row_contract.contr_type,0,1,null), l_deadline);
     end if;
   else -- Прив'язка існуючої ВМД або акту
     if p_vmd_type=0 then -- ВМД
       select kv, s, direct, cim_branch into l_vt, l_s, l_direct, l_vmd_branch from v_cim_customs_decl where cim_id=p_ref;
-      if l_contr_type=0 and l_direct=0 or l_contr_type=1 and l_direct=1 then bars_error.raise_error(g_module_name, 60); end if;
-      if l_vmd_branch is not null and l_vmd_branch!=l_branch then bars_error.raise_error(g_module_name, 62); end if;
+      if l_row_contract.contr_type=0 and l_direct=0 or l_row_contract.contr_type=1 and l_direct=1 then bars_error.raise_error(g_module_name, 60); end if;
+      if l_vmd_branch is not null and l_vmd_branch!=l_row_contract.branch then bars_error.raise_error(g_module_name, 62); end if;
       select l_s*100-nvl(sum(s_vt),0) into l_s_unbound from cim_vmd_bound where delete_date is null and vmd_id=p_ref;
       if p_s_vt*100>l_s_unbound or p_s_vt=0 then bars_error.raise_error(g_module_name, 43);
       else
         select bars_sqnc.get_nextval('s_cim_vmd_bound') into l_bound_id from dual;
-        insert into cim_vmd_bound (bound_id, direct, vmd_id, contr_id, s_vt, rate_vk, s_vk, comments, journal_num)
-        values (l_bound_id, l_direct, p_ref, p_contr_id, round(p_s_vt*100,0), (case when l_vc=p_kv then 1 else p_rate end),
-               (case when l_vc=p_kv then round(p_s_vt*100,0) else round(p_s_vc*100,0) end), p_comments,
-               decode(l_contr_type,0,1,null));
+        insert into cim_vmd_bound (bound_id, direct, vmd_id, contr_id, s_vt, rate_vk, s_vk, comments, journal_num, deadline)
+        values (l_bound_id, l_direct, p_ref, p_contr_id, round(p_s_vt*100,0), (case when l_row_contract.kv=p_kv then 1 else p_rate end),
+               (case when l_row_contract.kv=p_kv then round(p_s_vt*100,0) else round(p_s_vc*100,0) end), p_comments,
+               decode(l_row_contract.contr_type,0,1,null), l_deadline);
       end if;
       /*
       l_set_doc_date := '0';
@@ -2880,20 +3129,20 @@ begin
         select par_value into l_set_doc_date from cim_params where par_name='SET_MD_AUTOBOUND_DATE';
       end if; */
       update customs_decl set cim_date=allow_dat, --decode(l_set_doc_date, '1', allow_dat, p_doc_date),
-                              cim_branch=l_branch, cim_boundsum=l_s*100-l_s_unbound+p_s_vt*100
+                              cim_branch=l_row_contract.branch, cim_boundsum=l_s*100-l_s_unbound+p_s_vt*100
         where cim_id=p_ref;
     else -- Акт
       select kv, s, direct into l_vt, l_s, l_direct from cim_acts where act_id=p_ref;
-      if not (l_contr_type=0 and l_direct=1 or l_contr_type=1 and l_direct=0) then bars_error.raise_error(g_module_name, 60); end if;
+      if not (l_row_contract.contr_type=0 and l_direct=1 or l_row_contract.contr_type=1 and l_direct=0) then bars_error.raise_error(g_module_name, 60); end if;
       select l_s-nvl(sum(s_vt),0) into l_s_unbound from cim_act_bound where delete_date is null and act_id=p_ref;
       if p_s_vt*100>l_s_unbound or p_s_vt=0 then bars_error.raise_error(g_module_name, 43);
       else
         select bars_sqnc.get_nextval('s_cim_act_bound') into l_bound_id from dual;
-        insert into cim_act_bound (bound_id, direct, act_id, contr_id, s_vt, rate_vk, s_vk, comments, journal_num)
-        values (l_bound_id, l_direct, p_ref, p_contr_id, round(p_s_vt*100,0), (case when l_vc=p_kv then 1 else p_rate end),
-               (case when l_vc=p_kv then round(p_s_vt*100,0) else round(p_s_vc*100,0) end),
+        insert into cim_act_bound (bound_id, direct, act_id, contr_id, s_vt, rate_vk, s_vk, comments, journal_num, deadline)
+        values (l_bound_id, l_direct, p_ref, p_contr_id, round(p_s_vt*100,0), (case when l_row_contract.kv=p_kv then 1 else p_rate end),
+               (case when l_row_contract.kv=p_kv then round(p_s_vt*100,0) else round(p_s_vc*100,0) end),
                decode(p_vmd_type, 5, 'Взаємозалік. ','')||p_comments,
-               decode(l_contr_type,0,1,null));
+               decode(l_row_contract.contr_type,0,1,null), l_deadline);
         update cim_acts set bound_sum=s-l_s_unbound+p_s_vt*100 where act_id=p_ref;
       end if;
     end if;
@@ -2901,6 +3150,7 @@ begin
   if p_contr_id != 0 then check_contract_status(p_contr_id);  end if;
   bars_audit.info(g_module_name||' Прив`язка МД. bound_id:'||l_bound_id||' vmd_type:'||p_vmd_type||' ref: '||p_ref||
                   ' contr_id:'||p_contr_id||' s_vt:'||p_s_vt||' rate:'||p_rate||' s_vc:'||p_s_vc||' doc_date: '||p_doc_date);
+
   return l_bound_id;
 end bound_vmd;
 
@@ -3406,6 +3656,7 @@ begin
   end if;
 end delete_from_journal;
 
+
 -- check_bound- Перевірка прив'язки платежу до контракту
 --
 function check_bound(p_doc_kind in number, --вид документу (0 - платіж, 1 - МД)
@@ -3420,32 +3671,35 @@ function check_bound(p_doc_kind in number, --вид документу (0 - платіж, 1 - МД)
                      p_s_vc in number, -- Сума прив'язки у валюті контракту
                      p_val_date in date, -- Дата валютування
                      p_subject in number := null, -- Предмет оплати (0 - товари, 1 - послуги)
-                     p_service_code in varchar2 :=null -- Код класифікатора послуг
+                     p_service_code in varchar2 :=null, -- Код класифікатора послуг
                      ----------------------------------------
-                     --p_kv in number :=null -- Код валюти платежу
+                     p_kv in number :=null -- Код валюти платежу
                     ) return varchar2
 is l_txt varchar2(1000); -- Текст повідомлення
 
-   l_contr_type number; -- Тип контракту
    l_s_contr number; -- Сума контракту
-   l_s_limit number; -- Ліміт заборгованості (на дату валютування) ?
+--   l_s_limit number; -- Ліміт заборгованості (на дату валютування) ?
    l_s_in_pl number; -- Сума вхідних платежів
    l_s_out_pl number; -- Сума вихідних платежів
    l_z_pr number; --Заборгованість по процентах
    l_z_pr_nbu number; -- Заборгованість по процентах за ставкою НБУ
 
-   l_out_okpo varchar2 (14 byte);
    l_out_benef_name varchar2 (256 byte);
    l_s number;
-   l_contr_bic varchar2 (11 byte);
    l_bic varchar2 (11 byte);
    l_n number;
+
+   l_row_contract  cim_contracts%rowtype;
+   l_fragm         T_FRAGMENT;
+   l_check_type    varchar2(20);
+   l_isfragment    cim_contracts_trade.is_fragment%type;
 begin
+  bars_audit.info('cim_mgr.check_bound START: p_doc_kind=' || p_doc_kind|| ' p_payment_type='||p_payment_type||' p_contr_id='||p_contr_id ||' p_ref='||p_ref||' p_val_date='||p_val_date||' p_s_vp='||p_s_vp||' p_kv='||p_kv);
   l_txt := '';
   if p_contr_id!=0 then
-    select contr_type, okpo, bic into l_contr_type, l_out_okpo, l_contr_bic from cim_contracts where contr_id=p_contr_id;
-    if p_direct = 1 then delete from cim_license_link where p_s_vp*100<s and payment_id is null and fantom_id is null and okpo=l_out_okpo; end if;
-    if l_contr_type=2 then
+    select * into l_row_contract from cim_contracts where contr_id=p_contr_id;
+    if p_direct = 1 then delete from cim_license_link where p_s_vp*100<s and payment_id is null and fantom_id is null and okpo=l_row_contract.okpo; end if;
+    if l_row_contract.contr_type=2 then
       create_credgraph(p_contr_id);
       select s, s_in_pl, s_out_pl, z_pr, s_pr_nbu-s_v_pr-s_dod_pl into l_s_contr, l_s_in_pl, l_s_out_pl, l_z_pr, l_z_pr_nbu
         from v_cim_credit_contracts where contr_id=p_contr_id;
@@ -3454,16 +3708,36 @@ begin
       if p_direct=1 and p_pay_flag>2 and p_s_vc>l_z_pr_nbu then l_txt:=l_txt||'Сума виплачених % перевищує суму нарахованих % за ставкою НБУ!<Br>'; end if;
     end if;
 
-    if p_doc_kind=0 and p_direct=1 and check_contract_sanction(p_contr_id, p_val_date, l_out_okpo, l_out_benef_name)>1 then
+    if p_doc_kind=0 and p_direct=1 and check_contract_sanction(p_contr_id, p_val_date, l_row_contract.okpo, l_out_benef_name)>1 then
       select nvl(sum(s),0) into l_s from cim_license_link where delete_date is null and payment_id is null and fantom_id is null;
       if p_s_vp*100>l_s then l_txt:='По даному контракту є санкції мінекономіки. Для прив`язки платежу необхідні ліцензії! Для прив`язки ліцензій натисніть <Відміна>.'
                                                             ||' Натискання <ОК> приведе до прив`язки платежу без ліцензії!<Br>'; end if;
     end if;
+
+    if (l_row_contract.contr_type = 0 /*Експортний*/ and p_doc_kind = 1) or (l_row_contract.contr_type = 1 /*Імпортний*/ and p_doc_kind = 0) then
+      if check_fragmentation(p_contr_id, p_doc_kind, p_payment_type, p_ref, p_s_vp, p_val_date, p_kv, l_row_contract, l_fragm, l_check_type) then
+        select nvl(is_fragment, 0) into l_isfragment from cim_contracts_trade where contr_id = p_contr_id;
+        if l_isfragment = 0 then
+          l_txt := l_txt||'Буде ознака дроблення, документів('||l_fragm.COUNT||'/'||l_check_type||'): <Br>';
+          for i in 1..l_fragm.COUNT loop
+            l_txt := substr(l_txt||'CONTR_ID='||l_fragm(i).bound_contr_id||' BOUND_ID='||l_fragm(i).bound_id
+                            ||' TYPE='||case
+                                          when l_fragm(i).kind_doc_id = 0 and l_fragm(i).type_doc_id = 0 then 'Платіж'
+                                          when l_fragm(i).kind_doc_id = 0 and l_fragm(i).type_doc_id = 1 then 'Фантом'
+                                          when l_fragm(i).kind_doc_id = 1 and l_fragm(i).type_doc_id = 0 then 'МД'
+                                          when l_fragm(i).kind_doc_id = 1 and l_fragm(i).type_doc_id = 1 then 'Акт'
+                                        end
+                            ||' DATE='||to_char(l_fragm(i).date_doc,'DD.MM.YYYY'), 1, 950)||' SQ='||l_fragm(i).sq||' <Br>';
+          end loop;
+        end if;
+      end if;
+    end if;
+
   else
     if p_doc_kind=0 and p_payment_type=0 and p_direct=1 then
       select count(*), max(value) into l_n, l_bic from operw where tag='57A' and ref=p_ref;
-      if l_contr_bic is null then l_txt:='Не заповнено BIC-код банку нерезидента у контракті!<Br>';
-        elsif l_n=1 and l_bic != l_contr_bic then l_txt:='BIC-код банку нерезидента платіжного документа не співпадвє з BIC-колом контракту!<Br>';
+      if l_row_contract.bic is null then l_txt:='Не заповнено BIC-код банку нерезидента у контракті!<Br>';
+        elsif l_n=1 and l_bic != l_row_contract.bic then l_txt:='BIC-код банку нерезидента платіжного документа не співпадвє з BIC-колом контракту!<Br>';
       end if;
     end if;
   end if;
@@ -3506,8 +3780,8 @@ begin
 --  bars_audit.info('CIM_MGR.get_control_date: p_doc_kind='||p_doc_kind||' p_doc_type='||p_doc_type||' p_doc_id='||p_doc_id);
   if p_doc_kind=0 then
     if nvl(p_pay_flag, 0) = 0 then
-      select b.vdat, b.contr_id, (select contr_type from cim_contracts where contr_id=b.contr_id)--, b.borg_reason
-        into l_vdat, l_contr_id, l_contr_type from /*v_cim_trade_payments*/v_cim_bound_payments b
+      select b.vdat, b.contr_id, (select contr_type from cim_contracts where contr_id=b.contr_id), b.deadline_doc
+        into l_vdat, l_contr_id, l_contr_type, l_deadline  from v_cim_bound_payments b
         where b.pay_flag = 0 and b.type_id=p_doc_type and b.bound_id=p_doc_id;
         if l_contr_type!=1 then return null; end if;
         else --тоді тупо ретурн нулл, бо буде но_дата_фаунд (бо cim_reports використовує також v_cim_bound_payments)
@@ -3515,23 +3789,26 @@ begin
     end if;
   else
     if p_doc_type=0 then
-      select trunc(v.allow_dat), b.contr_id into l_vdat, l_contr_id
+      select trunc(v.allow_dat), b.contr_id, b.deadline into l_vdat, l_contr_id, l_deadline
         from cim_vmd_bound b join customs_decl v on v.cim_id=b.vmd_id
         where b.bound_id=p_doc_id;
     else
-      select trunc(v.allow_date), b.contr_id into l_vdat, l_contr_id
+      select trunc(v.allow_date), b.contr_id, b.deadline into l_vdat, l_contr_id, l_deadline
         from cim_act_bound b join cim_acts v on v.act_id=b.act_id
         where b.bound_id=p_doc_id;
     end if;
   end if;
-  begin
-    select case when deadline=120 and l_vdat<to_date('01/04/2016', 'dd/mm/yyyy') then 90 else deadline end into l_deadline
-      from cim_contracts_trade where contr_id=l_contr_id;
 
-    exception
-        when NO_DATA_FOUND then
-          l_deadline := 0;
-  end;
+  if nvl(l_deadline, 0) = 0 then
+    begin
+      select case when deadline=120 and l_vdat<to_date('01/04/2016', 'dd/mm/yyyy') then 90 else deadline end into l_deadline
+        from cim_contracts_trade where contr_id=l_contr_id;
+
+      exception
+          when NO_DATA_FOUND then
+            l_deadline := 0;
+    end;
+  end if;
 
   l_minus_date:=null;
 
@@ -3948,7 +4225,7 @@ is
   l_kurs_a number;
   l_kurs_b number;
 begin
-  --bars_audit.debug(g_module_name||' val_convert() - p_dat:'||p_dat||' p_s:'||p_s||' p_kv_a:'||p_kv_a||' p_kv_b:'||p_kv_b||' g_root_branch:'||g_root_branch);
+  bars_audit.debug(g_module_name||' val_convert() - p_dat:'||p_dat||' p_s:'||p_s||' p_kv_a:'||p_kv_a||' p_kv_b:'||p_kv_b||' g_root_branch:'||g_root_branch);
   if p_dat<to_date('26/12/2008', 'dd/mm/yyyy') then return null; end if;
   if p_kv_a=980 then l_kurs_a:=1;
   else
@@ -4088,7 +4365,7 @@ select max(k030) as k030, max(k020) as k020, max(r4) as r4, case when max(sanksi
   l_n_z number;
   l_benef_id number;
 begin
---  bars_audit.info(g_module_name||'.check_contract_sanction. p_contr_id:'||p_contr_id||' p_date:'||p_date||' p_okpo:'||p_okpo||' p_benef_name:'||p_benef_name);  
+--  bars_audit.info(g_module_name||'.check_contract_sanction. p_contr_id:'||p_contr_id||' p_date:'||p_date||' p_okpo:'||p_okpo||' p_benef_name:'||p_benef_name);
   date_i:=null; date_z:=null; date_i_end:=null; date_z_end:=null; l_n_i:=0; l_n_z:=0; l_n:=0;
   for c in c_sanction loop
     if c.k030=2 then
@@ -4119,7 +4396,7 @@ begin
 
   select okpo, benef_id into p_okpo, l_benef_id  from cim_contracts where contr_id=p_contr_id;
   select benef_name into p_benef_name from cim_beneficiaries where benef_id=l_benef_id;
-  bars_audit.info(g_module_name||'.check_contract_sanction. p_contr_id:'||p_contr_id||' p_date:'||p_date||' p_okpo:'||p_okpo||' p_benef_name:'||p_benef_name||' Санкції? => l_n='||l_n);      
+  bars_audit.info(g_module_name||'.check_contract_sanction. p_contr_id:'||p_contr_id||' p_date:'||p_date||' p_okpo:'||p_okpo||' p_benef_name:'||p_benef_name||' Санкції? => l_n='||l_n);
   if l_n=0 then return 0; -- Немає жодних санкцій
     elsif date_i is not null and l_n_i>0 then return 2; --Є діючі санкції на резидента
     elsif date_z is not null and l_n_z>0 then return 3; --Є діючі санкції на нерезидента
@@ -4241,6 +4518,101 @@ begin
   commit;
   return l_txt;
 end change_link_date;
+
+-- 6.	На форму «Нерозібрані МД» добавити кнопку «Чужа МД. Включити у 531 форму».
+-- інформація про МД повинна бути включена у 531 звіт за місяць, до якого відноситься дата реєстру МД (поле DAT таблиці CUSTOMS_DECL). Це можна реалізувати добавленням стрічки у таблицю CIM_F36
+--
+function add_into_f36(p_vmd_id in number, p_vmd_type in number default 0) return varchar2
+  is
+  l_txt                   varchar2(1000); -- Текст повідомлення
+  l_v_cim_unbound_vmd     v_cim_unbound_vmd%rowtype;
+  l_date_z_end            date;
+  l_cim_f36               cim_f36%rowtype;
+  l_customer              customer%rowtype;
+begin
+  --l_txt:='В розробці...';
+  bars_audit.info(g_trace_module||' add_into_f36 START.  p_vmd_id:'||p_vmd_id||' p_vmd_type:'||p_vmd_type);
+  if p_vmd_type > 0 then
+    l_txt := 'Це не МД!';
+    bars_audit.error(g_trace_module||' add_into_f36.  Це не МД!');
+    return l_txt;
+  end if;
+
+  begin
+    select * into l_v_cim_unbound_vmd from v_cim_unbound_vmd where vmd_id = p_vmd_id and vmd_type = p_vmd_type;
+  exception
+    when NO_DATA_FOUND then
+      bars_audit.error(g_trace_module||' add_into_f36.  Не знайшов МД з p_vmd_id='||p_vmd_id ||' p_vmd_type='||p_vmd_type);
+      l_txt := substr('Не знайшов МД з p_vmd_id='||p_vmd_id ||' p_vmd_type='||p_vmd_type, 1,1000);
+      return l_txt;
+  end;
+
+  if l_v_cim_unbound_vmd.s != l_v_cim_unbound_vmd.unbound_s then
+    l_txt:='МД прив’язана до контракту. Включення у 531 форму неможливе';
+  end if;
+
+  begin
+    select * into l_customer
+             from(select * from customer c where c.okpo = l_v_cim_unbound_vmd.okpo order by c.date_off nulls first)
+             where rownum < 2;
+    exception
+      when others then null;
+  end;
+
+  --інформація про МД повинна бути включена у 531 звіт за місяць, до якого відноситься дата реєстру МД (поле DAT таблиці CUSTOMS_DECL).
+  l_date_z_end:=last_day(add_months(l_v_cim_unbound_vmd.f_date,-1))+1;
+
+  l_cim_f36.manual_include := 1;
+  l_cim_f36.create_date    := l_date_z_end;
+  begin
+    select substr(b.b040,9,12) into l_cim_f36.b041 from branch b where b.branch=sys_context('bars_context', 'user_branch');
+    exception
+      when NO_DATA_FOUND then
+        bars_audit.error(g_trace_module||' add_into_f36.  Не можу знайти в довіднику branch '||sys_context('bars_context', 'user_branch'));
+        l_txt := substr('Не знайшов МД з p_vmd_id='||p_vmd_id ||' p_vmd_type='||p_vmd_type, 1,1000);
+        return l_txt;
+  end;
+  l_cim_f36.k020           := lpad(l_v_cim_unbound_vmd.okpo,10,'0');
+  l_cim_f36.doc_date       := to_char(l_v_cim_unbound_vmd.allow_date,'ddmmyyyy');
+  l_cim_f36.p01            := 1;
+  begin
+    select k112 into l_cim_f36.p02 from kl_k110 where k110=l_customer.ved;
+    exception
+      when others then null;
+  end;
+  l_cim_f36.p06 := l_v_cim_unbound_vmd.nmk;--l_customer.nmk;
+  l_cim_f36.p07 := l_v_cim_unbound_vmd.benef_adr;
+  l_cim_f36.p08 := l_v_cim_unbound_vmd.benef_name;
+  l_cim_f36.p09 := l_v_cim_unbound_vmd.country;
+  l_cim_f36.p13 := val_convert(l_date_z_end-1, l_v_cim_unbound_vmd.s, l_v_cim_unbound_vmd.kv, 980);
+  l_cim_f36.p14 := l_v_cim_unbound_vmd.kv;
+  l_cim_f36.p15 := l_v_cim_unbound_vmd.s;
+  l_cim_f36.p16 := l_v_cim_unbound_vmd.contract_date;
+  l_cim_f36.p17 := l_v_cim_unbound_vmd.contract_num;
+  l_cim_f36.p18 := 1;
+  l_cim_f36.p19 := 0;
+  l_cim_f36.p21 := l_date_z_end;
+  l_cim_f36.p22 := -1;
+  l_cim_f36.branch := sys_context('bars_context', 'user_branch');
+
+  insert into cim_f36
+       values l_cim_f36;
+
+  update customs_decl c
+  set c.cim_boundsum = null,
+      c.cim_original = 2
+  where c.cim_id =  p_vmd_id;
+
+  bars_audit.info(g_trace_module||' add_into_f36 END.  p_vmd_id:'||p_vmd_id||' p_vmd_type:'||p_vmd_type);
+  return l_txt;
+
+  exception
+    when others then
+      bars_audit.error(g_trace_module||' add_into_f36. '||sqlerrm||' - '||dbms_utility.format_error_backtrace);
+      l_txt := substr(sqlerrm||' - '||dbms_utility.format_error_backtrace, 1, 1000);
+      return l_txt;
+end add_into_f36;
+
 
 begin
    -- Initialization
