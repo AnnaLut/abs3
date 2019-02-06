@@ -270,11 +270,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('AA7', 'AA7 Купівля іноземної валюти у нерезидента', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 1, 0, null, null, 56, null, '#(nbs_ob22 (''3800'',''10''))', null, '1001110001010000000000000000000000010000000000000000000000010000', 'Купівля іноземної валюти у нерезидента');
+    values ('AA7', 'AA7 Купівля іноземної валюти у нерезидента', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 1, 0, null, null, 56, null, '38002000010', null, '0001110001010000000000000000000000010000000000000000000000010002', 'Купівля іноземної валюти у нерезидента');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='AA7', name='AA7 Купівля іноземної валюти у нерезидента', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=56, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='1001110001010000000000000000000000010000000000000000000000010000', nazn='Купівля іноземної валюти у нерезидента'
+         set tt='AA7', name='AA7 Купівля іноземної валюти у нерезидента', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=56, proc=null, s3800='38002000010', rang=null, flags='0001110001010000000000000000000000010000000000000000000000010002', nazn='Купівля іноземної валюти у нерезидента'
        where tt='AA7';
   end;
   --------------------------------
