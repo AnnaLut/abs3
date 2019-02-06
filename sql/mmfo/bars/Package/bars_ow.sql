@@ -488,7 +488,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.027 20/11/2018';
+g_body_version    constant varchar2(64)  := 'version 6.028 06/02/2019';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -12770,13 +12770,18 @@ begin
   end if;
 
   -- открытие карточного счета
-  op_reg_lock(99, 0, 0, l_grp, l_tmp, p_customer.rnk, l_nls, p_product.kv, l_nms,
+  op_reg_ex(99, 0, 0, l_grp, l_tmp, p_customer.rnk, l_nls, p_product.kv, l_nms,
      p_product.tip, user_id, l_acc, 1, null,
      l_vid, null, null, null, null, case when p_product.custtype = 1 then null else case when p_product.nbs = '1919' then null else 26 end end, 
      null, null, null, null, p_branch);
   -- по ЮО закриваємо рахунок і ставимо його в чергу на підтвердження
   if p_product.custtype <> 1 then
-     update accounts a set a.dazs = bankdate, a.nbs = null where a.acc = l_acc;
+     -- Спочатку update dazs а потім nbs = null, інакше якщо одним скриптом то в тригері accounts.tbu_accounts_tax не вірно аналізується :new.nbs
+     -- і закриті рахунки ЮО (не активовані) попадають в чергу ДПА -- COBUSUPABS-7421
+     --update accounts a set a.dazs = bankdate, a.nbs = null where a.acc = l_acc;
+     update accounts a set a.dazs = bankdate where a.acc = l_acc;
+     update accounts a set a.nbs = null where a.acc = l_acc;
+     -- 
      insert into w4_acc_instant
        (acc, card_code, batchid, state, rnk)
      values
