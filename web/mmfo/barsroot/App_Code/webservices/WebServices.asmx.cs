@@ -593,7 +593,7 @@ namespace Bars.WebServices
                 if (ReqName == "PASPV") //COBUMMFO-10624
                 {
                     tag_browser = (reqsValues.Length > 5 && reqsValues[5].ToString() == "1") ? 
-                        "TagBrowse('SELECT name, passp FROM passp order by passp')" : "TagBrowse('SELECT name, passp FROM passpv where rezid = 2 order by passp')";
+                        "TagBrowse('SELECT name, passp FROM passpv where rezid=1 order by passp')" : "TagBrowse('SELECT name, passp FROM passpv where rezid = 2 order by passp')";
                     list.Add(tag_browser);
                     list.Add(ReqName);
                 }
