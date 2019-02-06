@@ -11,7 +11,7 @@
     <script type="text/javascript" src="/Common/WebGrid/Grid2005.js"></script>
     <script type="text/javascript" src="/Common/Script/Localization.js"></script>
     <script type="text/javascript" src="Scripts/Common.js"></script>
-    <script type="text/javascript" src="Scripts/SP.js?v1.2"></script>
+    <script type="text/javascript" src="Scripts/SP.js?v1.3"></script>
 </head>
 <body onload="InitSP()">
     <span class="CheckBox">

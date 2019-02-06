@@ -20,6 +20,7 @@
 <xsl:attribute name="onclick"><xsl:text>SelectRow('</xsl:text><xsl:value-of select="$id"/><xsl:text>',</xsl:text><xsl:value-of select="position()"/><xsl:text>)</xsl:text></xsl:attribute>
 <xsl:attribute name="id"><xsl:value-of select="concat('r_',position())" /></xsl:attribute>
 <xsl:attribute name="opt"><xsl:value-of select="OPT" /></xsl:attribute>
+<xsl:attribute name="spid"><xsl:value-of select="$id" /></xsl:attribute>
 <xsl:attribute name="ondblclick"><xsl:text>Edit('</xsl:text><xsl:value-of select="$id"/><xsl:text>',</xsl:text><xsl:value-of select="position()"/><xsl:text>)</xsl:text></xsl:attribute>
 <xsl:if test="OPT=1"><xsl:attribute name="style">color:maroon</xsl:attribute></xsl:if>  
 <TD>

@@ -79,8 +79,15 @@ function fnCheckSP() {
             webService.SP.callService(onCheckSPDic, "CheckSPDic", document.getElementById("VALUE").value, selectedRowId, data[2].text);
     }
     else {
-        SaveSP(selectedRowId, document.getElementById("VALUE").value, row_id, code);
-        AfterGetSParams();
+        if (selectedRow.spid === "66" && document.getElementById("VALUE").value.match(new RegExp("[^A-Z]"))) // 66 - Way4. Назва компанії що ембосується (на англійський)
+        {
+            Dialog("Необхідно ввести не більше 14 символів у верхньому регістрі латинськими літерами", 1);
+            document.getElementById("VALUE").value = document.getElementById("VALUE_" + row_id).innerText;
+        }
+        else {
+            SaveSP(selectedRowId, document.getElementById("VALUE").value, row_id, code);
+            AfterGetSParams();
+        }
     }
 }
 function onCheckSPDic(result) {
