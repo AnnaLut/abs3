@@ -90,7 +90,7 @@ public partial class cim_master : System.Web.UI.MasterPage
     /// <param name="src"></param>
     public void AddScript(string src)
     {
-        ScriptManager.GetCurrent(this.Page).Scripts.Add(new ScriptReference(string.Format("{0}?v{1}.{2}", src, CimManager.Version, BuildVersion)));
+        ScriptManager.GetCurrent(this.Page).Scripts.Add(new ScriptReference(string.Format("{0}{1}{2}.{3}", src.Trim(), src.Contains("?") ? "." : "?v=", CimManager.Version, BuildVersion)));
     }
 
     public void WriteMessage(Control ctrl, string message, MessageType type)
