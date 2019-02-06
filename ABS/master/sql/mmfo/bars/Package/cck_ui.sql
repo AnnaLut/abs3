@@ -347,8 +347,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
            If x_ND is not null then  insert into nd_acc (nd, acc) select n.nd, a9.acc from nd_acc n where acc = p_acc; end if;
 
-           If xx.acc_ss is not null then update PRVN_FIN_DEB set acc_sp = a9.acc, AGRM_ID = nvl(AGRM_ID, x_ND) where acc_ss = xx.acc_ss ;
-           else                     Insert into PRVN_FIN_DEB(ACC_SS,acc_sp, AGRM_ID) values (p_acc, a9.acc, x_ND) ;
+           If xx.acc_ss is not null then 
+             update PRVN_FIN_DEB 
+               set acc_sp = a9.acc, 
+                   AGRM_ID = nvl(AGRM_ID, x_ND), 
+                   effectdate = gl.bdate 
+               where acc_ss = xx.acc_ss ;
+           else                     
+             Insert into PRVN_FIN_DEB (ACC_SS,acc_sp, AGRM_ID,EFFECTDATE) 
+               values (p_acc, a9.acc, x_ND,gl.bDATE) ;
            end if;
 
     EXCEPTION  WHEN NO_DATA_FOUND        THEN raise_application_error(g_errn,g_errs ||s_Err1 || ' не знайдено в accounts'  );
