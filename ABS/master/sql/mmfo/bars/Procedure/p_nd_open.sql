@@ -1,8 +1,9 @@
 CREATE OR REPLACE PROCEDURE p_nd_open (p_dat01 date) IS 
 
-/* Версия 2.5  04-01-2018   03-01-2017  16-11-2017  17-10-2017  29-09-2017  12-06-2017  30-09-2016
+/* Версия 2.6  06-02-2019  04-01-2018   03-01-2017  16-11-2017  17-10-2017  29-09-2017  12-06-2017  30-09-2016
    Действующий ли договор (Кредиты ЮЛ и ФЛ) - vidd in (1,2,3,11,12,13,110) 
    -------------------------------------
+7) 06-02-2019(2.6) - определение закрытого договора по ОВЕРАМ по закрытию счета 8999 (OVN)
 6) 04-01-2018(2.5) - Новая версия (COBUMMFO-6116, COBUSUPABS-5487) -
 5) 03-01-2018(2.4) - тормозился расчет 
 4) 12-12-2017      - Убрала  p_BLOCK_351(p_dat01) - Для резерва она вызывается в процедуре CR;
@@ -67,7 +68,11 @@ begin
          l_open := 0;
          for s in ( select a.acc from  nd_acc n, accounts a where n.nd=k.nd and n.acc=a.acc and  decode(l_kor,1,ost_korr(a.acc,l_dat31,null,a.nbs),2, a.ostc, fost(a.acc,p_dat01) ) <0 )
          LOOP
-            l_open := 1;
+            begin 
+               SELECT 1 into l_OPEN  FROM   ND_ACC N, ACCOUNTS A, cc_deal d 
+               WHERE  d.nd = k.nd  and d.ndi= n.nd and N.ACC = A.ACC AND A.TIP='OVN' and  (DAZS is NULL or DAZS >= p_DAT01);
+            EXCEPTION WHEN NO_DATA_FOUND THEN  l_open := 0;
+            END;
          end LOOP;
          if l_open = 1 THEN
             insert into nd_open (fdat, nd) values (p_dat01, k.nd);
