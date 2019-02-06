@@ -102,7 +102,7 @@ public partial class cim_sanctions_default : System.Web.UI.Page
 
         Master.SetPageTitle(this.Title, true);
         ScriptManager.GetCurrent(this).RegisterPostBackControl(btImportF98);
-        Master.AddScript("/barsroot/cim/sanctions/scripts/default.js");
+		Master.AddScript(String.Format("/barsroot/cim/sanctions/scripts/default.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
 
         dsSanctions.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
         if (!IsPostBack)

@@ -57,7 +57,7 @@ namespace cim.payments
                 tbABindStart.Value = bdate.AddDays(-30).ToString("dd/MM/yyyy");
             }
 
-            Master.AddScript("/barsroot/cim/payments/scripts/cim_declarations.js");
+            Master.AddScript(String.Format("/barsroot/cim/payments/scripts/cim_declarations.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
             Master.AddInitScript(initParams);
         }
 
@@ -227,6 +227,16 @@ namespace cim.payments
             cm.HideDecl(vmdId);
         }
 
+        [WebMethod(EnableSession = true)]
+        public static string CD2form531(string vmdId, string vmdType)
+        {
+            Decimal nVmdId = 0;
+            Decimal nVmdType = 0;
+            if (!Decimal.TryParse(vmdId, out nVmdId)) return "Id МД має бути числовим";
+            if (!Decimal.TryParse(vmdType, out nVmdType)) return "Тип МД має бути числовим";
+            CimManager cm = new CimManager(false);
+            return cm.Decl2form531(nVmdId, nVmdType);
+        }
         #endregion
 
         protected void cbFilterByOkpo_OnCheckedChanged(object sender, EventArgs e)

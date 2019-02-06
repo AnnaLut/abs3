@@ -1069,6 +1069,40 @@ namespace barsroot.cim
             }
             return strJson;
         }
+        /// <summary>
+        /// «Чужа МД» --> «Включити у 531 форму»
+        /// </summary>
+        /// <param name="vmdId">МД id</param>
+        public string Decl2form531(Decimal vmdId, Decimal vmdType)
+        {
+            string strError = "";
+            InitConnection();
+            try
+            {
+                oraCmd = oraConn.CreateCommand();
+                oraCmd.Parameters.Add("res", OracleDbType.Varchar2, 4000, "", ParameterDirection.Output);
+                oraCmd.Parameters.Add("p_vmd_id", OracleDbType.Decimal, vmdId, ParameterDirection.Input);
+                oraCmd.Parameters.Add("p_vmd_type", OracleDbType.Decimal, vmdType, ParameterDirection.Input);
+                oraCmd.CommandText = "declare res varchar2(4000); begin :res := cim_mgr.add_into_f36(:p_vmd_id, :p_vmd_type); end;";
+                oraCmd.ExecuteNonQuery();
+                OracleString oError = (OracleString)oraCmd.Parameters["res"].Value;
+                if (!oError.IsNull)
+                    strError = String.Format(" {0} ", oError);
+
+            }
+            catch (System.Exception ex)
+            {
+                SaveException(ex);
+                strError = String.Format("Виклик cim_mgr.add_into_f36({1},{2}) Текст помилки: {0} ", ex,vmdId,vmdType);
+            }
+            finally
+            {
+                oraCmd.Dispose();
+                oraConn.Close();
+                oraConn.Dispose();
+            }
+            return strError;
+        }
     }
 
     /// <summary>
@@ -1611,8 +1645,11 @@ namespace barsroot.cim
                     oraCmd.Parameters.Add("p_valdate", OracleDbType.Date, bindInfo.DocDateVal, ParameterDirection.Input);
                     oraCmd.Parameters.Add("p_subject", OracleDbType.Decimal, bindInfo.Subject, ParameterDirection.Input);
                     oraCmd.Parameters.Add("p_service_code", OracleDbType.Varchar2, bindInfo.ServiceCode, ParameterDirection.Input);
+                    // COBUMMFO-10604 Цей параметр необхідно передавати завжди. 
+                    oraCmd.Parameters.Add("p_kv", OracleDbType.Decimal, bindInfo.DocKv, ParameterDirection.Input);
+                    
 
-                    oraCmd.CommandText = "declare res varchar2(4000); begin :res := cim_mgr.check_bound(:p_doc_kind,:p_payment_type,:p_pay_flag,:p_direct,:p_ref,:p_contr_id,:p_s_vp,:p_comiss,:p_rate,:p_s_vc,:p_valdate,:p_subject,:p_service_code); end;";
+                    oraCmd.CommandText = "declare res varchar2(4000); begin :res := cim_mgr.check_bound(:p_doc_kind,:p_payment_type,:p_pay_flag,:p_direct,:p_ref,:p_contr_id,:p_s_vp,:p_comiss,:p_rate,:p_s_vc,:p_valdate,:p_subject,:p_service_code,:p_kv); end;";
                     oraCmd.ExecuteNonQuery();
                     result.CodeMajor = 0;
                     if (oraCmd.Parameters["res"].Value.ToString() != "null")
@@ -1798,7 +1835,7 @@ namespace barsroot.cim
                     oraCmd.Parameters.Add("p_comments", OracleDbType.Varchar2, bindInfo.Comment, ParameterDirection.Input);
 
                     string addPars = "";
-                    if (bindInfo.IsFantom)
+                    if (bindInfo.IsFantom || (bindInfo.DocKind==1 && bindInfo.PaymentType==1))
                     {
                         oraCmd.Parameters.Add("p_num", OracleDbType.Varchar2, bindInfo.DocNum, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_kv", OracleDbType.Decimal, bindInfo.DocKv, ParameterDirection.Input);
@@ -2384,6 +2421,80 @@ namespace barsroot.cim
                 oraConn.Dispose();
             }
         }
+        
+        public void SaveDeadline(int boundType, decimal boundId, int docType, decimal deadlineDate)
+        {
+            InitConnection();
+            try
+            {
+                oraCmd = oraConn.CreateCommand();
+                oraCmd.Parameters.Add("p_date", OracleDbType.Decimal, deadlineDate, ParameterDirection.Input);
+                oraCmd.Parameters.Add("p_boundId", OracleDbType.Decimal, boundId, ParameterDirection.Input);
+
+                string tabName = "cim_vmd_bound";
+
+                if (boundType == 0)
+                {
+                    if (docType == 0)
+                        tabName = "cim_payments_bound";
+                    else
+                        tabName = "cim_fantoms_bound";
+                }
+                else if (boundType == 1)
+                {
+                    if (docType == 0)
+                        tabName = "cim_vmd_bound";
+                    else
+                        tabName = "cim_act_bound";
+                }
+
+                oraCmd.CommandText = "update " + tabName + " set DEADLINE = :p_date where bound_id=:p_boundId";
+                oraCmd.ExecuteNonQuery();
+            }
+            catch (System.Exception ex)
+            {
+                SaveException(ex);
+                throw ex;
+            }
+            finally
+            {
+                oraCmd.Dispose();
+                oraConn.Close();
+                oraConn.Dispose();
+            }
+        }
+
+        public void SaveIsDoc(decimal boundId, int docType, string isDoc)
+        {
+            InitConnection();
+            try
+            {
+                oraCmd = oraConn.CreateCommand();
+                oraCmd.Parameters.Add("p_isDoc", OracleDbType.Varchar2, isDoc, ParameterDirection.Input);
+                oraCmd.Parameters.Add("p_boundId", OracleDbType.Decimal, boundId, ParameterDirection.Input);
+
+                string tabName = "";
+
+                if (docType == 0)
+                    tabName = "cim_vmd_bound";
+                else
+                    tabName = "cim_act_bound";
+
+                oraCmd.CommandText = "update " + tabName + " set IS_DOC = :p_isDoc where bound_id=:p_boundId";
+                oraCmd.ExecuteNonQuery();
+            }
+            catch (System.Exception ex)
+            {
+                SaveException(ex);
+                throw ex;
+            }
+            finally
+            {
+                oraCmd.Dispose();
+                oraConn.Close();
+                oraConn.Dispose();
+            }
+        }
 
         public string SaveRegDate(int contrType, int boundType, decimal boundId, int docType, int docId, string regDate)
         {
@@ -2522,6 +2633,10 @@ namespace barsroot.cim
 
         public bool HasMultiValutsPayments { get; set; }
         public bool HasMultiValutsDecls { get; set; }
+        /// <summary>
+        /// «Ознака дроблення»
+        /// </summary>
+        public string IsFRAGMENT { get; set; }
         #endregion
 
         #region Private methods
@@ -2536,7 +2651,8 @@ namespace barsroot.cim
                     oraCmd.Parameters.Add("contrId", OracleDbType.Decimal, this.ContrId, ParameterDirection.Input);
                     oraCmd.CommandText = @"select contr_id, spec_id, subject_id, deadline, trade_desc, s_pl, z_pl, s_pl_after, s_vmd, z_vmd, s_vmd_after, 
                                                   (select 1 from dual where exists (select 1 from v_cim_trade_payments where v_pl != a.kv and contr_id=a.contr_id)) hmp,
-                                                  (select 1 from dual where exists (select 1 from v_cim_bound_vmd      where vt != a.kv   and contr_id=a.contr_id)) hmd, without_acts from v_cim_trade_contracts a where contr_id=:contrId";
+                                                  (select 1 from dual where exists (select 1 from v_cim_bound_vmd      where vt != a.kv   and contr_id=a.contr_id)) hmd, 
+                                                without_acts, IS_FRAGMENT from v_cim_trade_contracts a where contr_id=:contrId";
 
                     oraRdr = oraCmd.ExecuteReader();
                     if (oraRdr.Read())
@@ -2568,6 +2684,8 @@ namespace barsroot.cim
                         this.HasMultiValutsDecls = !oraRdr.IsDBNull(12);
                         if (!oraRdr.IsDBNull(13))
                             this.WithoutActs = Convert.ToDecimal(oraRdr.GetValue(13));
+                        
+                        this.IsFRAGMENT = oraRdr.IsDBNull(14) ? "Не встановлено" : Convert.ToString(oraRdr.GetValue(14)); // «Ознака дроблення»
                     }
                     else
                         this.ContrId = null;

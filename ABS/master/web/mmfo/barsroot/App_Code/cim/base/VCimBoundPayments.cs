@@ -26,7 +26,9 @@ namespace cim
         {
             fillFields();
         }
-        public VCimBoundPaymentsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BOUND_ID, Decimal? CONTR_ID, Decimal? PAY_FLAG, String PAY_FLAG_NAME, Decimal? REF, Decimal? DIRECT, Decimal? TYPE_ID, String TYPE, DateTime? VDAT, String ACCOUNT, String NAZN, Decimal? V_PL, Decimal? S_VPL, Decimal? SK_VPL, Decimal? RATE, Decimal? S_VK, DateTime? CREATE_DATE, DateTime? MODIFY_DATE, Decimal? BORG_REASON, String EA_URL)
+        public VCimBoundPaymentsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BOUND_ID, Decimal? CONTR_ID, Decimal? PAY_FLAG, String PAY_FLAG_NAME, Decimal? REF, Decimal? DIRECT, Decimal? TYPE_ID, String TYPE, DateTime? VDAT
+            , String ACCOUNT, String NAZN, Decimal? V_PL, Decimal? S_VPL, Decimal? SK_VPL, Decimal? RATE, Decimal? S_VK, DateTime? CREATE_DATE, DateTime? MODIFY_DATE, Decimal? BORG_REASON, String EA_URL, String BRANCH
+            , Decimal? DEADLINE_DOC)
             : this(Parent)
         {
             this.BOUND_ID = BOUND_ID;
@@ -49,6 +51,9 @@ namespace cim
             this.MODIFY_DATE = MODIFY_DATE;
             this.BORG_REASON = BORG_REASON;
             this.EA_URL = EA_URL;
+            this.BRANCH         = BRANCH;
+            this.DEADLINE_DOC   = DEADLINE_DOC;
+
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
             this.ClearChanges();
@@ -74,7 +79,9 @@ namespace cim
             Fields.Add( new BbField("CREATE_DATE", OracleDbType.Date, true, false, false, false, false, "V_CIM_BOUND_PAYMENTS", ObjectTypes.View, "Прив`язані платежі v 1.00.01", "Дата створення"));
             Fields.Add( new BbField("MODIFY_DATE", OracleDbType.Date, true, false, false, false, false, "V_CIM_BOUND_PAYMENTS", ObjectTypes.View, "Прив`язані платежі v 1.00.01", "Дата модифікації"));
             Fields.Add( new BbField("BORG_REASON", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_BOUND_PAYMENTS", ObjectTypes.View, "Прив`язані платежі v 1.00.01", "Причина заборгованості "));
-            Fields.Add( new BbField("EA_URL", OracleDbType.Varchar2, true, false, false, false, false, "V_CIM_BOUND_PAYMENTS", ObjectTypes.View, "Прив`язані платежі v 1.00.01", "Адреса сервера електронного архіву ВК"));        
+            Fields.Add( new BbField("EA_URL", OracleDbType.Varchar2, true, false, false, false, false, "V_CIM_BOUND_PAYMENTS", ObjectTypes.View, "Прив`язані платежі v 1.00.01", "Адреса сервера електронного архіву ВК"));
+            Fields.Add( new BbField("BRANCH", OracleDbType.Varchar2, true, false, false, false, false, "V_CIM_BOUND_PAYMENTS", ObjectTypes.View, "Прив`язані платежі v 1.00.04", ""));
+            Fields.Add( new BbField("DEADLINE_DOC", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_BOUND_PAYMENTS", ObjectTypes.View, "Прив`язані платежі v 1.00.04", "Контрольний строк по документу"));
         }
         public Decimal? BOUND_ID { get { return (Decimal?)FindField("BOUND_ID").Value; } set {SetField("BOUND_ID", value);} }
         public Decimal? CONTR_ID { get { return (Decimal?)FindField("CONTR_ID").Value; } set {SetField("CONTR_ID", value);} }
@@ -95,7 +102,9 @@ namespace cim
         public DateTime? CREATE_DATE { get { return (DateTime?)FindField("CREATE_DATE").Value; } set {SetField("CREATE_DATE", value);} }
         public DateTime? MODIFY_DATE { get { return (DateTime?)FindField("MODIFY_DATE").Value; } set {SetField("MODIFY_DATE", value);} }
         public Decimal? BORG_REASON { get { return (Decimal?)FindField("BORG_REASON").Value; } set {SetField("BORG_REASON", value);} }
-        public String EA_URL { get { return (String)FindField("EA_URL").Value; } set {SetField("EA_URL", value);} }
+        public String EA_URL { get { return (String)FindField("EA_URL").Value; } set { SetField("EA_URL", value); } }
+        public String BRANCH { get { return (String)FindField("BRANCH").Value; } set { SetField("BRANCH", value); } }
+        public Decimal? DEADLINE_DOC { get { return (Decimal?)FindField("DEADLINE_DOC").Value; } set { SetField("DEADLINE_DOC", value); } }
     }
 
     public sealed class VCimBoundPaymentsFilters : BbFilters
@@ -122,6 +131,8 @@ namespace cim
             MODIFY_DATE = new BBDateFilter(this, "MODIFY_DATE");
             BORG_REASON = new BBDecimalFilter(this, "BORG_REASON");
             EA_URL = new BBVarchar2Filter(this, "EA_URL");
+            BRANCH = new BBVarchar2Filter(this, "BRANCH");
+            DEADLINE_DOC = new BBDecimalFilter(this, "DEADLINE_DOC");
         }
         public BBDecimalFilter BOUND_ID;
         public BBDecimalFilter CONTR_ID;
@@ -143,6 +154,8 @@ namespace cim
         public BBDateFilter MODIFY_DATE;
         public BBDecimalFilter BORG_REASON;
         public BBVarchar2Filter EA_URL;
+        public BBVarchar2Filter BRANCH      ;
+        public BBDecimalFilter DEADLINE_DOC ;
     }
 
     public partial class VCimBoundPayments : BbTable<VCimBoundPaymentsRecord, VCimBoundPaymentsFilters>
@@ -187,8 +200,10 @@ namespace cim
                         rdr.IsDBNull(17) ?  (DateTime?)null : Convert.ToDateTime(rdr[17]), 
                         rdr.IsDBNull(18) ?  (DateTime?)null : Convert.ToDateTime(rdr[18]), 
                         rdr.IsDBNull(19) ?  (Decimal?)null : Convert.ToDecimal(rdr[19]), 
-                        rdr.IsDBNull(20) ?  (String)null : Convert.ToString(rdr[20]))
-                    );
+                        rdr.IsDBNull(20) ?  (String)null : Convert.ToString(rdr[20]),
+                        rdr.IsDBNull(21) ? (String)null : Convert.ToString(rdr[21]),
+                        rdr.IsDBNull(22) ? (Decimal?)null : Convert.ToDecimal(rdr[22])
+                    ));
                 }
             }
             finally

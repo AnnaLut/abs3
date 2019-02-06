@@ -135,6 +135,7 @@ CIM.declaration_module = function () {
     module.PrepareSendToBank = prepareSendToBank;
     module.DeleteAct = deleteAct;
     //#endregion
+    module.ToStrangeMD = md2form531;
 
     // ******** private methods ********
     function confirmAction(result, callFunc) {
@@ -751,5 +752,35 @@ CIM.declaration_module = function () {
     }
     //#endregion
 
+    function md2form531() {
+        if (!$(".selectedRow").length) {
+            core$WarningBox("Не вибрано МД. Виберіть рядок з переліку МД,<br/>в якому вказана МД, яку потрібно включити в 531 форму.", "Чужа МД");
+            return;
+        }
+        selRowData = eval('(' + $(".selectedRow").attr("rd") + ')');
+        var diagBindDoc = $('#dialog2form531');
+        diagBindDoc.dialog({
+            autoOpen: true,
+            modal: true,
+            width: 820,
+            title: 'Чужа МД - Включити МД з №' + selRowData.nm+' у 531 форму',
+            buttons: {
+                "Так": function () {
+                    PageMethods.CD2form531(selRowData.rf, selRowData.vtp, onMD2form531, CIM.reloadPage);
+                    $(this).dialog("close");
+                    CIM.reloadPage();
+                },
+                "Відміна": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }
+    function onMD2form531(result) {
+        if (result && result.length > 0) {
+            core$WarningBox("Помилка під час включення в 531 форму.<br/><div style='color:red'>" + result + '</div>', "Чужа МД");
+            CIM.reloadPage();
+        }
+    }
     return module;
 };

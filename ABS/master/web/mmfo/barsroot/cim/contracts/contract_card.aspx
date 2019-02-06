@@ -27,7 +27,7 @@
         SelectCommand="select null id, null name from dual union all select id,name from cim_credit_percent">
     </bars:BarsSqlDataSourceEx>
     <bars:BarsSqlDataSourceEx runat="server" ID="dsTrDeadline" ProviderName="barsroot.core"
-        SelectCommand="select deadline, comments from cim_contract_deadlines">
+        SelectCommand="select deadline, comments from cim_contract_deadlines where delete_date is null order by deadline">
     </bars:BarsSqlDataSourceEx>
     <bars:BarsSqlDataSourceEx runat="server" ID="dsTrSpecs" ProviderName="barsroot.core"
         SelectCommand="select spec_id, spec_name from cim_contract_specs">

@@ -22,7 +22,7 @@ public partial class cim_contracts_licenses : System.Web.UI.Page
         dsLicenseType.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
 
         //ScriptManager.GetCurrent(this).Scripts.Add(new ScriptReference("/barsroot/cim/contracts/scripts/cim_licenses.js?v" + CimManager.Version + Master.BuildVersion));
-        Master.AddScript("/barsroot/cim/contracts/scripts/cim_licenses.js");
+		Master.AddScript(String.Format("/barsroot/cim/contracts/scripts/cim_licenses.js?v={0}.01", barsroot.ServicesClass.GetVersionWeb()));
         if (!ClientScript.IsStartupScriptRegistered(this.GetType(), "init"))
             ClientScript.RegisterStartupScript(this.GetType(), "init", "CIM.setVariables('" + Request["contr_id"] + "', '" + Request["taxcode"] + "'); ", true);
     }
