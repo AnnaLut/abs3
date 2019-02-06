@@ -205,7 +205,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.14 23/08/2018';
+   g_body_version      constant varchar2 (64) := 'version 1.01.15 25/01/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -718,28 +718,28 @@ begin
   end if;
 
   bars_audit.info('CIM p_f531  '||p_date||': :'||user_id||':');
-  
+
   l_sysdate:=trunc(sysdate);
-  
-  select nvl(substr(par_value,1,3),'XXX') 
-  into l_oblcode 
-  from cim_params 
+
+  select nvl(substr(par_value,1,3),'XXX')
+  into l_oblcode
+  from cim_params
   where par_name='EL_COD_OBL';
-  
+
   l_filename:='#36'||l_oblcode||num_code(to_number(to_char(l_sysdate,'MM')))||
               num_code(to_number(to_char(l_sysdate,'DD')))||'.E'||num_code(to_number(to_char(p_date,'MM')))||'1';
-              
-  p_error:=l_filename; 
-  
+
+  p_error:=l_filename;
+
   select nvl(substr(par_value,1,2),'XX') into l_oblcode from cim_params where  par_name='OBL_CODE';
 
-  dbms_lob.createtemporary(l_txt_clob, false); 
-  
+  dbms_lob.createtemporary(l_txt_clob, false);
+
   l_date_z_end:=last_day(add_months(p_date,-1))+1;
-  
-  select nvl(max(create_date), add_months(l_date_z_end,-1)) 
-  into l_last_date 
-  from cim_f36 
+
+  select nvl(max(create_date), add_months(l_date_z_end,-1))
+  into l_last_date
+  from cim_f36
   where branch like sys_context('bars_context', 'user_mfo_mask');
 
   if l_last_date=l_date_z_end and
@@ -749,10 +749,10 @@ begin
           (to_number(to_char(l_sysdate,'yyyymm'))+1=to_number(to_char(l_date_z_end,'yyyymm')) and to_number(to_char(l_sysdate,'dd'))>10 or
            to_number(to_char(l_sysdate,'yyyymm'))+1>to_number(to_char(l_date_z_end,'yyyymm')) )
   then
-    delete from cim_f36 where create_date=l_date_z_end and branch like sys_context('bars_context', 'user_mfo_mask');
+    delete from cim_f36 where create_date=l_date_z_end and branch like sys_context('bars_context', 'user_mfo_mask') and nvl(manual_include, 0) != 1;
     insert into cim_f36 (b041, k020, p17, p16, doc_date, p21, p14, p01, p22, p15, p18, create_date)
                  values (0, 0, '0', to_date('01/01/2015', 'dd/mm/yyyy'), '01012015', to_date('01/01/2015', 'dd/mm/yyyy'), 0, 0, 0, 0, 0, l_date_z_end);
-                 
+
     for l in
     (
       select * from (
@@ -898,7 +898,7 @@ begin
   for l in
   ( select f.b041, f.k020, f.p01, f.p02, f.p06, f.p07, f.p08, f.p09, f.p13, f.p14, f.p15, f.p16, f.p17, f.p18, f.p19, f.p20, f.p21, f.p22, f.p23, f.p24, f.doc_date, f.p27
       from cim_f36 f
-     where f.b041 != 0 
+     where f.b041 != 0
        and f.create_date=l_date_z_end
        and F.P22 > 0
        and f.branch like sys_context('bars_context', 'user_mfo_mask')
@@ -955,9 +955,9 @@ begin
     end;
     l_txt:=l_txt||'#1='||l_oblcode||'='||l_b041||chr(13)||chr(10);
   end if;
-  
+
   dbms_lob.createtemporary(l_result, false); dbms_lob.append(l_result, l_txt); dbms_lob.append(l_result, l_txt_clob);
-  
+
   return l_result;
 end  p_f531;
 
@@ -2538,21 +2538,21 @@ end  p_f531;
 
   end;
 
-  function get_contracts_list(p_mfo         varchar2,--cim_contracts.kf%type, 
-                              p_date_from   cim_contracts.open_date%type, 
+  function get_contracts_list(p_mfo         varchar2,--cim_contracts.kf%type,
+                              p_date_from   cim_contracts.open_date%type,
                               p_date_to     cim_contracts.open_date%type,
                               p_contr_type  varchar2,--cim_contracts.contr_type%type,
                               p_kv          varchar2,--cim_contracts.kv%type,
                               p_status      varchar2--cim_contracts.status_id%type
-                              ) 
+                              )
   return t_arr_contracts pipelined PARALLEL_ENABLE
   is
-    l_title   CONSTANT VARCHAR2 (50) := 'CIM_REPORTS.get_contracts_list: ';  
-    l_branch  CONSTANT VARCHAR2 (30) := sys_context('bars_context','user_branch'); 
-  
+    l_title   CONSTANT VARCHAR2 (50) := 'CIM_REPORTS.get_contracts_list: ';
+    l_branch  CONSTANT VARCHAR2 (30) := sys_context('bars_context','user_branch');
+
     l_t_contracts t_contracts;
     l_cur         sys_refcursor;
-    
+
     l_sql         varchar2(4000) := 'select cc.contr_id, cc.contr_type, ct.contr_type_name, cc.num, cc.subnum, cc.rnk, c.okpo, '||chr(13)||chr(10)||
                                     '       nvl((select nmku from corps where rnk=cc.rnk), c.nmk) nmk, c.nmkk, c.custtype, c.nd, '||chr(13)||chr(10)||
                                     '       cc.status_id, cs.status_name, cc.comments,cc.branch branch_own, br.name branch_own_name, '||chr(13)||chr(10)||
@@ -2572,41 +2572,41 @@ end  p_f531;
     l_sql_order   varchar2(255)  := ' order by cc.branch, cc.contr_id';
   begin
     bars_audit.info(l_title||' Пуск l_branch='||l_branch);
-    if (l_branch is not null and l_branch not in ('/', '/300465/')) or (p_mfo = 'Поточне' and sys_context('bars_context','user_mfo') is not null) then 
+    if (l_branch is not null and l_branch not in ('/', '/300465/')) or (p_mfo = 'Поточне' and sys_context('bars_context','user_mfo') is not null) then
       --тільки ЦА або "/" може бачити все (таблиці на час розробки звіту неполітизовані тому є можливість для ЦА бачити всіх)
       --таблиця customer політизована, тому якщо в табл. corps немає записів то для 300465 найменування організаціїї буде пустим
       l_sql_where := l_sql_where||' and cc.kf = '''||sys_context('bars_context','user_mfo')||''' '||chr(13)||chr(10);
-    end if;  
-    
+    end if;
+
     if p_mfo is not null and p_mfo != '%' and p_mfo != 'Поточне' then
       l_sql_where := l_sql_where||' and cc.kf = '''||replace(p_mfo,'/','')||''' '||chr(13)||chr(10);
-    end if;  
+    end if;
     if p_date_from is not null then
       l_sql_where := l_sql_where||' and cc.open_date >= to_date('''||to_char(p_date_from,'DDMMYYYY')||''',''DDMMYYYY'') '||chr(13)||chr(10);
-    end if;   
+    end if;
     if p_date_to is not null then
       l_sql_where := l_sql_where||' and cc.open_date <= to_date('''||to_char(p_date_to,'DDMMYYYY')||''',''DDMMYYYY'') '||chr(13)||chr(10);
-    end if;   
+    end if;
     if p_contr_type is not null and  p_contr_type != '%' then
       l_sql_where := l_sql_where||' and cc.contr_type = '||p_contr_type||' '||chr(13)||chr(10);
-    end if;    
+    end if;
     if p_kv is not null and p_kv != '%' then
       l_sql_where := l_sql_where||' and cc.kv = '||p_kv||' '||chr(13)||chr(10);
-    end if;    
+    end if;
     if p_status is not null and p_status != '%' then
       l_sql_where := l_sql_where||' and cc.status_id = '||p_status||' '||chr(13)||chr(10);
-    end if;     
-    
+    end if;
+
     bars_audit.info(l_title||' SQL = '||chr(13)||chr(10)||l_sql||l_sql_where||l_sql_order);
     open l_cur for l_sql||l_sql_where||l_sql_order;
     loop
       fetch l_cur into l_t_contracts;
       exit when l_cur%notfound;
 
-      pipe row (l_t_contracts);     
+      pipe row (l_t_contracts);
     end loop;
     close l_cur;
-  end;    
+  end;
 
 
 end cim_reports;

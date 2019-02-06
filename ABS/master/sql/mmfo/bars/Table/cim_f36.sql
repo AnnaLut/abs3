@@ -257,6 +257,16 @@ exception when others then
 
 
 
+begin
+    execute immediate 'alter table bars.CIM_F36 add (manual_include number(1) default 0)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F36.manual_include IS '1-МД включена вручну';
+
+
 PROMPT *** Create  grants  CIM_F36 ***
 grant SELECT                                                                 on CIM_F36         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F36         to BARS_ACCESS_DEFROLE;

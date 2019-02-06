@@ -121,6 +121,35 @@ exception when others then
 /
 
 
+begin
+    execute immediate 'alter table bars.CIM_CONTRACTS_TRADE add (IS_FRAGMENT NUMBER(1) default 0)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_CONTRACTS_TRADE.IS_FRAGMENT IS 'Ознака дроблення:  1 - Так';
+
+begin
+    execute immediate 'alter table bars.CIM_CONTRACTS_TRADE add (FRAGMENT_CHG_DATE DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_CONTRACTS_TRADE.FRAGMENT_CHG_DATE IS 'Дата зміни Ознаки дроблення';
+
+begin
+    execute immediate 'alter table bars.CIM_CONTRACTS_TRADE add (FRAGMENT_CHG_USERID NUMBER)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_CONTRACTS_TRADE.FRAGMENT_CHG_USERID IS 'Користувач зміни Ознаки дроблення';
+
+
+
 
 PROMPT *** Create  grants  CIM_CONTRACTS_TRADE ***
 grant SELECT                                                                 on CIM_CONTRACTS_TRADE to BARSREADER_ROLE;
