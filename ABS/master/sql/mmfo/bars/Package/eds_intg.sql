@@ -513,8 +513,7 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
          
          update eds_decl e
             set e.state=st_declaration_prepared,
-                e.decl_id = l_decl_id,
-                e.prepare_date = sysdate
+                e.decl_id = l_decl_id
          where e.id=p_req_id;
          
          p_id := l_decl_id; 
@@ -522,8 +521,7 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
          rollback to bef_form;
          update eds_decl e
             set e.state = st_declaration_rejected,
-                e.comm = substr(e.comm||' -edecl-'||p_req_id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace, 1, 255),
-                e.prepare_date = sysdate
+                e.comm = substr(e.comm||' -edecl-'||p_req_id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace, 1, 255)
          where e.id = p_req_id;
          bars.logger.info('edecl-'||p_req_id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
 end;
