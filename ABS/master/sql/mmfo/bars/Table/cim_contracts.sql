@@ -258,6 +258,17 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I4_CIM_CONTRACTS ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I4_CIM_CONTRACTS ON BARS.CIM_CONTRACTS (OKPO) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 
 PROMPT *** Create  grants  CIM_CONTRACTS ***
