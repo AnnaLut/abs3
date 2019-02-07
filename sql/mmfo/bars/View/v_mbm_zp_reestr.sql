@@ -19,7 +19,8 @@ select a.acc          as rn,
        a.nls          as nls,
        a.dazs         as dazs,
        c.date_off     as date_off,
-       ap.status      as acc_pk_status
+       ap.status      as acc_pk_status,
+       c.rnk          as staff_rnk
 from zp_deals z
      inner join zp_acc_pk ap on ap.id = z.id
      inner join accounts a on a.acc = ap.acc_pk
@@ -47,6 +48,7 @@ comment on column bars.v_mbm_zp_reestr.nls              is 'Номер рахунку (який 
 comment on column bars.v_mbm_zp_reestr.dazs             is 'Дата закриття рахунка';
 comment on column bars.v_mbm_zp_reestr.date_off         is 'Дата закриття клієнта банку (2625)';
 comment on column bars.v_mbm_zp_reestr.acc_pk_status    is 'Ознака блокування працівника в зкп';
+comment on column bars.v_mbm_zp_reestr.staff_rnk        is 'RNK працівника';
 
 PROMPT *** Create  grants  v_mbm_zp_reestr ***
 
