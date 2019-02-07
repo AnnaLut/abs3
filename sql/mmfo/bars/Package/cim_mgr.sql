@@ -782,7 +782,7 @@ is
    --  Currency Inspection Module - Модуль валютного контролю
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.03 06/02/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.04 07/02/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -1060,17 +1060,19 @@ begin
                     and c.benef_id = p_row_contract.benef_id
                     and c.num = p_row_contract.num and c.open_date = p_row_contract.open_date
                     and v.vdat >= l_wee_st
-                    and v.zsq_vp * 100 <= l_lim_day)
+                    /*and v.zsq_vp * 100 <= l_lim_day оптимімус фуліус джойніус викликає*/)
     loop
-      l_fragm.extend;
-      l_fragm(l_fragm.last).bound_contr_id := cur.contr_id;
-      l_fragm(l_fragm.last).sq             := cur.zsq_vp;
-      l_fragm(l_fragm.last).bound_id       := cur.bound_id;
-      l_fragm(l_fragm.last).kind_doc_id    := 0;
-      l_fragm(l_fragm.last).type_doc_id    := cur.type_id;
-      l_fragm(l_fragm.last).date_doc       := cur.vdat;
+      if cur.zsq_vp <= l_lim_day then
+        l_fragm.extend;
+        l_fragm(l_fragm.last).bound_contr_id := cur.contr_id;
+        l_fragm(l_fragm.last).sq             := cur.zsq_vp;
+        l_fragm(l_fragm.last).bound_id       := cur.bound_id;
+        l_fragm(l_fragm.last).kind_doc_id    := 0;
+        l_fragm(l_fragm.last).type_doc_id    := cur.type_id;
+        l_fragm(l_fragm.last).date_doc       := cur.vdat;
 
-      l_sq := l_sq + cur.zsq_vp;
+        l_sq := l_sq + cur.zsq_vp;
+      end if;  
     end loop;
     if l_sq > l_lim_day * 2 then
       p_list_doc   := l_fragm;
@@ -1093,17 +1095,19 @@ begin
                     and c.benef_id = p_row_contract.benef_id
                     and c.num = p_row_contract.num and c.open_date = p_row_contract.open_date
                     and v.vdat >= l_mon_st
-                    and v.zsq_vp * 100 <= l_lim_day)
+                    /*and v.zsq_vp * 100 <= l_lim_day оптимімус фуліус джойніус викликає*/)
     loop
-      l_fragm.extend;
-      l_fragm(l_fragm.last).bound_contr_id := cur.contr_id;
-      l_fragm(l_fragm.last).sq             := cur.zsq_vp;
-      l_fragm(l_fragm.last).bound_id       := cur.bound_id;
-      l_fragm(l_fragm.last).kind_doc_id    := 0;
-      l_fragm(l_fragm.last).type_doc_id    := cur.type_id;
-      l_fragm(l_fragm.last).date_doc       := cur.vdat;
+      if cur.zsq_vp <= l_lim_day then
+        l_fragm.extend;
+        l_fragm(l_fragm.last).bound_contr_id := cur.contr_id;
+        l_fragm(l_fragm.last).sq             := cur.zsq_vp;
+        l_fragm(l_fragm.last).bound_id       := cur.bound_id;
+        l_fragm(l_fragm.last).kind_doc_id    := 0;
+        l_fragm(l_fragm.last).type_doc_id    := cur.type_id;
+        l_fragm(l_fragm.last).date_doc       := cur.vdat;
 
-      l_sq := l_sq + cur.zsq_vp;
+        l_sq := l_sq + cur.zsq_vp;
+      end if;  
     end loop;
     if l_sq > l_lim_day * 8 then
       p_list_doc   := l_fragm;
@@ -1113,6 +1117,7 @@ begin
       return true;
     end if;
   end if;
+  bars_audit.info('cim_mgr.check_fragmentation END:  p_contr_id='||p_contr_id||case when l_res then 'l_res=true ' else 'l_res=false ' end);
   return l_res;
 
   exception
