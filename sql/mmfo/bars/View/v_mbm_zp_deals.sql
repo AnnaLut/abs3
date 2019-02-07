@@ -21,7 +21,8 @@ select z.id             as ProjectId,
        a.kf             as BankId2909,
        a.nms            as Name2909,
        a.kv             as Kv2909,
-       c.okpo           as CustomerOkpo
+       c.okpo           as CustomerOkpo,
+       z.tarif_name     as TarifName
 from bars.v_zp_deals z
      inner join branch b on b.branch = z.branch
      inner join accounts a on a.acc = z.acc_2909
@@ -48,6 +49,7 @@ comment on column bars.v_mbm_zp_deals.BankId2909                 is 'МФО банка, 
 comment on column bars.v_mbm_zp_deals.Name2909                   is 'Найменування рахунка 2909';
 comment on column bars.v_mbm_zp_deals.Kv2909                     is 'Код (цифровий) валюти';
 comment on column bars.v_mbm_zp_deals.CustomerOkpo               is 'ОКПО клієнта';
+comment on column bars.v_mbm_zp_deals.TarifName                  is 'Назва тарифу';
 
 PROMPT *** Create  grants  v_mbm_zp_deals ***
 

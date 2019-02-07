@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_MBM_ALL_ACCOUNTS ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_MBM_ALL_ACCOUNTS ("ACC_ID", "CUST_ID", "ACC_NUM", "NAME", "ALT_NAME", "CUR_ID", "CUR_CODE", "OPENING_DATE", "CLOSING_DATE", "BANK_ID", "BRANCH_ID", "PAF_ID", "TYPE_ID", "LOCK_DEBIT_CODE", "LOCK_CREDIT_CODE", "LIMIT", "FIN_DATE", "FIN_BALANCE", "DEBIT_TURNS", "CREDIT_TURNS", "EQ_DATE", "EQ_BALANCE", "EQ_DEBIT_TURNS", "EQ_CREDIT_TURNS", "OKPO", "PLANNED_BALANCE") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_MBM_ALL_ACCOUNTS ("ACC_ID", "CUST_ID", "ACC_NUM", "NAME", "ALT_NAME", "CUR_ID", "CUR_CODE", "OPENING_DATE", "CLOSING_DATE", "BANK_ID", "BRANCH_ID", "PAF_ID", "TYPE_ID", "LOCK_DEBIT_CODE", "LOCK_CREDIT_CODE", "LIMIT", "FIN_DATE", "FIN_BALANCE", "DEBIT_TURNS", "CREDIT_TURNS", "EQ_DATE", "EQ_BALANCE", "EQ_DEBIT_TURNS", "EQ_CREDIT_TURNS", "OKPO", "PLANNED_BALANCE", "TIP", "OB22") AS 
   SELECT a.acc AS acc_id,
           a.rnk AS cust_id,
           a.nls AS acc_num,
@@ -32,8 +32,10 @@ PROMPT *** Create  view V_MBM_ALL_ACCOUNTS ***
           a.ostq AS eq_balance,
           a.dosq AS eq_debit_turns,
           a.kosq AS eq_credit_turns,
-		  c.OKPO,
-		  a.ostb as planned_balance
+	  c.OKPO,
+	  a.ostb as planned_balance,
+          a.tip,
+          a.ob22
      FROM accounts a, customer c, tabval$global t, mbm_nbs_acc_types at
     WHERE a.kv = t.kv
 		AND a.nbs = at.nbs
