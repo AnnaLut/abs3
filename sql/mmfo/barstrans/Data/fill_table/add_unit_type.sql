@@ -15,4 +15,15 @@ EXCEPTION
     END IF;
 END;
 /
+
+begin
+    execute immediate 'insert into TRANSPORT_UNIT_TYPE (ID, TRANSPORT_TYPE_CODE, TRANSPORT_TYPE_NAME, DIRECTION, PROCESSING_BLOCK, COMPRESSED, BASE64, CHECKSUM, INFORMATION_REQUEST)
+values (7, ''HOUSEHOLDPAYMENTS'', ''Приймання платежів на рахунки комунальних підприємств'', 1, null, 1, 1, 2, 2)';
+ exception when others then 
+    if sqlcode = -1 then null; else raise; 
+    end if; 
+end;
+/ 
+
+commit;
 prompt Done.
