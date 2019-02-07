@@ -8745,7 +8745,7 @@ end if;
                                    'SK9',
                                    'CR9',
                                    'SN8',
-                                   'SNA',
+--                                   'SNA',
                                    'SNO'
                                    ,'S36')) LOOP
 

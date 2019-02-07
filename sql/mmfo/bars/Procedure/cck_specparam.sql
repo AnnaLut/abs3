@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_SPECPARAM.sql =========*** Run
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CCK_SPECPARAM ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/cck_specparam.sql =========*** Run
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.CCK_SPECPARAM (ACC_   int, -- вн. номер подвязываемого счета под договор
                                           NLS_   varchar2, -- лицевой номер подвязываемый счета под договор
                                           KV_    int, -- валюта подвязываемый счета под договор
@@ -74,19 +71,14 @@ begin
 
   --------------  R011 -------------------
 
-  if substr(NLS_, 1, 4) = '2909' and VIDD_ in (1, 2, 3) and TIP_ = 'SG ' then
-    l_R011 := 1;
-  elsif substr(NLS_, 1, 4) = '2909' and VIDD_ in (11, 12, 13) and
-        TIP_ = 'SG ' then
-    l_R011 := 2;
-  elsif tip_ in ('SP ', 'SN ', 'SPN', 'SL ', 'SLN', 'SK0', 'SK9') then
+  if tip_ in ('SP ', 'SN ', 'SPN', 'SL ', 'SLN', 'SK0', 'SK9') then
     l_R011 := substr(cck.R011_S181(ACC_, ND_), 1, 1);
   end if;
 
   If TIP_ in ('SN ', 'SK0') then
-    l_R013 := '3';
+    l_R013 := '2';
   ElsIf TIP_ in ('SPN', 'SK9') then
-    l_R013 := '1';
+    l_R013 := '3';
   ElsIf TIP_ = 'SLN' then
     l_R013 := '3';
   ElsIf TIP_ = 'CR9' then
@@ -198,7 +190,7 @@ begin
        SET s080 = Nvl(s080, l_S080),
            R013 = Nvl(R013, l_R013), -- проставляет Толик при формировании А3 файла после первой проводки по счету
            s260 = Nvl(s260, l_S260),
-           R011 = l_R011,
+           R011 = nvl(l_R011,R011),
            S200=  l_S200
      WHERE acc = ACC_ ;
 
@@ -215,8 +207,8 @@ begin
 
     elsif Tip_ in ('SP ', 'SL ') then
       Insert into specparam
-        (acc, R011, s080, s190, s200, s260)
-        select ACC_, l_R011, s.S080, '3', s.s200, l_S260
+        (acc, R011, s080, s200, s260)
+        select ACC_, l_R011, s.S080, s.s200, l_S260
           from specparam s
          where s.acc = (select accs
                           from cc_add
@@ -233,7 +225,7 @@ begin
       Insert into specparam
         (acc, r011, s260, r013)
       values
-        (ACC_, 'Z', l_S260, l_R013) ;
+        (ACC_, '1', l_S260, l_R013) ;
 
     elsif tip_ = 'CR9' then
       insert into specparam
@@ -258,10 +250,11 @@ begin
 
 end;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_SPECPARAM.sql =========*** End
-PROMPT ===================================================================================== 
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/cck_specparam.sql =========*** End
+ PROMPT ===================================================================================== 
+ 
