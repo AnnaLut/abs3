@@ -33,8 +33,6 @@ create or replace package eds_intg is
   procedure pocess_request(p_transp_id varchar2);
   --Формування вітрини даних
   procedure fill_data(p_req_id varchar2);
-  --Очистка старих данних в вітринах
-  procedure delete_old_data;
   
 end eds_intg;
 /
@@ -456,7 +454,7 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                         end loop;
 
                           for credit in (select s.nd, s.kf, substr(b.attribute_value, 1, 100) as attribute_value, c.sdate, c.vidd, abs(bars.fost(a.acc,cust.date_to)) as BAL_DEBT,
-                                                a.kv, s.proc_sum, s.credit_sum, s.proc_sum + s.credit_sum as sum_totaly, c.sdog*100 as sum_zagal
+                                                a.kv, s.proc_sum, s.credit_sum, s.proc_sum + s.credit_sum as sum_totaly
                                          from
                                         (select n.nd, n.kf,
                                         GREATEST (
@@ -494,7 +492,6 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                          l_eds_credit_data(l_eds_credit_data.last).amount_pay_principal:=credit.credit_sum;
                                          l_eds_credit_data(l_eds_credit_data.last).sum_totaly_credit:=credit.sum_totaly;
                                          l_eds_credit_data(l_eds_credit_data.last).kf:=credit.kf;
-                                         l_eds_credit_data(l_eds_credit_data.last).sum_zagal:= credit.sum_zagal;
                                          end loop;
        end loop;
          if l_eds_w4_data.count <> 0 then
