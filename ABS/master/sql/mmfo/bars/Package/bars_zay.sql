@@ -5172,7 +5172,8 @@ end;
 -------------------------------------------------------------------------------
 procedure check_lim (p_id number,p_mode varchar2 ) as
  l_dk zayavka.dk%type;
- l_basis zayavka.basis%type;
+-- l_basis zayavka.basis%type;
+ l_f092 zayavka.f092%type;
  l_check_result_m number;
  l_check_result_d number;
  l_check_result   number;
@@ -5194,8 +5195,8 @@ begin
     
     begin
     --пошук заявки на рівні РУ+ЦА(300465) (zay21)
-    select z.dk,z.basis,z.kv2, c.custtype, tv.prv
-        into l_dk,l_basis,l_kv2, l_custtype, l_prv
+    select z.dk,z.f092,z.kv2, c.custtype, tv.prv
+        into l_dk,l_f092,l_kv2, l_custtype, l_prv
          from  zayavka z
           inner join tabval tv on tv.kv=z.kv2
           inner join customer  c on c.rnk=z.rnk
@@ -5203,15 +5204,17 @@ begin
      exception when no_data_found 
         then 
         begin
+        select req_id into l_reqid from zayavka_ru where id = p_id;
+        
+        select f092 into l_f092 from zay_val_control where zay_id=l_reqid;
+        
          --пошук РУ заявки на рівні ЦА (zay52)
-         select z.dk,z.basis,z.kv2, tv.prv
-          into l_dk,l_basis,l_kv2, l_prv
+         select z.dk,z.kv2, tv.prv
+          into l_dk,l_kv2, l_prv
             from  zayavka_ru z
               inner join tabval tv on tv.kv=z.kv2
               where z.id=p_id;
-        
-        select req_id into l_reqid from zayavka_ru where id = p_id;
-        
+         
         select custtype into l_custtype from zay_val_control where zay_id = l_reqid;  
         
         end;
@@ -5219,9 +5222,9 @@ begin
     
     
   -------------------------------
-  --якщо заявка на купівлю ,базис=9.9.9., ФО купує все або ЮЛ купує метал
+  --якщо заявка на купівлю ,F_092=164., ФО купує все або ЮЛ купує метал
   if (l_dk=1
-       and l_basis=F_ZAY_GET_BCONTL --9,9,9
+       and l_f092=F_ZAY_GET_BCONTL --164 з F_092
        and (l_custtype=3 --фізик/ФОП
              or (l_custtype=2 and l_prv=1)/* ЮО метал*/ ) )
    then
@@ -5269,7 +5272,7 @@ begin
         --    end if;
   end if;
 
-end;
+end check_lim;
 
 -------------------------------------------------------------------------------
 --

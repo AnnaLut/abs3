@@ -1,8 +1,8 @@
-create or replace procedure P_zay_val_control_do (
+CREATE OR REPLACE procedure BARS.P_zay_val_control_do (
        p_iddo     varchar2,/* I -insert, E- end ,R-повернення,  UM - оновити при розбитті заявки */
        p_zay_id   number,
-       --p_sum      number          default null,
-       --p_basis    varchar2        default null,
+       p_sum      number          default null,
+       p_basis    varchar2        default null,
        p_viza     integer         default null
 )
 is
@@ -11,10 +11,19 @@ is
        l_okpo     customer.okpo%type;
        l_SER      person.ser%type;
        l_numdoc   person.numdoc%type;
+       l_custtype CUSTOMER.CUSTTYPE%type;
        l_request  zayavka%rowtype;
        l_suma_eq  number;--еквівалент суми заявки
 begin
- /*30.01.2019 v. 4*/
+ /*
+ 06,02,2019: 
+   'I'  -  вставка заявки
+   'D'  -  видалення заявки
+   'E'  -  оновдення статуса кінцеве в zay52
+   'UM' -  оновлення статусів заявки при розділенні заявки ділером
+   'R'  -  оновлення статусів заявки при поверненні
+ 30.01.2019 v. 4
+ */
 
        if p_iddo = 'I'
        then
@@ -29,8 +38,8 @@ begin
                                    trunc(SYSDATE));
          begin
            --пошукаємо клієнта всюди
-           select c.rnk, c.nmk, c.okpo, p.SER, p.numdoc
-           into   l_rnk, l_nmk, l_okpo, l_SER, l_numdoc
+           select c.rnk, c.nmk, c.okpo, p.SER, p.numdoc, C.CUSTTYPE
+           into   l_rnk, l_nmk, l_okpo, l_SER, l_numdoc, l_custtype
            from   customer c
            left   join person p
            on     (p.rnk = c.rnk)
@@ -63,7 +72,10 @@ begin
           RATE_O,
           SUMMA,
           MFO,
-          BRANCH)
+          BRANCH,
+          custtype,
+          f092
+          )
           VALUES (
           p_zay_id,
           trunc(sysdate),
@@ -79,7 +91,9 @@ begin
           BARS.f_ret_kurs(l_request.kv2, trunc(sysdate)),
           l_suma_eq,
           l_request.kf,
-          l_request.branch
+          l_request.branch,
+          l_custtype,
+          l_request.f092
              );
        end if;
 
@@ -92,17 +106,13 @@ begin
            update zay_val_control set sos=1,viza=2 ,zay_date_v=trunc(sysdate) where ZAY_ID=p_zay_id;
        end if;
 
-
        if p_iddo='UM' then --ZAY42 Розбиття заявки, стару треба проапдейтити
         --
            update zay_val_control set sos=-1,viza=2 where ZAY_ID = p_zay_id;
-           --in (select req_id from zayavka_ru where id = p_zay_id);
        end if;
        
        if p_iddo='R' then --повернення
            update zay_val_control set sos=0,viza=p_viza where ZAY_ID = p_zay_id;
        end if;
-
-
 end;
 /

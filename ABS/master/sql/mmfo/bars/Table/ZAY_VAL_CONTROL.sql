@@ -61,6 +61,17 @@ end;
 /
 
 
+PROMPT *** Alter  table ZAY_VAL_CONTROL ***
+begin 
+  execute immediate '
+  alter table zay_val_control add f092 char(3byte)'
+;
+exception when others then       
+  if sqlcode=-01430 then null; else raise; end if; 
+end; 
+/
+
+
 PROMPT ***  Create/Recreate indexes  table ZAY_VAL_CONTROL *** 
 begin 
   execute immediate '
@@ -86,7 +97,7 @@ alter table ZAY_VAL_CONTROL
   maxtrans 255
 ';
 exception when others then       
-  if sqlcode=-00955 then null; else raise; end if; 
+  if sqlcode=-02260 then null; else raise; end if; 
 end; 
 /
 
@@ -106,6 +117,7 @@ comment on column ZAY_VAL_CONTROL.ser_pasp  is 'серія паспорта ';
 comment on column ZAY_VAL_CONTROL.nom_pasp  is 'Номер паспорта';
 comment on column ZAY_VAL_CONTROL.summa     is 'Сума еквівалента заявки';
 comment on column ZAY_VAL_CONTROL.custtype  is 'Тип контрагента';
+comment on column ZAY_VAL_CONTROL.f092	    is 'Значення F092';
 
 
 PROMPT ===================================================================================== 
