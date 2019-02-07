@@ -5616,14 +5616,12 @@ is
   l_dk    zayavka.id%type ;
   l_basis zayavka.basis%type;
   l_check_result number;
+  l_f092 zayavka.f092%type;
 
 begin
+--перед візуванням ділером заявки в ZAY.52 перевіряємо чи не превищомо
+--ліміт якщо дозволимо провести операцію.
 
-/**v. 4 **********  перевірка на ліміти **************/
- if gZAYMODE = 1 then
-     check_lim(p_id,'ZAY52'); --ділер остаточно візує заявку. Ставимо додаткову перевіркку на ліміт на день.
-  end if;
-/*-------------------------------------*/
   select branch into l_branch from v_zay where id = p_id and sos<2 and sos>-1;
 
   if gZAYMODE = 0 then
@@ -5636,6 +5634,13 @@ begin
      -- Определяем, чья заявка: ЦА или РУ
      begin
         select id into l_reqid from zayavka where id = p_id and branch = l_branch;
+        
+        select dk,f092 into l_dk,l_f092 from zayavka where id = p_id and branch = l_branch;        
+        /**v. 5 **********  перевірка на ліміти **************/
+        if (l_dk=1 and l_f092=F_ZAY_GET_BCONTL ) then
+            check_lim(p_id,'ZAY52'); --ділер остаточно візує заявку. Ставимо додаткову перевіркку на ліміт на день.
+        end if;
+        
         update zayavka
            set sos  = 1,
                datz = p_datz
@@ -5645,6 +5650,19 @@ begin
         begin
            -- zayavka_ru.id - ид.в ЦА (zayavka_ru.req_id-ид.в РУ)
            select req_id, mfo, viza into l_reqid, l_mfo, l_viza from zayavka_ru where id = p_id and branch = l_branch;
+           
+           select dk into l_dk from zayavka_ru where id = p_id and branch = l_branch;
+           
+           begin
+            select f092 into l_f092 from zay_val_control where zay_id= l_reqid;
+           /**v. 5 **********  перевірка на ліміти **************/
+            if (l_dk=1 and l_f092=F_ZAY_GET_BCONTL ) then
+             check_lim(p_id,'ZAY52'); --ділер остаточно візує заявку. Ставимо додаткову перевіркку на ліміт на день.
+            end if;
+           exception
+            when no_data_found then null; 
+           end; 
+           
            update zayavka_ru
               set sos  = 1,
                   datz = p_datz
@@ -5668,7 +5686,6 @@ begin
   end if;
 
 end visa_kurs;
-
 -------------------------------------------------------------------------------
 --
 -- Удаление заявки
