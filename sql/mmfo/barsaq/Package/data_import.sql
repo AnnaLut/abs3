@@ -229,8 +229,8 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure sync_account_stmt2(
     p_acc       in number default null,
     p_startdate in date default trunc(sysdate-1));
-
-
+    
+    
   ----
   -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
   -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -2063,6 +2063,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_turnovers2;
+  
    ----
   -- sync_acc_turnovers2_kf - синхронизиреут историю остатков и оборотов в АБС для передачи в систему
   --
@@ -2085,7 +2086,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_cnt       integer;
   begin
     -- точка отката
-   -- savepoint sp;
+    --savepoint sp;
     --
     --l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
     --
@@ -2223,7 +2224,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                        ||' починаючи з дати '||to_char(l_startdate,'DD.MM.YYYY'));
   exception when others then
     --
-    -- rollback to sp;
+   -- rollback to sp;
     --
     raise_application_error(-20000, get_error_msg());
     --
@@ -2683,7 +2684,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_transactions2;
-
+  
   ----
   -- sync_acc_transactions2_kf - синхронизиреут проводки в АБС для передачи в систему
   --
@@ -2710,7 +2711,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_ref92_bank_name acc_transactions.ref92_bank_name%type;
   begin
     -- точка отката
-  --    savepoint sp;
+    --savepoint sp;
     --
    -- l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
     --
@@ -4028,7 +4029,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_ACC_TRANSACTIONS, JOB_STATUS_FAILED, l_acc_msg, SQLCODE, get_error_msg());
     --
   end sync_account_stmt2;
-
+  
   ----
   -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
   -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -4926,9 +4927,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         l_nbsa := substr(l_doc.nls_a, 1, 4);
         l_nbsb := substr(l_doc.nls_b, 1, 4);
 
-        /*if (substr(l_doc.nls_b,1,4) in ('2605','2625','2655')) then
+        if (substr(l_doc.nls_b,1,4) in ('2605','2625','2655')) then
           raise_application_error(-20000, ' Номери карт. рах. 2625, 2605, 2655 змінено у зв''язку з вимогами Постанови НБУ № 89 від 11.09.2017!!!');
-        end if;*/
+        end if;
 
 
 
