@@ -16,7 +16,7 @@ PROMPT *** Create  view V_CIM_BOUND_VMD ***
           (select par_value from cim_params where par_name='EA_URL')||'document?clientcode='||(select okpo from cim_contracts c where c.contr_id=a.contr_id)||
            '&'||'typecode=30&'||'number='||cim_mgr.form_url_encode(a.num)||'&'||'date='||to_char(a.allow_dat, 'yyyy-mm-dd') as ea_url,
           a.deadline_doc,
-          gl.p_icurval(a.vt, round(a.s_vt*(1-a.s/a.s_vk),2)/*z_vt*/ * 100, nvl(a.date_max_bound_doc, a.allow_dat)) / 100 as zq_vt,
+          cim_mgr.val_convert(nvl(a.date_max_bound_doc, a.allow_dat), round(a.s_vt*(1-a.s/a.s_vk),2)/*z_vt*/ * 100, a.vt, 980) / 100 as zq_vt,
           a.is_doc, a.date_max_bound_doc
    from (select b.bound_id, b.contr_id, b.vmd_id, b.direct, v.cnum_cst||'/'||v.cnum_year||'/'||to_char(v.cnum_num,'fm000000') as num, v.cim_date as doc_date,
                 trunc(v.allow_dat) as allow_dat, v.kv as vt, round(b.s_vt/100,2) as s_vt, b.rate_vk, round(b.s_vk/100,2) as s_vk, v.dat as file_date,
@@ -47,7 +47,7 @@ PROMPT *** Create  view V_CIM_BOUND_VMD ***
            '&'||'typecode='||case when a.act_type=5 then 32 when a.act_type in (1,6,7) then 31 else 30 end||'&'||'number='||cim_mgr.form_url_encode(a.num)||'&'||'date='||
            to_char(a.allow_date, 'yyyy-mm-dd') as ea_url,
           a.deadline_doc,
-          gl.p_icurval(a.kv, round(a.s_vt*(1-a.s/a.s_vk),2)/*z_vt*/ * 100, nvl(a.date_max_bound_doc, a.allow_date)) / 100 as zq_vt,
+          cim_mgr.val_convert(nvl(a.date_max_bound_doc, a.allow_date), round(a.s_vt*(1-a.s/a.s_vk),2)/*z_vt*/ * 100, a.kv, 980) / 100 as zq_vt,
           a.is_doc, a.date_max_bound_doc
    from (select b.contr_id, b.bound_id, b.act_id, b.direct, a.act_type, a.file_name, a.file_date,
                 (select max(name) from cim_act_types where type_id=a.act_type) as type_name,
