@@ -66,7 +66,7 @@ namespace BarsWeb.Areas.EDeclarations.Controllers
             FrxDocHelper helper = new FrxDocHelper(new FastReportModel
             {
                 ResponseFileType = FrxExportTypes.Pdf,
-                FileName = "EDECL_FR.frx",
+                FileName = "EDECL_FR_OSHAD.frx",
                 Parameters = new FrxParameters
                 {
                     new FrxParameter("p_decl_id", TypeCode.Int32, id)
