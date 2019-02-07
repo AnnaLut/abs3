@@ -32,6 +32,15 @@ CREATE OR REPLACE PACKAGE "BARSTRANS"."TRANSPORT_UTL" is
                                  p_state          out number,
                                  p_msg            out varchar2)return varchar2;
 
+  function create_transport_unit_sub(p_unit_type_code in varchar2,
+                                     p_ext_id         in varchar2,
+                                     p_receiver_url   in varchar2,
+                                     p_request_data   in clob,
+                                     p_hash           in varchar2,
+                                     p_state          out number,
+                                     p_msg            out varchar2)
+    return varchar2;
+
   procedure set_transport_state(p_id               in varchar2,
                                 p_state_id         in integer,
                                 p_tracking_comment in varchar2,
@@ -343,6 +352,133 @@ CREATE OR REPLACE PACKAGE BODY "BARSTRANS"."TRANSPORT_UTL" is
   exception
     when others then
       p_state := 1;
+      p_msg   := 'Системна помилка: ' ||
+                 substr(dbms_utility.format_error_stack() || chr(10) ||
+                        dbms_utility.format_error_backtrace(),
+                        1,
+                        4000);
+      return null;
+  end;
+
+  function create_transport_unit_sub(p_unit_type_code in varchar2,
+                                     p_ext_id         in varchar2,
+                                     p_receiver_url   in varchar2,
+                                     p_request_data   in clob,
+                                     p_hash           in varchar2,
+                                     p_state          out number,
+                                     p_msg            out varchar2)
+    return varchar2 is
+    l_warning                 integer;
+    l_dest_offset             integer := 1;
+    l_src_offset              integer := 1;
+    l_blob_csid               number := dbms_lob.default_csid;
+    l_lang_context            number := dbms_lob.default_lang_ctx;
+    l_unit_type_id            number;
+    l_transport_unit_type_row transport_unit_type%rowtype;
+    l_transport_unit_row      transport_unit%rowtype;
+  begin
+    p_state := 0;
+    p_msg := 'OK';
+    l_unit_type_id            := get_unit_type_id(p_unit_type_code);
+  	l_transport_unit_type_row := read_unit_type(l_unit_type_id);
+    l_transport_unit_row      := is_file_existed(l_unit_type_id, p_ext_id);
+    if l_transport_unit_row.id is not null then
+      p_state := 2;
+      p_msg   := 'З ідентифікатором '|| p_ext_id|| ' вже зареєстровано запит на обробку платежів (RequestId = '||l_transport_unit_row.id||')';
+      return l_transport_unit_row.id;      
+    end if;
+    if l_transport_unit_row.state_id =
+       transport_utl.trans_state_broken_file or
+       l_transport_unit_row.state_id is null then
+      if l_transport_unit_row.id is null then
+        l_transport_unit_row.id := sys_guid;
+      end if;
+
+      l_transport_unit_row.unit_type_id     := l_unit_type_id;
+      l_transport_unit_row.external_file_id := p_ext_id;
+      l_transport_unit_row.receiver_url     := p_receiver_url;
+      l_transport_unit_row.kf := sys_context('bars_context','user_mfo');
+
+      -- перевірка цілісності файлу(MD5)
+      if (l_transport_unit_type_row.checksum = 1 and
+         file_utl.check_hash(p_request_data, p_hash)) or
+         l_transport_unit_type_row.checksum = 2 then
+
+        if l_transport_unit_type_row.base64 = 1 then
+          l_transport_unit_row.request_data := file_utl.decode_base64(p_clob_in => p_request_data);
+        else
+          dbms_lob.createtemporary(lob_loc => l_transport_unit_row.request_data,
+                                   cache   => true,
+                                   dur     => dbms_lob.call);
+          dbms_lob.converttoblob(dest_lob     => l_transport_unit_row.request_data,
+                                 src_clob     => p_request_data,
+                                 amount       => dbms_lob.lobmaxsize,
+                                 dest_offset  => l_dest_offset,
+                                 src_offset   => l_src_offset,
+                                 blob_csid    => l_blob_csid,
+                                 lang_context => l_lang_context,
+                                 warning      => l_warning);
+        end if;
+
+        if l_transport_unit_type_row.compressed = 2 then
+          l_transport_unit_row.request_data := utl_compress.lz_compress(l_transport_unit_row.request_data);
+        end if;
+        l_transport_unit_row.state_id       := transport_utl.trans_state_new;
+        l_transport_unit_row.failures_count := 0;
+      else
+        p_state                             := 1;
+        p_msg                               := 'Не співпадає контрольна сума файлу: ' ||
+                                               p_ext_id;
+        l_transport_unit_row.state_id       := transport_utl.trans_state_broken_file;
+        l_transport_unit_row.failures_count := nvl(l_transport_unit_row.failures_count,
+                                                   0) + 1;
+        dbms_lob.createtemporary(lob_loc => l_transport_unit_row.request_data,
+                                 cache   => true,
+                                 dur     => dbms_lob.call);
+        dbms_lob.converttoblob(dest_lob     => l_transport_unit_row.request_data,
+                               src_clob     => p_request_data,
+                               amount       => dbms_lob.lobmaxsize,
+                               dest_offset  => l_dest_offset,
+                               src_offset   => l_src_offset,
+                               blob_csid    => l_blob_csid,
+                               lang_context => l_lang_context,
+                               warning      => l_warning);
+      end if;
+
+      merge into transport_unit t
+      using (select l_transport_unit_row.id id,
+                    l_transport_unit_row.unit_type_id unit_type_id,
+                    l_transport_unit_row.external_file_id external_file_id,
+                    l_transport_unit_row.receiver_url receiver_url,
+                    l_transport_unit_row.request_data request_data,
+                    l_transport_unit_row.state_id state_id,
+                    l_transport_unit_row.failures_count failures_count
+               from dual) o
+      on (t.id = o.id)
+      when not matched then
+        insert
+          (t.id, t.unit_type_id, t.external_file_id, t.receiver_url,
+           t.request_data, t.response_data, t.state_id, t.failures_count)
+        values
+          (o.id, o.unit_type_id, o.external_file_id, o.receiver_url,
+           o.request_data, null, o.state_id, o.failures_count)
+      when matched then
+        update
+           set t.state_id       = o.state_id,
+               t.failures_count = o.failures_count;
+
+      track_transport(l_transport_unit_row.id,
+                      l_transport_unit_row.state_id,
+                      null,
+                      case l_transport_unit_row.state_id when
+                      transport_utl.trans_state_broken_file then
+                      'Original data:#' || utl_tcp.crlf || p_request_data ||
+                      utl_tcp.crlf || '#Hash:#' || utl_tcp.crlf || p_hash else null end);
+    end if;
+    return l_transport_unit_row.id;
+  exception
+    when others then
+      p_state := 10;
       p_msg   := 'Системна помилка: ' ||
                  substr(dbms_utility.format_error_stack() || chr(10) ||
                         dbms_utility.format_error_backtrace(),
