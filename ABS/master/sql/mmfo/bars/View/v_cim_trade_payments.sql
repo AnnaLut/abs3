@@ -42,7 +42,7 @@ PROMPT *** Create  view V_CIM_TRADE_PAYMENTS ***
           (select max(service_code) from cim_ape_link where fantom_id = b.bound_id)
          end as servce_code,
          b.create_date, b.modify_date, b.borg_reason, b.ea_url, b.deadline_doc,
-         gl.p_icurval(v_pl, decode(b.s_vk, 0, 0, round((b.s_vpl+ decode(b.direct, 0, b.sk_vpl, -b.sk_vpl))*(b.s_vk-b.s_pd)/b.s_vk,2))/*zs_vp*/ * 100, nvl(b.date_max_bound_doc,b.vdat)) / 100 as zsq_vp,
+         cim_mgr.val_convert(nvl(b.date_max_bound_doc,b.vdat), decode(b.s_vk, 0, 0, round((b.s_vpl+ decode(b.direct, 0, b.sk_vpl, -b.sk_vpl))*(b.s_vk-b.s_pd)/b.s_vk,2))/*zs_vp*/ * 100, v_pl, 980) / 100 as zq_vt,
          b.date_max_bound_doc
     FROM (SELECT b.bound_id, b.contr_id, b.pay_flag, b.pay_flag_name, b.ref, b.direct, b.type_id, b.type, b.vdat, b.account,
                  b.nazn, b.v_pl, b.s_vpl, b.sk_vpl, b.rate, b.s_vk, cim_mgr.get_control_date(0, b.type_id, b.bound_id) as control_date,
