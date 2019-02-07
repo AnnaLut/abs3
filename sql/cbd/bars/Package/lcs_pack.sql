@@ -908,14 +908,20 @@ function get_branch_name (p_id in number) return varchar2 is
     r_trans  lcs_transactions%rowtype;
     --get active limits for current passport and series
 
-    cursor c_limits is select distinct  t.id
+    /*cursor c_limits is select distinct  t.id
                         from
                         (
                             SELECT  l.id, l.name,l.status_id, l.active_flag, trim(REGEXP_SUBSTR (replace(l.filter_clause,'''','') ,'[^,]+',1,LEVEL)) as token
                             FROM   lcs_limits l
                             CONNECT BY trim(REGEXP_SUBSTR (replace(l.filter_clause,'''',''),'[^,]+',1,LEVEL)) IS NOT NULL
                         )t
-                        where t.active_flag = 1 and t.status_id not like 'UNLIMITED' and t.id in (1,2,3,8,9,10);
+                        where t.active_flag = 1 and t.status_id not like 'UNLIMITED' and t.id in (1,2,3,8,9,10);*/
+
+     CURSOR c_limits IS SELECT DISTINCT T.ID
+                              FROM      LCS_LIMITS  T
+                               WHERE     T.ACTIVE_FLAG = 1
+                                AND T.STATUS_ID NOT LIKE 'UNLIMITED'
+                                AND T.ID IN (1, 2, 3, 8, 9, 10);
    cursor c_transactions  is select l.* from lcs_transactions l
         where l.doc_series = l_serial_doc
                 and l.doc_number = l_numb_doc and l.exception_flag = 0 and l.trans_crt_date>=  to_date(to_char(trunc(sysdate, 'MM'), 'dd.mm.yyyy'),'dd.mm.yyyy');
@@ -1062,7 +1068,8 @@ bars_audit.info ('LCS.SET_RETURN3_1. p_source_type:'||p_source_type||' p_mfo: '|
            when others
              then l_res := 'Виникла помилка. Статус RETURN не встановлено!'||sqlerrm;
        end;
-    else
+    else
+
 
 
       l_res := 'Знайдено більше однієї транзакції';
