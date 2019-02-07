@@ -2588,7 +2588,6 @@ end mbm_payments;
  
 PROMPT *** Create  grants  MBM_PAYMENTS ***
 grant EXECUTE                                                                on MBM_PAYMENTS    to BARS_ACCESS_DEFROLE;
-
  
  
  PROMPT ===================================================================================== 
