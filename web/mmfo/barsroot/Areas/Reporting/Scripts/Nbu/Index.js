@@ -62,8 +62,8 @@
                 code: id,
                 date: reportDate
             };*/
-
-            $http.put($scope.apiUrl + '?reportDate=' + reportDate + '&fileCodeBase64=' + fileCodeBase64 + '&schemeCode=' + schemeCode + '&fileType=' + fileType + '&kf=' + kf)
+            var encodedURI = '?reportDate=' + encodeURIComponent(reportDate) + '&fileCodeBase64=' +  encodeURIComponent(fileCodeBase64) + '&schemeCode=' + encodeURIComponent(schemeCode) + '&fileType=' + encodeURIComponent(fileType) + '&kf=' + encodeURIComponent(kf);
+            $http.put($scope.apiUrl + encodedURI)
                 .success(function (request) {
                     bars.ui.notify('Повідомлення',request.reponseMessage, 'success');
                 });
