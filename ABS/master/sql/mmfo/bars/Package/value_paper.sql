@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.30 09.01.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.31 30.01.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -51,7 +51,8 @@ IS
       NO_P       NUMBER,
       ACTIVE     NUMBER,
       OSTRD      NUMBER,
-      OSTS2      NUMBER
+      OSTS2      NUMBER,
+      OSTSDM     NUMBER
    );
 
    TYPE t_cp_v_set IS TABLE OF r_cp_v;
@@ -589,7 +590,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.49 10.01.2019';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.50 30.01.2019';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -646,7 +647,7 @@ IS
       if (p_active = 0) then l_active := '-1'; end if;
       if (p_active = 1) then l_active := '0,1';end if;
       v_stmt_str :=
-            'select DATD, nvl(ND,''-'') ND, SUMB, REF, ID, CP_ID, KV, VIDD, PFNAME, RYN, MDATE as DATP, nvl(NO_PR,0.00) NO_PR, BAL_VAR, KIL, CENA, nvl(ZAL,0) ZAL, OSTA, OSTAB, OSTAF, OSTD, OST_2VD, OSTP, OST_2VP, OSTR, OSTR2, OSTR3, OSTUNREC, OSTEXPN, OSTEXPR, OSTS, ERAT, NO_P, ACTIVE, OSTRD, OSTS2 from CP_V_NEW where '
+            'select DATD, nvl(ND,''-'') ND, SUMB, REF, ID, CP_ID, KV, VIDD, PFNAME, RYN, MDATE as DATP, nvl(NO_PR,0.00) NO_PR, BAL_VAR, KIL, CENA, nvl(ZAL,0) ZAL, OSTA, OSTAB, OSTAF, OSTD, OST_2VD, OSTP, OST_2VP, OSTR, OSTR2, OSTR3, OSTUNREC, OSTEXPN, OSTEXPR, OSTS, ERAT, NO_P, ACTIVE, OSTRD, OSTS2, OSTSDM from CP_V_NEW where '
          || '(' || l_filtr_id ||') '
          || ' and active in ('
          || l_active || ')';
@@ -664,8 +665,8 @@ IS
       CLOSE v_cpv_cursor;
    END;
 
-   function get_param(p_par_name cim_params.par_name%type) return cim_params.par_value%type is
-     l_val cim_params.par_value%type;
+   function get_param(p_par_name cp_params.par_name%type) return cp_params.par_value%type is
+     l_val cp_params.par_value%type;
    begin
      begin 
        select par_value
@@ -1340,6 +1341,16 @@ BEGIN
        if (p_rb_K_P = 0)
        then
         BEGIN
+         --перевірка на обовязкові параметри
+         if p_ifrs is null then
+           p_sErr:= 'Не заповнено IFRS ';  return;
+         end if;  
+         if p_bus_mod is null then
+           p_sErr:= 'Не заповнено BUS_MOD ';  return;
+         end if;  
+         if p_sppi is null then
+           p_sErr:= 'Не заповнено SPPI ';  return;
+         end if;                    
          l_description := Upper('Купівлі');
          o_rec.nazn := 'Купівля '|| o_rec.nazn;
            CP.CP_KUP (p_CP_AI,
@@ -1557,6 +1568,22 @@ BEGIN
             end if;
           p_sREF := p_REF_MAIN ||',' ||o_recdcp.ref;
          end if;
+         --обов. параметри в спец таблицю cp_refw
+         
+         cp.cp_set_tag(p_ref   => p_REF_MAIN,
+                       p_tag   => 'IFRS',
+                       p_value => p_ifrs,
+                       p_type  => 3);
+         cp.cp_set_tag(p_ref   => p_REF_MAIN,
+                       p_tag   => 'BUS_MOD',
+                       p_value => p_bus_mod,
+                       p_type  => 3);
+         cp.cp_set_tag(p_ref   => p_REF_MAIN,
+                       p_tag   => 'SPPI',
+                       p_value => case when p_sppi = 0 then 'Ні' else 'Так' end,
+                       p_type  => 3);
+                       
+                       
 
        else -- П р о д а ж а
 
@@ -2272,7 +2299,7 @@ END;
             'select DATD, ND, SUMB, REF, ID, CP_ID, KV, VIDD, PFNAME, RYN, DATP, NO_PR, BAL_VAR, KIL, CENA, ZAL, OSTA, OSTAB, OSTAF, OSTD, OST_2VD, OSTP, OST_2VP, OSTR, OSTR2, OSTR3, OSTUNREC, OSTEXPN, OSTEXPR, OSTS, ERAT, NO_P, ACTIVE from CP_V_NEW where '
          || p_filtr_id;
 
-      BARS_AUDIT.INFO(v_stmt_str);
+      BARS_AUDIT.INFO('value_paper.make_amort: p_date='||to_char(p_date,'DD.MM.YYYY')||' '||v_stmt_str);
 
       OPEN v_cpamor_cursor FOR v_stmt_str;
 
