@@ -21,7 +21,7 @@
 										border="0">
 										<TR>
 											<TD runat="server" meta:resourcekey="tdEntName" style="PADDING-RIGHT: 3px; PADDING-LEFT: 3px" noWrap>Наименование по уставу</TD>
-											<TD><INPUT class="tab_main_rekv_ed2_style" id="ed_NMKU" tabIndex="1" type="text" maxLength="70"
+											<TD><INPUT class="tab_main_rekv_ed2_style" id="ed_NMKU" tabIndex="1" type="text" maxLength="135" <%--COBUMMFO-10090--%>
 													onchange="ToDoOnChange();" /></TD>
 										</TR>
 										<TR>
@@ -46,7 +46,7 @@
 										</TR>
 										<TR>
 											<TD style="PADDING-RIGHT: 3px; PADDING-LEFT: 3px" noWrap>E-mail</TD>
-											<TD><INPUT class="tab_main_rekv_ed_style" id="ed_E_MAIL" tabIndex="6" type="text" onchange="ToDoOnChange();"></TD>
+											<TD><INPUT class="tab_main_rekv_ed_style" id="ed_E_MAIL" tabIndex="6" type="text" maxLength="100" onchange="ToDoOnChange();"></TD>
 										</TR>
 										<TR>
 											<TD runat="server" meta:resourcekey="tdFax" style="PADDING-RIGHT: 3px; PADDING-LEFT: 3px" noWrap>Факс</TD>

@@ -208,6 +208,8 @@ namespace clientregister
                     break;
                 case "bank": client_rekv_link += "bank.asPX";
                     break;
+                default: client_rekv_link += "person.asPX";
+                    break;
             }
 
             string[] tabs = new string[9];
