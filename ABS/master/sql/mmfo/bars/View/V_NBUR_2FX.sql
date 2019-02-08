@@ -7,11 +7,13 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_NBUR_2FX ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_2FX ("REPORT_DATE", "KF", "VERSION_ID", "FIELD_CODE", "EKP", "D110", "K014", "K019", "K030", "K040", "K044", "KU", "R030", "T070_1", "T070_2", "T100") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_2FX ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "EKP", "D110", "K014", "K019", "K030", "K040", "K044", "KU", "R030", "T070_1", "T070_2", "T100") AS 
   select   p.REPORT_DATE
        , p.KF
        , p.VERSION_ID
-       , null  as field_code
+       , p.KF  as NBUC
+       , p.EKP||'|'||p.D110||'|'||p.K014||'|'||p.K019||'|'||
+         p.K030||'|'||p.K040||'|'||p.K044||'|'||p.KU||'|'||p.R030 as field_code
        , p.EKP
        , p.D110
        , p.K014
@@ -47,7 +49,6 @@ from   (select   v.REPORT_DATE
                 and f.FILE_FMT  = 'XML'
                 and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' )
        ) p
- order by 2
 ;
 
 
