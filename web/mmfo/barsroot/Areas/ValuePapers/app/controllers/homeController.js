@@ -102,6 +102,7 @@ function homeController($scope, paramsService, $window, LS) {
                     OSTUNREC: { type: "number" },
                     OSTS: { type: "number" },
                     OSTS2: { type: "number" },
+                    OSTSDM: { type: "number" },
                     ERAT: { type: "number" },
                     NO_P: { type: "number" }
                 }
@@ -164,6 +165,7 @@ function homeController($scope, paramsService, $window, LS) {
             { field: "OST_2VD", title: "Сума<br>дисконту<br>2VD", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OST_2VD,'n2')#</div>" },
             { field: "OSTP", title: "Сума<br>премії<br>Р", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTP,'n2')#</div>" },
             { field: "OST_2VP", title: "Сума<br>премії<br>2VР", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OST_2VP,'n2')#</div>" },
+            { field: "OSTSDM", title: "Сума <br>дисконту/премії <br>модифікації", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTSDM,'n2')#</div>" },
             { field: "OSTR", title: "Сума<br>нарах.%<br>R", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTR,'n2')#</div>" },
             { field: "OSTRD", title: "Сума<br>нарах.%<br>дивідентів", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTRD,'n2')#</div>" },
             { field: "OSTR2", title: "Сума<br>куплених.%<br>R2", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTR2,'n2')#</div>" },

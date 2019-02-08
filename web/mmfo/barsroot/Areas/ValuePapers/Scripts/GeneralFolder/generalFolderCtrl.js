@@ -148,6 +148,7 @@ angular.module("BarsWeb.Controllers")
                             OSTEXPR: { type: "number" },
                             OSTUNREC: { type: "number" },
                             OSTS: { type: "number" },
+                            OSTSDM: { type: "number" },
                             ERAT: { type: "number" },
                             NO_P: { type: "number" }
                         }
@@ -184,6 +185,7 @@ angular.module("BarsWeb.Controllers")
                 { field: "OST_2VD", title: "Сума<br>дисконту<br>2VD", width: 90 },
                 { field: "OSTP", title: "Сума<br>премії<br>Р", width: 80 },
                 { field: "OST_2VP", title: "Сума<br>премії<br>2VР", width: 80 },
+                { field: "OSTSDM", title: "Сума дисконту<br>премії<br>модифікації", width: 100 },
                 { field: "OSTR", title: "Сума<br>нарах.%<br>R", width: 90 },
                 { field: "OSTR2", title: "Сума<br>куплених.%<br>R2", width: 90 },
                 { field: "OSTR3", title: "Сума<br>куплених.%<br>R3", width: 90 },
