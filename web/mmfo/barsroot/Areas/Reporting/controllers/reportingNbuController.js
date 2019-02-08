@@ -1481,7 +1481,7 @@ angular.module(globalSettings.modulesAreas)
                     '&isDtl=' + isDtl;
 
                 if ($scope.isRowDetailed !== false) {
-                    url_prefix += '&fieldCode=' + $scope.selectRowForDetailedReport['FIELD_CODE'];
+                    url_prefix += '&fieldCode=' + encodeURIComponent($scope.selectRowForDetailedReport['FIELD_CODE']);
                     url_prefix += '&nbuc=' + $scope.selectRowForDetailedReport['NBUC'];
                 }
                 return url_prefix;
