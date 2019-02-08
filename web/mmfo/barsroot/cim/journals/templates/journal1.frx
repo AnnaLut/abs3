@@ -1,33 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="11/20/2012 15:46:20" ReportInfo.Modified="02/06/2019 12:42:02" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/20/2012 15:46:20" ReportInfo.Modified="01/22/2019 15:39:22" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="barsdev" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5dkgTIzpx5iIqSm9faUQu2CPhiZBPjJyyMRTFtBdyiM+tyyxIn6cYhN1TP9EffjIKLNT2NbgG6smhDLIJrjjvuc=">
-      <TableDataSource Name="Table" Alias="p" DataType="System.Int32" Enabled="true" ForceLoadData="true" SelectCommand="select &#13;&#10;         branch, &#13;&#10;         branch_name, &#13;&#10;         decode(str_level, -1, num_txt||', '|| TO_CHAR (create_date,         'dd.mm.yy'), &#13;&#10;         TO_CHAR (link_date, 'dd.mm.yy')) as num_txt,&#13;&#10;        nvl2(okpo, okpo||', '||nmk||', Україна','') as nmk,&#13;&#10;         benef_name||', '||country_name as benef_name, &#13;&#10;         TO_CHAR (val_date, 'dd.mm.yy') AS val_date,&#13;&#10;         kv_p,&#13;&#10;         s_p_dig,&#13;&#10;         contr_date,&#13;&#10;         nvl(contr_num, ' ') as contr_num,&#13;&#10;         conclusion,&#13;&#10;         comments,&#13;&#10;         TO_CHAR (allow_date, 'dd.mm.yy') AS allow_date,&#13;&#10;         kv_v,&#13;&#10;         s_v_dig,&#13;&#10;         vmd_num,&#13;&#10;         file_date,&#13;&#10;         file_name,&#13;&#10;         control_date,&#13;&#10;         str_level, zq_vt&#13;&#10;, :pbranch, :pdat&#13;&#10;  from v_cim_journal t &#13;&#10;where to_date(:pdat, 'dd/mm/yyyy') in (t.create_date, t.modify_date)&#13;&#10;    and t.journal_num = 1&#13;&#10;    and branch = :pbranch&#13;&#10;">
-        <Column Name="BRANCH" DataType="System.String"/>
-        <Column Name="BRANCH_NAME" DataType="System.String"/>
-        <Column Name="NUM_TXT" DataType="System.String"/>
+    <OracleDataConnection Name="barsdev" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5dkgTIzpx5iIqSm9faUQu2CPhiZBPjJyyMRTFtBdyiM+tyyxIn6cYhN1TP9EffjIKE19/IIHJ+IM+qOj4zhDOBg=">
+      <TableDataSource Name="Table" Alias="p" DataType="System.Int32" Enabled="true" ForceLoadData="true" SelectCommand="SELECT branch, branch_name, decode(str_level, -1, num_txt||', '|| TO_CHAR (create_date,         'dd.mm.yy'), TO_CHAR (link_date, 'dd.mm.yy')) as num_txt,&#13;&#10;        nvl2(okpo, okpo||', '||nmk||', Україна','') as nmk,&#13;&#10;         benef_name||', '||country_name as benef_name, &#13;&#10;         TO_CHAR (val_date, 'dd.mm.yy') AS val_date,&#13;&#10;         kv_p,&#13;&#10;         s_p_dig,&#13;&#10;         contr_date,&#13;&#10;         nvl(contr_num, ' ') as contr_num,&#13;&#10;         conclusion,&#13;&#10;         comments,&#13;&#10;         TO_CHAR (allow_date, 'dd.mm.yy') AS allow_date,&#13;&#10;         kv_v,&#13;&#10;         s_v_dig,&#13;&#10;         vmd_num,&#13;&#10;         file_date,&#13;&#10;         file_name,&#13;&#10;         control_date,&#13;&#10;         str_level, zq_vt&#13;&#10;    FROM v_cim_journal&#13;&#10;   WHERE branch like :pbranch and journal_num = 1  AND  TO_DATE (:pdat1, 'DD/MM/YYYY') in (modify_date, create_date)">
         <Column Name="NMK" DataType="System.String"/>
-        <Column Name="BENEF_NAME" DataType="System.String"/>
         <Column Name="VAL_DATE" DataType="System.String"/>
-        <Column Name="KV_P" DataType="System.String"/>
-        <Column Name="S_P_DIG" DataType="System.Decimal"/>
         <Column Name="CONTR_DATE" DataType="System.String"/>
-        <Column Name="CONTR_NUM" DataType="System.String"/>
-        <Column Name="CONCLUSION" DataType="System.String"/>
+        <Column Name="CONTR_NUM" DataType="System.Char"/>
         <Column Name="COMMENTS" DataType="System.String"/>
+        <Column Name="BENEF_NAME" DataType="System.String"/>
         <Column Name="ALLOW_DATE" DataType="System.String"/>
+        <Column Name="KV_P" DataType="System.String"/>
         <Column Name="KV_V" DataType="System.String"/>
-        <Column Name="S_V_DIG" DataType="System.Decimal"/>
         <Column Name="VMD_NUM" DataType="System.String"/>
         <Column Name="FILE_DATE" DataType="System.String"/>
         <Column Name="FILE_NAME" DataType="System.String"/>
+        <Column Name="NUM_TXT" DataType="System.String"/>
+        <Column Name="CONCLUSION" DataType="System.String"/>
         <Column Name="CONTROL_DATE" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="S_P_DIG" DataType="System.Decimal"/>
+        <Column Name="S_V_DIG" DataType="System.Decimal"/>
         <Column Name="STR_LEVEL" DataType="System.Decimal"/>
         <Column Name="ZQ_VT" DataType="System.Decimal"/>
-        <Column Name=":PBRANCH" DataType="System.String"/>
-        <Column Name=":PDAT" DataType="System.String"/>
-        <CommandParameter Name=":pbranch" DataType="126" Expression="[p_branch]" DefaultValue="/300465/"/>
-        <CommandParameter Name=":pdat" DataType="126" Expression="[p_dat]" DefaultValue="08/01/2019"/>
+        <CommandParameter Name="pbranch" DataType="126" Expression="[p_branch]"/>
+        <CommandParameter Name="pdat1" DataType="126" Expression="[p_dat]"/>
       </TableDataSource>
     </OracleDataConnection>
     <Relation Name="Table_Table1" ParentDataSource="Table" ChildDataSource="null" ParentColumns="BOUND_ID&#13;&#10;PTYPE_ID" ChildColumns="BOUND_ID&#13;&#10;PAYMENT_TYPE" Enabled="true"/>
@@ -60,93 +58,96 @@
       <TextObject Name="Text81" Left="907.2" Width="75.6" Height="113.4" Border.Lines="All" Text="Інформація про надані за цим договором резидента висновки" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
       <TextObject Name="Text83" Left="548.1" Width="75.6" Height="113.4" Border.Lines="All" Text="Грн.екв.останьої події незавершеного розрахунку" Padding="1, 0, 1, 0" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="157.6" Width="1077.3" Height="28.35" CanGrow="true" CanShrink="true" DataSource="Table">
-      <TextObject Name="Text3" Width="56.7" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.NUM_TXT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text4" Left="56.7" Width="132.3" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="&#13;&#10;[p.NMK]&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text5" Left="189" Width="113.4" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="&#13;&#10;[p.BENEF_NAME]&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text9" Left="803.25" Width="56.7" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONTR_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text10" Left="859.95" Width="47.25" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="&#13;&#10;[p.CONTR_NUM]&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text30" Left="472.5" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.VMD_NUM] [p.FILE_NAME] [p.FILE_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text31" Left="302.4" Width="56.7" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.ALLOW_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text32" Left="396.9" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.S_V_DIG]" HideZeros="true" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text34" Left="982.8" Width="94.5" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.COMMENTS]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text35" Left="359.1" Width="37.8" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.KV_V]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text68" Left="623.7" Width="66.15" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONTROL_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text56" Left="689.85" Width="37.8" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.VAL_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text58" Left="756" Width="47.25" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.S_P_DIG]" HideZeros="true" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text57" Left="727.65" Width="28.35" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.KV_P]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text12" Left="907.2" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONCLUSION]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-      <TextObject Name="Text84" Left="548.1" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.ZQ_VT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
-        <Highlight>
-          <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
-        </Highlight>
-      </TextObject>
-    </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="189.15" Width="1077.3" Height="66.15" KeepWithData="true">
+    <GroupHeaderBand Name="GroupHeader1" Top="157.6" Width="1077.3" Height="18.9" Guides="0" KeepWithData="true" Condition="[p.BRANCH]" SortOrder="None">
+      <TextObject Name="Text82" Width="1077.3" Height="18.9" Border.Lines="Left, Right" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="[p.BRANCH] - [p.BRANCH_NAME]" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+      <DataBand Name="Data1" Top="179.7" Width="1077.3" Height="28.35" CanGrow="true" Guides="9.45,0" DataSource="Table" KeepTogether="true" KeepDetail="true">
+        <TextObject Name="Text3" Width="56.7" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.NUM_TXT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text4" Left="56.7" Width="132.3" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="&#13;&#10;[p.NMK]&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text5" Left="189" Width="113.4" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="&#13;&#10;[p.BENEF_NAME]&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text9" Left="804.25" Width="56.7" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONTR_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text10" Left="860.95" Width="47.25" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="&#13;&#10;[p.CONTR_NUM]&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text30" Left="472.5" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.VMD_NUM] [p.FILE_NAME] [p.FILE_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text31" Left="302.4" Width="56.7" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.ALLOW_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text32" Left="396.9" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.S_V_DIG]" HideZeros="true" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text34" Left="983.8" Width="94.5" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.COMMENTS]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text35" Left="359.1" Width="37.8" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.KV_V]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text68" Left="624.7" Width="66.15" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONTROL_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text56" Left="690.85" Width="37.8" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.VAL_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text58" Left="757" Width="47.25" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.S_P_DIG]" HideZeros="true" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text57" Left="728.65" Width="28.35" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.KV_P]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text12" Left="908.2" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.CONCLUSION]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+        <TextObject Name="Text84" Left="548.1" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[p.ZQ_VT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt">
+          <Highlight>
+            <Condition Expression="[p.STR_LEVEL]== -1" Font="Times New Roman, 8.25pt, style=Bold" ApplyTextFill="false" ApplyFont="true"/>
+          </Highlight>
+        </TextObject>
+      </DataBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="211.25" Width="1077.3" Height="66.15" KeepWithData="true">
       <TextObject Name="Text7" Left="56.7" Top="28.35" Width="1020.6" Height="18.9" Text="                               Керівник " VertAlign="Center" Font="Times New Roman, 10pt"/>
       <TextObject Name="Text8" Left="708.75" Top="47.25" Width="75.6" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter1" Top="258.5" Width="1077.3" Height="18.9">
+    <PageFooterBand Name="PageFooter1" Top="280.6" Width="1077.3" Height="18.9" Guides="9.45">
       <TextObject Name="Text11" Width="1077.3" Height="18.9" Text="[Page]" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt"/>
     </PageFooterBand>
   </ReportPage>
