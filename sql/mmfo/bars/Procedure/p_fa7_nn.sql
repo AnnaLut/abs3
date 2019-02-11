@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.027  16/01/2019 (11/01/2019)
+% VERSION     :  v.19.003  11/02/2019 (31.01.2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -34,22 +34,22 @@ IS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  16/01/2019 для дочерних счетов по ЦБ будет формироваться код остатка 
             родительского счета и значение показателя с противоположным 
-            знаком если типы остаков не совпадают
- 10/01/2019 для бал.рах. 1415, 3015, 3115 будуть включатися доч_рн_ особов_
+            знаком если типы остатков не совпадают
+ 10/01/2019 для бал.рах. 1415, 3015, 3115 будуть включатися дочiрнi особовi
             рахунки зам_сть консол_дованих 
  09/01/2019 з 10/01/2019 для код_в S240 in ('6','7','8','A','B') не буде 
             виконуватися зам_на на значення "J" 
             з 10/01/2019 введено нов_ значення S240 ("O","N","P") 
-            бал.рах. 2396 буде оброблятися аналог_чно як _ 2046                   
+            бал.рах. 2396 буде оброблятися аналогiчно як i 2046                   
             (в VIEW V_TMP_REZ_RISK_C5 для цього бал.рах. буде заповнено
              поле ZPR)                                                 
- 24.10.2018 розраховуємо суму обтяження для ЦП в екв_валент_
+ 24.10.2018 розраховуємо суму обтяження для ЦП в еквiвалентi
  23.10.2018 доработки для Инстолменту
  09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок
             активу 3541
  20.09.2018 для счетов резерва параметр S181 изменяем на "1" если значение
             равно нулю
- 21.08.2018 добавлен? бал.счета 2206, 2236 для в?равнивания с балансом
+ 21.08.2018 добавлены бал.счета 2206, 2236 для выравнивания с балансом
  22.03.2018 для 3648 устанавливается R011 =0 по умолчанию
  02.03.2018 для pmode_=2 переменная  Datn_ определяется как и для pmode_=0
             (включались балансовые счета у которых D_CLOSE='31/12/2017')
@@ -287,6 +287,7 @@ IS
    apl_dat#_        DATE;
 
    sum_zal          number:=0;
+   sum_dk           number:=0;
 
 ----------------------------------------------------------------------------
    TYPE ref_type_curs IS REF CURSOR;
@@ -985,7 +986,7 @@ BEGIN
                        from (
                        SELECT a.acc, a.nls, a.kv, a.fdat, a.nbs, a.tip, p.s240, p.s180, p.s181,
                              p.r011, nvl(trim(p.r013), ''0'') r013, l.r031, a.mdate, a.ost, a.ostq, a.rnk, a.isp,
-                             DECODE(f_ourmfo, 380764, 2-MOD(c.codcagent,2), NVL (DECODE (c.country, 804, ''1'', ''2''), ''1'')) k041,
+                             NVL (DECODE (c.country, 804, ''1'', ''2''), ''1'') k041,
                              a.pap, a.daos, a.dapp, a.pr, a.tobo, LPAD (NVL (TRIM (p.s260), ''00''), 2, ''0'') s260,
                              lpad(l.r030, 3, ''0'') r030,
                              (case when c.codcagent = 5 and sed = ''91'' then 3 else c.codcagent end) codcagent,
@@ -1862,9 +1863,17 @@ BEGIN
                         || rez_
                         || s190_
                         || r030_;
+                   sum_dk := abs(sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end)
+                                           ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_dk := 0 -sum_dk;
+                          end if;
 
                     p_add_rec(s_rnbu_record.NEXTVAL, userid_, nls_, kv_,
-                                data_, kodp_, TO_CHAR (ABS (sum_zal)), acc_, rnk_,
+                                data_, kodp_, TO_CHAR (sum_dk), acc_, rnk_,
                                 isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                );
                 END IF;
@@ -1882,9 +1891,17 @@ BEGIN
                         || rez_
                         || s190_
                         || r030_;
+                   sum_dk := abs(se_ - sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || r011_
+                                           ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_dk := 0 -sum_dk;
+                          end if;
 
                     p_add_rec(s_rnbu_record.NEXTVAL, userid_, nls_, kv_,
-                                data_, kodp_, TO_CHAR (ABS (se_ - sum_zal)), acc_, rnk_,
+                                data_, kodp_, TO_CHAR (sum_dk), acc_, rnk_,
                                 isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                );
                 END IF;
@@ -2336,18 +2353,32 @@ BEGIN
 
                       if sum_zal <> 0 then
                          kodp_ := dk_ || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                         sum_zal := abs(sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_zal := 0 - sum_zal;
+                          end if;
 
                          p_add_rec (s_rnbu_record.NEXTVAL, userid_, rnls_, kv_,
-                                       data_, kodp_, TO_CHAR (ABS (sum_zal)), acc_, rnk_,
+                                       data_, kodp_, TO_CHAR (sum_zal), acc_, rnk_,
                                        isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                       );
                       end if;
                    else
                       if sum_zal <> 0 then
                          kodp_ := dk_ || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                         sum_zal := abs(sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_zal := 0 - sum_zal;
+                          end if;
 
                          p_add_rec (s_rnbu_record.NEXTVAL, userid_, rnls_, kv_,
-                                       data_, kodp_, TO_CHAR (ABS (sum_zal)), acc_, rnk_,
+                                       data_, kodp_, TO_CHAR (sum_zal), acc_, rnk_,
                                        isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                       );
                       end if;
@@ -3004,11 +3035,12 @@ BEGIN
          r011_ :='0';
       end if;
 
-      if nbs_ in ('2029','2039','2079','2209','2219','2229')
+      if      nbs_ in ('2029','2039','2079','2209','2219','2229')
       then
-         r011_ :='1';
-      elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
-         r011_ :='2';
+            r011_ :='1';
+      elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548')
+      then
+            r011_ :='2';
       end if;
 
       if r011_ ='0' then
@@ -3487,9 +3519,9 @@ BEGIN
       then
           r011_ :='1';
       elsif nbs_ = '3599' then
-          if substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
+          if   substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
              r011_ := '2';
-          else
+          elsif substr(k.nls, 1, 4) not in ('3540') then 
              r011_ := '1';
           end if;
       end if;
@@ -3894,7 +3926,8 @@ BEGIN
                       into kodp_
                       from (select kodp
                             from rnbu_trace
-                            where acc = acc_
+                            where acc = k.acc and
+                                kodp like substr(k.kodp, 1, 5) || '%'
                             group by kodp
                             having sum(znap) >= abs(rizn_));
                   exception 
@@ -4287,7 +4320,7 @@ BEGIN
                                      (case when typ_ > 0
                                              THEN NVL (F_Codobl_branch (s.tobo, typ_), nbuc1_)
                                              else nbuc1_
-                                     end) nbuc, 2-MOD(c.codcagent,2) rez,
+                                     end) nbuc, NVL (DECODE (c.country, 804, '1', '2'), '1') rez,
                                  sign(decode(a.kv, 980, decode(pmode_, 2, a.ost - a.dos96 + a.kos96, a.ost),
                                                         decode(pmode_, 2, a.ostq - a.dosq96 + a.kosq96, a.ostq))) t020,
                                  a.nbs, a.kv,
@@ -4300,14 +4333,15 @@ BEGIN
                                            '2400','2401','2600','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500','1419','1429','1509','1519',
                                            '1529','2039','2046','2049','2069','2089','2109','2119','2129',
-                                           '2139','2209','2239','2609','2629','2659','3119','3219','2206','2236','2396')
+                                           '2139','2209','2239','2609','2629','2659','3119','3219',
+                                           '2066','2206','2236','2396')
                                 and tip <> 'NL8'
                                 and a.acc = s.acc
                                 and a.rnk = c.rnk
                              group by (case when typ_ > 0
                                              THEN NVL (F_Codobl_branch (s.tobo, typ_), nbuc1_)
                                              else nbuc1_
-                                     end), 2-MOD(c.codcagent,2),
+                                     end), NVL (DECODE (c.country, 804, '1', '2'), '1'),
                                      sign(decode(a.kv, 980, decode(pmode_, 2, a.ost - a.dos96 + a.kos96, a.ost),
                                                         decode(pmode_, 2, a.ostq - a.dosq96 + a.kosq96, a.ostq))),
                                       a.nbs, a.kv)
@@ -4328,7 +4362,7 @@ BEGIN
                                            '9010','9015','9030','9031','9036','9500','1419','1429','1509','1519',
                                            '1529','2039','2046','2049','2069','2089','2109','2119','2129',
                                            '2139','2209','2239','2609','2629',
-                                           '2659','3119','3219','2206','2236','2396')
+                                           '2659','3119','3219','2066','2206','2236','2396')
                          group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
                      on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
                  where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
@@ -4429,7 +4463,7 @@ BEGIN
                                  select (case when typ_ > 0
                                                  THEN NVL (F_Codobl_branch (s.tobo, typ_), nbuc1_)
                                                  else nbuc1_
-                                         end) nbuc, 2-MOD(c.codcagent,2) rez,
+                                         end) nbuc, NVL (DECODE (c.country, 804, '1', '2'), '1') rez,
                                      sign(decode(s.kv, 980, a.ost, a.ostq)) t020,
                                      s.nbs, s.kv,
                                      sum(decode(s.kv, 980, a.ost, a.ostq)) ostq
@@ -4441,7 +4475,7 @@ BEGIN
                                  group by (case when typ_ > 0
                                                  THEN NVL (F_Codobl_branch (s.tobo, typ_), nbuc1_)
                                                  else nbuc1_
-                                         end), 2-MOD(c.codcagent,2),
+                                         end), NVL (DECODE (c.country, 804, '1', '2'), '1'),
                                          sign(decode(s.kv, 980, a.ost, a.ostq)), s.nbs, s.kv)
                                where t020 <> 0)) a
                          full outer join
@@ -4620,9 +4654,9 @@ BEGIN
        set kodp =substr(kodp,1,8)||'I'||substr(kodp,10)
      where substr(kodp,9,1) in ('J');
 
-    update rnbu_trace
-       set kodp =substr(kodp,1,8)||'I'||substr(kodp,10)
-     where substr(kodp,9,1) = 'Z' and substr(kodp,2,4) = '2236' and znap < 0;
+--    update rnbu_trace
+--       set kodp =substr(kodp,1,8)||'I'||substr(kodp,10)
+--     where substr(kodp,9,1) = 'Z' and substr(kodp,2,4) = '2236' and znap < 0;
 
 --------------------------------------------------
    IF pmode_ = 0
