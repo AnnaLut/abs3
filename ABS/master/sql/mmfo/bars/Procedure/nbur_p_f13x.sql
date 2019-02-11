@@ -11,9 +11,9 @@ is
 % DESCRIPTION : ѕроцедура формировани€ 13X дл€ ќщадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.000  07.06.2018
+% VERSION     :  v.1.002  07/02/2019 (07.06.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            constant char(30)  := 'v.1.000  07.06.2018';
+  ver_            constant char(30)  := 'v.1.002  07.02.2019';
   c_title         constant varchar2(50 char) := $$PLSQL_UNIT || '.';
   c_int_file_code constant varchar2(3 char) := '@12';
   c_SK_ZB         constant varchar2(10 char) := 'SK_ZB';
@@ -31,11 +31,17 @@ is
   l_datez         date := p_report_date + 1;
   l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
   l_date_beg      date := nbur_files.f_get_date (p_report_date, 2);
+  l_date_beg2     date;
 BEGIN
   logger.info (c_title || ' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 
   -- определение начальных параметров (код области или ћ‘ќ или подразделение)
   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type);
+  
+  -- в перший йм≥с€ць року може бути особлив≥сть, що файл в реший робочий день не формують 
+  if to_char(trunc(p_report_date, 'mm'), 'ddmm') = '0101' then
+     l_date_beg2 := nbur_calendar.f_get_next_bank_date(l_date_beg, 1);
+  end if;
 
   BEGIN
     INSERT INTO nbur_detail_protocols (
@@ -149,6 +155,60 @@ BEGIN
                                          and r.FILE_CODE = c_int_file_code
                                 )
                and field_code in ('35');
+        
+        -- €кщо н≥чого не маЇ, то пробуЇмо другу дату (ле лише дл€ 1-го м≥с€ц€
+        if sql%rowcount = 0 and l_date_beg2 is not null then
+            INSERT INTO nbur_detail_protocols (
+                                              report_date
+                                              , kf
+                                              , report_code
+                                              , nbuc
+                                              , field_code
+                                              , field_value
+                                              , description
+                                              , acc_id
+                                              , acc_num
+                                              , kv
+                                              , maturity_date
+                                              , cust_id
+                                              , REF
+                                              , nd
+                                              , branch
+                                            )
+            select p_report_date
+                   , kf
+                   , p_file_code
+                   , (case when l_type = 0 then l_nbuc else a.nbuc end)
+                   , c_ekp_A13003
+                     || a.field_code
+                     || f_get_ku_by_nbuc(a.nbuc) as field_code
+                   , field_value
+                   , description
+                   , acc_id
+                   , acc_num
+                   , kv
+                   , maturity_date
+                   , cust_id
+                   , REF
+                   , nd
+                   , branch
+            from   nbur_detail_protocols_arch a
+            where  report_date = l_date_beg2
+                   and kf = p_kod_filii
+                   and report_code = c_int_file_code
+                   and version_id = (
+                                      select l.version_id
+                                      from   nbur_lst_files l
+                                             , nbur_ref_files r
+                                      where  l.report_date = a.report_date
+                                             and l.kf = a.kf
+                                             and l.file_status = 'FINISHED'
+                                             and l.file_id = r.id
+                                             and r.FILE_CODE = c_int_file_code
+                                    )
+                   and field_code in ('35');
+        end if;  
+        
     EXCEPTION
       when others then
         logger.info (c_title ||  ' Error on period begin balance insert : ' || dbms_utility.format_error_backtrace || ' for date = ' || TO_CHAR (p_report_date, 'dd.mm.yyyy'));
