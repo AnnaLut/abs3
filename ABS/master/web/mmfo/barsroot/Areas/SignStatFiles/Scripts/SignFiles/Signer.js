@@ -129,8 +129,8 @@
             Encoding: 'UTF8',
             FileHash: _buffer,
             SignatureType: 1,
-            GetTimeStampSig: true,
-            GetTimeStampContent: true
+            //GetTimeStampSig: 'false',
+            GetTimeStampContent: 'false'
         };
 
         _signer.g_signer.SignFile(query,
