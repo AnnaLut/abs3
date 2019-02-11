@@ -145,14 +145,14 @@ CREATE OR REPLACE PACKAGE BODY DPT_UI is
    bars_audit.trace('%s Мин.допустимый баланс на деп.счетах клиента = %s', l_title, to_char(l_min_balance));
 
    -- определяем баланс по депозитам на контрольную дату
-
-    select nvl(sum(fost(a.acc, l_control_date - 1)),0)
+    select --nvl(sum(fost(a.acc, l_control_date - 1)),0)
+    nvl(sum(gl.p_icurval(a.kv, fost(a.acc, l_control_date - 1), l_control_date)),0)
     into l_control_balance
     from accounts a, 
          dpt_deposit_clos ddc,
          dpt_vidd dv 
     where a.rnk = p_rnk
-      and a.kv = l_vidd_rec.kv
+      --and a.kv = l_vidd_rec.kv
       and a.nbs = '2630'
       and ddc.acc = a.acc
       and ddc.idupd = (select max(idupd) from dpt_deposit_clos d where d.acc = ddc.acc and d.rnk = ddc.rnk)
@@ -168,13 +168,15 @@ CREATE OR REPLACE PACKAGE BODY DPT_UI is
 
     -- определяем баланс по действующим депозитам на текущую банковскую дату
 
-    select nvl(sum(fost(a.acc, l_bdate)),0), nvl(sum(a.ostb),0)
+    select --nvl(sum(fost(a.acc, l_bdate)),0), nvl(sum(a.ostb),0)
+    nvl(sum(gl.p_icurval(a.kv, fost(a.acc, l_bdate), l_control_date)),0),
+    nvl(sum(gl.p_icurval(a.kv, a.ostb, l_control_date)),0)
     into l_current_balance, l_future_balance
     from accounts a, 
          dpt_deposit_clos ddc,
          dpt_vidd dv 
     where a.rnk = p_rnk
-      and a.kv = l_vidd_rec.kv
+      --and a.kv = l_vidd_rec.kv
       and a.nbs = '2630'
       and ddc.acc = a.acc
       and ddc.idupd = (select max(idupd) from dpt_deposit_clos d where d.acc = ddc.acc and d.rnk = ddc.rnk)
@@ -217,3 +219,4 @@ grant EXECUTE on DPT_UI to WR_ALL_RIGHTS;
 PROMPT ===================================================================================== 
 PROMPT *** End *** =========== Scripts /Sql/BARS/Package/DPT_UI.sql =============*** End ***
 PROMPT ===================================================================================== 
+
