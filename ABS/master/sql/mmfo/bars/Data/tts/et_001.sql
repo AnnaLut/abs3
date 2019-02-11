@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !ZP
-prompt Наименование операции: !ZP STOP-контроль (Зарплата)   ---
+prompt Наименование операции: !ZP STOP-контроль (Зарплата)
 declare                                                      
   cnt_  number;
 begin
