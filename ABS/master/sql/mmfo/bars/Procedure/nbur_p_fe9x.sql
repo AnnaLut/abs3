@@ -7,11 +7,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FE9X (p_kod_filii  varchar2
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования #E9 для схема "C"
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :    17/12/2018 (07/09/2018)
+% VERSION     :    07/02/2019 (17/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.004  12/12/2018';
+  ver_              char(30)  := 'v.1.005  07/02/2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -173,6 +173,7 @@ begin
                                                                kf = p_kod_filii
                                                         group by substr(field_code,3,2)    )
                                         and d_close is null
+                                        and d060 not in ('01', '06', '09', '11', '12', '13', '14', '15')
                               )
                         select p_report_date, p_kod_filii, p_file_code,
                                (select obl from branch where branch='/'||p_kod_filii||'/') nbuc,
