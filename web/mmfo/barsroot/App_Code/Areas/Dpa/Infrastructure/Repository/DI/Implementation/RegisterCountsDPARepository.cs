@@ -93,7 +93,10 @@ public class RegisterCountsDPARepository : IRegisterCountsDPARepository
                              ,'dd/mm/yyyy')
                    END) OR t.odat IS NULL)
    AND (   a.nls    = t.nls
-        OR a.nlsalt = t.nls)
+        OR (
+             a.nlsalt = t.nls 
+             and not exists(select 1 from accounts where nls = a.nlsalt and kf = a.kf and acc != a.acc) 
+             ))
    AND a.kv = t.kv
    AND a.kf = t.mfo
    AND substr(t.nls
