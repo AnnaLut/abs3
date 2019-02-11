@@ -13,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F2GX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 2GX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.001    10.12.2018
+ VERSION     :    v.19.001    14.01.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  l_p_version       char(30)  := ' v.18.001  10.12.2018';
+  l_p_version       char(30)  := ' v.19.001  14.01.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -74,7 +74,7 @@ begin
                    where dat =p_report_date
                      and kva != 980   and kvb =980 
                      and nvl(swap_tag,0) = 0
-                     and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) 
+                     and exists (select 1 from oper o where o.ref=f.ref and sos <>-1 and sos is not null)
                   union all 
                   select '4' f091, kvb r030, rnk, nb,
                          gl.p_icurval (kvb, sumb, p_report_date) t070,
@@ -88,7 +88,7 @@ begin
                    where dat =p_report_date
                      and kva = 980     and kvb !=980 
                      and nvl(swap_tag,0) = 0
-                     and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) 
+                     and exists (select 1 from oper o where o.ref=f.ref and sos <>-1 and sos is not null)
       ) loop
 
          if u.op_tag is null or u.op_tag is not null and u.op_tag != 'SWAP'  then
