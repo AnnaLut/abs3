@@ -1,15 +1,17 @@
 CREATE OR REPLACE PROCEDURE BARS.FORM_SALDOZ
-( z_dat31 DATE
-, p_acc   number default null
-, p_korr  boolean default false
+( z_dat31   DATE
+, p_acc     number default null
+, p_korr    boolean default false
+, p_incl_ZG boolean default false
 ) IS
   /**
   <b>FORM_SALDOZ</b> - перенакопиченн€ коригуючих оборот≥в за зв≥тну дату
   %param p_dat31 - останн≥й робочий деньзв≥тного  м≥с€ц€
   %param p_acc  - ≥дентиф≥катор конкретного рахунку
-  %param p_korr  - виправит, €кщо нев≥рна дата валютуванн€ дл€ м≥с€чних коригуючих
+  %param p_korr  - виправл€ти, €кщо нев≥рна дата валютуванн€ дл€ м≥с€чних коригуючих
+  %param p_incl_ZG  - не включаЇмо обороти ZG
 
-  %version 3.2   01/02/2019 (18/01/2019)
+  %version 3.3  09/02/2019 (01/02/2019)
   %usage   перенакопиченн€ м≥с€чних виправних оборот≥в.
   */
   l_dat    DATE := trunc( z_dat31, 'MM' ); -- 1e число зв≥тного м≥с€ц€
@@ -44,29 +46,52 @@ BEGIN
     
     delete SALDOZ
      where FDAT = l_dat;
-
-    insert
-      into SALDOZ
-         ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
-    select /*+ FULL( o ) */ o.KF, l_dat, o.ACC
-         , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.S  else 0 end ) as DOS
-         , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.SQ else 0 end ) as DOSQ
-         , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.S  else 0 end ) as KOS
-         , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.SQ else 0 end ) as KOSQ
-         , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.S  else 0 end ) as DOS_YR
-         , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.SQ else 0 end ) as DOSQ_YR
-         , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.S  else 0 end ) as KOS_YR
-         , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.SQ else 0 end ) as KOSQ_YR
-      from OPLDOK o
-      join OPER   d
-        on ( d.KF = o.KF and d.REF = o.REF )
-     where o.FDAT between l_dat0 AND l_dat1
-       and o.SOS  = 5
-       and d.VDAT = z_dat31
-       and d.VOB  = any ( 96, 99 )
-       and d.tt not like 'ZG%'
-     group BY o.KF, o.ACC;
-
+    
+    if not p_incl_ZG then -- не включаЇмо обороти по згортанню коригуючих
+        insert
+          into SALDOZ
+             ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
+        select /*+ FULL( o ) */ o.KF, l_dat, o.ACC
+             , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.S  else 0 end ) as DOS
+             , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.SQ else 0 end ) as DOSQ
+             , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.S  else 0 end ) as KOS
+             , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.SQ else 0 end ) as KOSQ
+             , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.S  else 0 end ) as DOS_YR
+             , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.SQ else 0 end ) as DOSQ_YR
+             , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.S  else 0 end ) as KOS_YR
+             , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.SQ else 0 end ) as KOSQ_YR
+          from OPLDOK o
+          join OPER   d
+            on ( d.KF = o.KF and d.REF = o.REF )
+         where o.FDAT between l_dat0 AND l_dat1
+           and o.SOS  = 5
+           and d.VDAT = z_dat31
+           and d.VOB  = any ( 96, 99 )
+           and d.tt not like 'ZG%'
+         group BY o.KF, o.ACC;
+    else
+        insert
+          into SALDOZ
+             ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
+        select /*+ FULL( o ) */ o.KF, l_dat, o.ACC
+             , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.S  else 0 end ) as DOS
+             , sum( case when ( o.DK = 0 and d.VOB = 96 ) then o.SQ else 0 end ) as DOSQ
+             , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.S  else 0 end ) as KOS
+             , sum( case when ( o.DK = 1 and d.VOB = 96 ) then o.SQ else 0 end ) as KOSQ
+             , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.S  else 0 end ) as DOS_YR
+             , sum( case when ( o.DK = 0 and d.VOB = 99 ) then o.SQ else 0 end ) as DOSQ_YR
+             , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.S  else 0 end ) as KOS_YR
+             , sum( case when ( o.DK = 1 and d.VOB = 99 ) then o.SQ else 0 end ) as KOSQ_YR
+          from OPLDOK o
+          join OPER   d
+            on ( d.KF = o.KF and d.REF = o.REF )
+         where o.FDAT between l_dat0 AND l_dat1
+           and o.SOS  = 5
+           and d.VDAT = z_dat31
+           and d.VOB  = any ( 96, 99 )
+         group BY o.KF, o.ACC;    
+    end if;
+    
     insert
       into SALDOZ
          ( KF, FDAT, ACC, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
@@ -85,7 +110,14 @@ BEGIN
      WHERE s.FDAT = l_dat
        and a.NBS Is Null
      group by s.KF, s.FDAT, a.ACCC;
-
+     commit;
+     
+     -- 
+     if z_dat31 = to_date('31012019', 'ddmmyyyy') then
+        --включаЇмо з оборотами ZG
+        FORM_SALDOZ(to_date('29122018', 'ddmmyyyy'), null, false, true);
+        commit;
+     end if;
   else
 
     bars_audit.info( $$PLSQL_UNIT||': for acc = '||to_char(p_acc) );
