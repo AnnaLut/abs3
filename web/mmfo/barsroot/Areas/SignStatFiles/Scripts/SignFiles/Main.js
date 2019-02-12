@@ -278,6 +278,7 @@ var toolBarHandlers = {
 function signFile(selectedRow, isCAdES) {
 
     $signer.initSign(function () {
+        bars.ui.loader('body', true);
         $.ajax({
             type: 'GET',
             url: bars.config.urlContent('/api/SignStatFiles/SignFiles/GetFileHash'),
@@ -286,8 +287,7 @@ function signFile(selectedRow, isCAdES) {
                 isCAdES: isCAdES
             },
             success: function (data) {
-                if (isCAdES) {
-                    // to do call sign file method from barscryptor
+                if (isCAdES) {                    
                     $signer.signFile(data, function (res) {
                         setFileOperation(selectedRow, selectedRow.OperationName, res.SignFile, false, true);
                     });
