@@ -86,6 +86,17 @@ exception
 end;
 /
 
+PROMPT *** Create  index IDX_MWAYMATCH_DRN_TR ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_MWAYMATCH_DRN_TR ON BARS.MWAY_MATCH (DRN_TR) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 PROMPT *** Create  grants  MWAY_MATCH ***
 grant SELECT                                                                 on MWAY_MATCH      to BARS_ACCESS_DEFROLE;
 

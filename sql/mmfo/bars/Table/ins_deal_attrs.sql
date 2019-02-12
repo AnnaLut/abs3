@@ -123,6 +123,7 @@ exception when others then
 /
 
 
+
 PROMPT *** Create  grants  INS_DEAL_ATTRS ***
 grant SELECT                                                                 on INS_DEAL_ATTRS  to BARSREADER_ROLE;
 grant SELECT                                                                 on INS_DEAL_ATTRS  to UPLD;
