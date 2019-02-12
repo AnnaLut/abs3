@@ -136,6 +136,20 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index IDX_TMS_TASK_RUN_ID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_TMS_TASK_RUN_ID ON BARS.TMS_TASK_RUN (RUN_ID, TASK_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  TMS_TASK_RUN ***
 grant SELECT                                                                 on TMS_TASK_RUN    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMS_TASK_RUN    to UPLD;
