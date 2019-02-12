@@ -1,3 +1,4 @@
+set define off
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_W_FM.sql =========*
 PROMPT ===================================================================================== 
@@ -285,18 +286,39 @@ begin
 															  p_frontend => l_application_type_id
 															  );
 					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                     
+          --  Створюємо функцію ФМ. Відбір документів
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'ФМ. Відбір документів',
+                                                  p_funcname => '/barsroot/Finmon/FmDocuments/index?access=assignee',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Імпорт файлів з переліком публічних діячів ********** ');
           --  Створюємо функцію Імпорт файлів з переліком публічних діячів
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Імпорт файлів з переліком публічних діячів',
-                                                  p_funcname => '/barsroot/finmon/finmon/ImportPublicFigures',
+                                                  p_name     => 'Імпорт файлів з переліком КІС',
+                                                  p_funcname => '/barsroot/finmon/finmon/ImportFile?fileType=KIS',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
 
+                                                  
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Імпорт файлів з переліком PEP ********** ');
+          --  Створюємо функцію Імпорт файлів з переліком публічних діячів
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Імпорт файлів з переліком PEP',
+                                                  p_funcname => '/barsroot/finmon/finmon/ImportFile?fileType=PEP',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Імпорт файлу терористів ********** ');
           --  Створюємо функцію Імпорт файлу терористів
@@ -304,7 +326,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Імпорт файлу терористів',
-                                                  p_funcname => '/barsroot/finmon/finmon/importterrorists',
+                                                  p_funcname => '/barsroot/finmon/finmon/ImportFile?fileType=Terr',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -314,6 +336,9 @@ begin
           --  Створюємо функцію ФМ. Збіг ПЕП БАЗОВИЙ
       l := l +1;
       l_function_ids.extend(l);
+      update operlist
+      set funcname = '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_FINMON_PUBLIC_CUSTOMERS'
+      where funcname = '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=FINMON_PUBLIC_CUSTOMERS';
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ФМ. Збіг ПЕП БАЗОВИЙ',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_FINMON_PUBLIC_CUSTOMERS',
@@ -352,7 +377,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ФМ. Перевірка ПЕП БАЗОВИЙ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>finmon_check_public(0)][QST=>Виконати перевірку всіх клієнтів банку?][MSG=>Виконано!]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=> fm_utl.run_deferred_task(''fm_public_utl.check_public'', ''Перевірку клієнтів на список публ. діячів завершено. Перевірте довідник ПЕП.'')][QST=>Запустити перевірку всіх клієнтів банку?][MSG=>Перевірку запущено, очікуйте повідомлення]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -446,3 +471,4 @@ end;
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/Bars/Data/Applist/codeapp$RM_W_FM.sql =========**
 PROMPT ===================================================================================== 
+set define on
