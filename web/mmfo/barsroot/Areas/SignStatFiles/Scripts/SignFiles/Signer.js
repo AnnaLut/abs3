@@ -67,26 +67,29 @@
                             if (keyResponse.State == "OK" && keyResponse.Keys.length > 0) {
                                 _signer.keys = keyResponse.Keys;
 
-                                $.ajax({
-                                    type: 'GET',
-                                    url: bars.config.urlContent("/api/SignStatFiles/SignFiles/GetCurrentUserSubjectSN"),
-                                    success: function(result) {
-                                        for (var i = 0; i < _signer.keys.length; i++) {
-                                            if (_signer.keys[i].SubjectSN.toLowerCase() == result.toLowerCase()) {
-                                                _signer.currentKeyToUse = _signer.keys[i];
-                                            }
-                                        }
+                                _signer.currentKeyToUse = _signer.keys[0];
+                                if (cbFunc) cbFunc();
 
-                                        if (_signer.currentKeyToUse.Id) {
-                                            if (cbFunc) cbFunc();
-                                        } else {
-                                            showBarsErrorAlert("Ключ в базі даних не співпадає з ключем на носії, зверніться до адміністратора!");
-                                        }
-                                    },
-                                    error: function() {
-                                        showBarsErrorAlert("Відбулась помилка при запиті цлюча ЕЦП з бази даних!");
-                                    }
-                                });
+                                //$.ajax({
+                                //    type: 'GET',
+                                //    url: bars.config.urlContent("/api/SignStatFiles/SignFiles/GetCurrentUserSubjectSN"),
+                                //    success: function(result) {
+                                //        for (var i = 0; i < _signer.keys.length; i++) {
+                                //            if (_signer.keys[i].SubjectSN.toLowerCase() == result.toLowerCase()) {
+                                //                _signer.currentKeyToUse = _signer.keys[i];
+                                //            }
+                                //        }
+
+                                //        if (_signer.currentKeyToUse.Id) {
+                                //            if (cbFunc) cbFunc();
+                                //        } else {
+                                //            showBarsErrorAlert("Ключ в базі даних не співпадає з ключем на носії, зверніться до адміністратора!");
+                                //        }
+                                //    },
+                                //    error: function() {
+                                //        showBarsErrorAlert("Відбулась помилка при запиті цлюча ЕЦП з бази даних!");
+                                //    }
+                                //});
 
                             } else {
                                 showBarsErrorAlert("Не знайдено особистих ключів на носії!");
