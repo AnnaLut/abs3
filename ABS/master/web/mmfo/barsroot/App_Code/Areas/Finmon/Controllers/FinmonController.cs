@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
-using BarsWeb.Areas.Finmom.Infrastructure.Repository.DI.Abstract;
+using BarsWeb.Areas.Finmon.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Controllers;
 using clientregister;
 using Kendo.Mvc.Extensions;

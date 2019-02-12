@@ -1,8 +1,8 @@
 ﻿using Areas.Finmon.Models;
-using BarsWeb.Areas.Finmom.Infrastructure.Repository.DI.Abstract;
+using BarsWeb.Areas.Finmon.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Models;
 
-namespace BarsWeb.Areas.Finmom.Infrastructure.Repository.DI.Implementation
+namespace BarsWeb.Areas.Finmon.Infrastructure.Repository.DI.Implementation
 {
     public class FinmonRepository : IFinmonRepository
     {

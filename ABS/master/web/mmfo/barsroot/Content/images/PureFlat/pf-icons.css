@@ -2,6 +2,14 @@
   
 /*==========16==========*/
 .pf-16{width:16px;height:16px}
+
+.pf-16.pf-lock_delete{background-image:url(16/lock_delete.png)}
+.pf-16.pf-remove{background-image:url(16/remove.png)}
+.pf-16.pf-REPAIR{background-image:url(16/REPAIR.png)}
+.pf-16.pf-visa_back{background-image:url(16/visa_back.png)}
+.pf-16.pf-filter2{background-image:url(16/filter2.png)}
+.pf-16.pf-SEARCH_X{background-image:url(16/SEARCH_X.png)}
+
 .pf-16.pf-add{background-image:url(16/add.png)}
 .pf-16.pf-add_button{background-image:url(16/add_button.png)}
 .pf-16.pf-address_book-design{background-image:url(16/address_book-design.png)}

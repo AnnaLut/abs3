@@ -32,6 +32,9 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
         #region API
         public byte[] Make(byte[] CadesBesSign, byte[] file)
         {
+            ServicePointManager.ServerCertificateValidationCallback += ((sender, certificate, chain, sslPolicyErrors) => { return true; });
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
+
             // D:\Work\StatFiles\else\crypto\TestDocument\TestDocument.pdf.p7s
             // byte[] CadesBesSign = File.ReadAllBytes(@"D:\Work\StatFiles\else\crypto\TestDocument\TestDocument.pdf.p7s");
 
