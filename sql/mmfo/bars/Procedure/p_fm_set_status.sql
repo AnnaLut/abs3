@@ -20,9 +20,16 @@ is
 begin
 
   begin
-     select status into l_status
-       from finmon_que
-      where decode(p_ref,null,rec,ref) = decode(p_ref,null,p_rec,p_ref);
+     case 
+       when p_ref is null then 
+         select q.status into l_status
+           from finmon_que q
+          where q.rec = p_rec;
+       else
+         select q.status into l_status
+           from finmon_que q
+          where q.ref = p_ref;
+      end case;          
   exception when no_data_found then
      l_status := null;
   end;
