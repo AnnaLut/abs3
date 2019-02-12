@@ -247,6 +247,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
     l_filetype varchar2(100);
     l_id       number := null;
     i          number;
+    l_file_ext varchar2(4);
     h          varchar2(100) := 'ow_files_proc.load_file. ';
   begin
 
@@ -254,6 +255,9 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 
     l_filename := upper(p_filename);
 
+    l_file_ext := lower(substr(l_filename, -4));
+    
+    if l_file_ext in ('.zip', '.xml') then
     -- определяем тип файла
     l_filetype := get_file_type(l_filename);
     bars_audit.info(h || 'l_filetype=>' || l_filetype);
@@ -283,6 +287,9 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
         p_msg := 'Файл вже імпортувався';
       end if;
     end if;
+    else
+           p_msg := 'Розширення файла '||upper(l_file_ext)||' не оброблюється';
+	end if;
 
     p_id := l_id;
 
