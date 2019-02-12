@@ -45,7 +45,7 @@ exception when others then
 /
 
 
-PROMPT *** Drop index I1_DYNFILTER ***
+PROMPT *** Drop index IDX_INS_DEAL_ATTRS_VAL ***
 declare
     index_doesnt_exist exception;
     pragma exception_init(index_doesnt_exist, -1418);
@@ -55,4 +55,4 @@ exception
     when index_doesnt_exist then
          null;
 end;
-
+/
