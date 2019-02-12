@@ -11,7 +11,7 @@ PROMPT *** Create  trigger TAU_OPER_LCS_BACK ***
 after update of sos ON BARS.OPER
 for each row
     WHEN (
-new.sos<0 and old.sos>0
+new.sos<0 and old.sos>=0
       ) declare
 l_cnt number :=0;
 begin
