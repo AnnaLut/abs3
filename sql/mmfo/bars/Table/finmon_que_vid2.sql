@@ -27,7 +27,8 @@ begin
    (	ID NUMBER, 
 	VID VARCHAR2(4), 
 	COMM VARCHAR2(254), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
+    ORDER_ID number
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -37,8 +38,14 @@ exception when others then
 end; 
 /
 
-
-
+prompt add order_id
+begin
+    execute immediate 'alter table finmon_que_vid2 add order_id number';    
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to FINMON_QUE_VID2 ***
  exec bpa.alter_policies('FINMON_QUE_VID2');
@@ -49,6 +56,7 @@ COMMENT ON COLUMN BARS.FINMON_QUE_VID2.ID IS 'ID документа';
 COMMENT ON COLUMN BARS.FINMON_QUE_VID2.VID IS 'Код признака операции подпадающей под мониторинг';
 COMMENT ON COLUMN BARS.FINMON_QUE_VID2.COMM IS 'Комментарий';
 COMMENT ON COLUMN BARS.FINMON_QUE_VID2.KF IS '';
+COMMENT ON COLUMN BARS.FINMON_QUE_VID2.order_id IS 'Порядок кодов / их значимость (asc)';
 
 
 
