@@ -4,7 +4,7 @@ create or replace package fm_utl
 is
 /* created 26.12.2017
   Разрозненные процедуры модуля ФМ собраны в один пакет */
-g_header_version constant varchar2(64) := 'version 1.5   07.12.2018';
+g_header_version constant varchar2(64) := 'version 1.0   26.12.2017';
 
 -- возвращает версию заголовка пакета FM_UTL
 function header_version return varchar2;
@@ -12,40 +12,34 @@ function header_version return varchar2;
 -- возвращает версию тела пакета FM_UTL
 function body_version   return varchar2;
 
---
--- Перерахунок рівня ризику клієнтів
---
-procedure recalc_risk(p_risk_id in fm_risk_criteria.id%type);
+-- функция проверки по ФИО / названию на вхождение в справочник террористов с применением Hash-функции
+-- возвращает код террориста в справочнике V_FINMON_REFT или 0 в случае отсутствия совпадения
+function get_terrorist_code (p_txt varchar2) return number;
 
---  
--- Запустить процедуру в джобе, который по завершению отправит сообщение p_success_message запустившему пользователю и самоудалится
---
-procedure run_deferred_task(p_procname        varchar2,
+-- проверка клиента на соответствие списку террористов по ФИО / названию
+-- возвращает в случае совпадения номер в списке, если p_mode = 1; 1 - если p_mode = 0; 0 - если не совпало
+function get_public_code (p_name   in varchar2,
+                          p_mode   in int default 0) return number;
+                          
+-- проверка клиента на соответствие списку террористов по РНК
+-- возвращает в случае совпадения номер в списке, если p_mode = 1; 1 - если p_mode = 0; 0 - если не совпало
+function get_public_code (p_rnk    in number,
+                          p_mode   in int default 0) return number;
+
+-- Проверка клиентов банка на соответствие загруженному списку террористов и санкционных лиц
+-- наполняет справочник подозрительных клиентов - fm_klient
+procedure check_terrorists;
+
+-- проверка клиентов банка на соответствие списку публичных деятелей
+-- наполняет справочник клиентов-ПЕП - finmon_public_customers
+procedure check_public;
+
+-- запустить процедуру в джобе, который по завершению отправит сообщение p_success_message запустившему пользователю и самоудалится
+procedure run_deferred_task(p_procname        varchar2, 
                             p_success_message varchar2);
 
-
---
--- Простановка параметров ФМ
---
-procedure set_fm_params (p_id    finmon_que.id%type,
-                         p_ref   finmon_que.ref%type,
-                         p_rec   finmon_que.rec%type,
-                         p_vid1  finmon_que.opr_vid1%type,
-                         p_vid2  finmon_que.opr_vid2%type,
-                         p_comm2 finmon_que.comm_vid2%type,
-                         p_vid3  finmon_que.opr_vid3%type,
-                         p_comm3 finmon_que.comm_vid3%type,
-                         p_mode  finmon_que.monitor_mode%type,
-                         p_rnka  finmon_que.rnk_a%type,
-                         p_rnkb  finmon_que.rnk_b%type,
-                         p_vids2 T_DICTIONARY,
-                         p_vids3 T_DICTIONARY
-                         );
-
---
--- Пакетное проставление параметров ФМ
+-- пакетное проставление параметров ФМ
 -- проставляет один набор кодов операции, ОМ и ВМ на весь список операций
---
 procedure set_fm_params_bulk(p_refs     in number_list,                  -- коллекция референсов
                              p_opr_vid1 in finmon_que.opr_vid1%type,     -- код вида операции
                              p_opr_vid2 in finmon_que.opr_vid2%type,     -- код ОМ
@@ -53,33 +47,27 @@ procedure set_fm_params_bulk(p_refs     in number_list,                  -- колл
                              p_opr_vid3 in finmon_que.opr_vid3%type,     -- код ВМ
                              p_comm3    in finmon_que.comm_vid3%type,    -- комментарий к ВМ
                              p_mode     in finmon_que.monitor_mode%type, -- режим мониторинга
-                             p_vid2     in T_DICTIONARY,                 -- доп. коды ОМ (коллекция)
-                             p_vid3     in T_DICTIONARY                  -- доп. коды ВМ (коллекция)
+                             p_vid2     in string_list,                  -- доп. коды ОМ (коллекция)
+                             p_vid3     in string_list                   -- доп. коды ВМ (коллекция)
                              );
 
---
--- Проверка операций за период на соответствие правилам ФМ
+-- проверка операций за период на соответствие правилам ФМ
 -- наполняет таблицу tmp_fm_checkrules для вызвавшего пользователя
---
 procedure check_fm_rules (p_dat1 date, p_dat2 date, p_rules varchar2);
 
---
--- Проверка операции (неблокирующая) на список террористов
+-- проверка операции (неблокирующая) на список террористов
 -- возвращает 0 в случае отсутствия совпадения, -1 в случае ошибки или номер в справочнике террористов
---
 function ref_check(p_ref oper.ref%type) return number;
 
---
--- Проверка (блокирующая) конкретной операции или всех операций в очереди
+-- проверка (блокирующая) конкретной операции или всех операций в очереди
 -- в случае совпадения отправляет в очередь для просмотра ФМ и блокирует визой ФМ
---
 procedure ref_block(p_ref in oper.ref%type default null);
 
 end fm_utl;
 /
 create or replace package body fm_utl
 is
-g_body_version constant varchar2(64)  := 'version 1.5   07.12.2018';
+g_body_version constant varchar2(64)  := 'version 1.0   26.12.2017';
 g_trace constant varchar2(16) := 'FM_UTL';
 
 -------------------------------------------------------------------------------------------------
@@ -102,279 +90,319 @@ BEGIN
    RETURN 'Package body '||g_trace|| ' ' || G_BODY_VERSION;
 END body_version;
 
---
--- Перерахунок рівня ризику клієнтів
---
-procedure recalc_risk(p_risk_id in fm_risk_criteria.id%type) is
-    l_trace constant varchar2(24) := 'RECALC_RISK';
-    l_value  varchar2(20);
-    l_iddpl  date;
-    l_rizik  number;
-    l_iddpr2 date;
-    l_rnk    customer.rnk%TYPE;
-    CURSOR c1 is
-        SELECT c.rnk
-          FROM customer c
-         inner join customer_risk r
-            on r.rnk = c.rnk
-         WHERE c.date_off is null
-           and r.risk_id = p_risk_id
-           and trunc(sysdate) between r.dat_begin and
-               coalesce(r.dat_end, to_date('31.12.9999', 'dd.mm.yyyy'));
+-------------------------------------------------------------------------------------------------
+-- get_terrorist_code - функция проверки по ФИО / названию на вхождение в справочник террористов с применением Hash-функции
+-- возвращает код террориста в справочнике V_FINMON_REFT или 0 в случае отсутствия совпадения
+-------------------------------------------------------------------------------------------------
+function get_terrorist_code (p_txt varchar2) return number
+is
+  l_ret         number := 0;
 begin
-    bars_audit.info(g_trace || '.' || l_trace || ': start p_risk_id=' ||
-                    to_char(p_risk_id));
+    select c1 into l_ret from v_finmon_reft where name_hash = f_fm_hash(p_txt) and rownum = 1;
+    return l_ret;
+exception
+    when no_data_found then return 0;
+end get_terrorist_code;
 
-    OPEN c1;
-    LOOP
-        fetch c1
-            into l_rnk;
-    EXIT WHEN c1%NOTFOUND;
+-------------------------------------------------------------------------------------------------
+-- проверка клиента на соответствие списку террористов по ФИО / названию
+-- возвращает в случае совпадения номер в списке, если p_mode = 1; 1 - если p_mode = 0; 0 - если не совпало
+-------------------------------------------------------------------------------------------------
+function get_public_code (p_name   in varchar2,
+                          p_mode   in int default 0)
+return number
+is
+l_public   int;
+l_name     varchar2(250);
+begin
+    l_name := replace(replace(replace(replace(replace(replace(replace(replace(p_name,'/',''),'\',''),'*',''),'~',''),'!',''),'&',''),'?',''),' ','');
+    if  l_name is null then
+        return 0;
+    end if;
     
-        select substr(f_get_cust_hlist(l_rnk,
-                                       23,
-                                       f_get_cust_fmdat(to_number(to_char(sysdate,
-                                                                          'DDMMYYYY')))),
-                      1,
-                      20)
-          into l_value
-          from dual;
+    begin
+        select /*+ index(I_FMN_PUBLIC_RELS) */ 
+               case when p_mode = 0 then 1
+                    when p_mode = 1 then id
+               end
+        into l_public
+        from finmon_public_rels
+        where fullname = upper(l_name)
+          and (ADD_MONTHS(termin,36) >= bankdate or termin is null);
+    exception 
+        when no_data_found then l_public := 0;
+        when too_many_rows then l_public := 1;
+    end;
+    return l_public;
+end get_public_code;
+
+-------------------------------------------------------------------------------------------------
+-- проверка клиента на соответствие списку террористов по РНК
+-- возвращает в случае совпадения номер в списке, если p_mode = 1; 1 - если p_mode = 0; 0 - если не совпало
+-------------------------------------------------------------------------------------------------
+function get_public_code (p_rnk    in number,
+                          p_mode   in int default 0)
+return number
+is
+l_name customer.nmk%type;
+begin
+    if p_rnk is not null then
         begin
-            update customerw
-               set value = l_value
-             where rnk = l_rnk
-               and tag = 'RIZIK';
-            if sql%rowcount = 0 then
-                insert into customerw
-                    (rnk, tag, value, isp)
-                values
-                    (l_rnk, 'RIZIK', l_value, 0);
+            select nmk
+            into l_name
+            from customer
+            where rnk = p_rnk;
+        exception 
+            when no_data_found then return 0;
+        end;
+        return get_public_code(l_name, p_mode);
+    else
+        return 0;
+    end if;
+end get_public_code;
+
+-------------------------------------------------------------------------------------------------
+-- Проверка клиентов банка на соответствие загруженному списку террористов и санкционных лиц
+-- наполняет справочник подозрительных клиентов - fm_klient
+-------------------------------------------------------------------------------------------------
+procedure check_terrorists
+/* 
+Проверяются клиенты-физлица по наименованиям, клиенты-юрлица по наименованиям, связанные лица (как клиенты, так и не-клиенты) клиентов-юрлиц;
+Перед каждой проверкой существующий список совпадений удаляется.
+*/    
+    is
+    l_trace constant varchar2(24) := 'CHECK_TERRORISTS';
+    l_bdate date := bankdate_g;
+    l_kf varchar2(6) := sys_context('bars_context', 'user_mfo');
+begin
+    bars_audit.info(g_trace||'.'||l_trace||': Старт. Удаляем предыдущие данные.');
+    delete from fm_klient;
+    commit;
+    
+    bars_audit.info(g_trace||'.'||l_trace||': Начинаем наполнение перечня совпадений.');
+    for k in (/* физлица */
+              select /*+ parallel(8)*/ rnk, nmk, nmkk, nmkv, fr1.c1 as c1, null as c2, null as c3, null as rel_rnk, null as rel_intext
+              from customer c,
+                   FINMON_REFT_AKALIST fr1
+              where (date_off is null or date_off > l_bdate)
+              and fr1.name_hash = f_fm_hash(c.nmk)
+              union all
+              select /*+ parallel(8)*/ rnk, nmk, nmkk, nmkv, null as c1, fr2.c1 as c2, null as c3, null as rel_rnk, null as rel_intext
+              from customer c,
+                   FINMON_REFT_AKALIST fr2
+              where (date_off is null or date_off > l_bdate)
+              and fr2.name_hash = f_fm_hash(c.nmkk)
+              union all
+              select /*+ parallel(8)*/ rnk, nmk, nmkk, nmkv, null as c1, null as c2, fr3.c1 as c3, null as rel_rnk, null as rel_intext
+              from customer c,
+                   FINMON_REFT_AKALIST fr3
+              where (date_off is null or date_off > l_bdate)
+              and fr3.name_hash = f_fm_hash(c.nmkv)
+
+              union all
+
+              /* юрлица и их связанные */
+
+              select /*+ parallel(8)*/ c.rnk, c.nmk, c.nmkk, c.nmkv, fr1.c1 as c1, null as c2, null as c3, r.rel_rnk as rel_rnk, 1 as rel_intext
+              from customer c,
+                   customer_rel r,
+                   customer cr,
+                   FINMON_REFT_AKALIST fr1
+              where (c.date_off is null or c.date_off > l_bdate)
+              and c.custtype = 2
+              and c.rnk = r.rnk
+              and r.rel_intext = 1
+              and cr.rnk = r.rel_rnk
+              and fr1.name_hash = f_fm_hash(cr.nmk)
+
+              union all
+
+              select /*+ parallel(8)*/ c.rnk, c.nmk, c.nmkk, c.nmkv, null as c1, fr2.c1 as c2, null as c3, r.rel_rnk as rel_rnk, 1 as rel_intext
+              from customer c,
+                   customer_rel r,
+                   customer cr,
+                   FINMON_REFT_AKALIST fr2
+              where (c.date_off is null or c.date_off > l_bdate)
+              and c.custtype = 2
+              and c.rnk = r.rnk
+              and r.rel_intext = 1
+              and cr.rnk = r.rel_rnk
+              and fr2.name_hash = f_fm_hash(cr.nmkk)
+
+              union all
+
+              select /*+ parallel(8)*/ c.rnk, c.nmk, c.nmkk, c.nmkv, null as c1, null as c2, fr3.c1 as c3, r.rel_rnk as rel_rnk, 1 as rel_intext
+              from customer c,
+                   customer_rel r,
+                   customer cr,
+                   FINMON_REFT_AKALIST fr3
+              where (c.date_off is null or c.date_off > l_bdate)
+              and c.custtype = 2
+              and c.rnk = r.rnk
+              and r.rel_intext = 1
+              and cr.rnk = r.rel_rnk
+              and fr3.name_hash = f_fm_hash(cr.nmkv)
+
+              union all
+
+              /* не-клиенты - как связи юрлиц */
+              select /*+ parallel(8)*/ c.rnk, c.nmk, c.nmkk, c.nmkv, null as c1, null as c2, fr3.c1 as c3, r.rel_rnk as rel_rnk, 0 as rel_intext
+              from customer c,
+                   customer_rel r,
+                   customer_extern cre,
+                   FINMON_REFT_AKALIST fr3
+              where (c.date_off is null or c.date_off > l_bdate)
+              and c.custtype = 2
+              and c.rnk = r.rnk
+              and r.rel_intext = 0
+              and r.rel_rnk = cre.id
+              and fr3.name_hash = f_fm_hash(cre.name)
+    )
+    loop
+        begin
+            if k.c1 is not null then
+                insert into fm_klient (rnk, kod, dat, rel_rnk, rel_intext, kf) values (k.rnk, k.c1, l_bdate, k.rel_rnk, k.rel_intext, l_kf);
+            elsif k.c2 is not null then
+                insert into fm_klient (rnk, kod, dat, rel_rnk, rel_intext, kf) values (k.rnk, k.c2, l_bdate, k.rel_rnk, k.rel_intext, l_kf);
+            elsif k.c3 is not null then
+                insert into fm_klient (rnk, kod, dat, rel_rnk, rel_intext, kf) values (k.rnk, k.c3, l_bdate, k.rel_rnk, k.rel_intext, l_kf);
             end if;
+        exception when dup_val_on_index then null;
         end;
-    
-        begin
-            begin
-            
-                select trim(to_date(c.value, 'dd/mm/yyyy'))
-                  into l_iddpr2
-                  from customerw c
-                 where rnk = l_rnk
-                   and tag = 'IDDPR';
-            
-                begin
-                    select nvl(decode(l_value,
-                                      'Неприйнятно високий',
-                                      1,
-                                      'Високий',
-                                      1,
-                                      'Середній',
-                                      2,
-                                      3),
-                               3)
-                      into l_rizik
-                      from dual;
-                exception
-                    when no_data_found then
-                        l_rizik := 3;
-                end;
-            
-                select add_months(l_iddpr2,
-                                  decode(l_rizik, 1, 12, 2, 24, 36))
-                  into l_iddpl
-                  from dual;
-                if l_iddpl < add_months(bankdate, 1) then
-                    l_iddpl := add_months(bankdate, 1);
-                end if;
-            
-                update customerw c
-                   set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                 where c.tag = 'IDDPL'
-                   and c.rnk = l_rnk;
-                if sql%rowcount = 0 then
-                    insert into customerw
-                        (rnk, tag, value, isp)
-                    values
-                        (l_rnk, 'IDDPL', to_char(l_iddpl, 'dd/mm/yyyy'), 0);
-                end if;
-            
-            exception
-                when others then
-                    if sqlcode = -01861 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    elsif sqlcode = -01858 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    elsif sqlcode = -01843 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    elsif sqlcode = -01830 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    elsif sqlcode = -01841 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    elsif sqlcode = -01847 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    elsif sqlcode = -01840 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    elsif sqlcode = -01839 then
-                        select add_months(bankdate, 1)
-                          into l_iddpl
-                          from dual;
-                        update customerw c
-                           set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                         where c.tag = 'IDDPL'
-                           and c.rnk = l_rnk;
-                        if sql%rowcount = 0 then
-                            insert into customerw
-                                (rnk, tag, value, isp)
-                            values
-                                (l_rnk,
-                                 'IDDPL',
-                                 to_char(l_iddpl, 'dd/mm/yyyy'),
-                                 0);
-                        end if;
-                    else
-                        raise;
-                    end if;
-            end;
-        
-        exception
-            when no_data_found then
-                select add_months(bankdate, 1) into l_iddpl from dual;
-                update customerw c
-                   set c.value = to_char(l_iddpl, 'dd/mm/yyyy')
-                 where c.tag = 'IDDPL'
-                   and c.rnk = l_rnk;
-                if sql%rowcount = 0 then
-                    insert into customerw
-                        (rnk, tag, value, isp)
-                    values
-                        (l_rnk, 'IDDPL', to_char(l_iddpl, 'dd/mm/yyyy'), 0);
-                end if;
-            
-        end;
-    
-    END LOOP;
-    CLOSE c1;
+    end loop;
+    bars_audit.info(g_trace||'.'||l_trace||': Финиш. Проверка завершена.');
+exception 
+    when others then
+        bars_audit.error(g_trace||'.'||l_trace||': Завершилось с ошибкой: '||sqlerrm||' '||dbms_utility.format_error_backtrace);
+        rollback; -- возвращаемся к пустому списку
+        raise; 
+end check_terrorists;
 
-    bars_audit.info(g_trace || '.' || l_trace || ': finish');
-end recalc_risk;
+-------------------------------------------------------------------------------------------------
+-- проверка клиентов банка на соответствие списку публичных деятелей
+-- наполняет справочник клиентов-ПЕП - finmon_public_customers
+-------------------------------------------------------------------------------------------------
+procedure check_public
+is
+l_trace constant varchar2(24) := 'CHECK_PUBLIC';
+ /*
+ RNK,
+ ПІБ/Назва клієнта,
+ № особи в переліку публічних осіб,
+ рівень ризику,
+ критерії ризику, у колонці «критерії ризику» відображати інформацію щодо встановлення критеріїв ризику з кодами (Id) 2, 3, 62-65.
+ (+) RNK пов'язаної особи,
+ (+) ПІБ/Назва пов'язаної особи,
+ (+) № пов'яз. особи в переліку публічних осіб,
+ (+) Коментар
+ дата звірки;
+
+ У звіт відбираються лише діючі клієнти
+   1) збіг Клієнта з переліком публічних осіб - поля "RNK пов'язаної особи", "ПІБ/Назва пов'язаної особи", "№ пов'яз. особи в переліку публічних осіб" пусті, Коментар="клієнт"
+   2) збіг пов'язаної особи (клієнта банку) на дату звірки, перевіряються і закриті клієнти - блок даних по клієнту - дані клієнта пов'язаного з публічною особою, поле "№ особи в переліку публічних осіб" пусте, блок пов'язаної особи - відповідні дані по кому пройшов збіг, Коментар="пов'язана особа (клієнт банку)"
+   3) збіг пов'язаної особи (не клієнт банку) на дату звірки - блок даних по клієнту - дані клієнта пов'язаного з публічною особою, поле "№ особи в переліку публічних осіб" пусте, блок пов'язаної особи - відповідні дані по кому пройшов збіг, Коментар="пов'язана особа (НЕ клієнт банку)"
+ */
+
+begin
+    bars_audit.info(g_trace||'.'||l_trace||': Старт. Удаляем предыдущие данные');
+    delete from FINMON_PUBLIC_CUSTOMERS;
+    commit; -- удаляем данные в любом случае
+    
+    bars_audit.info(g_trace||'.'||l_trace||': Начинаем наполнение перечня совпадений.');
+    
+    INSERT INTO FINMON_PUBLIC_CUSTOMERS (ID, RNK, NMK, CRISK, CUST_RISK, CHECK_DATE, RNK_REEL, NMK_REEL, NUM_REEL, COMMENTS)
+    /* 1) збіг Клієнта з переліком публічних осіб
+            поля    "RNK пов'язаної особи",
+                    "ПІБ/Назва пов'язаної особи",
+                    "№ пов'яз. особи в переліку публічних осіб" пусті,
+                    Коментар="клієнт"
+    */
+    SELECT  FINMON_IS_PUBLIC (C.NMK, C.RNK, 1),
+         C.RNK,
+         C.NMK,
+         NVL (CW.VALUE, 'Низький'),
+         CONCATSTR (CR.RISK_ID),
+         TRUNC (SYSDATE),
+         null,
+         '',
+         null,
+         'клієнт'
+    FROM CUSTOMER C,
+         (SELECT RNK, RISK_ID
+            FROM CUSTOMER_RISK
+           WHERE TRUNC (SYSDATE) BETWEEN DAT_BEGIN AND NVL(DAT_END, trunc(sysdate))
+             AND RISK_ID IN (2,3,62,63,64,65) order by RISK_ID) CR,
+         (SELECT RNK, VALUE
+            FROM CUSTOMERW
+           WHERE TAG = 'RIZIK') CW
+    WHERE FINMON_IS_PUBLIC (NMK, C.RNK, 0) = 1
+      AND DATE_OFF IS NULL
+      AND CR.RNK(+) = C.RNK
+      AND CW.RNK(+) = C.RNK
+    GROUP BY C.RNK, C.NMK, CW.VALUE
+      /* 2) збіг пов'язаної особи (клієнта банку) на дату звірки,
+            перевіряються і закриті клієнти - блок даних по клієнту - дані клієнта пов'язаного з публічною особою,
+            поле    "№ особи в переліку публічних осіб" пусте,
+                    блок пов'язаної особи - відповідні дані по кому пройшов збіг,
+                    Коментар="пов'язана особа (клієнт банку)"
+         3) збіг пов'язаної особи (не клієнт банку) на дату звірки - блок даних по клієнту - дані клієнта пов'язаного з публічною особою,
+            поле    "№ особи в переліку публічних осіб" пусте,
+                    блок пов'язаної особи - відповідні дані по кому пройшов збіг,
+                    Коментар="пов'язана особа (НЕ клієнт банку)"
+      */
+    UNION ALL
+    SELECT  NULL,
+         C.RNK,
+         C.NMK,
+         NVL (CW.VALUE, 'Низький'),
+         CONCATSTR (CR.RISK_ID),
+         TRUNC (SYSDATE),
+         CREL.REL_RNK,
+         COALESCE(C2.NMK,CE.NAME),
+         FINMON_IS_PUBLIC (COALESCE(C2.NMK,CE.NAME), CREL.REL_RNK, 1),
+         CASE   WHEN REL_INTEXT = 1 THEN 'пов''язана особа (клієнт банку)'
+                WHEN REL_INTEXT = 0 THEN 'пов''язана особа (НЕ клієнт банку)'
+         END
+    FROM CUSTOMER C,
+         CUSTOMER_REL CREL,
+         CUSTOMER_EXTERN CE,
+         (SELECT RNK, RISK_ID
+            FROM CUSTOMER_RISK
+           WHERE TRUNC (SYSDATE) BETWEEN DAT_BEGIN AND NVL(DAT_END, trunc(sysdate))
+             AND RISK_ID IN (2,3,62,63,64,65) order by RISK_ID) CR,
+         (SELECT RNK, VALUE
+            FROM CUSTOMERW
+           WHERE TAG = 'RIZIK') CW,
+         CUSTOMER C2
+    WHERE     FINMON_IS_PUBLIC (COALESCE(C2.NMK,CE.NAME), CREL.REL_RNK, 0) = 1
+         AND CREL.REL_RNK = CE.ID(+)
+         AND C.RNK = CREL.RNK
+         AND C.DATE_OFF IS NULL
+         AND CR.RNK(+) = CREL.RNK
+         AND CW.RNK(+) = CREL.RNK
+         AND C2.RNK(+) = CREL.REL_RNK
+    GROUP BY C.RNK, C.NMK, CW.VALUE, CREL.REL_RNK,CREL.REL_INTEXT,CE.NAME,C2.NMK;
+bars_audit.info('finmon_check_public - finished');
+exception 
+    when others then
+        bars_audit.error(g_trace||'.'||l_trace||': Завершилось с ошибкой: '||sqlerrm||' '||dbms_utility.format_error_backtrace);
+        rollback; -- возвращаемся к пустому списку
+        raise;    
+end check_public;
 
 -------------------------------------------------------------------------------------------------
 -- запустить процедуру в джобе, который по завершению отправит сообщение p_success_message запустившему пользователю и самоудалится
 -------------------------------------------------------------------------------------------------
-procedure run_deferred_task(p_procname        varchar2,
+procedure run_deferred_task(p_procname        varchar2, 
                             p_success_message varchar2)
 is
-l_jobname varchar2(64) := 'FM_'||substr(upper(p_procname), instr(p_procname, '.')+1)||'_'||f_ourmfo;
+l_jobname varchar2(64) := 'FM_'||replace(upper(p_procname), 'FM_UTL.', '')||'_'||f_ourmfo;
 l_error_message varchar2(256) := 'Відкладена процедура виконалась з помилками. Зверніться до департаменту ІТ';
-l_action varchar2(2000) :=
-'begin
-    bars_login.login_user(sys_guid, 1, null, null);
-    bc.go('''||f_ourmfo||''');
-    '||p_procname||';
+l_action varchar2(2000) := 
+'begin 
+    bars_login.login_user(sys_guid, 1, null, null); 
+    bc.go('''||f_ourmfo||'''); 
+    '||p_procname||'; 
     commit;
     bms.send_message(p_receiver_id     => '||user_id||',
      p_message_type_id => 1,
@@ -390,11 +418,10 @@ l_action varchar2(2000) :=
              p_expiration      => 0);
  end;';
 begin
-    --bars_audit.info(g_trace||'.run_deferred_task '||l_jobname||': start p_procname='||p_procname||', p_success_message='||p_success_message);
-    dbms_scheduler.create_job(job_name => l_jobname,
-                              job_type => 'PLSQL_BLOCK',
-                              job_action => l_action,
-                              auto_drop => true,
+    dbms_scheduler.create_job(job_name => l_jobname, 
+                              job_type => 'PLSQL_BLOCK', 
+                              job_action => l_action, 
+                              auto_drop => true, 
                               enabled => true);
 exception
     when others then
@@ -403,74 +430,10 @@ exception
         raise;
 end run_deferred_task;
 
---
--- Простановка параметров ФМ
---
-procedure set_fm_params (p_id    finmon_que.id%type,
-                         p_ref   finmon_que.ref%type,
-                         p_rec   finmon_que.rec%type,
-                         p_vid1  finmon_que.opr_vid1%type,
-                         p_vid2  finmon_que.opr_vid2%type,
-                         p_comm2 finmon_que.comm_vid2%type,
-                         p_vid3  finmon_que.opr_vid3%type,
-                         p_comm3 finmon_que.comm_vid3%type,
-                         p_mode  finmon_que.monitor_mode%type,
-                         p_rnka  finmon_que.rnk_a%type,
-                         p_rnkb  finmon_que.rnk_b%type,
-                         p_vids2 T_DICTIONARY,
-                         p_vids3 T_DICTIONARY
-                         )
-is
-l_id finmon_que.id%type := p_id;
-begin
-    if l_id is null then
-
-        insert into finmon_que(ref, rec, status, opr_vid1, opr_vid2, comm_vid2, opr_vid3, comm_vid3, monitor_mode, agent_id, rnk_a, rnk_b)
-        values (p_ref, p_rec, 'I', nvl(p_vid1,'999999999999999'), p_vid2, p_comm2, p_vid3, p_comm3, p_mode, user_id, p_rnka, p_rnkb)
-        returning id into l_id;
-
-    else
-        update finmon_que
-        set opr_vid1 = nvl(p_vid1,'999999999999999'),
-            opr_vid2 = p_vid2,
-            comm_vid2 = p_comm2,
-            opr_vid3  = p_vid3,
-            comm_vid3 = p_comm3,
-            monitor_mode = p_mode,
-            status = decode(status,'R','I',status),
-            rnk_a = p_rnka,
-            rnk_b = p_rnkb
-        where id = l_id;
-
-        if p_vid2 = '0000' then
-        delete from finmon_que_vid2 where id = l_id;
-        end if;
-        if p_vid3 = '000' then
-        delete from finmon_que_vid3 where id = l_id;
-        end if;
-    end if;
-    
-    -- если есть доп. коды ОМ
-    -- удаляем существующие
-    delete from finmon_que_vid2 where id = l_id;
-    if p_vids2 is not null and p_vids2.count > 0 then
-        insert into finmon_que_vid2 (id, order_id, vid)
-        select l_id, key, value from table(p_vids2);
-    end if;
-    -- если есть доп. коды ВМ
-    -- удаляем существующие
-    delete from finmon_que_vid3 where id = l_id;
-    if p_vids3 is not null and p_vids3.count > 0 then
-        insert into finmon_que_vid3 (id, order_id, vid)
-        select l_id, key, value from table(p_vids3);
-    end if;
-    
-end set_fm_params;
-
---
--- Пакетное проставление параметров ФМ
+-------------------------------------------------------------------------------------------------
+-- пакетное проставление параметров ФМ
 -- проставляет один набор кодов операции, ОМ и ВМ на весь список операций
---
+-------------------------------------------------------------------------------------------------
 procedure set_fm_params_bulk(p_refs     in number_list,                  -- коллекция референсов
                              p_opr_vid1 in finmon_que.opr_vid1%type,     -- код вида операции
                              p_opr_vid2 in finmon_que.opr_vid2%type,     -- код ОМ
@@ -478,11 +441,11 @@ procedure set_fm_params_bulk(p_refs     in number_list,                  -- колл
                              p_opr_vid3 in finmon_que.opr_vid3%type,     -- код ВМ
                              p_comm3    in finmon_que.comm_vid3%type,    -- комментарий к ВМ
                              p_mode     in finmon_que.monitor_mode%type, -- режим мониторинга
-                             p_vid2     in T_DICTIONARY,                  -- доп. коды ОМ (коллекция)
-                             p_vid3     in T_DICTIONARY                   -- доп. коды ВМ (коллекция)
+                             p_vid2     in string_list,                  -- доп. коды ОМ (коллекция)
+                             p_vid3     in string_list                   -- доп. коды ВМ (коллекция)
                              )
 is
-/*
+/* 
 created 12.05.2017
 ММФО
 */
@@ -569,8 +532,8 @@ begin
             bars_audit.trace('%s: %s vids2 is not empty, processing', g_modcode, $$PLSQL_UNIT);
             -- проставляем новые
             forall idx in 1..p_vid2.count
-                insert into finmon_que_vid2(id, vid, order_id)
-                select id, p_vid2(idx).value, p_vid2(idx).key
+                insert into finmon_que_vid2(id, vid)
+                select id, p_vid2(idx)
                 from finmon_que where ref in (select * from table(p_refs));
         end if;
     end if;
@@ -582,8 +545,8 @@ begin
             bars_audit.trace('%s: %s vids3 is not empty, processing', g_modcode, $$PLSQL_UNIT);
             -- проставляем новые
             forall idx in 1..p_vid3.count
-                insert into finmon_que_vid3(id, vid, order_id)
-                select id, p_vid3(idx).value, p_vid3(idx).key
+                insert into finmon_que_vid3(id, vid)
+                select id, p_vid3(idx)
                 from finmon_que where ref in (select * from table(p_refs));
         end if;
     end if;
@@ -591,10 +554,10 @@ begin
     bars_audit.trace('%s: %s done', g_modcode, $$PLSQL_UNIT);
 end set_fm_params_bulk;
 
---
--- Проверка операций за период на соответствие правилам ФМ;
+-------------------------------------------------------------------------------------------------
+-- проверка операций за период на соответствие правилам ФМ;
 -- наполняет таблицу tmp_fm_checkrules для вызвавшего пользователя
---
+-------------------------------------------------------------------------------------------------
 procedure check_fm_rules (p_dat1 date, p_dat2 date, p_rules varchar2)
 is
 l_trace constant varchar2(128):= g_trace || '.check_fm_rules';
@@ -612,7 +575,7 @@ begin
     exception
         when partition_doesnt_exist then
             execute immediate 'alter table bars.tmp_fm_checkrules add partition usr'|| user_id || ' values (' || user_id || ')';
-        when resource_busy then
+        when resource_busy then 
             raise_application_error(-20000, 'Запит від даного користувача вже виконується');
         when others then
             bars_audit.error('tmp_fm_checkrules : '||sqlerrm);
@@ -627,9 +590,9 @@ text="На текущий момент верхний цикл делает несколько тысяч итераций.
     for z in (select ref, vdat
                 from oper
                where vdat between p_dat1 and p_dat2
-                 and
+                 and 
                  (kv = 980 and s >= 10000000
-                  or
+                  or 
                   kv <> 980 and gl.p_icurval (nvl(kv, 980), nvl(s, 0), vdat) >= 10000000)
              )
     loop
@@ -641,7 +604,7 @@ text="На текущий момент верхний цикл делает несколько тысяч итераций.
                 execute immediate 'select 1 from ' || k.v_name || ' where ref = :ref and vdat = :vdat'
                 into l_tmp using z.ref, z.vdat;
                 l_rules := l_rules || ', ' || k.id;
-            exception
+            exception 
                 when no_data_found then null;
             end;
         end loop;
@@ -653,10 +616,10 @@ text="На текущий момент верхний цикл делает несколько тысяч итераций.
     bars_audit.trace(l_trace || ' finish.');
 end check_fm_rules;
 
---
--- Проверка операции (неблокирующая) на список террористов
+-------------------------------------------------------------------------------------------------
+-- проверка операции (неблокирующая) на список террористов
 -- возвращает 0 в случае отсутствия совпадения, -1 в случае ошибки или номер в справочнике террористов
---
+-------------------------------------------------------------------------------------------------
 function ref_check(p_ref oper.ref%type) return number
 is
 l_trace constant varchar2(150) := g_trace||'.'||'ref_check';
@@ -664,44 +627,45 @@ l_datr           date;
 l_nazn           oper.nazn%type;
 l_nama           oper.nam_a%type;
 l_namb           oper.nam_b%type;
-l_id_a  oper.id_a%type;
-l_id_b  oper.id_b%type;
 l_tt             oper.tt%type;
 l_flag           number;
 l_otm            fm_ref_que.otm%type := 0;
 resource_busy    exception;
 pragma exception_init (resource_busy, -54);
 begin
-    bars_audit.trace(l_trace || ': start. Получаем данные операции '||p_ref);
+    bars_audit.trace(l_trace || ': start. Получаем данные операции');
     begin
         select o.tt, o.nazn, o.nam_a, o.nam_b
           into l_tt, l_nazn, l_nama, l_namb
           from oper o
-         where o.ref = p_ref
-        for update of o.sos nowait;
+         where o.ref = p_ref;
     exception
         when no_data_found then return -1;
         when resource_busy then return -1;
     end;
     bars_audit.trace(l_trace || ': сверяем флаг "не проверять на террористов"');
     -- не проверять операции с флагом "Не сверять со списком террористов"
-    l_flag := operations.GET_FLAG(tt_id => l_tt, flag_id => 30);
+    begin
+        select nvl(f.value,0) into l_flag from tts_flags f where f.tt = l_tt and f.fcode = 30;
+    exception when no_data_found then
+        l_flag := 0;
+    end;
     if l_flag = 1 then
         return 0;
     end if;
     -- проверка на совпадение со списком террористов
     -- наименование отправителя
     bars_audit.trace(l_trace || ': проверяем наименование отправителя');
-    l_otm := fm_terrorist_utl.get_terrorist_code(l_nama);
+    l_otm := get_terrorist_code(l_nama);
     -- наименование получателя
     if l_otm = 0 then
         bars_audit.trace(l_trace || ': проверяем наименование получателя');
-        l_otm := fm_terrorist_utl.get_terrorist_code(l_namb);
+        l_otm := get_terrorist_code(l_namb);
     end if;
     -- назначение платежа
     if l_otm = 0 then
         bars_audit.trace(l_trace || ': проверяем назначение платежа');
-        l_otm := fm_terrorist_utl.get_terrorist_code(l_nazn);
+        l_otm := get_terrorist_code(l_nazn);
     end if;
 
     if l_otm = 0 then
@@ -712,77 +676,13 @@ begin
                       and tag in ('FIO', 'FIO2', 'OTRIM') )
         loop
             bars_audit.trace(l_trace || ': проверяем допреквизиты: '||d.tag);
-            l_otm := fm_terrorist_utl.get_terrorist_code(d.value);
+            l_otm := get_terrorist_code(d.value);
             if l_otm > 0 then
                 exit;
             end if;
         end loop;
     end if;
 
-    /*
-      COBUSUPABS-9160
-    */
-    -------------------------------
-    -- Якщо в l_id_a , l_id_b є ОКПО в терористах
-    if l_otm = 0 then
-       begin
-            select fin_r.c1 into l_otm
-              from bars.FINMON_REFT fin_r
-             where fin_r.c25 is not null
-               and regexp_like(fin_r.c25, '^([[:digit:]]{8}|[[:digit:]]{10})$')
-               and fin_r.c25 in (l_id_a , l_id_b)
-               and rownum = 1;
-       exception
-         when no_data_found then l_otm := 0;
-       end;
-    end if;
-    -- Якщо в l_nazn є ОКПО в терористах
-    if l_otm = 0 then
-       begin 
-        with tab_okpo as
-         (SELECT regexp_replace(res_okpo, '[^0-9]') res_okpo
-            FROM (SELECT REGEXP_SUBSTR(str, '[^ ]+', 1, LEVEL) AS res_okpo
-                    FROM (SELECT l_nazn AS str
-                            FROM DUAL)
-                  CONNECT BY LEVEL <= LENGTH(REGEXP_REPLACE(str, '[^ ]+')) + 1)
-           WHERE REGEXP_LIKE(res_okpo, '(^|\D)(\d{8}|\d{10})(\D|$)'))
-        select fin_r.c1 into l_otm
-          from bars.FINMON_REFT fin_r, tab_okpo
-         where fin_r.c25 = tab_okpo.res_okpo
-           and fin_r.c25 is not null
-           and regexp_like(fin_r.c25, '^([[:digit:]]{8}|[[:digit:]]{10})$')
-           and rownum = 1;
-           exception
-         when no_data_found then l_otm := 0;
-       end;
-    end if;
-    -- Якщо в TAG =>FIO э слова ч/3 або через то треба перевірити стандартним методом
-    if l_otm = 0 then
-       begin
-        for check_str in ( 
-                           select level as element,
-                                  regexp_substr(str, '(.*?)( (через)|(ч/з)|$)', 1, level, null, 1) as element_value
-                             from (select value str
-                                     from operw
-                                    where ref = p_ref
-                                      and tag = 'FIO'
-                                      and rownum =1 
-                                  ) 
-                             where regexp_like(str,'ч/з|через') 
-                             connect by level <= regexp_count(str, 'через') + regexp_count(str, 'ч/з')+ 1
-                          )
-        loop
-           l_otm := f_istr (check_str.element_value);
-           if l_otm > 0 then
-              exit;
-           end if;
-        end loop;
-       exception
-         when no_data_found then l_otm := 0;  
-       end;
-    end if;
-    ------------------------------
-    
     /*COBUSUPABS-5202
     По операціям з кодами CVO, IBO, CVS додатково перевіряти на наявність терористів у Переліку додатковий реквізит операції "59" «SWT.59 Beneficiare Customer»
     (%TERROR%, де TERROR - найменування юрособи або ПІБ особи з переліку осіб).
@@ -826,10 +726,10 @@ begin
                               and tag in ('DATN', 'DRDAY', 'DT_R') )
                 loop
                     if dats.value = l_datr
-                    then
+                    then 
                         bars_audit.trace(l_trace||': Дата рождения из operw = '||to_char(dats.value,'dd.mm.yyyy'));
                         exit;
-                    else
+                    else 
                         l_otm := 0;
                         bars_audit.trace(l_trace||': Дата рождения из operw = '||to_char(dats.value,'dd.mm.yyyy')|| ' не равна дате рождения в списке. Сбрасываем признак.');
                     end if;
@@ -842,31 +742,30 @@ begin
     return l_otm;
 end ref_check;
 
---
--- Проверка (блокирующая) конкретной операции или всех операций в очереди
+-------------------------------------------------------------------------------------------------
+-- проверка (блокирующая) конкретной операции или всех операций в очереди
 -- в случае совпадения отправляет в очередь для просмотра ФМ и блокирует визой ФМ
---
+-------------------------------------------------------------------------------------------------
 procedure ref_block(p_ref in oper.ref%type default null)
 is
 -- код группы визирования "Заблокировано Фин.Мониторингом"
 c_grp   constant number := getglobaloption ('FM_GRP1');
 l_otm            fm_ref_que.otm%type := 0;
 l_trace constant varchar2(150) := g_trace||'.'||'ref_block';
-l_doc_lock_limit constant number := 100;
 begin
     bars_audit.trace(l_trace||': Старт'||case when p_ref is not null then ' для ref='||p_ref else '' end);
     if p_ref is not null then
         /* проверка одного документа */
-        for r in (select ref from ref_que where fmcheck = 0 and ref = p_ref )
+        for r in (select ref from ref_que where nvl(fmcheck, 0) = 0 and ref = p_ref )
         loop
             bars_audit.trace(l_trace||': loop: ref = '||p_ref);
             l_otm := ref_check(r.ref);
-            if l_otm = -1 then
+            if l_otm = -1 then 
                 continue; /* если проверка вернула ошибку - переходим к следующей операции */
             end if;
-            bars_audit.trace(l_trace||': ставим признак "проверено": '||r.ref);
-            update ref_que
-            set fmcheck = 1
+            bars_audit.trace(l_trace||': ставим признак "проверено"');
+            update ref_que 
+            set fmcheck = 1 
             where ref = p_ref;
             if l_otm > 0 then
                 begin
@@ -886,37 +785,40 @@ begin
         end loop;
     else
         /* проверка всех документов в очереди */
-        for r in (select rownum rn, ref from ref_que where fmcheck = 0 )
+        for b in (select kf from mv_kf)
         loop
-            bars_audit.trace(l_trace||': loop: ref = '||r.ref);
-            l_otm := ref_check(r.ref);
-            if l_otm = -1 then
-                continue; /* если проверка вернула ошибку - переходим к следующей операции */
-            end if;
-            bars_audit.trace(l_trace||': ставим признак "проверено": '||r.ref);
-            update ref_que
-            set fmcheck = 1
-            where ref = r.ref;
-            if l_otm > 0 then
-                begin
-                    bars_audit.trace(l_trace||': вставляем в очередь ФМ');
-                    insert into fm_ref_que (ref, otm)
-                    values (r.ref, l_otm);
-                exception
-                    when dup_val_on_index then null;
-                end;
-
-                if c_grp is not null then
-                    bars_audit.trace(l_trace||': блокируем визой ФМ');
-                    insert into oper_visa (ref, dat, userid, groupid, status)
-                    values (r.ref, sysdate, user_id, c_grp, 1);
+            -- представляемся чужим МФО
+            bc.subst_mfo(b.kf);
+            for r in (select ref from ref_que where nvl(fmcheck, 0) = 0 )
+            loop
+                bars_audit.trace(l_trace||': loop: ref = '||p_ref);
+                l_otm := ref_check(r.ref);
+                if l_otm = -1 then 
+                    continue; /* если проверка вернула ошибку - переходим к следующей операции */
                 end if;
-            end if;
-           -- коммитим (отпуская oper for update) каждые N проверенных документов
-           if mod(r.rn, l_doc_lock_limit) = 0 then
-               commit;
-           end if;
-        end loop;
+                bars_audit.trace(l_trace||': ставим признак "проверено"');
+                update ref_que 
+                set fmcheck = 1 
+                where ref = p_ref;
+                if l_otm > 0 then
+                    begin
+                        bars_audit.trace(l_trace||': вставляем в очередь ФМ');
+                        insert into fm_ref_que (ref, otm)
+                        values (p_ref, l_otm);
+                    exception
+                        when dup_val_on_index then null;
+                    end;
+
+                    if c_grp is not null then
+                        bars_audit.trace(l_trace||': блокируем визой ФМ');
+                        insert into oper_visa (ref, dat, userid, groupid, status)
+                        values (p_ref, sysdate, user_id, c_grp, 1);
+                    end if;
+                end if;
+            end loop;
+            -- возвращаемся к себе
+         end loop;
+         bc.set_context;
     end if;
 
 exception when others then
@@ -929,7 +831,10 @@ exception when others then
           dbms_utility.format_error_backtrace());
 end ref_block;
 
-end fm_utl;
+
+begin
+    null;
+end;
 /
 show errors;
 grant execute on bars.fm_utl to bars_access_defrole;
