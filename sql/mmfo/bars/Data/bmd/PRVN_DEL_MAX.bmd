@@ -126,12 +126,14 @@ begin
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 2, 'KF', 'C', 'Код~РУ  ', '', null, 2, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'NAME_KF', 'C', 'Назва~РУ  ', '', null, 3, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'DEL_SDF', 'N', 'Для~SDF', '', null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'DEL_SDM', 'N', 'Для~SDM', '', null, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'DEL_SDI', 'N', 'Для~SDI', '', null, 33, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 43, 'DEL_SDA', 'N', 'Для~SDA', '', null, 43, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 53, 'DEL_SNA', 'N', 'Для~SNA', '', null, 53, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 63, 'DEL_SRR', 'N', 'Для~SRR', '', null, 63, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'DEL_SDF', 'N', 'Для~SDF~(Коп)', '', null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'DEL_SDM', 'N', 'Для~SDM~(Коп)', '', null, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'DEL_SDI', 'N', 'Для~SDI~(Коп)', '', null, 33, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'DEL_SDA', 'N', 'Для~SDA~(Коп)', '', null, 43, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 53, 'DEL_SNA', 'N', 'Для~SNA~(Коп)', '', null, 53, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 63, 'DEL_SRR', 'N', 'Для~SRR~(Коп)', '', null, 63, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 73, 'DEL_REZ_SUM', 'N', 'Для~REZ~(Грн)', '', null, 73, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 74, 'DEL_REZ_PRC', 'N', 'Для~REZ_PROC~(%)', '', null, 74, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 1, 'ASC ');

@@ -48,6 +48,15 @@ COMMENT ON COLUMN BARS.FIN_DEB_ARC.ACC_SP IS 'Рахунок простроченого тіла';
 COMMENT ON COLUMN BARS.FIN_DEB_ARC.EFFECTDATE IS '';
 
 
+begin
+ execute immediate   'alter table FIN_DEB_ARC add (CHGDATE date ) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN FIN_DEB_ARC.CHGDATE  IS 'Дата формування';
+
 PROMPT *** Create  constraint CC_PRVNFINDEB_KF_NN ***
 begin   
  execute immediate '
@@ -56,8 +65,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
 
 
 PROMPT *** Create  constraint CC_FINDEBARC_EFFECTDATE_NN ***
@@ -69,10 +76,10 @@ exception when others then
  end;
 /
 
-PROMPT *** Create  index IDX_FINDEBARC_EFFECTDT_ACCSS ***
+PROMPT *** Create  index IDX_FINDEBARC_CHGDATE_ACCSS ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.IDX_FINDEBARC_EFFECTDT_ACCSS ON BARS.FIN_DEB_ARC (mdat, EFFECTDATE, ACC_SS) 
+  CREATE INDEX BARS.IDX_FINDEBARC_CHGDATE_ACCSS ON BARS.FIN_DEB_ARC (mdat, chgdate, ACC_SS) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND ';
 exception when others then
@@ -96,19 +103,6 @@ exception when others then
   if  sqlcode=-2443  then null; else raise; end if;
  end;
 /
-begin   
- execute immediate 'drop index UK_FINDEBARC_ACCSS';
-exception when others then
-  if  sqlcode=-1418  then null; else raise; end if;
- end;
-/
-begin   
- execute immediate 'drop index I1_FINDEBARC_ACCSP';
-exception when others then
-  if  sqlcode=-1418  then null; else raise; end if;
- end;
-/
-
 
 PROMPT *** Create  index UK_FINDEBARC_ACCSS ***
 begin   

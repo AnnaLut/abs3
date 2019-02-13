@@ -73,8 +73,14 @@ COMMENT ON COLUMN BARS.XOZ_REF_ARC.ID IS '';
 COMMENT ON COLUMN BARS.XOZ_REF_ARC.MDAT IS '';
 COMMENT ON COLUMN BARS.XOZ_REF_ARC.KF IS '';
 
-
-
+begin
+ execute immediate   'alter table XOZ_REF_ARC add (CHGDATE date ) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN XOZ_REF_ARC.CHGDATE  IS 'Дата формування';
 
 PROMPT *** Create  constraint SYS_C00138857 ***
 begin   
@@ -163,8 +169,6 @@ exception when others then
 /
 
 
-
-
 PROMPT *** Create  constraint CC_XOZREFARC_KF_NN ***
 begin   
  execute immediate '
@@ -173,9 +177,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index PK_XOZREFARC ***
 begin   
@@ -188,9 +189,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  index I1_XOZ_REF_ARC ***
 begin   
  execute immediate '
@@ -202,6 +200,16 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I2_XOZ_REF_ARC ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I2_XOZ_REF_ARC ON BARS.XOZ_REF_ARC (MDAT, chgdate) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  XOZ_REF_ARC ***

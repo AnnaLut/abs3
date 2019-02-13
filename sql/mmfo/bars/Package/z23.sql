@@ -2078,7 +2078,7 @@ PROCEDURE start_rez
   -- переменные
   aa        accounts%rowtype;
   kol_max   int    ;  dat31_    date  ; l_d1    date  ;  s_dat01  varchar2(10);
-  nd_       number ;  accs_    number ; l_time  number;
+  nd_       number ;  accs_    number ; l_time  number;  l_cnt    number;
 
 begin
 
@@ -2168,32 +2168,43 @@ begin
 
      --z23.to_log_rez (user_id , 351 , p_dat01 ,' cck_arc_cc_lim');
      --cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 );
+     
+     select count(*) into l_cnt from xoz_ref_arc  cl where cl.mdat = p_dat01 and chgdate >= p_dat01 and chgdate is not null;
 
-     if BARSUPL.IS_T0_OK(p_dat01) <> 1 THEN
-        delete from fin_deb_arc where mdat=p_dat01;
-        delete from xoz_ref_arc where mdat=p_dat01;
+     if l_cnt = 0  THEN
+        z23.to_log_rez (user_id , 351 , p_dat01 ,'DELETE xoz_ref_arc');
+        delete from xoz_ref_arc where mdat=p_dat01;           
+        z23.to_log_rez (user_id , 351 , p_dat01 ,'INSERT xoz_ref_arc');
+        insert into xoz_ref_arc (REF1, STMT1, REF2, ACC, MDATE, S, FDAT, S0, NOTP, PRG, BU, DATZ, REFD, ID, KF, mdat,chgdate)
+        select t.REF1, t.STMT1, t.REF2, t.ACC, t.MDATE, t.S, t.FDAT, t.S0, t.NOTP, t.PRG, t.BU, t.DATZ, t.REFD, t.ID, t.KF, p_dat01, sysdate
+        from xoz_ref t;
      end if;
 
+     select count(*) into l_cnt from fin_deb_arc cl where cl.mdat = p_dat01 and chgdate >= p_dat01 and chgdate is not null;
 
-     if BARSUPL.IS_T0_OK(p_dat01) <> 1 THEN
-        delete from fin_deb_arc where mdat=p_dat01;
-        delete from xoz_ref_arc where mdat=p_dat01;
+     if l_cnt = 0  THEN
+        z23.to_log_rez (user_id , 351 , p_dat01 ,'DELETE fin_deb_arc');
+        delete from fin_deb_arc where mdat=p_dat01;           
+        z23.to_log_rez (user_id , 351 , p_dat01 ,'INSERT fin_deb_arc');
+        insert into fin_deb_arc ( ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID, MDAT, kf, chgdate)
+        select f.ACC_SS, f.ACC_SP, f.EFFECTDATE, f.AGRM_ID, p_dat01, f.kf, sysdate
+        from prvn_fin_deb f;
      end if;
-
+  /*
      -- архив по хоз.дебиторке
      z23.to_log_rez (user_id , 351 , p_dat01 ,' xoz_ref_arc');
-     insert into xoz_ref_arc (REF1, STMT1, REF2, ACC, MDATE, S, FDAT, S0, NOTP, PRG, BU, DATZ, REFD, ID, KF, mdat)
-     select t.REF1, t.STMT1, t.REF2, t.ACC, t.MDATE, t.S, t.FDAT, t.S0, t.NOTP, t.PRG, t.BU, t.DATZ, t.REFD, t.ID, t.KF, p_dat01
+     insert into xoz_ref_arc (REF1, STMT1, REF2, ACC, MDATE, S, FDAT, S0, NOTP, PRG, BU, DATZ, REFD, ID, KF, mdat,chgdate)
+     select t.REF1, t.STMT1, t.REF2, t.ACC, t.MDATE, t.S, t.FDAT, t.S0, t.NOTP, t.PRG, t.BU, t.DATZ, t.REFD, t.ID, t.KF, p_dat01, sysdate
      from xoz_ref t
      where not exists (select 1 from xoz_ref_arc cl where cl.mdat= p_dat01 and rownum=1);
      commit;
      z23.to_log_rez (user_id , 351 , p_dat01 ,' fin_deb_arc');
-     insert into fin_deb_arc ( ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID, MDAT, kf)
-     select f.ACC_SS, f.ACC_SP, f.EFFECTDATE, f.AGRM_ID, p_dat01, f.kf
+     insert into fin_deb_arc ( ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID, MDAT, kf, chgdate)
+     select f.ACC_SS, f.ACC_SP, f.EFFECTDATE, f.AGRM_ID, p_dat01, f.kf, sysdate
      from prvn_fin_deb f
      where not exists (select 1 from fin_deb_arc cl where cl.mdat= p_dat01 and rownum=1);
      commit;
-     /*
+    
      -- формування 
      begin
         delete from rez_par_9200 where fdat = p_dat01; 

@@ -693,13 +693,14 @@ BEGIN
                   END IF;
                end if;
                --новая сумма резерва
-               if    nal_  in ('3','4','8')      THEN  s_new_ := k.sz;
-               elsif nal_  in ('2','5','C')      THEN  s_new_ := k.sz_30;
-               elsif nal_  in ('6','D')          THEN  s_new_ := k.sz_30;
-               elsif nal_ ='7'                   THEN  s_new_ := k.sz_30;
+               if    nal_  in ('4','8')      THEN  s_new_ := k.sz;
+               elsif nal_  in ('2','5','C')  THEN  s_new_ := k.sz_30;
+               elsif nal_  in ('6','D')      THEN  s_new_ := k.sz_30;
+               elsif nal_  in ('3')          THEN  s_new_ := k.sz-k.sz_30;
+               elsif nal_  =   '7'           THEN  s_new_ := k.sz_30;
                else
-                  if    k.sz_30<>0               THEN  s_new_ := k.sz-k.sz_30;
-                  else                                 s_new_ := k.sz;
+                  if    k.sz_30<>0           THEN  s_new_ := k.sz-k.sz_30;
+                  else                             s_new_ := k.sz;
                   end if;
                end if;
 
