@@ -58,10 +58,18 @@ begin
      insert into finmon_que (id, ref, rec, status, agent_id, comments)
      values (l_id, p_ref, p_rec, p_status, user_id, p_comments);
   else
-     update finmon_que
-        set status = p_status,
-            comments = p_comments
-      where decode(p_ref,null,rec,ref) = decode(p_ref,null,p_rec,p_ref);
+    case
+      when p_ref is null then
+           update finmon_que q
+              set q.status = p_status,
+                  q.comments = p_comments
+            where q.rec = p_rec;
+      else
+           update finmon_que q
+              set q.status = p_status,
+                  q.comments = p_comments
+            where q.ref = p_ref;
+      end case;
   end if;
 
   -- если устанавливается статус N (к отправке) - меняем код блокировки
