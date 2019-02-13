@@ -1,100 +1,114 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/v_nbur_3kx.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
+
+create or replace force view v_nbur_3kx 
+(  REPORT_DATE
+       , KF
+       , VERSION_ID
+       , NBUC
+         , FIELD_CODE
+       , EKP
+       , Q003_1
+       , F091
+       , R030
+       , T071
+       , K020
+       , K021
+       , K030
+       , Q001
+       , Q024  
+       , D100
+       , S180
+       , F089
+       , F092
+       , Q003_2
+       , Q007_1
+       , Q006 )
+as
+select t.REPORT_DATE
+       , t.KF
+       , t.VERSION_ID
+       , t.KF      as NBUC
+         , substr(trim(t.Q003_1),1,3)   as FIELD_CODE
+       , t.EKP
+       , t.Q003_1
+       , t.F091
+       , t.R030
+       , t.T071
+       , t.K020
+       , t.K021
+       , t.K030
+       , t.Q001
+       , t.Q024
+       , t.D100
+       , t.S180
+       , t.F089
+       , t.F092
+       , t.Q003_2
+       , t.Q007_1
+       , t.Q006
+from   (select
+               v.REPORT_DATE
+               , v.KF
+               , v.version_id
+               , extractValue( COLUMN_VALUE, 'DATA/EKP'   ) as EKP
+               , extractValue( COLUMN_VALUE, 'DATA/Q003_1') as Q003_1
+               , extractValue( COLUMN_VALUE, 'DATA/F091'  ) as F091
+               , extractValue( COLUMN_VALUE, 'DATA/R030'  ) as R030
+               , extractValue( COLUMN_VALUE, 'DATA/T071'  ) as T071
+               , extractValue( COLUMN_VALUE, 'DATA/K020'  ) as K020
+               , extractValue( COLUMN_VALUE, 'DATA/K021'  ) as K021
+               , extractValue( COLUMN_VALUE, 'DATA/K030'  ) as K030
+               , extractValue( COLUMN_VALUE, 'DATA/Q001'  ) as Q001
+               , extractValue( COLUMN_VALUE, 'DATA/Q024'  ) as Q024
+               , extractValue( COLUMN_VALUE, 'DATA/D100'  ) as D100
+               , extractValue( COLUMN_VALUE, 'DATA/S180'  ) as S180
+               , extractValue( COLUMN_VALUE, 'DATA/F089'  ) as F089
+               , extractValue( COLUMN_VALUE, 'DATA/F092'  ) as F092
+               , extractValue( COLUMN_VALUE, 'DATA/Q003_2') as Q003_2
+               , extractValue( COLUMN_VALUE, 'DATA/Q007_1') as Q007_1
+               , extractValue( COLUMN_VALUE, 'DATA/Q006'  ) as Q006
+         from   NBUR_REF_FILES f
+                , NBUR_LST_FILES v
+                , table( XMLSequence( XMLType( v.FILE_BODY ).extract('/NBUSTATREPORT/DATA') ) ) t
+         where  f.ID        = v.FILE_ID
+                and f.FILE_CODE = '#3K'
+                and f.FILE_FMT  = 'XML'
+                and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' )
+       ) t;
+
+comment on table  v_nbur_3kx is '3KX - Дані про купівлю, продаж безготівкової іноземної валюти';
+comment on column v_nbur_3kx.REPORT_DATE is 'Звiтна дата';
+comment on column v_nbur_3kx.KF is 'Фiлiя';
+comment on column v_nbur_3kx.VERSION_ID is 'Номер версії файлу';
+comment on column v_nbur_3kx.NBUC is 'Код розрізу даних';
+comment on column v_nbur_3kx.FIELD_CODE is 'Код показника';
+comment on column v_nbur_3kx.EKP is 'XML Код показника';
+comment on column v_nbur_3kx.Q003_1 is 'Умовний номер рядка';
+comment on column v_nbur_3kx.F091 is 'Код операції';
+comment on column v_nbur_3kx.R030 is 'Код валюти';
+comment on column v_nbur_3kx.T071 is 'Сума купівлі/продажу';
+comment on column v_nbur_3kx.K020 is 'Код відправника/отримувача';
+comment on column v_nbur_3kx.K021 is 'Код ознаки ідентифікаційного коду';
+comment on column v_nbur_3kx.K030 is 'Код резидентності';
+comment on column v_nbur_3kx.Q001 is 'Назва покупця/продавця';
+comment on column v_nbur_3kx.Q024 is 'Тип контрагента';
+comment on column v_nbur_3kx.D100 is 'Код умов валютної операції';
+comment on column v_nbur_3kx.S180 is 'Строк валютної операції';
+comment on column v_nbur_3kx.F089 is 'Ознака консолідації';
+comment on column v_nbur_3kx.F092 is 'Підстава для купівлі/ мета продажу';
+comment on column v_nbur_3kx.Q003_2 is 'Номер контракту';
+comment on column v_nbur_3kx.Q007_1 is 'Дата контракту';
+comment on column v_nbur_3kx.Q006 is 'Відомості про операцію';
+
+
+GRANT SELECT ON BARS.V_NBUR_3KX TO BARSREADER_ROLE;
+GRANT SELECT ON BARS.V_NBUR_3KX TO BARS_ACCESS_DEFROLE;
+GRANT SELECT ON BARS.V_NBUR_3KX TO UPLD;
 
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_NBUR_3KX.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_NBUR_3KX ***
-
-CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_3KX
-(
-   REPORT_DATE,
-   KF,
-   VERSION_ID,
-   NBUC,
-   FIELD_CODE,
-   SEG_01,
-   SEG_02,
-   FIELD_VALUE
-)
-AS
-     SELECT p.REPORT_DATE,
-            p.KF,
-            p.VERSION_ID,
-            p.NBUC,
-            p.FIELD_CODE,
-            SUBSTR (p.FIELD_CODE, 1, 4) AS SEG_01,
-            SUBSTR (p.FIELD_CODE, 5, 3) AS SEG_02,
-            p.FIELD_VALUE
-       FROM NBUR_AGG_PROTOCOLS_ARCH p
-            JOIN NBUR_REF_FILES f ON (f.FILE_CODE = p.REPORT_CODE)
-            JOIN
-            NBUR_LST_FILES v
-               ON (    v.REPORT_DATE = p.REPORT_DATE
-                   AND v.KF = p.KF
-                   AND v.VERSION_ID = p.VERSION_ID
-                   AND v.FILE_ID = f.ID)
-      WHERE p.REPORT_CODE = '#3K' AND v.FILE_STATUS IN ('FINISHED', 'BLOCKED')
-   ORDER BY nbuc, SUBSTR (FIELD_CODE, 5, 3), 
-            (case SUBSTR (FIELD_CODE, 1, 4) 
-            when 'F091' then 1 
-            when 'R030' then 2 
-            when 'T071' then 3
-            when 'K020' then 4
-            when 'K021' then 5 
-            when 'Q001' then 6
-            when 'Q024' then 7 
-            when 'D100' then 8
-            when 'S180' then 9 
-            when 'F089' then 10 
-            when 'F092' then 11
-            when 'Q003' then 12 
-            when 'Q007' then 13
-            when 'Q006' then 14
-            else 15
-            end)
-/
-
-COMMENT ON TABLE BARS.V_NBUR_3KX IS '3KX - Дані про купівлю, продаж безготівкової іноземної валюти'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.REPORT_DATE IS 'Звітна дата'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.KF IS 'Код фiлiалу (МФО)'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.VERSION_ID IS 'Ід. версії файлу'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.NBUC IS 'Код розрізу даних у звітному файлі'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.FIELD_CODE IS 'Код показника'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.SEG_01 IS 'Елемент'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.SEG_02 IS 'Умовний номер'
-/
-
-COMMENT ON COLUMN BARS.V_NBUR_3KX.FIELD_VALUE IS 'Значення показника'
-/
-
-
-
-GRANT SELECT ON BARS.V_NBUR_3KX TO BARSREADER_ROLE
-/
-
-GRANT SELECT ON BARS.V_NBUR_3KX TO BARS_ACCESS_DEFROLE
-/
-
-GRANT SELECT ON BARS.V_NBUR_3KX TO UPLD
-/
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_NBUR_3KX.sql =========*** End *** ===
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_nbur_3kx.sql =========*** End *** ===
 PROMPT ===================================================================================== 
 

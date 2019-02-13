@@ -13,12 +13,12 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.021          17.12.2018
+% VERSION     :   v.19.003          06.02.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-    ver_           varchar2(30)        := ' v.18.021    17.12.2018';
+    ver_           varchar2(30)        := ' v.19.003    06.02.2019';
 /*
    Структура показателя    DDDD NNN
 
@@ -69,10 +69,6 @@ IS
    nbuc1_     varchar2(12);
    kurs_      number;
 
-   pr_s3_           number;               -- флаг для определение наличия поля S3 табл.ZAYAVKA
-   is_swap_tag_     number;               -- флаг для определение наличия поля SWAP_TAG табл.FX_DEAL
-   is_f092_         number;               -- флаг для определение наличия поля F092 табл.ZAYAVKA
-
    dat_1_           date;                 -- fx_deal.dat 
    dat_2_           date;                 -- fx_deal.dat_b
 
@@ -81,6 +77,7 @@ IS
    okpo_a     varchar2(14);
    nmk_a      varchar2(70);
    k021_a     varchar2(1);
+   k030_a     varchar2(1);
    op_spot_   number;
 
    sql_z      varchar2(200);
@@ -99,6 +96,7 @@ IS
    t071_      number;
    k020_      varchar2(20);
    k021_      varchar2(1);
+   k030_      varchar2(1);
    q001_      varchar2(135);
    q024_      varchar2(1);
    d100_      varchar2(2);
@@ -142,6 +140,7 @@ IS
    d1#3K_     varchar2(70);
    a2_        varchar2(70);
    a3_        varchar2(70);
+   comm_      varchar2(200);
 
    ser_       person.ser%TYPE;
    numdoc_    person.numdoc%TYPE;
@@ -150,7 +149,12 @@ IS
    IS
       SELECT   t.ko,
                nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_),
-               c.rnk, c.okpo, nvl(substr(trim(p.nmku),1,135),c.nmk) nmk,
+               c.rnk, c.okpo,
+               (case
+                   when c.codcagent in ('3','4')
+                      then    nvl(substr(trim(p.nmku),1,135),c.nmk)
+                   else   c.nmk
+                 end)  nmk,
                to_char(c.country), c.adr,
                NVL (c.ise, '00000'), NVL (c.fs, '00'), c.codcagent,
                SUM (t.s_eqv),
@@ -164,7 +168,11 @@ IS
                nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_),
                c.rnk,
                c.okpo,
-               nvl(substr(trim(p.nmku),1,135),c.nmk),
+               (case
+                   when c.codcagent in ('3','4')
+                      then    nvl(substr(trim(p.nmku),1,135),c.nmk)
+                   else   c.nmk
+                 end),
                TO_CHAR (c.country),
                c.adr,
                NVL (c.ise, '00000'), NVL (c.fs, '00'),
@@ -225,7 +233,7 @@ IS
             into NBUR_DETAIL_PROTOCOLS
                ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, DESCRIPTION
                , ACC_ID, ACC_NUM, KV, CUST_ID, REF )
-          values ( dat_, mfo_, '#3K', nbuc_, l_kodp, nvl(l_znap,' '), to_char(refd_),
+          values ( dat_, mfo_, '#3K', nbuc_, l_kodp, nvl(l_znap,' '), comm_,
                    acc_, nls_, kv_, rnk_, ref_ );
 
    END;
@@ -331,22 +339,20 @@ IS
          if ko_ = 2 and (trim(p_value_) is null or trim(p_value_)='DDMMYYYY')
          then
             a3_ := ' ';
-            IF pr_s3_ >= 1
-            THEN
-               sql_z := 'SELECT NVL(to_char(datz,''DDMMYYYY''),''DDMMYYYY''),'
-                     || '       NVL(to_char(fdat,''DDMMYYYY''),''DDMMYYYY'') '
-                     || 'FROM ZAYAVKA  '
-                     || 'WHERE REF = :ref_';
-               BEGIN
-                  EXECUTE IMMEDIATE sql_z
-                     INTO p_value_, a3_
-                  USING ref_ ;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  a3_ := ' ';
-               END;
-            END IF;
 
-            if (trim(p_value_) is null or trim(p_value_)='DDMMYYYY') then --and trim(a3_) is not null then
+              begin
+                  select nvl(to_char(datz,'DDMMYYYY'),'DDMMYYYY'),
+                         nvl(to_char(fdat,'DDMMYYYY'),'DDMMYYYY')
+                                                     into p_value_, a3_
+                    from zayavka
+                   WHERE REF = ref_;
+
+              exception
+                 when no_data_found then
+                    a3_ := ' ';
+              end;
+
+            if (trim(p_value_) is null or trim(p_value_)='DDMMYYYY') then
                p_value_ := a3_;
             end if;
          end if;
@@ -355,9 +361,9 @@ IS
             a3_ := ' ';
 
               BEGIN
-                    SELECT NVL(to_char(dat_vmd,'DDMMYYYY'),'DDMMYYYY'),
-                           NVL(to_char(dat2_vmd,'DDMMYYYY'),'DDMMYYYY') 
-                                                        INTO p_value_, a3_
+                    SELECT nvl(to_char(dat_vmd,'DDMMYYYY'),'DDMMYYYY'),
+                           nvl(to_char(dat2_vmd,'DDMMYYYY'),'DDMMYYYY') 
+                                                           into p_value_, a3_
                       FROM ZAYAVKA  
                      WHERE REF = ref_;
 
@@ -367,7 +373,7 @@ IS
                          BEGIN
                            SELECT NVL(to_char(dat_vmd,'DDMMYYYY'),'DDMMYYYY'),
                                   NVL(to_char(dat2_vmd,'DDMMYYYY'),'DDMMYYYY') 
-                                                            INTO p_value_, a3_
+                                                                  into p_value_, a3_
                              FROM ZAYAVKA  
                             WHERE refd_ in (ref,ref_sps);
                      
@@ -381,7 +387,7 @@ IS
 
               end;
 
-            if (trim(p_value_) is null or trim(p_value_)='DDMMYYYY') then --and trim(a3_) is not null then
+            if (trim(p_value_) is null or trim(p_value_)='DDMMYYYY') then
                p_value_ := a3_;
             end if;
          end if;
@@ -526,24 +532,6 @@ BEGIN
       ourGLB_ := null;
    END;
 
--- определение наличия поля S3 табл.ZAYAVKA
-   SELECT COUNT (*)
-     INTO pr_s3_
-     FROM all_tab_columns
-    WHERE owner = 'BARS' AND table_name = 'ZAYAVKA' AND column_name = 'S3';
-
--- определение наличия поля SWAP_TAG табл.FX_DEAL
-   SELECT COUNT (*)
-     INTO is_swap_tag_
-     FROM all_tab_columns
-    WHERE owner = 'BARS' AND table_name = 'FX_DEAL' AND column_name = 'SWAP_TAG';
-
--- определение наличия поля F092 табл.ZAYAVKA
-   SELECT COUNT ( * )
-     INTO is_f092_
-     FROM all_tab_columns
-    WHERE owner = 'BARS' AND table_name = 'ZAYAVKA' AND column_name = 'F092';
-
    -- отбор проводок, удовлетворяющих условию
    INSERT INTO OTCN_PROV_TEMP
                (ko, rnk, REF, acck, nlsk, kv, accd, nlsd, nazn, s_nom, s_eqv)
@@ -587,59 +575,74 @@ BEGIN
                        )                                                      
               GROUP BY '1', o.rnkk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
               UNION ALL -- продаж валюти
-              SELECT   '2' ko, o.rnkd, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn,
-                       SUM (o.s * 100) s_nom,
-                       SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
-                  FROM provodki_otc o
-                 WHERE o.fdat = dat_
-                   AND o.kv not in (959, 961, 962, 964, 980)
-                   AND (   (     ( substr (o.nlsk, 1,4) ='2900'  and  o.ob22k !='05'  or
-                                   substr (o.nlsk, 1,4) ='3739'  and  substr (o.nlsb, 1,4) ='2900' )
-                            AND
-                                SUBSTR (o.nlsd, 1,4) IN
-                                     ('1600', '1602', '2520', '2530', '2531',
-                                      '2541', '2542', '2544', '2545', '2555',
-                                      '2600', '2603', '2620', '2622','2650', '3640')
-                            AND LOWER (TRIM (o.nazn)) not like '%конверс%'
-                            AND LOWER (TRIM (o.nazn)) not like '%конверт%'
-                            AND LOWER (TRIM (o.nazn)) not like '%куп_вля%'
-                           )
-                        OR (    substr (o.nlsk, 1,4) ='2900'
-                            AND SUBSTR (o.nlsd, 1,4) in ('2062','2063','2072','2073'))
-                        OR (    o.nlsk like '2903%'  AND  o.nlsd like '2900%'   )
-                        OR (    o.nlsk like '2900%'  AND  o.nlsd like '2909%'   )
-                        OR (    o.nlsk like '2900%'  AND  o.nlsd like '2900%'   
-                            AND mfou_ = 300465 AND mfou_ <> mfo_
-                            AND LOWER (TRIM (o.nazn)) like '%продаж%'
-                          )
-                        OR (    o.nlsd LIKE '2900205%'  AND  o.nlsk LIKE '29003%'
-                            AND mfo_ = 300465
-                           )
-                        OR (    substr (o.nlsd, 1,4) ='2603'
-                            AND substr (o.nlsk, 1,4) ='3739'
-                            AND mfou_ = 300465
-                            AND ( LOWER (TRIM (o.nazn)) like '%перерах%кошт_в для обов_язкового продажу%' OR
-                                  LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
+              SELECT   ko, rnkd, REF, accd, nlsd, kv, acck, nlsk, nazn,
+                       SUM (s_nom) s_nom, SUM (s_eqv) s_eqv
+                from (
+                    SELECT   '2' ko,  (case
+                                         when  o.nbsd ='2900' and o.nbsk='3739'
+                                            then nvl( (select a.rnk
+                                                         from provodki_otc p, accounts a
+                                                        where p.kv = o.kv  and  p.s = o.s
+                                                          and p.nlsb = o.nlsa
+                                                          and p.nlsd like '26%'
+                                                          and p.fdat = o.fdat
+                                                          and a.kv = p.kv
+                                                          and a.nls = p.nlsa), o.rnkd)
+                                              else o.rnkd
+                                       end) rnkd,
+                             o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn,
+                             o.s * 100 as s_nom,  gl.p_icurval (o.kv, o.s * 100, dat_) as s_eqv
+                        FROM provodki_otc o
+                       WHERE o.fdat = dat_
+                         AND o.kv not in (959, 961, 962, 964, 980)
+                         AND (   (     ( substr (o.nlsk, 1,4) ='2900'  and  o.ob22k !='05'  or
+                                         substr (o.nlsk, 1,4) ='3739'  and  substr (o.nlsb, 1,4) ='2900' )
+                                  AND
+                                      SUBSTR (o.nlsd, 1,4) IN
+                                           ('1600', '1602', '2520', '2530', '2531',
+                                            '2541', '2542', '2544', '2545', '2555',
+                                            '2600', '2603', '2620', '2622','2650', '3640')
+                                  AND LOWER (TRIM (o.nazn)) not like '%конверс%'
+                                  AND LOWER (TRIM (o.nazn)) not like '%конверт%'
+                                  AND LOWER (TRIM (o.nazn)) not like '%куп_вля%'
+                                 )
+                              OR (    substr (o.nlsk, 1,4) ='2900'
+                                  AND SUBSTR (o.nlsd, 1,4) in ('2062','2063','2072','2073'))
+                              OR (    o.nlsk like '2903%'  AND  o.nlsd like '2900%'   )
+                              OR (    o.nlsk like '2900%'  AND  o.nlsd like '2909%'   )
+                              OR (    o.nlsk like '2900%'  AND  o.nlsd like '2900%'   
+                                  AND mfou_ = 300465 AND mfou_ <> mfo_
+                                  AND LOWER (TRIM (o.nazn)) like '%продаж%'
                                 )
-                           )
-                        OR (    SUBSTR (o.nlsd, 1,4) in ('2900', '2600', '2620', '2650')
-                            AND substr (o.nlsk, 1,4) ='3739'
-                            AND mfou_ = 300465
-                            AND LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
-                            AND instr(LOWER (o.nazn),'продаж не ') =0
-                           )
-                        OR (    SUBSTR (o.nlsd, 1,4) ='2620'
-                            AND substr (o.nlsk, 1,4) ='3800'
-                            AND o.tt in ('OW1','OW2')
-                            AND mfou_ = 300465
-                           )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2625','2630','2525','2546')
-                            AND substr (o.nlsk, 1,4) ='3800'
-                            AND o.tt !='DPT'
-                            AND mfou_ = 300465
-                           )
-                       )
-              GROUP BY '2', o.rnkd, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn );
+                              OR (    o.nlsd LIKE '2900205%'  AND  o.nlsk LIKE '29003%'
+                                  AND mfo_ = 300465
+                                 )
+                              OR (    substr (o.nlsd, 1,4) ='2603'
+                                  AND substr (o.nlsk, 1,4) ='3739'
+                                  AND mfou_ = 300465
+                                  AND ( LOWER (TRIM (o.nazn)) like '%перерах%кошт_в для обов_язкового продажу%' OR
+                                        LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
+                                      )
+                                 )
+                              OR (    SUBSTR (o.nlsd, 1,4) in ('2900', '2600', '2620', '2650')
+                                  AND substr (o.nlsk, 1,4) ='3739'
+                                  AND mfou_ = 300465
+                                  AND LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
+                                  AND instr(LOWER (o.nazn),'продаж не ') =0
+                                 )
+                              OR (    SUBSTR (o.nlsd, 1,4) ='2620'
+                                  AND substr (o.nlsk, 1,4) ='3800'
+                                  AND o.tt in ('OW1','OW2')
+                                  AND mfou_ = 300465
+                                 )
+                              OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2625','2630','2525','2546')
+                                  AND substr (o.nlsk, 1,4) ='3800'
+                                  AND o.tt !='DPT'
+                                  AND mfou_ = 300465
+                                 )
+                             )
+                    )
+              GROUP BY ko, rnkd, REF, accd, nlsd, kv, acck, nlsk, nazn );
 
    commit;
 
@@ -710,15 +713,10 @@ BEGIN
    end if;
 
 
-   IF pr_s3_ >= 1  THEN
+     UPDATE OTCN_PROV_TEMP t 
+        SET t.s_kom =(SELECT z.s3 FROM ZAYAVKA z WHERE z.REF = t.REF) 
+      WHERE t.REF IN (SELECT REF FROM ZAYAVKA WHERE NVL(s3,0) <> 0);
 
-      sql_z :=
-            'UPDATE OTCN_PROV_TEMP t '
-         || 'SET t.s_kom=(SELECT z.s3 FROM ZAYAVKA z WHERE z.REF = t.REF) '
-         || 'WHERE t.REF IN (SELECT REF FROM ZAYAVKA WHERE NVL(s3,0) <> 0)';
-
-      EXECUTE IMMEDIATE sql_z;
-   END IF;
 
    -- для ММФО исключаем проводки по конверсии (ранее только 300465)
 --   IF mfou_ = 300465  THEN
@@ -741,6 +739,8 @@ BEGIN
       sum1_ := sum1_ - NVL (sumk1_, 0);
       rez_ := MOD (codc_, 2);
       k021_ :='1';
+      k030_ := to_char(2-mod(codc_,2));
+
 ------------------------------------------------------------------------------
       IF codc_ = 3   THEN                                 --юр.особи резиденти
 
@@ -874,7 +874,7 @@ BEGIN
 
       end if;
 
-      IF ko_ in ('1','2')  and  ROUND (sum1_ / kurs_, 0) > gr_sum_ 
+      IF ko_ in ('1','2')  --and  ROUND (sum1_ / kurs_, 0) > gr_sum_ 
       THEN
 
          dig_ := f_ret_dig (kv_) * 100;   -- для отображения суммы в единицах валюты
@@ -893,7 +893,7 @@ BEGIN
 
             EXIT WHEN opl_dok%NOTFOUND;
 
-            IF ko_ = ko_1  and  ROUND(gl.p_icurval(kv_, sum0_, dat_) / kurs_, 0) > gr_sum_
+            IF ko_ = ko_1  --and  ROUND(gl.p_icurval(kv_, sum0_, dat_) / kurs_, 0) > gr_sum_
             THEN
 
                IF typ_ > 0  THEN
@@ -909,6 +909,7 @@ BEGIN
                sum0_ := sum0_ - NVL (sumk0_, 0);
                f089_ := '2';                          --неконсолидированные данные
                refd_ := null;
+               comm_ := null;
 
                if ko_ = 2
                then
@@ -1026,11 +1027,6 @@ BEGIN
                end if;
                if ko_ =2  and d1#3K_ is null  then
 
-                   if is_f092_ >=1  then
-
---                      sql_z := 'SELECT F092 '
---                            || 'FROM ZAYAVKA  '
---                            || 'WHERE :ref_ in (ref, ref_sps) and nvl(dk, 1) = 2';
                       sql_z := 'select max(F092)  from zayavka '
                             || ' where nvl(dk, 1) =2 '
                             || '   and ( :ref_ in (ref, ref_sps) '
@@ -1056,9 +1052,6 @@ BEGIN
                                        d1#3K_ := NULL;
                              end if;
                       end;
-                   else
-                      d1#3K_ :='000';
-                   end if;
 
                end if;
 
@@ -1066,13 +1059,15 @@ BEGIN
                   IF rez_ = 0 and trim(okpo_) is NULL -- для нерезидентiв
                   THEN
                      okpo_ := '0';
+                     k030_ := '1';
                   END IF;
 
                   if okpo_ = ourOKPO_ then
                      okpo_ := ourGLB_;
-                     codc_ := 1 ;
                      k021_ :='3';
+                     k030_ :='1';
                   end if;
+                  comm_ := comm_||to_char(refd_);
 
          if  mfo_ =300465  and ko_='2' and nls_ ='2900205'
                                        and nlsk_='29003'
@@ -1083,6 +1078,7 @@ BEGIN
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
                p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
                p_ins (nnnn_, 'K021', k021_);
+               p_ins (nnnn_, 'K030', k030_);
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
@@ -1100,6 +1096,7 @@ BEGIN
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
                p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
                p_ins (nnnn_, 'K021', k021_);
+               p_ins (nnnn_, 'K030', k030_);
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
@@ -1116,6 +1113,7 @@ BEGIN
                p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
                p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
                p_ins (nnnn_, 'K021', k021_);
+               p_ins (nnnn_, 'K030', k030_);
                p_ins (nnnn_, 'Q024', '2');
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
@@ -1147,7 +1145,7 @@ BEGIN
                               and p.acck =acc_
                               and p.kv =kv_
                               and p.s =0.01*sum0_
-                              and p.nlsa like '2625%'
+                              and p.nlsa like '26%'
                               and p.id_a = c.okpo and c.date_off is null
                               and rownum = 1;
 
@@ -1157,6 +1155,7 @@ BEGIN
 
                       IF codc_a = 5  and  rnk_a !=0  THEN               --фiз.особи резиденти      
                 
+                         k030_a := '1';
                          -- наличие ИНН(ОКПО)
                          IF nvl(ltrim(trim(okpo_a), '0'), 'Z') <> 'Z' AND 
                             nvl(ltrim(trim(okpo_a), '9'), 'Z') <> 'Z'  
@@ -1187,6 +1186,7 @@ BEGIN
 ----------------------------------------------------------------------------------------------
                       ELSIF codc_a = 6  and  rnk_a !=0  THEN                    --фiз.особи нерезиденти      
                 
+                         k030_a := '2';
                          -- наличие ИНН(ОКПО)
                          IF nvl(ltrim(trim(okpo_a), '0'), 'Z') <> 'Z' AND 
                             nvl(ltrim(trim(okpo_a), '9'), 'Z') <> 'Z'  
@@ -1222,6 +1222,7 @@ BEGIN
                       if rnk_a !=0  then
                         p_ins (nnnn_, 'K020', lpad(TRIM (okpo_a),10,'0'));
                         p_ins (nnnn_, 'K021', k021_a);
+                        p_ins (nnnn_, 'K030', k030_a);
 
                         p_ins (nnnn_, 'Q001', TRIM (nmk_a));       -- назва клiєнта
                         p_ins (nnnn_, 'Q024', '2');                -- тип контрагента
@@ -1232,6 +1233,7 @@ BEGIN
                   if rnk_a =0 then
                       p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
                       p_ins (nnnn_, 'K021', k021_);
+                      p_ins (nnnn_, 'K030', k030_);
 
                       p_ins (nnnn_, 'Q001', TRIM (nmk_));       -- назва клiєнта
                       p_ins (nnnn_, 'Q024', q024_);             -- тип контрагента
@@ -1336,12 +1338,14 @@ BEGIN
                         nlsd like '3800%' 
                  GROUP BY kv
      ) loop
+          comm_ := '"зеркальные: операции';
           nnnn_ := nnnn_+1;
           p_ins (nnnn_, 'F091', '3');
           p_ins (nnnn_, 'R030', LPAD (u.kv, 3,'0'));
           p_ins (nnnn_, 'T071', TO_CHAR (u.sum0));
           p_ins (nnnn_, 'K020', '0000000006');
           p_ins (nnnn_, 'K021', '3');
+          p_ins (nnnn_, 'K030', '1');
           p_ins (nnnn_, 'Q024', '1');
           p_ins (nnnn_, 'D100', '01');
           p_ins (nnnn_, 'S180', '#');
@@ -1371,9 +1375,9 @@ BEGIN
                               pivot
                               ( max(trim(field_value))
                                   for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
-                                                 'K020' as K020, 'K021' as K021, 'Q001' as Q001,
-                                                 'Q024' as Q024, 'D100' as D100, 'S180' as S180,
-                                                 'F089' as F089, 'F092' as F092, 
+                                                 'K020' as K020, 'K021' as K021, 'K030' as K030,
+                                                 'Q001' as Q001, 'Q024' as Q024, 'D100' as D100,
+                                                 'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
                         where  f091 ='4' and f092 ='216'
@@ -1398,6 +1402,9 @@ BEGIN
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
            values ( mfo_, dat_, '#3K', nbuc_, 'K021'||kodp_,  '#' );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'K030'||kodp_,  '1' );
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
            values ( mfo_, dat_, '#3K', nbuc_, 'Q024'||kodp_,  '2' );
@@ -1433,9 +1440,9 @@ BEGIN
                               pivot
                               ( max(trim(field_value))
                                   for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
-                                                 'K020' as K020, 'K021' as K021, 'Q001' as Q001,
-                                                 'Q024' as Q024, 'D100' as D100, 'S180' as S180,
-                                                 'F089' as F089, 'F092' as F092, 
+                                                 'K020' as K020, 'K021' as K021, 'K030' as K030,
+                                                 'Q001' as Q001, 'Q024' as Q024, 'D100' as D100,
+                                                 'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
                         where  f091 ='4' and f092 ='216' and r030 =u.r030
@@ -1448,10 +1455,8 @@ BEGIN
    f089_ :='2';
 
 --   операции из модуля FOREX
-    IF is_swap_tag_ >= 1
-    THEN
          v_sql_ :=
-            ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, '
+            ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, ''1'' k030, '
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
@@ -1464,7 +1469,7 @@ BEGIN
           ||'    and kva != 980   and kvb =980 '
           ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) '
           ||' union all '
-          ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
+          ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, ''1'' k030, '
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
@@ -1476,38 +1481,15 @@ BEGIN
           ||'  where dat =:2 '
           ||'    and kva = 980     and kvb !=980 '
           ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) ';
-    ELSE
-         v_sql_ :=
-            ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, '
-          ||'        (select nb from rcukru where glb=6) q001, '
-          ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
-          ||'         ''00''  d100, dat_a, dat, ref, '
-          ||'       (select count(*) from operw o where o.ref=f.ref '
-          ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
-          ||'   from fx_deal f'
-          ||'  where dat =:1 '
-          ||'    and kva != 980     and kvb =980 '
-          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) '
-          ||' union all '
-          ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
-          ||'        (select nb from rcukru where glb=6) q001, '
-          ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
-          ||'        ''00'' d100, dat_b, dat, ref, '
-          ||'       (select count(*) from operw o where o.ref=f.ref '
-          ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
-          ||'   from fx_deal f'
-          ||'  where dat =:2 '
-          ||'    and kva = 980     and kvb !=980 '
-          ||'    and exists (select 1 from oper o where o.ref=f.ref and sos in (3,5)) ' ;
-
-    END IF ;
                                                     --3 покупка, 4 продажа
     OPEN rfc1_  FOR v_sql_  USING dat_, dat_;
     LOOP
        FETCH rfc1_
-          INTO  f091_, r030_, t071_, k020_, k021_, q001_, q024_, d100_, dat_2_, dat_1_, ref_, op_spot_;
+          INTO  f091_, r030_, t071_, k020_, k021_, k030_, 
+                q001_, q024_, d100_, dat_2_, dat_1_, ref_, op_spot_;
        EXIT WHEN rfc1_%NOTFOUND;
 
+         comm_ := 'FOREX';
          nnnn_ :=nnnn_+1;
          dig_ := f_ret_dig (r030_) * 100;      -- для отображения суммы в единицах валюты
 
@@ -1534,6 +1516,7 @@ BEGIN
          end if;
        end if;
 
+         acc_ := null;
          nls_ := null;
          rnk_ := null;
          kv_ := r030_;
@@ -1545,6 +1528,7 @@ BEGIN
 --         p_ins (nnnn_, 'T071', TO_CHAR (ROUND (t071_ / dig_, 0)));
 	 p_ins (nnnn_, 'K020', k020_);
 	 p_ins (nnnn_, 'K021', k021_);
+	 p_ins (nnnn_, 'K030', k030_);
          p_ins (nnnn_, 'Q001', q001_);
          p_ins (nnnn_, 'Q024', q024_);
          p_ins (nnnn_, 'D100', d100_);
@@ -1597,6 +1581,7 @@ BEGIN
               GROUP BY '4', o.rnkd, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
     ) loop
 
+         comm_ := 'FOREX Викуп валюти';
          nnnn_ :=nnnn_+1;
 
          kv_ := u.kv;
@@ -1619,6 +1604,7 @@ BEGIN
 --         p_ins (nnnn_, 'T071', TO_CHAR (ROUND (u.s_nom / dig_, 0)));
 	 p_ins (nnnn_, 'K020', '0000000006');
 	 p_ins (nnnn_, 'K021', '3');
+	 p_ins (nnnn_, 'K030', '1');
          p_ins (nnnn_, 'Q001', 'АТ Ощадбанк');
          p_ins (nnnn_, 'Q024', '1');
          p_ins (nnnn_, 'D100', '01');
@@ -1652,9 +1638,9 @@ BEGIN
                               pivot
                               ( max(trim(field_value))
                                   for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
-                                                 'K020' as K020, 'K021' as K021, 'Q001' as Q001,
-                                                 'Q024' as Q024, 'D100' as D100, 'S180' as S180,
-                                                 'F089' as F089, 'F092' as F092, 
+                                                 'K020' as K020, 'K021' as K021, 'K030' as K030,
+                                                 'Q001' as Q001, 'Q024' as Q024, 'D100' as D100,
+                                                 'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
                         where  f091 ='4' and f092 ='216' and f089 ='1') );
@@ -1670,10 +1656,6 @@ insert into OTCN_TRACE_70
    from nbur_detail_protocols
   where report_date = dat_  and  kf =mfo_
     and report_code ='#3K';
-
---             otc_del_arch('3K', dat_, 1);
---             OTC_SAVE_ARCH('3K', dat_, 1);
---             commit;
 
     logger.info ('P_F3KX  end  for date = '||to_char(dat_, 'dd.mm.yyyy'));
 
