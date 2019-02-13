@@ -44,10 +44,13 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
   TIPA:
        3 - кредиты
        4 - бюджет
+       5 - МБДК
+       6 - коррсчета 
        9 - фінансові зобов`язання - кредиты (9129)
       10 - ОВЕРДРАФТЫ
       41 - старый процессинг (карточки)
       42 - новый  процессинг (карточки)
+      44 - поцессинг (instolment)
       90 - фінансові зобов`язання - ОВЕРДРАФТЫ (9129)
       94 - фінансові зобов`язання - БПК (9129)
 
@@ -103,7 +106,7 @@ begin
              select distinct b.nd, null cc_id, 11, fin23, tip_kart tipa, null dat_begin, null dat_end, '2203' prod, b.RNK, null pd, vkr, 
                     decode(trim(c.sed),'91',3,c.custtype) custtype, trim(c.sed) sed, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo,
                     substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK
-             from rez_w4_bpk b, customer c where b.rnk = c.rnk
+             from rez_w4_bpk b, customer c where b.nbs not in ('3570','3578') and b.rnk = c.rnk
              union all
              SELECT d.nd, d.cc_id,  d.vidd, D.FIN23, 5 tipa, d.sdate, d.wdate, d.prod, d.rnk, PD, f_vkr_MBDK(d.rnk) VKR, decode(trim(c.sed),'91',3,c.custtype) custtype, 
                     trim(c.sed) sed, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo,substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK
@@ -145,9 +148,9 @@ begin
       else                    l_poci := 0;
       end if; 
 
-      if     d.tipa in (41,42,10) and d.custtype = 2 THEN d.vidd := 1 ;
-      elsif  d.tipa in (41,42,10)                    THEN d.vidd := 11;
-      elsif  d.sed = '91'                            THEN d.vidd := 11;
+      if     d.tipa in (41,42,44,10) and d.custtype = 2 THEN d.vidd := 1 ;
+      elsif  d.tipa in (41,42,44,10)                    THEN d.vidd := 11;
+      elsif  d.sed = '91'                               THEN d.vidd := 11;
       end if;
 
       if d.custtype in (1, 2) THEN
@@ -207,7 +210,7 @@ begin
             if l_fin is null and d.tipa in (41,42) THEN l_fin := 5; VKR_ := 'Г'; end if; -- не санкционированный ОВЕРДРАФТ
             l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);
 
-            if l_s240 in ('C','D','E','F','G','H','Z') and d.tipa not in (5, 6, 41, 42) THEN
+            if l_s240 in ('C','D','E','F','G','H','Z') and d.tipa not in (5, 6, 41, 42, 44) THEN
                update ex_kl351 set kl_351 = 0 where acc = s.acc and pawn = 28;
                IF SQL%ROWCOUNT=0 then
                   insert into ex_kl351 (acc,pawn,kl_351) values (s.acc , 28, 0);
@@ -330,7 +333,7 @@ begin
                l_RC      := 0;
                l_RCQ     := 0;
                --logger.info('REZ_351 40 : nd = ' || d.nd || ' l_idf =' || l_idf || ' l_pd =' || l_pd || ' s.rnk=' ||s.rnk ) ;
-               if (( l_ead = 0 or l_ead is null ) and z.sall is null and d.tipa in (41,42,10) ) or s.nbs='9129'  THEN
+               if (( l_ead = 0 or l_ead is null ) and z.sall is null and d.tipa in (41, 42, 44, 10) ) or s.nbs='9129'  THEN
                   l_EAD  := nvl(z.bv_all,z.bv02);
                end if;
                l_EAD     := greatest(l_EAD,0);

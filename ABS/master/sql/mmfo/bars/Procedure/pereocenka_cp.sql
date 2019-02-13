@@ -6,8 +6,14 @@ PROMPT =========================================================================
 PROMPT *** Create  procedure pereocenka_cp ***
 
 CREATE OR REPLACE PROCEDURE BARS.pereocenka_cp (p_dat01 date, p_mode number)  is
--- pmode = 0 - рассформирование
---         1 - формирование
+/*  pmode = 0 - рассформирование
+            1 - формирование
+    ----------------------------
+   Версия 1.0   11-02-2019
+   Дооцінка ЦП на суму сформованого резерву
+   -------------------------------------
+01) 11-02-2019(1.0) -  Операція - RXP
+*/ 
 
 l_nbs    accounts.nbs%type;
 l_nms    accounts.nms%type;
@@ -17,18 +23,18 @@ l_nls    accounts.nls%type;
 l_accc   accounts.accc%type;
 l_grp    accounts.grp%type;
 l_mdate  accounts.mdate%type;
+l_tip    accounts.tip%type;
 l_ost    number;
 l_r1     int              ;
 oo       oper%rowtype;
 sdat01_  char(10);
 l_sErr   VARCHAR2 (200);
-dat_v    date;
 l_kf     VARCHAR2 (20);
-
+dat_v    date;
+l_dazs   date;
 
 TYPE CurTyp IS REF CURSOR;
   c0 CurTyp;
-
 
 TYPE r0Typ IS RECORD (
      nd       number,
@@ -49,8 +55,8 @@ begin
    if p_mode = 1 THEN  dat_v := Dat_last_work (p_dat01 -1 );
    else                dat_v := Dat_last_work (add_months( p_dat01, -1 ) -1 );
    end if;
-   oo.nlsb := '5102431141187';
-   --oo.nlsb := '510281218';
+   --oo.nlsb := '5102431141187';
+   oo.nlsb := '510281218';
    begin
       select okpo into oo.id_b from  customer  where rnk in (select rnk from accounts where nls=oo.nlsb and kv=980);
    EXCEPTION  WHEN NO_DATA_FOUND  THEN  oo.id_a:=null;
@@ -75,8 +81,14 @@ begin
          -- есть ли счет переоценки за счет резерва 
          begin 
             --logger.info('PEREOC 1 : nd = ' || k.nd || ' kv ='  ||k.kv || ' rez =' ||k.rez  || ' nb =' ||k.nb) ;
-            select a.nls, a.acc, substr(a.nms,1,38), ost_korr(a.acc,oo.vdat,null,'1415') into l_nls, l_acc, oo.nam_a, l_ost 
+            select a.nls, a.acc, substr(a.nms,1,38), ost_korr(a.acc,oo.vdat,null,'1415'), dazs, tip into l_nls, l_acc, oo.nam_a, l_ost, l_dazs, l_tip 
             from cp_accounts c, accounts a where c.cp_ref = k.nd AND c.cp_acctype='SR' and c.cp_acc=a.acc;
+            if l_tip<>'SR' THEN
+               UPDATE accounts SET tip = 'SR', pap=1  WHERE acc = l_acc;
+            end if;
+            if l_dazs is not null THEN
+               UPDATE accounts SET dazs = null WHERE acc = l_acc;
+            end if;
          EXCEPTION  WHEN NO_DATA_FOUND  THEN  
             l_ost := 0;
             l_nbs := k.nb||'5';
@@ -105,7 +117,8 @@ begin
             --  logger.info('PEREOC 6 : nd = ' || k.nd || ' l_nls= '  || l_nls) ;
             -- открытие счета переоценки
             cp.CP_REG_EX(99, 0, 0, l_GRP, l_r1, l_RNK, l_NLS, k.KV, oo.nam_a, 'SR', gl.aUid, l_acc);
-            UPDATE accounts SET daos = oo.vdat, mdate = l_mdate, accc = l_accc, seci = 4, pos = 1, pap=1, tip='SR' WHERE acc = l_acc;
+            UPDATE accounts SET mdate = l_mdate, accc = l_accc, seci = 4, pos = 1, pap=1, tip='SR' WHERE acc = l_acc;
+            UPDATE accounts SET daos = oo.vdat WHERE acc = l_acc and daos > oo.vdat;
             begin
 -- -- logger.info('PEREOC 7 : nd = ' || k.nd || ' l_acc= '  || l_acc) ;
                insert into cp_accounts (cp_ref, cp_acctype, cp_acc) values (k.nd,'SR',l_acc);
@@ -133,7 +146,7 @@ begin
       if k.ost<>0 THEN 
          gl.ref (oo.REF);
          oo.datd := gl.bdate;
-         oo.tt   := 'FXP'; 
+         oo.tt   := 'RXP'; 
          oo.vob  := 96;
          oo.nd   := 'PRC'||trim (Substr( '       '||to_char(oo.ref) , -7 ) ) ;
          oo.kv   := k.kv;

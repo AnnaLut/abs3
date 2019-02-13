@@ -172,6 +172,7 @@ BEGIN
       elsif k.tipa in (10, 90)                                THEN l_id := 'OVER' || k.nd ||        k.acc; l_ta :=10;                    
       elsif k.tipa in (42)                                    THEN l_id := 'W4'   || k.nd ||        k.acc; l_ta := 4;                         
       elsif k.tipa in (41)                                    THEN l_id := 'BPK'  || k.nd ||        k.acc; l_ta := 4;                         
+      elsif k.tipa in (44)                                    THEN l_id := 'INS'  || k.nd ||        k.acc; l_ta :=23;                         
       else                                                         l_id := 'NNN'  || k.nd ||        k.acc; l_ta := NULL;                  
       end if;
 

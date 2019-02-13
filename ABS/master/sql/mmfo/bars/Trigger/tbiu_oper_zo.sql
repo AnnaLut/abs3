@@ -57,7 +57,7 @@ DECLARE
 -------------------------
 BEGIN
    IF    :new.vob <> 96                                              --не корр
-      OR :new.tt IN ('ARE', 'AR*','FXP')     -- резерв, переоц.ЦБ
+      OR :new.tt IN ('ARE', 'AR*','RXP')     -- резерв, переоц.ЦБ на суму резерву
       OR :new.TT = 'IRR' AND :new.ND = 'FV9' -- Отримано з Finevare. Корекція доходів на суму НЕвизнаних
       OR TRUNC (:new.vdat, 'MM') = TRUNC (gl.bdate, 'MM') -- не переход, т.е в одном месяце
    THEN
