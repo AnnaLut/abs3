@@ -620,7 +620,8 @@ IS
                    NVL (z.YDOSQ, 0) AS YR_DOS_UAH,
                    NVL (z.YKOS, 0) AS YR_KOS,
                    NVL (z.YKOSQ, 0) AS YR_KOS_UAH
-              FROM (  SELECT KF,
+              FROM (  SELECT /*+ NO_INDEX(S UK_SNAP_BALANCES) USE_HASH_AGGREGATION*/
+			                 KF,
                              ACC,
                              SUM (DECODE (fdat, dat0_, ost, 0)) ost,
                              SUM (DECODE (fdat, dat0_, ostq, 0)) ostq,
@@ -629,7 +630,7 @@ IS
                              SUM (kos) kos,
                              SUM (kosq) kosq,
                              ABS (MAX (DECODE (fdat, dat0_, rnk, -rnk))) rnk
-                        FROM SNAP_BALANCES
+                        FROM SNAP_BALANCES S
                        WHERE FDAT BETWEEN dat11_ AND dat2_ AND KF = l_kf
                     GROUP BY KF, ACC) b
                    FULL JOIN (SELECT NVL (r.KF, u.KF) AS KF,
