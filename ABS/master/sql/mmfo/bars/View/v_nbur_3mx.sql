@@ -17,6 +17,7 @@ create or replace force view v_nbur_3MX
        , F090
        , K040
        , F089
+       , K030
        , K020
        , K021
        , Q001_1
@@ -43,6 +44,7 @@ select t.REPORT_DATE
        , t.F090
        , t.K040
        , t.F089
+       , t.K030
        , t.K020
        , t.K021
        , t.Q001_1
@@ -67,6 +69,7 @@ from   (select
                , extractValue( COLUMN_VALUE, 'DATA/F090'  ) as F090
                , extractValue( COLUMN_VALUE, 'DATA/K040'  ) as K040
                , extractValue( COLUMN_VALUE, 'DATA/F089'  ) as F089
+               , extractValue( COLUMN_VALUE, 'DATA/K030'  ) as K030
                , extractValue( COLUMN_VALUE, 'DATA/K020'  ) as K020
                , extractValue( COLUMN_VALUE, 'DATA/K021'  ) as K021
                , extractValue( COLUMN_VALUE, 'DATA/Q001_1') as Q001_1
@@ -101,7 +104,8 @@ comment on column v_nbur_3mx.F091 is 'Код операції';
 comment on column v_nbur_3mx.R030 is 'Код валюти';
 comment on column v_nbur_3mx.F090 is 'Код мети надходження/переказу';
 comment on column v_nbur_3mx.K040 is 'Код країни';
-comment on column v_nbur_3mx.F089 is 'Ознака консолідації';
+comment on column v_nbur_3mx.F089 is 'Ознака консолідації';              
+comment on column v_nbur_3mx.K030 is 'Код резидентності';
 comment on column v_nbur_3mx.K020 is 'Код відправника/отримувача';
 comment on column v_nbur_3mx.K021 is 'Код ознаки ідентифікаційного коду';
 comment on column v_nbur_3mx.Q001_1 is 'Найменування клієнта';
