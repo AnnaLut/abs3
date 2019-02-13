@@ -18,6 +18,7 @@ select p.REPORT_DATE
          , p.F090
          , p.K040
          , p.F089
+         , p.K030
          , p.K020
          , p.K021
          , p.Q001_1
@@ -59,6 +60,7 @@ comment on column v_nbur_3mx_DTL.R030 is 'Код валюти';
 comment on column v_nbur_3mx_DTL.F090 is 'Код мети надходження/переказу';
 comment on column v_nbur_3mx_DTL.K040 is 'Код країни';
 comment on column v_nbur_3mx_DTL.F089 is 'Ознака консолідації';
+comment on column v_nbur_3mx_DTL.K030 is 'Код резидентності';
 comment on column v_nbur_3mx_DTL.K020 is 'Код відправника/отримувача';
 comment on column v_nbur_3mx_DTL.K021 is 'Код ознаки ідентифікаційного коду';
 comment on column v_nbur_3mx_DTL.Q001_1 is 'Найменування клієнта';

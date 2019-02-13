@@ -99,10 +99,7 @@ end;
 
 commit;
 
-prompt  ======================================================
-prompt  /Sql/BARS/Table/nbur_log_f3mx                 Comments
-
-comment on table  NBUR_LOG_F3MX is 'E9X Дані про перекази з використанням систем переказу коштів';
+comment on table  NBUR_LOG_F3MX is '3MX Дані про надходження та переказ безготівкових коштів в Україну/з України';
 comment on column NBUR_LOG_F3MX.REPORT_DATE is 'Звiтна дата';
 comment on column NBUR_LOG_F3MX.KF is 'Фiлiя';
 comment on column NBUR_LOG_F3MX.VERSION_ID is 'Номер версії файлу';
@@ -136,8 +133,14 @@ comment on column NBUR_LOG_F3MX.CUST_ID is 'Ід. клієнта';
 comment on column NBUR_LOG_F3MX.REF is 'Ід. платіжного документа';
 comment on column NBUR_LOG_F3MX.BRANCH is 'Код підрозділу';
 
-prompt  ======================================================
-prompt  /Sql/BARS/Table/nbur_log_f3mx                   Grants
+begin
+    execute immediate 'alter table bars.nbur_log_f3mx add (K030  VARCHAR2(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+comment on column NBUR_LOG_F3MX.K030 is 'Код резидентності';
 
 grant SELECT on NBUR_LOG_F3MX to BARSUPL;
 grant SELECT on NBUR_LOG_F3MX to BARS_ACCESS_DEFROLE;

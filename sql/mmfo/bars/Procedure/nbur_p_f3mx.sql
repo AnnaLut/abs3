@@ -13,7 +13,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 3MX для схема "C"
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.19.003      18.01.2019
+ VERSION     :    v.19.005      08.02.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 
@@ -22,7 +22,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
     блок 2 #E2  для 300465:       nbur_p_fe2.sql ( часть для 300465 )
     блок 3 #E2  кроме 300465:     переработанный алгоритм из p_fe2_nn.sql
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := ' v.19.003  18.01.2019';
+  ver_              char(30)  := ' v.19.005  08.02.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -33,8 +33,6 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
 
     l_version       number;
     l_file_id       number;
-    l_file_id_C9       number          := 16757;               -- #C9
-    l_file_id_E2       number          := 16950;               -- #E2
 
     l_kurs_840      number := F_NBUR_RET_KURS (840, p_report_date);
     l_gr_sum_840    number          := 0;   -- гранична сума
@@ -94,7 +92,7 @@ begin
   insert
     into NBUR_LOG_F3MX
        (REPORT_DATE, KF, NBUC, VERSION_ID, EKP, 
-        KU, T071, Q003_1, F091, R030, F090, K040, F089, K020, K021, Q001_1,
+        KU, T071, Q003_1, F091, R030, F090, K040, F089, K030, K020, K021, Q001_1,
         B010, Q033, Q001_2, Q003_2, Q007_1, F027, F02D, Q006,
         DESCRIPTION, ACC_ID, ACC_NUM, KV, CUST_ID, REF, BRANCH)
             select   report_date, kf, nbuc, l_version
@@ -109,6 +107,7 @@ begin
                    , (case when substr(k020,1,1)='0'  then '1'
                              else '2'
                        end)                     F089
+                   , K030
                    , (case when substr(k020,1,1)='0'  then '0'
                              else lpad(substr(trim(k020),2),10,'0' )
                        end)                     K020
@@ -146,6 +145,7 @@ begin
 --                            , f_nbur_get_f090('C9', e.ref, t.f090a)    F090
                             , f_nbur_get_f090('C9', ref, P40)    F090
                             , P62                        K040
+                            , P35                        K030
                             , f_nbur_get_k020_by_rnk(cust_id)            K020
                             , cust_name                  Q001_1
                             , null                       B010
@@ -171,7 +171,7 @@ begin
                                   p10, 
                                   p20, 
                                   (case when flag_kons = 0 then (case when p31 = '0' and p31_add is not null then p31_add else p31 end) else (case when p31 = '006' then p31 else '0' end) end) p31, 
-                                  (case when flag_kons = 0 then p35 else '0' end) p35, 
+                                  p35, 
                                   (case when flag_kons = 0 then p42 else '00' end) p42, 
                                   (case when flag_kons = 0 then p40 else '00' end) p40, 
                                   (case when flag_kons = 0 then p62 else '000' end) p62,
@@ -513,6 +513,81 @@ begin
     from nbur_log_f3mx
     WHERE     report_date = p_report_date
           AND kf = p_kod_filii;
+
+---------------                       обробка операцій  дт2909(1500) - кт3720
+  insert
+    into NBUR_LOG_F3MX
+       (REPORT_DATE, KF, NBUC, VERSION_ID, EKP, 
+        KU, T071, Q003_1, F091, R030, F090, K040, F089, K030, K020, K021, Q001_1,
+        B010, Q033, Q001_2, Q003_2, Q007_1, F027, F02D, Q006,
+        DESCRIPTION, KV, CUST_ID, REF)
+            select    p_report_date  as report_date
+                   ,  p_kod_filii    as kf
+                   ,  p_kod_filii    as nbuc
+                   ,  l_version      as version_id
+                   , 'A3M001'                          as EKP
+                   ,  f_get_ku_by_nbuc(p_kod_filii)    as KU
+                   ,  T071
+                   ,  lpad((dense_rank() over (order by R030, K040)) +l_last_q003, 3, '0')
+                                                       as Q003_1
+                   ,  '6'                     as F091
+                   ,  R030
+                   ,  '604'                   as F090
+                   ,  K040
+                   ,  '1'                     as F089
+                   ,  '1'                     as K030
+                   ,  '0'                     as K020
+                   ,  '#'                     as K021
+                   ,  null                    as Q001_1
+                   ,  null                    as B010
+                   ,  null                    as Q033
+                   ,  null                    as Q001_2
+                   ,  null                    as Q003_2
+                   ,  null                    as Q007_1
+                   ,  '#'                     as F027
+                   ,  '#'                     as F02D
+                   ,  'сума до з’ясування'    as Q006
+                   ,  description
+                   ,  kv     
+                   ,  cust_id
+                   ,  ref   
+              from (
+                    select   trim(TO_CHAR(t.bal))     as T071
+                           ,  t.kv                    as R030
+                           ,  f_nbur_get_kod_g(t.ref, 1)
+                                                      as K040                      
+                           ,  a.txt    as description
+                           ,  t.kv     
+                           ,  t.cust_id_db        as cust_id
+                           ,  t.ref   
+                     from nbur_dm_transactions t
+                          join nbur_dm_transactions_arch a
+                            on (    a.acc_id_cr = t.acc_id_db
+                                and a.kv = t.kv
+                                and a.bal = t.bal )
+                    where  t.report_date = p_report_date
+                      and  t.kf = p_kod_filii
+                      and  t.r020_db ='2909' and t.ob22_db in ('82','56')
+                      and  t.r020_cr ='3720' 
+                      and  gl.p_icurval(t.kv, t.bal, p_report_date) <=15000000
+                      and (a.report_date, a.kf, a.version_id) in
+                                  (select report_date, kf, version_id
+                                     from nbur_lst_objects
+                                    where object_id = (select id from nbur_ref_objects
+                                                        where object_name ='NBUR_DM_TRANSACTIONS' ) 
+                                      and report_date between p_report_date-7 and p_report_date
+                                      and kf = p_kod_filii
+                                      and object_status in ('FINISHED', 'VALID'))
+             );
+
+   -- додаємо в кінець вже заповненого файлу
+    select to_number(nvl(max(Q003_1),'0'))
+    into l_last_q003
+    from nbur_log_f3mx
+    WHERE     report_date = p_report_date
+          AND kf = p_kod_filii;
+
+    commit;
 
 -- блок 2 ------------------------------------------------------------- вставка данных #E2 для 300465
 --                                                                      nbur_p_fe2.sql
@@ -907,7 +982,7 @@ begin
   insert
     into NBUR_LOG_F3MX
        (REPORT_DATE, KF, NBUC, VERSION_ID, EKP, 
-        KU, T071, Q003_1, F091, R030, F090, K040, F089, K020, K021, Q001_1,
+        KU, T071, Q003_1, F091, R030, F090, K040, F089, K030, K020, K021, Q001_1,
         B010, Q033, Q001_2, Q003_2, Q007_1, F027, F02D, Q006,
         DESCRIPTION, ACC_ID, ACC_NUM, KV, CUST_ID, REF, BRANCH)
             select   report_date, kf, nbuc, l_version
@@ -922,6 +997,7 @@ begin
                    , (case when substr(k020,1,1)='0'  then '1'
                              else '2'
                        end)                     F089
+                   ,  K030
                    , (case when substr(k020,1,1)='0'  then '0'
                              else lpad(substr(trim(k020),2),10,'0' )
                        end)                     K020
@@ -952,6 +1028,7 @@ begin
                             , t.P10                        R030
                             , f_nbur_get_f090('E2', t.ref, t.P40)    F090
                             , t.P64                        K040
+                            , t.P62                        K030
                             , f_nbur_get_k020_by_rnk(t.cust_id)            K020
                             , t.cust_name                  Q001_1
                             , t.P65                        B010
@@ -1381,6 +1458,88 @@ begin
                         and df.kv(+)      = t.KV  
  );
 
+   -- додаємо в кінець вже заповненого файлу
+    select to_number(nvl(max(Q003_1),'0'))
+    into l_last_q003
+    from nbur_log_f3mx
+    WHERE     report_date = p_report_date
+          AND kf = p_kod_filii;
+
+---------------                       обробка операцій ЦА  дт373911505 - кт1500  [кт3720 (РУ,ЦА) - дт373911505]
+  insert
+    into NBUR_LOG_F3MX
+       (REPORT_DATE, KF, NBUC, VERSION_ID, EKP, 
+        KU, T071, Q003_1, F091, R030, F090, K040, F089, K030, K020, K021, Q001_1,
+        B010, Q033, Q001_2, Q003_2, Q007_1, F027, F02D, Q006,
+        DESCRIPTION, KV, CUST_ID, REF)
+            select    p_report_date  as report_date
+                   ,  p_kod_filii    as kf
+                   ,  p_kod_filii    as nbuc
+                   ,  l_version      as version_id
+                   , 'A3M001'                          as EKP
+                   ,  f_get_ku_by_nbuc(p_kod_filii)    as KU
+                   ,  lpad((dense_rank() over (order by R030, K040)), 3, '0')
+                                                       as Q003_1
+                   ,  T071
+                   ,  '5'                     as F091
+                   ,  R030
+                   ,  '604'                   as F090
+                   ,  K040
+                   ,  '1'                     as F089
+                   ,  '1'                     as K030
+                   ,  '0'                     as K020
+                   ,  '#'                     as K021
+                   ,  null                    as Q001_1
+                   ,  null                    as B010
+                   ,  null                    as Q033
+                   ,  null                    as Q001_2
+                   ,  null                    as Q003_2
+                   ,  null                    as Q007_1
+                   ,  '#'                     as F027
+                   ,  '#'                     as F02D
+                   ,  'сума до з’ясування'    as Q006
+                   ,  description
+                   ,  kv     
+                   ,  cust_id
+                   ,  ref   
+              from (
+                    select   trim(TO_CHAR(t.bal))     as T071
+                           ,  t.kv                    as R030
+                           ,  substr(
+                                   nvl(lpad(nvl(nvl(trim(translate(b.kod_g, '0123456789OPОП', '0123456789')),
+                                                     substr(trim (b.D6#E2), 1, 70)),
+                                                f_get_swift_country(b.ref)), 3, '0'),
+                                          'код' ) 
+                                    ,1,3)             as K040                      
+                           ,  a.txt    as description
+                           ,  t.kv     
+                           ,  t.cust_id_db        as cust_id
+                           ,  t.ref   
+                     from nbur_dm_transactions t
+                          join nbur_dm_transactions_arch a
+                               on (    a.acc_id_cr = t.acc_id_db
+                                   and a.kv = t.kv
+                                   and a.bal = t.bal 
+                                   and regexp_instr(a.txt,'^[ 3720| 2909]')>0 )
+                     left join nbur_dm_adl_doc_rpt_dtl b
+                               on (     b.ref = t.ref
+                                   and  b.report_date =p_report_date
+                                   and  b.kf = p_kod_filii )
+                    where  t.report_date =p_report_date
+                      and  t.kf = p_kod_filii
+                      and  t.r020_db ='3739' and t.acc_num_db = '373911505'
+                      and  t.r020_cr ='1500' 
+                      and  gl.p_icurval(t.kv, t.bal, p_report_date) <=15000000
+                      and (a.report_date, a.kf, a.version_id) in
+                                  (select report_date, kf, version_id
+                                     from nbur_lst_objects
+                                    where object_id = (select id from nbur_ref_objects
+                                                        where object_name ='NBUR_DM_TRANSACTIONS') 
+                                      and report_date between p_report_date-7 and p_report_date
+                                      and kf = p_kod_filii
+                                      and object_status in ('FINISHED', 'VALID'))
+              );
+
     else
 -- блок 3 ------------------------------------------------------------- вставка данных #E2 все кроме 300465
 --                                                 на основе алгоритма  p_fe2_nn.sql
@@ -1399,6 +1558,7 @@ begin
            l_k21_k20    varchar2(30);
            l_k020       varchar2(20);
            l_k021       varchar2(1);
+           l_k030       varchar2(1);
            l_ku         varchar2(2);
            l_t071       number;
         
@@ -1568,6 +1728,7 @@ begin
                 l_rnk     := k.rnk;
                 l_okpo    := k.okpo;
                 l_codc    := k.codcagent;
+                l_k030    := to_char(2-mod(l_codc,2));
       
                 d4#E2_    := null;
                 d61#E2_   := null;
@@ -1921,6 +2082,14 @@ begin
                                 l_k21_k20 := f_nbur_get_k020_by_rnk( l_rnka );
                                 l_k021 := substr(l_k21_k20,1,1);
                                 l_k020 := lpad(trim(substr(l_k21_k20,2)),10,'0');
+
+                                   begin
+                                       select to_char(2-mod(codcagent,2))  into l_k030
+                                         from customer
+                                        where rnk = l_rnka;
+                                   exception 
+                                      when others  then  null;
+                                   end;
                                end if;
       
                             EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -2359,12 +2528,12 @@ begin
         insert
           into NBUR_LOG_F3MX
              ( REPORT_DATE, KF, VERSION_ID, EKP, 
-               NBUC, KU, T071, Q003_1, F091, R030, F090, K040, F089, K020, K021, Q001_1,
+               NBUC, KU, T071, Q003_1, F091, R030, F090, K040, F089, K030, K020, K021, Q001_1,
                B010, Q033, Q003_2, Q007_1, Q006, Q001_2, F027, F02D,
                REF, BRANCH, DESCRIPTION, ACC_ID, ACC_NUM, KV, CUST_ID)
             values (p_report_date, l_ourMFO, l_version, 'A3M001',
                    l_ku, l_ku, l_t071, lpad(l_q003,3,'0'), l_f091, l_r030, l_f090, l_k040, l_f089,
-                   l_k020, l_k021, l_q001, l_b010, l_q033, l_q0032,
+                   l_k030, l_k020, l_k021, l_q001, l_b010, l_q033, l_q0032,
                    (case
                        when    length(l_q0071)=8 
                            and regexp_instr(l_q0071,'^[0-9]+$')>0
@@ -2399,7 +2568,7 @@ begin
    insert
     into NBUR_LOG_F3MX
        (REPORT_DATE, KF, NBUC, VERSION_ID, EKP, 
-        KU, T071, Q003_1, F091, R030, F090, K040, F089, K020, K021, Q001_1,
+        KU, T071, Q003_1, F091, R030, F090, K040, F089, K030, K020, K021, Q001_1,
         B010, Q033, Q001_2, Q003_2, Q007_1, F027, F02D, Q006,
         DESCRIPTION, ACC_ID, ACC_NUM, KV, CUST_ID, REF, BRANCH)
             select   report_date, kf, nbuc, l_version
@@ -2414,6 +2583,7 @@ begin
                    , (case when substr(k020,1,1)='0'  then '1'
                              else '2'
                        end)                     F089
+                   , K030
                    , (case when substr(k020,1,1)='0'  then '0'
                              else lpad(substr(trim(k020),2),10,'0' )
                        end)                     K020
@@ -2445,6 +2615,7 @@ begin
 --                            , f_nbur_get_f090('C9', e.ref, t.f090a)    F090
                             , '999'                      F090
                             , P62                        K040
+                            , P35                        K030
                             , P31                        K020
                             , null                       Q001_1
                             , null                       B010
