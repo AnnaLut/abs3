@@ -13,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FD9X (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования D9X
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.003    26.11.2018
+ VERSION     :    v.19.001    12.02.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := ' v.18.003  26.11.2018';
+  ver_              char(30)  := ' v.19.001  12.02.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -61,7 +61,7 @@ begin
     into NBUR_LOG_FD9X
        (REPORT_DATE, KF, NBUC, VERSION_ID, EKP, Q003_1,
         K020_1, K021_1, Q001_1, Q029_1, K020_2, K021_2, Q001_2, Q029_2,
-        K014, K040, KU_1, K110, T090_1, T090_2,
+        K014, K040, KU_1, K110, T090_1A, T090_2A,
         CUST_ID, BRANCH)
   select p_report_date,  p_kod_filii,  p_kod_filii,  l_version
          , 'AD9001'                as EKP
@@ -86,8 +86,8 @@ begin
                         else           ltrim(c.ku_1,'0')
                       end)            KU_1
          ,         c.k110             K110
-         ,         nvl(c.t090_1,0)         T090_1
-         ,         nvl(c.t090_2,0)         T090_2  
+         ,         nvl(c.t090_1,0)         T090_1a
+         ,         nvl(c.t090_2,0)         T090_2a  
          ,         u.code_rnk+u.new_rnk    cust_id
          ,         u.branch                 branch
               from (
