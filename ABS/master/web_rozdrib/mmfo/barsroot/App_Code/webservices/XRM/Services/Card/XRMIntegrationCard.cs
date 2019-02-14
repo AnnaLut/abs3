@@ -45,10 +45,13 @@ namespace Bars.WebServices.XRM.Services.Card
                 using (OracleConnection con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
                 {
                     LoginADUserIntSingleCon(con, XRMOpenCard[0].UserLogin);
-                    foreach (var CardReq in XRMOpenCard)
+                    foreach (XRMOpenCardReq CardReq in XRMOpenCard)
                     {
                         XRMOpenCardResult CardRes = new XRMOpenCardResult();
                         Byte[] responseBytes = null;
+
+                        string _request = Newtonsoft.Json.JsonConvert.SerializeObject(CardReq);
+
                         try
                         {
                             ProcessTransactions(con, CardReq.TransactionId, CardReq.UserLogin, CardReq.OperationType, out responseBytes, moduleName);
@@ -62,7 +65,7 @@ namespace Bars.WebServices.XRM.Services.Card
                             else
                             {
                                 CardRes = CardWorker.ProcOpenCard(CardReq, con);
-                                WriteRequestResponseToLog(con, CardReq.TransactionId, CardReq, CardRes);
+                                WriteRequestResponseToLog(con, CardReq.TransactionId, Newtonsoft.Json.JsonConvert.DeserializeObject<XRMOpenCardReq>(_request), CardRes);
                             }
                         }
                         catch (System.Exception e)
@@ -86,6 +89,13 @@ namespace Bars.WebServices.XRM.Services.Card
 
             return resList;
         }
+
+        //[SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
+        //[WebMethod(EnableSession = true)]
+        //public XRMResponseDetailed<string> GetInsPdf(XRMRequest<long> Request)
+        //{
+        //    return ExecuteMethod(Request, CardWorker.GetInsPdf, false);
+        //}
         #endregion card_method
 
         #region getInstantDict
