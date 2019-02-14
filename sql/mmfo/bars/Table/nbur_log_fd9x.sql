@@ -92,9 +92,6 @@ end;
 
 commit;
 
-prompt  ======================================================
-prompt  /Sql/BARS/Table/nbur_log_fd9x                 Comments
-
 comment on table  NBUR_LOG_FD9X is 'D9X Дані про найбільших (прямих та опосередкованих) учасників контрагентів банку';
 comment on column NBUR_LOG_FD9X.REPORT_DATE is 'Звiтна дата';
 comment on column NBUR_LOG_FD9X.KF is 'Фiлiя';
@@ -122,8 +119,24 @@ comment on column NBUR_LOG_FD9X.KV is 'Ід. валюти';
 comment on column NBUR_LOG_FD9X.CUST_ID is 'Ід. клієнта';
 comment on column NBUR_LOG_FD9X.BRANCH is 'Код підрозділу';
 
-prompt  ======================================================
-prompt  /Sql/BARS/Table/nbur_log_fd9x                   Grants
+begin
+    execute immediate 'alter table bars.nbur_log_fd9x add (T090_1A  NUMBER(12,4))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+comment on column NBUR_LOG_FD9X.T090_1A is 'Відсоток прямої участі учасника';
+
+begin
+    execute immediate 'alter table bars.nbur_log_fd9x add (T090_2A  NUMBER(12,4))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+comment on column NBUR_LOG_FD9X.T090_2A is 'Відсоток опосередкованої участі учасника';
+
 
 grant SELECT on NBUR_LOG_FD9X to BARSUPL;
 grant SELECT on NBUR_LOG_FD9X to BARS_ACCESS_DEFROLE;

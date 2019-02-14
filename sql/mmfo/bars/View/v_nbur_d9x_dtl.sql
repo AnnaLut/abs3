@@ -23,8 +23,8 @@ select p.REPORT_DATE
          , p.K040
          , p.KU_1
          , p.K110
-         , p.T090_1
-         , p.T090_2
+         , p.T090_1A    as  T090_1
+         , p.T090_2A    as  T090_2
          , p.DESCRIPTION
          , p.KV
          , p.CUST_ID
