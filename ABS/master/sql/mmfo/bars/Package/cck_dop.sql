@@ -1933,9 +1933,11 @@ COBUMMFO-7118
                    cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'U') ZAYU,
                    cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'V') ZAYV,
                    (select name from cc_tag where tag = n.tag and n.tag like 'ZAY_P') NAMEP
-              FROM nd_txt n, cc_pawn c
+              FROM nd_txt n, cc_pawn c, cc_deal cd
              WHERE n.nd = p_nd AND tag LIKE 'ZAY_P'
                and n.txt = to_char(c.pawn(+))
+               and n.nd  = cd.nd
+               and nvl(cd.ndg,cd.nd) = cd.nd
          )
 
      LOOP
