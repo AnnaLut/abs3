@@ -28,8 +28,8 @@ select r.id,
        interest_utl.get_reckoning_comment(r.id, r.state_id, r.accrual_document_id, r.payment_document_id) state_comment,
        a.isp manager_id,
        s.fio manager_name,
-       nvl(w.kodk, k.kodk) corporation_code,
-       c.name_cli corporation_name
+       nvl(acorp.value, ccorp.value) corporation_code,
+       nvl(aname.corporation_name, cname.corporation_name) corporation_name
 from   int_reckonings r
 join   saldo a on a.acc = r.account_id
 join   customer cu on cu.rnk = a.rnk
@@ -37,9 +37,10 @@ join   int_accn i on i.acc = r.account_id and i.id = r.interest_kind_id
 join   int_idn ik on ik.id = i.id
 left join saldo ia on ia.acc = i.acra
 left join accounts ca on ca.acc = i.acrb
-left join rnkp_kod k on k.rnk = a.rnk
-left join rnkp_kod_acc w on w.acc = a.rnk
-left join kod_cli c on c.kod_cli = nvl(w.kodk, k.kodk)
+left join accountsw acorp on acorp.acc = a.acc and acorp.tag = 'OBCORP'
+left join customerw ccorp on ccorp.rnk = a.rnk and ccorp.TAG = 'OBPCP' 
+left join v_root_corporation aname on acorp.value = aname.EXTERNAL_ID
+left join v_root_corporation cname on ccorp.value = cname.EXTERNAL_ID
 left join staff$base s on s.id = a.isp
 where  r.grouping_line_id is null and
        r.line_type_id = 1 /*RECKONING_TYPE_ORDINARY_INT*/ and
