@@ -24,8 +24,9 @@ end FV9 ;
 /
 
 CREATE OR REPLACE PACKAGE BODY BARS.FV9  IS
-  g_body_version   CONSTANT VARCHAR2(64) := 'version 1.1  31.01.2019';
+  g_body_version   CONSTANT VARCHAR2(64) := 'version 1.2  11.02.2019';
 /*
+ 11-02-2019(1.2) Операция дооценки ЦБ на сумму резерва FXP --> RXP
  31-01-2019(1.1) БЕК уценки за счет резерва 
  14.01.2019 Sta  Отключила контроль на макс.дельту для 2018 года  / Работает только для :sysdate > to_date ('01.02.2019', 'dd.mm.yyyy');           
  25.09.2018 Sta  Добавила во все эксепшены gl.aMfo
@@ -164,12 +165,12 @@ P9	P9
           If p_PX < 'P10'  then 
              begin 
                 if sys_context('bars_context','user_mfo')='300465' THEN
-                   delete from nbu23_rez where fdat=p_dat01 and nbs in ('1415','3115') and tip='SRR';
+                   delete from nbu23_rez where fdat=p_dat01 and nbs in ('1415','3115') and tip='SR';
                 end if; 
                 begin
-                   select fdat into FDAT_ from opldok p, oper o where o.ref= p.ref and o.tt='FXP' and o.vdat= DAT31_ and o.vob= 96 and o.sos=5 and p.fdat> DAT31_ and rownum= 1;
-                   dbms_application_info.set_client_info(':'|| gl.aMfo ||':БЕК документів FXP');
-                   FV9.BEK ( 'FXP', FDAT_, zz.KF )   ; 
+                   select fdat into FDAT_ from opldok p, oper o where o.ref= p.ref and o.tt='RXP' and o.vdat= DAT31_ and o.vob= 96 and o.sos=5 and p.fdat> DAT31_ and rownum= 1;
+                   dbms_application_info.set_client_info(':'|| gl.aMfo ||':БЕК документів RXP');
+                   FV9.BEK ( 'RXP', FDAT_, zz.KF )   ; 
                    l_Run := 1;
                 EXCEPTION WHEN NO_DATA_FOUND THEN Null;
                 end ;
