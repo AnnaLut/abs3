@@ -8957,7 +8957,8 @@ is
         from accounts
        where acc in
              (select accid from dpt_accounts where dptid = p_dptdata.dptid)
-         and blkd = 11;
+         and blkd in (11, 19, 40) ; -- 19 и 40 добавлены в рамках --COBUMMFO-9697
+         
       bars_audit.trace('%s arested = %s, dptid => %s',
                        title,
                        case when l_arest11 > 0 then 'Y' else 'N' end,
