@@ -276,10 +276,10 @@ function buildUI2DestroyEpc() {
 function SearchPensioners() {
     kendo.ui.progress($(".search-box"), true);
     var qv = {};
-    qv.Epc = NullOrValue($("#searchEPC").val());
-    qv.Okpo = NullOrValue($("#searchInn").val());
-    qv.Nmk = NullOrValue($("#searchName").val());
-    qv.Nls = NullOrValue($("#searchNls").val());
+    qv.EPP_NUMBER = NullOrValue($("#searchEPC").val());
+    qv.TAX_REGISTRATION_NUMBER = NullOrValue($("#searchInn").val());
+    qv.NAME_PENSIONER = NullOrValue($("#searchName").val());
+    qv.NLS = NullOrValue($("#searchNls").val());
 
     getSearchData(qv);
 }
