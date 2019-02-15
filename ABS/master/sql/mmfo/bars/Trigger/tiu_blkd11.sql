@@ -1,5 +1,4 @@
 
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TIU_BLKD11.sql =========*** Run *** 
 PROMPT ===================================================================================== 
@@ -11,7 +10,7 @@ PROMPT *** Create  trigger TIU_BLKD11 ***
    BEFORE INSERT OR UPDATE OF blkd
    ON accounts
    FOR EACH ROW
-     WHEN (NEW.blkd = '11' OR (OLD.blkd = '11' AND NEW.blkd = '0')) DECLARE
+     WHEN (NEW.blkd in (11, 19, 40) OR (OLD.blkd in (11, 19, 40) AND NEW.blkd = 0)) DECLARE
    /* 03/08/2015 Евгений Сошко, Инга Павленко Заявка http://jira.unity-bars.com.ua:11000/browse/COBUSUPABS-3507
       В картці рахунку на вкладці «Фінансові» в полі «Блокування по дебету» передбачити параметр
       «Заарештувати частково» та водночас забезпечити при виборі цього параметру обов’язковий
@@ -34,6 +33,8 @@ PROMPT *** Create  trigger TIU_BLKD11 ***
       наступного за днем зняття арешту.
       При цьому відсотки не повинні нараховуватися за період
       дії арешту (з дати накладення арешту до дати зняття арешту включно).
+      
+      02/11/2018 В рамках COBUMMFO-9697 добавлены коды блокировки 40 и 19 для 2630
    */
    is_dp   INT := 0;      -- признак, относится к депозитным портфелям или нет
    l_id    int_ratn.id%TYPE;
@@ -74,11 +75,11 @@ PROMPT *** Create  trigger TIU_BLKD11 ***
       RETURN is_dp;
    END;
 BEGIN
-   IF :NEW.BLKD = '11' AND NVL (COALESCE (:NEW.LIM, :OLD.LIM), 0) = 0
+   IF :NEW.BLKD = 11 AND NVL (COALESCE (:NEW.LIM, :OLD.LIM), 0) = 0
    THEN
       bars_error.raise_nerror ('CAC', 'ERR_BLKD11');
    ELSE
-      IF :NEW.blkd = '11'
+      IF :NEW.blkd in (11, 19, 40)
       THEN
          BEGIN
             -- 1. Проверим, относится ли частично блокируемый счет к депозитному портфелю
@@ -88,6 +89,10 @@ BEGIN
             THEN
                RETURN;
          END;
+         
+         IF :NEW.blkd in (19, 40) AND :old.nbs <> '2630' --COBUMMFO-9697
+           THEN is_dp := 0;
+         END IF;  
 
          -- 1.a Вычитаем параметры действующей процентной карточки счета
          IF NVL (IS_DP, 0) = 1
@@ -129,7 +134,7 @@ BEGIN
                   RETURN;
             END;
          END IF;
-      ELSIF (:OLD.blkd = '11' AND :NEW.blkd = '0')
+      ELSIF (:OLD.blkd in (11, 19, 40) AND :NEW.blkd = '0')
       THEN
          -- 1. Проверим, относится ли частично блокируемый счет к депозитному портфелю
          BEGIN
@@ -141,6 +146,10 @@ BEGIN
                RETURN;
          END;
 
+         IF :NEW.blkd in (19, 40) AND :old.nbs <> '2630' --COBUMMFO-9697
+           THEN is_dp := 0;
+         END IF;
+         
          IF NVL (is_dp, 0) = 1
          THEN
             -- 1.a Вычитаем параметры действующей процентной карточки счета
