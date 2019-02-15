@@ -75,8 +75,6 @@ procedure INTX               ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 numb
 procedure INTXJ  ( p_User int,p_branch varchar2, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- Собственно расчет  %%
 procedure INTB       ( p_mode int); --- Генерация проводок согласно итоговому протоколу
 procedure OP_3600    ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a36 IN OUT accounts%rowtype) ;   -- откр дисконта  3600
-   -- переформирование форвардных проводок
-procedure REAMORT_3600  (p_acc in accounts.acc%type); --реф договора 110 (участника)
 procedure OP_SP      ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a67 IN OUT accounts%rowtype, a69 IN OUT accounts%rowtype) ;   -- откр просрочки 2067 + 2069
 procedure BG1        ( p_ini  int, p_mode int, p_dat date, dd cc_deal%rowtype, a26 accounts%rowtype, x26 accounts%rowtype ) ;   -- БЭК-сопровождение одного 2600
 function  SP         ( p_mode int, p_nd number, p_rnk number) return number ;
