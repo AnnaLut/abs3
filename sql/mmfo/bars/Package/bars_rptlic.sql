@@ -1,7 +1,7 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts \Sql\BARS\package\bars_rptlic.sql =========*** Run ***
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_rptlic.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.BARS_RPTLIC 
@@ -1173,8 +1173,10 @@ is
                      --корреспондента смотрим по OPLDOK
                      when G_SEARCH_OPLDOK then
 
-						 -- а также явно указанные опреации для поиска только в OPER
-                         if (c2.kv2 = c2.kv and c2.tt not like 'PS%' and not G_NAZNTT_LIST.exists(c1.tt)   ) then
+						 -- а также явно указанные операции для поиска только в OPER
+                         if (c2.kv2 = c2.kv and c2.tt not like 'PS%' and not G_NAZNTT_LIST.exists(c1.tt)
+                             and c1.tt <> 'W45' --MDom COBUMMFO-9907 2019.01.29
+                         ) then
                              l_nazn:= c1.txt;
                          else
                              l_nazn:= c2.nazn;
