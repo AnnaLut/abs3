@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.1 19.12.2018';
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.6 14.01.2019';
 -- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -75,6 +75,8 @@ procedure INTX               ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 numb
 procedure INTXJ  ( p_User int,p_branch varchar2, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- Собственно расчет  %%
 procedure INTB       ( p_mode int); --- Генерация проводок согласно итоговому протоколу
 procedure OP_3600    ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a36 IN OUT accounts%rowtype) ;   -- откр дисконта  3600
+   -- переформирование форвардных проводок
+procedure REAMORT_3600  (p_acc in accounts.acc%type); --реф договора 110 (участника)
 procedure OP_SP      ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a67 IN OUT accounts%rowtype, a69 IN OUT accounts%rowtype) ;   -- откр просрочки 2067 + 2069
 procedure BG1        ( p_ini  int, p_mode int, p_dat date, dd cc_deal%rowtype, a26 accounts%rowtype, x26 accounts%rowtype ) ;   -- БЭК-сопровождение одного 2600
 function  SP         ( p_mode int, p_nd number, p_rnk number) return number ;
@@ -109,7 +111,7 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 CREATE OR REPLACE PACKAGE BODY OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.1 19.12.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.6 14.01.2019';
 /*
 10.07.2018 LitvinSO COBUMMFO-8388 - Проверка параметра Страхування кредиту при авторизации
 06.04.2018  Нач %% через JOB
@@ -848,19 +850,30 @@ begin
 
   -- Расчет ЛДн
   If LDT_ = 0 then
+    begin
      select max(fdat) into dTmp_ from OVR_LIM  where nd = l_ND and acc = ACC8_ and fdat < dat21_ and lim >0 and ok = 1 ;
      If dTmp_ is null then
         raise_application_error(g_errn, g_errS||'Відсутні робочі ліміти НЕ =0 до Договору ref='||l_nd )  ;
      end if;
      select lim  into LDT_ from  OVR_LIM  where nd = l_ND and acc = ACC8_ and fdat = dTmp_ and ok = 1 ;
+    exception when others then
+        bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));     
+        LDT_:=0;
+    end; 
    end if;
 
-  -- первоначальный (договорной)
-  select max(fdat) into dTmp_ from OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat <= dat21_ and lim >0 ;
-  If dTmp_ is null then
-     raise_application_error(g_errn, g_errS||'Відсутні догов. ліміти НЕ =0 до Договору ref='||l_nd )  ;
-  end if;
-  select lim  into LD0_ from  OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat = dTmp_;
+    begin
+        -- первоначальный (договорной)
+        select max(fdat) into dTmp_ from OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat <= dat21_ and lim >0 ;
+        If dTmp_ is null then
+           raise_application_error(g_errn, g_errS||'Відсутні догов. ліміти НЕ =0 до Договору ref='||l_nd )  ;
+        end if;
+        select lim  into LD0_ from  OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat = dTmp_;
+    exception when others then
+        bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));     
+        LD0_:=0;
+    end;   
+  
   LDN_ := CDO_ * PD_ /100  ;  -- • ЛДн = ЧД *ПД.
   nTmp_ := div0( Abs(LDN_-LDT_), LDT_ );
 
@@ -1003,7 +1016,7 @@ BEGIN
   If OVRN.GetW(a89.acc, 'TERM_DAY') is null then
      raise_application_error(g_errn, g_errS||'Дог.Не заповнено рекв.TERM_DAY =Термiн(день мiс) для сплати %%' );
   end if ;
-  
+
   update int_accn set basey = 3 where acc = a89.acc and id = 0 ; -- 3 Г% Факт/360  ACT/360
   update int_accn set basey = 0 where acc = a89.acc and id = 1 ; -- 0 Г% Факт/Факт  ACT/ACT
 
@@ -1625,7 +1638,7 @@ begin
 
   If l_lim is not null then
      update OVR_LIM set lim = round( l_lim*100, 0)  where acc = aa.acc  and fdat = dd.sdate  and  nd = l_nd ;
-     if SQL%rowcount = 0 then insert into OVR_LIM (nd,acc,fdat, lim) values (l_nd, aa.acc, dd.sdate , round( l_lim*100, 0) ); end if;    
+     if SQL%rowcount = 0 then insert into OVR_LIM (nd,acc,fdat, lim) values (l_nd, aa.acc, dd.sdate , round( l_lim*100, 0) ); end if;
   end if;
 
   u_ND := null ;
@@ -1703,7 +1716,7 @@ begin
   OVRN.SetW (aa.acc, 'PCR_CHKO' , to_char(p_PK  ) ) ;   --- g_TAGC = PCR_CHKO -- Розмiр лiмiту (% вiд ЧКО)
   OVRN.SetW (aa.acc, 'DONOR'    , to_char(p_Don ) ) ;   --- g_TAGN = DONOR -- Признак донора
   OVRN.SetW (aa.acc, 'NEW_KL'   , to_char(p_NK  ) ) ;   --- g_TAGK = NEW_KL -- Признак <<нов кл>>
-   
+
   if nvl(p_don,0) <> 1 then
      begin select a.* into a9 from accounts a, nd_acc n where a.rnk = aa.rnk and a.nbs = '9129' and a.tip ='CR9' and a.kv = aa.kv and a.acc= n.acc and n.nd = dd.nd ;
      EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -1732,7 +1745,13 @@ end ADD_slave ;
 procedure DEL_slave  (p_ND number, p_acc number, p_nls varchar2, p_kv int) is
   a26 accounts%rowtype;  dd cc_deal%rowtype ;
   l_ndu number;
+  l_count number;
 begin
+  select count(nd) into l_count from cc_deal where ndi = p_ND and vidd = 110 and sos >= 10 and sos < 14;
+  if l_count <=1 then
+    raise_application_error(g_errn, 'Єдиний учасник не може бути видалений –скористайтеся функцією закриття договору!' ) ;
+  end if;
+  
   begin select *    into dd    from cc_deal             where   nd  = p_ND and vidd   =  10 ;
         select n.nd into l_ndu from cc_deal d, nd_acc n where d.ndi = p_ND and d.vidd = 110 and d.nd = n.nd and n.acc= p_acc ;
   EXCEPTION WHEN NO_DATA_FOUND THEN RETURN;
@@ -1825,7 +1844,7 @@ begin
      oo.ND   := NVL ( oo.ND, trim (Substr( '          '||to_char(oo.ref), -10 ) ) ) ;
 
      gl.ref (oo.REF);
-     oo.nd := trim (Substr( '          '||to_char(oo.ref) , -10 ) ) ;
+   --  oo.nd := trim (Substr( '          '||to_char(oo.ref) , -10 ) ) ;
      gl.in_doc3 (ref_=>oo.REF  ,  tt_ =>oo.tt  , vob_=>oo.vob , nd_  =>oo.nd   ,pdat_=>SYSDATE, vdat_=>oo.vdat , dk_ =>oo.dk,
                   kv_=>oo.kv   ,  s_  =>oo.S   , kv2_=>oo.kv2 , s2_  =>oo.S2   ,sk_  => null  , data_=>gl.BDATE,datp_=>gl.bdate,
                nam_a_=>oo.nam_a, nlsa_=>oo.nlsa,mfoa_=>oo.mfoa,nam_b_=>oo.nam_b,nlsb_=>oo.nlsb, mfob_=>oo.mfob,
@@ -1916,7 +1935,7 @@ begin
 
         select ostc into a26.ostc from accounts where acc = a26.acc;
 
-        If a26.ostc <= 0 and  p_mode = 0 then
+        If /*a26.ostc <= 0 and */ p_mode = 0 then -- COBUMMFO-10560  (деньги насчете есть, но запрещено договорное списание. Получается, что и не гасим и не выносим на просрочку)
 
            If a26.ostc < 0 then   --просроч тело
               l_mdat := Least ( dd.Wdate, OVRN.Get_mdat (a26.acc) );
@@ -2061,7 +2080,6 @@ begin
          OVRN.NEXT_LIM ( a89.acc ); -- проверка на перелимит после установки новых лимитов
 
       end if;  -- ФИНИШ
-
   end loop ; -- d
 
 end background ;
@@ -2086,6 +2104,7 @@ begin
                    next_date => sysdate,
                    interval  => null,
                    no_parse  => true);
+   bars_audit.info(l_job_what);                
 exception when others then    rollback to savepoint before_job_start;   bars_audit.info('ERROR'||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));    -- произошли ошибки
 end intx;
 
@@ -2826,7 +2845,7 @@ BEGIN
        where o.nlsB in (select nls from tt)  and o.id_B = OKPO_2600 AND O.DK = 1
          and o.id_A not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_B)
          and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_B and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) -- эти БС в 2017 избыточны
-         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1  
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1
          and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
 
 --STA   05.09.2017 --дЕБЕТОВІЕ ДОК
@@ -2837,7 +2856,7 @@ BEGIN
        where o.nlsA in (select nls from tt)  and o.id_A = OKPO_2600 AND O.DK = 0
          and o.id_B not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_A)
          and o.NLSB not in (select a.nls from accounts a where a.rnk=o.id_A and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) -- эти БС в 2017 избыточны
-         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1 
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1
          and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
 END;
 
@@ -3135,17 +3154,17 @@ BEGIN
   -- ставим обметку о закрытии дог. Переходит в портфель закрытых .    Добавлю опцию «просмотра закрытых»
   for k in (select * from accounts   where acc in (select acc from nd_acc where nd = dd.nd)  and dazs is null      )
   loop
-     If    k.nbs in ('2600','2650','2602','2603','2604')     then  
-       
+     If    k.nbs in ('2600','2650','2602','2603','2604')     then
+
      update accounts set lim = 0, accc = null where acc = k.ACC;  -- эти БС в 2017 не меняются
                                                                    update accounts set ostc = ostc - k.ostc where acc = k.accc;
-          
+
      ----чистка тормозной зоны по счету, который используется повторно уже с другим договором
      delete from OVR_TERM_TRZ where acc = k.ACC;
      ----обнуляем лимиты
      delete from OVR_LIM     where acc = k.ACC;
      delete from OVR_LIM_DOG where acc = k.ACC;
-                                                                   
+
      elsIf k.nbs in ('2608','2658')                          then  null;                                                        -- эти БС в 2017 не меняются
      elsIf k.tip in ('OVN')                                  then  update accounts set dazs = l_bDat_Next where acc = k.ACC;
      elsIf k.tip in ('SN ') and k.ostc =0                    then  update accounts set dazs = l_bDat_Next where acc = k.ACC;
