@@ -75,7 +75,7 @@ PROMPT *** Create  view W4_DEAL_WEB_UO ***
                   AND SUBSTR (a.nls, 1, 4) = n.nbs
                   AND a.ob22 = n.ob22
                   AND a.tip = n.tip
-                  AND SUBSTR (a.nls, 1, 4) in( '2605', '2655', '2552', '2554', '2600', '1919')
+                  AND SUBSTR (a.nls, 1, 4) in ('2605', '2655', '2552', '2554', '2600', '1919', '2520')
                   AND a.branch LIKE
                          SYS_CONTEXT ('bars_context', 'user_branch_mask'));
 
