@@ -1,0 +1,465 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="11/16/2018 10:08:04" ReportInfo.Modified="01/31/2019 10:44:13" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQLFU/rEH1QDqVBUr5ThTQn8=">
+      <TableDataSource Name="Table" Alias="s_tmp_report_data" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 FIO, CHAR01 SRT, NUM00 DKSRT, NUM01 VOBSRT, CHAR02 NMK, CHAR03 OKPO, NUM02 ACC, CHAR04 NLS, NUM03 KV, CHAR05 LCV, DAT00 FDAT, DAT01 DAPP, NUM04 OSTF, NUM05 OSTFQ, CHAR06 NMS, NUM06 S, NUM07 SQ, NUM08 DOSS, NUM09 KOSS, NUM10 DOSSQ, NUM11 KOSSQ, CHAR07 ND, CHAR08 MFO2, CHAR09 NB2, CHAR10 NLS2, CHAR11 NMK2, CHAR12 OKPO2, CHAR13 NAZN, NUM12 BIS, NUM13 DOSR, NUM14 KOSR, NUM15 OSTFR, DAT02 FDAT, NUM16 CURS, NUM17 BSUM, DAT03 PAYDATE from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="SRT" DataType="System.String"/>
+        <Column Name="DKSRT" DataType="System.Decimal"/>
+        <Column Name="VOBSRT" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="ACC" DataType="System.Decimal"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="DAPP" DataType="System.DateTime"/>
+        <Column Name="OSTF" DataType="System.Decimal"/>
+        <Column Name="OSTFQ" DataType="System.Decimal"/>
+        <Column Name="NMS" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="DOSS" DataType="System.Decimal"/>
+        <Column Name="KOSS" DataType="System.Decimal"/>
+        <Column Name="DOSSQ" DataType="System.Decimal"/>
+        <Column Name="KOSSQ" DataType="System.Decimal"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="MFO2" DataType="System.String"/>
+        <Column Name="NB2" DataType="System.String"/>
+        <Column Name="NLS2" DataType="System.String"/>
+        <Column Name="NMK2" DataType="System.String"/>
+        <Column Name="OKPO2" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="BIS" DataType="System.Decimal"/>
+        <Column Name="DOSR" DataType="System.Decimal"/>
+        <Column Name="KOSR" DataType="System.Decimal"/>
+        <Column Name="OSTFR" DataType="System.Decimal"/>
+        <Column Name="FDAT1" DataType="System.DateTime"/>
+        <Column Name="CURS" DataType="System.Decimal" Format="Currency"/>
+        <Column Name="BSUM" DataType="System.Decimal"/>
+        <Column Name="PAYDATE" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="branch" DataType="System.Int32" Enabled="true" SelectCommand="select substr(branch,1,30) as OUR_BRANCH,&#13;&#10;          substr(name,1,70) as OUR_BRANCH_NAME&#13;&#10;  from branch where branch like SYS_CONTEXT('bars_context','user_branch')">
+        <Column Name="OUR_BRANCH" DataType="System.String"/>
+        <Column Name="OUR_BRANCH_NAME" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="dat" DataType="System.Int32" Enabled="true" SelectCommand="select :sFdat1, :sFdat2 from dual">
+        <Column Name=":SFDAT1" DataType="System.DateTime" Format="Date"/>
+        <Column Name=":SFDAT2" DataType="System.DateTime" Format="Date"/>
+        <CommandParameter Name=":sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name=":sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32" Expression="812711"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="Q1" DataType="System.Decimal" Expression="Abs([Q3])"/>
+    <Parameter Name="Q2" DataType="System.Decimal" Expression="[Q1] * ToDecimal(FormatNumber([s_tmp_report_data.CURS],4))/100"/>
+    <Parameter Name="Q3" DataType="System.Decimal" Expression="ToDecimal([s_tmp_report_data.OSTF] + [DOSS1] + [KOSST])"/>
+    <Parameter Name="QT1" DataType="System.Decimal" Expression="Abs([QT3])"/>
+    <Parameter Name="QT2" DataType="System.Decimal" Expression="[QT1] * ToDecimal(FormatNumber([s_tmp_report_data.CURS],4))/100"/>
+    <Parameter Name="QT3" DataType="System.Decimal" Expression="ToDecimal([s_tmp_report_data.OSTF] + [DOSS1] + [KOSS1])"/>
+    <Parameter Name="O1" DataType="System.String" Expression="FormatNumber([DOSSQ1]*(-1),2)"/>
+    <Parameter Name="O2" DataType="System.String" Expression="FormatNumber([DOSRT],2)"/>
+    <Total Name="DOSS1" Expression="[s_tmp_report_data.DOSS]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="KOSS1" Expression="[s_tmp_report_data.KOSS]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="DOSSQ1" Expression="[s_tmp_report_data.DOSSQ]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="KOSSQ1" Expression="[s_tmp_report_data.KOSSQ]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="DOSRT" Expression="[s_tmp_report_data.DOSR]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="KOSRT" Expression="[s_tmp_report_data.KOSR]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="DOSST" Expression="[s_tmp_report_data.DOSS]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="KOSST" Expression="[s_tmp_report_data.KOSS]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="DOSSQT" Expression="[s_tmp_report_data.DOSSQ]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="KOSSQT" Expression="[s_tmp_report_data.KOSSQ]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="DOSRTT" Expression="[s_tmp_report_data.DOSR]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="KOSRTT" Expression="[s_tmp_report_data.KOSR]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="1039.5">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="55.6" Guides="75.6">
+      <TableObject Name="Table1" Top="0.11" Width="1039.5" Height="55.49" GrowToBottom="true" RepeatHeaders="false">
+        <TableColumn Name="Column59" Width="66.17"/>
+        <TableColumn Name="Column60" Width="133.24"/>
+        <TableColumn Name="Column61" Width="76.54"/>
+        <TableColumn Name="Column62" Width="86"/>
+        <TableColumn Name="Column63" Width="104.89"/>
+        <TableColumn Name="Column64" Width="112.45"/>
+        <TableColumn Name="Column65" Width="103"/>
+        <TableColumn Name="Column66" Width="84.11"/>
+        <TableColumn Name="Column67" Width="178.6"/>
+        <TableColumn Name="Column68" Width="94.5"/>
+        <TableRow Name="Row21" Height="27.14" AutoSize="true">
+          <TableCell Name="Cell175" VertAlign="Center"/>
+          <TableCell Name="Cell176" VertAlign="Center"/>
+          <TableCell Name="Cell177" VertAlign="Center"/>
+          <TableCell Name="Cell178" VertAlign="Center"/>
+          <TableCell Name="Cell179" VertAlign="Center"/>
+          <TableCell Name="Cell180" VertAlign="Center"/>
+          <TableCell Name="Cell181" VertAlign="Center"/>
+          <TableCell Name="Cell182" VertAlign="Center"/>
+          <TableCell Name="Cell183" Text="Надруковано  [FormatDateTime([Date],&quot;Short Date&quot;)]" ColSpan="2"/>
+          <TableCell Name="Cell184"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="28.35">
+          <TableCell Name="Cell185"/>
+          <TableCell Name="Cell186"/>
+          <TableCell Name="Cell187"/>
+          <TableCell Name="Cell188"/>
+          <TableCell Name="Cell189" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell190"/>
+          <TableCell Name="Cell191"/>
+          <TableCell Name="Cell192" ColSpan="3">
+            <Formats>
+              <GeneralFormat/>
+              <GeneralFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell193"/>
+          <TableCell Name="Cell194"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader2" Top="58.63" Width="1047.06" Height="27.14" Condition="[s_tmp_report_data.ACC]">
+      <TableObject Name="Table5" Width="1039.5" Height="27.14" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="2" GrowToBottom="true" RepeatHeaders="false">
+        <TableColumn Name="Column99" Width="66.17"/>
+        <TableColumn Name="Column100" Width="133.24"/>
+        <TableColumn Name="Column101" Width="76.54"/>
+        <TableColumn Name="Column102" Width="86"/>
+        <TableColumn Name="Column103" Width="104.89"/>
+        <TableColumn Name="Column104" Width="112.45"/>
+        <TableColumn Name="Column105" Width="103"/>
+        <TableColumn Name="Column106" Width="84.11"/>
+        <TableColumn Name="Column107" Width="178.6"/>
+        <TableColumn Name="Column108" Width="94.5"/>
+        <TableRow Name="Row45" Height="27.14" AutoSize="true">
+          <TableCell Name="Cell415" VertAlign="Center"/>
+          <TableCell Name="Cell416" VertAlign="Center"/>
+          <TableCell Name="Cell417" VertAlign="Center"/>
+          <TableCell Name="Cell418" VertAlign="Center"/>
+          <TableCell Name="Cell419" VertAlign="Center"/>
+          <TableCell Name="Cell420" VertAlign="Center"/>
+          <TableCell Name="Cell421" VertAlign="Center"/>
+          <TableCell Name="Cell422" Text="ВИПИСКА за період  [FormatDateTime([sFdat1],&quot;Short Date&quot;)]  -  [FormatDateTime([sFdat2],&quot;Short Date&quot;)]" VertAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell423"/>
+          <TableCell Name="Cell424"/>
+        </TableRow>
+      </TableObject>
+      <GroupHeaderBand Name="GroupHeader1" Top="88.8" Width="1047.06" Height="168.89" Condition="[s_tmp_report_data.FDAT]">
+        <TableObject Name="Table5" Left="-0.95" Width="1045.36" Height="168.89" GrowToBottom="true" RepeatHeaders="false">
+          <TableColumn Name="Column39" Width="58.59"/>
+          <TableColumn Name="Column40" Width="140.99"/>
+          <TableColumn Name="Column41" Width="77.49"/>
+          <TableColumn Name="Column42" Width="86.94"/>
+          <TableColumn Name="Column43" Width="103.95"/>
+          <TableColumn Name="Column44" Width="113.4"/>
+          <TableColumn Name="Column45" Width="103.95"/>
+          <TableColumn Name="Column46" Width="85.05"/>
+          <TableColumn Name="Column47" Width="179.55"/>
+          <TableColumn Name="Column48" Width="95.45"/>
+          <TableRow Name="Row19" Height="27.14" AutoSize="true">
+            <TableCell Name="Cell155" Text="[branch.OUR_BRANCH]/[branch.OUR_BRANCH_NAME]" VertAlign="Center" ColSpan="5"/>
+            <TableCell Name="Cell156" VertAlign="Center"/>
+            <TableCell Name="Cell157" VertAlign="Center"/>
+            <TableCell Name="Cell158" VertAlign="Center"/>
+            <TableCell Name="Cell159" VertAlign="Center"/>
+            <TableCell Name="Cell160" VertAlign="Center"/>
+            <TableCell Name="Cell161" VertAlign="Center"/>
+            <TableCell Name="Cell162" VertAlign="Center"/>
+            <TableCell Name="Cell163" VertAlign="Center"/>
+            <TableCell Name="Cell164" VertAlign="Center"/>
+          </TableRow>
+          <TableRow Name="Row26">
+            <TableCell Name="Cell225" Text="Клієнт:" ColSpan="2"/>
+            <TableCell Name="Cell226"/>
+            <TableCell Name="Cell227" Text="[s_tmp_report_data.NMK] ([s_tmp_report_data.OKPO])" ColSpan="7"/>
+            <TableCell Name="Cell228"/>
+            <TableCell Name="Cell229"/>
+            <TableCell Name="Cell230"/>
+            <TableCell Name="Cell231"/>
+            <TableCell Name="Cell232"/>
+            <TableCell Name="Cell233"/>
+            <TableCell Name="Cell234"/>
+          </TableRow>
+          <TableRow Name="Row27">
+            <TableCell Name="Cell235" Text="Рахунок:" ColSpan="2"/>
+            <TableCell Name="Cell236"/>
+            <TableCell Name="Cell237" Text="[s_tmp_report_data.NLS]/([s_tmp_report_data.LCV])       [s_tmp_report_data.NMS]" ColSpan="7"/>
+            <TableCell Name="Cell238"/>
+            <TableCell Name="Cell239"/>
+            <TableCell Name="Cell240"/>
+            <TableCell Name="Cell241"/>
+            <TableCell Name="Cell242"/>
+            <TableCell Name="Cell243"/>
+            <TableCell Name="Cell244"/>
+          </TableRow>
+          <TableRow Name="Row28">
+            <TableCell Name="Cell245" Text="Вхiдний залишок на :" ColSpan="2"/>
+            <TableCell Name="Cell246"/>
+            <TableCell Name="Cell247" Text="[FormatDateTime([s_tmp_report_data.FDAT],&quot;Short Date&quot;)]        [FormatNumber(Abs([s_tmp_report_data.OSTF]),2)]( [FormatNumber(Abs([s_tmp_report_data.OSTF]) * [s_tmp_report_data.CURS]/100)] ) [IIf(([s_tmp_report_data.OSTF]&lt;0),&quot;Дб&quot;, &quot;Кр&quot;)]" ColSpan="7">
+              <Formats>
+                <GeneralFormat/>
+                <GeneralFormat/>
+                <GeneralFormat/>
+                <GeneralFormat/>
+              </Formats>
+            </TableCell>
+            <TableCell Name="Cell248"/>
+            <TableCell Name="Cell249"/>
+            <TableCell Name="Cell250"/>
+            <TableCell Name="Cell251"/>
+            <TableCell Name="Cell252"/>
+            <TableCell Name="Cell253"/>
+            <TableCell Name="Cell254"/>
+          </TableRow>
+          <TableRow Name="Row29">
+            <TableCell Name="Cell255" Text="Попередня дата руху:" ColSpan="2"/>
+            <TableCell Name="Cell256"/>
+            <TableCell Name="Cell257" Text="[FormatDateTime([s_tmp_report_data.DAPP],&quot;Short Date&quot;)]" ColSpan="7"/>
+            <TableCell Name="Cell258"/>
+            <TableCell Name="Cell259"/>
+            <TableCell Name="Cell260"/>
+            <TableCell Name="Cell261"/>
+            <TableCell Name="Cell262"/>
+            <TableCell Name="Cell263"/>
+            <TableCell Name="Cell264"/>
+          </TableRow>
+          <TableRow Name="Row30" Height="28.35">
+            <TableCell Name="Cell265" Text="Курс на  :" ColSpan="2"/>
+            <TableCell Name="Cell266"/>
+            <TableCell Name="Cell267" Text="[FormatNumber([s_tmp_report_data.CURS],4)] \[FormatNumber([s_tmp_report_data.BSUM],0)]" ColSpan="7"/>
+            <TableCell Name="Cell268"/>
+            <TableCell Name="Cell269"/>
+            <TableCell Name="Cell270"/>
+            <TableCell Name="Cell271"/>
+            <TableCell Name="Cell272"/>
+            <TableCell Name="Cell273"/>
+            <TableCell Name="Cell274"/>
+          </TableRow>
+          <TableRow Name="Row31" Height="37.8">
+            <TableCell Name="Cell275" Border.Lines="All" Border.Style="Dash" Text="МФО" VertAlign="Center"/>
+            <TableCell Name="Cell276" Border.Lines="All" Border.Style="Dash" Text="рахунок" VertAlign="Center"/>
+            <TableCell Name="Cell277" Border.Lines="All" Border.Style="Dash" Text="№ Док-та" VertAlign="Center"/>
+            <TableCell Name="Cell278" Border.Lines="All" Border.Style="Dash" Text="ДЕБЕТ" VertAlign="Center"/>
+            <TableCell Name="Cell279" Border.Lines="All" Border.Style="Dash" Text="КРЕДИТ" VertAlign="Center"/>
+            <TableCell Name="Cell280" Border.Lines="All" Border.Style="Dash" Text="ДЕБЕТ(Еквів.)" VertAlign="Center"/>
+            <TableCell Name="Cell281" Border.Lines="All" Border.Style="Dash" Text="КРЕДИТ(Еквів.)" VertAlign="Center"/>
+            <TableCell Name="Cell282" Border.Lines="All" Border.Style="Dash" Text="Дата док." VertAlign="Center"/>
+            <TableCell Name="Cell283" Border.Lines="All" Border.Style="Dash" Text="ЗКПО контр." VertAlign="Center"/>
+            <TableCell Name="Cell284" Border.Lines="All" Border.Style="Dash" Text="проведення" VertAlign="Center"/>
+          </TableRow>
+        </TableObject>
+        <DataBand Name="Data1" Top="260.72" Width="1047.06" Height="93.29" Guides="37.8,75.6" DataSource="Table">
+          <TableObject Name="Table3" Width="1043.68" Height="93.29" GrowToBottom="true" RepeatHeaders="false">
+            <TableColumn Name="Column16" Width="58.59"/>
+            <TableColumn Name="Column17" Width="139.86"/>
+            <TableColumn Name="Column18" Width="77.48"/>
+            <TableColumn Name="Column19" Width="86.93"/>
+            <TableColumn Name="Column20" Width="104.33"/>
+            <TableColumn Name="Column21" Width="113.39"/>
+            <TableColumn Name="Column22" Width="103.94"/>
+            <TableColumn Name="Column23" Width="85.05"/>
+            <TableColumn Name="Column24" Width="179.54"/>
+            <TableColumn Name="Column25" Width="94.57"/>
+            <TableRow Name="Row8" Height="36.59" AutoSize="true">
+              <TableCell Name="Cell61" Text="[s_tmp_report_data.MFO2]" VertAlign="Center"/>
+              <TableCell Name="Cell62" Text="[s_tmp_report_data.NLS2]" VertAlign="Center"/>
+              <TableCell Name="Cell63" Text="[s_tmp_report_data.ND]" VertAlign="Center"/>
+              <TableCell Name="Cell64" Text="[FormatNumber([s_tmp_report_data.DOSS]*(-1),2)]" VertAlign="Center"/>
+              <TableCell Name="Cell65" Text="[FormatNumber([s_tmp_report_data.KOSS],2)]" VertAlign="Center"/>
+              <TableCell Name="Cell66" Text="[FormatNumber([s_tmp_report_data.DOSSQ]*(-1),2)]" VertAlign="Center"/>
+              <TableCell Name="Cell67" Text="[FormatNumber([s_tmp_report_data.KOSSQ],2)]" VertAlign="Center"/>
+              <TableCell Name="Cell68" Text="[s_tmp_report_data.FDAT]" Format="Custom" Format.Format="dd.MM.yyyy" VertAlign="Center"/>
+              <TableCell Name="Cell69" Text="-&gt;[s_tmp_report_data.OKPO2]" VertAlign="Center"/>
+              <TableCell Name="Cell70" Text="[s_tmp_report_data.PAYDATE]" Format="Custom" Format.Format="dd.MM.yyyy" VertAlign="Center"/>
+            </TableRow>
+            <TableRow Name="Row24" Height="28.35" AutoSize="true">
+              <TableCell Name="Cell205"/>
+              <TableCell Name="Cell206"/>
+              <TableCell Name="Cell207"/>
+              <TableCell Name="Cell208"/>
+              <TableCell Name="Cell209"/>
+              <TableCell Name="Cell210"/>
+              <TableCell Name="Cell211"/>
+              <TableCell Name="Cell212" Text="[s_tmp_report_data.NMK2]" ColSpan="3"/>
+              <TableCell Name="Cell213"/>
+              <TableCell Name="Cell214"/>
+            </TableRow>
+            <TableRow Name="Row25" Height="28.35" AutoSize="true">
+              <TableCell Name="Cell215" Border.Lines="Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell216" Border.Lines="Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell217" Border.Lines="Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell218" Border.Lines="Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell219" Border.Lines="Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell220" Border.Lines="Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell221" Border.Lines="Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell222" Border.Lines="Bottom" Border.Style="Dash" Text="[s_tmp_report_data.NAZN]" ColSpan="3"/>
+              <TableCell Name="Cell223"/>
+              <TableCell Name="Cell224"/>
+            </TableRow>
+          </TableObject>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter1" Top="357.04" Width="1047.06" Height="102.73" Guides="0,0">
+          <TableObject Name="Table5" Left="-0.95" Width="1045.36" Height="102.73" GrowToBottom="true" RepeatHeaders="false">
+            <TableColumn Name="Column79" Width="58.59" AutoSize="true"/>
+            <TableColumn Name="Column80" Width="105.84" AutoSize="true"/>
+            <TableColumn Name="Column81" Width="112.64" AutoSize="true"/>
+            <TableColumn Name="Column82" Width="86.94" AutoSize="true"/>
+            <TableColumn Name="Column83" Width="105.84" AutoSize="true"/>
+            <TableColumn Name="Column84" Width="111.51" AutoSize="true"/>
+            <TableColumn Name="Column85" Width="103.95" AutoSize="true"/>
+            <TableColumn Name="Column86" Width="85.05" AutoSize="true"/>
+            <TableColumn Name="Column87" Width="179.55" AutoSize="true"/>
+            <TableColumn Name="Column88" Width="95.45" AutoSize="true"/>
+            <TableRow Name="Row35" Height="29.5" AutoSize="true">
+              <TableCell Name="Cell315" Text="Оборотiв за день  :" VertAlign="Bottom" ColSpan="3"/>
+              <TableCell Name="Cell316" VertAlign="Center"/>
+              <TableCell Name="Cell317" VertAlign="Center"/>
+              <TableCell Name="Cell318" Text="[FormatNumber([DOSS1]*(-1),2)]" VertAlign="Bottom"/>
+              <TableCell Name="Cell319" Text="[FormatNumber([KOSS1],2)]" VertAlign="Bottom"/>
+              <TableCell Name="Cell320" Text="[O1]" VertAlign="Bottom"/>
+              <TableCell Name="Cell321" Text="[FormatNumber([KOSSQ1],2)]" VertAlign="Bottom"/>
+              <TableCell Name="Cell322" VertAlign="Center"/>
+              <TableCell Name="Cell323"/>
+              <TableCell Name="Cell324"/>
+            </TableRow>
+            <TableRow Name="Row36" Height="21.26">
+              <TableCell Name="Cell325" Text="Переоцінка (грн)   :" ColSpan="3"/>
+              <TableCell Name="Cell326"/>
+              <TableCell Name="Cell327"/>
+              <TableCell Name="Cell328"/>
+              <TableCell Name="Cell329" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell330" Text="[FormatNumber(ToDouble([O2]) - ToDouble([O1]),2)]"/>
+              <TableCell Name="Cell331" Text="[FormatNumber([KOSRT] - [KOSSQ1],2)]"/>
+              <TableCell Name="Cell332"/>
+              <TableCell Name="Cell333"/>
+              <TableCell Name="Cell334"/>
+            </TableRow>
+            <TableRow Name="Row37" Height="21.26">
+              <TableCell Name="Cell335" Text="Оборотiв з переоцінкою (грн):" ColSpan="3"/>
+              <TableCell Name="Cell336"/>
+              <TableCell Name="Cell337"/>
+              <TableCell Name="Cell338"/>
+              <TableCell Name="Cell339" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell340" Text="[O2]"/>
+              <TableCell Name="Cell341" Text="[FormatNumber([KOSRT],2)]"/>
+              <TableCell Name="Cell342"/>
+              <TableCell Name="Cell343"/>
+              <TableCell Name="Cell344"/>
+            </TableRow>
+            <TableRow Name="Row38" Height="30.71" AutoSize="true">
+              <TableCell Name="Cell345" Text="Вихiдний залишок на: [FormatDateTime([s_tmp_report_data.FDAT],&quot;Short Date&quot;)] " ColSpan="3"/>
+              <TableCell Name="Cell346"/>
+              <TableCell Name="Cell347"/>
+              <TableCell Name="Cell348" Text="[Abs(ToDecimal([s_tmp_report_data.OSTF] + [DOSS1] + [KOSS1]))]([FormatNumber(Abs(ToDecimal([s_tmp_report_data.OSTF] + [DOSS1] + [KOSS1])) * [s_tmp_report_data.CURS]/100)]) [IIf(([Q3]&lt;0),&quot;Дб&quot;, &quot;Кр&quot;)]" ColSpan="5">
+                <Formats>
+                  <NumberFormat/>
+                  <GeneralFormat/>
+                  <GeneralFormat/>
+                </Formats>
+              </TableCell>
+              <TableCell Name="Cell349"/>
+              <TableCell Name="Cell350"/>
+              <TableCell Name="Cell351"/>
+              <TableCell Name="Cell352"/>
+              <TableCell Name="Cell353"/>
+              <TableCell Name="Cell354"/>
+            </TableRow>
+          </TableObject>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter2" Top="462.8" Width="1047.06" Height="132.3" Guides="132.3">
+        <TableObject Name="Table5" Width="1044.23" Height="131.09" GrowToBottom="true" RepeatHeaders="false">
+          <TableColumn Name="Column109" Width="58.59"/>
+          <TableColumn Name="Column110" Width="105.84"/>
+          <TableColumn Name="Column111" Width="111.51"/>
+          <TableColumn Name="Column112" Width="86.94"/>
+          <TableColumn Name="Column113" Width="105.84"/>
+          <TableColumn Name="Column114" Width="111.51"/>
+          <TableColumn Name="Column115" Width="103.95"/>
+          <TableColumn Name="Column116" Width="85.05"/>
+          <TableColumn Name="Column117" Width="179.55"/>
+          <TableColumn Name="Column118" Width="95.45"/>
+          <TableRow Name="Row46" Height="28.35">
+            <TableCell Name="Cell425" Text="Всього за період   :   [FormatDateTime([sFdat1],&quot;Short Date&quot;)]  -  [FormatDateTime([sFdat2],&quot;Short Date&quot;)]" ColSpan="5"/>
+            <TableCell Name="Cell426"/>
+            <TableCell Name="Cell427"/>
+            <TableCell Name="Cell428"/>
+            <TableCell Name="Cell429"/>
+            <TableCell Name="Cell430"/>
+            <TableCell Name="Cell431"/>
+            <TableCell Name="Cell432"/>
+            <TableCell Name="Cell433"/>
+            <TableCell Name="Cell434"/>
+          </TableRow>
+          <TableRow Name="Row47" Height="27.14" AutoSize="true">
+            <TableCell Name="Cell435" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2" Text="Оборотiв за день  :" VertAlign="Center" ColSpan="3"/>
+            <TableCell Name="Cell436" VertAlign="Center"/>
+            <TableCell Name="Cell437" VertAlign="Center"/>
+            <TableCell Name="Cell438" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2" Text="[FormatNumber([DOSST]*(-1),2)]" VertAlign="Center"/>
+            <TableCell Name="Cell439" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2" Text="[FormatNumber([KOSST],2)]" VertAlign="Center"/>
+            <TableCell Name="Cell440" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2" Text="[FormatNumber([DOSSQT]*(-1),2)]" VertAlign="Center"/>
+            <TableCell Name="Cell441" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2" Text="[FormatNumber([KOSSQT],2)]" VertAlign="Center"/>
+            <TableCell Name="Cell442" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2" VertAlign="Center"/>
+            <TableCell Name="Cell443" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2"/>
+            <TableCell Name="Cell444" Border.Lines="Top" Border.LeftLine.Width="2" Border.TopLine.Style="Double" Border.TopLine.Width="2" Border.RightLine.Width="2" Border.BottomLine.Width="2"/>
+          </TableRow>
+          <TableRow Name="Row48">
+            <TableCell Name="Cell445" Text="Переоцінка (грн)   :" ColSpan="3"/>
+            <TableCell Name="Cell446"/>
+            <TableCell Name="Cell447"/>
+            <TableCell Name="Cell448"/>
+            <TableCell Name="Cell449" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell450" Text="[FormatNumber([DOSRTT] - (-1)*[DOSSQT],2)]"/>
+            <TableCell Name="Cell451" Text="[FormatNumber([KOSRTT] - [KOSSQT],2)]"/>
+            <TableCell Name="Cell452"/>
+            <TableCell Name="Cell453"/>
+            <TableCell Name="Cell454"/>
+          </TableRow>
+          <TableRow Name="Row49">
+            <TableCell Name="Cell455" Text="Оборотiв з переоцінкою (грн):" ColSpan="3"/>
+            <TableCell Name="Cell456"/>
+            <TableCell Name="Cell457"/>
+            <TableCell Name="Cell458"/>
+            <TableCell Name="Cell459" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell460" Text="[FormatNumber([DOSRTT],2)]"/>
+            <TableCell Name="Cell461" Text="[FormatNumber([KOSRTT],2)]"/>
+            <TableCell Name="Cell462"/>
+            <TableCell Name="Cell463"/>
+            <TableCell Name="Cell464"/>
+          </TableRow>
+          <TableRow Name="Row50">
+            <TableCell Name="Cell465" Text="Вихiдний залишок на: [FormatDateTime([sFdat2],&quot;Short Date&quot;)]" ColSpan="3"/>
+            <TableCell Name="Cell466"/>
+            <TableCell Name="Cell467"/>
+            <TableCell Name="Cell468" Text="[Abs(ToDecimal([s_tmp_report_data.OSTF] + [DOSS1] + [KOSST]))]([FormatNumber(Abs(ToDecimal([s_tmp_report_data.OSTF] + [DOSS1] + [KOSST])) * [s_tmp_report_data.CURS]/100)]) [IIf(([Q3]&lt;0),&quot;Дб&quot;, &quot;Кр&quot;)]" ColSpan="5">
+              <Formats>
+                <NumberFormat/>
+                <GeneralFormat/>
+                <GeneralFormat/>
+              </Formats>
+            </TableCell>
+            <TableCell Name="Cell469"/>
+            <TableCell Name="Cell470"/>
+            <TableCell Name="Cell471"/>
+            <TableCell Name="Cell472"/>
+            <TableCell Name="Cell473"/>
+            <TableCell Name="Cell474"/>
+          </TableRow>
+          <TableRow Name="Row51">
+            <TableCell Name="Cell475"/>
+            <TableCell Name="Cell476"/>
+            <TableCell Name="Cell477"/>
+            <TableCell Name="Cell478"/>
+            <TableCell Name="Cell479"/>
+            <TableCell Name="Cell480"/>
+            <TableCell Name="Cell481"/>
+            <TableCell Name="Cell482"/>
+            <TableCell Name="Cell483"/>
+            <TableCell Name="Cell484"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>
