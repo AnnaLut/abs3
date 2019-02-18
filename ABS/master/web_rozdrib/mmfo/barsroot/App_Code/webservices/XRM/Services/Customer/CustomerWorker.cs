@@ -425,71 +425,71 @@ namespace Bars.WebServices.XRM.Services.Customer
                         _ClientAddressPostal.TYPE_ID = 3;
 
                         _ClientAddressLegal.COUNTRY = ((OracleDecimal)cmdSearchCustomer.Parameters["p_1country"].Value).Value;
-                        _ClientAddressPostal.COUNTRY = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2country"].Value).Value;
-                        _ClientAddressActual.COUNTRY = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3country"].Value).Value;
+                        _ClientAddressPostal.COUNTRY = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3country"].Value).Value;
+                        _ClientAddressActual.COUNTRY = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2country"].Value).Value;
 
                         _ClientAddressLegal.ZIP = ((OracleString)cmdSearchCustomer.Parameters["p_1zip"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1zip"].Value).Value;
-                        _ClientAddressPostal.ZIP = ((OracleString)cmdSearchCustomer.Parameters["p_2zip"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2zip"].Value).Value;
-                        _ClientAddressActual.ZIP = ((OracleString)cmdSearchCustomer.Parameters["p_3zip"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3zip"].Value).Value;
+                        _ClientAddressPostal.ZIP = ((OracleString)cmdSearchCustomer.Parameters["p_3zip"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3zip"].Value).Value;
+                        _ClientAddressActual.ZIP = ((OracleString)cmdSearchCustomer.Parameters["p_2zip"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2zip"].Value).Value;
 
                         _ClientAddressLegal.DOMAIN = ((OracleString)cmdSearchCustomer.Parameters["p_1domain"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1domain"].Value).Value;
-                        _ClientAddressPostal.DOMAIN = ((OracleString)cmdSearchCustomer.Parameters["p_2domain"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2domain"].Value).Value;
-                        _ClientAddressActual.DOMAIN = ((OracleString)cmdSearchCustomer.Parameters["p_3domain"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3domain"].Value).Value;
+                        _ClientAddressPostal.DOMAIN = ((OracleString)cmdSearchCustomer.Parameters["p_3domain"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3domain"].Value).Value;
+                        _ClientAddressActual.DOMAIN = ((OracleString)cmdSearchCustomer.Parameters["p_2domain"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2domain"].Value).Value;
 
                         _ClientAddressLegal.REGION = ((OracleString)cmdSearchCustomer.Parameters["p_1region"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1region"].Value).Value;
-                        _ClientAddressPostal.REGION = ((OracleString)cmdSearchCustomer.Parameters["p_2region"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2region"].Value).Value;
-                        _ClientAddressActual.REGION = ((OracleString)cmdSearchCustomer.Parameters["p_3region"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3region"].Value).Value;
+                        _ClientAddressPostal.REGION = ((OracleString)cmdSearchCustomer.Parameters["p_3region"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3region"].Value).Value;
+                        _ClientAddressActual.REGION = ((OracleString)cmdSearchCustomer.Parameters["p_2region"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2region"].Value).Value;
 
                         _ClientAddressLegal.LOCALITY = ((OracleString)cmdSearchCustomer.Parameters["p_1locality"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1locality"].Value).Value;
-                        _ClientAddressPostal.LOCALITY = ((OracleString)cmdSearchCustomer.Parameters["p_2locality"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2locality"].Value).Value;
-                        _ClientAddressActual.LOCALITY = ((OracleString)cmdSearchCustomer.Parameters["p_3locality"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3locality"].Value).Value;
+                        _ClientAddressPostal.LOCALITY = ((OracleString)cmdSearchCustomer.Parameters["p_3locality"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3locality"].Value).Value;
+                        _ClientAddressActual.LOCALITY = ((OracleString)cmdSearchCustomer.Parameters["p_2locality"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2locality"].Value).Value;
 
                         _ClientAddressLegal.ADDRESS = ((OracleString)cmdSearchCustomer.Parameters["p_1address"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1address"].Value).Value;
-                        _ClientAddressPostal.ADDRESS = ((OracleString)cmdSearchCustomer.Parameters["p_2address"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2address"].Value).Value;
-                        _ClientAddressActual.ADDRESS = ((OracleString)cmdSearchCustomer.Parameters["p_3address"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3address"].Value).Value;
+                        _ClientAddressPostal.ADDRESS = ((OracleString)cmdSearchCustomer.Parameters["p_3address"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3address"].Value).Value;
+                        _ClientAddressActual.ADDRESS = ((OracleString)cmdSearchCustomer.Parameters["p_2address"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2address"].Value).Value;
 
                         _ClientAddressLegal.TERRITORY_ID = ((OracleDecimal)cmdSearchCustomer.Parameters["p_1territoryId"].Value) == null ? 0 : ((OracleDecimal)cmdSearchCustomer.Parameters["p_1territoryId"].Value).Value;
-                        _ClientAddressPostal.TERRITORY_ID = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2territoryId"].Value) == null ? 0 : ((OracleDecimal)cmdSearchCustomer.Parameters["p_2territoryId"].Value).Value;
-                        _ClientAddressActual.TERRITORY_ID = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3territoryId"].Value) == null ? 0 : ((OracleDecimal)cmdSearchCustomer.Parameters["p_3territoryId"].Value).Value;
+                        _ClientAddressPostal.TERRITORY_ID = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3territoryId"].Value) == null ? 0 : ((OracleDecimal)cmdSearchCustomer.Parameters["p_3territoryId"].Value).Value;
+                        _ClientAddressActual.TERRITORY_ID = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2territoryId"].Value) == null ? 0 : ((OracleDecimal)cmdSearchCustomer.Parameters["p_2territoryId"].Value).Value;
 
                         _ClientAddressLegal.LOCALITY_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_1locality_type"].Value).Value;
-                        _ClientAddressPostal.LOCALITY_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2locality_type"].Value).Value;
-                        _ClientAddressActual.LOCALITY_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3locality_type"].Value).Value;
+                        _ClientAddressPostal.LOCALITY_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3locality_type"].Value).Value;
+                        _ClientAddressActual.LOCALITY_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2locality_type"].Value).Value;
 
                         _ClientAddressLegal.STREET_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_1street_type"].Value).Value;
-                        _ClientAddressPostal.STREET_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2street_type"].Value).Value;
-                        _ClientAddressActual.STREET_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3street_type"].Value).Value;
+                        _ClientAddressPostal.STREET_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3street_type"].Value).Value;
+                        _ClientAddressActual.STREET_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2street_type"].Value).Value;
 
                         _ClientAddressLegal.STREET = ((OracleString)cmdSearchCustomer.Parameters["p_1street"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1street"].Value).Value;
-                        _ClientAddressPostal.STREET = ((OracleString)cmdSearchCustomer.Parameters["p_2street"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2street"].Value).Value;
-                        _ClientAddressActual.STREET = ((OracleString)cmdSearchCustomer.Parameters["p_3street"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3street"].Value).Value;
+                        _ClientAddressPostal.STREET = ((OracleString)cmdSearchCustomer.Parameters["p_3street"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3street"].Value).Value;
+                        _ClientAddressActual.STREET = ((OracleString)cmdSearchCustomer.Parameters["p_2street"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2street"].Value).Value;
 
                         _ClientAddressLegal.HOME_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_1home_type"].Value).Value;
-                        _ClientAddressPostal.HOME_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2home_type"].Value).Value;
-                        _ClientAddressActual.HOME_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3home_type"].Value).Value;
+                        _ClientAddressPostal.HOME_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3home_type"].Value).Value;
+                        _ClientAddressActual.HOME_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2home_type"].Value).Value;
 
                         _ClientAddressLegal.HOME = ((OracleString)cmdSearchCustomer.Parameters["p_1home"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1home"].Value).Value;
-                        _ClientAddressPostal.HOME = ((OracleString)cmdSearchCustomer.Parameters["p_2home"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2home"].Value).Value;
-                        _ClientAddressActual.HOME = ((OracleString)cmdSearchCustomer.Parameters["p_3home"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3home"].Value).Value;
+                        _ClientAddressPostal.HOME = ((OracleString)cmdSearchCustomer.Parameters["p_3home"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3home"].Value).Value;
+                        _ClientAddressActual.HOME = ((OracleString)cmdSearchCustomer.Parameters["p_2home"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2home"].Value).Value;
 
                         _ClientAddressLegal.HOMEPART_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_1homepart_type"].Value).Value;
-                        _ClientAddressPostal.HOMEPART_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2homepart_type"].Value).Value;
-                        _ClientAddressActual.HOMEPART_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3homepart_type"].Value).Value;
+                        _ClientAddressPostal.HOMEPART_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3homepart_type"].Value).Value;
+                        _ClientAddressActual.HOMEPART_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2homepart_type"].Value).Value;
 
                         _ClientAddressLegal.HOMEPART = ((OracleString)cmdSearchCustomer.Parameters["p_1homepart"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1homepart"].Value).Value;
-                        _ClientAddressPostal.HOMEPART = ((OracleString)cmdSearchCustomer.Parameters["p_2homepart"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2homepart"].Value).Value;
-                        _ClientAddressActual.HOMEPART = ((OracleString)cmdSearchCustomer.Parameters["p_3homepart"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3homepart"].Value).Value;
+                        _ClientAddressPostal.HOMEPART = ((OracleString)cmdSearchCustomer.Parameters["p_3homepart"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3homepart"].Value).Value;
+                        _ClientAddressActual.HOMEPART = ((OracleString)cmdSearchCustomer.Parameters["p_2homepart"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2homepart"].Value).Value;
 
                         _ClientAddressLegal.ROOM_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_1room_type"].Value).Value;
-                        _ClientAddressPostal.ROOM_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2room_type"].Value).Value;
-                        _ClientAddressActual.ROOM_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3room_type"].Value).Value;
+                        _ClientAddressPostal.ROOM_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_3room_type"].Value).Value;
+                        _ClientAddressActual.ROOM_TYPE = ((OracleDecimal)cmdSearchCustomer.Parameters["p_2room_type"].Value).Value;
 
                         _ClientAddressLegal.ROOM = ((OracleString)cmdSearchCustomer.Parameters["p_1room"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1room"].Value).Value;
-                        _ClientAddressPostal.ROOM = ((OracleString)cmdSearchCustomer.Parameters["p_2room"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2room"].Value).Value;
-                        _ClientAddressActual.ROOM = ((OracleString)cmdSearchCustomer.Parameters["p_3room"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3room"].Value).Value;
+                        _ClientAddressPostal.ROOM = ((OracleString)cmdSearchCustomer.Parameters["p_3room"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3room"].Value).Value;
+                        _ClientAddressActual.ROOM = ((OracleString)cmdSearchCustomer.Parameters["p_2room"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2room"].Value).Value;
                         _ClientAddressLegal.COMM = ((OracleString)cmdSearchCustomer.Parameters["p_1comment"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_1comment"].Value).Value;
-                        _ClientAddressPostal.COMM = ((OracleString)cmdSearchCustomer.Parameters["p_2comment"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2comment"].Value).Value;
-                        _ClientAddressActual.COMM = ((OracleString)cmdSearchCustomer.Parameters["p_3comment"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3comment"].Value).Value;
+                        _ClientAddressPostal.COMM = ((OracleString)cmdSearchCustomer.Parameters["p_3comment"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_3comment"].Value).Value;
+                        _ClientAddressActual.COMM = ((OracleString)cmdSearchCustomer.Parameters["p_2comment"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["p_2comment"].Value).Value;
 
                         _ClientPerson.PASSP = ((OracleDecimal)cmdSearchCustomer.Parameters["Passp_"].Value) == null ? 1 : ((OracleDecimal)cmdSearchCustomer.Parameters["Passp_"].Value).Value;
                         _ClientPerson.SER = ((OracleString)cmdSearchCustomer.Parameters["Ser_"].Value) == null ? "" : ((OracleString)cmdSearchCustomer.Parameters["Ser_"].Value).Value;
