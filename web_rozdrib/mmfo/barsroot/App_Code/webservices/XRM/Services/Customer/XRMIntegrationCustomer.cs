@@ -42,7 +42,7 @@ namespace Bars.WebServices.XRM.Services.Customer
                 {
                     LoginADUserIntSingleCon(con, Clients[0].UserLogin);
 
-                    foreach (var ClientsReq in Clients)
+                    foreach (SetClient ClientsReq in Clients)
                     {
                         Byte[] responseBytes;
                         decimal TransSuccess = TransactionCheck(con, ClientsReq.TransactionId, out responseBytes);
@@ -50,8 +50,10 @@ namespace Bars.WebServices.XRM.Services.Customer
                         {
                             TransactionCreate(con, ClientsReq.TransactionId, ClientsReq.UserLogin, ClientsReq.OperationType);
 
+                            string request = Newtonsoft.Json.JsonConvert.SerializeObject(ClientsReq);
+
                             SetClientResponse = CustomerWorker.CreateCustomer(ClientsReq, con);
-                            WriteRequestResponseToLog(con, ClientsReq.TransactionId, ClientsReq, SetClientResponse);
+                            WriteRequestResponseToLog(con, ClientsReq.TransactionId, Newtonsoft.Json.JsonConvert.DeserializeObject<SetClient>(request), SetClientResponse);
                         }
                         else
                         {
