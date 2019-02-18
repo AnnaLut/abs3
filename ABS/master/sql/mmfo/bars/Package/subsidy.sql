@@ -30,6 +30,8 @@ CREATE OR REPLACE PACKAGE "BARS"."SUBSIDY" is
 
   procedure getaccbalance(p_datefrom       in date,
                           p_dateto         in date,
+                          p_nls            in varchar2,
+                          p_mfo            in varchar2,
                           p_accnum         out varchar2,
                           p_currentbalance out number,
                           p_creditturnover out number,
@@ -81,6 +83,8 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
   --повернення залишку розподільчого рахунку 2560 з типом sbd(субсидії)
   procedure getaccbalance(p_datefrom       in date,
                           p_dateto         in date,
+                          p_nls            in varchar2,
+                          p_mfo            in varchar2,
                           p_accnum         out varchar2,
                           p_currentbalance out number,
                           p_creditturnover out number,
@@ -95,19 +99,21 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
         into p_accnum, p_currentbalance, l_acc
         from accounts t
        where t.tip = g_sub_tip
+         and t.kf = p_mfo
+         and t.nls = p_nls
          and t.dazs is null
-         and t.nbs = g_sub_nbs
+         --and t.nbs = g_sub_nbs
          and kv = 980;
     exception
       when no_data_found then
         p_errcode := 1;
-        p_errmsg  := 'Не знайдено відкритий рахунок(' || g_sub_nbs || '/' ||
+        p_errmsg  := 'Не знайдено відкритий рахунок(' || p_nls || '/' || p_mfo || '/' ||
                      g_sub_tip || ')для виплати субсидій';
         return;
       when too_many_rows then
-        p_errcode := 2;
+        p_errcode := 2; 
         p_errmsg  := 'Знайдено більше ніж один відкритий рахунок(' ||
-                     g_sub_nbs || '/' || g_sub_tip ||
+                     p_nls || '/' || g_sub_tip ||
                      ')для виплати субсидій';
         return;
     end;
@@ -197,10 +203,18 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
     for i in 0 .. dbms_xmldom.getlength(l_rows) - 1 loop
       l_row := dbms_xmldom.item(l_rows, i);
       l_sybsidy_list(i).extreqid := p_id;
+      l_sybsidy_list(i).payeraccnum := upper(substr(dbms_xslprocessor.valueof(l_row,
+                                                                                 'PAYERACCNUM/text()'),
+                                                       1,
+                                                       29));
+      l_sybsidy_list(i).payerbankcode := upper(substr(dbms_xslprocessor.valueof(l_row,
+                                                                               'PAYERBANKCODE/text()'),
+                                                     1,
+                                                     12));
       l_sybsidy_list(i).receiveraccnum := upper(substr(dbms_xslprocessor.valueof(l_row,
                                                                                  'RECEIVERACCNUM/text()'),
                                                        1,
-                                                       15));
+                                                       29));
       l_sybsidy_list(i).receivername := upper(substr(dbms_xslprocessor.valueof(l_row,
                                                                                'RECEIVERNAME/text()'),
                                                      1,
@@ -239,7 +253,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
   end;
 
   function pay_data(p_sybsidy_list in t_sybsidy_list) return t_sybsidy_list is
-    l_nls           accounts.nls%type := get_sybsidy_nls;
+    l_nls           accounts.nls%type;-- := get_sybsidy_nls;
     l_nls_3570      accounts.nls%type;
     l_acc_6510      accounts.acc%type;
     l_bdate         date;
@@ -265,21 +279,28 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
     l_erramsg       varchar2(1000);
     l_buf           varchar2(32000);
   begin
-  
+    
+    
     if p_sybsidy_list.count > 0 then
       l_sybsidy_list  := p_sybsidy_list;
-      l_bdate         := gl.bdate;
-      l_mfo           := gl.amfo;
-      l_accounts_line := account_utl.read_account(p_account_number => l_nls,
-                                                  p_currency_id    => 980);
-      l_okpo          := customer_utl.get_customer_okpo(l_accounts_line.rnk);
-      l_branch        := l_accounts_line.branch;
       
-      bc.subst_branch(l_branch);
+      l_bdate         := gl.bdate;
+      
+      
     
       for i in l_sybsidy_list.first .. l_sybsidy_list.last loop
         begin
           savepoint before_pay;
+          
+          l_nls           := l_sybsidy_list(i).payeraccnum;
+          l_mfo           := l_sybsidy_list(i).payerbankcode;
+          l_accounts_line := account_utl.read_account(p_account_number => l_nls,
+                                                  p_currency_id    => 980,
+                                                  p_mfo            => l_mfo);
+          l_okpo          := customer_utl.get_customer_okpo(l_accounts_line.rnk);
+          l_branch        := l_accounts_line.branch;
+          
+          bc.subst_branch(l_branch);
           
           if substr(l_sybsidy_list(i).receiveraccnum, 1, 4) = '2603' then
             l_tt := 'SM3';
@@ -289,9 +310,10 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
             l_tt := 'SM1';
           end if;
           
-          l_buf := l_sybsidy_list(i).receiveraccnum || l_sybsidy_list(i).receivername || l_sybsidy_list(i).receiverrnk || 
-                   l_sybsidy_list(i).receiveridentcode || l_sybsidy_list(i).receiverbankcode || l_sybsidy_list(i).amount || 
-                   l_sybsidy_list(i).purpose || l_sybsidy_list(i).feerate;
+          l_buf := l_sybsidy_list(i).payeraccnum || l_sybsidy_list(i).payerbankcode || l_sybsidy_list(i).receiveraccnum || 
+                   l_sybsidy_list(i).receivername || l_sybsidy_list(i).receiverrnk || l_sybsidy_list(i).receiveridentcode || 
+                   l_sybsidy_list(i).receiverbankcode || l_sybsidy_list(i).amount || l_sybsidy_list(i).purpose || 
+                   l_sybsidy_list(i).feerate;
           --Перевіряємо макпідпис, можливо прийдеть добавити кодування, за замовчуванням Win1251
           if crypto_utl.check_mac_sh1(p_src     => l_buf,
                                       p_key     => crypto_utl.get_key_value(sysdate, 'SUBSIDY'),
@@ -422,20 +444,20 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
              where ref = l_ref;
                      
             l_sybsidy_list(i).ref := l_ref;
-
-	     bc.home;
+            
+            bc.home;
           else
             l_sybsidy_list(i).err := 'Підпис не пройшов перевірку';
           end if;
         exception
           when others then
+            bc.home;
             bars_error.get_error_info(p_errtxt   => sqlerrm,
                                       p_errumsg  => l_errumsg,
                                       p_erracode => l_erracode,
                                       p_erramsg  => l_erramsg);
           
             l_sybsidy_list(i).err := l_errumsg;
-            bc.home;
             rollback to before_pay;
           
         end;
