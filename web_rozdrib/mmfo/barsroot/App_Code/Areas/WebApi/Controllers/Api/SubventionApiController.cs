@@ -71,12 +71,12 @@ namespace BarsWeb.Areas.WebApi.Subvention
         }
 
         [HttpGet]
-        [GET("api/Subvention/GetAccBalance/{from}/{to}")]
-        public HttpResponseMessage GetAccBalance([FromUri] string from, [FromUri] string to)
+        [GET("api/Subvention/GetAccBalance/{accNum}/{from}/{to}/{accMfo?}")]
+        public HttpResponseMessage GetAccBalance(string accNum, string from, string to, string accMfo = "300465")
         {
             try
             {
-                AccBalance result = _repo.GetAccBalance(from, to);
+                AccBalance result = _repo.GetAccBalance(accNum, accMfo, from, to);
                 Response<AccBalance> resp = new Response<AccBalance>();
                 resp.ResultMessage = result;
 
@@ -91,7 +91,7 @@ namespace BarsWeb.Areas.WebApi.Subvention
         {
             try
             {
-                throw new NotImplementedException("Метод HouseholdPayments не доступний.");
+                //throw new NotImplementedException("Метод HouseholdPayments не доступний.");
 
                 string data = request.Content.ReadAsStringAsync().Result;
                 if (string.IsNullOrWhiteSpace(data)) throw new ArgumentNullException("Content", "Тіло запиту не може бути пустим");
@@ -113,7 +113,7 @@ namespace BarsWeb.Areas.WebApi.Subvention
         {
             try
             {
-                throw new NotImplementedException("Метод HouseholdReceive не доступний.");
+                //throw new NotImplementedException("Метод HouseholdReceive не доступний.");
 
                 Response<string> resp = new Response<string>();
                 resp.ResultMessage = _repo.GetTicket(requestId);

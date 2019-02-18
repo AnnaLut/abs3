@@ -43,7 +43,7 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
             }
         }
 
-        public AccBalance GetAccBalance(string _from, string _to)
+        public AccBalance GetAccBalance(string accNum, string accMfo, string _from, string _to)
         {
             LoginUser();
             DateTime from = DateTime.ParseExact(_from, "ddMMyyyy", ci);
@@ -62,6 +62,8 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
                 cmd.CommandText = "bars.subsidy.getaccbalance";
                 cmd.Parameters.Add(new OracleParameter("p_datefrom", OracleDbType.Date, from, ParameterDirection.Input));
                 cmd.Parameters.Add(new OracleParameter("p_dateto", OracleDbType.Date, to, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_nls", OracleDbType.Varchar2, accNum, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_mfo", OracleDbType.Varchar2, accMfo, ParameterDirection.Input));
                 cmd.Parameters.Add(pAccNum);
                 cmd.Parameters.Add(pCurrentBalance);
                 cmd.Parameters.Add(pCreditTurnOver);
