@@ -63,11 +63,11 @@ namespace BarsWeb.Areas.EDeclarations.Infrastructure.DI.Implementation
             return _globalData.GetParam(id);
         }
 
-        public string CreateRequest(BarsSql sql)
+        public Int32? CreateRequest(BarsSql sql)
         {
             OracleParameterCollection collection = ExecuteOracleRequest(sql);
-            string result = collection["p_status"].Value.ToString();
-            return result;
+            OracleDecimal oraDecimal = (OracleDecimal)collection["p_decl_id"].Value;
+            return oraDecimal.IsNull? (Int32?)null: Convert.ToInt32(oraDecimal.Value);
         }
 
         private OracleParameterCollection ExecuteOracleRequest(BarsSql barsSql)

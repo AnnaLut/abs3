@@ -269,4 +269,48 @@ function downloadFile(id) {
     //    }
     //});
     //window.location = '/barsroot/edeclarations/edeclarations/downloaddeclaration/' + id;
- }
+}
+
+function renewDecl() {
+    $("<div class='k-overlay'></div>").appendTo($(document.body));
+    var grid = $("#gridMain").data("kendoGrid");
+    var selected = grid.select();
+    if (selected.length === 0) {
+        bars.ui.alert({
+            text: 'Не вибрано жодної декларації',
+            close: function (e) {
+                $('.k-overlay').remove();
+            }
+        });
+    }
+    else {
+        var data = grid.dataItem(selected[0]);
+
+        bars.ui.confirm({
+            text: 'Бажаєте переформувати декларацію за номером ' + data.DECL_ID + '?<br>Попередню буде видалено!'
+        }, function () {
+                $.ajax({
+                    url: "/barsroot/api/edeclarations/edeclarations/RenewDeclaration/" + data.DECL_ID,
+                    type: 'POST',
+                    success: function (e) {
+                        bars.ui.alert({
+                            text: 'Декларація сформована',
+                            close: function () {
+                                $('.k-overlay').remove();
+                                updateMainGrid();
+                            }
+                        });
+                    },
+                    error: function (err) {
+                        window.parent.$('.k-overlay').css('z-index', '10002');
+                        bars.ui.error({
+                            text: err.responseJSON,
+                            close: function (err) {
+                                $('.k-overlay').remove();
+                            }
+                        });
+                    }
+                });
+            });
+    }
+}

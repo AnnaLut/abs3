@@ -70,10 +70,25 @@ namespace BarsWeb.Areas.EDeclarations.Controllers.Api
             try
             {
                 BarsSql sql = SqlCreator.GetCreateRequest(model);
-                string result = _repo.CreateRequest(sql);
+                Int32? result = _repo.CreateRequest(sql);
                 return Request.CreateResponse(HttpStatusCode.OK, result);
             }
             catch(Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+
+        }
+
+        [HttpPost]
+        public HttpResponseMessage RenewDeclaration(Int32 id)
+        {
+            try
+            {
+                Int32? result = _repo.CreateRequest(SqlCreator.RenewDeclaration(id));
+                return Request.CreateResponse(HttpStatusCode.OK, result);
+            }
+            catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }

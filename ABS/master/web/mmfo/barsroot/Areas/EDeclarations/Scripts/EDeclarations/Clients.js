@@ -20,6 +20,7 @@
 
     $("#Cancel").click(function () {
         window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+        window.parent.$('#creatClientsWindow').closest(".k-window-content").data("kendoWindow").close();
     });
 
     $("#CreateDecl").click(function () {
@@ -39,14 +40,37 @@
             data: data,
             success: function (e) {
                 window.parent.$('.k-overlay').css('z-index', '10002');
-                //if (e === '')
+                if (e && !isNaN(+e)) {
+                    $.post('/barsroot/api/edeclarations/edeclarations/CreateSearch/' + e,
+                        function (response) {
+                            bars.ui.alert({
+                                text: response,
+                                close: function () {
+                                    window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+                                    window.parent.$('#creatClientsWindow').closest(".k-window-content").data("kendoWindow").close();
+                                }
+                            });
+                        }
+                    ).always(function () {
+                        $('.k-overlay').remove();
+                    });
+                    //bars.ui.alert({
+                    //    text: '',
+                    //    close: function (e) {
+                    //        window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+                    //        window.parent.$('#creatClientsWindow').closest(".k-window-content").data("kendoWindow").close();
+                    //    }
+                    //});
+                }
+                else {
                     bars.ui.alert({
-                        text: e,
-                        close: function (e) {
+                        text: 'Декларацію сформовано',
+                        close: function () {
                             window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
                             window.parent.$('#creatClientsWindow').closest(".k-window-content").data("kendoWindow").close();
                         }
-                    })
+                    });
+                }
             },
             error: function (err) {
                 window.parent.$('.k-overlay').css('z-index', '10002');

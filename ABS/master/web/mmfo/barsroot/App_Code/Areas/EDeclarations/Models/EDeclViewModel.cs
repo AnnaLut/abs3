@@ -26,5 +26,6 @@ namespace Areas.EDeclarations.Models
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
         public String Rnk { get; set; }
+        public Int32? DeclId { get; set; }
     }
 }

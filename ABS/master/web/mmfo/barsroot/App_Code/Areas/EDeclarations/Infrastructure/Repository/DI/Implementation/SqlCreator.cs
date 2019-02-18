@@ -41,7 +41,30 @@ namespace BarsWeb.Areas.EDeclarations.Infrastructure.DI.Implementation {
                 new OracleParameter("p_date_to", OracleDbType.Date, model.DateTo, ParameterDirection.Input),
                 new OracleParameter("p_name", OracleDbType.Varchar2, model.Fullname, ParameterDirection.Input),
                 new OracleParameter("p_comm", OracleDbType.Varchar2, model.Rnk, ParameterDirection.Input),
-                new OracleParameter("p_status", OracleDbType.Varchar2, 2000, null,  ParameterDirection.Output)
+                new OracleParameter("p_decl_id", OracleDbType.Int32, model.DeclId, ParameterDirection.InputOutput)
+            };
+
+            return new BarsSql
+            {
+                SqlText = "bars.eds_intg.create_request",
+                SqlParams = parameters
+            };
+        }
+
+        public static BarsSql RenewDeclaration(Int32 id)
+        {
+            OracleParameter[] parameters = new OracleParameter[]
+            {
+                new OracleParameter("p_okpo", OracleDbType.Varchar2, null, ParameterDirection.Input),
+                new OracleParameter("p_birth_date", OracleDbType.Date, null, ParameterDirection.Input),
+                new OracleParameter("p_doc_type", OracleDbType.Decimal, null, ParameterDirection.Input),
+                new OracleParameter("p_doc_serial", OracleDbType.Varchar2, null, ParameterDirection.Input),
+                new OracleParameter("p_doc_number", OracleDbType.Varchar2, null, ParameterDirection.Input),
+                new OracleParameter("p_date_from", OracleDbType.Date, null, ParameterDirection.Input),
+                new OracleParameter("p_date_to", OracleDbType.Date, null, ParameterDirection.Input),
+                new OracleParameter("p_name", OracleDbType.Varchar2, null, ParameterDirection.Input),
+                new OracleParameter("p_comm", OracleDbType.Varchar2, null, ParameterDirection.Input),
+                new OracleParameter("p_decl_id", OracleDbType.Int32, id, ParameterDirection.InputOutput)
             };
 
             return new BarsSql
