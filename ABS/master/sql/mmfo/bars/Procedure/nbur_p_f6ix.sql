@@ -13,11 +13,15 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6IX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 6IX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.001    27.11.2018
+ VERSION     :    v.18.005  15.02.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+15.02.2019	COBUMMFO-9739 додаємо "нульові" (T070=0) показники 'A6I014', 'A6I015', 'A6I016',
+                              якщо відсутнє забезпечення (в розрізі кожного Q003_2)
+11.02.2019	COBUMMFO-9739 додаємо "нульовий"(T070=0) показник A6I014, якщо відсутнє забезпечення (немає в #D8 seg_01 = 081,084,083)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.001  27.11.2018';
+  ver_              char(30)  := 'v.18.005  15.02.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -104,7 +108,10 @@ begin
                 , LPAD(v.seg_02,10,'0')  as    K020
                 , v.seg_07               as    K021   
                 , v.seg_03               as    Q003_2
-                , v.seg_06               as    Q003_4
+		, (case 
+			when v.seg_06 in ('081','084','083') then '00'
+			else v.seg_06
+			end)		 as    Q003_4
                 , (case v.seg_05
                         when null       then '#'
                         when '000'      then '#'
@@ -150,7 +157,43 @@ begin
             and v.seg_01 in (121,126,131,123,127,134,132,122,124,125,118,119,133,081,084,083)
        );
 
-    commit;
+  -- додаємо "нульові" (T070=0) показники 'A6I014', 'A6I015', 'A6I016', якщо відсутнє забезпечення (немає в #D8 seg_01 in 081,084,083)
+  declare
+    type t_ekp_mass is varray(3) of varchar(6);
+    ekp_mass t_ekp_mass := t_ekp_mass ('A6I014', 'A6I015', 'A6I016');
+  begin
+     for indx in ekp_mass.first..ekp_mass.last
+     loop
+                  for k in (select distinct nbuc, VERSION_D8,K020,K021, Q003_2 
+                              from Nbur_Log_F6ix n1
+                             where report_date = p_report_date
+                               and kf = p_kod_filii
+                               and version_id = l_version_id
+                               and not exists (select 1 
+                                                 from Nbur_Log_F6ix n2 
+                                                where n1.K020=n2.K020 
+                                                  and n2.EKP = ekp_mass(indx)
+                                                  and n2.Q003_2 = n1.Q003_2
+                                               )
+                            )
+                   loop
+                         begin 
+                                insert 
+                                  into NBUR_LOG_F6IX
+                                      (REPORT_DATE, KF, NBUC, VERSION_ID, VERSION_D8, 
+                                       EKP, K020, K021, Q003_2, Q003_4, R030, R020, F081, S031, T070_DTL, T070,  
+                                       DESCRIPTION)
+                                values (p_report_date, p_kod_filii, nvl(trim(k.nbuc), l_nbuc),l_version_id, k.VERSION_D8,
+                                       ekp_mass(indx), k.K020, k.K021, k.Q003_2, '00', '#', '#', '#', '#', 
+                                       0, 0, 'додано 0 застава');
+                                exception 
+                                  when dup_val_on_index then null;
+                          end;
+                   end loop;
+     end loop;
+  end;
+
+  commit;
 
    logger.info(c_title || ' end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 end;
