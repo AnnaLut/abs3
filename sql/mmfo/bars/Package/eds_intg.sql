@@ -1,13 +1,16 @@
 create or replace package eds_intg is
 
   gc_header_version constant varchar2(64)  := 'version 1.2 23.01.2019';
-
+  
+  gc_iban constant boolean :=false;
+  
   st_request_new          constant number := -1; -- Новий запит
   st_declaration_register constant number :=  0; -- Запит зареєстровано
   st_declaration_prepared constant number :=  1; -- Декларація підготовлена
   st_declaration_error    constant number :=  2; -- Помилка підготовки декларації
   st_declaration_rejected constant number :=  3; -- Декларацію відхилено
   st_declaration_deleted  constant number :=  4; -- Декларацію видалено
+  st_declaration_new_ex   constant number :=  5; -- Дані видалені, існує нова декларація
 
   --Формування guid в форматі XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
   function get_guid return varchar2;
@@ -23,7 +26,7 @@ create or replace package eds_intg is
     p_date_to    in eds_decl.date_to%type,
     p_name       in eds_decl.cust_name%type,
     p_comm       in eds_decl.comm%type,
-    p_status     out varchar2
+    p_decl_id    in out number
     );
   --Пошук декларації за номером
   procedure decl_search(p_decl_id number, p_resp out number);
@@ -33,6 +36,8 @@ create or replace package eds_intg is
   procedure pocess_request(p_transp_id varchar2);
   --Формування вітрини даних
   procedure fill_data(p_req_id varchar2);
+  --Очистка старих данних в вітринах
+  procedure delete_old_data;
   
 end eds_intg;
 /
@@ -263,8 +268,8 @@ procedure log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2, 
              l_id:='-1';
          end;
          if l_id <> '-1' then
-             insert into eds_decls_policy ( id, add_date, add_id, kf)
-             values (l_id, sysdate, user_id, sys_context('bars_context','user_mfo'));
+             insert into eds_decls_policy ( id, add_date, add_id)
+             values (l_id, sysdate, user_id);
              p_resp:=0;
          end if;
      else
@@ -280,7 +285,7 @@ procedure p_cur_rates (p_req_id varchar2)
    insert into eds_curs_rates (req_id,kv,name,vdate,rate_o,rate_b,rate_s)
    select e.id,c.kv,n.name,e.date_to,c.rate_o,c.rate_b,c.rate_s
      from bars.eds_decl e
-     join bars.cur_rates$base c on c.vdate=e.date_to and c.kv in (840,978,643) and c.branch = '/300465/'
+     join bars.cur_rates$base c on c.vdate=e.date_to and c.kv in (840,978) and c.branch = '/300465/'
      join bars.TABVAL$GLOBAL n on n.kv = c.kv
     where e.id=p_req_id;
 exception when dup_val_on_index then
@@ -308,41 +313,44 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
   
   eds_intg.p_cur_rates (p_req_id);
   
-  for cust in (select i.id, c.okpo, c.rnk, c.kf, i.date_from, i.date_to
-                      from person p, customer c, eds_decl i
-                     where p.rnk=c.rnk
-                       and c.okpo=i.okpo
-                       and p.passp= i.doc_type
-                       and p.numdoc=i.doc_number
-                       and p.bday= i.birth_date
-                       and i.id = p_req_id
-                       and case when i.doc_type = 7
-                                then '1' else p.ser end =
-                           case when i.doc_type = 7
-                           then '1' else i.doc_serial end) loop
-
-                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as end_bal, a.acc, a.nls, a.nbs, a.kv, substr(b.attribute_value, 1, 100) as attribute_value, a.kf, w4.code, w4.grp_code,
-                            case when w4.grp_code= 'SALARY' then 'SALARY'
-                                           when w4.grp_code in ('PENSION', 'MOYA_KRAYINA') then 'PENSION'
-                                           else 'OTHERS' end as ACC_TYPE
-                                         from accounts a
-                                         left join branch_attribute_value b on b.attribute_code='NAME_BRANCH' and b.branch_code=a.branch
-                                         left join (select w4.acc_pk, w4.kf, c.code, t.grp_code
-                                                     from w4_acc w4
-                                                     join w4_card c on w4.card_code = c.code and w4.kf = c.kf
-                                                     join w4_product t on t.code=c.product_code and t.kf = c.kf
-                                                    where t.grp_code in ('PENSION', 'MOYA_KRAYINA', 'SALARY')) w4 on w4.acc_pk = a.acc and w4.kf = a.kf
-                                        where a.rnk=cust.rnk
-                                          and a.nbs in ('2620','2625') and not exists(select 1 from w4_acc ww where ww.acc_2625d = a.acc)) loop
+  for cust in (select i.id, c.okpo, c.rnk, c.kf, i.date_from, i.date_to,
+                      substr(b.attribute_value, 1, 100) as attribute_value
+                      from person p 
+                      join customer c on p.rnk = c.rnk
+                      join eds_decl i on c.okpo = i.okpo 
+                                     and p.passp = i.doc_type 
+                                     and p.passp = i.doc_type 
+                                     and p.numdoc = i.doc_number 
+                                     and p.bday = i.birth_date
+                                     and case when i.doc_type = 7 then '1' else p.ser end = case when i.doc_type = 7 then '1' else i.doc_serial end
+                     left join branch_attribute_value b on b.attribute_code='NAME_BRANCH' and b.branch_code=c.branch
+                     where i.id = p_req_id) loop
+                     
+                     for account in (select fost(a.acc,trunc(cust.date_to)) as end_bal,
+                                            gl.p_icurval(a.kv,fost(a.acc,trunc(cust.date_to)), cust.date_to) as end_balq,
+                                            a.acc, a.nls, a.nbs, a.kv, a.kf, c.code, t.grp_code,
+                                            case t.grp_code 
+                                                when 'SALARY' then 'SALARY'
+                                                when 'PENSION' then 'PENSION'
+                                                when 'MOYA_KRAYINA' then 'PENSION'
+                                                else 'OTHERS' end as ACC_TYPE
+                                       from accounts a
+                                       left join w4_acc w4 on w4.acc_pk = a.acc and w4.kf = a.kf
+                                       left join w4_card c on w4.card_code = c.code and w4.kf = c.kf
+                                       left join w4_product t on t.code=c.product_code and t.kf = c.kf
+                                      where a.rnk=cust.rnk
+                                        and a.nbs in ('2620','2625') 
+                                        and not exists(select 1 from w4_acc ww where ww.acc_2625d = a.acc)) loop
                                         l_eds_w4_data.extend;
                                         l_eds_w4_data(l_eds_w4_data.last).req_id:=cust.id;
                                         l_eds_w4_data(l_eds_w4_data.last).rnk:=cust.rnk;
                                         l_eds_w4_data(l_eds_w4_data.last).acc:=account.acc;
                                         l_eds_w4_data(l_eds_w4_data.last).nls:=account.nls;
                                         l_eds_w4_data(l_eds_w4_data.last).kv:=account.kv;
-                                        l_eds_w4_data(l_eds_w4_data.last).open_in:=account.attribute_value;
+                                        l_eds_w4_data(l_eds_w4_data.last).open_in:=cust.attribute_value;
                                         l_eds_w4_data(l_eds_w4_data.last).acc_type:=account.acc_type;
                                         l_eds_w4_data(l_eds_w4_data.last).end_bal:= account.end_bal;
+                                        l_eds_w4_data(l_eds_w4_data.last).end_balq:= account.end_balq;
                                         l_eds_w4_data(l_eds_w4_data.last).kf:=account.kf;
                                         
                                begin
@@ -350,31 +358,38 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                                     (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and o.tt ='PKX') or
                                                     (account.grp_code not in ('PENSION', 'MOYA_KRAYINA', 'SALARY') or account.grp_code is null)
                                               then o.s else 0 end) as AMOUNT,
+                                      sum(case when (account.grp_code= 'SALARY' and o.tt in ('PKS','KL1','IB6','IB5','PKB','CL5')) or
+                                                    (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and o.tt ='PKX') or
+                                                    (account.grp_code not in ('PENSION', 'MOYA_KRAYINA', 'SALARY') or account.grp_code is null)
+                                              then gl.p_icurval(account.kv, o.s, o.fdat) else 0 end) as AMOUNT,
                                       sum(case when (account.grp_code= 'SALARY' and o.tt not in ('PKS','KL1','IB6','IB5','PKB','CL5')) or
                                                     (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and o.tt <>'PKX')
                                                then o.s else 0 end) AMOUNT_OTH
-                                        into l_eds_w4_data(l_eds_w4_data.last).amount_period, l_eds_w4_data(l_eds_w4_data.last).other_accruals
+                                        into l_eds_w4_data(l_eds_w4_data.last).amount_period,
+                                             l_eds_w4_data(l_eds_w4_data.last).amount_periodq, 
+                                             l_eds_w4_data(l_eds_w4_data.last).other_accruals
                                         from opldok o
                                         left join opldok o2 on o.ref = o2.ref and o2.dk = 1-o.dk and  o2.stmt = o.stmt
-                                        where o.acc=account.acc
-                                          and o.kf = account.kf
-                                          and not exists (select 1 from w4_acc_inst i where i.acc_pk = account.acc and i.acc = o2.acc and i.trans_mask = 'ACC_2203I') --не рахуємо кредити instolment
-                                          and not exists (select 1 from w4_acc w where w.acc_pk = account.acc and (w.acc_2628 = o2.acc or w.acc_ovr = o2.acc)) --не рахуємо проценти за депозитом та кредити ovr
-                                          and o.dk=1
-                                          and o.fdat between cust.date_from and cust.date_to
-                                        group by o.acc;
+                                       where o.acc=account.acc
+                                         and o.kf = account.kf
+                                         and not exists (select 1 from w4_acc_inst i where i.acc_pk = account.acc and i.acc = o2.acc and i.trans_mask = 'ACC_2203I') --не рахуємо кредити instolment
+                                         and not exists (select 1 from w4_acc w where w.acc_pk = account.acc and (w.acc_2628 = o2.acc or w.acc_ovr = o2.acc)) --не рахуємо проценти за депозитом та кредити ovr
+                                         and o.dk=1
+                                         and o.fdat between cust.date_from and cust.date_to
+                                       group by o.acc;
                                exception when no_data_found then
                                    l_eds_w4_data(l_eds_w4_data.last).amount_period:=0;
                                    l_eds_w4_data(l_eds_w4_data.last).other_accruals:=0;
                                end;
-                                        end loop;
+                               end loop;
                        --deposit
-                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as end_bal, a.acc, a.nls, a.nbs, a.kv, substr(b.attribute_value, 1, 100) as attribute_value, a.kf,a.tip, acc_pp.acc as acc_dpt
+                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as end_bal, 
+                                              gl.p_icurval(a.kv,fost(a.acc,trunc(cust.date_to)), cust.date_to) as end_balq,
+                                              a.acc, a.nls, a.nbs, a.kv, a.kf, a.tip, acc_pp.acc as acc_dpt
                                          from accounts a
                                          left join (select dpa.accid, a1.acc from dpt_accounts dpa
                                                             join dpt_accounts dpa1 on dpa1.dptid=dpa.dptid                                           
                                                             join accounts a1 on a1.acc=dpa1.accid and a1.nbs='2638') acc_pp on acc_pp.accid=a.acc
-                                         left join branch_attribute_value b on b.attribute_code='NAME_BRANCH' and b.branch_code=a.branch
                                         where a.rnk = cust.rnk
                                           and a.nbs = '2630') loop
 
@@ -384,18 +399,25 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                         l_eds_dpt_data(l_eds_dpt_data.last).acc:=account.acc;
                                         l_eds_dpt_data(l_eds_dpt_data.last).nls:=account.nls;
                                         l_eds_dpt_data(l_eds_dpt_data.last).kv:=account.kv;
-                                        l_eds_dpt_data(l_eds_dpt_data.last).open_in:=account.attribute_value;
+                                        l_eds_dpt_data(l_eds_dpt_data.last).open_in:=cust.attribute_value;
                                         l_eds_dpt_data(l_eds_dpt_data.last).end_bal:=account.end_bal;
+                                        l_eds_dpt_data(l_eds_dpt_data.last).end_balq:=account.end_balq;
                                         l_eds_dpt_data(l_eds_dpt_data.last).kf:=account.kf;
                                         l_eds_dpt_data(l_eds_dpt_data.last).tip:=account.tip;
                                         
                                        begin
                                        select sum(case when o.tt ='%%1' then o.s else 0 end) as sum_proc,
+                                              sum(case when o.tt ='%%1' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_procq,
                                               sum(case when o.tt ='%15' then o.s else 0 end) as sum_pdfo,
+                                              sum(case when o.tt ='%15' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_pdfoq,
                                               sum(case when o.tt ='MIL' then o.s else 0 end) as sum_mil,
-                                              sum(case when o.tt in ('MIL','%15') then o.s else 0 end) as sum_totaly
-                                              into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc, l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,
-                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_mil, l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly
+                                              sum(case when o.tt ='MIL' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_milq,
+                                              sum(case when o.tt in ('MIL','%15') then o.s else 0 end) as sum_totaly,
+                                              sum(case when o.tt in ('MIL','%15') then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_totalyq
+                                              into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc,   l_eds_dpt_data(l_eds_dpt_data.last).sum_procq, 
+                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq,
+                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_mil,    l_eds_dpt_data(l_eds_dpt_data.last).sum_milq,
+                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly, l_eds_dpt_data(l_eds_dpt_data.last).sum_totalyq  
                                          from opldok o
                                         where o.acc = account.acc_dpt
                                           and o.kf = account.kf
@@ -410,13 +432,13 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                         end loop;
                                         
                           --mobilni zaoschadzhenia              
-                          for account in (select bars.fost(a1.acc,trunc(cust.date_to)) as END_BAL, 
+                          for account in (select bars.fost(a1.acc,trunc(cust.date_to)) as end_bal, 
+                                                 gl.p_icurval(nvl(a1.kv, 980),fost(a1.acc,trunc(cust.date_to)), cust.date_to) as end_balq,
                                                  nvl(w.acc_2625d, a.acc) as acc , nvl(a1.nls, a.nls) as nls, 
-                                                 a.kv, substr(b.attribute_value, 1, 100) as attribute_value, a.kf, nvl(a1.tip, a.tip) as tip, w.acc_2628
+                                                 a.kv, a.kf, nvl(a1.tip, a.tip) as tip, w.acc_2628
                                          from accounts a
                                          join w4_acc w on a.acc = w.acc_pk
                                          left join accounts a1 on a1.acc = w.acc_2625d
-                                         left join branch_attribute_value b on b.attribute_code='NAME_BRANCH' and b.branch_code=a.branch
                                         where a.rnk=cust.rnk
                                           and a.nbs in ('2625','2620') and w.acc_2628 is not null) loop
 
@@ -426,18 +448,25 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                         l_eds_dpt_data(l_eds_dpt_data.last).acc:=account.acc;
                                         l_eds_dpt_data(l_eds_dpt_data.last).nls:=account.nls;
                                         l_eds_dpt_data(l_eds_dpt_data.last).kv:=account.kv;
-                                        l_eds_dpt_data(l_eds_dpt_data.last).open_in:=account.attribute_value;
+                                        l_eds_dpt_data(l_eds_dpt_data.last).open_in:=cust.attribute_value;
                                         l_eds_dpt_data(l_eds_dpt_data.last).end_bal:=account.end_bal;
+                                        l_eds_dpt_data(l_eds_dpt_data.last).end_bal:=account.end_balq;
                                         l_eds_dpt_data(l_eds_dpt_data.last).kf:=account.kf;
                                         l_eds_dpt_data(l_eds_dpt_data.last).tip:=account.tip;
                                         
                                        begin
                                        select sum(case when o.dk=1 and a1.nbs='7040' then o.s else 0 end) as sum_proc,
+                                              sum(case when o.dk=1 and a1.nbs='7040' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_procq,
                                               sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='37' then o.s else 0 end) as sum_pdfo,
+                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='37' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_pdfoq,
                                               sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='36' then o.s else 0 end) as sum_mil,
-                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then o.s else 0 end) as sum_totaly 
-                                              into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc, l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,
-                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_mil, l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly                         
+                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='36' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_milq,
+                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then o.s else 0 end) as sum_totaly, 
+                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_totalyq                                              
+                                              into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc,   l_eds_dpt_data(l_eds_dpt_data.last).sum_procq, 
+                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq,
+                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_mil,    l_eds_dpt_data(l_eds_dpt_data.last).sum_milq,
+                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly, l_eds_dpt_data(l_eds_dpt_data.last).sum_totalyq                        
                                         from opldok o
                                         join opldok o2 on o.ref = o2.ref and o2.dk = 1-o.dk and  o2.stmt = o.stmt
                                         join accounts a1 on a1.acc = o2.acc and a1.nbs in ('3622', '7040')   
@@ -452,31 +481,30 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly:=0;
                                          end;
                                         end loop;
-
-                          for credit in (select s.nd, s.kf, substr(b.attribute_value, 1, 100) as attribute_value, c.sdate, c.vidd, abs(bars.fost(a.acc,cust.date_to)) as BAL_DEBT,
-                                                a.kv, s.proc_sum, s.credit_sum, s.proc_sum + s.credit_sum as sum_totaly
+                            --cc_deals
+                          for credit in (select s.nd, s.kf, c.vidd, abs(bars.fost(a.acc,cust.date_to)) as BAL_DEBT,
+                                                a.kv, s.proc_sum, s.credit_sum, s.proc_sum + s.credit_sum as sum_totaly, c.sdate, c.sdog*100 as sum_zagal
                                          from
                                         (select n.nd, n.kf,
                                         GREATEST (
-                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip = 'SN'  then bars.gl.p_Icurval(a.kv, s.kos, s.fdat) else 0 end),0),gl.bd)-
+                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip in ('SN', 'SPN')  then bars.gl.p_Icurval(a.kv, s.kos, s.fdat) else 0 end),0),gl.bd)-
                                         bars.gl.p_ncurval(980,NVL(sum(case when a.tip = 'SPN' then bars.gl.p_Icurval(a.kv, s.DOS, s.fdat) else 0 end),0),gl.bd)
                                         ,0) as proc_sum,
 
                                         GREATEST (
-                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip = 'SS' then bars.gl.p_Icurval (a.kv, s.kos, s.fdat) else 0 end),0),gl.bd)-
+                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip in ('SS', 'SP') then bars.gl.p_Icurval (a.kv, s.kos, s.fdat) else 0 end),0),gl.bd)-
                                         bars.gl.p_ncurval(980,NVL(sum(case when a.tip = 'SP' then bars.gl.p_Icurval (a.kv, s.DOS, s.fdat) else 0 end),0),gl.bd)
                                         ,0) as credit_sum
                                          FROM bars.accounts a
                                               join bars.nd_acc n on n.acc = a.acc and a.kf = n.kf
                                               join bars.saldoa s on s.acc = a.acc and a.kf = s.kf
-                                         WHERE fdat BETWEEN cust.date_from AND cust.date_to
+                                         WHERE s.fdat BETWEEN cust.date_from AND cust.date_to
                                            and a.rnk=cust.rnk
                                            AND a.tip IN ('SS', 'SP', 'SN', 'SPN')
                                          group by  n.nd, n.kf) s
                                          join bars.nd_acc n on n.nd = s.nd and n.kf = s.kf
                                          join bars.cc_deal c on c.nd = s.nd and c.kf = s.kf
                                          join accounts a on n.acc = a.acc and n.kf = a.kf and a.tip='SS' and (a.dazs >= cust.date_from or a.dazs is null)
-                                         left join branch_attribute_value b on b.attribute_code='NAME_BRANCH' and b.branch_code=a.branch
                                          where c.wdate>=cust.date_from)
                                          loop
                                          l_eds_credit_data.extend;
@@ -485,13 +513,152 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                          l_eds_credit_data(l_eds_credit_data.last).nd:=credit.nd;
                                          l_eds_credit_data(l_eds_credit_data.last).vidd:=credit.vidd;
                                          l_eds_credit_data(l_eds_credit_data.last).kv:=credit.kv;
-                                         l_eds_credit_data(l_eds_credit_data.last).open_in:=credit.attribute_value;
+                                         l_eds_credit_data(l_eds_credit_data.last).open_in:=cust.attribute_value;
                                          l_eds_credit_data(l_eds_credit_data.last).sdate:=credit.sdate;
                                          l_eds_credit_data(l_eds_credit_data.last).balance_debt:=credit.bal_debt;
                                          l_eds_credit_data(l_eds_credit_data.last).amount_pay_proc:=credit.proc_sum;
                                          l_eds_credit_data(l_eds_credit_data.last).amount_pay_principal:=credit.credit_sum;
                                          l_eds_credit_data(l_eds_credit_data.last).sum_totaly_credit:=credit.sum_totaly;
                                          l_eds_credit_data(l_eds_credit_data.last).kf:=credit.kf;
+                                         l_eds_credit_data(l_eds_credit_data.last).sum_zagal:= credit.sum_zagal;
+                                         l_eds_credit_data(l_eds_credit_data.last).credit_type:= 'CC_DEALS';
+                                         end loop;
+                           --instolment              
+                          for credit in (select kv, chain_idt, posting_date, 
+                                               sum(BAL_DEBT) over (partition by acc) + BAL_9129 as total_amount,
+                                               BAL_DEBT, proc_sum, credit_sum, proc_sum + credit_sum as sum_totaly, kf 
+                                          from (
+                                                select a.acc, a.kv,
+                                                       i.chain_idt,
+                                                       t.posting_date,
+                                                       max(case when a1.tip = 'ISS' then abs(bars.fost(a1.acc,cust.date_to)) else null end) as BAL_DEBT,
+                                                       max(abs(bars.fost(a2.acc,cust.date_to))) as BAL_9129,
+                                                       GREATEST(
+                                                       bars.gl.p_ncurval(980,NVL(sum(case when a1.tip in ('IKN', 'IPN') then bars.gl.p_Icurval(a1.kv, s.kos, s.fdat) else 0 end), 0),gl.bd)-
+                                                       bars.gl.p_ncurval(980,NVL(sum(case when a1.tip = 'IPN' then bars.gl.p_Icurval(a1.kv, s.dos, s.fdat) else 0 end), 0),gl.bd), 0) as proc_sum,
+                                                       GREATEST(
+                                                       bars.gl.p_ncurval(980,NVL(sum(case when a1.tip in ('ISS', 'ISP') then bars.gl.p_Icurval(a1.kv, s.kos, s.fdat) else 0 end), 0),gl.bd) -
+                                                       bars.gl.p_ncurval(980,NVL(sum(case when a1.tip = 'ISP' then bars.gl.p_Icurval(a1.kv, s.dos, s.fdat) else 0 end), 0),gl.bd), 0) as credit_sum,
+                                                       a.kf
+                                                  from accounts a
+                                                  join w4_acc w on a.acc = w.acc_pk
+                                                  join accounts a2 on w.acc_9129i = a2.acc
+                                                  left join w4_acc_inst i on a.acc = i.acc_pk
+                                                  left join accounts a1 on i.acc = a1.acc                                           
+                                                  left join ow_inst_totals t on i.chain_idt = t.chain_idt and (t.end_date_f is not null or t.end_date_f >= cust.date_from)
+                                                  left join bars.saldoa s on s.acc = a1.acc and s.kf = a1.kf and s.fdat BETWEEN cust.date_from AND cust.date_to
+                                                 where a.rnk = cust.rnk 
+                                                   and substr(a.nls, 1, 4) in ('2620', '2625') 
+                                                   and (a.dazs >= cust.date_from or a.dazs is null)
+                                              group by a.acc, a.kv, a.kf, i.chain_idt, t.posting_date))
+                                         loop
+                                         l_eds_credit_data.extend;
+                                         l_eds_credit_data(l_eds_credit_data.last).req_id:=cust.id;
+                                         l_eds_credit_data(l_eds_credit_data.last).rnk:=cust.rnk;
+                                         l_eds_credit_data(l_eds_credit_data.last).nd:=credit.chain_idt;
+                                         l_eds_credit_data(l_eds_credit_data.last).vidd:=null;
+                                         l_eds_credit_data(l_eds_credit_data.last).kv:=credit.kv;
+                                         l_eds_credit_data(l_eds_credit_data.last).open_in:=cust.attribute_value;
+                                         l_eds_credit_data(l_eds_credit_data.last).sdate:=credit.posting_date;
+                                         l_eds_credit_data(l_eds_credit_data.last).balance_debt:=credit.bal_debt;
+                                         l_eds_credit_data(l_eds_credit_data.last).amount_pay_proc:=credit.proc_sum;
+                                         l_eds_credit_data(l_eds_credit_data.last).amount_pay_principal:=credit.credit_sum;
+                                         l_eds_credit_data(l_eds_credit_data.last).sum_totaly_credit:=credit.sum_totaly;
+                                         l_eds_credit_data(l_eds_credit_data.last).kf:=credit.kf;
+                                         l_eds_credit_data(l_eds_credit_data.last).sum_zagal:= credit.total_amount;
+                                         l_eds_credit_data(l_eds_credit_data.last).credit_type:= 'INSTALLMENT';
+                                         end loop; 
+                          --bpk              
+                          for credit in (with w4 as (select ND, ACC_PK, ACC_FILD, ACC 
+                                                       from ( select nd, ACC_PK, ACC_2207, ACC_2208, ACC_2209, ACC_OVR, ACC_9129
+                                                                from W4_ACC) 
+                                                             unpivot (ACC FOR ACC_FILD IN (ACC_2207, ACC_2208, ACC_2209, ACC_OVR, ACC_9129)))
+                                        select a.kv,
+                                               w4.nd,
+                                               max(case when w4.ACC_FILD = 'ACC_9129' then a1.daos else null end) as daos,
+                                               max(case when w4.ACC_FILD = 'ACC_OVR' then abs(bars.fost(a1.acc,cust.date_to)) else 0 end) as BAL_DEBT,
+                                               max(case when w4.ACC_FILD = 'ACC_OVR' then abs(bars.fost(a1.acc,cust.date_to)) else 0 end) + 
+                                               max(case when w4.ACC_FILD = 'ACC_9129' then abs(bars.fost(a1.acc,cust.date_to)) else 0 end) as dog_sum,
+                                               GREATEST(
+                                                        bars.gl.p_ncurval(980,NVL(sum(case when w4.ACC_FILD in ('ACC_2208', 'ACC_2209') then bars.gl.p_Icurval(a1.kv, s.kos, s.fdat) else 0 end), 0),gl.bd)-
+                                                        bars.gl.p_ncurval(980,NVL(sum(case when w4.ACC_FILD = 'ACC_2209' then bars.gl.p_Icurval(a1.kv, s.dos, s.fdat) else 0 end), 0),gl.bd), 0) as proc_sum,
+                                               GREATEST(
+                                                        bars.gl.p_ncurval(980,NVL(sum(case when w4.ACC_FILD in ('ACC_OVR', 'ACC_2207') then bars.gl.p_Icurval(a1.kv, s.kos, s.fdat) else 0 end), 0),gl.bd) -
+                                                        bars.gl.p_ncurval(980,NVL(sum(case when w4.ACC_FILD = 'ACC_2207' then bars.gl.p_Icurval(a1.kv, s.dos, s.fdat) else 0 end), 0),gl.bd), 0) as credit_sum,
+                                               GREATEST(
+                                                        bars.gl.p_ncurval(980,NVL(sum(case when w4.ACC_FILD in ('ACC_2208', 'ACC_OVR', 'ACC_2207') then bars.gl.p_Icurval(a1.kv, s.kos, s.fdat) else 0 end), 0),gl.bd)-
+                                                        bars.gl.p_ncurval(980,NVL(sum(case when w4.ACC_FILD in ('ACC_2209', 'ACC_2207') then bars.gl.p_Icurval(a1.kv, s.dos, s.fdat) else 0 end), 0),gl.bd), 0) as sum_totaly,
+                                               a.kf
+                                          from accounts a
+                                          join w4 on a.acc = w4.acc_pk
+                                          left join accounts a1 on a1.acc = w4.acc and (a1.dazs is null or a1.dazs >= cust.date_from)
+                                          left join saldoa s on s.acc = w4.acc and s.fdat between cust.date_from and cust.date_to
+                                         where a.rnk = cust.rnk 
+                                           and substr(a.nls, 1, 4) in ('2625', '2620') 
+                                           and (a.dazs >= cust.date_from or a.dazs is null)   
+                                         group by a.kv, w4.nd, a.kf)
+                                         loop
+                                         l_eds_credit_data.extend;
+                                         l_eds_credit_data(l_eds_credit_data.last).req_id:=cust.id;
+                                         l_eds_credit_data(l_eds_credit_data.last).rnk:=cust.rnk;
+                                         l_eds_credit_data(l_eds_credit_data.last).nd:=credit.nd;
+                                         l_eds_credit_data(l_eds_credit_data.last).vidd:=null;
+                                         l_eds_credit_data(l_eds_credit_data.last).kv:=credit.kv;
+                                         l_eds_credit_data(l_eds_credit_data.last).open_in:=cust.attribute_value;
+                                         l_eds_credit_data(l_eds_credit_data.last).sdate:=credit.daos;
+                                         l_eds_credit_data(l_eds_credit_data.last).balance_debt:=credit.bal_debt;
+                                         l_eds_credit_data(l_eds_credit_data.last).amount_pay_proc:=credit.proc_sum;
+                                         l_eds_credit_data(l_eds_credit_data.last).amount_pay_principal:=credit.credit_sum;
+                                         l_eds_credit_data(l_eds_credit_data.last).sum_totaly_credit:=credit.sum_totaly;
+                                         l_eds_credit_data(l_eds_credit_data.last).kf:=credit.kf;
+                                         l_eds_credit_data(l_eds_credit_data.last).sum_zagal:= credit.dog_sum;
+                                         l_eds_credit_data(l_eds_credit_data.last).credit_type:= 'BPK';
+                                         end loop;
+                          --over              
+                          for credit in (select s.nd, s.kf, c.sdate, c.vidd, abs(bars.fost(a.acc,cust.date_to)) as BAL_DEBT,
+                                                a.kv, s.proc_sum, s.credit_sum, s.proc_sum + s.credit_sum as sum_totaly, sumzagal.sum_zagal as sum_zagal, a.tip
+                                                from
+                                        (select n.nd, n.kf,
+                                        GREATEST (
+                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip in ('SN', 'SPN')  then bars.gl.p_Icurval(a.kv, s.kos, s.fdat) else 0 end),0),gl.bd)-
+                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip = 'SPN' then bars.gl.p_Icurval(a.kv, s.DOS, s.fdat) else 0 end),0),gl.bd)
+                                        ,0) as proc_sum,
+
+                                        GREATEST (
+                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip in ('OVN', 'SP') then bars.gl.p_Icurval (a.kv, s.kos, s.fdat) else 0 end),0),gl.bd)-
+                                        bars.gl.p_ncurval(980,NVL(sum(case when a.tip = 'SP' then bars.gl.p_Icurval (a.kv, s.DOS, s.fdat) else 0 end),0),gl.bd)
+                                        ,0) as credit_sum
+                                         FROM bars.accounts a
+                                              join bars.nd_acc n on n.acc = a.acc and a.kf = n.kf
+                                              join bars.saldoa s on s.acc = a.acc and a.kf = s.kf
+                                         WHERE s.fdat BETWEEN cust.date_from AND cust.date_to
+                                           and a.rnk=cust.rnk
+                                           AND a.tip IN ('OVN', 'SP', 'SN', 'SPN')
+                                         group by  n.nd, n.kf) s
+                                         join bars.nd_acc n on n.nd = s.nd and n.kf = s.kf
+                                         join bars.cc_deal c on c.nd = s.nd and c.kf = s.kf
+                                         join accounts a on n.acc = a.acc and n.kf = a.kf and a.tip='OVN' and (a.dazs >= cust.date_from or a.dazs is null)
+                                         left join (select na.nd,a.acc, min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal
+                                                      from bars.saldoa a, bars.accounts a1, bars.nd_acc na
+                                                     where a1.acc=na.acc and a.acc=a1.acc and a1.nbs=9129
+                                                     group by na.nd,a.acc)   sumzagal on sumzagal.nd=c.nd
+                                         where c.wdate>=cust.date_from and c.vidd in (10, 110))
+                                         loop
+                                         l_eds_credit_data.extend;
+                                         l_eds_credit_data(l_eds_credit_data.last).req_id:=cust.id;
+                                         l_eds_credit_data(l_eds_credit_data.last).rnk:=cust.rnk;
+                                         l_eds_credit_data(l_eds_credit_data.last).nd:=credit.nd;
+                                         l_eds_credit_data(l_eds_credit_data.last).vidd:=credit.vidd;
+                                         l_eds_credit_data(l_eds_credit_data.last).kv:=credit.kv;
+                                         l_eds_credit_data(l_eds_credit_data.last).open_in:=cust.attribute_value;
+                                         l_eds_credit_data(l_eds_credit_data.last).sdate:=credit.sdate;
+                                         l_eds_credit_data(l_eds_credit_data.last).balance_debt:=credit.bal_debt;
+                                         l_eds_credit_data(l_eds_credit_data.last).amount_pay_proc:=credit.proc_sum;
+                                         l_eds_credit_data(l_eds_credit_data.last).amount_pay_principal:=credit.credit_sum;
+                                         l_eds_credit_data(l_eds_credit_data.last).sum_totaly_credit:=credit.sum_totaly;
+                                         l_eds_credit_data(l_eds_credit_data.last).kf:=credit.kf;
+                                         l_eds_credit_data(l_eds_credit_data.last).sum_zagal:= credit.sum_zagal;
+                                         l_eds_credit_data(l_eds_credit_data.last).credit_type:= 'OVER';
                                          end loop;
        end loop;
          if l_eds_w4_data.count <> 0 then
@@ -513,7 +680,8 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
          
          update eds_decl e
             set e.state=st_declaration_prepared,
-                e.decl_id = l_decl_id
+                e.decl_id = l_decl_id,
+                e.prepare_date = sysdate
          where e.id=p_req_id;
          
          p_id := l_decl_id; 
@@ -521,7 +689,8 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
          rollback to bef_form;
          update eds_decl e
             set e.state = st_declaration_rejected,
-                e.comm = substr(e.comm||' -edecl-'||p_req_id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace, 1, 255)
+                e.comm = substr(e.comm||' -edecl-'||p_req_id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace, 1, 255),
+                e.prepare_date = sysdate
          where e.id = p_req_id;
          bars.logger.info('edecl-'||p_req_id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
 end;
@@ -576,6 +745,25 @@ end create_fill_job;
     end;
     return l_id;
  end;
+ 
+ procedure clear_old_decl(p_id number) is
+    l_id varchar2(40);
+ begin
+ begin
+ select id into l_id from eds_decl d where d.decl_id = p_id;
+ exception when no_data_found then
+ l_id := null;
+ end;
+      delete eds_w4_data w where w.req_id  = l_id;
+      delete eds_dpt_data d where d.req_id  = l_id;
+      delete eds_credit_data c where c.req_id  = l_id;
+      delete eds_curs_rates r where r.req_id  = l_id;
+      update eds_decl e 
+         set e.state = st_declaration_new_ex
+      where e.id  = l_id and e.state in (st_declaration_prepared, 
+                                         st_declaration_error);
+ end;
+ 
   
   -----------------------------------------------------------------------------------------
   --  create_request
@@ -592,16 +780,15 @@ end create_fill_job;
     p_date_to    in eds_decl.date_to%type,
     p_name       in eds_decl.cust_name%type,
     p_comm       in eds_decl.comm%type,
-    p_status     out varchar2
+    p_decl_id    in out number
     )
   is
     l_decl_id           number;
-    l_state             number;
-    l_err_txt           varchar2(255);
     l_eds_decl          eds_decl%rowtype;
     l_eds_decls_policy  eds_decls_policy%rowtype;
     l_act               varchar2(255) := gc_pkg||'.create_request ';
   begin
+  if p_decl_id is null then
     l_eds_decl.id          := get_guid;
     l_eds_decl.crt_date    := sysdate;
     l_eds_decl.state       := st_declaration_register;   
@@ -617,32 +804,36 @@ end create_fill_job;
     l_eds_decl.doneby      := user_id;
     l_eds_decl.doneby_fio  := user_name;
     l_eds_decl.branch      := sys_context('bars_context','user_branch');
-    
+  else
+  select * into l_eds_decl from eds_decl e where decl_id = p_decl_id;
+    l_eds_decl.id          := get_guid;
+    l_eds_decl.decl_id     := null;    
+    l_eds_decl.crt_date    := sysdate;
+    l_eds_decl.state       := st_declaration_register;
+    l_eds_decl.doneby      := user_id;
+    l_eds_decl.doneby_fio  := user_name;
+    l_eds_decl.branch      := sys_context('bars_context','user_branch');
+  end if;    
     l_eds_decls_policy.id       := l_eds_decl.id;
     l_eds_decls_policy.add_date := sysdate;
     l_eds_decls_policy.add_id   := user_id;
-    l_eds_decls_policy.kf       := f_ourmfo;
     
-    l_decl_id:= get_ex_decl(l_eds_decl);
+    if p_decl_id is null then
+        l_decl_id:= get_ex_decl(l_eds_decl);
+    else
+        clear_old_decl(p_decl_id);
+        l_decl_id:=null;
+    end if;
     if l_decl_id is null then
         add_new_decl(l_eds_decl, l_eds_decls_policy);
         set_decl_status(l_eds_decl.id ,st_declaration_register);
         eds_intg.create_fill_job(l_eds_decl.id);
-        l_err_txt:= 'Запит зареєстровано.';
-    else
-        decl_search(l_decl_id, l_state);
-        l_err_txt:=case l_state
-                       when 0 then 'Декларація за наданими параметрами вже була сформована з ІД - '||to_char(l_decl_id)||' та додана до переліку.'
-                       when 1 then 'Декларація за наданими параметрами вже існує в переліку з ІД - '||to_char(l_decl_id)||'.'
-                       when 2 then 'Декларація за наданими параметрами вже була сформована з ІД - '||to_char(l_decl_id)||', але виникла помилка підчас додавання до переліку.'
-                       when 3 then 'Декларація за наданими параметрами вже була сформована з ІД - '||to_char(l_decl_id)||', але виникла помилка підчас її пошуку в реєстрі.' 
-                  end;
     end if;
-     p_status:=l_err_txt;
+    p_decl_id:=l_decl_id;
 
   exception
     when others then
-    bars.logger.info('edecl-'||l_eds_decl.id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+    bars.logger.info(l_act||l_eds_decl.id|| ' error crt_decl '|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
     raise_application_error(-20000, '<b>Помилка формування декларації</b>'||chr(10)|| dbms_utility.format_error_stack || ' ' || dbms_utility.format_error_backtrace);
   end create_request; 
   
@@ -693,6 +884,36 @@ end create_fill_job;
         barstrans.transp_utl.add_resp(p_transp_id, l_buff);
     end if;
 end pocess_request;
+
+procedure delete_old_data is
+l_vc2list varchar2_list;
+cursor old_date is 
+(select id from eds_decl d where d.prepare_date < add_months(sysdate, -1));
+begin
+open old_date;
+loop
+fetch old_date bulk collect into l_vc2list limit 1000;
+    if l_vc2list.count = 0 then 
+        exit; 
+    end if;    
+    forall i in l_vc2list.first..l_vc2list.last
+      delete eds_w4_data w where w.req_id  = l_vc2list(i);
+    forall i in l_vc2list.first..l_vc2list.last
+      delete eds_dpt_data d where d.req_id  = l_vc2list(i);
+    forall i in l_vc2list.first..l_vc2list.last
+      delete eds_credit_data c where c.req_id  = l_vc2list(i);
+    forall i in l_vc2list.first..l_vc2list.last
+      delete eds_curs_rates r where r.req_id  = l_vc2list(i);
+    forall i in l_vc2list.first..l_vc2list.last
+      update eds_decl e 
+         set e.state = st_declaration_deleted
+      where e.id  = l_vc2list(i) and e.state in (st_declaration_prepared, 
+                                                 st_declaration_error,
+                                                 st_declaration_new_ex);
+    l_vc2list.delete;
+end loop;
+close old_date;
+end;
 
 end eds_intg;
 /

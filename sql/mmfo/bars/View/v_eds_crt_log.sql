@@ -29,11 +29,12 @@ PROMPT *** Create  view V_EDS_CRT_LOG ***
    p.ADD_DATE, 
    p.ADD_ID as ADD_FIO,
    b.fio,  
-   p.KF
+   substr(e.BRANCH, 2, 6) as KF
 FROM BARS.EDS_DECL e
 JOIN BARS.EDS_DECLS_POLICY p on e.id = p.id
 left join EDS_CRT_LOG_STATE s on e.state = s.id
-left join STAFF$BASE b on p.add_id = b.id;
+left join STAFF$BASE b on p.add_id = b.id
+where p.add_id = user_id;
 
 PROMPT *** Create  grants  V_EDS_CRT_LOG ***
 grant SELECT                                                                 on V_EDS_CRT_LOG   to BARS_ACCESS_DEFROLE;

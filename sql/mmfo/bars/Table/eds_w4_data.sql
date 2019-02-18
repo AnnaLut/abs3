@@ -25,14 +25,16 @@ begin
    (    REQ_ID VARCHAR2(36), 
     RNK NUMBER, 
     ACC NUMBER(38,0), 
-    NLS VARCHAR2(20), 
+    NLS VARCHAR2(30), 
     KV NUMBER(3,0), 
     OPEN_IN VARCHAR2(100), 
     ACC_TYPE VARCHAR2(50), 
     END_BAL NUMBER(10,0), 
     AMOUNT_PERIOD NUMBER(10,0), 
     OTHER_ACCRUALS NUMBER(10,0), 
-    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
+	END_BALQ NUMBER(10),
+	AMOUNT_PERIODQ NUMBER(10)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -42,7 +44,22 @@ exception when others then
 end; 
 /
 
-
+begin
+execute immediate'alter table EDS_w4_DATA modify nls varchar2(30)';
+end;
+/
+begin
+execute immediate'alter table eds_w4_data add end_balq number(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
+begin
+execute immediate'alter table eds_w4_data add amount_periodq number(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to EDS_W4_DATA ***

@@ -36,6 +36,7 @@ function initMainGrid() {
                     DATE_FROM: { type: 'date' },
                     DATE_TO: { type: 'date' },
                     CUST_NAME: { type: 'string' },
+					STATE: { type: 'number' },
                     C_STATE: { type: 'string' },
                     CRT_DATE: { type: 'date' },
                     DECL_ID: { type: 'number' },
@@ -95,7 +96,7 @@ function initMainGrid() {
                     width: '10%'
                 },
                 {
-                    template: "<div style='text-align:center;'>#=getButtonOrInfo(DECL_ID)#</div>",
+                    template: "<div style='text-align:center;'>#=getButtonOrInfo(DECL_ID, STATE)#</div>",
                     field: "DECL_ID",
                     title: "Завантаження декларації",
                     width: "10%"
@@ -239,8 +240,8 @@ function SearchDeclaration() {
     })
 }
 
-function getButtonOrInfo(decl_id) {
-    if (decl_id !== null)
+function getButtonOrInfo(decl_id, state) {
+    if (decl_id !== null && state == 1)
         return '<a class="k-button k-primary" onclick="downloadFile(' + decl_id + ')">Завантажити</a>';
     //return '<a class="k-button k-primary" onclick="downloadFile(1234567)">Завантажити</a>';
     return '';

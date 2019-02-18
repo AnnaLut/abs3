@@ -27,7 +27,7 @@ begin
    (    REQ_ID VARCHAR2(36), 
     RNK NUMBER, 
     ACC NUMBER(38,0), 
-    NLS VARCHAR2(20), 
+    NLS VARCHAR2(30), 
     KV NUMBER(3,0), 
     OPEN_IN VARCHAR2(100), 
     END_BAL NUMBER(10,0), 
@@ -35,7 +35,12 @@ begin
     SUM_PDFO NUMBER(10,0), 
     SUM_MIL NUMBER(10,0), 
     SUM_TOTALY NUMBER(10,0), 
-    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
+	END_BALQ NUMBER(10),
+	SUM_PROCQ NUMBER(10),
+	SUM_PDFOQ NUMBER(10),
+	SUM_MILQ NUMBER(10),
+	SUM_TOTALYQ NUMBER(10)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -45,7 +50,41 @@ exception when others then
 end; 
 /
 
+begin
+execute immediate'alter table EDS_DPT_DATA modify nls varchar2(30)';
+end;
+/
 
+begin
+execute immediate'alter table eds_dpt_data add end_balq number(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
+begin
+execute immediate'alter table eds_dpt_data add sum_procq number(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
+begin
+execute immediate'alter table eds_dpt_data add sum_pdfoq number(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
+begin
+execute immediate'alter table eds_dpt_data add sum_milq number(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
+begin
+execute immediate'alter table eds_dpt_data add sum_totalyq number(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to EDS_DPT_DATA ***

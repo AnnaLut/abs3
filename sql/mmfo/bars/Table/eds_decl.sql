@@ -37,7 +37,8 @@ begin
     COMM VARCHAR2(255), 
     DONEBY NUMBER, 
     DONEBY_FIO VARCHAR2(60), 
-    BRANCH VARCHAR2(255)
+    BRANCH VARCHAR2(255),
+    PREPARE_DATE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -47,7 +48,12 @@ exception when others then
 end; 
 /
 
-
+begin
+execute immediate'alter table EDS_DECL add PREPARE_DATE DATE';
+exception when others then
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to EDS_DECL ***
@@ -71,7 +77,7 @@ COMMENT ON COLUMN BARS.EDS_DECL.COMM IS 'Коментар(РНК)';
 COMMENT ON COLUMN BARS.EDS_DECL.DONEBY IS 'Ід користувча, який створив декларацію';
 COMMENT ON COLUMN BARS.EDS_DECL.DONEBY_FIO IS 'ФІО користувча, який створив декларацію';
 COMMENT ON COLUMN BARS.EDS_DECL.BRANCH IS 'Бранч користувча, який створив декларацію';
-
+COMMENT ON COLUMN BARS.EDS_DECL.PREPARE_DATE IS 'Дата формування даних';
 
 
 
@@ -109,6 +115,17 @@ begin
   CREATE INDEX BARS.IND_EDS_DECL_OKPO ON BARS.EDS_DECL (OKPO) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IND_EDS_DECL_OKPO ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IND_EDS_DECL_PREP_DATE ON BARS.EDS_DECL (PREPARE_DATE) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;

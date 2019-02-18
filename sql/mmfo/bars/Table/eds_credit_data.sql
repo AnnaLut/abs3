@@ -22,7 +22,7 @@ PROMPT *** Create  table EDS_CREDIT_DATA ***
 begin 
   execute immediate '
   CREATE TABLE BARS.EDS_CREDIT_DATA 
-   (    REQ_ID VARCHAR2(36), 
+   (REQ_ID VARCHAR2(36), 
     RNK NUMBER, 
     ACC NUMBER(38,0), 
     ND NUMBER(22,0), 
@@ -34,7 +34,9 @@ begin
     AMOUNT_PAY_PROC NUMBER(10,0), 
     AMOUNT_PAY_PRINCIPAL NUMBER(10,0), 
     SUM_TOTALY_CREDIT NUMBER(10,0), 
-    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
+	SUM_ZAGAL NUMBER(10),
+	CREDIT_TYPE VARCHAR2(30)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -44,7 +46,19 @@ exception when others then
 end; 
 /
 
+begin
+execute immediate'alter table EDS_CREDIT_DATA add SUM_ZAGAL NUMBER(10)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
 
+begin
+execute immediate'alter table eds_credit_data add credit_type varchar2(30)';
+exception when others then 
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to EDS_CREDIT_DATA ***
@@ -64,6 +78,7 @@ COMMENT ON COLUMN BARS.EDS_CREDIT_DATA.BALANCE_DEBT IS 'Залишок невиплаченого кр
 COMMENT ON COLUMN BARS.EDS_CREDIT_DATA.AMOUNT_PAY_PROC IS 'Кількість виплачених процентів';
 COMMENT ON COLUMN BARS.EDS_CREDIT_DATA.AMOUNT_PAY_PRINCIPAL IS 'Сума оплаченого кредиту';
 COMMENT ON COLUMN BARS.EDS_CREDIT_DATA.SUM_TOTALY_CREDIT IS 'Сума кредиту';
+COMMENT ON COLUMN BARS.EDS_CREDIT_DATA.SUM_ZAGAL IS 'Сума договору';
 COMMENT ON COLUMN BARS.EDS_CREDIT_DATA.KF IS '';
 
 
