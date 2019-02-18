@@ -9,7 +9,8 @@
 </head>
 <body bottommargin="0" rightmargin="0">
     <form id="form1" runat="server">
-        <pre id="edMain" runat="server"></pre>
+        <%--<pre id="edMain" runat="server"></pre>--%>
+        <textarea rows="12" cols="80" style="height:400px" id="edMain" readonly="readonly" runat="server"></textarea>
     </form>
 </body>
 </html>
