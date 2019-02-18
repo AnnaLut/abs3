@@ -726,75 +726,120 @@ procedure pay_perekr  (
                        uid_    NUMBER DEFAULT NULL,
                        koef_   NUMBER)
 IS
- REF_  number ; --референс
- data_   DATE ; --data_=> gl.BDATE,
- datp_   DATE ; --datp_=> gl.bdate,
- l_d_rec varchar2(60) ;
- l_nazn varchar2(160);
- l_flag number;
+  REF_    number; --референс
+  data_   DATE;   --data_ => gl.BDATE,
+  datp_   DATE;   --datp_ => gl.bdate,
+  l_d_rec varchar2(60);
+  l_nazn  varchar2(160);
+  l_flag  number;
+  l_sos   number;
 
+/*
+20.11.2018 COBUMMFO-10143 MDom додав savepoint, rollbak та блок exception
+10.07.2018 Одеса ввела не правильно перекриття. Для внутрішніх платежів
+           замість операції PS1 використала зовнішню операцію PS5,
+           додаю страховку замість paytt => gl.dyntt2
+*/
 begin
-l_d_rec:='';
-data_:=gl.BDATE;
-datp_:=gl.bdate;
-l_nazn:=nazn_;
+  l_d_rec := '';
+  data_   := gl.BDATE;
+  datp_   := gl.bdate;
+  l_nazn  := nazn_;
 
---формування призначення
---IF length (nazn_)<=148 then l_NAZN:=l_NAZN||' ('||KOEF_*100||'%)';
---else l_d_rec:='#П ('||KOEF_*100||'%)'||'#'; end if;
+  --формування призначення
+  --IF length(nazn_) <= 148 then l_NAZN := l_NAZN||' ('||KOEF_*100||'%)';
+  --else l_d_rec := '#П ('||KOEF_*100||'%)'||'#'; end if;
 
-        BEGIN
-           SELECT SUBSTR (flags, 38, 1)
-             INTO l_flag
-             FROM tts
-            WHERE tt = tt_;
-        EXCEPTION
-           WHEN NO_DATA_FOUND
-           THEN
-              l_flag := 0;
-        END;
-    --оплата документу
-    IF S_> 0 THEN
-             gl.REF(REF_);
-             gl.in_doc3
-              (ref_  => REF_,   tt_   => tt_  , vob_ => vob_  , nd_  => TO_CHAR (REF_),  pdat_=> pdat_ , vdat_=> gl.BDATE,  dk_=> dk_,
-               kv_   => kv_,   s_    => S_   , kv2_ => kv2_, s2_  => S_,   sk_ => sk_, data_=> data_ , datp_=> datp_ ,
-               nam_a_=> nam_a_,  nlsa_ => nlsa_ , mfoa_=> mfoa_,
-               nam_b_=> nam_b_, nlsb_ => nlsb_, mfob_=> mfob_ , nazn_ => l_nazn,
-               d_rec_=> l_d_rec  , id_a_ => id_a_, id_b_=> id_b_ , id_o_ => id_o_, sign_=> sign_, sos_=> sos_, prty_=> prty_, uid_=> uid_);
+  BEGIN
+    SELECT SUBSTR(flags, 38, 1)
+      INTO l_flag
+      FROM tts
+     WHERE tt = tt_;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      l_flag := 0;
+  END;
+  
+  savepoint before_pay_doc;
+  
+  --logger.info('SPS l_flag      '||l_flag);
+  --оплата документу
+  IF S_> 0 THEN
+    begin
+      gl.REF(REF_);
+      gl.in_doc3(
+        ref_   => REF_,          tt_    => tt_,           
+        vob_   => vob_,          nd_    => TO_CHAR(REF_), 
+        pdat_  => pdat_,         vdat_  => gl.BDATE,      
+        dk_    => dk_,           kv_    => kv_,           
+        s_     => S_,            kv2_   => kv2_,          
+        s2_    => S_,            sk_    => sk_,           
+        data_  => data_,         datp_  => datp_,         
+        nam_a_ => nam_a_,        nlsa_  => nlsa_,         
+        mfoa_  => mfoa_,         nam_b_ => nam_b_,        
+        nlsb_  => nlsb_,         mfob_  => mfob_,         
+        nazn_  => l_nazn,        d_rec_ => l_d_rec,       
+        id_a_  => id_a_,         id_b_  => id_b_,         
+        id_o_  => id_o_,         sign_  => sign_,         
+        sos_   => sos_,          prty_  => prty_,         
+        uid_   => uid_);
 
-             paytt (l_flag, REF_,  gl.bDATE, TT_, DK_, kv_, nlsa_, S_, kv2_, nlsb_, S_  );
-    end if;
+      gl.dyntt2(
+        sos_   => l_sos,
+        mod1_  => l_flag,
+        mod2_  => 1,
+        ref_   => REF_,
+        vdat1_ => gl.bDATE,
+        vdat2_ => null,
+        tt0_   => TT_,
+        dk_    => DK_,
+        kva_   => kv_,
+        mfoa_  => mfoa_,
+        nlsa_  => nlsa_,
+        sa_    => S_,
+        kvb_   => kv2_,
+        mfob_  => mfob_,
+        nlsb_  => nlsb_,
+        sb_    => S_,
+        sq_    => null,
+        nom_   => null);
+      --gl.dyntt(l_flag, REF_, gl.bDATE, DK_, kv_, nlsa_, S_, kv2_, nlsb_, S_);
+      --paytt(l_flag, REF_, gl.bDATE, TT_, DK_, kv_, nlsa_, S_, kv2_, nlsb_, S_);
+    exception
+      when others then
+        rollback to savepoint before_pay_doc;
+        raise;
+    end;
+  end if;
 
-    if ref_ is not null then
+  if ref_ is not null then
+    begin
+      logger.info('SPS015: '||ref_);
+      --logger.info('SPS: '||nlsa_||' '||mfoa_||' '||id_a_||' '||sys_context('bars_global', 'user_id')||'suma '||S_);
+      delete from tsel015 t
+       where T.NLSA = nlsa_
+         and T.MFOA = mfoa_
+         and T.OKPOA = id_a_
+         and T.KVA = kv_
 
-                           begin
-                           logger.info ('SPS015: ' || ref_);
-                           --logger.info ('SPS: ' ||nlsa_||' '||mfoa_||' '||id_a_||' '||sys_context('bars_global','user_id')||'suma '||S_);
-                           delete from tsel015 t
-                           where  T.NLSA=nlsa_
-                              and T.MFOA=mfoa_
-                              and T.OKPOA = id_a_
-                              and T.KVA= kv_
+         and T.NLSB = nlsb_
+         and T.MFOB = mfob_
+         and T.OKPOB = id_b_
+         and T.KVB = kv2_
 
-                              and T.NLSB=nlsb_
-                              and T.MFOB=mfob_
-                              and T.OKPOB=id_b_
-                              and T.KVB=kv2_
+         and t.tt = tt_
+         and t.dk = dk_
 
-                              and t.tt=tt_
-                              and t.dk=dk_
+         and T.SUMA = S_
+         and t.nazn like l_nazn
 
-                              and T.SUMA=S_
-                              and t.nazn like l_nazn
-
-                              and t.us_id=sys_context('bars_global','user_id');
-                              ----------------------------
-                           commit;
-                           end;
-
-    end if;
+         and t.us_id = sys_context('bars_global', 'user_id');
+         ----------------------------
+      commit;
+    end;
+  end if;
 END;
+
 
 PROCEDURE SEL023
 ( Mode_ int, Grp  int, Іnview varchar2)
