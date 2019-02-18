@@ -13,11 +13,13 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6GX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 6GX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.002    05.12.2018
+ VERSION     :    v.18.003    14.02.2019 (05.12.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+14.02.2019	виправлено помилку з населенням VERSION_ID, VERSION_D8
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.002  05.12.2018';
+  ver_              char(30)  := 'v.18.003  14.02.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -68,7 +70,7 @@ begin
     into NBUR_LOG_F6GX
        (REPORT_DATE, KF, NBUC, VERSION_ID, VERSION_D8, EKP,K020,K021,Q003_2, Q003_3, Q007, B040, T070_1,
     DESCRIPTION,KV,CUST_ID,CUST_CODE,CUST_NAME,ND,AGRM_NUM,BEG_DT,END_DT,BRANCH)
-  select p_report_date, p_kod_filii, nvl(trim(nbuc), l_nbuc), version_id, l_version_id 
+  select p_report_date, p_kod_filii, nvl(trim(nbuc), l_nbuc), l_version_id, version_id 
         , 'A6G001'  as  EKP
         , LPAD(K020,10,'0')   as  K020 
         , K021
