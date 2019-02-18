@@ -27,6 +27,8 @@ begin
   ref               NUMBER,
   feerate           NUMBER(38),
   receiverrnk       NUMBER(38),
+  payeraccnum 	    VARCHAR2(29),
+  payerbankcode     VARCHAR2(12),
   err               varchar2(1000)
 )
 tablespace BRSDYND';
@@ -100,7 +102,28 @@ begin
 end;
 / 
 
+begin
+    execute immediate 'alter table SUBSIDY_DATA add payeraccnum VARCHAR2(29)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table SUBSIDY_DATA add payerbankcode VARCHAR2(12)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
 -- Add comments to the columns 
+comment on column SUBSIDY_DATA.payeraccnum
+  is 'Номер рахунку відправника';
+comment on column SUBSIDY_DATA.payerbankcode
+  is 'МФО банку відправника';
 comment on column SUBSIDY_DATA.feerate
   is 'Процент коміссії';
 comment on column SUBSIDY_DATA.receiverrnk
