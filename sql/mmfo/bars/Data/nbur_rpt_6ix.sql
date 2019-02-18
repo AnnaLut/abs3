@@ -113,11 +113,14 @@ begin
        ( DATE_START, FILE_CODE, DESC_XML, ATTR_NIL )
      Values
        (TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'), '#6I',
-'select distinct EKP, K020, K021, Q003_2, Q003_4, R030, R020, F081, S031, T070
-    from nbur_log_f6IX t
-    where  report_date = :p_rpt_dt and
-           kf = :p_kf
-    order by K020, EKP, Q003_2, Q003_4, R030, R020, F081, S031',
+'select EKP, K020, K021, Q003_2, Q003_4, R030, R020, F081, S031, SUM(T070) as T070
+ from (select distinct EKP, K020, K021, Q003_2, Q003_4, R030, R020, F081, S031, T070
+         from nbur_log_f6IX t
+        where report_date = :p_rpt_dt 
+          and kf = :p_kf
+       )
+ group by EKP, K020, K021, Q003_2, Q003_4, R030, R020, F081, S031
+ order by K020, EKP, Q003_2, Q003_4, R030, R020, F081, S031',
     null
        );
 
