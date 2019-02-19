@@ -706,7 +706,7 @@ function get_md5 (input_string varchar2) return varchar2
         end;
        -- отправка через СЕП
 
-          pay_to_sep (p_ref =>l_ref ,p_trans_nls=>l_trans,p_pay_amount=>l_pay_amount,p_mfo_term=>l_mfo_term);
+          pay_to_sep (p_ref =>l_ref ,p_trans_nls=>l_trans,p_pay_amount=>p_sum,p_mfo_term=>l_mfo_term);
 
   end if ;   
        --Добавляем в доп. реквезит документа номер чека ТОМАС

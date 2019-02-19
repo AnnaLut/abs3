@@ -56,12 +56,13 @@ begin
     l_zpr.txt          := 'select c.nmk,
        c.okpo,
        vcr.name,
-       vcr.birthday,
-       vcr.doc_date,
-       vcr.date_photo as day25_45,
-       vcr.actual_date,
-       trunc(add_months(vcr.birthday,12*25),''DD'') day25,
-       trunc(add_months(vcr.birthday,12*45),''DD'') day45
+       to_char(vcr.birthday,''dd.mm.yyyy'') birthday,
+       to_char(vcr.doc_date,''dd.mm.yyyy'') doc_date,
+       to_char(vcr.date_photo,''dd.mm.yyyy'') date_photo,
+       decode(vcr.doc_type,1,''not ID'','''')||to_char(vcr.actual_date,''dd.mm.yyyy'') actual_date,
+       to_char(trunc(add_months(vcr.birthday,12*25),''DD''),''dd.mm.yyyy'') day25,
+       to_char(trunc(add_months(vcr.birthday,12*45),''DD''),''dd.mm.yyyy'') day45,
+       (SELECT psp.name FROM passp psp WHERE psp.passp=vcr.doc_type) doc_type
   from v_cust_relations vcr,
        customer c,
        (select trim(:Param0) param0,
@@ -74,7 +75,6 @@ begin
  where c.rnk=vcr.rnk
        AND C.CUSTTYPE=2
        AND C.DATE_OFF IS NULL
-       AND vcr.doc_type=1
        and (case when param0 = ''%''
                  then 1
                  when param0 = ''='' and trunc(add_months(vcr.birthday,12*45),''DD'')=sFdat1--”мова по к≥лькост≥ повних рок≥в

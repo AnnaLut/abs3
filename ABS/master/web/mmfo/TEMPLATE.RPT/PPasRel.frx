@@ -1,49 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="07/30/2018 17:18:47" ReportInfo.Modified="09/24/2018 10:07:02" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="07/30/2018 17:18:47" ReportInfo.Modified="01/22/2019 10:58:36" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQF0zd0fTimxeFWTo7q19IJ8=" CommandTimeout="4000">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select char00 name, char01 okpo, char02 name_rel, dat00 birthday, dat01 doc_date, dat02 photo, dat03 actual_date, dat04 day25, dat05 day45  from rs_tmp_report_data where&#13;&#10;session_id=:SESSION_ID order by id">
-        <Column Name="NAME" DataType="System.String"/>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQCJCnLWYcA0jwn9aHZ7g1s8=" CommandTimeout="4000">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 NMK, CHAR01 OKPO, CHAR02 NAME, CHAR03 BIRTHDAY, CHAR04 DOC_DATE, CHAR05 DATE_PHOTO, CHAR06 ACTUAL_DATE, CHAR07 DAY25, CHAR08 DAY45, CHAR09 DOC_TYPE from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="NMK" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
-        <Column Name="NAME_REL" DataType="System.String"/>
-        <Column Name="ACTUAL_DATE" DataType="System.DateTime"/>
-        <Column Name="BIRTHDAY" DataType="System.DateTime"/>
-        <Column Name="DOC_DATE" DataType="System.DateTime"/>
-        <Column Name="PHOTO" DataType="System.DateTime"/>
-        <Column Name="DAY25" DataType="System.DateTime"/>
-        <Column Name="DAY45" DataType="System.DateTime"/>
-        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="810342"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="BIRTHDAY" DataType="System.String"/>
+        <Column Name="DOC_DATE" DataType="System.String"/>
+        <Column Name="DATE_PHOTO" DataType="System.String"/>
+        <Column Name="ACTUAL_DATE" DataType="System.String"/>
+        <Column Name="DAY25" DataType="System.String"/>
+        <Column Name="DAY45" DataType="System.String"/>
+        <Column Name="DOC_TYPE" DataType="System.String"/>
+        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="-1"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="session_id" DataType="System.Int64"/>
   </Dictionary>
-  <ReportPage Name="Page1" Landscape="true" PaperWidth="330" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
-    <ReportTitleBand Name="ReportTitle1" Width="1171.8" Height="37.8">
-      <TableObject Name="Table1" Left="9.45" Width="1115.1" Height="37.8" Border.Lines="All">
-        <TableColumn Name="Column7" Width="193.72"/>
-        <TableColumn Name="Column8" Width="184.25"/>
-        <TableColumn Name="Column9" Width="165.36"/>
-        <TableColumn Name="Column13" Width="113.4"/>
-        <TableColumn Name="Column15" Width="85.05"/>
-        <TableColumn Name="Column16" Width="85.05"/>
-        <TableColumn Name="Column10" Width="89.79"/>
-        <TableColumn Name="Column11" Width="99.24"/>
-        <TableColumn Name="Column12" Width="99.24"/>
-        <TableRow Name="Row3" Height="37.8">
-          <TableCell Name="Cell33" Border.Lines="All" Text="Найменування юридичної особи" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell34" Border.Lines="All" Text="Код ЄДРПОУ юридичної особи" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell35" Border.Lines="All" Text="ПІБ пов’язаної особи" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell39" Text="Дата народження" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell41" Border.Lines="All" Text="Дата виповнення 25 років" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell42" Border.Lines="All" Text="Дата виповнення 45 років" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell36" Border.Lines="All" Text="Дата видачі паспорту" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell37" Border.Lines="All" Text="Дата вклеювання фото" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell38" Border.Lines="All" Text="Термін дії паспорта" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-        </TableRow>
-      </TableObject>
-    </ReportTitleBand>
-    <DataBand Name="Data1" Top="43.13" Width="1171.8" Height="38.8" DataSource="Table" Indent="0">
-      <TableObject Name="Table1" Left="9.45" Width="1115.1" Height="38.8" Border.Lines="All">
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="360" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <DataBand Name="Data1" Top="41.8" Width="1285.2" Height="38.8" CanGrow="true" CanShrink="true" DataSource="Table" Indent="0">
+      <TableObject Name="Table1" Left="9.45" Width="1219.05" Height="38.8" Border.Lines="All">
         <TableColumn Name="Column1" Width="193.72"/>
         <TableColumn Name="Column2" Width="184.25"/>
         <TableColumn Name="Column3" Width="165.36"/>
@@ -53,18 +30,46 @@
         <TableColumn Name="Column4" Width="89.79"/>
         <TableColumn Name="Column5" Width="99.24"/>
         <TableColumn Name="Column6" Width="99.24"/>
-        <TableRow Name="Row2" Height="38.8">
-          <TableCell Name="Cell6" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
+        <TableColumn Name="Column20" Width="103.95"/>
+        <TableRow Name="Row2" Height="38.8" AutoSize="true">
+          <TableCell Name="Cell6" Border.Lines="All" Text="[Table.NMK]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell7" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell8" Border.Lines="All" Text="[Table.NAME_REL]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell40" Text="[Table.BIRTHDAY]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell43" Border.Lines="All" Text="[Table.DAY25]" HideZeros="true" Format="Date" Format.Format="d" VertAlign="Center"/>
-          <TableCell Name="Cell44" Border.Lines="All" Text="[Table.DAY45]" HideZeros="true" Format="Date" Format.Format="d" VertAlign="Center"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="[Table.DAY25]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[Table.DAY45]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell9" Border.Lines="All" Text="[Table.DOC_DATE]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell27" Border.Lines="All" Text="[Table.PHOTO]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell32" Text="[Table.ACTUAL_DATE]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="[Table.DATE_PHOTO]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[Table.ACTUAL_DATE]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Text="[Table.DOC_TYPE]" HorzAlign="Center"/>
         </TableRow>
       </TableObject>
+      <DataHeaderBand Name="DataHeader1" Width="1285.2" Height="37.8">
+        <TableObject Name="Table1" Left="9.45" Width="1219.05" Height="37.8" Border.Lines="All">
+          <TableColumn Name="Column21" Width="193.72"/>
+          <TableColumn Name="Column22" Width="184.25"/>
+          <TableColumn Name="Column23" Width="165.36"/>
+          <TableColumn Name="Column24" Width="113.4"/>
+          <TableColumn Name="Column25" Width="85.05"/>
+          <TableColumn Name="Column26" Width="85.05"/>
+          <TableColumn Name="Column27" Width="89.79"/>
+          <TableColumn Name="Column28" Width="99.24"/>
+          <TableColumn Name="Column29" Width="99.24"/>
+          <TableColumn Name="Column30" Width="103.95"/>
+          <TableRow Name="Row4" Height="37.8">
+            <TableCell Name="Cell47" Border.Lines="All" Text="Найменування юридичної особи" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell48" Border.Lines="All" Text="Код ЄДРПОУ юридичної особи" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell49" Border.Lines="All" Text="ПІБ пов’язаної особи" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell50" Text="Дата народження" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell51" Border.Lines="All" Text="Дата виповнення 25 років" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell52" Border.Lines="All" Text="Дата виповнення 45 років" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell53" Border.Lines="All" Text="Дата видачі паспорту" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell54" Border.Lines="All" Text="Дата вклеювання фото" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell55" Border.Lines="All" Text="Термін дії паспорта" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell56" Text="Тип документу" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
     </DataBand>
   </ReportPage>
 </Report>
