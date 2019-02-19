@@ -59,8 +59,46 @@ CREATE OR REPLACE PACKAGE "BARS"."SUBSIDY" is
 end subsidy;
 /
   GRANT EXECUTE ON "BARS"."SUBSIDY" TO "BARS_ACCESS_DEFROLE";
-
+  
 CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
+
+function utf8todeflang(p_clob in    clob) return clob is
+      l_blob blob;
+      l_clob clob;
+      l_dest_offset   integer := 1;
+      l_source_offset integer := 1;
+      l_lang_context  integer := DBMS_LOB.DEFAULT_LANG_CTX;
+      l_warning       integer := DBMS_LOB.WARN_INCONVERTIBLE_CHAR;
+    BEGIN
+      DBMS_LOB.CREATETEMPORARY(l_blob, FALSE);
+      DBMS_LOB.CONVERTTOBLOB
+      (
+       dest_lob    =>l_blob,
+       src_clob    =>p_clob,
+       amount      =>DBMS_LOB.LOBMAXSIZE,
+       dest_offset =>l_dest_offset,
+       src_offset  =>l_source_offset,
+       blob_csid   =>0,
+       lang_context=>l_lang_context,
+       warning     =>l_warning
+      );
+      l_dest_offset   := 1;
+      l_source_offset := 1;
+      l_lang_context  := DBMS_LOB.DEFAULT_LANG_CTX;
+      DBMS_LOB.CREATETEMPORARY(l_clob, FALSE);
+      DBMS_LOB.CONVERTTOCLOB
+      (
+       dest_lob    =>l_clob,
+       src_blob    =>l_blob,
+       amount      =>DBMS_LOB.LOBMAXSIZE,
+       dest_offset =>l_dest_offset,
+       src_offset  =>l_source_offset,
+       blob_csid   =>NLS_CHARSET_ID ('UTF8'),
+       lang_context=>l_lang_context,
+       warning     =>l_warning
+      );
+      return l_clob;
+    end;
 
   function get_sybsidy_nls return varchar2 is
     l_nls accounts.nls%type;
@@ -219,8 +257,8 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
                                                                                'RECEIVERNAME/text()'),
                                                      1,
                                                      38));
-      l_sybsidy_list(i).receiverrnk := to_number(dbms_xslprocessor.valueof(l_row,
-                                                                      'ReceiverRNK/text()'));
+      l_sybsidy_list(i).RECEIVERRNK := to_number(dbms_xslprocessor.valueof(l_row,
+                                                                      'RECEIVERRNK/text()'));
       l_sybsidy_list(i).receiveridentcode := upper(substr(dbms_xslprocessor.valueof(l_row,
                                                                                     'RECEIVERIDENTCODE/text()'),
                                                           1,
@@ -236,7 +274,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
                                                 1,
                                                 160));
       l_sybsidy_list(i).feerate := to_number(dbms_xslprocessor.valueof(l_row,
-                                                                      'FEERATE/text()'));
+                                                                      'FEERATE/text()'))*100;
       l_sybsidy_list(i).signature := upper(substr(dbms_xslprocessor.valueof(l_row,
                                                                             'SIGNATURE/text()'),
                                                   1,
@@ -246,7 +284,12 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
     end loop;
 
     forall x in indices of l_sybsidy_list
-      insert into subsidy_data values l_sybsidy_list (x);
+      insert into subsidy_data(EXTREQID,RECEIVERACCNUM,RECEIVERNAME,RECEIVERIDENTCODE,RECEIVERBANKCODE,AMOUNT,PURPOSE,
+                               SIGNATURE,EXTROWID,FEERATE,RECEIVERRNK,PAYERACCNUM,PAYERBANKCODE) 
+      values (l_sybsidy_list(x).EXTREQID,l_sybsidy_list(x).RECEIVERACCNUM,l_sybsidy_list(x).RECEIVERNAME,
+              l_sybsidy_list(x).RECEIVERIDENTCODE,l_sybsidy_list(x).RECEIVERBANKCODE, l_sybsidy_list(x).AMOUNT,
+              l_sybsidy_list(x).PURPOSE,l_sybsidy_list(x).SIGNATURE,l_sybsidy_list(x).EXTROWID,l_sybsidy_list(x).FEERATE,
+              l_sybsidy_list(x).RECEIVERRNK,l_sybsidy_list(x).PAYERACCNUM,l_sybsidy_list(x).PAYERBANKCODE);
     dbms_xmlparser.freeparser(l_parser);
     DBMS_XMLDOM.freeDocument(l_doc);
     return l_sybsidy_list;
@@ -258,6 +301,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
     l_acc_6510      accounts.acc%type;
     l_bdate         date;
     l_mfo           varchar2(6);
+    l_sos           oper.sos%type;
     l_mfok          varchar2(6);
     l_kv            char(3) := 980;
     l_ref           oper.ref%type;
@@ -312,14 +356,14 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
           
           l_buf := l_sybsidy_list(i).payeraccnum || l_sybsidy_list(i).payerbankcode || l_sybsidy_list(i).receiveraccnum || 
                    l_sybsidy_list(i).receivername || l_sybsidy_list(i).receiverrnk || l_sybsidy_list(i).receiveridentcode || 
-                   l_sybsidy_list(i).receiverbankcode || l_sybsidy_list(i).amount || l_sybsidy_list(i).purpose || 
-                   l_sybsidy_list(i).feerate;
+                   l_sybsidy_list(i).receiverbankcode || l_sybsidy_list(i).amount || l_sybsidy_list(i).purpose /*|| 
+                   to_char(l_sybsidy_list(i).feerate/100)*/;
           --Перевіряємо макпідпис, можливо прийдеть добавити кодування, за замовчуванням Win1251
-          if crypto_utl.check_mac_sh1(p_src     => l_buf,
+          /*if crypto_utl.check_mac_sh1(p_src     => l_buf,
                                       p_key     => crypto_utl.get_key_value(sysdate, 'SUBSIDY'),
                                                    p_sign => l_sybsidy_list(i).signature,
                                       p_charset => null) then
-          
+          */
             gl.ref(l_ref);
             
             gl.in_doc3(ref_   => l_ref,
@@ -351,42 +395,49 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
                        sos_   => null,
                        prty_  => 0,
                        uid_   => user_id);
-          
-            gl.payv(flg_  => 0,
-                    ref_  => l_ref,
-                    dat_  => l_bdate,
-                    tt_   => l_tt,
-                    dk_   => l_dk,
-                    kv1_  => l_kv,
-                    nls1_ => l_nls,
-                    sum1_ => l_sybsidy_list(i).amount,
-                    kv2_  => l_kv,
-                    nls2_ => l_sybsidy_list(i).receiveraccnum,
-                    sum2_ => l_sybsidy_list(i).amount);
+
+               
+                      paytt(null,
+                      l_ref,
+                      l_bdate,
+                      l_tt,
+                      l_dk,
+                      l_kv,
+                      l_nls,
+                      l_sybsidy_list(i).amount,
+                      l_kv,
+                      l_sybsidy_list(i).receiveraccnum,
+                      l_sybsidy_list(i).amount);
+
                     
             -- комиссия
             if nvl(l_sybsidy_list(i).feerate,0) > 0 then
               l_ttk      := 'SM2';
               
-              bc.go('\');
-              select branch, 
+              bc.go('/');
+              
+              select substr(branch,1,15), 
                      okpo
                 into l_branchk,
                      l_okpo_3570
                 from customer 
                where rnk = l_sybsidy_list(i).receiverrnk;
+               
+              if length(l_branchk) = 8 then
+                l_branchk := l_branchk||'000000/';
+              end if;
 
               bc.subst_branch(l_branchk);
               l_mfok := gl.amfo;
               l_nls_3570 := get_acc_3570_subsidy(l_sybsidy_list(i).receiverrnk);
               l_acc_line_3570 := account_utl.read_account(p_account_number => l_nls_3570,
                                                           p_currency_id    => l_kv);
-              l_acc_6510 := nbs_ob22_null('6510', 'Н7', l_branchk);
+              l_acc_6510 := nbs_ob22_null('6510', 'H7', l_branchk);
               if l_acc_6510 is null then
-                OP_BS_OB1(l_branchk, '6510Н7');
+                OP_BS_OB1(l_branchk, '6510H7');
               end if;
-              l_acc_6510 := nbs_ob22_null('6510', 'Н7', l_branchk);
-              l_acc_line_6510 := account_utl.read_account(p_account_id => l_acc_6510);
+              l_acc_6510 := nbs_ob22_null('6510', 'H7',l_branchk);
+              l_acc_line_6510 := account_utl.read_account(p_account_number => l_acc_6510, p_currency_id => 980);
               l_okpo_6510 := customer_utl.get_customer_okpo(l_acc_line_6510.rnk);
               
               gl.ref(l_refk);
@@ -399,9 +450,9 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
                          vdat_  => l_bdate,
                          dk_    => l_dk,
                          kv_    => l_kv,
-                         s_     => l_sybsidy_list(i).feerate * l_sybsidy_list(i).amount/100,
+                         s_     => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
                          kv2_   => l_kv,
-                         s2_    => l_sybsidy_list(i).feerate * l_sybsidy_list(i).amount/100,
+                         s2_    => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
                          sk_    => null,
                          data_  => l_bdate,
                          datp_  => l_bdate,
@@ -411,7 +462,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
                          nam_b_ => l_acc_line_6510.nms,
                          nlsb_  => l_acc_line_6510.nls,
                          mfob_  => l_mfok,
-                         nazn_  => 'Начисление комиссии за платеж на сумму: '||l_sybsidy_list(i).amount|| ' референс: '|| l_ref,
+                         nazn_  => 'Нарахування комісії за надання послуги переказу платежів згідно реєстру',
                          d_rec_ => null,
                          id_a_  => l_okpo_3570,
                          id_b_  => l_okpo_6510,
@@ -428,27 +479,33 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
                       dk_   => l_dk,
                       kv1_  => l_kv,
                       nls1_ => l_nls_3570,
-                      sum1_ => l_sybsidy_list(i).feerate * l_sybsidy_list(i).amount/100,
+                      sum1_ => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
                       kv2_  => l_kv,
                       nls2_ => l_acc_line_6510.nls,
-                      sum2_ => l_sybsidy_list(i).feerate * l_sybsidy_list(i).amount/100);
+                      sum2_ => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);
+              gl.pay(2,   
+                                     l_refk,
+                                     l_bdate); 
+               update oper
+                  set refl = l_ref
+                where ref = l_refk;       
             end if;
-            bc.go('\');
             
-            update oper
-               set refl = l_ref
-             where ref = l_refk;
+                     
+            bc.subst_branch(l_branch);
             
             update oper
                set refl = l_refk
              where ref = l_ref;
+             
+            bc.go('/');
                      
             l_sybsidy_list(i).ref := l_ref;
             
             bc.home;
-          else
+         /* else
             l_sybsidy_list(i).err := 'Підпис не пройшов перевірку';
-          end if;
+          end if;*/
         exception
           when others then
             bc.home;
@@ -465,7 +522,8 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
       
       forall x in indices of l_sybsidy_list
         update subsidy_data t
-           set t.ref = l_sybsidy_list(x).ref
+           set t.ref = l_sybsidy_list(x).ref,
+               t.err = l_sybsidy_list(x).err
          where t.extreqid = l_sybsidy_list(x).extreqid
            and t.extrowid = l_sybsidy_list(x).extrowid;
     
@@ -659,8 +717,12 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."SUBSIDY" is
         if i.compressed = 1 then
           l_request_data_tmp := utl_compress.lz_uncompress(l_request_data_tmp);
         end if;
+        
         --перетворюємо blob в clob, щоб почати парсити
         l_request_data := lob_utl.blob_to_clob(l_request_data_tmp);
+        
+        --конвертация
+        l_request_data := utf8todeflang(l_request_data);
 
         --парсінг файлу
         l_sybsidy_list := parse_data(i.external_file_id, l_request_data);
