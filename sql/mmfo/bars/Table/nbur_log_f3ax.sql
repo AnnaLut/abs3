@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : NBUR
 -- Author : 
--- Date   : 11.05.2018
+-- Date   : 19/02/2019 (11.05.2018)
 -- ======================================================================================
 -- create table NBUR_LOG_F3AX
 -- ======================================================================================
@@ -17,9 +17,10 @@ prompt -- create table NBUR_LOG_F3AX
 prompt -- ======================================================
 
 begin
+  BARS.BPA.remove_policies( 'NBUR_LOG_F3AX');
+  
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F3AX', 'WHOLE' , NULL, NULL, NULL, NULL );
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F3AX', 'FILIAL',  'M', NULL,  'E',  'E' );
-  BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F3AX', 'CENTER', NULL,  'E',  'E',  'E' );
 end;
 /
 
@@ -42,7 +43,7 @@ begin
 , R030            VARCHAR2(3 CHAR) constraint CC_NBURLOGF3AX_R030_NN       NOT NULL
 , K030            VARCHAR2(1 CHAR) constraint CC_NBURLOGF3AX_K030_NN       NOT NULL
 , T070            NUMBER(38)
-, T090            NUMBER(38)
+, T090            NUMBER(12, 4)
 , DESCRIPTION     VARCHAR2(250)
 , ACC_ID          NUMBER(38)
 , ACC_NUM         VARCHAR2(20)

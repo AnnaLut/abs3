@@ -1,9 +1,9 @@
 -- ======================================================================================
 -- Module : NBUR
 -- Author : Virko
--- Date   : 25/10/2018
+-- Date   : 19/02/2019 (25/10/2018)
 -- ======================================================================================
--- create table NBUR_LOG_F36X
+-- create table NBUR_LOG_FI5X
 -- ======================================================================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
@@ -58,7 +58,7 @@ begin
 , S260            VARCHAR2(2 CHAR) 
 , F048            VARCHAR2(1 CHAR) 
 , T070            NUMBER(38)
-, T090            NUMBER(38, 4)
+, T090            NUMBER(12, 4)
 , ACC_ID          number(38)
 , ACC_NUM         VARCHAR2(20)
 , KV              NUMBER(3)
