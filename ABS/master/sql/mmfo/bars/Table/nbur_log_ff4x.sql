@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : NBUR
 -- Author : 
--- Date   : 02.09.2018
+-- Date   : 15.02.2019 (02.09.2018)
 -- ======================================================================================
 -- create table NBUR_LOG_FF4X
 -- ======================================================================================
@@ -17,6 +17,8 @@ prompt -- create table NBUR_LOG_FF4X
 prompt -- ======================================================
 
 begin
+  BARS.BPA.remove_policies( 'NBUR_LOG_FF4X');
+
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_FF4X', 'WHOLE' , NULL, NULL, NULL, NULL );
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_FF4X', 'FILIAL',  'M', NULL,  'E',  'E' );
 end;
@@ -44,7 +46,7 @@ begin
 , S180            VARCHAR2(1 CHAR) constraint CC_NBURLOGFF4X_S180_NN         NOT NULL 
 , D020            VARCHAR2(2 CHAR) constraint CC_NBURLOGFF4X_D020_NN         NOT NULL
 , T070            NUMBER(38)
-, T090            NUMBER(38)
+, T090            NUMBER(12, 4)
 , DESCRIPTION     VARCHAR2(250)
 , ACC_ID          NUMBER(38)
 , ACC_NUM         VARCHAR2(20)
