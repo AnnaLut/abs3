@@ -54,7 +54,7 @@ begin
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select cr.rnk,
-       relext_id,
+       decode(cr.rel_intext, 0,relext_id, 1,cr.relcust_rnk) relext_id,
        name, 
        doc_name,
        doc_serial,
