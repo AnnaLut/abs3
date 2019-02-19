@@ -110,7 +110,7 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
                 OracleString _res = (OracleString)pBulkId.Value;
                 return _res.Value;
             }
-        }
+        }       
 
         public string GetTicket(string requestId)
         {
@@ -132,8 +132,10 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
 
                 ProcessError(pErrCode, pErrMsg);
 
-                OracleString _res = (OracleString)pTicket.Value;
-                return _res.Value;
+                using (OracleClob _clobRes = (OracleClob)pTicket.Value)
+                {
+                    return _clobRes.Value;
+                }
             }
         }
 
