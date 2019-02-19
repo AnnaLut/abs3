@@ -7,7 +7,7 @@
   CREATE OR REPLACE PACKAGE BARS.IBX_PACK is
 
   -- ===============================================================================================
-  g_header_version constant varchar2(64) := 'version 2.2.0 16.05.2018';
+  g_header_version constant varchar2(64) := 'version 2.3.0 19.02.2019';
   -- Имя пакета
   g_pack constant varchar2(100) := 'ibx_pack';
   -- Имя модуля для работы с ошибками
@@ -84,7 +84,7 @@ end ibx_pack;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
   -- ================================== Константы ===============================================
-  g_body_version constant varchar2(64) := 'version 2.2.3 05.12.2018'; 
+  g_body_version constant varchar2(64) := 'version 2.3.0 19.02.2019'; 
 
   -- ===============================================================================================
   -- header_version - возвращает версию заголовка пакета
@@ -168,7 +168,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
              REGEXP_SUBSTR(s, '[^.]+', 1, 3) kv
          into p_kf, p_nls, p_kv
          from (select p_pay_account s from dual);
- end;  
+exception 
+  when others then 
+    if sqlcode=-06502 then 
+    raise_application_error(-20000, 'Помилка розбору рахунка отримувача', false);       
+   end if; 
+ end;
 -------Export XML-----
  --  add_text_node_utl
   --
@@ -419,28 +424,7 @@ function get_md5 (input_string varchar2) return varchar2
                       p_trade_point =>v_trade_point,                     --номер терминала
                       p_receiver_kf =>v_receiver_kf
                       );
-     /*     pay_common (
-                          p_trade_point in varchar2,--код терминала +МФО его
-                          p_payer_name in varchar2,--наименование плательщика
-                          p_receiver_acc in varchar2,-- счет получателя
-                          p_receiver_mfo in varchar2,-- МФО получателя
-                          p_receiver_curr in varchar2,--валюта счета получателя
-                          p_receiver_okpo in integer,--код получателя
-                          p_receiver_name in varchar2,--наименование получателя
-                          p_cash_symb in varchar2,--касовий символ
-                          p_payment_purpose in varchar2,--призначення платежу
-                          p_res_code out number, --код ответа 
-                          p_res_text out varchar2, --текст ответа                        
-                          p_res_ref  out oper.ref%type,                          
-                          p_receipt_num number, --номер чека
-                          p_pay_id Varchar2,  --пай его ид
-                          p_pay_amount number, --сумма платежа 
-                          p_fee_amount number, --сумма комиссии                          
-                          p_ref out number,     
-                          p_deal_id  in varchar2,
-                          p_sum      in number, --сумма платежа
-                          p_date     in date                          
-                     );      */      
+      
 -----------------------------------------------------------
       -- добавляем документ в таблицу квитовки
       if v_res_code <> 0 then
@@ -640,7 +624,6 @@ function get_md5 (input_string varchar2) return varchar2
     else    --платежи НА карточный счет    
       --1004 - 2924
       --выбор транзитного счета для бренча карточного счета 
-      -- l_trans:=get_tp_param(p_trade_point,'TRANS_CARD_ACC');
          l_trans:= get_trans_nls(l_nls_credit);  
        paytt ( flg_ => null,
           ref_ => l_ref,
@@ -705,7 +688,6 @@ function get_md5 (input_string varchar2) return varchar2
             return;
         end;
        -- отправка через СЕП
-
           pay_to_sep (p_ref =>l_ref ,p_trans_nls=>l_trans,p_pay_amount=>p_sum,p_mfo_term=>l_mfo_term);
 
   end if ;   
@@ -944,7 +926,7 @@ procedure pay_to_sep (
         and tp.mfo= l_mfo;
       exception
         when no_data_found then
-          p_res_code := 101;
+          p_res_code := 100;
           p_res_text := 'Код устройства Томас в указанном МФО не найден';
           return;
      end;
@@ -958,7 +940,7 @@ procedure pay_to_sep (
           and ac.kv = v_receiver_curr;
       exception
         when no_data_found then
-          p_res_code := 101;
+          p_res_code := 100;
           p_res_text := 'Счет NLS_ACC для устройства Томас не найден';
           return;
      end;
@@ -976,7 +958,7 @@ procedure pay_to_sep (
       into p_ref
       from ibx_legal_pers_paym i
       where i.pay_id = l_pay_id;
-          p_res_code := 102;
+          p_res_code := 101;
           p_res_text := 'Дублюючий платіж для '||l_pay_id;
           return;
     exception when no_data_found then
@@ -1003,7 +985,6 @@ procedure pay_to_sep (
           then l_tt:='TO1';
           else l_tt:='328';
         end if;
---logger.info ('ibx_pack.pay_common:l_mfo = '||l_mfo||'-'||v_receiver_mfo||',date=');          
        begin
           gl.in_doc3 (ref_    => p_ref,
                       tt_     => l_tt,
@@ -1051,7 +1032,7 @@ procedure pay_to_sep (
              and ac.branch = ibx_pack.get_tp_param(l_trade_point,'TRANS_BR');
          exception
           when no_data_found then
-            p_res_code := 101;
+            p_res_code := 100;
             p_res_text := 'Счет TRANS_ACC для устройства Томас не найден';
             return;
          end;        
@@ -1069,7 +1050,7 @@ procedure pay_to_sep (
                  and ac.branch=ibx_pack.get_tp_param(l_trade_point,'FEE_BR');
               exception
                when no_data_found then
-                p_res_code := 101;
+                p_res_code := 100;
                 p_res_text := 'Счет FEE_ACC для устройства Томас не найден';
                 return;
               end;
@@ -1121,10 +1102,10 @@ procedure pay_to_sep (
        else --- одно РУ
         --Достаем тип счета получателя  
           begin 
-           select tip into l_acc_tip from accounts a where a.nls=v_receiver_acc;  
+           select tip into l_acc_tip from accounts a where a.nls=v_receiver_acc and a.dazs is null;  
           exception 
           when no_data_found then  
-            p_res_code := 102;
+            p_res_code := 100;
             p_res_text := 'Рахунок отримувача не знайдено';
             return;
           end ;
@@ -1163,14 +1144,18 @@ procedure pay_to_sep (
 
         insert into ibx_legal_pers_paym (pay_id, ref)
         values (l_pay_id, p_ref);
-       end if;
-    commit;
+       end if; 
+
     
     exception when others then
-       p_res_code := 101;
-       p_res_text := sqlerrm;
-       bars_audit.info('IBX_PACK.pay_common ERROR '||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
-       rollback;
+       p_res_code := 100;
+       p_res_text := sqlerrm;       
+       if abs(sqlcode)>20000 then
+        p_res_text:=sqlerrm;
+        p_res_text:='Прикладна помилка: '||regexp_substr(p_res_text, '[^\]+', 1, 2);
+       else  p_res_text:='Системна помилка: '||sqlerrm;  
+       end if;
+       logger.error('ibx_pack.pay_common:PAY_ID='||l_pay_id||sqlerrm);
 
   end pay_common;----------------------------------------------------------------
 --Пакетная проверка платежа на счет (ACT=30, service_id=TOMAS4)
@@ -1773,6 +1758,8 @@ error
       add_txt_node_utl( l_domdoc,l_head_node,'time_stamp',to_char(sysdate,'dd.mm.yyyy HH24:MI:SS'));                                          
       dbms_lob.createtemporary(p_result, true, 12);
       dbms_xmldom.writetoclob(l_domdoc, p_result);
+    --сохранение всей пачки платежей
+    COMMIT;
 
    --отпускаем объекты ...
     dbms_xmlparser.freeParser(p);
@@ -1924,23 +1911,22 @@ response
      --читаем данные главной транзакции -- для истории
 		 v_Emp_Nodes := dbms_xmldom.getelementsbytagname(v_doc, 'main_transaction');
 		 v_Emp_Node := dbms_xmldom.item(v_Emp_Nodes, 0);
-     v_receipt_num := dbms_xslprocessor.valueof(v_Emp_Node, 'receipt_num/text()');
---     v_pay_id_main := dbms_xslprocessor.valueof(v_Emp_Node, 'pay_id/text()');
---     v_amount := dbms_xslprocessor.valueof(v_Emp_Node, 'amount/text()');     
---     v_record := dbms_xslprocessor.valueof(v_Emp_Node, 'record/text()');
-     -- читаем блок transactions -----    
+     v_receipt_num := dbms_xslprocessor.valueof(v_Emp_Node, 'receipt_num/text()');     
+     v_pay_id_main := dbms_xslprocessor.valueof(v_Emp_Node, 'pay_id/text()');     
+     -- читаем блок transactions -----
      v_Emp_Nodes := Dbms_Xmldom.Getelementsbytagname(v_doc ,'transaction');
      For j In 0 .. Dbms_Xmldom.Getlength(v_Emp_Nodes)-1 Loop
       v_Emp_Node := Dbms_Xmldom.Item(v_Emp_Nodes ,j);
       v_Child_Nodes := Dbms_Xmldom.Getchildnodes(v_Emp_Node);
       --
       For i In 0 .. Dbms_Xmldom.Getlength(v_Child_Nodes) -1 Loop
+      begin
          v_Child_Node := Dbms_Xmldom.Item(v_Child_Nodes ,i);
          v_Node_Name  := Dbms_Xmldom.Getnodename(v_Child_Node);
          v_Text_Node  := Dbms_Xmldom.Getfirstchild(v_Child_Node);
          v_Node_Value := Dbms_Xmldom.Getnodevalue(v_Text_Node);
          --
-        If       
+        If
                v_Node_Name = 'payer_name'     Then v_payer_name  := v_Node_Value;
          Elsif v_Node_Name = 'pay_account'    Then v_pay_account := v_Node_Value;
          Elsif v_Node_Name = 'okpo'           Then v_receiver_okpo := v_Node_Value;
@@ -1951,55 +1937,59 @@ response
          Elsif v_Node_Name = 'pay_id'         Then v_pay_id      := v_Node_Value;
          Elsif v_Node_Name = 'pay_amount'     Then v_pay_amount  := to_number(v_Node_Value);
          Elsif v_Node_Name = 'fee_amount'     Then v_fee_amount  := to_number(v_Node_Value);
-    
         End If;
+      exception 
+       when others then         
+
+         logger.error( l_proc||' error:'||sqlerrm ||';pay_id_main:'||v_pay_id_main);
+      end;
       End Loop;
-      
-       --действие с данными 
-       
+       --действие с данными
           pay_common     (p_trade_point=>v_trade_point,    --код терминала +МФО его
                           p_payer_name =>v_payer_name,     --наименование плательщика
-                          p_pay_account=>v_pay_account,    -- мфо.счет.валюта получателя  
+                          p_pay_account=>v_pay_account,    -- мфо.счет.валюта получателя
                           p_receiver_okpo=>v_receiver_okpo,--код получателя
                           p_receiver_name=>v_receiver_name,--наименование получателя
                           p_cash_symb =>v_cash_symbol,     --касовий символ
                           p_payment_purpose=>v_payment_purpose, --призначення платежу
-                          p_res_code =>v_status_code,      --код ответа 
-                          p_res_text=>v_comment ,          --текст ответа                        
+                          p_res_code =>v_status_code,      --код ответа
+                          p_res_text=>v_comment ,          --текст ответа
                           p_receipt_num =>v_receipt_num,   --номер чека
                           p_pay_id =>v_pay_id ,            --пай его ид
-                          p_pay_amount => v_pay_amount,    --сумма платежа 
-                          p_fee_amount => v_fee_amount,    --сумма комиссии                          
-                          p_ref =>v_ref 
+                          p_pay_amount => v_pay_amount,    --сумма платежа
+                          p_fee_amount => v_fee_amount,    --сумма комиссии
+                          p_ref =>v_ref
                           ) ;
 
       l_head_node1 := dbms_xmldom.appendchild(l_head_node0, dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc,'transaction')));
-
-   if v_status_code in (22,102) then 
+   if v_status_code in (22,101) then
      add_txt_node_utl( l_domdoc,l_head_node1,'pay_id',v_pay_id);
      add_txt_node_utl( l_domdoc,l_head_node1,'ref',v_ref);
-     add_txt_node_utl( l_domdoc,l_head_node1,'status_code','22');                      
-   else 
+     add_txt_node_utl( l_domdoc,l_head_node1,'status_code','22');
+   else
      add_txt_node_utl( l_domdoc,l_head_node1,'pay_id',v_pay_id);
      add_txt_node_utl( l_domdoc,l_head_node1,'ref',v_ref);
-     add_txt_node_utl( l_domdoc,l_head_node1,'status_code',to_char(v_status_code));                      
+     add_txt_node_utl( l_domdoc,l_head_node1,'status_code',to_char(v_status_code));
      add_txt_node_utl( l_domdoc,l_head_node1,'description',v_comment);
-   end if;     
+   end if;
+
 
    End Loop;
      add_txt_node_utl( l_domdoc,l_head_node,'service_id','TOMAS3');
-     add_txt_node_utl( l_domdoc,l_head_node,'time_stamp',to_char(sysdate,'dd.mm.yyyy HH24:MI:SS'));     
-
-
+     add_txt_node_utl( l_domdoc,l_head_node,'time_stamp',to_char(sysdate,'dd.mm.yyyy HH24:MI:SS'));  
      dbms_lob.createtemporary(p_result, true, 12);
      dbms_xmldom.writetoclob(l_domdoc, p_result);
-     
+    --сохранение всей пачки платежей
+   COMMIT;
+
+
+
    --отпускаем объекты ...
     dbms_xmlparser.freeParser(p);
     dbms_xmldom.freeDocument(v_doc);
-    dbms_xmldom.freedocument(l_domdoc);  
+    dbms_xmldom.freedocument(l_domdoc);
   end Pay_20;
-  
+
   --общая процедура проверки возможности платежа(платежей)
   procedure info_common  (p_pay_account in varchar2,
                           p_min_amount out varchar2,
@@ -2008,16 +1998,16 @@ response
                           p_status_code out number,
                           p_fio out  varchar2,
                           p_nls out varchar2,
-                          p_okpo out customer.okpo%TYPE) 
+                          p_okpo out customer.okpo%TYPE)
   is
    v_kf  accounts.kf%TYPE; --МФО
    v_kv  accounts.kv%TYPE;  --валюта
-   v_close_date accounts.dazs%TYPE; --дата закриття рах. отримувача  
+   v_close_date accounts.dazs%TYPE; --дата закриття рах. отримувача
    v_rezid number; --признак резидента
-  begin 
+  begin
     p_status_code:=21;
-    p_comment:='Платіж можливий';    
-    pay_account_attr (p_pay_account,v_kf,p_nls,v_kv); -- разбор входящей строки МФО.СЧЕТ.ВАЛЮТА 
+    p_comment:='Платіж можливий';
+    pay_account_attr (p_pay_account,v_kf,p_nls,v_kv); -- разбор входящей строки МФО.СЧЕТ.ВАЛЮТА
 
       begin --проверка на существование счета
         select c.nmk as fio,
@@ -2080,23 +2070,23 @@ response
   end info_common;
 
 ----------------------------------------------------------
----1-for-ALL--разделение по процедурам в зависимости от АСТ и сервиса 
+---1-for-ALL--разделение по процедурам в зависимости от АСТ и сервис
   procedure ExchangeData (
                        p_params  in clob, -- XML c входящими параметрами
-                       p_result  out clob -- XML c результатом выполнения  
+                       p_result  out clob -- XML c результатом выполнения
                        ) is
   -- для парсера
    p              Dbms_Xmlparser.Parser;
    v_Doc          Dbms_Xmldom.Domdocument;
    v_Emp_Nodes    Dbms_Xmldom.Domnodelist;
    v_Emp_Node     Dbms_Xmldom.Domnode;
-   --                          
-   v_act number; 
+   --
+   v_act number;
    v_service_id varchar(20);
-   v_sql_exp varchar(100);
+   v_sql_exp varchar(500);
    l_proc varchar2(50):='ibx_pack.exchangedata.';
---------------   
-  begin  
+--------------
+  begin
     /* error
     <?xml version="1.0" encoding="utf-8"?>
 <pay-response>
@@ -2104,43 +2094,47 @@ response
     <status_code>5</status_code>
     <service_id>TOMAS</service_id>
     <time-stamp>16.05.2018 17:00:05</time-stamp>
-</pay-response>    
+</pay-response>
     */
    --создаем парсер и документ
+  
+  
    p := Dbms_Xmlparser.Newparser;
    Dbms_Xmlparser.Setvalidationmode(p,False);
    dbms_xmlparser.parseclob(p, p_params);
    v_Doc := Dbms_Xmlparser.Getdocument(p);
 
    --читаем номер операции (ACT) и service_id
+   
  	 v_Emp_Nodes := dbms_xmldom.getelementsbytagname(v_doc, 'pay-request');
 	 v_Emp_Node  := dbms_xmldom.item(v_Emp_Nodes, 0);
    v_act       := to_number(dbms_xslprocessor.valueof(v_Emp_Node, 'act/text()'));
    v_service_id:=dbms_xslprocessor.valueof(v_Emp_Node, 'service_id/text()');
-
-   -- по act  определяем, чем обрабатывать   
+ 
+   -- по act  определяем, чем обрабатывать
    begin
---   if v_act in (1,4,7,10,20,30) then
+
      v_sql_exp:='begin ibx_pack.Pay_'||v_act||'(:p_params ,:v_xml_text);end;';
      execute immediate v_sql_exp  using p_params, out p_result;
-   exception when others then 
-     Logger.info('ibx_pack.exchangedata: ERROR!:'||sqlerrm);
+   exception when others then
+     Logger.error('ibx_pack.exchangedata: ERROR!:'||sqlerrm||':'||v_sql_exp);
      p_result:='<pay-response>';
      p_result:=p_result||'<description>ERR(Проблеми з системою)</description>';
      p_result:=p_result||'<status_code>5</status_code>';
      p_result:=p_result||'<service_id>'||v_service_id||'</service_id>';
-     p_result:=p_result||'<time-stamp>'||to_char(sysdate,'dd.mm.yyyy HH24:MI:SS')||'</time-stamp>';                                
+     p_result:=p_result||'<time-stamp>'||to_char(sysdate,'dd.mm.yyyy HH24:MI:SS')||'</time-stamp>';
      p_result:=p_result||'</pay-response>';
---    end if;  
-   end;   
+     
+   end;
    --отпускаем объекты ...
    dbms_xmlparser.freeParser(p);
    dbms_xmldom.freeDocument(v_doc);
-  end ExchangeData;                     
-------------------------- 
-  
+  end ExchangeData;
+-------------------------
+
 ------------------------------------
 end ibx_pack;
+
 /
  show err;
  
