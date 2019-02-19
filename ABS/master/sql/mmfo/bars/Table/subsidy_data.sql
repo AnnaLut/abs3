@@ -119,6 +119,18 @@ begin
 end;
 / 
 
+-- Create/Recreate primary, unique and foreign key constraints 
+begin
+    execute immediate 'alter table SUBSIDY_DATA
+  add constraint UK_SUBSIDY_DATA unique (EXTROWID)
+  using index 
+  tablespace BRSDYND';
+ exception when others then 
+    if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
+    end if; 
+end;
+/ 
+
 -- Add comments to the columns 
 comment on column SUBSIDY_DATA.payeraccnum
   is 'Номер рахунку відправника';

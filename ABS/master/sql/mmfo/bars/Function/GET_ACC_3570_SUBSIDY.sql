@@ -29,7 +29,14 @@ begin
 
  ------    Находим RNK и ACC  входящего лицевого счета:
  Begin
-
+   begin
+    select substr(nmk,1,38)
+      into l_nms
+      from customer 
+     where rnk = p_rnk;
+   exception when no_data_found then raise_application_error(-20000, 'Клієнта з вказаним РНК не знайдено! (p_rnk:'||p_rnk||')');
+   end;
+  
     Select ACC
       into l_acc1
       From Accounts
@@ -59,7 +66,7 @@ begin
          Accreg.setAccountSParam(l_acc1, 'R011', '1' );
          Accreg.setAccountSParam(l_acc1, 'S180', '1' );
          Accreg.setAccountSParam(l_acc1, 'R013', '2' );
-         Accreg.setAccountSParam(l_acc1, 'S240', 'Розрахунковий');
+                  Accreg.setAccountSParam(l_acc1, 'S240', '5');
       End;
  End;
 

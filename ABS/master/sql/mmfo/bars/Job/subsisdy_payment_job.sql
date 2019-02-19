@@ -1,7 +1,7 @@
 begin
   sys.dbms_scheduler.create_job(job_name        => 'BARS.SUBSIDY_PAYMENT_JOB',
                                 job_type        => 'PLSQL_BLOCK',
-                                job_action      => 'declare
+                                job_action      => 'begin
     bc.go(300465);
     subsidy.processing_payments();
   end;',
