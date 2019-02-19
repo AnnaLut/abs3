@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :    v.18.019  07/02/2019 (18/12/2018)
+% VERSION     :    v.18.021  19/02/2019 (12/02/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -331,6 +331,11 @@ BEGIN
    ELSE
       nbuc_ := nbuc1_;
    END IF;
+   
+   -- По Київському РУ та Криму потрібен код області
+   if l_kod_filii in ('322669', '324805') then
+      l_ku := ltrim(nbuc_, '0');
+   end if;
 
    nd_ := null;
    acc2_ := null;
@@ -1024,7 +1029,7 @@ BEGIN
              from int_accn
              where kf = l_kod_filii and
                    acc = nvl(accr_, acc_) and 
-                   id=2; 
+                   id = 0; 
          exception  
              when no_data_found then
                   l_metr := null;            
@@ -1044,7 +1049,7 @@ BEGIN
                   
          l_f048 := (case
                        when l_metr is null and not (substr(nbs_, 4, 1) in ('6', '8', '9') or 
-                            nbs_ in ('1607', '2607', '2627', '2657', '3570')) then '0'
+                            nbs_ in ('1607', '2397', '2607', '2627', '2657', '3570')) then '0'
                        when l_metr in (7, 9) or -- для овердрафтів ЮО
                             trim(l_txt) = 'Так' -- для МБДК
                        then '2'
@@ -1054,25 +1059,27 @@ BEGIN
          when no_data_found then
               l_f048 := '0';
       end;   
+      
       if l_f048 ='0' and nbs_ in ('2203','2233')  then  l_f048 :='3';  end if;
       
       begin
-         select max(nvl(trim(ekp), c_XXXXXX))
-         into l_ekp
-         from nbur_tmp_desc_ekp p 
-         left join (select r020, max(I010) I010
-                      from   kl_r020
-                      where  dat_ between d_open and coalesce(d_close, date '4000-01-01')
-                         and r020 = nbs_ 
-                      group by r020
-                   ) kl 
-         on (p.I010 = kl.I010)
-         where   p.t020 = dk_ and
-                 p.r020 = nbs_;                     
+        select nvl(max(trim(ekp)), c_XXXXXX)
+        into l_ekp
+        from nbur_tmp_desc_ekp p 
+        left join (select r020, max(I010) I010
+                  from   kl_r020
+                  where  dat_ between d_open and coalesce(d_close, date '4000-01-01')
+                     and r020 = nbs_ 
+                  group by r020
+                 ) kl 
+        on (p.I010 = kl.I010 and
+           p.r020 = kl.r020)
+        where   p.t020 = dk_ and
+               p.r020 = nbs_;                     
       exception
-         when no_data_found then
+      when no_data_found then
            l_ekp := c_XXXXXX;
-      end;    
+      end; 
       
       --   проверка наличия для счета значений R013
       if not table_r013.exists(nbs_)
@@ -1125,9 +1132,9 @@ BEGIN
              insert into nbur_log_fd5x(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r013, r030, k040,
                                         k072, k111, k140, f074, s032, s080, s183, s190, s241, s260, f048, t070, description,
                                         acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
-             values (dat_, l_kod_filii, l_kod_filii, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_1, 
+             values (dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_1, 
                        coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
-                      '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_1)),
+                      k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_1)),
                       comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
           end if;
           
@@ -1136,9 +1143,9 @@ BEGIN
              insert into nbur_log_fd5x(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r013, r030, k040,
                                         k072, k111, k140, f074, s032, s080, s183, s190, s241, s260, f048, t070, description,
                                         acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
-             values (dat_, l_kod_filii, l_kod_filii, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_2, 
+             values (dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_2, 
                        coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
-                      '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_2)),
+                      k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_2)),
                       comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
           end if;
 
@@ -1151,9 +1158,9 @@ BEGIN
           insert into nbur_log_fd5x(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r013, r030, k040,
                                     k072, k111, k140, f074, s032, s080, s183, s190, s241, s260, f048, t070, description,
                                     acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
-          values (dat_, l_kod_filii, l_kod_filii, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013, 
+          values (dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013, 
                    coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
-                  '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(znap_)),
+                  k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(znap_)),
                   comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
        end if;
    end if;
@@ -1436,6 +1443,11 @@ BEGIN
              ELSE
                 nbuc_ := nbuc1_;
              END IF;
+             
+            -- По Київському РУ та Криму потрібен код області
+             if l_kod_filii in ('322669', '324805') then
+                l_ku := ltrim(nbuc_, '0');
+             end if;             
 
              if k.accr = k.accr_30 or f_ret_type_r013 (dat_, k.nbs, k.r013 ) = 1
              then
@@ -1546,7 +1558,7 @@ BEGIN
                 if l_f048 ='0' and nbs_ in ('2203','2233')  then  l_f048 :='3';  end if;
                 
                 begin
-                   select max(nvl(trim(ekp), c_XXXXXX))
+                   select nvl(max(trim(ekp)), c_XXXXXX)
                    into l_ekp
                    from nbur_tmp_desc_ekp p 
                    left join (select r020, max(I010) I010
@@ -1555,7 +1567,8 @@ BEGIN
                                  and r020 = nbs_ 
                               group by r020
                              ) kl 
-                   on (p.I010 = kl.I010)
+                   on (p.I010 = kl.I010 and
+                       p.r020 = kl.r020)
                    where   p.t020 = dk_ and
                            p.r020 = nbs_;                     
                 exception
@@ -1566,7 +1579,7 @@ BEGIN
                 insert into nbur_log_fd5x(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r013, r030, k040,
                                         k072, k111, k140, f074, s032, s080, s183, s190, s241, s260, f048, t070, description,
                                         acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
-                values(dat_, l_kod_filii, l_kod_filii, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013, 
+                values(dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013, 
                        coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
                        k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(znap_)),
                        comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
