@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/17/2018 15:12:41" ReportInfo.Modified="07/17/2018 17:25:37" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="mmfo" ConnectionString="rijcmlqxoJkxB+qVyinWpGXWWtjhMjKw11u8R/Kl15vXx6soq0hzB6T2c1OSdM7B+J0+PJF">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select t.branch,t.nls,c.nmk,t.okpo,to_date(ost_zarax_pf, 'dd/mm/yyyy') ost_zarax_pf, decode(t.ob22, '29', 'Соціальна пенсія', '30', 'Військова пенсія') type &#13;&#10;  from TEST_OTCH_PF_NEW t, customer c&#13;&#10; where t.branch like :branch || '%'&#13;&#10;   and ob22 = :ob22&#13;&#10;   and v_client is null&#13;&#10;   and count_tt &gt;=12&#13;&#10;   and dos &lt;= 16000&#13;&#10;   and kos &gt; 1000000&#13;&#10;   and t.rnk = c.rnk&#13;&#10;order by t.branch">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="OST_ZARAX_PF" DataType="System.DateTime"/>
+        <Column Name="TYPE" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <CommandParameter Name="branch" DataType="126" Expression="[branch]" DefaultValue="/352457/"/>
+        <CommandParameter Name="ob22" DataType="126" Expression="[ob22]" DefaultValue="29"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="branch" DataType="System.String"/>
+    <Parameter Name="ob22" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="300" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1058.4" Height="37.8">
+      <TextObject Name="Text6" Width="1048.95" Height="37.8" Text="Звіт в ПФ щомісячний (фіз.ос.)&#13;&#10;[Table.TYPE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41.8" Width="1058.4" Height="18.9">
+      <TextObject Name="Text17" Width="198.45" Height="18.9" Border.Lines="All" Text="Бранч відділення" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text18" Left="311.85" Width="132.3" Height="18.9" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text19" Left="198.45" Width="113.4" Height="18.9" Border.Lines="All" Text="ОКПО" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text20" Left="444.15" Width="434.7" Height="18.9" Border.Lines="All" Text="Найменування клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text21" Left="878.85" Width="170.1" Height="18.9" Border.Lines="All" Text="Зарахування від ПФУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="64.7" Width="1058.4" Height="18.9" DataSource="Table" KeepTogether="true">
+      <TextObject Name="Text1" Width="198.45" Height="18.9" Border.Lines="All" Text="[Table.BRANCH]" VertAlign="Center"/>
+      <TextObject Name="Text2" Left="311.85" Width="132.3" Height="18.9" Border.Lines="All" Text="[Table.NLS]" VertAlign="Center"/>
+      <TextObject Name="Text3" Left="444.15" Width="434.7" Height="18.9" Border.Lines="All" Text="[Table.NMK]" VertAlign="Center"/>
+      <TextObject Name="Text4" Left="198.45" Width="113.4" Height="18.9" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text5" Left="878.85" Width="170.1" Height="18.9" Border.Lines="All" Text="[Table.OST_ZARAX_PF]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+    </DataBand>
+  </ReportPage>
+</Report>

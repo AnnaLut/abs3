@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="06/06/2018 13:11:59" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="11/05/2018 20:50:07" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQFegIjcQHp8TKxTt4o6T0T4=">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqGvSwQ3Ug2J0QD0n/zY8UZr2Y5KHBRGZO+a0UH0C/CRUT1Zw6iJK/KYUKYwP5kCGIiGsh/cdLQi2hu8iuFyxryA==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       upper(bt.type_name) as type_name,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       decode (bv.duration,'0',bv.duration_days||' днів',bv.duration ||' міс.') as term_calc_like,&#13;&#10;       DPT_WEB.GET_DPTRATE (d.acc,d.kv,d.limit,bankdate) as rate,&#13;&#10;       f_sumpr(DPT_WEB.GET_DPTRATE (d.acc,d.kv,d.limit,bankdate), '', 'M', 3) as rate_w,&#13;&#10;       decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(d.mfo_d), '_________________') as mfo_d,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(bd.nb), '____') as nb_d,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls,&#13;&#10;       nvl(trim(d.nls_d), '_________________') as nls_d&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b, dpt_vidd bv, dpt_types bt, banks bd&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.vidd = BV.VIDD&#13;&#10;   and bv.type_id = bt.type_id&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.mfo_d = bd.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
@@ -83,7 +83,7 @@ namespace FastReport
         <Column Name="BRANCH_PHONE" DataType="System.String"/>
         <Column Name="BRANCH_TOWN" DataType="System.String"/>
       </TableDataSource>
-      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand=" select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="DOC_ID" DataType="System.Decimal"/>
         <Column Name="CRT_DATE" DataType="System.DateTime"/>
@@ -93,8 +93,8 @@ namespace FastReport
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
+         <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="DOC_PRINT_NUMBER" DataType="System.String"/>
         <Column Name="TICKET_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
@@ -142,13 +142,13 @@ namespace FastReport
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="p_doc_id" DataType="System.Int64" Expression="1025"/>
-    <Parameter Name="p_rnk" DataType="System.Int32" Expression="1064574"/>
+    <Parameter Name="p_rnk" DataType="System.Int64" Expression="1064574"/>
     <Parameter Name="p_agr_id" DataType="System.Int64" Expression="2537963"/>
     <Parameter Name="p_agrmnt_id" DataType="System.Int64" Expression="396752"/>
   </Dictionary>
   <ReportPage Name="Page1">
-    <DataBand Name="Data1" Width="718.2" Height="1590.62" CanGrow="true" CanShrink="true" Guides="141.75">
-      <TableObject Name="Table1" Left="9.45" Width="699.24" Height="1583.06">
+    <DataBand Name="Data1" Width="718.2" Height="1518.8" CanGrow="true" CanShrink="true" Guides="141.75">
+      <TableObject Name="Table1" Left="9.45" Width="699.24" Height="1518.8">
         <TableColumn Name="Column1" Width="56.67"/>
         <TableColumn Name="Column18" Width="207.9"/>
         <TableColumn Name="Column17" Width="189"/>
@@ -166,8 +166,8 @@ namespace FastReport
           <TableCell Name="Cell436"/>
           <TableCell Name="Cell2" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
         </TableRow>
-        <TableRow Name="Row3" Height="45.36" AutoSize="true">
-          <TableCell Name="Cell11" Text="&lt;b&gt;Публічне акціонерне товариство «Державний ощадний банк України»&lt;/b&gt; (далі – Банк), в особі &lt;b&gt;[COMMON_DATA.STAFF_STATUS_R]&lt;/b&gt;, &lt;b&gt;[COMMON_DATA.STAFF_FIO_R]&lt;/b&gt;, який(яка) діє на підставі &lt;b&gt;[COMMON_DATA.STAFF_DOVER]&lt;/b&gt;, з однієї сторони, і &lt;b&gt;[CLIENT_DATA.FIO]&lt;/b&gt; (далі – Вкладник), який є &lt;b&gt;[CLIENT_DATA.CODCAGENT]&lt;/b&gt;, з другої сторони (далі разом – Сторони, а кожна окремо - Сторона), уклали цей Договір № [DPT_DATA.ID] на вклад “МІЙ ДЕПОЗИТ” на ім’я фізичної особи (далі – Договір) про наступне:" Padding="2, 1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="5">
+        <TableRow Name="Row3" Height="41.58" AutoSize="true">
+          <TableCell Name="Cell11" Text="&lt;b&gt;Публічне акціонерне товариство «Державний ощадний банк України»&lt;/b&gt; (далі – Банк), в особі &lt;b&gt;[COMMON_DATA.STAFF_STATUS_R]&lt;/b&gt;, &lt;b&gt;[COMMON_DATA.STAFF_FIO_R]&lt;/b&gt;, який(яка) діє на підставі &lt;b&gt;[COMMON_DATA.STAFF_DOVER]&lt;/b&gt;, з однієї сторони, і &lt;b&gt;[CLIENT_DATA.FIO]&lt;/b&gt; (далі – Вкладник), який є &lt;b&gt;[CLIENT_DATA.CODCAGENT]&lt;/b&gt;, з другої сторони (далі разом – Сторони, а кожна окремо - Сторона), уклали цей Договір № [DPT_DATA.ID] на вклад “МІЙ ПЕНСІЙНИЙ ДЕПОЗИТ” на ім’я фізичної особи (далі – Договір) про наступне:" Padding="2, 1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5">
             <Formats>
               <GeneralFormat/>
               <GeneralFormat/>
@@ -176,20 +176,20 @@ namespace FastReport
               <GeneralFormat/>
             </Formats>
           </TableCell>
-          <TableCell Name="Cell391"/>
-          <TableCell Name="Cell344"/>
-          <TableCell Name="Cell438"/>
-          <TableCell Name="Cell12" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell391" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell344" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell438" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell12" Font="Times New Roman, 6.5pt"/>
         </TableRow>
         <TableRow Name="Row4" Height="10.58">
-          <TableCell Name="Cell16" Text="1. Предмет Договору" Padding="2, -1, 2, -1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt, style=Bold" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell392"/>
-          <TableCell Name="Cell345"/>
-          <TableCell Name="Cell439"/>
-          <TableCell Name="Cell17" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell16" Text="1. Предмет Договору" Padding="2, -1, 2, -1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 6.5pt, style=Bold" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell392" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell345" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell439" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell17" Font="Times New Roman, 6.5pt"/>
         </TableRow>
-        <TableRow Name="Row5" Height="120.96" AutoSize="true">
-          <TableCell Name="Cell21" Text="   1.1. Вкладник вносить, а Банк приймає на вкладний (депозитний) рахунок № &lt;b&gt;[DPT_DATA.NLSD]&lt;/b&gt; (далі – Рахунок) на умовах цього Договору кошти в сумі &lt;b&gt;[DPT_DATA.SUMM]&lt;/b&gt; (&lt;b&gt;[DPT_DATA.SUM_W]&lt;/b&gt;) &lt;b&gt;[DPT_DATA.KV]&lt;/b&gt; (далі – Депозит) строком на &lt;b&gt;[DPT_DATA.TERM_CALC_LIKE]&lt;/b&gt; (далі – Строк Депозиту).&#13;&#10;   Днем (датою) повернення Депозиту є &lt;b&gt;[DPT_DATA.END_DATE]&lt;/b&gt;, а у випадку автоматичного продовження Строку Депозиту відповідно до умов цього Договору, днем повернення Депозиту є останній день продовженого Строку Депозиту.&#13;&#10;   Строк Депозиту, за взаємною згодою Сторін може бути змінений на інший строк, ніж зазначений у п.1.1 цього Договору, шляхом укладення Сторонами додаткового договору до цього Договору.&#13;&#10;   1.2. Процентна ставка за Депозитом встановлюється в розмірі &lt;b&gt;[FormatNumber([DPT_DATA.RATE], 2)]&lt;/b&gt; (&lt;b&gt;[DPT_DATA.RATE_W]&lt;/b&gt;) % річних.&#13;&#10;   Сторони погоджуються з тим, що розмір процентної ставки, зазначений в цьому пункті Договору, збільшується згідно з умовами  депозитної складової пакету послуг «Ексклюзивний»,  затвердженої Банком на дату укладання цього Договору.&#13;&#10;   1.3. При зміні дати повернення Депозиту, вказаної в п.1.1 Договору, за взаємною згодою Сторін відповідно до умов цього Договору, нарахування процентів за користування Депозитом здійснюється з урахуванням Строку Депозиту наступним чином:" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="5">
+        <TableRow Name="Row5" Height="132.3" AutoSize="true">
+          <TableCell Name="Cell21" Text="   1.1. Вкладник вносить, а Банк приймає на вкладний (депозитний) рахунок № &lt;b&gt;[DPT_DATA.NLSD]&lt;/b&gt; (далі – Рахунок) на умовах цього Договору кошти в сумі &lt;b&gt;[DPT_DATA.SUMM]&lt;/b&gt; (&lt;b&gt;[DPT_DATA.SUM_W]&lt;/b&gt;) &lt;b&gt;[DPT_DATA.KV]&lt;/b&gt; (далі – Депозит) строком на &lt;b&gt;[DPT_DATA.TERM_CALC_LIKE]&lt;/b&gt; (далі – Строк Депозиту).&#13;&#10;   Днем (датою) повернення Депозиту є &lt;b&gt;[DPT_DATA.END_DATE]&lt;/b&gt;, а у випадку автоматичного продовження Строку Депозиту відповідно до умов цього Договору, днем повернення Депозиту є останній день продовженого Строку Депозиту.&#13;&#10;   Строк Депозиту, за взаємною згодою Сторін може бути змінений на інший строк, ніж зазначений у п.1.1 цього Договору, шляхом укладення Сторонами додаткового договору до цього Договору.&#13;&#10;   1.2. Процентна ставка за Депозитом встановлюється в розмірі &lt;b&gt;[FormatNumber([DPT_DATA.RATE], 2)]&lt;/b&gt; (&lt;b&gt;[DPT_DATA.RATE_W]&lt;/b&gt;) % річних.&#13;&#10;   Сторони погоджуються з тим, що розмір процентної ставки, зазначений в цьому пункті Договору, збільшується згідно з умовами  депозитної складової пакету послуг «Ексклюзивний»,  затвердженої Банком на дату укладання цього Договору.    &#13;&#10;   У разі надходження коштів у сумі відмінній від суми, зазначеної у п. 1.1. Договору, нарахування процентів здійснюється за процентною ставкою, яка діяла у Банку по даному виду вкладу на момент укладання цього Договору з врахуванням депозитної складової пакету послуг «Ексклюзивний».    &#13;&#10;   1.3. При зміні дати повернення Депозиту, вказаної в п.1.1 Договору, за взаємною згодою Сторін відповідно до умов цього Договору, нарахування процентів за користування Депозитом здійснюється з урахуванням Строку Депозиту наступним чином:" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5">
             <Formats>
               <GeneralFormat/>
               <NumberFormat UseLocale="false" GroupSeparator=""/>
@@ -199,96 +199,138 @@ namespace FastReport
               <GeneralFormat/>
             </Formats>
           </TableCell>
-          <TableCell Name="Cell393"/>
-          <TableCell Name="Cell346"/>
-          <TableCell Name="Cell440"/>
-          <TableCell Name="Cell22" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell393" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell346" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell440" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell22" HorzAlign="Justify" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
         </TableRow>
-        <TableRow Name="Row150" Height="24.57">
-          <TableCell Name="Cell483"/>
-          <TableCell Name="Cell484" Border.Lines="All" Text="При Строках Депозиту до 6 місяців (включно)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt, style=Bold" HtmlTags="true"/>
-          <TableCell Name="Cell485" Border.Lines="All" Text=" Проценти за весь Строк Депозиту нараховуються за процентною ставкою, що діє в Банку по вкладах на вимогу (поточних рахунках) на день витребування Депозиту;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="2"/>
-          <TableCell Name="Cell486" Border.Lines="All" VertAlign="Center"/>
-          <TableCell Name="Cell487"/>
+        <TableRow Name="Row150" Height="22.68">
+          <TableCell Name="Cell483" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell484" Border.Lines="All" Text="При Строках Депозиту до 6 місяців (включно)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 6.5pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell485" Border.Lines="All" Text=" Проценти за весь Строк Депозиту нараховуються за процентною ставкою, що діє в Банку по вкладах на вимогу (поточних рахунках) на день витребування Депозиту;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell486" Border.Lines="All" VertAlign="Center" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell487" Font="Arial, 6.5pt"/>
         </TableRow>
-        <TableRow Name="Row151" Height="24.57">
-          <TableCell Name="Cell488"/>
-          <TableCell Name="Cell489" Border.Lines="All" Text="При Строках Депозиту від 6 до 12 місяців (включно)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt, style=Bold" HtmlTags="true"/>
-          <TableCell Name="Cell490" Border.Lines="All" Text=" Проценти за весь Строк Депозиту нараховуються за процентною ставкою, що становить 50% від розміру процентної ставки, визначеної в п.1.2 Договору." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="2"/>
-          <TableCell Name="Cell491" Border.Lines="All" VertAlign="Center"/>
-          <TableCell Name="Cell492"/>
+        <TableRow Name="Row151" Height="22.68">
+          <TableCell Name="Cell488" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell489" Border.Lines="All" Text="При Строках Депозиту від 6 до 12 місяців (включно)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 6.5pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell490" Border.Lines="All" Text=" Проценти за весь Строк Депозиту нараховуються за процентною ставкою, що становить 50% від розміру процентної ставки, визначеної в п.1.2 Договору." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell491" Border.Lines="All" VertAlign="Center" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell492" Font="Arial, 6.5pt"/>
         </TableRow>
-        <TableRow Name="Row152" Height="24.57">
-          <TableCell Name="Cell493"/>
-          <TableCell Name="Cell494" Border.Lines="All" Text="При Строках  Депозиту понад 12 місяців " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt, style=Bold" HtmlTags="true"/>
-          <TableCell Name="Cell495" Border.Lines="All" Text=" Проценти за весь Строк Депозиту нараховуються за процентною ставкою, визначеною в п.1.2 Договору." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="2"/>
-          <TableCell Name="Cell496" Border.Lines="All" VertAlign="Center"/>
-          <TableCell Name="Cell497"/>
+        <TableRow Name="Row152" Height="22.68">
+          <TableCell Name="Cell493" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell494" Border.Lines="All" Text="При Строках  Депозиту понад 12 місяців " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 6.5pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell495" Border.Lines="All" Text=" Проценти за весь Строк Депозиту нараховуються за процентною ставкою, визначеною в п.1.2 Договору." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell496" Border.Lines="All" VertAlign="Center" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell497" Font="Arial, 6.5pt"/>
         </TableRow>
-        <TableRow Name="Row142" Height="34.02">
-          <TableCell Name="Cell326" Text="   1.4. Сплата процентів за  користування Депозитом здійснюється &lt;b&gt;[DPT_DATA.FREQ_W]&lt;/b&gt;. У разі зміни Строку Депозиту за згодою Сторін на умовах цього Договору, нараховані відповідно до п.1.3 проценти виплачуються Вкладнику разом з поверненням Депозиту. При перевищенні суми процентів, отриманих Вкладником, над сумою процентів, що підлягають сплаті в дату повернення Депозиту, надлишково виплачені проценти утримуються з суми Депозиту, що підлягає поверненню Вкладнику." HorzAlign="Justify" VertAlign="Bottom" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell399"/>
-          <TableCell Name="Cell352"/>
-          <TableCell Name="Cell446"/>
-          <TableCell Name="Cell327"/>
+        <TableRow Name="Row142" Height="32.13">
+          <TableCell Name="Cell326" Text="   1.4. Сплата процентів за користування Депозитом здійснюється щомісячно.  У разі зміни Строку Депозиту за згодою Сторін на умовах цього Договору, нараховані відповідно до п.1.3 проценти виплачуються Вкладнику разом з поверненням Депозиту. При перевищенні суми процентів, отриманих Вкладником, над сумою процентів, що підлягають сплаті в дату повернення Депозиту, надлишково виплачені проценти утримуються з суми Депозиту, що підлягає поверненню Вкладнику." HorzAlign="Justify" VertAlign="Bottom" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell399" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell352" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell446" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell327" Font="Arial, 6.5pt"/>
         </TableRow>
         <TableRow Name="Row6" Height="13.23">
-          <TableCell Name="Cell23" Text="2. Умови Депозиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt, style=Bold" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell400"/>
-          <TableCell Name="Cell353"/>
-          <TableCell Name="Cell447"/>
-          <TableCell Name="Cell24" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell23" Text="2. Умови Депозиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 6.5pt, style=Bold" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell400" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell353" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell447" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell24" Font="Times New Roman, 6.5pt"/>
         </TableRow>
-        <TableRow Name="Row7" Height="444.15" AutoSize="true">
-          <TableCell Name="Cell25" Text="   2.1. У разі відсутності у Вкладника відкритого поточного рахунку в Банку, операції за яким здійснюються з використанням електронного платіжного засобу у валюті Депозиту, одночасно із розміщенням Депозиту здійснюється відкриття Вкладнику поточного рахунку в Банку, операції за яким здійснюються з використанням електронного платіжного засобу (надалі – поточний рахунок) у валюті Депозиту. &#13;&#10;   Проценти за Депозитом нараховуються Банком  від  дня, наступного за днем зарахування (внесення) Депозиту на Рахунок до дня, який передує поверненню Депозиту або списанню грошових коштів з Рахунку з інших підстав.&#13;&#10;   2.2. Нарахування Банком процентів за Договором здійснюється з урахуванням календарного числа днів (неробочих святкових та вихідних включно). Кількість днів у році приймається за 365 (366).&#13;&#10;   У випадку, якщо виконання Банком своїх зобов’язань щодо повернення Депозиту та/або виплати нарахованих до сплати процентів за Депозитом припадає на неробочий/вихідний день Банку, вказане виконання зобов’язань Банку переноситься на наступний за неробочим робочий день Банку, при цьому Банком здійснюється нарахування процентів за додатковий час розміщення Депозиту.&#13;&#10;   2.3. Мінімальна сума Депозиту становить 200 (двісті) гривень або 10 (десять) доларів США або 10 (десять) євро відповідно до валюти  Депозиту.&#13;&#10;   2.4. Рахунок може поповнюватися додатковими внесками в розмірі не менше 200 (двісті) гривень або 10 (десяти) доларів США або 10 (десяти) євро відповідно до валюти Депозиту.&#13;&#10;   Поповнення Рахунку безготівковим шляхом може здійснюватися в порядку перерахування коштів з власного поточного / власного вкладного (депозитного) рахунку або шляхом перерахування коштів з поточного рахунку іншої фізичної особи.&#13;&#10;   2.5. Дострокове повернення (видача) Депозиту до закінчення Строку Депозиту,  визначеного згідно умов п.1.1. Договору, не передбачено.&#13;&#10;   2.6. Якщо Вкладник в день повернення Депозиту не з’явився до установи Банку для отримання Депозиту, то строк дії Договору та Строк Депозиту автоматично продовжується щоразу на строк, вказаний у п.1.1 Договору, на умовах та за процентною ставкою, що діятимуть у Банку по даному виду вкладу на момент продовження. При цьому Вкладник погоджується з тим, що при продовженні строку дії Договору та Строку Депозиту відповідно до умов цього пункту 2.6 Договору, умови пункту 2.8 не застосовуються.&#13;&#10;   Сторони погодили, що Строк Депозиту та дія цього Договору не продовжується автоматично згідно з цим пунктом Договору у випадку розміщення Банком публічного письмового оголошення в установі Банку про незастосування умов пролонгації. Після вказаної в такому оголошенні Банку дати, з якої автоматичне продовження Строку Депозиту не здійснюватиметься, Депозит, черговий продовжений строк розміщення якого закінчився, підлягає перерахуванню на поточний рахунок Вкладника, вказаний у п.3.3.1 Договору, а в разі закриття такого рахунку - зберігається на Рахунку без нарахування процентів.&#13;&#10;   2.7. Після закінчення Строку Депозиту, вказаного у п.1.1 Договору, або після закінчення подовженого Строку Депозиту Депозит та невиплачені проценти, нараховані до закінчення Строку Депозиту, Вкладник протягом 1 дня (дня повернення Депозиту) може отримати готівкою. Якщо в день повернення Депозиту Вкладник не отримав Депозит та/або проценти, то Депозит разом з нарахованими та невиплаченими процентами наступного робочого дня підлягають перерахуванню на поточний рахунок Вкладника, вказаний у п. 3.3.1 Договору, а в разі закриття такого рахунку – Депозит зберігається на Рахунку без нарахування процентів.&#13;&#10;   2.8. Сторони погоджуються з тим, що розмір процентної ставки, зазначеної в п.1.2 Договору, може бути змінений у разі зміни облікової ставки Національного банку України та/або зміни ситуації на грошово–кредитному ринку. Про ініціювання зміни процентної ставки Банк повідомляє Вкладника шляхом публічного письмового оголошення в установі Банку, в якому зазначає розмір нової процентної ставки. Якщо протягом 10 календарних днів з дня повідомлення нового розміру процентної ставки від Вкладника не надходить заперечень, Сторони вважають, що Вкладник дав згоду на зміну процентної ставки. Нова процентна ставка починає діяти з 11-го дня після її оголошення. У разі надходження від Вкладника заперечень у письмовій формі протягом 10 календарних днів з дня повідомлення не зважаючи на умови п. 1.1 Договору, строк повернення Депозиту за Договором вважається  таким, що настав з 11-го дня після оголошення нової процентної ставки, і кошти з Рахунку повертаються Вкладнику на поточний рахунок, зазначений в п. 3.3.1 Договору, з процентами, нарахованими згідно з п.1.2 Договору, а в разі закриття такого рахунку - зберігаються на Рахунку без нарахування процентів. &#13;&#10;   Сторони досягли згоди, що зміна процентної ставки в порядку, передбаченому цим пунктом Договору, не вважається односторонньою зміною процентної ставки за Депозитом та не потребує укладення між Сторонами змін до цього Договору.&#13;&#10;   2.9. Відповідно до статті 57 Закону України „Про банки і банківську діяльність” вклади фізичних осіб АТ „Ощадбанк” гарантуються державою. &#13;&#10;   2.10. У разі накладення арешту на Депозит/ його частину Банк припиняє нарахування процентів по Рахунку з дня надходження до Банку документів про арешт. Поновлення нарахування процентів здійснюється з дня, наступного за днем зняття арешту." Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell401" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell354" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell448" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell26" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        <TableRow Name="Row7" Height="102.06" AutoSize="true">
+          <TableCell Name="Cell25" Text="   2.1. У разі відсутності у Вкладника відкритого поточного рахунку в Банку, операції за яким здійснюються з використанням електронного платіжного засобу у валюті Депозиту, одночасно із розміщенням Депозиту здійснюється відкриття Вкладнику поточного рахунку в Банку, операції за яким здійснюються з використанням електронного платіжного засобу (надалі – поточний рахунок) у валюті Депозиту. &#13;&#10;   Проценти за Депозитом нараховуються Банком  від  дня, наступного за днем зарахування (внесення) Депозиту на Рахунок до дня, який передує поверненню Депозиту або списанню грошових коштів з Рахунку з інших підстав.&#13;&#10;   2.2. Нарахування Банком процентів за Договором здійснюється з урахуванням календарного числа днів (неробочих святкових та вихідних включно). Кількість днів у році приймається за 365 (366).&#13;&#10;У випадку, якщо виконання Банком своїх зобов’язань щодо повернення Депозиту та/або виплати нарахованих до сплати процентів за Депозитом припадає на неробочий/вихідний день Банку, вказане виконання зобов’язань Банку переноситься на наступний за неробочим робочий день Банку, при цьому Банком здійснюється нарахування процентів за додатковий час розміщення Депозиту. " Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell401" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell354" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell448" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell26" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row188" Height="113.4">
+          <TableCell Name="Cell641" Text="   2.3. Мінімальна сума Депозиту становить 1000 (тисяча) гривень або 100 (сто) доларів США або 100(сто) євро відповідно до валюти  Депозиту.&#13;&#10;   2.4. Рахунок може поповнюватися додатковими внесками в розмірі не менше 200 (двісті) гривень або 10 (десяти) доларів США або 10 (десяти) євро відповідно до валюти Депозиту.&#13;&#10;   Поповнення Рахунку безготівковим шляхом може здійснюватися в порядку перерахування коштів з власного поточного / власного вкладного (депозитного) рахунку або шляхом перерахування коштів з поточного рахунку іншої фізичної особи.&#13;&#10;   Для депозитів, внесених на строк 12 та 18 місяців, щомісячна сума поповнення не може перевищувати суму початкового внеску фактично внесеного на Рахунок (при первинному внесенні Депозиту) або суму Депозиту наявну на Рахунку на момент автоматичного подовження Строку Депозиту, при цьому:&#13;&#10;   - поповнення Депозиту, внесеного на строк 12 місяців, здійснюється протягом перших 8 місяців з моменту первинного внесення Депозиту/з моменту автоматичного подовження Строку Депозиту.&#13;&#10;   - поповнення Депозиту, внесеного на строк 18 місяців, здійснюється протягом перших 12 місяців з моменту первинного внесення Депозиту/з моменту автоматичного подовження Строку Депозиту." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell642"/>
+          <TableCell Name="Cell643"/>
+          <TableCell Name="Cell644"/>
+          <TableCell Name="Cell645"/>
+        </TableRow>
+        <TableRow Name="Row183" Height="122.85">
+          <TableCell Name="Cell616" Text="   2.5. Дострокове повернення (видача) Депозиту до закінчення Строку Депозиту,  визначеного згідно умов п.1.1. Договору, не передбачено.&#13;&#10;   2.6. Якщо Вкладник в день повернення Депозиту не з’явився до установи Банку для отримання Депозиту, то строк дії Договору та Строк Депозиту автоматично продовжується щоразу на строк, вказаний у п.1.1 Договору, на умовах та за процентною ставкою, що діятимуть у Банку по даному виду вкладу на момент продовження. При цьому Вкладник погоджується з тим, що при продовженні строку дії Договору та Строку Депозиту відповідно до умов цього пункту 2.6 Договору, умови пункту 2.8 не застосовуються.&#13;&#10;   Сторони погодили, що Строк Депозиту та дія цього Договору не продовжується автоматично згідно з цим пунктом Договору у випадку розміщення Банком публічного письмового оголошення в установі Банку про незастосування умов пролонгації. Після вказаної в такому оголошенні Банку дати, з якої автоматичне продовження Строку Депозиту не здійснюватиметься, Депозит, черговий продовжений строк розміщення якого закінчився, підлягає перерахуванню на поточний рахунок Вкладника, вказаний у п.3.3.1 Договору, а в разі закриття такого рахунку - зберігається на Рахунку без нарахування процентів.&#13;&#10;   2.7. Після закінчення Строку Депозиту, вказаного у п.1.1 Договору, або після закінчення подовженого Строку Депозиту Депозит та невиплачені проценти, нараховані до закінчення Строку Депозиту, Вкладник протягом 1 дня (дня повернення Депозиту) може отримати готівкою. Якщо в день повернення Депозиту Вкладник не отримав Депозит та/або проценти, то Депозит разом з нарахованими та невиплаченими процентами наступного робочого дня підлягають перерахуванню на поточний рахунок Вкладника, вказаний у п. 3.3.1 Договору, а в разі закриття такого рахунку – Депозит зберігається на Рахунку без нарахування процентів." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell617" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell618" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell619" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell620" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row184" Height="122.85">
+          <TableCell Name="Cell621" Text="   2.8. Сторони погоджуються з тим, що розмір процентної ставки, зазначеної в п.1.2 Договору, може бути змінений у разі зміни облікової ставки Національного банку України та/або зміни ситуації на грошово–кредитному ринку. Про ініціювання зміни процентної ставки Банк повідомляє Вкладника шляхом публічного письмового оголошення в установі Банку, в якому зазначає розмір нової процентної ставки. Якщо протягом 10 календарних днів з дня повідомлення нового розміру процентної ставки від Вкладника не надходить заперечень, Сторони вважають, що Вкладник дав згоду на зміну процентної ставки. Нова процентна ставка починає діяти з 11-го дня після її оголошення. У разі надходження від Вкладника заперечень у письмовій формі протягом 10 календарних днів з дня повідомлення не зважаючи на умови п. 1.1 Договору, строк повернення Депозиту за Договором вважається  таким, що настав з 11-го дня після оголошення нової процентної ставки, і кошти з Рахунку повертаються Вкладнику на поточний рахунок, зазначений в п. 3.3.1 Договору, з процентами, нарахованими згідно з п.1.2 Договору а в разі закриття такого рахунку - зберігаються на Рахунку без нарахування процентів. &#13;&#10;   Сторони досягли згоди, що зміна процентної ставки в порядку, передбаченому цим пунктом Договору, не вважається односторонньою зміною процентної ставки за Депозитом та не потребує укладення між Сторонами змін до цього Договору.&#13;&#10;   2.9. Відповідно до статті 57 Закону України „Про банки і банківську діяльність” вклади фізичних осіб АТ „Ощадбанк” гарантуються державою. &#13;&#10;   2.10. У разі накладення арешту на Депозит/ його частину Банк припиняє нарахування процентів по Рахунку з дня надходження до Банку документів про арешт. Поновлення нарахування процентів здійснюється з дня, наступного за днем зняття арешту." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell622" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell623" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell624" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell625" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row43" Height="11.34" AutoSize="true">
-          <TableCell Name="Cell97" Text="3. Права та обов’язки Сторін" Padding="2, -1, 2, -1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt, style=Bold" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell420" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell373" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell467" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell98" Padding="2, -1, 2, -1" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell97" Text="3. Права та обов’язки Сторін" Padding="2, -1, 2, -1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 6.5pt, style=Bold" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell420" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell373" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell467" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell98" Padding="2, -1, 2, -1" HorzAlign="Justify" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
         </TableRow>
-        <TableRow Name="Row44" Height="126.63" AutoSize="true">
-          <TableCell Name="Cell99" Text="   3.1. &lt;i&gt;&lt;b&gt;Вкладник має право&lt;/b&gt;&lt;/i&gt; реалізовувати права, що випливають з умов цього Договору та надані Вкладнику нормами чинного законодавства України.&#13;&#10;   3.2. &lt;i&gt;&lt;b&gt;Вкладник зобов’язується:&lt;/i&gt;&lt;/b&gt;&#13;&#10;   3.2.1. Враховуючи вимоги законодавства у сфері запобігання та протидії легалізації (відмиванню) доходів, одержаних злочинним шляхом, або фінансуванню тероризму чи розповсюдження зброї масового знищення (далі – &lt;b&gt;Законодавство про легалізацію&lt;/b&gt;):&#13;&#10;   1) невідкладно надавати Банку на його письмову вимогу або без такої вимоги в разі набуття Вкладником статусу національного, іноземного публічного діяча, діяча, що виконує політичні функції в міжнародних організаціях, особи, що діє від його імені, його близької особи або пов'язаної з ним особи чи кінцевого бенефіціарного власника (контролера) юридичної особи в розумінні Законодавства про легалізацію (далі – Публічний діяч або його представник, близька/пов’язана особа Публічного діяча), у письмовій формі інформацію та документи, що:&#13;&#10;      - підтверджують приналежність/набуття Вкладником статусу Публічного діяча або його представника, близької/пов’язаної особи Публічного діяча;&#13;&#10;      - підтверджують джерела походження коштів, активів, прав на активи Публічного діяча або його представника, близької/пов’язаної особи Публічного діяча тощо;&#13;&#10;      - необхідні для уточнення інформації про Вкладника згідно вимог Законодавства про легалізацію." Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell421" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell374" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell468" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell100" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        <TableRow Name="Row44" Height="81.27" AutoSize="true">
+          <TableCell Name="Cell99" Text="   3.1. &lt;b&gt;&lt;i&gt;Вкладник має право&lt;/b&gt;&lt;/i&gt; реалізовувати права, що випливають з умов цього Договору та надані Вкладнику нормами чинного законодавства України. &#13;&#10;   3.2. &lt;b&gt;&lt;i&gt;Вкладник зобов’язується: &lt;/b&gt;&lt;/i&gt;&#13;&#10;   3.2.1. Враховуючи вимоги законодавства у сфері запобігання та протидії легалізації (відмиванню) доходів, одержаних злочинним шляхом, або фінансуванню тероризму чи розповсюдження зброї масового знищення (далі – &lt;b&gt;Законодавство про легалізацію&lt;/b&gt;):&#13;&#10;   1) невідкладно надавати Банку на його письмову вимогу або без такої вимоги в разі набуття Вкладником статусу національного, іноземного публічного діяча, діяча, що виконує політичні функції в міжнародних організаціях, особи, що діє від його імені, його близької особи або пов'язаної з ним особи чи кінцевого бенефіціарного власника (контролера) юридичної особи в розумінні Законодавства про легалізацію (далі – &lt;b&gt;Публічний діяч або його представник, близька/пов’язана особа Публічного діяча&lt;/b&gt;), у письмовій формі інформацію та документи, що:" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell421" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell374" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell468" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell100" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
         </TableRow>
-        <TableRow Name="Row160" Height="264.6">
-          <TableCell Name="Cell533" Text="   2) звільнити Банк від будь-якої відповідальності, в тому числі за будь-яку моральну шкоду, майнові збитки, неотримані доходи (вигоду), завдані будь-яким особам внаслідок будь-яких суперечок, претензій, вимог або судових спорів щодо або у зв'язку з наданням Банку інформації та/або документів, пов’язаних з набуттям статусу Публічного діяча або його представника, близької/пов’язаної особи Публічного діяча, та приймає на себе повну відповідальність перед такими третіми особами, у тому числі за відшкодування збитків та шкоди.&#13;&#10;   3) підтримувати дійсність зазначених вище засвідчень і гарантій, а також відшкодувати Банку будь-які майнові збитки, моральну шкоду, неотримані доходи (вигоди), в т. ч. судові витрати та витрати на консультаційні послуги, що виникли внаслідок порушення Вкладником зазначених вище засвідчень і гарантій, або у разі застосування до Банку компетентними органами заходів впливу у зв'язку з порушенням Законодавства про легалізацію з вини Вкладника.&#13;&#10;   3.2.2. У випадку отримання Вкладником додаткових послуг Банку, що безпосередньо не пов’язані з укладенням цього Договору, наприклад з отримання довідок тощо, такі додаткові послуги Банку оплачуються Вкладником у відповідності до Тарифів за послуги установ АТ &quot;Ощадбанк (надалі - Тарифи), які розміщені на офіційному веб-сайті Банку за наступним посиланням www.oschadbank.ua/ua/private/accounts/ та на інформаційних стендах в установах Банку.&#13;&#10;   Шляхом підписання цього Договору Вкладник підтверджує, що ознайомлений з Тарифами Банку та може отримати за бажанням примірник Тарифів Банку, чинних на дату укладення Договору.&#13;&#10;   Вкладник погоджується з тим, що Тарифи можуть бути змінені Банком шляхом публікації повідомлення про зміну Тарифів та/або доповнення до Тарифів на офіційному веб-сайті Банку, що вказаний вище у цьому пункті, та/або шляхом розміщення у підрозділах Банку, що здійснюють обслуговування фізичних осіб. Вкладник підтверджує можливість ознайомлення зі змінами та/або доповненнями до Тарифів, що будуть оприлюднені будь-яким з вказаних у цьому пункті способів.&#13;&#10;   3.3. &lt;i&gt;&lt;b&gt;Банк зобов’язується:&lt;/i&gt;&lt;/b&gt;&#13;&#10;   3.3.1. Повернути Депозит в день (дату) повернення Депозиту, визначений у відповідності до п. 1.1. Договору шляхом перерахування на поточний рахунок № &lt;b&gt;[DPT_DATA.NLS_D]&lt;/b&gt;, відкритий &lt;b&gt;[DPT_DATA.NB_D]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.MFO_D]&lt;/b&gt; або шляхом видачі готівкою та сплатити нараховані проценти, обумовлені Договором, за вирахуванням податків/зборів та інших обов’язкових платежів, що підлягають сплаті відповідно до законодавства України, шляхом перерахування на рахунок № &lt;b&gt;[DPT_DATA.PAYM_NLS]&lt;/b&gt; відкритий у &lt;b&gt;[DPT_DATA.PAYM_NB]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.PAYM_MFO]&lt;/b&gt; або шляхом видачі готівкою.&#13;&#10;   3.3.2. Забезпечити збереження банківської таємниці за цим Договором, за виключенням випадків передбачених законодавством України. За розголошення банківської таємниці Банк несе відповідальність, передбачену законодавством України.&#13;&#10;   3.4. &lt;i&gt;&lt;b&gt;Банк має право:&lt;/i&gt;&lt;/b&gt;&#13;&#10;   3.4.1. Ініціювати зміну процентної ставки за Депозитом у порядку, визначеному п.2.8. Договору." Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell534" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell535" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell536" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell537" Padding="2, -1, 2, -1"/>
+        <TableRow Name="Row185" Height="75.6">
+          <TableCell Name="Cell626" Text="   - підтверджують приналежність/набуття Вкладником статусу Публічного діяча або його представника, близької/пов’язаної особи Публічного діяча; &#13;&#10;   - підтверджують джерела походження коштів, активів, прав на активи Публічного діяча або його представника, близької/пов’язаної особи Публічного діяча тощо;  &#13;&#10;   - необхідні для уточнення інформації про Вкладника згідно вимог Законодавства про легалізацію.&#13;&#10;   2) звільнити Банк від будь-якої відповідальності, в тому числі за будь-яку моральну шкоду, майнові збитки, неотримані доходи (вигоду), завдані будь-яким особам внаслідок будь-яких суперечок, претензій, вимог або судових спорів щодо або у зв'язку з наданням Банку інформації та/або документів, пов’язаних з набуттям статусу Публічного діяча або його представника, близької/пов’язаної особи Публічного діяча, та приймає на себе повну відповідальність перед такими третіми особами, у тому числі за відшкодування збитків та шкоди." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell627"/>
+          <TableCell Name="Cell628"/>
+          <TableCell Name="Cell629"/>
+          <TableCell Name="Cell630"/>
+        </TableRow>
+        <TableRow Name="Row160" Height="62.37">
+          <TableCell Name="Cell533" Text="   3) підтримувати дійсність зазначених вище засвідчень і гарантій, а також відшкодувати Банку будь-які майнові збитки, моральну шкоду, неотримані доходи (вигоди), в т. ч. судові витрати та витрати на консультаційні послуги, що виникли внаслідок порушення Вкладником зазначених вище засвідчень і гарантій, або у разі застосування до Банку компетентними органами заходів впливу у зв'язку з порушенням Законодавства про легалізацію з вини Вкладника&#13;&#10;   3.2.2.  У випадку отримання Вкладником додаткових послуг Банку, що безпосередньо не пов’язані з укладенням цього Договору, наприклад з отримання довідок тощо, такі додаткові послуги Банку оплачуються Вкладником у відповідності до Тарифів за послуги установ АТ &quot;Ощадбанк (надалі - Тарифи), які розміщені на офіційному веб-сайті Банку за наступним посиланням &lt;i&gt;&lt;u&gt;www.oschadbank.ua/ua/private/accounts/&lt;/u&gt;&lt;/i&gt; та на інформаційних стендах в установах Банку." Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell534" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell535" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell536" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell537" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+        </TableRow>
+        <TableRow Name="Row186" Height="56.7">
+          <TableCell Name="Cell631" Text="   Шляхом підписання цього Договору Вкладник підтверджує, що ознайомлений з Тарифами Банку та може отримати за бажанням примірник Тарифів Банку, чинних на дату укладення Договору.&#13;&#10;   Вкладник погоджується з тим, що Тарифи можуть бути змінені Банком шляхом публікації повідомлення про зміну Тарифів та/або доповнення до Тарифів на офіційному веб-сайті Банку, що вказаний вище у цьому пункті, та/або шляхом розміщення у підрозділах Банку, що здійснюють обслуговування фізичних осіб. Вкладник підтверджує можливість ознайомлення зі змінами та/або доповненнями до Тарифів, що будуть оприлюднені будь-яким з вказаних у цьому пункті способів." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell632" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell633" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell634" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell635" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row187" Height="94.5">
+          <TableCell Name="Cell636" Text="   3.3. &lt;i&gt;&lt;b&gt;Банк зобов’язується:&lt;/i&gt;&lt;/b&gt;&#13;&#10;   3.3.1. Повернути Депозит в день (дату) повернення Депозиту, визначений у відповідності до п. 1.1. Договору шляхом перерахування на поточний рахунок № &lt;b&gt;[DPT_DATA.NLS_D]&lt;/b&gt;, відкритий &lt;b&gt;[DPT_DATA.NB_D]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.MFO_D]&lt;/b&gt; або шляхом видачі готівкою та сплатити нараховані проценти, обумовлені Договором, за вирахуванням податків/зборів та інших обов’язкових платежів, що підлягають сплаті відповідно до законодавства України, шляхом перерахування на рахунок № &lt;b&gt;[DPT_DATA.PAYM_NLS]&lt;/b&gt; відкритий у &lt;b&gt;[DPT_DATA.PAYM_NB]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.PAYM_MFO]&lt;/b&gt; або шляхом видачі готівкою.&#13;&#10;   3.3.2.	Забезпечити збереження банківської таємниці за цим Договором, за виключенням випадків передбачених законодавством України. За розголошення банківської таємниці Банк несе відповідальність, передбачену законодавством України.&#13;&#10;   3.4. &lt;i&gt;&lt;b&gt;Банк має право:&lt;/i&gt;&lt;/b&gt;&#13;&#10;   3.4.1. Ініціювати зміну процентної ставки за Депозитом у порядку, визначеному п.2.8. Договору." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell637" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell638" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell639" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
+          <TableCell Name="Cell640" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row49" Height="11.34" AutoSize="true">
-          <TableCell Name="Cell109" Text="4. Інші умови" Padding="2, -1, 2, -1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 7pt, style=Bold" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell426" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell379" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell473" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell110" Padding="2, -1, 2, -1" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell109" Text="4. Інші умови" Padding="2, -1, 2, -1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 6.5pt, style=Bold" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell426" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell379" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell473" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell110" Padding="2, -1, 2, -1" HorzAlign="Justify" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
         </TableRow>
-        <TableRow Name="Row50" Height="381.78" AutoSize="true">
-          <TableCell Name="Cell111" Text="   4.1. Цей Договір набуває чинності з моменту його підписання Сторонами і діє до повного виконання Сторонами своїх зобов’язань за Договором.&#13;&#10;   4.2. Цей Договір вважається припиненим і Рахунок закривається з моменту виплати Банком Вкладнику всієї суми Депозиту та нарахованих процентів за ним.&#13;&#10;   4.3. Дія Договору може бути припинена  відповідно до умов  Договору та в інших випадках, передбачених законодавством України.&#13;&#10;   4.4. Цей Договір може бути змінений за взаємною згодою Сторін шляхом укладення Сторонами додаткового договору до нього.&#13;&#10;   4.5. У разі ненадходження коштів, зазначених у п.1.1 Договору, на Рахунок протягом 15 (п’ятнадцяти) робочих днів з моменту підписання Сторонами Договору, Договір вважається припиненим. Рахунок при цьому закривається.&#13;&#10;   4.6. Сторони звільняються від відповідальності за невиконання умов Договору, якщо воно відбулося внаслідок дії обставин непереборної сили, якими є: стихійне лихо (землетрус, блискавка, пожежа, буря, повінь, нагромадження снігу або ожеледь тощо) або соціальні явища (військові дії, терористичні акти, блокада, страйк, революція, заколот, повстання, масові заворушення, громадська демонстрація, акт вандалізму, неправомірні дії (бездіяльність) державних органів та/чи їх посадових осіб, заборона і обмеження, які витікають з документів нормативного і ненормативного характеру органів державної влади і управління в галузі регулювання банківської діяльності та/або виконавчого органу Банку, які роблять неможливими для Сторін виконання своїх зобов’язань за Договором, тощо) - за умови, що ці обставини безпосередньо вплинули на виконання зобов’язань за Договором. Зазначені обставини автоматично продовжують термін виконання зобов’язань на весь період їх дії і ліквідації наслідків.&#13;&#10;    4.7. За невиконання або неналежне виконання зобов'язань за цим Договором Сторони несуть відповідальність згідно з вимогами чинного законодавства України. &#13;&#10;    4.8. Спори  Сторони вирішуватимуть шляхом проведення переговорів. При недосягненні згоди протягом 14 календарних днів спір передається на розгляд суду згідно з законодавством України.&#13;&#10;    4.9. Вкладник, як суб’єкт персональних даних, підтверджує, що йому відомі його права, передбачені Законом України “Про захист персональних даних”. Вкладник, керуючись Законом України “Про захист персональних даних”, своїм підписом підтверджує надання беззастережної згоди (дозволу) на обробку своїх персональних даних, в межах норм зазначеного Закону України, з метою виконання умов даного Договору та належного надання Банком банківських послуг на строк, що є необхідним та достатнім для виконання Сторонами своїх зобов’язань за цим Договором і дотримання положень законодавства України, якщо інший строк не передбачено законодавством України.&#13;&#10;   4.10. Вкладник підтверджує надання беззастережної згоди (дозволу) на розкриття Банком третім особам персональних даних Вкладника в межах, визначених законодавством України в сфері захисту персональних даних, без обов’язку додаткового повідомлення Банком Вкладника (в тому числі в письмовій формі) про здійснення такого розкриття персональних даних третім особам на строк, що є необхідним та достатнім для виконання положень законодавства України, якщо інший строк не передбачено законодавством України. &#13;&#10;   4.11. Вкладник  надає беззастережну згоду на розкриття Банком  будь-якої інформації стосовно Вкладника, умов цього Договору та порядку виконання обов’язків за ним аудиторам, які надають Банку послуги, що пов’язані з основною діяльністю Банка.&#13;&#10;   4.12. Вкладник підтверджує, що до моменту підписання цього Договору Банк надав йому інформацію, зазначену в частині другій статті 12 Закону України «Про фінансові послуги та державне регулювання ринків фінансових послуг». Надана Вкладнику інформація є повною та зрозумілою, вона забезпечує правильне розуміння суті фінансових послуг, які отримує Вкладник відповідно до цього Договору, без нав'язування Банком її придбання.&#13;&#10;   4.13. Підписанням даного Договору Вкладник підтверджує, що йому відомі положення Податкового кодексу України, згідно якого проценти на депозитний (вкладний) банківський рахунок вважаються «пасивним доходом» Вкладника, а також відомо, що Банком, на виконання функцій податкового агента, відповідно до положень Податкового кодексу України  буде утримано та сплачено до бюджету Держави загальну суму податку з таких доходів, якщо інше не буде визначено законодавством на момент виплати процентів за Депозитом.&#13;&#10;   4.14. Цей Договір Сторонами прочитаний, відповідає їх намірам та досягнутим домовленостям, що засвідчується підписами Сторін." Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="5"/>
-          <TableCell Name="Cell427" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell380" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell474" Padding="2, -1, 2, -1"/>
-          <TableCell Name="Cell112" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        <TableRow Name="Row50" Height="321.3" AutoSize="true">
+          <TableCell Name="Cell111" Text="   4.1. Цей Договір набуває чинності з моменту його підписання Сторонами і діє до повного виконання Сторонами своїх зобов’язань за Договором.&#13;&#10;   4.2. Цей Договір вважається припиненим і Рахунок закривається з моменту виплати Банком Вкладнику всієї суми Депозиту та нарахованих процентів за ним.&#13;&#10;   4.3. Дія Договору може бути припинена  відповідно до умов  Договору та в інших випадках, передбачених законодавством України.&#13;&#10;   4.4. Цей Договір може бути змінений за взаємною згодою Сторін шляхом укладення Сторонами додаткового договору до нього.&#13;&#10;   4.5. У разі ненадходження коштів, зазначених у п.1.1 Договору, на Рахунок протягом 15 (п’ятнадцяти) робочих днів з моменту підписання Сторонами Договору, Договір вважається припиненим. Рахунок при цьому закривається.&#13;&#10;   4.6. Сторони звільняються від відповідальності за невиконання умов Договору, якщо воно відбулося внаслідок дії обставин непереборної сили, якими є: стихійне лихо (землетрус, блискавка, пожежа, буря, повінь, нагромадження снігу або ожеледь тощо) або соціальні явища (військові дії, терористичні акти, блокада, страйк, революція, заколот, повстання, масові заворушення, громадська демонстрація, акт вандалізму, неправомірні дії (бездіяльність) державних органів та/чи їх посадових осіб, заборона і обмеження, які витікають з документів нормативного і ненормативного характеру органів державної влади і управління в галузі регулювання банківської діяльності та/або виконавчого органу Банку, які роблять неможливими для Сторін виконання своїх зобов’язань за Договором, тощо) - за умови, що ці обставини безпосередньо вплинули на виконання зобов’язань за Договором. Зазначені обставини автоматично продовжують термін виконання зобов’язань на весь період їх дії і ліквідації наслідків.&#13;&#10;   4.7. За невиконання або неналежне виконання зобов'язань за цим Договором Сторони несуть відповідальність згідно з вимогами чинного законодавства України. &#13;&#10;   4.8. Спори  Сторони вирішуватимуть шляхом проведення переговорів. При недосягненні згоди протягом 14 календарних днів спір передається на розгляд суду згідно з законодавством України.&#13;&#10;   4.9. Вкладник, як суб’єкт персональних даних, підтверджує, що йому відомі його права, передбачені Законом України “Про захист персональних даних”. Вкладник, керуючись Законом України “Про захист персональних даних”, своїм підписом підтверджує надання беззастережної згоди (дозволу) на обробку своїх персональних даних, в межах норм зазначеного Закону України, з метою виконання умов даного Договору та належного надання Банком банківських послуг на строк, що є необхідним та достатнім для виконання Сторонами своїх зобов’язань за цим Договором і дотримання положень законодавства України, якщо інший строк не передбачено законодавством України.&#13;&#10;   4.10. Вкладник підтверджує надання беззастережної згоди (дозволу) на розкриття Банком третім особам персональних даних Вкладника в межах, визначених законодавством України в сфері захисту персональних даних, без обов’язку додаткового повідомлення Банком Вкладника (в тому числі в письмовій формі) про здійснення такого розкриття персональних даних третім особам на строк, що є необхідним та достатнім для виконання положень законодавства України, якщо інший строк не передбачено законодавством України. &#13;&#10;   4.11. Вкладник  надає беззастережну згоду на розкриття Банком  будь-якої інформації стосовно Вкладника, умов цього Договору та порядку виконання обов’язків за ним аудиторам, які надають Банку послуги, що пов’язані з основною діяльністю Банка.&#13;&#10;   4.12. Вкладник підтверджує, що до моменту підписання цього Договору Банк надав йому інформацію, зазначену в частині другій статті 12 Закону України «Про фінансові послуги та державне регулювання ринків фінансових послуг». Надана Вкладнику інформація є повною та зрозумілою, вона забезпечує правильне розуміння суті фінансових послуг, які отримує Вкладник відповідно до цього Договору, без нав'язування Банком її придбання.&#13;&#10;   4.13. Підписанням даного Договору Вкладник підтверджує, що йому відомі положення Податкового кодексу України, згідно якого проценти на депозитний (вкладний) банківський рахунок вважаються «пасивним доходом» Вкладника, а також відомо, що Банком, на виконання функцій податкового агента, відповідно до положень Податкового кодексу України  буде утримано та сплачено до бюджету Держави загальну суму податку з таких доходів, якщо інше не буде визначено законодавством на момент виплати процентів за Депозитом.&#13;&#10;   4.14. Цей Договір Сторонами прочитаний, відповідає їх намірам та досягнутим домовленостям, що засвідчується підписами Сторін.&#13;&#10;" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell427" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell380" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell474" Padding="2, -1, 2, -1" Font="Arial, 6.5pt"/>
+          <TableCell Name="Cell112" Padding="2, -1, 2, -1" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="1592.72" Width="718.2" Height="268.35" Guides="18.9">
+    <DataBand Name="Data2" Top="1521.58" Width="718.2" Height="268.35" Guides="18.9">
       <TableObject Name="Table10" Left="9.45" Width="699.22" Height="266.46" CanBreak="false">
         <TableColumn Name="Column20" Width="349.61"/>
         <TableColumn Name="Column15" Width="349.61"/>
         <TableRow Name="Row182" Height="22.68">
-          <TableCell Name="Cell614" Text="   4.15. Цей Договір складено у двох примірниках, один з яких знаходиться в Банку, другий – у Вкладника. Обидва примірники мають однакову юридичну силу та є автентичними за змістом." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 7pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell614" Text="   4.15. Цей Договір складено у двох примірниках, один з яких знаходиться в Банку, другий – у Вкладника. Обидва примірники мають однакову юридичну силу та є автентичними за змістом." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 6.5pt" HtmlTags="true" ColSpan="2"/>
           <TableCell Name="Cell615"/>
         </TableRow>
         <TableRow Name="Row181" Height="13.23">
@@ -337,7 +379,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="1863.17" Width="718.2" Height="75.6">
+    <PageFooterBand Name="PageFooter1" Top="1792.71" Width="718.2" Height="85.05">
       <TableObject Name="Table5" Left="415.8" Width="292.95" Height="15.12">
         <TableColumn Name="Column10" Width="58.59"/>
         <TableColumn Name="Column11" Width="58.59"/>
@@ -345,7 +387,7 @@ namespace FastReport
         <TableColumn Name="Column13" Width="58.59"/>
         <TableColumn Name="Column14" Width="58.59"/>
         <TableRow Name="Row135" Height="3.78">
-          <TableCell Name="Cell297" Text="&lt;b&gt;Депозити  гарантовані  державою&lt;/b&gt;" HorzAlign="Right" Font="Arial, 8pt, style=Italic" HtmlTags="true" ColSpan="5" RowSpan="4"/>
+          <TableCell Name="Cell297" Text="&lt;b&gt;Депозити гарантовані державою&lt;/b&gt;" HorzAlign="Right" Font="Arial, 8pt, style=Italic" HtmlTags="true" ColSpan="5" RowSpan="4"/>
           <TableCell Name="Cell298"/>
           <TableCell Name="Cell299"/>
           <TableCell Name="Cell300"/>
@@ -373,8 +415,7 @@ namespace FastReport
           <TableCell Name="Cell316"/>
         </TableRow>
       </TableObject>
-      <BarcodeObject Name="Barcode2" Left="141.75" Top="16.98" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
-      <TextObject Name="Text8" Left="359.1" Top="9.45" Width="538.65" Height="66.15" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+      <TextObject Name="Text8" Left="378" Top="9.45" Width="538.65" Height="75.6" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
         <Formats>
           <GeneralFormat/>
           <GeneralFormat/>
@@ -383,6 +424,7 @@ namespace FastReport
           <GeneralFormat/>
         </Formats>
       </TextObject>
+      <BarcodeObject Name="Barcode3" Left="160.65" Top="26.43" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
     </PageFooterBand>
   </ReportPage>
 </Report>

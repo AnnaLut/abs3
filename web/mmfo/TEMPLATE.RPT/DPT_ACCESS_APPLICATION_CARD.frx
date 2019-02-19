@@ -1,7 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="04/30/2015 15:08:06" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="07/10/2018 16:36:59" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using Oracle.DataAccess.Client;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void _FinishReport(object sender, EventArgs e)
+    {
+      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
+      
+      OracleCommand command = connection.CreateCommand();
+      command.CommandType = CommandType.StoredProcedure;
+      command.CommandText = &quot;ead_pack.doc_page_count&quot;;
+      
+      Parameter DocID = Report.GetParameter(&quot;p_doc_id&quot;);
+      command.Parameters.Add(&quot;p_doc_id&quot;, DocID.Value);
+      command.Parameters.Add(&quot;p_page_count&quot;, Report.Engine.TotalPages);
+      
+      connection.Open();
+      try
+      {
+        command.ExecuteNonQuery();
+      }
+      finally
+      {
+        connection.Close();
+      }
+    }
+  }
+}
+</ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRn214q0Hfdlh7k5nWiLDtAag==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqGvSwQ3Ug2J0QD0n/zY8UZr2Y5KHBRGZO+a0UH0C/CRUT1Zw6iJK/KYUKYwP5kCGILP7bbYA9J0vwcvkooLY6wg==">
       <TableDataSource Name="Table2" Alias="COMMON_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.name as name_branch,&#13;&#10;       nvl(nvl(trim(d.adress), b.name), '___') as adres_branch,&#13;&#10;       tobopack.get_branch_param('DPT_PHON') as phones_branch,&#13;&#10;       nvl(d.dover, '________') as staff_dover,&#13;&#10;       nvl(d.fio_r, '________') as staff_fio_r,&#13;&#10;       NVL(d.posada_r, '________') as staff_status_r,&#13;&#10;       nvl(d.town, tobopack.get_branch_param('TOWN')) as staff_town,&#13;&#10;       f_dat_lit(trunc(sysdate)) as today_w&#13;&#10;  from branch b, dpt_staff d&#13;&#10; where b.branch = tobopack.get_branch&#13;&#10;   and d.userid(+) = user_id&#13;&#10;   and d.branch(+) = b.branch">
         <Column Name="NAME_BRANCH" DataType="System.String"/>
         <Column Name="ADRES_BRANCH" DataType="System.String"/>
@@ -44,10 +89,15 @@
         <Column Name="PHONE" DataType="System.String"/>
         <CommandParameter Name="p_req_id" DataType="113" Expression="[p_req_id]" DefaultValue="0"/>
       </TableDataSource>
+      <TableDataSource Name="Table" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id&#13;&#10;  from v_ead_docs ed  &#13;&#10; where ed.doc_id = :p_doc_id">
+        <Column Name="DOC_ID" DataType="System.Decimal"/>
+        <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
+      </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="p_req_id" DataType="System.Int32" Expression="641604"/>
+    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="10181"/>
   </Dictionary>
-  <ReportPage Name="Page1">
+  <ReportPage Name="Page1" FinishPageEvent="_FinishReport">
     <DataBand Name="Data1" Width="718.2" Height="189" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table1" Left="9.45" Top="9.45" Width="699.23" Height="146.69" GrowToBottom="true">
         <TableColumn Name="Column1" Width="335.43"/>
@@ -90,7 +140,7 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="191.84" Width="718.2" Height="179.55" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="Data2" Top="193" Width="718.2" Height="179.55" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table3" Left="9.45" Width="699.3" Height="132.3">
         <TableColumn Name="Column28" Width="115.29"/>
         <TableColumn Name="Column29" Width="238.14"/>
@@ -140,5 +190,8 @@
         </TableRow>
       </TableObject>
     </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="376.55" Width="718.2" Height="37.8">
+      <TextObject Name="Text3" Left="481.95" Top="18.9" Width="236.25" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    </PageFooterBand>
   </ReportPage>
 </Report>

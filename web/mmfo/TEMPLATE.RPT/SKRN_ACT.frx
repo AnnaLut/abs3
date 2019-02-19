@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" UseFileCache="true" ReportInfo.Created="06/24/2014 16:54:08" ReportInfo.Modified="12/21/2017 17:19:28" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" UseFileCache="true" ReportInfo.Created="06/24/2014 16:54:08" ReportInfo.Modified="07/17/2018 14:16:09" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -83,7 +83,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5Y3Neg7DvdR2Vu1DbZYHDJIJHEDEQst4kKpqTLmpSao9Fh7KdSnx2Iv4GEv1AmBOyYr7WHrUMI8SGHVlvZ1QEv8=">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5Y3Neg7DvdR2Vu1DbZYHDJIJHEDEQst4kKpqTLmpSao9Fh7KdSnx2Iv4GEv1AmBOySPgzJgJPMTkSnNNBVF35og=">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select '[GetVal(&quot;'||id||'&quot;)]' as form, id, name , ssql  from DOC_ATTR where id like 'SKR%'">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
@@ -146,7 +146,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader2" Top="144.55" Width="680.4" Height="189">
+    <PageHeaderBand Name="PageHeader2" Top="145.75" Width="680.4" Height="189">
       <TableObject Name="Table5" Width="680.4" Height="160.65" GrowToBottom="true">
         <TableColumn Name="Column25" Width="136.08"/>
         <TableColumn Name="Column26" Width="136.08"/>
@@ -175,7 +175,7 @@ namespace FastReport
           <TableCell Name="Cell281" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row117" Height="94.5">
-          <TableCell Name="Cell282" Text="         Ми, що нижче підписалися,  представник Публічного акціонерного товариства &quot;Державний ощадний банк України&quot;,  в особі  &lt;b&gt;[GetVal(&quot;SKRN_STAF_POSADAR&quot;)]&lt;/b&gt; &lt;b&gt;[GetVal(&quot;SKRN_STAF_STAFFR&quot;)]&lt;/b&gt; ,   з одного боку, і представник Клієнта  &lt;b&gt;[GetVal(&quot;SKRN_FIO_PREDST&quot;)]&lt;/b&gt;,   в особі &lt;b&gt;[GetVal(&quot;SKRN_FIO&quot;)]&lt;/b&gt;,   з іншого боку, склали цей акт про те, що Банком були надані такі послуги  згідно умов  договору  №[Table1.NDOC] від [Table1.DAT_BEGIN] з [Table1.DATAZ]р. по [Table1.DATAPO]р." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="5">
+          <TableCell Name="Cell282" Text="         Ми, що нижче підписалися,  представник Публічного акціонерного товариства &quot;Державний ощадний банк України&quot;,  в особі  &lt;b&gt;[GetVal(&quot;SKRN_STAF_POSADAR&quot;)]&lt;/b&gt; &lt;b&gt;[GetVal(&quot;SKRN_STAF_STAFFR&quot;)]&lt;/b&gt; ,   з одного боку, і представник Клієнта  &lt;b&gt;[GetVal(&quot;SKRN_FIO&quot;)]&lt;/b&gt;,   в особі &lt;b&gt;[GetVal(&quot;SKRN_FIO_PREDST&quot;)]&lt;/b&gt;,   з іншого боку, склали цей акт про те, що Банком були надані такі послуги  згідно умов  договору  №[Table1.NDOC] від [Table1.DAT_BEGIN] з [Table1.DATAZ]р. по [Table1.DATAPO]р." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 11pt" HtmlTags="true" ColSpan="5">
             <Formats>
               <GeneralFormat/>
               <GeneralFormat/>
@@ -194,7 +194,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </PageHeaderBand>
-    <DataBand Name="Data4" Top="376.94" Width="680.4" Height="75.6">
+    <DataBand Name="Data4" Top="380.55" Width="680.4" Height="75.6">
       <TableObject Name="Table5" Width="680.4" Height="75.6">
         <TableColumn Name="Column35" Width="41.58"/>
         <TableColumn Name="Column36" Width="192.78"/>
@@ -216,7 +216,7 @@ namespace FastReport
           <TableCell Name="Cell301" Text="[Table1.SPD]&#13;&#10;[Table1.PD]&#13;&#10;" Format="Currency" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 11pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader3" Top="336.34" Width="680.4" Height="37.8">
+      <DataHeaderBand Name="DataHeader3" Top="338.75" Width="680.4" Height="37.8">
         <TableObject Name="Table5" Width="680.4" Height="37.8">
           <TableColumn Name="Column30" Width="41.58"/>
           <TableColumn Name="Column31" Width="192.78"/>
@@ -232,7 +232,7 @@ namespace FastReport
           </TableRow>
         </TableObject>
       </DataHeaderBand>
-      <DataFooterBand Name="DataFooter2" Top="455.34" Width="680.4" Height="368.55" CanGrow="true">
+      <DataFooterBand Name="DataFooter2" Top="460.15" Width="680.4" Height="368.55" CanGrow="true">
         <TextObject Name="Text3" Top="9.45" Width="680.4" Height="56.7" Text="Загальна вартість послуг склала:[Table1.SUMA], ПДВ - [Table1.SUM_PDV], загальна вартість послуг із ПДВ - [Table1.SUM_ALL]." VertAlign="Center" Font="Times New Roman, 11pt"/>
         <TextObject Name="Text4" Top="66.15" Width="680.4" Height="37.8" Text="Банк надав послуги у повному обсязі і у встановлені строки&#13;&#10;Сторони претензій одна до одної не мають.&#13;&#10;" VertAlign="Center" Font="Times New Roman, 11pt"/>
         <TableObject Name="Table5" Top="160.65" Width="680.4" Height="207.9">
@@ -260,7 +260,7 @@ namespace FastReport
           </TableRow>
           <TableRow Name="Row126" AutoSize="true">
             <TableCell Name="Cell312" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Text="/ [GetVal(&quot;SKRN_STAF_STAFF&quot;)] /" HorzAlign="Right" Font="Times New Roman, 10pt" HtmlTags="true"/>
-            <TableCell Name="Cell313" Border.Lines="Left, Bottom" Border.LeftLine.Style="DashDotDot" Border.BottomLine.Style="Dot" Text="/[GetVal(&quot;SKRN_FIO&quot;)]/" HorzAlign="Right" Font="Times New Roman, 10pt" HtmlTags="true"/>
+            <TableCell Name="Cell313" Border.Lines="Left, Bottom" Border.LeftLine.Style="DashDotDot" Border.BottomLine.Style="Dot" Text="/[GetVal(&quot;SKRN_FIO_PREDST&quot;)]/" HorzAlign="Right" Font="Times New Roman, 10pt" HtmlTags="true"/>
           </TableRow>
           <TableRow Name="Row127" AutoSize="true">
             <TableCell Name="Cell314" Text="          (підпис)  " Font="Times New Roman, 10pt" HtmlTags="true"/>

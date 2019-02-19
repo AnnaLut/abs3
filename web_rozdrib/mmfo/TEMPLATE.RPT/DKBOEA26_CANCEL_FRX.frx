@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/12/2017 11:40:17" ReportInfo.Modified="08/22/2017 17:42:14" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/12/2017 11:40:17" ReportInfo.Modified="11/09/2018 13:20:54" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,20 +44,37 @@ namespace FastReport
             finally
             {
                 connection.Close();
-            }
+            }   
         }
   }
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHz/03L09idGFNzz+yYha3VW0+kx/xQS9Wo6OCNkvd1Y0A=="/>
-    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="0"/>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQAQRKT/O94Hlf0+nWeTkgV4=">
+      <TableDataSource Name="Table" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
+        <Column Name="DOC_ID" DataType="System.Decimal"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
+        <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="CL_FIO" DataType="System.String"/>
+        <Column Name="AGR_ID" DataType="System.Decimal"/>
+        <Column Name="AGR_NUM" DataType="System.String"/>
+        <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
+        <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
+        <Column Name="CRT_BRANCH" DataType="System.String"/>
+        <Column Name="DOC_PRINT_NUMBER" DataType="System.String"/>
+        <Column Name="TICKET_ID" DataType="System.String"/>
+        <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="10220601311"/>
   </Dictionary>
-  <ReportPage Name="Page1" Watermark.Text="gfhdfghdfghdfg">
-    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15" PrintOn="FirstPage">
+  <ReportPage Name="Page1" Guides="9.45,689.85,415.8,699.3,707.93,23.52,349.65,353.66,367.73,707.94,352.87,367.74,24.32,708.75,141.75,359.1,897.75" Watermark.Text="gfhdfghdfghdfg">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15" PrintOn="FirstPage" Guides="-2,64.15">
       <TextObject Name="Text1" Left="9.45" Top="-2" Width="680.4" Height="66.15" Border.Lines="Bottom" Border.Color="220, 225, 35" Border.Width="4" Text="Публічне акціонерне товариство&#13;&#10;«Державний ощадний банк України»&#13;&#10;" Font="Trebuchet MS, 16pt"/>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="68.82" Width="718.2" Height="1472.78" CanGrow="true" CanShrink="true">
+    <DataBand Name="Data1" Top="68.44" Width="718.2" Height="1472.78" CanGrow="true" CanShrink="true" Guides="7.9,121.3,151.65,282.11,0,11.62,24.89,13.27,40.56,130.46,289.4,1217.63,13.23,312.94,726.85,136.08,277.83,764.65,37.8,928.23,163.58">
       <TextObject Name="Text2" Left="415.8" Top="7.9" Width="283.5" Height="113.4" Text="Додаток №3&#13;&#10;До Змін до Порядку емісії та обслуговування &#13;&#10;платіжних карток в установах  АТ «Ощадбанк»&#13;&#10;затверджених постановою правління АТ «Ощадбанк» &#13;&#10;від 19.10.2015 р. №294&#13;&#10;&#13;&#10;Додаток 26 &#13;&#10;Порядку емісії та обслуговування &#13;&#10;платіжних карток в установах  АТ «Ощадбанк»&#13;&#10;" HorzAlign="Right" Font="Times New Roman, 8pt"/>
       <TableObject Name="Table1" Left="9.45" Top="151.65" Width="698.48" Height="130.46" GrowToBottom="true">
         <TableColumn Name="Column1" Width="344.21"/>
@@ -84,7 +101,7 @@ namespace FastReport
           <TableCell Name="Cell18" Border.Lines="All" Text="&lt;b&gt;1.1. Місцезнаходження Банку: &lt;/b&gt;&#13;&#10;м. Київ, вул.. Госпітальна, 12 г.&#13;&#10;&#13;&#10;&lt;b&gt;1.2. Місцезнаходження установи Банку: &lt;/b&gt;&#13;&#10;______________________________________________&#13;&#10;&lt;b&gt;1.3. Телефон:&lt;/b&gt;______________________________" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="Table2" Left="9.45" Top="289.4" Width="698.49" Height="1155.03" RepeatHeaders="false">
+      <TableObject Name="Table2" Left="9.45" Top="289.4" Width="698.49" Height="928.23" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="343.42"/>
         <TableColumn Name="Column5" Width="14.87"/>
         <TableColumn Name="Column6" Width="340.2"/>
@@ -103,7 +120,7 @@ namespace FastReport
           <TableCell Name="Cell32"/>
           <TableCell Name="Cell33"/>
         </TableRow>
-        <TableRow Name="Row11" Height="315.63">
+        <TableRow Name="Row11" Height="277.83">
           <TableCell Name="Cell37"/>
           <TableCell Name="Cell38"/>
           <TableCell Name="Cell39"/>
@@ -118,27 +135,42 @@ namespace FastReport
           <TableCell Name="Cell35" Border.Lines="All" Font="Times New Roman, 9pt" HtmlTags="true"/>
           <TableCell Name="Cell36" Border.Lines="All" Font="Times New Roman, 9pt" HtmlTags="true"/>
         </TableRow>
-        <TableRow Name="Row14">
-          <TableCell Name="Cell46" Border.Lines="Left" HtmlTags="true"/>
-          <TableCell Name="Cell47" HtmlTags="true"/>
-          <TableCell Name="Cell48" Border.Lines="Right" Text="(видається клієнту)" HorzAlign="Right" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="1543.5" Width="718.2" Height="103.95" FirstRowStartsNewPage="true" Guides="0,18.9,56.7,102.06,37.8,103.95">
+      <TextObject Name="Text4" Left="9.45" Width="699.3" Height="18.9" Text="Підпис представника Банку _________________          Підпис Клієнта/Держателя __________________" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
+      <BarcodeObject Name="Barcode3" Left="141.75" Top="56.7" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
+      <TextObject Name="Text5" Left="359.1" Top="37.8" Width="538.65" Height="66.15" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <CustomFormat Format="yyyy-MM-dd HH:mm:ss"/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+    </PageFooterBand>
+  </ReportPage>
+  <ReportPage Name="Page2" Guides="0,689,500,755.15,292.1,547.25,433.85" ResetPageNumber="true">
+    <PageHeaderBand Name="PageHeader2" Width="718.2" Height="28.35"/>
+    <DataBand Name="Data2" Top="30.64" Width="718.2" Height="359.1" Guides="0,179.56,14.18,56.71,42.53,85.06">
+      <TableObject Name="Table3" Width="689" Height="179.56">
+        <TableColumn Name="Column7" Width="433.85"/>
+        <TableColumn Name="Column8" Width="255.15"/>
+        <TableRow Name="Row16" Height="14.18">
+          <TableCell Name="Cell52" Text="(видається клієнту)" HorzAlign="Right" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell58"/>
         </TableRow>
-        <TableRow Name="Row15" Height="37.8">
-          <TableCell Name="Cell49" Border.Lines="Left, Right" Text="Повідомлення до заяви &#13;&#10;про розірвання Договору та/або закриття рахунку (ів) від ___________________" HorzAlign="Center" Font="Times New Roman, 9pt, style=Bold" ColSpan="3"/>
-          <TableCell Name="Cell50" HorzAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
-          <TableCell Name="Cell51" HorzAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+        <TableRow Name="Row17" Height="42.53">
+          <TableCell Name="Cell57" Text="Повідомлення до заяви &#13;&#10;про розірвання Договору та/або закриття рахунку (ів) від ___________________" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell59" Font="Times New Roman, 10pt"/>
         </TableRow>
-        <TableRow Name="Row13" Height="132.3">
-          <TableCell Name="Cell43" Border.Lines="Left, Right, Bottom" Text="&#13;&#10;Заява прийнята                                                                                    &quot;_____&quot; _____________ 20    р.&#13;&#10;Дата перерахування залишку коштів/виплати готівкою                 &quot;_____&quot; _____________ 20    р.&#13;&#10;Дата закриття рахунку (ів)                                                                 &quot;_____&quot; _____________ 20    р.&#13;&#10;Довідки за тел. ______________________&#13;&#10;&#13;&#10;М.П.&#13;&#10;Відповідальна особа установи банку                               ______________ /__________________&#13;&#10;                                                                                                  (підпис)                 (прізвище)&#13;&#10;" Font="Times New Roman, 9pt" HtmlTags="true" ColSpan="3"/>
-          <TableCell Name="Cell44" HtmlTags="true"/>
-          <TableCell Name="Cell45" HtmlTags="true"/>
+        <TableRow Name="Row18" Height="122.85">
+          <TableCell Name="Cell60" Text="&#13;&#10;     Заява прийнята                                                                                    &#13;&#10;     Дата перерахування залишку коштів/виплати готівкою                &#13;&#10;     Дата закриття рахунку (ів)                                                                &#13;&#10;     Довідки за тел. ______________________&#13;&#10;&#13;&#10;     М.П.&#13;&#10;     Відповідальна особа установи банку                              &#13;&#10;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell61" Text="&#13;&#10;&quot;_____&quot; _____________ 20    р.&#13;&#10;&quot;_____&quot; _____________ 20    р.&#13;&#10;&quot;_____&quot; _____________ 20    р.&#13;&#10;&#13;&#10;&#13;&#10; ______________ /__________________&#13;&#10;     (підпис)                 (прізвище)" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="1544.26" Width="718.2" Height="47.25" FirstRowStartsNewPage="true">
-      <TextObject Name="Text4" Left="9.45" Width="699.3" Height="18.9" Text="Підпис представника Банку _________________          Підпис Клієнта/Держателя __________________" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
-      <TextObject Name="Text66" Left="378" Top="28.35" Width="330.75" Height="18.9" Text="№ друку [p_doc_id] сторінка [Page] з [TotalPages]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
-      <BarcodeObject Name="Barcode1" Left="9.45" Top="28.35" Width="126.25" Height="18.9" Expression="[p_doc_id]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
-    </PageFooterBand>
+    <PageFooterBand Name="PageFooter2" Top="392.02" Width="718.2" Height="18.9"/>
   </ReportPage>
 </Report>

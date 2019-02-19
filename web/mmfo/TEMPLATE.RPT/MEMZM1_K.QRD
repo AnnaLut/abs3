@@ -32,7 +32,7 @@
 [REM | ВАЖНО !!! В остальные месяцы используется переменная OYear                      |] 
 [REM |                                                                                 |] 
 [REM +=================================================================================+]
-[ALIGN=CENTER]          КОРИГУЮЧИЙ ЗА [REF=OKMonth,C,8] [REF=OKYear,N,4] p.
+[ALIGN=CENTER]          КОРИГУЮЧИЙ ЗА [REF=OKMonth,C,8] [REF=OYear,N,4] p.
 
 [ALIGN=CENTER]вiд " [REF=ODay,N,2] " [REF=OMonth,C,10] [REF=OYear,N,4] р.
 

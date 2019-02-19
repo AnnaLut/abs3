@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="10/11/2018 14:07:34" ReportInfo.Modified="10/26/2018 15:06:42" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQH300NuBU6ZhpiF1thTmPzg=">
+      <TableDataSource Name="Table" Alias="tmp_rep_provod" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 DAT1, CHAR01 TT, NUM00 REF, NUM01 KV, CHAR02 NLSA, NUM02 S, NUM03 SQ, CHAR03 NLSB, CHAR04 NAZN, DAT00 PDAT, CHAR05 NAMTT, NUM04 ISP, CHAR06 P0, CHAR07 P1, CHAR08 P2, CHAR09 P3, CHAR10 P4, TO_CHAR(NUM05) P5, CHAR11 PBR, CHAR12 CONT_BR from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="PDAT" DataType="System.DateTime"/>
+        <Column Name="NAMTT" DataType="System.String"/>
+        <Column Name="ISP" DataType="System.Decimal"/>
+        <Column Name="P0" DataType="System.String"/>
+        <Column Name="P1" DataType="System.String"/>
+        <Column Name="P2" DataType="System.String"/>
+        <Column Name="P3" DataType="System.String"/>
+        <Column Name="P4" DataType="System.String"/>
+        <Column Name="P5" DataType="System.String" Format="General"/>
+        <Column Name="PBR" DataType="System.String"/>
+        <Column Name="CONT_BR" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="811356"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="branch" DataType="System.Int32" Enabled="true" SelectCommand="select substr(branch,1,30) as OUR_BRANCH,&#13;&#10;          substr(name,1,70) as OUR_BRANCH_NAME&#13;&#10;  from branch where branch like SYS_CONTEXT('bars_context','user_branch')">
+        <Column Name="OUR_BRANCH" DataType="System.String"/>
+        <Column Name="OUR_BRANCH_NAME" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32" Expression="811356"/>
+    <Total Name="Total1" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total2" Expression="[tmp_rep_provod.S]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total3" Expression="[tmp_rep_provod.SQ]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total4" TotalType="Count" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total5" Expression="[tmp_rep_provod.S]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total6" Expression="[tmp_rep_provod.SQ]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="320" PaperHeight="215" RawPaperSize="9">
+    <ReportTitleBand Name="ReportTitle1" Width="1134" Height="112.19" Guides="94.5">
+      <TableObject Name="Table1" Left="-0.95" Top="14.8" Width="1115.65" Height="74.39" Border.Lines="Top" Border.TopLine.Style="Dash" Border.TopLine.Width="2" GrowToBottom="true" RepeatHeaders="false">
+        <TableColumn Name="Column59" Width="66.11"/>
+        <TableColumn Name="Column60" Width="113.36"/>
+        <TableColumn Name="Column61" Width="85.01"/>
+        <TableColumn Name="Column62" Width="56.66"/>
+        <TableColumn Name="Column63" Width="132.26"/>
+        <TableColumn Name="Column64" Width="139.82"/>
+        <TableColumn Name="Column65" Width="111.47"/>
+        <TableColumn Name="Column66" Width="120.92"/>
+        <TableColumn Name="Column67" Width="187.07"/>
+        <TableColumn Name="Column68" Width="102.97"/>
+        <TableRow Name="Row21" Height="27.14" AutoSize="true">
+          <TableCell Name="Cell175" VertAlign="Center"/>
+          <TableCell Name="Cell176" VertAlign="Center"/>
+          <TableCell Name="Cell177" VertAlign="Center"/>
+          <TableCell Name="Cell178" VertAlign="Center"/>
+          <TableCell Name="Cell179" VertAlign="Center"/>
+          <TableCell Name="Cell180" VertAlign="Center"/>
+          <TableCell Name="Cell181" VertAlign="Center"/>
+          <TableCell Name="Cell182" VertAlign="Center"/>
+          <TableCell Name="Cell183" Text="Надруковано  [Date]" ColSpan="2"/>
+          <TableCell Name="Cell184"/>
+        </TableRow>
+        <TableRow Name="Row22">
+          <TableCell Name="Cell185" Text="[branch.OUR_BRANCH]" ColSpan="3"/>
+          <TableCell Name="Cell186"/>
+          <TableCell Name="Cell187"/>
+          <TableCell Name="Cell188"/>
+          <TableCell Name="Cell189" Text="Реєстр бухгалтерських проводок по операціях" HorzAlign="Center" VertAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell190"/>
+          <TableCell Name="Cell191"/>
+          <TableCell Name="Cell192"/>
+          <TableCell Name="Cell193"/>
+          <TableCell Name="Cell194"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="28.35">
+          <TableCell Name="Cell195" Text="[branch.OUR_BRANCH_NAME]" ColSpan="3"/>
+          <TableCell Name="Cell196"/>
+          <TableCell Name="Cell197"/>
+          <TableCell Name="Cell198"/>
+          <TableCell Name="Cell199" Text="за дату  [tmp_rep_provod.DAT1]" HorzAlign="Center" VertAlign="Center" ColSpan="3"/>
+          <TableCell Name="Cell200"/>
+          <TableCell Name="Cell201"/>
+          <TableCell Name="Cell202"/>
+          <TableCell Name="Cell203"/>
+          <TableCell Name="Cell204"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="115.22" Width="1134" Height="48.6" Guides="0,0,0,0,0,37.8,56.7,56.7,47.25,37.8,47.25,56.7,75.6" Condition="[tmp_rep_provod.TT]">
+      <TableObject Name="Table13" Top="20.75" Width="1115.75" Height="27.85" Border.Lines="Top, Bottom" Border.TopLine.Style="Dash" Border.TopLine.Width="2" Border.BottomLine.Style="Dash" Border.BottomLine.Width="2" RepeatHeaders="false">
+        <TableColumn Name="Column39" Width="66.12"/>
+        <TableColumn Name="Column40" Width="113.37"/>
+        <TableColumn Name="Column41" Width="85.02"/>
+        <TableColumn Name="Column42" Width="56.67"/>
+        <TableColumn Name="Column43" Width="132.27"/>
+        <TableColumn Name="Column44" Width="139.83"/>
+        <TableColumn Name="Column45" Width="111.48"/>
+        <TableColumn Name="Column46" Width="120.93"/>
+        <TableColumn Name="Column47" Width="187.08"/>
+        <TableColumn Name="Column48" Width="102.98"/>
+        <TableRow Name="Row19" Height="27.85" AutoSize="true">
+          <TableCell Name="Cell155" Text="Оп." VertAlign="Center"/>
+          <TableCell Name="Cell156" Text="Референс" VertAlign="Center"/>
+          <TableCell Name="Cell157" Text="Дата" VertAlign="Center"/>
+          <TableCell Name="Cell158" Text="ВАЛ" VertAlign="Center"/>
+          <TableCell Name="Cell159" Text="Рахунок-А" VertAlign="Center"/>
+          <TableCell Name="Cell160" Text="Рахунок-Б" VertAlign="Center"/>
+          <TableCell Name="Cell161" Text="Сума" VertAlign="Center"/>
+          <TableCell Name="Cell162" Text="Сума(еквівал.)" VertAlign="Center"/>
+          <TableCell Name="Cell163" Text="Призначення" VertAlign="Center"/>
+          <TableCell Name="Cell164" Text="Вик." VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table2" Top="0.26" Width="1114.63" Height="17.69" RepeatHeaders="false">
+        <TableColumn Name="Column49" Width="66.11"/>
+        <TableColumn Name="Column50" Width="113.35"/>
+        <TableColumn Name="Column51" Width="85"/>
+        <TableColumn Name="Column52" Width="56.65"/>
+        <TableColumn Name="Column53" Width="132.25"/>
+        <TableColumn Name="Column54" Width="139.81"/>
+        <TableColumn Name="Column55" Width="111.46"/>
+        <TableColumn Name="Column56" Width="120.92"/>
+        <TableColumn Name="Column57" Width="187.06"/>
+        <TableColumn Name="Column58" Width="102.02"/>
+        <TableRow Name="Row20" Height="17.69" AutoSize="true">
+          <TableCell Name="Cell165" Text="Операція   [tmp_rep_provod.TT]" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell166" VertAlign="Center"/>
+          <TableCell Name="Cell167" Text="[tmp_rep_provod.NAMTT]" VertAlign="Center" ColSpan="8"/>
+          <TableCell Name="Cell168" VertAlign="Center"/>
+          <TableCell Name="Cell169" VertAlign="Center"/>
+          <TableCell Name="Cell170" VertAlign="Center"/>
+          <TableCell Name="Cell171" VertAlign="Center"/>
+          <TableCell Name="Cell172" VertAlign="Center"/>
+          <TableCell Name="Cell173" VertAlign="Center"/>
+          <TableCell Name="Cell174" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="166.85" Width="1134" Height="17.78" CanGrow="true" Guides="66.15,66.15,66.15,66.15,66.15,66.15,66.15,66.15,66.15,66.15,28.35,0,9.45,18.9,9.45,9.45,28.35,0" DataSource="Table">
+        <TableObject Name="Table3" Top="-3.01" Width="1114.7" Height="22.68" RepeatHeaders="false">
+          <TableColumn Name="Column16" Width="66.11"/>
+          <TableColumn Name="Column17" Width="113.35"/>
+          <TableColumn Name="Column18" Width="85"/>
+          <TableColumn Name="Column19" Width="56.65"/>
+          <TableColumn Name="Column20" Width="132.25"/>
+          <TableColumn Name="Column21" Width="139.81"/>
+          <TableColumn Name="Column22" Width="111.46"/>
+          <TableColumn Name="Column23" Width="120.92"/>
+          <TableColumn Name="Column24" Width="187.06"/>
+          <TableColumn Name="Column25" Width="102.09"/>
+          <TableRow Name="Row8" Height="22.68" AutoSize="true">
+            <TableCell Name="Cell61" Text="[tmp_rep_provod.TT]"/>
+            <TableCell Name="Cell62" Text="[tmp_rep_provod.REF]"/>
+            <TableCell Name="Cell63" Text="[Day([tmp_rep_provod.PDAT])].[Month([tmp_rep_provod.PDAT])].[Year([tmp_rep_provod.PDAT])]"/>
+            <TableCell Name="Cell64" Text="[tmp_rep_provod.KV]"/>
+            <TableCell Name="Cell65" Text="[tmp_rep_provod.NLSA]"/>
+            <TableCell Name="Cell66" Text="[tmp_rep_provod.NLSB]"/>
+            <TableCell Name="Cell67" Text="[tmp_rep_provod.S]" HorzAlign="Right"/>
+            <TableCell Name="Cell68" Text="[tmp_rep_provod.SQ]" HorzAlign="Right"/>
+            <TableCell Name="Cell69" Text="[Trim([tmp_rep_provod.NAZN])]"/>
+            <TableCell Name="Cell70" Text="[tmp_rep_provod.ISP]"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="187.66" Width="1134" Height="75.6" Guides="0,0,0,0">
+        <TableObject Name="Table4" Width="1114.53" Height="75.6" Border.Lines="Top, Bottom" Border.TopLine.Style="Dash" Border.TopLine.Width="2" Border.BottomLine.Style="Dash" Border.BottomLine.Width="2">
+          <TableColumn Name="Column26" Width="92.23"/>
+          <TableColumn Name="Column27" Width="171.69"/>
+          <TableColumn Name="Column28" Width="70.2"/>
+          <TableColumn Name="Column29" Width="119.07"/>
+          <TableColumn Name="Column30" Width="139.82"/>
+          <TableColumn Name="Column31" Width="111.47"/>
+          <TableColumn Name="Column32" Width="410.05"/>
+          <TableRow Name="Row9" Height="37.8">
+            <TableCell Name="Cell71" Text="По валюті   [tmp_rep_provod.KV]" VertAlign="Center" ColSpan="2"/>
+            <TableCell Name="Cell72"/>
+            <TableCell Name="Cell73" Text="Кількість  [Total1]" VertAlign="Center" ColSpan="2"/>
+            <TableCell Name="Cell74"/>
+            <TableCell Name="Cell75" Text="Сума" VertAlign="Center"/>
+            <TableCell Name="Cell96" Text="[Total2]" VertAlign="Center"/>
+            <TableCell Name="Cell97" Text="[Total3]" VertAlign="Center"/>
+          </TableRow>
+          <TableRow Name="Row10" Height="37.8">
+            <TableCell Name="Cell76" Text="По операції  [tmp_rep_provod.TT]" VertAlign="Center" ColSpan="2"/>
+            <TableCell Name="Cell77"/>
+            <TableCell Name="Cell78" Text="Кількість  [Total1]" VertAlign="Center" ColSpan="2"/>
+            <TableCell Name="Cell79"/>
+            <TableCell Name="Cell80" Text="Сума" VertAlign="Center"/>
+            <TableCell Name="Cell98" Text="[Total2]" VertAlign="Center"/>
+            <TableCell Name="Cell99" Text="[Total3]" VertAlign="Center"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="266.29" Width="1134" Height="213.9">
+      <TableObject Name="Table5" Top="-3.45" Width="1115.16" Height="207.9">
+        <TableColumn Name="Column33" Width="264.56"/>
+        <TableColumn Name="Column34" Width="189.26"/>
+        <TableColumn Name="Column35" Width="139.82"/>
+        <TableColumn Name="Column36" Width="111.47"/>
+        <TableColumn Name="Column37" Width="120.92"/>
+        <TableColumn Name="Column38" Width="289.13"/>
+        <TableRow Name="Row11" Height="30.24">
+          <TableCell Name="Cell100" Text="Разом в еквіваленті :" VertAlign="Center"/>
+          <TableCell Name="Cell101" Text="Кількість" VertAlign="Center"/>
+          <TableCell Name="Cell102" Text="[Total4]" VertAlign="Center"/>
+          <TableCell Name="Cell103" Text="Сума" VertAlign="Center"/>
+          <TableCell Name="Cell104" Text="[Total5]" VertAlign="Center"/>
+          <TableCell Name="Cell125" Text="[Total6]" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="28.35">
+          <TableCell Name="Cell149" Border.Lines="Top" Border.TopLine.Style="Dash" Border.TopLine.Width="2" ColSpan="6"/>
+          <TableCell Name="Cell150"/>
+          <TableCell Name="Cell151"/>
+          <TableCell Name="Cell152"/>
+          <TableCell Name="Cell153"/>
+          <TableCell Name="Cell154"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="30.24">
+          <TableCell Name="Cell105" Text="Умови формування звіту"/>
+          <TableCell Name="Cell106" Text="Код операції"/>
+          <TableCell Name="Cell107" Text="[tmp_rep_provod.P0]"/>
+          <TableCell Name="Cell108" Text="Валюта"/>
+          <TableCell Name="Cell109" Text="[tmp_rep_provod.P1]"/>
+          <TableCell Name="Cell126" Text="Рахунок А  [tmp_rep_provod.P2]"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="30.24">
+          <TableCell Name="Cell110"/>
+          <TableCell Name="Cell111" Text="Код виконавця"/>
+          <TableCell Name="Cell112" Text="[tmp_rep_provod.P4]"/>
+          <TableCell Name="Cell113"/>
+          <TableCell Name="Cell114"/>
+          <TableCell Name="Cell127" Text="Рахунок Б  [tmp_rep_provod.P3]"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="30.24">
+          <TableCell Name="Cell115"/>
+          <TableCell Name="Cell116" Text="Код відділення"/>
+          <TableCell Name="Cell117" Text="[tmp_rep_provod.PBR]"/>
+          <TableCell Name="Cell118"/>
+          <TableCell Name="Cell119"/>
+          <TableCell Name="Cell128"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="30.24">
+          <TableCell Name="Cell120"/>
+          <TableCell Name="Cell121" Text="З підлеглими від."/>
+          <TableCell Name="Cell122" Text="[IIf(IsNull([tmp_rep_provod.P5]),&quot;&lt;0&gt; - Без підлеглих&quot;, &quot;&lt;1&gt;-З підлеглими&quot;)]" ColSpan="4"/>
+          <TableCell Name="Cell123"/>
+          <TableCell Name="Cell124"/>
+          <TableCell Name="Cell129"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="28.35">
+          <TableCell Name="Cell135" Text="Поточний підрозділ в момент формування звіту" ColSpan="2"/>
+          <TableCell Name="Cell136"/>
+          <TableCell Name="Cell137" Text="[tmp_rep_provod.CONT_BR]" ColSpan="4"/>
+          <TableCell Name="Cell138"/>
+          <TableCell Name="Cell139"/>
+          <TableCell Name="Cell140"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

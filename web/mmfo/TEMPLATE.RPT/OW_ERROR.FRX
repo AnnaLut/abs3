@@ -1,13 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="11/16/2015 19:24:11" ReportInfo.Modified="01/12/2018 15:11:07" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess.dll" ReportInfo.Created="11/16/2015 19:24:11" ReportInfo.Modified="06/22/2018 19:39:44" ReportInfo.CreatorVersion="2013.2.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using Oracle.DataAccess.Client;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void _StartReport(object sender, EventArgs e)
+    {
+      String kf = ((String)Report.GetParameterValue(&quot;tobo&quot;));
+      
+      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
+      OracleCommand command = connection.CreateCommand();
+      command.CommandText = &quot;begin bars.bc.go(substr('&quot;+kf+&quot;', 0, 8)); end;&quot;;         
+      //command.CommandText = &quot;begin bars.bc.go(substr('/304665/', 0, 8)); end;&quot;;         
+      
+      connection.Open();
+      try
+      {
+        command.ExecuteNonQuery();
+      }
+      finally
+      {
+        connection.Close();
+      }
+    }
+  }
+}
+</ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="barslug" ConnectionString="rijcmlqcvpYswQRIaQGfxxJYiMOC73d+Nto/45RRLDQtdr07ObpCh0r3SS62Jf9L58OJMDnoB6+nFXw/QkTPvYNIhgHgQ==" CommandTimeout="500">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select ROW_NUMBER() over(PARTITION BY ac.branch&#13;&#10;                         ORDER BY ac.branch ASC)  num,&#13;&#10;       SUM(ow.s) over(PARTITION BY ac.branch&#13;&#10;                         ORDER BY ac.branch ASC)  sum,&#13;&#10;       COUNT(ac.branch) over(PARTITION BY ac.branch&#13;&#10;                         ORDER BY ac.branch ASC)  count,&#13;&#10;       COUNT(o.kv) over(PARTITION BY  o.kv&#13;&#10;                         ORDER BY o.kv ASC)  count_kv,&#13;&#10;      SUM(ow.s) over(PARTITION BY o.kv&#13;&#10;                         ORDER BY o.kv ASC)  sum_kv,&#13;&#10;       ac.branch,&#13;&#10;       ow.ref,&#13;&#10;       o.tt,&#13;&#10;       o.pdat,&#13;&#10;       o.nlsa,&#13;&#10;       o.nam_a,&#13;&#10;       o.nlsb,&#13;&#10;       o.nam_b,&#13;&#10;       ac.nls tranz,&#13;&#10;       ac.nms name_tranz,&#13;&#10;       ow.nazn,&#13;&#10;       o.kv,&#13;&#10;       ow.s,&#13;&#10;       br.name&#13;&#10;    from v_ow_pkkque ow, opldok op, accounts ac, branch br, oper o&#13;&#10;        where ow.dk = op.dk&#13;&#10;          and ow.ref = o.ref&#13;&#10;          and ow.ref = op.ref&#13;&#10;          and op.acc = ac.acc&#13;&#10;          and ac.branch = br.branch&#13;&#10;          and ac.nbs = 2924&#13;&#10;          and ow.pkk_sos = 1 &#13;&#10;          and ow.resp_class = 'Error'&#13;&#10;          and ac.branch like sys_context('bars_context','user_branch')||'%'&#13;&#10; order by ac.branch, o.tt, o.nlsa, o.kv">
-        <Column Name="NUM" DataType="System.Decimal"/>
-        <Column Name="SUM" DataType="System.Decimal"/>
-        <Column Name="COUNT" DataType="System.Decimal"/>
-        <Column Name="COUNT_KV" DataType="System.Decimal"/>
-        <Column Name="SUM_KV" DataType="System.Decimal"/>
+    <OracleDataConnection Name="MMFO" ConnectionString="rijcmlqxoJkxB+qVyinWpGXWWtjhGRFAme/TOJ3t9k1ConJSlX5ctQEtUGMovQlzcv+CKLM" CommandTimeout="4000">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select  a.kf,&#13;&#10;        a.branch,&#13;&#10;        ow.ref,&#13;&#10;        op.tt,&#13;&#10;        o.pdat,&#13;&#10;        o.nlsa,&#13;&#10;        o.nam_a,&#13;&#10;        o.nlsb,&#13;&#10;        o.nam_b,&#13;&#10;        a.nls tranz,&#13;&#10;        a.nms name_tranz,&#13;&#10;        o.nazn,&#13;&#10;        o.kv,&#13;&#10;        o.s&#13;&#10;  from ow_pkk_que ow, &#13;&#10;       opl op, oper o, accounts a&#13;&#10; where ow.resp_class = 'Error'&#13;&#10;   and ow.ref = op.ref&#13;&#10;   and ow.dk = op.dk&#13;&#10;   and op.ref = o.ref&#13;&#10;   and a.acc = op.acc&#13;&#10;   and a.nbs = 2924">
         <Column Name="BRANCH" DataType="System.String"/>
         <Column Name="REF" DataType="System.Decimal"/>
         <Column Name="TT" DataType="System.String"/>
@@ -21,51 +59,43 @@
         <Column Name="NAZN" DataType="System.String"/>
         <Column Name="KV" DataType="System.Int16"/>
         <Column Name="S" DataType="System.Decimal"/>
-        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
       </TableDataSource>
     </OracleDataConnection>
   </Dictionary>
-  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9">
-    <GroupHeaderBand Name="GroupHeader1" Width="1047.06" Height="41.25" Condition="[Table.BRANCH]">
-      <TextObject Name="Text3" Top="22.35" Width="1048.95" Height="18.9" Border.Lines="Bottom" Border.Width="2" Text="[Table.BRANCH] [Table.NAME]" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" TextFill.Color="DarkRed"/>
-      <TextObject Name="Text4" Width="1048.95" Height="18.9" Text="Звіт по несквітованих документах WAY4 (помилки)" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextFill.Color="DarkBlue"/>
-      <GroupHeaderBand Name="GroupHeader2" Top="44.45" Width="1047.06" Height="37.8" Condition="[Table.KV]">
-        <TextObject Name="Text31" Left="23" Top="10.75" Width="463.05" Height="18.9" Text="[Table.TRANZ] - [Table.NAME_TRANZ] " Font="Arial, 11pt, style=Bold" TextFill.Color="DarkGreen"/>
-        <TextObject Name="Text2" Left="495.5" Top="10.75" Width="236.25" Height="18.9" Text="Код валюти: [Table.KV]" Font="Arial, 11pt, style=Bold" TextFill.Color="DarkGreen"/>
-        <DataBand Name="Data1" Top="121.57" Width="1047.06" Height="66.25" DataSource="Table">
-          <TextObject Name="Text10" Left="0.01" Width="85.05" Height="32.92" Border.Lines="All" Border.Width="0.5" Text="[Table.REF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
-          <TextObject Name="Text11" Left="85.06" Width="75.6" Height="32.92" Border.Lines="All" Border.Width="0.5" Text="[Table.PDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-          <TextObject Name="Text12" Left="160.66" Width="37.8" Height="32.92" Border.Lines="All" Border.Width="0.5" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-          <TextObject Name="Text13" Left="198.46" Width="37.8" Height="32.92" Border.Lines="All" Border.Width="0.5" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-          <TextObject Name="Text14" Left="236.26" Width="75.6" Height="32.92" Border.Lines="All" Border.Width="0.5" Text="[Table.S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
-          <TextObject Name="Text22" Top="33.33" Width="85.05" Height="32.92" Border.Lines="Left, Right, Bottom" Border.Width="0.5" Text="Відправник:&#13;&#10;Отримувач:" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
-          <TextObject Name="Text23" Left="85.05" Top="33.33" Width="113.4" Height="32.92" Border.Lines="Left, Right, Bottom" Border.Width="0.5" Text="[Table.NLSA]&#13;&#10;[Table.NLSB]" Format="Date" Format.Format="dd.MM.yy" VertAlign="Center" Font="Arial, 9pt"/>
-          <TextObject Name="Text24" Left="198.45" Top="33.33" Width="850.5" Height="32.92" Border.Lines="Left, Right, Bottom" Border.Width="0.5" Text="[Table.NAM_A]&#13;&#10;[Table.NAM_B]" VertAlign="Center" Font="Arial, 9pt"/>
-          <TextObject Name="Text15" Left="311.86" Width="737.1" Height="32.88" Border.Lines="All" Border.Width="0.5" Text="[Table.NAZN]" VertAlign="Center" Font="Arial, 9pt"/>
-          <DataHeaderBand Name="DataHeader1" Top="85.45" Width="1047.06" Height="32.92">
-            <TextObject Name="Text16" Width="85.05" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Референс" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
-            <TextObject Name="Text17" Left="85.05" Width="75.6" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Дата" Format="Date" Format.Format="dd.MM.yy" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
-            <TextObject Name="Text18" Left="160.65" Width="37.8" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Оп." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
-            <TextObject Name="Text19" Left="198.45" Width="37.8" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Вал." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
-            <TextObject Name="Text20" Left="236.25" Width="75.6" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Сума" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
-            <TextObject Name="Text21" Left="311.85" Width="737.1" Height="32.88" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Призначення платежу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
-          </DataHeaderBand>
-        </DataBand>
-        <GroupFooterBand Name="GroupFooter2" Top="191.02" Width="1047.06" Height="18.9" Fill.Color="WhiteSmoke">
-          <TextObject Name="Text32" Left="226.8" Width="75.6" Height="18.9" Text="[Table.COUNT_KV]" VertAlign="Center"/>
-          <TextObject Name="Text33" Width="226.8" Height="18.9" Text="Кількість докуметів по валюті:" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TextObject Name="Text34" Left="311.85" Width="189" Height="18.9" Text="Загальна сума по валюті:" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TextObject Name="Text35" Left="500.85" Width="113.4" Height="18.9" Text="[Table.SUM_KV]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center"/>
-        </GroupFooterBand>
-      </GroupHeaderBand>
-      <GroupFooterBand Name="GroupFooter1" Top="213.12" Width="1047.06" Height="18.9" Fill.Color="Gainsboro">
-        <TextObject Name="Text25" Left="850.5" Width="160.65" Height="18.9" Text="[Date]" Format="Date" Format.Format="d" VertAlign="Center"/>
-        <TextObject Name="Text1" Left="708.75" Width="141.75" Height="18.9" Text="Дата формування:" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-        <TextObject Name="Text29" Left="255.15" Width="75.6" Height="18.9" Text="[Table.COUNT]" VertAlign="Center"/>
-        <TextObject Name="Text30" Width="255.15" Height="18.9" Text="Загальна кількість докуметів:" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-        <TextObject Name="Text27" Left="340.2" Width="113.4" Height="18.9" Text="Загальна сума:" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-        <TextObject Name="Text26" Left="453.6" Width="113.4" Height="18.9" Text="[Table.SUM]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center"/>
-      </GroupFooterBand>
-    </GroupHeaderBand>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="1000" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="3704.4" Height="37.8">
+      <TextObject Name="Text4" Left="198.45" Width="2551.5" Height="37.8" Text="Звіт по несквітованих документах WAY4 (помилки)" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextFill.Color="DarkBlue"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="78.72" Width="3704.4" Height="23.47" DataSource="Table">
+      <TextObject Name="Text10" Left="198.46" Width="132.3" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.REF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text11" Left="330.76" Width="75.6" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.PDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text12" Left="406.36" Width="37.8" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text13" Left="444.16" Width="37.8" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text14" Left="481.96" Width="75.6" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text15" Left="1975.06" Width="774.9" Height="23.43" Border.Lines="All" Border.Width="0.5" Text="[Table.NAZN]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text26" Left="557.55" Width="132.3" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.NLSA]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text28" Left="689.85" Width="132.3" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.NLSB]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text30" Left="822.15" Width="576.45" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.NAM_A]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text33" Left="1398.6" Width="576.45" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.NAM_B]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text35" Width="198.45" Height="23.47" Border.Lines="All" Border.Width="0.5" Text="[Table.BRANCH]" VertAlign="Center" Font="Arial, 9pt"/>
+      <DataHeaderBand Name="DataHeader1" Top="41.8" Width="3704.4" Height="32.92">
+        <TextObject Name="Text16" Left="198.45" Width="132.3" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Референс" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text17" Left="330.75" Width="75.6" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Дата" Format="Date" Format.Format="dd.MM.yy" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text18" Left="406.35" Width="37.8" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Оп." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text19" Left="444.15" Width="37.8" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Вал." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text20" Left="481.95" Width="75.6" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Сума" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text21" Left="1975.05" Width="774.9" Height="32.88" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Призначення платежу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text25" Left="557.55" Width="132.3" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Відправник" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text27" Left="689.85" Width="132.3" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Отримувач" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text29" Left="822.15" Width="576.45" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Найменування відправника" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text32" Left="1398.6" Width="576.45" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Найменування отримувача" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Text34" Width="198.45" Height="32.92" Border.Lines="All" Border.Width="0.5" Fill.Color="WhiteSmoke" Text="Бранч" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+      </DataHeaderBand>
+      <Sort>
+        <Sort Expression="[Table.BRANCH]"/>
+        <Sort Expression="[Table.KV]"/>
+      </Sort>
+    </DataBand>
   </ReportPage>
 </Report>

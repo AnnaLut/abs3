@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Name="Звіт по відкритим картковим рахункам для карток" ReportInfo.Author="Ковальов В.В." ReportInfo.Created="04/18/2016 10:38:26" ReportInfo.Modified="01/19/2018 14:40:02" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="mmfo" ConnectionString="rijcmlqZZ+fmbIdUXD9+nidK7E24P55WAcEGOKLg4uxN3O6pTVxhHKLCC2wcfa/pnOUm1xy2Q6MrSoZvAeW58HQ3erW7Q==">
+      <TableDataSource Name="Table" Alias="Query_W4CardIsp" DataType="System.Int32" Enabled="true" SelectCommand="select au.chgdate DateReg,           &#13;&#10;       case when au.chgaction = 0 then 'Інстант' else null end InstOrName,&#13;&#10;       st.logname LOGIN,&#13;&#10;       st.fio FIO,&#13;&#10;       a.branch BRANCH, &#13;&#10;       au.nls NLS, &#13;&#10;       au.rnk RNK,&#13;&#10;       c.nmk NMK,&#13;&#10;       c.okpo OKPO,&#13;&#10;       c.adr AdrProp,  &#13;&#10;       ca.domain || ' ' || ca.region ||  ' ' || ca.locality || ' ' || ca.address  AdrFact,&#13;&#10;       wc.product_code CodeProduct&#13;&#10;from accounts_update au left join customer_address ca on ca.rnk = au.rnk and ca.type_id = 2, &#13;&#10;customer c, staff$base st, w4_acc wa, w4_product wp, w4_card wc, tabval t, accounts a&#13;&#10;where&#13;&#10;c.rnk = au.rnk&#13;&#10;and a.nls = au.nls&#13;&#10;and wp.kf = wc.kf &#13;&#10;--and wp.kf = 304665&#13;&#10;--and au.rnk = ca.rnk and ca.type_id = 2    &#13;&#10;and wa.acc_pk = au.acc&#13;&#10;and wa.card_code = wc.code&#13;&#10;and wc.product_code = wp.code&#13;&#10;and st.logname = au.doneby&#13;&#10;and au.kv = t.kv&#13;&#10;and au.nbs = '2625'  &#13;&#10;and substr(au.tip, 0, 2) = 'W4'&#13;&#10;and a.dazs is null&#13;&#10;and au.chgaction in (0, 1)   -- 0-istant, 1-именная&#13;&#10;and a.branch like  sys_context('bars_context', 'user_branch') || '%'&#13;&#10;and st.id like :isp&#13;&#10;and au.chgdate &gt;= to_date(:sFdat1, 'dd/mm/yyyy')                      &#13;&#10;and au.chgdate &lt;= to_date(:sFdat2, 'dd/mm/yyyy')  + 0.99999&#13;&#10;order by st.id, au.branch, au.nls, wa.card_code">
+        <Column Name="DATEREG" DataType="System.DateTime"/>
+        <Column Name="INSTORNAME" DataType="System.String"/>
+        <Column Name="LOGIN" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="ADRPROP" DataType="System.String"/>
+        <Column Name="ADRFACT" DataType="System.String"/>
+        <Column Name="CODEPRODUCT" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Size="5" Expression="[sFdat1]" DefaultValue="18/01/2018"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="18/01/2018"/>
+        <CommandParameter Name="isp" DataType="126" Expression="[isp]" DefaultValue="%"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="isp" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="800" PaperHeight="210">
+    <ReportTitleBand Name="ReportTitle1" Width="2948.4" Height="28.35">
+      <TextObject Name="Text1" Width="2948.4" Height="28.35" Text="Звіт по відкритим картковим рахункам для карток" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="52.38" Width="2948.4" Height="18.9" DataSource="Table">
+      <TextObject Name="Text2" Width="47.25" Height="18.9" Border.Lines="All" Text="[Row#]" VertAlign="Center"/>
+      <TextObject Name="Text3" Left="47.25" Width="85.05" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.DATEREG]" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text4" Left="132.3" Width="66.15" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.INSTORNAME]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text5" Left="198.45" Width="122.85" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.LOGIN]" VertAlign="Center"/>
+      <TextObject Name="Text6" Left="321.3" Width="292.95" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.FIO]" VertAlign="Center"/>
+      <TextObject Name="Text7" Left="614.25" Width="170.1" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.BRANCH]" VertAlign="Center"/>
+      <TextObject Name="Text13" Left="2003.4" Width="756" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.ADRFACT]" VertAlign="Center"/>
+      <TextObject Name="Text14" Left="2759.4" Width="189" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.CODEPRODUCT]" VertAlign="Center"/>
+      <TextObject Name="Text8" Left="784.35" Width="132.3" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.NLS]" VertAlign="Center"/>
+      <TextObject Name="Text9" Left="916.65" Width="75.6" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.RNK]" VertAlign="Center"/>
+      <TextObject Name="Text10" Left="992.25" Width="387.45" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.NMK]" VertAlign="Center"/>
+      <TextObject Name="Text11" Left="1379.7" Width="94.5" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.OKPO]" VertAlign="Center"/>
+      <TextObject Name="Text12" Left="1474.2" Width="529.2" Height="18.9" Border.Lines="All" Text="[Query_W4CardIsp.ADRPROP]" VertAlign="Center"/>
+      <DataHeaderBand Name="DataHeader1" Top="30.91" Width="2948.4" Height="18.9">
+        <TextObject Name="Text15" Width="47.25" Height="18.9" Border.Lines="All" Text="№ з/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text16" Left="47.25" Width="85.05" Height="18.9" Border.Lines="All" Text="Дата" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text17" Left="132.3" Width="66.15" Height="18.9" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text18" Left="198.45" Width="122.85" Height="18.9" Border.Lines="All" Text="Логін" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text19" Left="321.3" Width="292.95" Height="18.9" Border.Lines="All" Text="ПІБ виконавця" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text20" Left="614.25" Width="170.1" Height="18.9" Border.Lines="All" Text="БРАНЧ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text21" Left="784.35" Width="132.3" Height="18.9" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text22" Left="916.65" Width="75.6" Height="18.9" Border.Lines="All" Text="РНК" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text23" Left="992.25" Width="387.45" Height="18.9" Border.Lines="All" Text="Найменування клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text24" Left="1379.7" Width="94.5" Height="18.9" Border.Lines="All" Text="ЗКПО" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text25" Left="1474.2" Width="529.2" Height="18.9" Border.Lines="All" Text="Адреса прописки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text26" Left="2003.4" Width="756" Height="18.9" Border.Lines="All" Text="Адреса фактичного проживання" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text27" Left="2759.4" Width="189" Height="18.9" Border.Lines="All" Text="Код продукта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>

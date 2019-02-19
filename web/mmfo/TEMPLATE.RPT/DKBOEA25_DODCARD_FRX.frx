@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/12/2017 11:40:17" ReportInfo.Modified="08/22/2017 17:43:13" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/12/2017 11:40:17" ReportInfo.Modified="11/07/2018 14:37:41" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,14 +51,14 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHz/03L09idGFNzz+yYha3VWBcIzuuEjbk9/888UX1nfmg=="/>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHz/03L09idGFNzz+yYha3VWJFWjxBiG2131Oql4MmEZXg=="/>
     <Parameter Name="p_doc_id" DataType="System.Int64" Expression="0"/>
   </Dictionary>
-  <ReportPage Name="Page1" Watermark.Text="gfhdfghdfghdfg">
-    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15" PrintOn="FirstPage">
+  <ReportPage Name="Page1" Guides="9.45,689.85,415.8,699.3,708.75,28.35,359.1,340.2,707.9,207.9,75.6,444.15,141.75,349.65,897.75" Watermark.Text="gfhdfghdfghdfg">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15" PrintOn="FirstPage" Guides="-2,64.15">
       <TextObject Name="Text1" Left="9.45" Top="-2" Width="680.4" Height="66.15" Border.Lines="Bottom" Border.Color="220, 225, 35" Border.Width="4" Text="Публічне акціонерне товариство&#13;&#10;«Державний ощадний банк України»&#13;&#10;" Font="Trebuchet MS, 16pt"/>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="68.82" Width="718.2" Height="1285.2" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="Data1" Top="69.35" Width="718.2" Height="1209.6" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0.45,113.85,261.59,0,11.62,24.89,13.27,43.79,147.74,308.3,1035.1,18.9,151.2,170.1,641.75,726.8,262.5,309.75,1040.95,1116.55,37.8,56.7,75.6,1121.55,1187.7,66.14999,13.23">
       <TextObject Name="Text2" Left="415.8" Top="0.45" Width="283.5" Height="113.4" Text="Додаток №2&#13;&#10;До Змін до Порядку емісії та обслуговування &#13;&#10;платіжних карток в установах  АТ «Ощадбанк»&#13;&#10;затверджених постановою правління АТ «Ощадбанк» &#13;&#10;від 19.10.2015 р. №294&#13;&#10;&#13;&#10;Додаток 25 &#13;&#10;Порядку емісії та обслуговування &#13;&#10;платіжних карток в установах  АТ «Ощадбанк»&#13;&#10;" HorzAlign="Right" Font="Times New Roman, 8pt"/>
       <TableObject Name="Table1" Left="9.45" Top="113.85" Width="699.3" Height="147.74" GrowToBottom="true">
         <TableColumn Name="Column1" Width="330.75"/>
@@ -179,10 +179,18 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="1356.68" Width="718.2" Height="47.25" FirstRowStartsNewPage="true">
-      <TextObject Name="Text4" Left="9.45" Width="699.3" Height="18.9" Text="Підпис представника Банку _________________           Підпис Клієнта/Держателя __________________" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
-      <TextObject Name="Text66" Left="387.45" Top="28.35" Width="321.3" Height="18.9" Text="№ друку [p_doc_id] сторінка [Page] з [TotalPages]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
-      <BarcodeObject Name="Barcode1" Left="9.45" Top="28.35" Width="126.25" Height="18.9" ShowText="false" Barcode="Codabar"/>
+    <PageFooterBand Name="PageFooter1" Top="1282.15" Width="718.2" Height="103.95" FirstRowStartsNewPage="true" Guides="56.7,102.06,37.8,103.95,0,18.9">
+      <BarcodeObject Name="Barcode3" Left="141.75" Top="56.7" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
+      <TextObject Name="Text5" Left="359.1" Top="37.8" Width="538.65" Height="66.15" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <CustomFormat Format="yyyy-MM-dd HH:mm:ss"/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text4" Left="9.45" Width="699.3" Height="18.9" Text="Підпис представника Банку _________________          Підпис Клієнта/Держателя __________________" VertAlign="Center" Font="Times New Roman, 9pt"/>
     </PageFooterBand>
   </ReportPage>
 </Report>
