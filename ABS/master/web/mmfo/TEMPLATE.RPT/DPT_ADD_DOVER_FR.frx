@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="05/18/2015 13:08:33" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="11/05/2018 22:48:00" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRniMDM4qda++fu056ydzn4CA==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqGvSwQ3Ug2J0QD0n/zY8UZr2Y5KHBRGZO+a0UH0C/CRUT1Zw6iJK/KYUKYwP5kCGI/9oDfe6uJ9xymrqtB7tZ9Q==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,   &#13;&#10;&#13;&#10; bp.val  as branch_name &#13;&#10;&#13;&#10;  from dpt_deposit d , branch_parameters bp, dpt_agreements da &#13;&#10;&#13;&#10; where d.deposit_id =  da.dpt_id &#13;&#10;       and da.agrmnt_id = :p_agrmnt_id &#13;&#10;       and bp.tag='NAME_BRANCH' &#13;&#10;       and bp.branch=d.branch">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="BRANCH_NAME" DataType="System.String"/>
@@ -65,7 +65,7 @@ namespace FastReport
         <Column Name="STAFF_FIO_SHORT" DataType="System.String"/>
         <Column Name="TODAY_WB" DataType="System.String"/>
       </TableDataSource>
-      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch&#13;&#10;  from v_ead_docs ed&#13;&#10; where ed.doc_id = :p_doc_id">
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand=" select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="DOC_ID" DataType="System.Decimal"/>
         <Column Name="CRT_DATE" DataType="System.DateTime"/>
@@ -76,6 +76,9 @@ namespace FastReport
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
         <Column Name="EA_STRUCT_ID" DataType="System.String"/>
+        <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
+        <Column Name="DOC_PRINT_NUMBER" DataType="System.String"/>
+        <Column Name="TICKET_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
       <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       fio(c.nmk, 1) || ' ' || substr(fio(c.nmk, 2), 1, 1) || '. ' ||&#13;&#10;       substr(fio(c.nmk, 3), 1, 1) || '.' as fio_short,&#13;&#10;       c.okpo as okpo,&#13;&#10;       decode(c.codcagent,&#13;&#10;              5,&#13;&#10;              'резидент',&#13;&#10;              6,&#13;&#10;              'нерезидент',&#13;&#10;              '--') as codcagent,&#13;&#10;       p.passp as doc_id,&#13;&#10;       ps.name as doc_name,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;       F_GET_ADR (c.rnk ,1) as address_complete,&#13;&#10;       nvl(p.teld, nvl(p.telw, '________')) as phone,&#13;&#10;       bars.dpt_trusty_options(da.denom_count) as trusty_options&#13;&#10;  from customer c, person p, passp ps, dpt_agreements da&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and da.cust_id = c.rnk&#13;&#10;   and p.passp = ps.passp&#13;&#10;   and da.agrmnt_id = :p_agrmnt_id">
@@ -124,9 +127,9 @@ namespace FastReport
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="p_doc_id" DataType="System.Int32" Expression="1025"/>
-    <Parameter Name="p_rnk" DataType="System.Int64" Expression="1064574"/>
+    <Parameter Name="p_rnk" DataType="System.Int64" Expression="91646816"/>
     <Parameter Name="p_agr_id" DataType="System.Int64" Expression="7335001"/>
-    <Parameter Name="p_agrmnt_id" DataType="System.Int32" Expression="396752"/>
+    <Parameter Name="p_agrmnt_id" DataType="System.Int32" Expression="71900316"/>
   </Dictionary>
   <ReportPage Name="Page1">
     <DataBand Name="Data1" Width="718.2" Height="847.76" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
@@ -172,7 +175,7 @@ namespace FastReport
           <TableCell Name="Cell251" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row118" Height="47.25" AutoSize="true">
-          <TableCell Name="Cell255" Text="Довіреність видана строком на &lt;b&gt;[AGRMNT_DATA.TERM_B]&lt;/b&gt; та дійсна до &lt;b&gt;[AGRMNT_DATA.DATE_END_WB]&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell255" Text="Довіреність дійсна до &lt;b&gt;[AGRMNT_DATA.DATE_END_WB]&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
           <TableCell Name="Cell256" Font="Times New Roman, 10pt" HtmlTags="true"/>
           <TableCell Name="Cell257" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
@@ -203,9 +206,17 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="850.6" Width="718.2" Height="18.9">
-      <BarcodeObject Name="Barcode1" Left="96.52" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
-      <TextObject Name="Text2" Left="264.6" Width="444.15" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    <PageFooterBand Name="PageFooter1" Top="850.54" Width="718.2" Height="75.6">
+      <BarcodeObject Name="Barcode3" Left="113.4" Top="16.98" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
+      <TextObject Name="Text8" Left="330.75" Width="538.65" Height="75.6" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <CustomFormat Format="yyyy-MM-dd HH:mm:ss"/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
     </PageFooterBand>
   </ReportPage>
 </Report>

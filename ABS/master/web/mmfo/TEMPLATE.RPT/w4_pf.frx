@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/19/2018 11:39:07" ReportInfo.Modified="04/02/2018 16:24:25" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="mmfo" ConnectionString="rijcmlqxoJkxB+qVyinWpGXWWtjhOUx6uH0AW251ibWOgZR0fnRrllLoCX35E5ymMvva2og">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select branch,&#13;&#10;                                  nls,&#13;&#10;                                  rnk,&#13;&#10;                                  okpo,&#13;&#10;                                  nmk,&#13;&#10;                                  bday,&#13;&#10;                                  pass_ser,&#13;&#10;                                  pass_num,&#13;&#10;								  indx1,&#13;&#10;                                  np1,&#13;&#10;                                  adr1,&#13;&#10;                                  indx2,&#13;&#10;                                  np2,&#13;&#10;                                  adr2,&#13;&#10;                                  card_code,&#13;&#10;                                  code,&#13;&#10;                                  pr,&#13;&#10;                                  zar_365,&#13;&#10;                                  zar_n_365,&#13;&#10;                                  dmin_zar,&#13;&#10;                                  dmax_zar,&#13;&#10;                                  spi_365,&#13;&#10;                                  spi_365_dw,&#13;&#10;                                  dmax_spi,&#13;&#10;                                  ost_2625&#13;&#10;      from bars.T_W4_OTCH_PF&#13;&#10;where branch like :Param0 ||'%'&#13;&#10;        and case when pr = 'SOC' then '0' when pr = 'ARS' then '1'  end = :Param1">
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="BDAY" DataType="System.DateTime"/>
+        <Column Name="PASS_SER" DataType="System.String"/>
+        <Column Name="PASS_NUM" DataType="System.String"/>
+        <Column Name="INDX1" DataType="System.String"/>
+        <Column Name="NP1" DataType="System.String"/>
+        <Column Name="ADR1" DataType="System.String"/>
+        <Column Name="INDX2" DataType="System.String"/>
+        <Column Name="NP2" DataType="System.String"/>
+        <Column Name="ADR2" DataType="System.String"/>
+        <Column Name="CARD_CODE" DataType="System.String"/>
+        <Column Name="CODE" DataType="System.String"/>
+        <Column Name="PR" DataType="System.String"/>
+        <Column Name="ZAR_365" DataType="System.Decimal"/>
+        <Column Name="ZAR_N_365" DataType="System.Decimal"/>
+        <Column Name="DMIN_ZAR" DataType="System.DateTime"/>
+        <Column Name="DMAX_ZAR" DataType="System.DateTime"/>
+        <Column Name="SPI_365" DataType="System.Decimal"/>
+        <Column Name="SPI_365_DW" DataType="System.Decimal"/>
+        <Column Name="DMAX_SPI" DataType="System.DateTime"/>
+        <Column Name="OST_2625" DataType="System.Decimal"/>
+        <CommandParameter Name="Param1" DataType="126" Expression="[Param1]"/>
+        <CommandParameter Name="Param0" DataType="126" Expression="[Param0]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="Param0" DataType="System.String"/>
+    <Parameter Name="Param1" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="900" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="3326.4" Height="94.5">
+      <TextObject Name="Text1" Width="3213" Height="94.5" Text="Звіт &#13;&#10;про пенсіонерів, які одержують пенсію за довіреністю або не одержують пенсію" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="98.99" Width="3326.4"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="103.49" Width="3326.4" Height="85.05" Condition="[Table.BRANCH]">
+      <TextObject Name="Text2" Width="3213" Height="18.9" Text="[Table.BRANCH]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text14" Left="179.55" Top="18.9" Width="132.3" Height="66.15" Border.Lines="All" Text="Номер&#13;&#10;рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text20" Top="18.9" Width="179.55" Height="66.15" Border.Lines="All" Text="Бранч" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text22" Left="311.85" Top="18.9" Width="122.85" Height="66.15" Border.Lines="All" Text="Ідентиф.&#13;&#10;код" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text23" Left="793.8" Top="18.9" Width="141.75" Height="66.15" Border.Lines="All" Text="День неродження" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text24" Left="935.55" Top="18.9" Width="75.6" Height="66.15" Border.Lines="All" Text="Серія&#13;&#10;паспорта" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text27" Left="434.7" Top="18.9" Width="359.1" Height="66.15" Border.Lines="All" Text="Найменування клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text29" Left="1096.2" Top="18.9" Width="113.4" Height="66.15" Border.Lines="All" Text="Індекс&#13;&#10;(місце реєстрації)" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text30" Left="1209.6" Top="18.9" Width="207.9" Height="66.15" Border.Lines="All" Text="Населений&#13;&#10;пункт&#13;&#10;(місце реєстрації)" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text31" Left="1417.5" Top="18.9" Width="519.75" Height="66.15" Border.Lines="All" Text="Адреса&#13;&#10;(місце реєстрації)" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text32" Left="1937.25" Top="18.9" Width="94.5" Height="66.15" Border.Lines="All" Text="Індекс&#13;&#10;(місце проживання)" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text33" Left="2239.65" Top="18.9" Width="519.75" Height="66.15" Border.Lines="All" Text="Адреса&#13;&#10;(місце проживання)" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text34" Left="2031.75" Top="18.9" Width="207.9" Height="66.15" Border.Lines="All" Text="Населений&#13;&#10;пункт&#13;&#10;(місце проживання)" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text45" Left="2759.4" Top="18.9" Width="113.4" Height="66.15" Border.Lines="All" Text="Тип&#13;&#10;клієнта" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text50" Left="2872.8" Top="18.9" Width="113.4" Height="66.15" Border.Lines="All" Text="Дата останнього&#13;&#10;зарахування" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text52" Left="2986.2" Top="18.9" Width="113.4" Height="66.15" Border.Lines="All" Text="Тип зняття&#13;&#10;коштів" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text53" Left="3099.6" Top="18.9" Width="113.4" Height="66.15" Border.Lines="All" Text="Дата&#13;&#10;останнього&#13;&#10;зняття коштів" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text16" Left="1011.15" Top="18.9" Width="85.05" Height="66.15" Border.Lines="All" Text="Номер&#13;&#10;паспорта" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <DataBand Name="Data1" Top="193.03" Width="3326.4" Height="18.9" DataSource="Table">
+        <TextObject Name="Text4" Left="179.55" Width="132.3" Height="18.9" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text7" Left="1011.15" Width="85.05" Height="18.9" Border.Lines="All" Text="[Table.PASS_NUM]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text11" Width="179.55" Height="18.9" Border.Lines="All" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text6" Left="311.85" Width="122.85" Height="18.9" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text25" Left="935.55" Width="75.6" Height="18.9" Border.Lines="All" Text="[Table.PASS_SER]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text26" Left="793.8" Width="141.75" Height="18.9" Border.Lines="All" Text="[Table.BDAY]" Format="Date" Format.Format="d" HorzAlign="Center"/>
+        <TextObject Name="Text28" Left="434.7" Width="359.1" Height="18.9" Border.Lines="All" Text="[Table.NMK]" VertAlign="Center"/>
+        <TextObject Name="Text36" Left="1096.2" Width="113.4" Height="18.9" Border.Lines="All" Text="[Table.INDX1]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text37" Left="1209.6" Width="207.9" Height="18.9" Border.Lines="All" Text="[Table.NP1]" VertAlign="Center"/>
+        <TextObject Name="Text38" Left="1417.5" Width="519.75" Height="18.9" Border.Lines="All" Text="[Table.ADR1]" VertAlign="Center"/>
+        <TextObject Name="Text39" Left="2239.65" Width="519.75" Height="18.9" Border.Lines="All" Text="[Table.ADR2]" VertAlign="Center"/>
+        <TextObject Name="Text40" Left="2031.75" Width="207.9" Height="18.9" Border.Lines="All" Text="[Table.NP1]"/>
+        <TextObject Name="Text41" Left="1937.25" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.INDX1]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text46" Left="2759.4" Width="113.4" Height="18.9" Border.Lines="All" Text="[Table.PR]" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text58" Left="2872.8" Width="113.4" Height="18.9" Border.Lines="All" Text="[Table.DMAX_ZAR]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text60" Left="2986.2" Width="113.4" Height="18.9" Border.Lines="All" Text="[Table.SPI_365_DW]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+        <TextObject Name="Text61" Left="3099.6" Width="113.4" Height="18.9" Border.Lines="All" Text="[Table.DMAX_SPI]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="216.43" Width="3326.4"/>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="220.92" Width="3326.4" Height="18.9"/>
+  </ReportPage>
+</Report>

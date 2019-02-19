@@ -45,7 +45,9 @@
 -----------------------------------------------------------------------
 [ALIGN=LEFT]Загальна сума:[REF=OSummLit,C,69,,TRUE]
 [ALIGN=LEFT]Призначення платежу:[REF=ONazn,C,160,,TRUE]
-[ALIGN=LEFT]Пред'явлений документ:[REF=DR_PASP,C,15] N [REF=DR_PASPN,C,30]
+[ALIGN=LEFT]Пред'явлений документ:[REF=DR_PASP,C,15,,TRUE] N [REF=DR_PASPN,C,30,,TRUE]
+[ALIGN=LEFT]Ким і коли видано документ:[REF=DR_ATRT,C,100,,TRUE]
+[ALIGN=LEFT]Підстава:[REF=PIDST,C,160,,TRUE]
 
 [ALIGN=LEFT]Пiдпис отримувача ________________
 

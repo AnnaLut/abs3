@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/12/2017 11:40:17" ReportInfo.Modified="08/22/2017 17:41:07" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/12/2017 11:40:17" ReportInfo.Modified="11/07/2018 14:45:31" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,14 +49,31 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHz/03L09idGFNzz+yYha3VWBRS0Py3J48zeNZcW4dPVuQ=="/>
-    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="0"/>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQH0o+mQrHGyJ3ZnAT/E0jII=">
+      <TableDataSource Name="Table" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
+        <Column Name="DOC_ID" DataType="System.Decimal"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
+        <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="CL_FIO" DataType="System.String"/>
+        <Column Name="AGR_ID" DataType="System.Decimal"/>
+        <Column Name="AGR_NUM" DataType="System.String"/>
+        <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
+        <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
+        <Column Name="CRT_BRANCH" DataType="System.String"/>
+        <Column Name="DOC_PRINT_NUMBER" DataType="System.String"/>
+        <Column Name="TICKET_ID" DataType="System.String"/>
+        <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="10220601311"/>
   </Dictionary>
-  <ReportPage Name="Page1" Watermark.Text="gfhdfghdfghdfg">
-    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15" PrintOn="FirstPage">
+  <ReportPage Name="Page1" Guides="9.45,689.85,415.8,699.3,708.75,28.35,359.1,340.2,372.33,81.27,156.87,345.87,141.75,349.65,897.75" Watermark.Text="gfhdfghdfghdfg">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15" PrintOn="FirstPage" Guides="-2,64.15">
       <TextObject Name="Text1" Left="9.45" Top="-2" Width="680.4" Height="66.15" Border.Lines="Bottom" Border.Color="220, 225, 35" Border.Width="4" Text="Публічне акціонерне товариство&#13;&#10;«Державний ощадний банк України»&#13;&#10;" Font="Trebuchet MS, 16pt"/>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="68.82" Width="718.2" Height="1663.2" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="Data1" Top="69.35" Width="718.2" Height="1663.2" CanGrow="true" CanShrink="true" CanBreak="true" Guides="7.9,121.3,151.65,315.06,0,11.62,30.52,18.9,43.79,13.27,59.46,163.41,346.1,1472.78,409.33,428.23,890.4301,462.2,918.78,28.35,1107.78,189,1126.68,1483.65,1653.75,170.1,34.02">
       <TextObject Name="Text2" Left="415.8" Top="7.9" Width="283.5" Height="113.4" Text="Додаток №4&#13;&#10;До Змін до Порядку емісії та обслуговування &#13;&#10;платіжних карток в установах  АТ «Ощадбанк»&#13;&#10;затверджених постановою правління АТ «Ощадбанк» &#13;&#10;від 19.10.2015 р. №294&#13;&#10;&#13;&#10;Додаток 27 &#13;&#10;Порядку емісії та обслуговування &#13;&#10;платіжних карток в установах  АТ «Ощадбанк»&#13;&#10;" HorzAlign="Right" Font="Times New Roman, 8pt"/>
       <TableObject Name="Table1" Left="9.45" Top="151.65" Width="699.3" Height="163.41" GrowToBottom="true">
         <TableColumn Name="Column1" Width="330.75"/>
@@ -100,7 +117,7 @@ namespace FastReport
         <TableRow Name="Row8" Height="390.43" AutoSize="true">
           <TableCell Name="Cell28" Border.Lines="Left, Right, Bottom" Text="&lt;b&gt;2.1. Особа, яка уклала Договір комплексного банківського обслуговування фізичних осіб та відкрила поточний рахунок (Клієнт) &lt;/b&gt;&#13;&#10;Прізвище&#13;&#10;∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟&#13;&#10;Ім’я&#13;&#10;∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟&#13;&#10;По батькові&#13;&#10;∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟&#13;&#10;&lt;b&gt;2.2. Контактна інформація&lt;/b&gt;&#13;&#10;Домашній телефон    (∟∟∟) ∟∟∟∟∟∟∟&#13;&#10;Службовий телефон  (∟∟∟) ∟∟∟∟∟∟∟&#13;&#10;Мобільний телефон   (∟∟∟) ∟∟∟∟∟∟∟&#13;&#10;E-mail  ___________________________________________&#13;&#10;Я даю згоду на отримання виписок та іншої, пов’язаної з укладенням, зміною та виконанням умов Договору  комплексного банківського обслуговування фізичних осіб, за своїми банківськими рахунками на електронну адресу та/або на адресу листування, що вказані вище, та розумію, що розсилання виписок буде здійснюватись незахищеними електронними каналами і інформація з виписок може стати відомою третім особам внаслідок протиправних дій третіх осіб&#13;&#10;&lt;b&gt;2.3. Ім’я та прізвище на платіжній картці (латинськими літерами):&#13;&#10;як у закордонному паспорті або як Ви бажаєте бачити на платіжній картці)&lt;/b&gt;&#13;&#10;∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟∟" Font="Times New Roman, 9pt" HtmlTags="true"/>
           <TableCell Name="Cell29" Border.Lines="Left, Right, Bottom" Font="Times New Roman, 9pt, style=Bold"/>
-          <TableCell Name="Cell30" Border.Lines="Left, Right, Bottom" Text="&lt;b&gt;2.4. Реєстраційний номер облікової картки платника податків/ Ідентифікаційний номер за ДРФО&lt;sup&gt;1&lt;/sup&gt; (далі – Ідентифікаційний номер)&lt;/b&gt;&#13;&#10;∟∟∟∟∟∟∟∟∟∟&#13;&#10; Не маю Ідентифікаційного номеру (за умови наявності відповідної відмітки в паспорті) &#13;&#10; Підтверджую, що дані надані мною під час останньої ідентифікації не змінились.&#13;&#10;&lt;b&gt;&lt;sup&gt;1&lt;/sup&gt;Заповнюється, якщо фізична особа, яка відкриває рахунок, є резидентом України.&lt;/b&gt;&#13;&#10;&lt;b&gt;2.5. Реквізити документа, що посвідчує особу:&lt;/b&gt;&#13;&#10;№  ∟∟ ∟∟∟∟Серія ∟∟ Ким та коли виданий &#13;&#10;_________________________________________________&#13;&#10;&lt;b&gt;2.6.  Дата та місце народження:&lt;/b&gt;&#13;&#10;∟∟.∟∟.∟∟∟∟&#13;&#10;____________________________________&#13;&#10;&#13;&#10;&lt;b&gt;2.7. Громадянство:&lt;/b&gt; _______________________________&#13;&#10;&#13;&#10;&lt;b&gt;2.8. Адреса реєстрації: &lt;/b&gt;&#13;&#10;______________________________________&#13;&#10;&#13;&#10;&lt;b&gt;Адреса проживання (для листування)&lt;/b&gt; або &lt;b&gt;Місце тимчасового перебування на території України&lt;/b&gt; (для нерезидентів): &#13;&#10;співпадає з адресою реєстрації  Так  якщо НІ: &#13;&#10;_____________________________________________________&#13;&#10;&#13;&#10;&lt;b&gt;Про зміну адреси повідомлятиму Банк письмово&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell30" Border.Lines="Left, Right, Bottom" Text="&lt;b&gt;2.4. Реєстраційний номер облікової картки платника податків/ Ідентифікаційний номер за ДРФО&lt;sup&gt;1&lt;/sup&gt; (далі – Ідентифікаційний номер)&lt;/b&gt;&#13;&#10;∟∟∟∟∟∟∟∟∟∟&#13;&#10;£ Не маю Ідентифікаційного номеру (за умови наявності відповідної відмітки в паспорті) &#13;&#10;£ Підтверджую, що дані надані мною під час останньої ідентифікації не змінились.&#13;&#10;&lt;b&gt;&lt;sup&gt;1&lt;/sup&gt;Заповнюється, якщо фізична особа, яка відкриває рахунок, є резидентом України.&lt;/b&gt;&#13;&#10;&lt;b&gt;2.5. Реквізити документа, що посвідчує особу:&lt;/b&gt;&#13;&#10;№  ∟∟ ∟∟∟∟Серія ∟∟ Ким та коли виданий &#13;&#10;_________________________________________________&#13;&#10;&lt;b&gt;2.6.  Дата та місце народження:&lt;/b&gt;&#13;&#10;∟∟.∟∟.∟∟∟∟&#13;&#10;____________________________________&#13;&#10;&#13;&#10;&lt;b&gt;2.7. Громадянство:&lt;/b&gt; _______________________________&#13;&#10;&#13;&#10;&lt;b&gt;2.8. Адреса реєстрації: &lt;/b&gt;&#13;&#10;______________________________________&#13;&#10;&#13;&#10;&lt;b&gt;Адреса проживання (для листування)&lt;/b&gt; або &lt;b&gt;Місце тимчасового перебування на території України&lt;/b&gt; (для нерезидентів): &#13;&#10;співпадає з адресою реєстрації £ Так £ якщо НІ: &#13;&#10;_____________________________________________________&#13;&#10;&#13;&#10;&lt;b&gt;Про зміну адреси повідомлятиму Банк письмово&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 9pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row9">
           <TableCell Name="Cell31" Font="Times New Roman, 9pt, style=Bold" ColSpan="3"/>
@@ -171,10 +188,18 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="1734.68" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" FirstRowStartsNewPage="true">
-      <TextObject Name="Text4" Left="9.45" Width="699.3" Height="18.9" Text="Підпис представника Банку _________________                 Підпис Клієнта/Держателя __________________" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
-      <TextObject Name="Text66" Left="378" Top="28.35" Width="330.75" Height="18.9" Text="№ друку [p_doc_id] сторінка [Page] з [TotalPages]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
-      <BarcodeObject Name="Barcode1" Left="9.45" Top="28.35" Width="126.25" Height="18.9" Expression="[p_doc_id]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
+    <PageFooterBand Name="PageFooter1" Top="1735.75" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" FirstRowStartsNewPage="true" Guides="9.45,37.8,47.25,92.61,94.5">
+      <TextObject Name="Text4" Left="9.45" Top="9.45" Width="699.3" Height="28.35" Text="Підпис представника Банку _________________          Підпис Клієнта/Держателя __________________" VertAlign="Center" Font="Times New Roman, 9pt"/>
+      <BarcodeObject Name="Barcode3" Left="141.75" Top="47.25" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
+      <TextObject Name="Text5" Left="359.1" Top="37.8" Width="538.65" Height="56.7" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <CustomFormat Format="yyyy-MM-dd HH:mm:ss"/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
     </PageFooterBand>
   </ReportPage>
 </Report>

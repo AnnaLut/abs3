@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" UseFileCache="true" ReportInfo.Created="06/24/2014 16:54:08" ReportInfo.Modified="07/12/2018 16:53:48" ReportInfo.CreatorVersion="2013.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Data.Sql;
+using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
+
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    
+    public string TicDoc_attr(string Var)
+    {
+      // Обработка параметрів
+      Parameter p_nd = Report.GetParameter(&quot;p_nd&quot;);
+      String p_value1 = &quot;&quot;;
+      String p_value2 = &quot;&quot;;
+      String p_value3 = &quot;&quot;;
+
+      OracleDataConnection frxcon = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection con = (OracleConnection)frxcon.GetConnection();
+      OracleCommand cmd = con.CreateCommand();
+      
+      cmd.CommandType = CommandType.StoredProcedure;
+      cmd.CommandText = &quot;cc_doc_get_var_value2&quot;;
+         
+      cmd.Parameters.Add(&quot;p_tag&quot;,     OracleDbType.Varchar2, Var,           ParameterDirection.Input);       //0
+      cmd.Parameters.Add(&quot;p_dealnum&quot;, OracleDbType.Decimal, p_nd.Value,     ParameterDirection.Input);       //1
+      cmd.Parameters.Add(&quot;p_agrmnum&quot;, OracleDbType.Decimal, 0,             ParameterDirection.Input);        //2
+      cmd.Parameters.Add(&quot;p_value1&quot;, OracleDbType.Varchar2, 2000, p_value1, ParameterDirection.InputOutput); //3
+      cmd.Parameters.Add(&quot;p_value2&quot;, OracleDbType.Varchar2, 2000, p_value2, ParameterDirection.InputOutput); //4
+      cmd.Parameters.Add(&quot;p_value3&quot;, OracleDbType.Varchar2, 2000, p_value3, ParameterDirection.InputOutput); //5
+      
+      con.Open();
+      try
+      {
+        cmd.ExecuteNonQuery();
+        
+        p_value1 = cmd.Parameters[&quot;p_value1&quot;].Value.ToString();
+        p_value2 = cmd.Parameters[&quot;p_value2&quot;].Value.ToString();
+        p_value2 = cmd.Parameters[&quot;p_value3&quot;].Value.ToString();
+
+      }
+      finally
+      {
+        con.Close();
+      }
+      
+      return   p_value1;
+      
+    }
+    
+    
+    // Получение значения параметра тикета
+    public string GetVal(string Var)
+    {
+      try
+      {
+        string p_val = TicDoc_attr(Var);
+        
+        if (!String.IsNullOrEmpty(p_val) &amp;&amp; p_val != &quot;null&quot;)
+          return p_val;
+        else 
+          return &quot;&quot;;
+      }
+      catch (Exception) {  return &quot;&quot;; }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF11wS71L/O+VTkDYruQbASqVCFcIB7H0vq9JsvxwfmR3PHr6Vmygp9ESx3nH/Bj/M3vnCXVvOjqYnElor6tkqSo8=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select '[GetVal(&quot;'||id||'&quot;)]' as form, id, name , ssql  from DOC_ATTR where id like 'SKR%'">
+        <Column Name="ID" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="SSQL" DataType="System.String"/>
+        <Column Name="FORM" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="tariff" DataType="System.Int32" Enabled="true" SelectCommand="select t.name,  daysfrom, daysto, t2.s as sump,t.s  , s.nd, decode(t2.s,S.SD/100,1,0) as t&#13;&#10;  from skrynka_tip t, skrynka_tariff tf, skrynka_tariff2 t2 , skrynka_nd s &#13;&#10;  where t.o_sk = tf.o_sk&#13;&#10;    and TF.TARIFF = T2.TARIFF&#13;&#10;    and (t2.tariff, t2.tariff_date)&#13;&#10;       in  ( select tariff, max(tariff_date)&#13;&#10;               from skrynka_tariff2&#13;&#10;              where tariff_date &lt;= S.DAT_BEGIN and tariff = t2.tariff group by tariff )&#13;&#10;     and S.ND = :nd&#13;&#10;     and S.TARIFF = T2.TARIFF&#13;&#10;  Order by T.O_SK, daysfrom ">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="DAYSFROM" DataType="System.Decimal"/>
+        <Column Name="DAYSTO" DataType="System.Decimal"/>
+        <Column Name="SUMP" DataType="System.Decimal"/>
+        <Column Name="S" DataType="System.Double"/>
+        <Column Name="ND" DataType="System.Decimal"/>
+        <Column Name="T" DataType="System.Decimal"/>
+        <CommandParameter Name="nd" DataType="113" Expression="[p_nd]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_nd" DataType="System.Int64" Expression="13630672611"/>
+  </Dictionary>
+  <ReportPage Name="Page2">
+    <DataBand Name="Data4" Width="718.2" Height="1011.15">
+      <TableObject Name="Table1" Left="378" Width="340.2" Height="28.35" Anchor="Top, Right">
+        <TableColumn Name="Column1" Width="68.04"/>
+        <TableColumn Name="Column2" Width="68.04"/>
+        <TableColumn Name="Column3" Width="68.04"/>
+        <TableColumn Name="Column4" Width="68.04"/>
+        <TableColumn Name="Column5" Width="68.04"/>
+        <TableRow Name="Row1" Height="5.67">
+          <TableCell Name="Cell1" Border.Lines="All" Text="БАНКІВСЬКА ТАЄМНИЦЯ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 18pt, style=Bold" ColSpan="5" RowSpan="5"/>
+          <TableCell Name="Cell2" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell3" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell4" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell5" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="5.67">
+          <TableCell Name="Cell6" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell8" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="5.67">
+          <TableCell Name="Cell11" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="5.67">
+          <TableCell Name="Cell16" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell17" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell19" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell20" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="5.67">
+          <TableCell Name="Cell21" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell22" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell23" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell24" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+          <TableCell Name="Cell25" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table2" Left="103.95" Top="47.25" Width="387.45" Height="215.46">
+        <TableColumn Name="Column6" Width="77.49"/>
+        <TableColumn Name="Column7" Width="77.49"/>
+        <TableColumn Name="Column8" Width="77.49"/>
+        <TableColumn Name="Column9" Width="77.49"/>
+        <TableColumn Name="Column10" Width="77.49"/>
+        <TableRow Name="Row6" Height="96.39">
+          <TableCell Name="Cell26" Text="&lt;b&gt; АТ &quot;Ощадбанк&quot;&#13;&#10; [GetVal(&quot;DPT_NAME_BRANCH&quot;)]&lt;/b&gt;" Font="Times New Roman, 14pt" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell27"/>
+          <TableCell Name="Cell28"/>
+          <TableCell Name="Cell29"/>
+          <TableCell Name="Cell30"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="39.69">
+          <TableCell Name="Cell36" Text="&lt;b&gt;Договір оренди індивідуального сейфа&lt;/b&gt;&#13;&#10;&lt;b&gt;  &lt;u&gt;№ [GetVal(&quot;SKRN_ND&quot;)]   &lt;/u&gt;  від [GetVal(&quot;SKRN_DAT_BEGIN&quot;)]&lt;/b&gt;" Font="Times New Roman, 14pt" HtmlTags="true" ColSpan="5" RowSpan="3"/>
+          <TableCell Name="Cell37"/>
+          <TableCell Name="Cell38"/>
+          <TableCell Name="Cell39"/>
+          <TableCell Name="Cell40"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="39.69">
+          <TableCell Name="Cell41"/>
+          <TableCell Name="Cell42"/>
+          <TableCell Name="Cell43"/>
+          <TableCell Name="Cell44"/>
+          <TableCell Name="Cell45"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="39.69">
+          <TableCell Name="Cell46"/>
+          <TableCell Name="Cell47"/>
+          <TableCell Name="Cell48"/>
+          <TableCell Name="Cell49"/>
+          <TableCell Name="Cell50"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table3" Left="85.05" Top="396.9" Width="548.1" Height="189">
+        <TableColumn Name="Column11" Width="109.62"/>
+        <TableColumn Name="Column12" Width="109.62"/>
+        <TableColumn Name="Column13" Width="109.62"/>
+        <TableColumn Name="Column14" Width="109.62"/>
+        <TableColumn Name="Column15" Width="109.62"/>
+        <TableRow Name="Row11" Height="37.8">
+          <TableCell Name="Cell51" Text=" &lt;b&gt;[GetVal(&quot;SKRN_FIO&quot;)]&lt;/b&gt; " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 36pt, style=Bold" HtmlTags="true" ColSpan="5" RowSpan="5"/>
+          <TableCell Name="Cell52" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell53" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell54" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell55" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="37.8">
+          <TableCell Name="Cell56" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell57" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell58" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell59" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell60" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="37.8">
+          <TableCell Name="Cell61" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell62" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell63" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell64" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell65" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="37.8">
+          <TableCell Name="Cell66" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell67" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell68" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell69" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell70" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="37.8">
+          <TableCell Name="Cell71" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell72" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell73" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell74" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell75" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="56.7" Top="756" Width="642.6" Height="189">
+        <TableColumn Name="Column16" Width="128.52"/>
+        <TableColumn Name="Column17" Width="128.52"/>
+        <TableColumn Name="Column18" Width="128.52"/>
+        <TableColumn Name="Column19" Width="128.52"/>
+        <TableColumn Name="Column20" Width="128.52"/>
+        <TableRow Name="Row16" Height="37.8">
+          <TableCell Name="Cell76" Text="&lt;b&gt;Строк користування сейфом &#13;&#10;&lt;u&gt;[GetVal(&quot;SKRN_DAT_BEGIN&quot;)] - [GetVal(&quot;SKRN_DAT_END&quot;)]&lt;/u&gt;&lt;/b&gt;" HorzAlign="Center" Font="Times New Roman, 20pt, style=Bold" HtmlTags="true" ColSpan="5" RowSpan="5"/>
+          <TableCell Name="Cell77"/>
+          <TableCell Name="Cell78"/>
+          <TableCell Name="Cell79"/>
+          <TableCell Name="Cell80"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="37.8">
+          <TableCell Name="Cell81"/>
+          <TableCell Name="Cell82"/>
+          <TableCell Name="Cell83"/>
+          <TableCell Name="Cell84"/>
+          <TableCell Name="Cell85"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="37.8">
+          <TableCell Name="Cell86"/>
+          <TableCell Name="Cell87"/>
+          <TableCell Name="Cell88"/>
+          <TableCell Name="Cell89"/>
+          <TableCell Name="Cell90"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="37.8">
+          <TableCell Name="Cell91"/>
+          <TableCell Name="Cell92"/>
+          <TableCell Name="Cell93"/>
+          <TableCell Name="Cell94"/>
+          <TableCell Name="Cell95"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="37.8">
+          <TableCell Name="Cell96"/>
+          <TableCell Name="Cell97"/>
+          <TableCell Name="Cell98"/>
+          <TableCell Name="Cell99"/>
+          <TableCell Name="Cell100"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table6" Width="75.6" Height="83.21">
+        <TableColumn Name="Column21" Width="75.6"/>
+        <TableRow Name="Row21" Height="41.61">
+          <TableCell Name="Cell101" Border.Lines="Left, Right, Top" Text="&lt;b&gt; [GetVal(&quot;SKRN_NS&quot;)]&lt;/b&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="41.6">
+          <TableCell Name="Cell106" Border.Lines="Left, Right, Bottom" Text="(номер сейфа)" HorzAlign="Center" Font="Arial, 5pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table7" Top="75.6" Width="75.6" Height="935.55" Anchor="Bottom, Left" Border.Lines="Left, Right">
+        <TableColumn Name="Column22" Width="75.6"/>
+        <TableRow Name="Row23" Height="187.11">
+          <TableCell Name="Cell107" Border.Lines="Bottom" Text=" &lt;b&gt;[GetVal(&quot;SKRN_FIO&quot;)]&lt;/b&gt; " HorzAlign="Center" VertAlign="Center" Angle="270" Font="Times New Roman, 30pt" HtmlTags="true" RowSpan="5"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="187.11">
+          <TableCell Name="Cell112" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="187.11">
+          <TableCell Name="Cell117" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="187.11">
+          <TableCell Name="Cell122" Border.Lines="Bottom"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="187.11">
+          <TableCell Name="Cell127" Border.Lines="Bottom"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter2" Top="1013.21" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

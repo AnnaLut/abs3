@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/19/2018 11:39:07" ReportInfo.Modified="03/19/2018 15:16:45" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="mmfo" ConnectionString="rijcmlqxoJkxB+qVyinWpGXWWtjhOUx6uH0AW251ibWOgZR0fm7n77L1JByWu1D3x3zs113X1pqkWpoR95tFxCgJ3AAnA==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT TRUNC(ROWNUM/50)+1 ST, &#13;&#10;       TO_CHAR(T.DAT_1, 'DD.MM.YYYY') DAT_1,  &#13;&#10;       TO_CHAR(T.DAT_2, 'DD.MM.YYYY') DAT_2,&#13;&#10;       TO_CHAR(TRUNC(ADD_MONTHS(TO_DATE(:sFdat1,'DD/MM/YYYY'),-13),'MM'), 'DD.MM.YYYY')DAT_BEGIN,&#13;&#10;       TO_CHAR(LAST_DAY(ADD_MONTHS(TO_DATE(:sFdat1,'DD/MM/YYYY'),-1)), 'DD.MM.YYYY')DAT_END,&#13;&#10;       T.NLS NLS,&#13;&#10;       T.NMK NMK,&#13;&#10;       T.OKPO OKPO,&#13;&#10;       nvl(to_char(TO_DATE(T.DAT_OST,'DD/MM/YYYY')), ' ') DAT_OST,&#13;&#10;       nvl(to_char(T.DAT_REG_D), ' ') DAT_REG_D,&#13;&#10;       nvl(to_char(T.DAT_END_D), ' ') DAT_END_D,&#13;&#10;       T.ADR  ADR,&#13;&#10;       T.BRANCH ||' '||B.NAME BR,&#13;&#10;       T.OB22 OB22,&#13;&#10;       case when T.OB22 = '20' then 1 when T.OB22 = '21' then 0 when T.OB22 = '17' then 2 end PTYPE,&#13;&#10;       case when T.OB22 = '20' then 'ВІЙСЬКОВА ПЕНСІЯ' when T.OB22 = '21' then 'СОЦІАЛЬНА ПЕНСІЯ' when T.OB22 = '17' then 'БЮДЖЕТНА' end&#13;&#10;                                  ||'('||DECODE(:Param2,0,'Власник','За довіреністю')||')'  PTEXTTYPE&#13;&#10;  FROM (SELECT ID, DAT_1, DAT_2,NLS,NMK,OKPO,DAT_OST,DAT_REG_D, ACC,DAT_END_D ,ADR, BRANCH, OB22 FROM T_OTCH_PF ORDER BY BRANCH) T, BRANCH B&#13;&#10; WHERE B.BRANCH =T.BRANCH&#13;&#10;   AND B.BRANCH LIKE :Param0 ||'%'&#13;&#10;   AND case when T.OB22 = '20' then 1 when T.OB22 = '21' then 0 when T.OB22 = '17' then 2 end = :Param1&#13;&#10;   AND (case when DAT_OST is not null and ID is not null then 1 else 0 end) = :Param2 &#13;&#10; ORDER BY T.BRANCH, case when T.OB22 = '20' then 1 when T.OB22 = '21' then 0 when T.OB22 = '17' then 2 end, T.OB22, TO_DATE(T.DAT_OST,'DD/MM/YYYY')">
+        <Column Name="ST" DataType="System.Decimal"/>
+        <Column Name="DAT_1" DataType="System.String"/>
+        <Column Name="DAT_2" DataType="System.String"/>
+        <Column Name="DAT_BEGIN" DataType="System.String"/>
+        <Column Name="DAT_END" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="DAT_OST" DataType="System.DateTime"/>
+        <Column Name="DAT_REG_D" DataType="System.DateTime"/>
+        <Column Name="DAT_END_D" DataType="System.DateTime"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="BR" DataType="System.String"/>
+        <Column Name="OB22" DataType="System.String"/>
+        <Column Name="PTYPE" DataType="System.Decimal"/>
+        <Column Name="PTEXTTYPE" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="19/03/2018"/>
+        <CommandParameter Name="Param0" DataType="126" Expression="[Param0]" DefaultValue="/322669/000012/060012/"/>
+        <CommandParameter Name="Param1" DataType="126" Expression="[Param1]" DefaultValue="0"/>
+        <CommandParameter Name="Param2" DataType="126" Expression="[Param2]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="Param1" DataType="System.String"/>
+    <Parameter Name="Param2" DataType="System.String"/>
+    <Parameter Name="Param0" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="500" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1814.4" Height="94.5">
+      <TextObject Name="Text1" Width="1814.4" Height="94.5" Text="Звіт&#13;&#10;про пенсіонерів, які одержують пенсію за довіреністю або не одержують пенсію за період&#13;&#10;з [Table.DAT_BEGIN] по [Table.DAT_END]&#13;&#10;&#13;&#10;[Table.PTEXTTYPE] - ОБ22 ([Table.OB22])" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="97.95" Width="1814.4"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="101.4" Width="1814.4" Height="75.6" Condition="[Table.BR]">
+      <TextObject Name="Text2" Width="1701" Height="18.9" Text="[Table.BR]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text14" Left="66.15" Top="18.9" Width="132.3" Height="56.7" Border.Lines="All" Text="Номер&#13;&#10;рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text15" Left="198.45" Top="18.9" Width="472.5" Height="56.7" Border.Lines="All" Text="ПІБ&#13;&#10;вкладника" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text16" Left="793.8" Top="18.9" Width="141.75" Height="56.7" Border.Lines="All" Text="Дата останньої&#13;&#10;видаткової&#13;&#10;операції" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text17" Left="935.55" Top="18.9" Width="141.75" Height="56.7" Border.Lines="All" Text="Дата реєстрації&#13;&#10;довіреності" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text18" Left="1077.3" Top="18.9" Width="141.75" Height="56.7" Border.Lines="All" Text="Дата &#13;&#10;закінчення дії&#13;&#10;довіреності" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text19" Left="1219.05" Top="18.9" Width="595.35" Height="56.7" Border.Lines="All" Text="Адреса&#13;&#10;вкладника" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text20" Top="18.9" Width="66.15" Height="56.7" Border.Lines="All" Text="№&#13;&#10;п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text22" Left="670.95" Top="18.9" Width="122.85" Height="56.7" Border.Lines="All" Text="Ідентиф.&#13;&#10;код" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <DataBand Name="Data1" Top="180.44" Width="1814.4" Height="18.9" DataSource="Table">
+        <TextObject Name="Text4" Left="66.15" Width="132.3" Height="18.9" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center"/>
+        <TextObject Name="Text5" Left="198.45" Width="472.5" Height="18.9" Border.Lines="All" Text="[Table.NMK]"/>
+        <TextObject Name="Text7" Left="793.8" Width="141.75" Height="18.9" Border.Lines="All" Text="[Table.DAT_OST]" HorzAlign="Center"/>
+        <TextObject Name="Text8" Left="935.55" Width="141.75" Height="18.9" Border.Lines="All" Text="[Table.DAT_REG_D]" HorzAlign="Center"/>
+        <TextObject Name="Text9" Left="1077.3" Width="141.75" Height="18.9" Border.Lines="All" Text="[Table.DAT_END_D]" Format="Date" Format.Format="d" HorzAlign="Center"/>
+        <TextObject Name="Text10" Left="1219.05" Width="595.35" Height="18.9" Border.Lines="All" Text="[Table.ADR]"/>
+        <TextObject Name="Text11" Width="66.15" Height="18.9" Border.Lines="All" Text="[Row#]" HorzAlign="Center"/>
+        <TextObject Name="Text6" Left="670.95" Width="122.85" Height="18.9" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="202.79" Width="1814.4"/>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="206.24" Width="1814.4" Height="18.9"/>
+  </ReportPage>
+</Report>

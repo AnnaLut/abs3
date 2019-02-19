@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="06/06/2018 13:10:53" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="11/05/2018 23:15:48" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,8 +46,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIPKGXDk+ahZw7KzJhN2HGI=">
-      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       (select b.name from branch b where b.branch = a.branch) as branch_name,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;      decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;&#13;&#10;(select type_name from dpt_types t  where  t.type_id in (select type_id from dpt_vidd dd where dd.vidd=d.vidd))  as d_vidd,&#13;&#10;&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo_p,&#13;&#10;       nvl(trim(d.mfo_d), '_________________') as paym_mfo_d,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls_p,&#13;&#10;       nvl(trim(d.nls_d), '_________________') as paym_nls_d,&#13;&#10;       nvl (f_get_custw_h(c.rnk, 'SN_GC', sysdate),c.nmk) as fio_r&#13;&#10;       from dpt_deposit d, tabval t, accounts a, banks b, dpt_vidd v,customer c&#13;&#10; where c.rnk = d.rnk and&#13;&#10;   d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = (select da.dpt_id&#13;&#10;                         from dpt_agreements da&#13;&#10;                        where da.agrmnt_id = :p_agrmnt_id)">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqGvSwQ3Ug2J0QD0n/zY8UZr2Y5KHBRGZO+a0UH0C/CRUT1Zw6iJK/KYUKYwP5kCGIRwMyfhv2ZUBdR5GUK/5okw==">
+      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;      -- a.nls as nlsd,&#13;&#10;d.nls_d as nlsd,&#13;&#10;       (select b.name from branch b where b.branch = a.branch) as branch_name,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;      decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;    (select type_name from dpt_types t  where  t.type_id in (select type_id from dpt_vidd dd where dd.vidd=d.vidd))  as d_vidd,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls,&#13;&#10;       NVL(TRIM (d.nls_p), '_________________') AS nlsp,&#13;&#10;       nvl (f_get_custw_h(c.rnk, 'SN_GC', sysdate),c.nmk) as fio_r&#13;&#10;       from dpt_deposit d, tabval t, accounts a, banks b,customer c&#13;&#10; where c.rnk = d.rnk and&#13;&#10;   d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = (select da.dpt_id&#13;&#10;                         from dpt_agreements da&#13;&#10;                        where da.agrmnt_id = :p_agrmnt_id)">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
         <Column Name="END_DATE" DataType="System.String"/>
@@ -59,15 +59,14 @@ namespace FastReport
         <Column Name="TERM_CALC_W" DataType="System.String"/>
         <Column Name="RATE" DataType="System.Decimal"/>
         <Column Name="RATE_W" DataType="System.String"/>
+        <Column Name="PAYM_MFO" DataType="System.String"/>
         <Column Name="PAYM_NB" DataType="System.String"/>
+        <Column Name="NLSP" DataType="System.String" PropName="PAYM_NLS"/>
         <Column Name="BRANCH_NAME" DataType="System.String"/>
         <Column Name="FREQ_W" DataType="System.String"/>
         <Column Name="D_VIDD" DataType="System.String"/>
         <Column Name="FIO_R" DataType="System.String"/>
-        <Column Name="PAYM_MFO_P" DataType="System.String"/>
-        <Column Name="PAYM_MFO_D" DataType="System.String"/>
-        <Column Name="PAYM_NLS_P" DataType="System.String"/>
-        <Column Name="PAYM_NLS_D" DataType="System.String"/>
+        <Column Name="PAYM_NLS" DataType="System.String"/>
         <CommandParameter Name="p_agrmnt_id" DataType="113" Expression="[p_agrmnt_id]" DefaultValue="-1"/>
       </TableDataSource>
       <TableDataSource Name="Table2" Alias="COMMON_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.name as name_branch,&#13;&#10;       nvl(nvl(trim(d.adress), b.name), '___') as adres_branch,&#13;&#10;       tobopack.get_branch_param('DPT_PHON') as phones_branch,&#13;&#10;       nvl(d.dover, '________') as staff_dover,&#13;&#10;       nvl(d.fio, '________') as staff_fio,&#13;&#10;       decode(d.fio,&#13;&#10;              null,&#13;&#10;              '________',&#13;&#10;              fio(d.fio, 1) || ' ' || substr(fio(d.fio, 2), 1, 1) || '. ' ||&#13;&#10;              substr(fio(d.fio, 3), 1, 1) || '.') as staff_fio_short,&#13;&#10;       nvl(d.fio_r, '________') as staff_fio_r,&#13;&#10;       NVL(d.posada_r, '________') as staff_status_r,&#13;&#10;       nvl(d.town, tobopack.get_branch_param('TOWN')) as staff_town,&#13;&#10;       f_dat_lit(trunc(sysdate)) as today_w&#13;&#10;  from branch b, dpt_staff d&#13;&#10; where b.branch = tobopack.get_branch&#13;&#10;   and d.userid(+) = user_id&#13;&#10;   and d.branch(+) = b.branch">
@@ -82,7 +81,7 @@ namespace FastReport
         <Column Name="STAFF_FIO" DataType="System.String"/>
         <Column Name="STAFF_FIO_SHORT" DataType="System.String"/>
       </TableDataSource>
-      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand=" select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="DOC_ID" DataType="System.Decimal"/>
         <Column Name="CRT_DATE" DataType="System.DateTime"/>
@@ -92,8 +91,8 @@ namespace FastReport
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
+         <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="DOC_PRINT_NUMBER" DataType="System.String"/>
         <Column Name="TICKET_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
@@ -140,12 +139,12 @@ namespace FastReport
         <CommandParameter Name=":p_agrmnt_id" DataType="113" Expression="[p_agrmnt_id]" DefaultValue="-1"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="10181"/>
+    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="10181"/>
     <Parameter Name="p_rnk" DataType="System.Int64" Expression="991443"/>
     <Parameter Name="p_agr_id" DataType="System.Int64" Expression="5585926"/>
-    <Parameter Name="p_agrmnt_id" DataType="System.Int32" Expression="396752"/>
+    <Parameter Name="p_agrmnt_id" DataType="System.Int64" Expression="313155301"/>
   </Dictionary>
-  <ReportPage Name="Page1" Guides="378,368.55">
+  <ReportPage Name="Page1">
     <DataBand Name="Data1" Width="718.2" Height="699.3" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
       <TableObject Name="Table1" Left="9.45" Top="9.45" Width="698.42" Height="482.95">
         <TableColumn Name="Column1" Width="160.62"/>
@@ -179,12 +178,12 @@ namespace FastReport
           <TableCell Name="Cell248" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row126" Height="37.8">
-          <TableCell Name="Cell279" Text="	Депозит прошу повернути шляхом перерахування на рахунок № &lt;b&gt;[DPT_DATA.PAYM_NLS_D]&lt;/b&gt;, відкритий &lt;b&gt;[DPT_DATA.PAYM_NB]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.PAYM_MFO_D]&lt;/b&gt;, або шляхом видачі готівкою." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell279" Text="	Депозит прошу повернути шляхом перерахування на рахунок № &lt;b&gt;[DPT_DATA.NLSD]&lt;/b&gt;, відкритий &lt;b&gt;[DPT_DATA.PAYM_NB]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.PAYM_MFO]&lt;/b&gt;, або шляхом видачі готівкою." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
           <TableCell Name="Cell280"/>
           <TableCell Name="Cell281"/>
         </TableRow>
         <TableRow Name="Row127" Height="47.25">
-          <TableCell Name="Cell282" Text="	Нараховані проценти, обумовлені Договором, прошу сплатити шляхом перерахування на рахунок № &lt;b&gt;[DPT_DATA.PAYM_NLS_P]&lt;/b&gt; відкритий у &lt;b&gt;[DPT_DATA.PAYM_NB]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.PAYM_MFO_P]&lt;/b&gt;, або шляхом видачі готівкою." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell282" Text="	Нараховані проценти, обумовлені Договором, прошу сплатити шляхом перерахування на рахунок № &lt;b&gt;[DPT_DATA.NLSP]&lt;/b&gt; відкритий у &lt;b&gt;[DPT_DATA.PAYM_NB]&lt;/b&gt;, &lt;b&gt;[DPT_DATA.PAYM_MFO]&lt;/b&gt;, або шляхом видачі готівкою." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
           <TableCell Name="Cell283"/>
           <TableCell Name="Cell284"/>
         </TableRow>
@@ -195,9 +194,9 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="701.4" Width="718.2" Height="66.15">
-      <BarcodeObject Name="Barcode1" Left="160.65" Top="7.53" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
-      <TextObject Name="Text2" Left="378" Width="538.65" Height="66.15" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+    <PageFooterBand Name="PageFooter1" Top="702.08" Width="718.2" Height="75.6">
+      <BarcodeObject Name="Barcode3" Left="141.75" Top="16.98" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
+      <TextObject Name="Text8" Left="359.1" Width="538.65" Height="75.6" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
         <Formats>
           <GeneralFormat/>
           <GeneralFormat/>

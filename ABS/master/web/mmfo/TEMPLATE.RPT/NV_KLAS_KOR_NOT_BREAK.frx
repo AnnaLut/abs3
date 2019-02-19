@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="01/11/2016 11:31:20" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="11/05/2018 19:57:18" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnJi9jHCsMEmNqC7N08/N9Tg==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnHiDSbOaeEhyBCo/xzahAUQ==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       DPT_WEB.GET_DPTRATE (d.acc,d.kv,d.limit,bankdate) as rate,&#13;&#10;       f_sumpr(DPT_WEB.GET_DPTRATE (d.acc,d.kv,d.limit,bankdate), '', 'M', 3) as rate_w,&#13;&#10;       decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
@@ -78,7 +78,7 @@ namespace FastReport
         <Column Name="BRANCH_PHONE" DataType="System.String"/>
         <Column Name="BRANCH_TOWN" DataType="System.String"/>
       </TableDataSource>
-      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch&#13;&#10;  from v_ead_docs ed&#13;&#10; where ed.doc_id = :p_doc_id">
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand=" select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="DOC_ID" DataType="System.Decimal"/>
         <Column Name="CRT_DATE" DataType="System.DateTime"/>
@@ -88,7 +88,9 @@ namespace FastReport
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
+         <Column Name="EA_STRUCT_ID" DataType="System.String"/>
+        <Column Name="DOC_PRINT_NUMBER" DataType="System.String"/>
+        <Column Name="TICKET_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
       <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce((select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'MPNO '), p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10; where c.rnk = :p_rnk&#13;&#10;">
@@ -116,15 +118,15 @@ namespace FastReport
         <CommandParameter Name="p_agr_id" DataType="113" Expression="[p_agr_id]" DefaultValue="-1"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="1025"/>
-    <Parameter Name="p_rnk" DataType="System.Int32" Expression="1064574"/>
-    <Parameter Name="p_agr_id" DataType="System.Int32" Expression="7335001"/>
+    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="1025"/>
+    <Parameter Name="p_rnk" DataType="System.Int64" Expression="1064574"/>
+    <Parameter Name="p_agr_id" DataType="System.Int64" Expression="7335001"/>
   </Dictionary>
   <ReportPage Name="Page1">
     <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15">
       <PictureObject Name="Picture1" Left="557.55" Width="160.65" Height="66.15" Image="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"/>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="68.82" Width="718.2" Height="1470.42" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="Data1" Top="68.93" Width="718.2" Height="1470.42" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table1" Width="718.16" Height="1470.42">
         <TableColumn Name="Column1" Width="359.08"/>
         <TableColumn Name="Column2" Width="359.08"/>
@@ -390,7 +392,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="1541.9" Width="718.2" Height="322.3" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="Data2" Top="1542.13" Width="718.2" Height="322.3" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table5" Width="718.16" Height="322.3" CanBreak="false">
         <TableColumn Name="Column3" Width="359.08"/>
         <TableColumn Name="Column4" Width="359.08"/>
@@ -444,9 +446,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="1866.87" Width="718.2" Height="37.8">
-      <BarcodeObject Name="Barcode1" Left="96.52" Top="18.9" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
-      <TextObject Name="Text2" Left="283.5" Top="18.9" Width="425.25" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    <PageFooterBand Name="PageFooter1" Top="1867.2" Width="718.2" Height="94.5">
       <TableObject Name="Table7" Left="387.45" Width="321.3" Height="18.9">
         <TableColumn Name="Column10" Width="64.26"/>
         <TableColumn Name="Column11" Width="64.26"/>
@@ -489,6 +489,16 @@ namespace FastReport
           <TableCell Name="Cell321"/>
         </TableRow>
       </TableObject>
+      <BarcodeObject Name="Barcode3" Left="113.4" Top="45.33" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
+      <TextObject Name="Text8" Left="330.75" Top="18.9" Width="538.65" Height="75.6" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <CustomFormat Format="yyyy-MM-dd HH:mm:ss"/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
     </PageFooterBand>
   </ReportPage>
 </Report>

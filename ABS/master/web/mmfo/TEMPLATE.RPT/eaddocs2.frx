@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="08/02/2016 17:38:27" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="02/06/2019 18:02:52" ReportInfo.CreatorVersion="2013.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXawgQMNksAJZokM+/w71MdthAChJFyVf5MHBEM5l1AiA==">
-      <TableDataSource Name="Table" Alias="DOCS_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as rwn, t.*&#13;&#10;  from (select d.id,&#13;&#10;               d.crt_branch,&#13;&#10;               b.name as branch_name,&#13;&#10;               d.rnk,&#13;&#10;               c.nmk as fio,&#13;&#10;               d.ea_struct_id,&#13;&#10;               sc.name as ea_struct_name,&#13;&#10;               d.crt_date,&#13;&#10;               d.crt_staff_id,&#13;&#10;               sb.fio as crt_staff_fio,&#13;&#10;               nvl(d.page_count, 0) as page_count&#13;&#10;          from (select *&#13;&#10;                  from ead_docs&#13;&#10;                 where type_id = 'DOC'&#13;&#10;                   and to_char(ea_struct_id) in&#13;&#10;                       ('211',&#13;&#10;                        '212',&#13;&#10;                        '213',&#13;&#10;                        '214',&#13;&#10;                        '215',&#13;&#10;                        '216',&#13;&#10;                        '217',&#13;&#10;                        '218',&#13;&#10;                        '219',&#13;&#10;                        '222',&#13;&#10;                        '223',&#13;&#10;                        '224',&#13;&#10;                        '225',&#13;&#10;                       '2110',&#13;&#10;                       '2111',&#13;&#10;                        '226')&#13;&#10;                   and :sFdat1 &lt;= crt_date&#13;&#10;                   and crt_date &lt; :sFdat2 + 1&#13;&#10;                   and crt_staff_id =&#13;&#10;                       decode(:Param0, '%', crt_staff_id, to_number(:Param0))&#13;&#10;                  and crt_branch like   decode(:BRANCH, 'Поточне',  sys_context ('bars_context', 'user_branch'),:BRANCH)||'%'        &#13;&#10;                       ) d,&#13;&#10;               branch b,&#13;&#10;               customer c,&#13;&#10;               ead_struct_codes sc,&#13;&#10;               staff$base sb&#13;&#10;         where d.crt_branch = b.branch&#13;&#10;           and d.sign_date is not null&#13;&#10;           and d.rnk = c.rnk&#13;&#10;           and d.ea_struct_id = sc.id&#13;&#10;           and d.crt_staff_id = sb.id&#13;&#10;         order by d.id desc) t">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZZ+fmbIdUXD9+nidK7E24OanuRdL6zlYLIJW/yTS43NxHKPjTyxm+LyZNo+UzbkgvVsuXSqnx2LcNx38HCIW6Q==">
+      <TableDataSource Name="Table" Alias="DOCS_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as rwn, t.*&#13;&#10;  from (select nvl(DOC_PRINT_NUMBER, d.ID) as id,&#13;&#10;               d.crt_branch,&#13;&#10;               b.name as branch_name,&#13;&#10;               d.rnk,&#13;&#10;               c.nmk as fio,&#13;&#10;               d.ea_struct_id,&#13;&#10;               sc.name as ea_struct_name,&#13;&#10;               d.crt_date,&#13;&#10;               d.crt_staff_id,&#13;&#10;               sb.fio as crt_staff_fio,&#13;&#10;               nvl(d.page_count, 0) as page_count&#13;&#10;          from (select *&#13;&#10;                  from ead_docs&#13;&#10;                 where type_id = 'DOC'&#13;&#10;                   and to_char(ea_struct_id) in&#13;&#10;                       ('211',&#13;&#10;                        '212',&#13;&#10;                        '213',&#13;&#10;                        '214',&#13;&#10;                        '215',&#13;&#10;                        '216',&#13;&#10;                        '217',&#13;&#10;                        '218',&#13;&#10;                        '219',&#13;&#10;                        '222',&#13;&#10;                        '223',&#13;&#10;                        '224',&#13;&#10;                        '225',&#13;&#10;                       '2110',&#13;&#10;                       '2111',&#13;&#10;                        '226')&#13;&#10;                   and :sFdat1 &lt;= crt_date&#13;&#10;                   and crt_date &lt; :sFdat2 + 1&#13;&#10;                   and crt_staff_id =&#13;&#10;                       decode(:Param0, '%', crt_staff_id, to_number(:Param0))&#13;&#10;                  and crt_branch like   decode(:BRANCH, 'Поточне',  sys_context ('bars_context', 'user_branch'),:BRANCH)||'%'        &#13;&#10;                       ) d,&#13;&#10;               branch b,&#13;&#10;               customer c,&#13;&#10;               ead_struct_codes sc,&#13;&#10;               staff$base sb&#13;&#10;         where d.crt_branch = b.branch&#13;&#10;           and d.sign_date is not null&#13;&#10;           and d.rnk = c.rnk&#13;&#10;           and d.ea_struct_id = sc.id&#13;&#10;           and d.crt_staff_id = sb.id&#13;&#10;         order by d.id desc) t">
         <Column Name="RWN" DataType="System.Decimal"/>
         <Column Name="ID" DataType="System.Decimal"/>
         <Column Name="CRT_BRANCH" DataType="System.String"/>
@@ -33,7 +33,7 @@
     <Total Name="PageCount" Expression="[DOCS_DATA.PAGE_COUNT]" Evaluator="Data1" PrintOn="DataFooter1"/>
   </Dictionary>
   <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
-    <DataBand Name="Data1" Top="145.75" Width="1047.06" Height="37.8" DataSource="Table">
+    <DataBand Name="Data1" Top="144.05" Width="1047.06" Height="37.8" DataSource="Table">
       <TableObject Name="Table3" Width="1044.59" Height="37.8" Border.Lines="All">
         <TableColumn Name="Column32" Width="40.66"/>
         <TableColumn Name="Column33" Width="148.35"/>
@@ -108,7 +108,7 @@
           </TableRow>
         </TableObject>
       </DataHeaderBand>
-      <DataFooterBand Name="DataFooter1" Top="187.55" Width="1047.06" Height="56.7">
+      <DataFooterBand Name="DataFooter1" Top="184.15" Width="1047.06" Height="56.7">
         <TableObject Name="Table3" Width="1044.45" Height="56.7">
           <TableColumn Name="Column43" Width="40.66"/>
           <TableColumn Name="Column44" Width="148.35"/>
@@ -144,10 +144,10 @@
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="248.25" Width="1047.06" Height="28.35">
+    <ReportSummaryBand Name="ReportSummary1" Top="243.15" Width="1047.06" Height="28.35">
       <TextObject Name="Text2" Width="1039.5" Height="28.35" Text="Реєстр сформовано _____________________ (підпис)    [COMMON_DATA.STAFF_FIO]" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter1" Top="280.6" Width="1047.06" Height="18.9">
+    <PageFooterBand Name="PageFooter1" Top="273.8" Width="1047.06" Height="18.9">
       <TextObject Name="Text1" Left="756" Width="283.5" Height="18.9" Text="Сторінка [Page] з [TotalPages]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
     </PageFooterBand>
   </ReportPage>

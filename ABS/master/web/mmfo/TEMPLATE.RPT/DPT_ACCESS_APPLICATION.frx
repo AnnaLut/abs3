@@ -1,7 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="06/21/2016 20:17:04" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="07/09/2018 12:36:29" ReportInfo.CreatorVersion="2013.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;  
+using Oracle.DataAccess.Client;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void _FinishReport(object sender, EventArgs e)
+    {
+      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
+      
+      OracleCommand command = connection.CreateCommand();
+      command.CommandType = CommandType.StoredProcedure;
+      command.CommandText = &quot;ead_pack.doc_page_count&quot;;
+      
+      Parameter DocID = Report.GetParameter(&quot;p_doc_id&quot;);
+      command.Parameters.Add(&quot;p_doc_id&quot;, DocID.Value);
+      command.Parameters.Add(&quot;p_page_count&quot;, Report.Engine.TotalPages);
+      
+      connection.Open();
+      try
+      {
+        command.ExecuteNonQuery();
+      }
+      finally
+      {
+        connection.Close();
+      }
+    }
+  }
+}
+</ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUt7EIVCkoC3X/ERlONNLojZ8kDSQwa4lhTH6IVJHLHAjFnYuNbpppQ0catGqSqc+6g==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqXDNPX1eqkVhJtvHKAD0Djt/MITHTlpPj6G4OkulVf+6EnnO+FxICFbDTOrXLQSQQMiu9A9DRFzTqgfIaR2yFVQ==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       tp.type_name,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, trunc(sysdate)) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, trunc(sysdate)), '', 'M', 3) as rate_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d,&#13;&#10;       dpt_vidd    v,&#13;&#10;       dpt_types   tp,&#13;&#10;       tabval      t,&#13;&#10;       accounts    a,&#13;&#10;       banks       b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.vidd = v.vidd&#13;&#10;   and v.type_id = tp.type_id&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id in (select ra.contract_id&#13;&#10;                         from CUST_REQ_ACCESS ra&#13;&#10;                        where ra.req_id = :p_req_id)">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
@@ -62,8 +107,13 @@
         <Column Name="REQ_ID" DataType="System.Decimal"/>
         <CommandParameter Name="p_req_id" DataType="113" Expression="[p_req_id]" DefaultValue="0"/>
       </TableDataSource>
+      <TableDataSource Name="Table5" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id&#13;&#10;  from v_ead_docs ed  &#13;&#10; where ed.doc_id = :p_doc_id">
+        <Column Name="DOC_ID" DataType="System.Decimal"/>
+        <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
+      </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="p_req_id" DataType="System.Int32" Expression="60"/>
+    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="10181"/>
   </Dictionary>
   <ReportPage Name="Page1" Guides="718.2,9.45">
     <DataBand Name="Data1" Width="718.2" Height="217.35" CanGrow="true" CanShrink="true" CanBreak="true">
@@ -108,7 +158,7 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data3" Top="249.78" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" DataSource="Table">
+    <DataBand Name="Data3" Top="249.82" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" DataSource="Table">
       <TableObject Name="Table8" Left="9.45" Width="699.27" Height="28.35" GrowToBottom="true">
         <TableColumn Name="Column9" Width="162.18"/>
         <TableColumn Name="Column10" Width="190.53"/>
@@ -127,7 +177,7 @@
           <TableCell Name="Cell53" Border.Lines="All" NullValue="-" HorzAlign="Right" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="219.39" Width="718.2" Height="28.35">
+      <DataHeaderBand Name="DataHeader1" Top="219.41" Width="718.2" Height="28.35">
         <TableObject Name="Table8" Left="9.45" Width="699.16" Height="28.35" Border.Lines="All">
           <TableColumn Name="Column33" Width="161.98"/>
           <TableColumn Name="Column34" Width="190.33"/>
@@ -148,7 +198,7 @@
         </TableObject>
       </DataHeaderBand>
     </DataBand>
-    <DataBand Name="Data2" Top="280.17" Width="718.2" Height="245.7" CanGrow="true" CanShrink="true" CanBreak="true" StartNewPage="true">
+    <DataBand Name="Data2" Top="280.24" Width="718.2" Height="245.7" CanGrow="true" CanShrink="true" CanBreak="true" StartNewPage="true">
       <TableObject Name="Table3" Left="18.9" Top="9.45" Width="699.3" Height="236.25">
         <TableColumn Name="Column28" Width="115.29"/>
         <TableColumn Name="Column29" Width="238.14"/>
@@ -198,5 +248,8 @@
         </TableRow>
       </TableObject>
     </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="528" Width="718.2" Height="37.8">
+      <TextObject Name="Text3" Left="481.95" Top="18.9" Width="236.25" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    </PageFooterBand>
   </ReportPage>
 </Report>

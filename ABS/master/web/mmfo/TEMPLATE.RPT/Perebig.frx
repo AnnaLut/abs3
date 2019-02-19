@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess.dll" StartReportEvent="_StartReport" ReportInfo.Name="Звіт по перебіганням між рахунками 2924/23 (WEB)" ReportInfo.Author="Ковальов В.В." ReportInfo.Created="05/12/2016 12:41:41" ReportInfo.Modified="06/20/2018 16:23:44" ReportInfo.CreatorVersion="2013.2.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using Oracle.DataAccess.Client;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    
+
+    private void _StartReport(object sender, EventArgs e)
+    {
+      String kf = ((String)Report.GetParameterValue(&quot;tobo&quot;));
+      
+      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
+      OracleCommand command = connection.CreateCommand();
+      command.CommandText = &quot;begin bars.bc.go(substr('&quot;+kf+&quot;', 0, 8)); end;&quot;;         
+      
+      connection.Open();
+      try
+      {
+        command.ExecuteNonQuery();
+      }
+      finally
+      {
+        connection.Close();
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="mmfo" ConnectionString="rijcmlqZZ+fmbIdUXD9+nidK7E24JpeYCQPOK8UI62lFBs0opcQ+8/aGmHrDmk9IOza+NUE" CommandTimeout="1000">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select (CASE WHEN substr(o.nlsb,0,4) != '2625' and o.dk = 1 THEN 'Списання'&#13;&#10;              WHEN substr(o.nlsa,0,4)  =  '2625' and o.dk = 0 THEN 'Поповнення'&#13;&#10;              WHEN substr(o.nlsb,0,4)  = '2625' and o.dk = 1 THEN 'Поповнення' END) DK,&#13;&#10;        o.ref, &#13;&#10;        o.vdat, &#13;&#10;        o.tt, &#13;&#10;        o.kv, &#13;&#10;        o.nlsa, &#13;&#10;        o.nam_a,&#13;&#10;        o.mfoa, &#13;&#10;        o.id_a, &#13;&#10;        o.s/100, &#13;&#10;        o.nlsb, &#13;&#10;        o.nam_b, &#13;&#10;        o.mfob, &#13;&#10;        o.id_b, &#13;&#10;        o.nazn, &#13;&#10;        o1.nls, &#13;&#10;        o1.branch brancgK, &#13;&#10;        o2.nls, &#13;&#10;        o2.branch branchK,&#13;&#10;        o.kf &#13;&#10;   from oper o,&#13;&#10;        (select op.nls, &#13;&#10;                a.branch, &#13;&#10;                o.ref &#13;&#10;           from oper o, &#13;&#10;                opl op,&#13;&#10;                accounts a&#13;&#10;          where (substr(nlsa, 0, 4) = '2625'&#13;&#10;             or substr(nlsb, 0, 4) = '2625')&#13;&#10;            and op.acc = a.acc&#13;&#10;            and o.sos = 5&#13;&#10;            and o.ref = op.ref&#13;&#10;            and op.dk = 1&#13;&#10;            and substr(op.nls, 0, 4) = '2924' &#13;&#10;            and op.ob22 = '23'&#13;&#10;            and op.fdat&gt;= :Dat1&#13;&#10;            and op.fdat&lt;= :Dat2) o1,&#13;&#10;        (select op.nls, &#13;&#10;                a.branch, &#13;&#10;                o.ref &#13;&#10;           from oper o, &#13;&#10;                opl op,&#13;&#10;                accounts a&#13;&#10;          where (substr(nlsa, 0, 4) = '2625'&#13;&#10;             or substr(nlsb, 0, 4) = '2625')&#13;&#10;            and op.acc = a.acc&#13;&#10;            and o.sos = 5&#13;&#10;            and o.ref = op.ref&#13;&#10;            and op.dk = 0&#13;&#10;            and substr(op.nls, 0, 4) = '2924' &#13;&#10;            and op.ob22 = '23'&#13;&#10;            and op.fdat&gt;= :Dat1&#13;&#10;            and op.fdat&lt;= :Dat2) o2&#13;&#10;  where o.ref = o1.ref &#13;&#10;    and o.ref = o2.ref&#13;&#10;    and o1.ref = o2.ref&#13;&#10;    and o1.branch != o2.branch     &#13;&#10;     and (:chkTobo=0 and o.branch = :tobo&#13;&#10;            or :chkTobo=1 and o.branch like :tobo || '%') ">
+        <Column Name="DK" DataType="System.String"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="VDAT" DataType="System.DateTime"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="NAM_A" DataType="System.String"/>
+        <Column Name="MFOA" DataType="System.String"/>
+        <Column Name="ID_A" DataType="System.String"/>
+        <Column Name="O.S/100" DataType="System.Decimal"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="NAM_B" DataType="System.String"/>
+        <Column Name="MFOB" DataType="System.String"/>
+        <Column Name="ID_B" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="BRANCGK" DataType="System.String"/>
+        <Column Name="NLS1" DataType="System.String"/>
+        <Column Name="BRANCHK" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
+        <CommandParameter Name="Dat1" DataType="106" Expression="[sFdat1]" DefaultValue="01/06/2018"/>
+        <CommandParameter Name="Dat2" DataType="106" Expression="[sFdat2]" DefaultValue="20/06/2018"/>
+        <CommandParameter Name="chkTobo" DataType="126" Expression="[chkTobo]" DefaultValue="-1"/>
+        <CommandParameter Name="tobo" DataType="126" Expression="[tobo]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="chkTobo" DataType="System.Int32" Expression="1"/>
+    <Parameter Name="tobo" DataType="System.String" Expression="&quot;/304665/&quot;"/>
+    <Total Name="Total" Expression="[Table.O.S/100]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="Total1" Expression="[Table.O.S/100]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text1" Left="-9.45" Width="727.65" Height="37.8" Text="Звіт по перебіганням між рахунками 2924/23&#13;&#10;за період з [sFdat1] по [sFdat2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41.8" Width="718.2"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="45.8" Width="718.2" Height="37.8" Condition="[Table.BRANCGK]">
+      <TextObject Name="Text2" Width="718.2" Height="18.9" Text=" Відділення: [Table.BRANCGK]" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Top="18.9" Width="94.5" Height="18.9" Border.Lines="All" VertAlign="Center"/>
+      <TextObject Name="Text4" Left="94.5" Top="18.9" Width="94.5" Height="18.9" Border.Lines="All" Text="Референс" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text5" Left="189" Top="18.9" Width="94.5" Height="18.9" Border.Lines="All" Text="Дата" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text6" Left="283.5" Top="18.9" Width="94.5" Height="18.9" Border.Lines="All" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text7" Left="378" Top="18.9" Width="94.5" Height="18.9" Border.Lines="All" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text8" Left="472.5" Top="18.9" Width="245.7" Height="18.9" Border.Lines="All" Text="Транзитні рахунки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <GroupHeaderBand Name="GroupHeader2" Top="87.6" Width="718.2" Condition="[Table.DK]">
+        <DataBand Name="Data1" Top="91.6" Width="718.2" Height="18.9" DataSource="Table">
+          <TextObject Name="Text9" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.DK]" HorzAlign="Center" VertAlign="Center"/>
+          <TextObject Name="Text10" Left="94.5" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.REF]" HorzAlign="Center" VertAlign="Center"/>
+          <TextObject Name="Text11" Left="189" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.VDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TextObject Name="Text12" Left="283.5" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.O.S/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TextObject Name="Text13" Left="378" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>
+          <TextObject Name="Text14" Left="472.5" Width="122.85" Height="18.9" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
+          <TextObject Name="Text15" Left="595.35" Width="122.85" Height="18.9" Border.Lines="All" Text="[Table.NLS1]" HorzAlign="Center" VertAlign="Center"/>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter2" Top="114.5" Width="718.2"/>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter1" Top="118.5" Width="718.2"/>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="122.5" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

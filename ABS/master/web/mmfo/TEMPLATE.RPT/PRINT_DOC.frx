@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="08/09/2018 11:53:48" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="01/03/2019 14:58:58" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,6 +19,8 @@ namespace FastReport
 {
   public class ReportScript
   {
+    static int pageNum=0;
+    
     private void _FinishReport(object sender, EventArgs e)
     {
       OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
@@ -42,12 +44,23 @@ namespace FastReport
         connection.Close();
       }
     }
+
+    private void Barcode3_BeforePrint(object sender, EventArgs e)
+    { 
+      if (Engine.FinalPass)
+      {  
+        pageNum++;
+      
+        Barcode3.Text = string.Concat(((String)Report.GetColumnValue(&quot;TICKET_DATA.TICKET_ID&quot;)),&quot;;&quot;
+          , ToString(Engine.TotalPages),&quot;;&quot;,ToString(pageNum));
+      }
+    }          
   }
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQH8zxVGxIglHhdaDvo6LzTI=">
-      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq4prl5GMBG12x0q4xIbdAwh3QWQEu7hE8ZMwKaqn9iJVILlRe9aOaCrC0fAA0ks+yt5jeBGhiHII+3kuZxsT9+w==">
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand=" select ed.doc_id doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.ea_struct_name,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch,&#13;&#10;       ed.doc_print_number,&#13;&#10;       ed.ticket_id&#13;&#10;  from bars.v_ead_docs ed&#13;&#10;where ed.doc_id = :p_doc_id">
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="DOC_ID" DataType="System.Decimal"/>
         <Column Name="CRT_DATE" DataType="System.DateTime"/>
@@ -57,8 +70,8 @@ namespace FastReport
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="EA_STRUCT_NAME" DataType="System.String"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <Column Name="DOC_PRINT_NUMBER" DataType="System.String"/>
         <Column Name="TICKET_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
@@ -84,25 +97,23 @@ namespace FastReport
         <Column Name="FIO_SHORT" DataType="System.String"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="10189196311"/>
-    <Parameter Name="p_rnk" DataType="System.Int32" Expression="175956011"/>
-    <Parameter Name="p_agr_id" DataType="System.Int64"/>
+    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="10247408111"/>
+    <Parameter Name="p_rnk" DataType="System.Int32" Expression="226177211"/>
   </Dictionary>
   <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="5" TopMargin="2" RightMargin="2" BottomMargin="2" FirstPageSource="15" OtherPagesSource="15">
-    <ReportTitleBand Name="ReportTitle1" Width="767.34" Height="153.8">
+    <ReportTitleBand Name="ReportTitle1" Width="767.34" Height="156.84">
       <BarcodeObject Name="Barcode2" Width="153.8" Height="153.8" AutoSize="false" Expression="[TICKET_DATA.DOC_ID]+&quot;;&quot;+FormatDateTime([TICKET_DATA.CRT_DATE])+&quot;;&quot;+[TICKET_DATA.EA_STRUCT_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[TICKET_DATA.RNK]+&quot;;&quot;+[TICKET_DATA.CL_FIO]+&quot;;&quot;+ToString([TICKET_DATA.AGR_ID])+&quot;;&quot;+ToString([TICKET_DATA.AGR_NUM])+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_LOGNAME]+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_FIO]+&quot;;&quot;+[TICKET_DATA.CRT_BRANCH]" ShowText="false" Barcode="QR Code" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
       <TextObject Name="Text1" Left="170.1" Top="9.45" Width="519.75" Height="141.75" Text="Документ: [TICKET_DATA.EA_STRUCT_NAME]&#13;&#10;&#13;&#10;[CLIENT_DATA.FIO]&#13;&#10;[CLIENT_DATA.OKPO]&#13;&#10;[CLIENT_DATA.PASP_NO] [CLIENT_DATA.PASP_ATRT] [CLIENT_DATA.PASP_DATE]" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="157.65" Width="767.34" Height="548.1" CanShrink="true" CanBreak="true" DataSource="Table6">
-      <PictureObject Name="Picture1" Left="28.35" Width="661.5" Height="472.5" SizeMode="StretchImage" MaxWidth="661.5" MaxHeight="472.5" DataColumn="SCANS.SCAN_DATA"/>
-      <TextObject Name="Text3" Left="18.9" Top="481.95" Width="425.25" Height="28.35" Text="Копія вірна [FormatDateTime([Date], &quot;Short Date&quot;)]р. _____________________" VertAlign="Center" HtmlTags="true"/>
-      <TextObject Name="Text4" Left="444.15" Top="481.95" Width="274.05" Height="28.35" Text="[COMMON_DATA.FIO_SHORT]  / _______________" HorzAlign="Right" VertAlign="Center" HtmlTags="true"/>
-      <TextObject Name="Text5" Left="47.25" Top="500.85" Width="255.15" Height="18.9" Text="                               (підпис клієнта)" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Italic"/>
-      <TextObject Name="Text6" Left="444.15" Top="500.85" Width="274.05" Height="18.9" Text="(підпис працівника банку)" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Italic"/>
+    <DataBand Name="Data1" Top="160.29" Width="767.34" Height="519.75" CanShrink="true" DataSource="Table6">
+      <PictureObject Name="Picture1" Left="47.25" Top="5.45" Width="661.5" Height="444.15" SizeMode="StretchImage" MaxWidth="661.5" MaxHeight="472.5" DataColumn="SCANS.SCAN_DATA"/>
+      <TextObject Name="Text3" Left="37.8" Top="471.4" Width="406.35" Height="28.35" Text="Копія вірна [FormatDateTime([Date], &quot;Short Date&quot;)]р. _____________________ [CLIENT_DATA.FIO]" VertAlign="Center" HtmlTags="true"/>
+      <TextObject Name="Text4" Left="444.15" Top="461.95" Width="274.05" Height="28.35" Text="[COMMON_DATA.FIO_SHORT]  / _______________" HorzAlign="Right" VertAlign="Center" HtmlTags="true"/>
+      <TextObject Name="Text5" Left="66.15" Top="490.3" Width="274.05" Height="18.9" Text="                               (підпис клієнта)" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Italic"/>
+      <TextObject Name="Text6" Left="444.15" Top="490.3" Width="274.05" Height="18.9" Text="(підпис працівника банку)" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Italic"/>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="709.59" Width="767.34" Height="66.15">
-      <BarcodeObject Name="Barcode3" Left="160.65" Top="9.45" Width="207.9" Height="45.36" Anchor="Top, Right" AutoSize="false" Expression="[TICKET_DATA.TICKET_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[Page]" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
-      <TextObject Name="Text2" Left="378" Width="538.65" Height="66.15" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
+    <PageFooterBand Name="PageFooter1" Top="683.49" Width="767.34" Height="75.6">
+      <TextObject Name="Text8" Left="378" Width="538.65" Height="75.6" Text="стор. [Page] з [TotalPages]&#13;&#10;№ друку [TICKET_DATA.DOC_PRINT_NUMBER]&#13;&#10;[TICKET_DATA.CRT_DATE] ; тип док. [TICKET_DATA.EA_STRUCT_ID]" VertAlign="Center" Font="Times New Roman, 12pt">
         <Formats>
           <GeneralFormat/>
           <GeneralFormat/>
@@ -111,6 +122,7 @@ namespace FastReport
           <GeneralFormat/>
         </Formats>
       </TextObject>
+      <BarcodeObject Name="Barcode3" Left="160.65" Top="16.98" Width="207.9" Height="45.36" Anchor="Top, Right" BeforePrintEvent="Barcode3_BeforePrint" AutoSize="false" ShowText="false" Barcode="PDF417" Barcode.AspectRatio="0" Barcode.Columns="2" Barcode.Rows="25" Barcode.CodePage="437" Barcode.CompactionMode="Text" Barcode.ErrorCorrection="Level3" Barcode.PixelSize="2, 2"/>
     </PageFooterBand>
   </ReportPage>
 </Report>
