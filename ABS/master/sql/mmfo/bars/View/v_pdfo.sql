@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_PDFO.sql =========*** Run *** =======
 PROMPT ===================================================================================== 
@@ -61,7 +59,9 @@ SELECT A6.BRANCH,
             AND a.NBS = '3622'
             AND a.OB22 IN ('36','37')
             AND a.DAOS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' )
-            AND LNNVL( DAZS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' ) )
+            --AND LNNVL( DAZS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' ) )
+            AND DAZS is null --COBUMMFO-9741
+
        ) A6
      , ( SELECT a.ACC,
                 a.BRANCH,
@@ -80,7 +80,8 @@ SELECT A6.BRANCH,
             AND a.NBS = '3522'
             AND a.OB22 IN ('29', '30')
             AND a.DAOS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' )
-            AND LNNVL( DAZS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' ) )
+            --AND LNNVL( DAZS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' ) )
+            AND DAZS is null --COBUMMFO-9741
        ) A5
  WHERE A6.BRANCH = A5.BRANCH
    AND ( A6.OB22 = '36' AND A5.OB22 = '30' OR A6.OB22 = '37' AND A5.OB22 = '29' )
@@ -121,7 +122,8 @@ SELECT A6.BRANCH,
             AND a.NBS  = '3622'
             AND a.OB22 = '38'
             AND a.DAOS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' )
-            AND LNNVL( DAZS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' ) )
+            --AND LNNVL( DAZS <= trunc( nvl( to_date( PUL.GET('WDAT'), 'dd.mm.yyyy' ), SYSDATE ), 'MM' ) )
+            AND DAZS is null --COBUMMFO-9741
        ) A6;
 
 show errors;
