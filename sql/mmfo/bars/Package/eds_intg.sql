@@ -379,6 +379,7 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                        group by o.acc;
                                exception when no_data_found then
                                    l_eds_w4_data(l_eds_w4_data.last).amount_period:=0;
+                                   l_eds_w4_data(l_eds_w4_data.last).amount_periodq:=0;
                                    l_eds_w4_data(l_eds_w4_data.last).other_accruals:=0;
                                end;
                                end loop;
@@ -428,6 +429,10 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo:=0;
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_mil:=0;
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_procq:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_milq:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_totalyq:=0;
                                          end;
                                         end loop;
                                         
@@ -450,7 +455,7 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                         l_eds_dpt_data(l_eds_dpt_data.last).kv:=account.kv;
                                         l_eds_dpt_data(l_eds_dpt_data.last).open_in:=cust.attribute_value;
                                         l_eds_dpt_data(l_eds_dpt_data.last).end_bal:=account.end_bal;
-                                        l_eds_dpt_data(l_eds_dpt_data.last).end_bal:=account.end_balq;
+                                        l_eds_dpt_data(l_eds_dpt_data.last).end_balq:=account.end_balq;
                                         l_eds_dpt_data(l_eds_dpt_data.last).kf:=account.kf;
                                         l_eds_dpt_data(l_eds_dpt_data.last).tip:=account.tip;
                                         
@@ -479,6 +484,10 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo:=0;
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_mil:=0;
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_procq:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_milq:=0;
+                                             l_eds_dpt_data(l_eds_dpt_data.last).sum_totalyq:=0;
                                          end;
                                         end loop;
                             --cc_deals
