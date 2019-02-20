@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.31 30.01.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.30 09.01.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -590,7 +590,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.50 30.01.2019';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.50 14.01.2019';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
