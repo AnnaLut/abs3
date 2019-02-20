@@ -13,11 +13,13 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6HX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 6HX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.002    24.01.2019
+ VERSION     :    v.18.003    19.02.2019(24.01.2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+19.02.2019	F102 проставляємо згідно COBUMMFO-10962 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.002  24.01.2019';
+  ver_              char(30)  := 'v.18.003  19.02.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -68,14 +70,15 @@ begin
   insert
     into NBUR_LOG_F6HX
        (REPORT_DATE, KF, NBUC, VERSION_ID, VERSION_D8, EKP, K020, K021, Q003_2, Q003_4, R030, 
-       Q007_1, Q007_2, S210, S083, S080_1, S080_2, F074, F077, 
-       F078, F102, Q017, Q027, Q034, Q035, T070_2, T090, T100_1, T100_2, T100_3, 
+       Q007_1, Q007_2, S210, S083, S080_1, S080_2, F074, F077, F078, F102,
+       Q017, Q027, Q034, Q035, T070_2, T090, T100_1, T100_2, T100_3, 
        DESCRIPTION, ACC_ID, ACC_NUM, KV, CUST_ID, CUST_CODE, CUST_NAME,
        ND, AGRM_NUM, BEG_DT, END_DT, BRANCH)
   select p_report_date, p_kod_filii, nvl(trim(xd.nbuc), l_nbuc),l_version_id,xd.version_id, 
        xd.EKP, xd.K020, xd.K021, xd.Q003_2, xd.Q003_4, xd.R030, 
-       xd.Q007_1, xd.Q007_2, xd.S210, vs.S083, xd.S080_1, xd.S080_2, xd.F074, xd.F077, 
-       xd.F078, xd.F102, xd.Q017, xd.Q027, xd.Q034, xd.Q035, xd.T070_2, xd.T090, xd.T100_1, xd.T100_2, xd.T100_3, 
+       xd.Q007_1, xd.Q007_2, xd.S210, vs.S083, xd.S080_1, xd.S080_2, xd.F074, xd.F077, xd.F078, 
+       DECODE(f.seg_02, null, xd.F102, '111') F102, xd.Q017, xd.Q027, xd.Q034, xd.Q035, xd.T070_2, 
+       xd.T090, xd.T100_1, xd.T100_2, xd.T100_3, 
        vd.DESCRIPTION, vd.ACC_ID, vd.ACC_NUM, vd.KV, vd.CUST_ID, vd.CUST_CODE, vd.CUST_NAME,
        vd.ND, vd.AGRM_NUM, vd.BEG_DT, vd.END_DT, vd.BRANCH
   from (select nbuc
@@ -101,7 +104,10 @@ begin
              , (case 
                    when F078 in ('00000','00001','00010','00100','01000','10000') then F078 
                 else '#' end) as F078
-             , '#' as F102
+             , (case 
+                   when UPPER(K021) in ('3','4','9','C','G') 
+                     and LPAD(K020,10,'0') not in ('0004053915', '0037471933') then '111'
+                else '#' end) as F102
              , Q017
              , Q027
              , Q034
@@ -155,6 +161,17 @@ begin
                     ) vs -- дані для обчислення s083
                     on (xd.K020=vs.SEG_02
                         and xd.Q003_2=vs.SEG_03
+                        )
+      left join (select distinct SEG_02, SEG_03, SEG_06
+                    from V_NBUR_#D8
+                   where report_date = p_report_date
+                    and kf = p_kod_filii
+                    and seg_01 in ('121','122','123','124','125','126','127','131','132','133','134','118','119')
+                    and (SUBSTR(seg_04,1,3) in ('351','354','355') or seg_04='3570')
+                    ) f --  дані для обчислення F102
+                    on (    xd.K020=f.SEG_02
+                        and xd.Q003_2=f.SEG_03
+                        and xd.Q003_4=f.SEG_06
                         );
 
     commit;

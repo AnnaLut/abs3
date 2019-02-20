@@ -165,6 +165,9 @@ grant SELECT on NBUR_LOG_F6HX to BARSUPL;
 grant SELECT on NBUR_LOG_F6HX to BARS_ACCESS_DEFROLE;
 grant SELECT on NBUR_LOG_F6HX to BARSREADER_ROLE;
 
+prompt  ======================================================
+prompt  alter table NBUR_LOG_F6HX
+alter table NBUR_LOG_F6HX modify F102 varchar2(3 CHAR);
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ======= Scripts /Sql/BARS/Table/nbur_log_f6Hx.sql ======= *** End *** ===
