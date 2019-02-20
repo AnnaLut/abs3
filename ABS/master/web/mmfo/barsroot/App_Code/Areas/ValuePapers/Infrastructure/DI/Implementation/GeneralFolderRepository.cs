@@ -552,6 +552,10 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
                 command.Parameters.Add(new OracleParameter { ParameterName = "SNLS_FXC", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Varchar2, Value = data.SNLS_FXC });
                 command.Parameters.Add(new OracleParameter { ParameterName = "SNMS_FXC", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Varchar2, Value = data.SNMS_FXC });
                 command.Parameters.Add(new OracleParameter { ParameterName = "P_REPO", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = data.P_REPO });
+                command.Parameters.Add(new OracleParameter { ParameterName = "p_ifrs", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Varchar2, Value = data.IFRS });
+                command.Parameters.Add(new OracleParameter { ParameterName = "p_bus_mod", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = data.BUS_MOD });
+                command.Parameters.Add(new OracleParameter { ParameterName = "p_sppi", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Byte, Value = data.SPPI });
+
 
                 #endregion
 
@@ -755,7 +759,7 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
             string sqlText = @"select RYN as VAL, regexp_replace (Name, ' {2,}', ' ') as TEXT from CP_RYN
                                 WHERE RYN in (select ryn from cp_accc where vidd = :p_Vidd) 
                                   and (KV is null OR KV = :p_kv ) 
-                                  and TIPD= :p_tipd
+                                  and TIPD= :p_tipd and d_close is null 
                                 ORDER BY RYN";
 
             object[] parametrs = {
@@ -794,6 +798,32 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
                     com.ExecuteNonQuery();
                 }
             }
+        }
+
+        public IList<DropDownModel> GetDataListForBusMod()
+        {
+            string sqlText = @"select bus_mod_id as val, 
+                               bus_mod_id_ifrs || '. ' || bus_mod_name as text 
+                               from BUS_MOD";
+            return _entity.ExecuteStoreQuery<DropDownModel>(sqlText).ToList();
+        }
+
+        public IList<DropDownModel> GetDataListForSppi()
+        {
+            string sqlText = @"select sppi_value as val, 
+                               sppi_id  as text 
+                               from SPPI";
+            return _entity.ExecuteStoreQuery<DropDownModel>(sqlText).ToList();
+        }
+
+        public string GetIFRS(decimal vidd)
+        {
+            string sqlText = @"select value_paper.get_ifrs(:p_nbs) from dual";
+            object[] param = {
+                new OracleParameter("p_nbs", OracleDbType.Varchar2, vidd.ToString(), ParameterDirection.Input)
+            };
+           return _entity.ExecuteStoreQuery<string>(sqlText, param).FirstOrDefault();
+
         }
 
     }

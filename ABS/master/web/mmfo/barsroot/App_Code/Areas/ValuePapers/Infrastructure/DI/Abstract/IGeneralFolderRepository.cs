@@ -33,5 +33,10 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Abstract
         void DelIir(decimal? REF);
         string Diu_many(IRR_GRID data);
         void CalcFlows(decimal? reference);
+        IList<DropDownModel> GetDataListForBusMod();
+        IList<DropDownModel> GetDataListForSppi();
+        string GetIFRS(decimal vidd);
+
+
     }
 }

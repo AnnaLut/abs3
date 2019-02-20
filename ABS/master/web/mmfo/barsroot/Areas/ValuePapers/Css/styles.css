@@ -66,3 +66,8 @@
     opacity: .8;
     background-color: none;
 }
+
+    #bus_mod_listbox .k-item {
+        line-height: 1em;
+        font-size: 14px;
+    }
