@@ -460,25 +460,47 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                         l_eds_dpt_data(l_eds_dpt_data.last).tip:=account.tip;
                                         
                                        begin
-                                       select sum(case when o.dk=1 and a1.nbs='7040' then o.s else 0 end) as sum_proc,
-                                              sum(case when o.dk=1 and a1.nbs='7040' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_procq,
-                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='37' then o.s else 0 end) as sum_pdfo,
-                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='37' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_pdfoq,
-                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='36' then o.s else 0 end) as sum_mil,
-                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='36' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_milq,
-                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then o.s else 0 end) as sum_totaly, 
-                                              sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_totalyq                                              
-                                              into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc,   l_eds_dpt_data(l_eds_dpt_data.last).sum_procq, 
-                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq,
-                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_mil,    l_eds_dpt_data(l_eds_dpt_data.last).sum_milq,
-                                                   l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly, l_eds_dpt_data(l_eds_dpt_data.last).sum_totalyq                        
-                                        from opldok o
-                                        join opldok o2 on o.ref = o2.ref and o2.dk = 1-o.dk and  o2.stmt = o.stmt
-                                        join accounts a1 on a1.acc = o2.acc and a1.nbs in ('3622', '7040')   
-                                       where o.acc = account.acc_2628 
-                                         and o.kf = account.kf
-                                         and o.fdat between cust.date_from and cust.date_to
-                                        group by o.acc;
+                                        if account.kv = 980 then
+                                           select sum(case when o.dk=1 and a1.nbs='7040' then o.s else 0 end) as sum_proc,
+                                                  sum(case when o.dk=1 and a1.nbs='7040' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_procq,
+                                                  sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='37' then o.s else 0 end) as sum_pdfo,
+                                                  sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='37' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_pdfoq,
+                                                  sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='36' then o.s else 0 end) as sum_mil,
+                                                  sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22='36' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_milq,
+                                                  sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then o.s else 0 end) as sum_totaly, 
+                                                  sum(case when o.dk=0 and a1.nbs='3622' and a1.ob22 in ('36','37') then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_totalyq                                              
+                                             into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc,   l_eds_dpt_data(l_eds_dpt_data.last).sum_procq, 
+                                                  l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq,
+                                                  l_eds_dpt_data(l_eds_dpt_data.last).sum_mil,    l_eds_dpt_data(l_eds_dpt_data.last).sum_milq,
+                                                  l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly, l_eds_dpt_data(l_eds_dpt_data.last).sum_totalyq                        
+                                            from opldok o
+                                            join opldok o2 on o.ref = o2.ref and o2.dk = 1-o.dk and  o2.stmt = o.stmt
+                                            join accounts a1 on a1.acc = o2.acc and a1.nbs in ('3622', '7040')   
+                                           where o.acc = account.acc_2628 
+                                             and o.kf = account.kf
+                                             and o.fdat between cust.date_from and cust.date_to
+                                            group by o.acc;
+                                        else
+                                           select sum(case when o.dk=1 and op.nlsb like '2628%' and op.nazn like '%Моб.%' then o.s else 0 end) as sum_proc,
+                                                  sum(case when o.dk=1 and op.nlsb like '2628%' and op.nazn like '%Моб.%' then gl.p_icurval(op.kv ,o.s, o.fdat) else 0 end) as sum_procq,
+                                                  sum(case when o.dk=0 and substr(op.nlsb, 1, 4) in ('3622', '3800') and op.nazn = 'Cl Deposit Saving Profitt Interest Fee' then o.s else 0 end) as sum_pdfo,
+                                                  sum(case when o.dk=0 and substr(op.nlsb, 1, 4) in ('3622', '3800') and op.nazn = 'Cl Deposit Saving Profitt Interest Fee' then gl.p_icurval(op.kv ,o.s, o.fdat) else 0 end) as sum_pdfoq,
+                                                  sum(case when o.dk=0 and substr(op.nlsb, 1, 4) in ('3622', '3800') and op.nazn = 'PDFO BCU Account Transfer' then o.s else 0 end) as sum_mil,
+                                                  sum(case when o.dk=0 and substr(op.nlsb, 1, 4) in ('3622', '3800') and op.nazn = 'PDFO BCU Account Transfer' then gl.p_icurval(op.kv ,o.s, o.fdat) else 0 end) as sum_milq,
+                                                  sum(case when o.dk=0 and substr(op.nlsb, 1, 4) in ('3622', '3800') and op.nazn in ('PDFO BCU Account Transfer', 'Cl Deposit Saving Profitt Interest Fee') then o.s else 0 end) as sum_totaly, 
+                                                  sum(case when o.dk=0 and substr(op.nlsb, 1, 4) in ('3622', '3800') and op.nazn in ('PDFO BCU Account Transfer', 'Cl Deposit Saving Profitt Interest Fee') then gl.p_icurval(op.kv ,o.s, o.fdat) else 0 end) as sum_totalyq                                                                   
+                                             into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc,   l_eds_dpt_data(l_eds_dpt_data.last).sum_procq, 
+                                                  l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq,
+                                                  l_eds_dpt_data(l_eds_dpt_data.last).sum_mil,    l_eds_dpt_data(l_eds_dpt_data.last).sum_milq,
+                                                  l_eds_dpt_data(l_eds_dpt_data.last).sum_totaly, l_eds_dpt_data(l_eds_dpt_data.last).sum_totalyq   
+                                            from opldok o
+                                            join oper op on op.ref = o.ref and op.kf = o.kf
+                                           where o.acc = account.acc_2628 
+                                             and substr(op.nlsb, 1, 4) in ('2628', '3622', '3800')
+                                             and o.kf = account.kf
+                                             and o.fdat between cust.date_from and cust.date_to
+                                            group by o.acc;
+                                        end if;
                                          exception when no_data_found then
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_proc:=0;
                                              l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo:=0;
