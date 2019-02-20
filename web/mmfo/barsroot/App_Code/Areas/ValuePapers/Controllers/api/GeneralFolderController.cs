@@ -522,5 +522,41 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
             }
         }
 
+        public HttpResponseMessage GetDataListForBusMod()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, _repo.GetDataListForBusMod());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        public HttpResponseMessage GetDataListForSppi()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, _repo.GetDataListForSppi());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        public HttpResponseMessage GetIFRS(decimal vidd)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, new { IRFS = _repo.GetIFRS(vidd)});
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
     }
 }

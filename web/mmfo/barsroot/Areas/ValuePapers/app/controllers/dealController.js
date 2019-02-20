@@ -44,6 +44,8 @@ function dealController($scope, paramsService) {
 
         $scope.cmb_pf.dataSource.read();
         $scope.cmb_ryn.dataSource.data([]);
+        $scope.dll_bus_mod.dataSource.read();
+        $scope.dll_sppi.dataSource.read();
     });
 
     $scope.cmb_pf_options = {
@@ -83,6 +85,7 @@ function dealController($scope, paramsService) {
             $scope.cmb_ryn.dataSource.read();
             $scope.contractModel.PF = this.dataSource.data()[this.select()-1].PF;
             checkVisibilityRB_AI();
+            $scope.SetIFRS(this.value());
         }
     }
 
@@ -115,6 +118,45 @@ function dealController($scope, paramsService) {
         dataTextField: "TEXT",
         dataValueField: "VAL",
     }
+
+    $scope.bus_mod_options = {
+        dataSource: {
+            transport: {
+                read: {
+                    dataType: "json",
+                    url: paramsService.baseUrl + 'GetDataListForBusMod'
+                }
+            }
+        },
+        autoBind: false,
+        dataTextField: "TEXT",
+        dataValueField: "VAL",
+        dataBound: function () {
+            this.select(0);
+            $scope.contractModel.BUS_MOD = this.value();
+        }
+    };
+
+
+    $scope.sppi_options = {
+        dataSource: {
+            transport: {
+                read: {
+                    dataType: "json",
+                    url: paramsService.baseUrl + 'GetDataListForSppi'
+                }
+            }
+        },
+        autoBind: false,
+        dataTextField: "TEXT",
+        dataValueField: "VAL",
+        dataBound: function () {
+            this.select(0);
+            $scope.contractModel.SPPI = this.value();
+
+        }
+    };
+
 
     $scope.calcSUMBN = function () {
         $scope.contractModel.SUMBN = +$scope.contractModel.KOL * +$scope.contractModel.P_CENA;
@@ -292,5 +334,11 @@ function dealController($scope, paramsService) {
             $scope.contractModel.NLSB_ = response.NLSB || $scope.contractModel.NLSB_;
             //      $scope.$apply();
         });
-    }    
+    }
+
+    $scope.SetIFRS = function (vidd) {
+        paramsService.getIFRS(vidd).then(function (ifrs) {
+            $scope.contractModel.IFRS = ifrs;
+        });
+    };
  }

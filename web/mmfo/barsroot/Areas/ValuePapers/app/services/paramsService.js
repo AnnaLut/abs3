@@ -48,7 +48,10 @@
         DDAT: null,
         DDAT31: null,
         DAY_ZO: null,
-        P_VIDD: null
+        P_VIDD: null,
+        IFRS: "",
+        BUS_MOD: null,
+        SPPI: null
     };
     var baseUrl = '/barsroot/api/valuepapers/generalfolder/';
 
@@ -294,6 +297,18 @@
             });
     }
 
+    var _getIFRS = function (vidd) {
+
+        return $http({
+            url: baseUrl + 'GetIFRS',
+            method: "GET",
+            params: { vidd: vidd }
+        }).then(function (response) {
+
+            return response.data.IRFS;
+        });
+    };
+
     paramsServiceFactory.calcFlows = _calcFlows;
     paramsServiceFactory.calcEfectBet = _calcEfectBet;
     paramsServiceFactory.delIir = _delIir;
@@ -314,6 +329,7 @@
     paramsServiceFactory.baseUrl = baseUrl;
     paramsServiceFactory.getDefaultParams = _getDefaultParams;
     paramsServiceFactory.resetModel = _resetModel;
+    paramsServiceFactory.getIFRS = _getIFRS;
 
     return paramsServiceFactory;
 });
