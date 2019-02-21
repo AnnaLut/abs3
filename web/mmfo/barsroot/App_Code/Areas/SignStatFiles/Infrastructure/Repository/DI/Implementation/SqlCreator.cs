@@ -46,7 +46,7 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
             };
         }
 
-        public static BarsSql GetFileHistory(long fileId)
+        public static BarsSql GetFileHistory()
         {
             return new BarsSql
             {
@@ -59,11 +59,8 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
                                    t.oper_date OperDate,
                                    t.way,
                                    t.direction
-                            from V_STAT_FILE_WORKFLOW t
-                            where t.file_id = :p_file_id",
-                SqlParams = new object[] {
-                    new OracleParameter ("p_file_id", OracleDbType.Decimal, fileId, ParameterDirection.Input)
-                }
+                            from V_STAT_FILE_WORKFLOW t",
+                SqlParams = new object[] { }
             };
         }
     }

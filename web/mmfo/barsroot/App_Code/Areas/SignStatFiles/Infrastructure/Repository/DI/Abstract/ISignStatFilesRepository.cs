@@ -18,5 +18,6 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Abstract
         decimal UploadFileToDb(string filePath);
         byte[] GetLastSignature(long fileId);
         void UploadFileToResDir(string fileName, long fileId);
+        void SetFileDetailsId(long fileId);
     }
 }
