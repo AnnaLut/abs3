@@ -16469,8 +16469,13 @@ begin
                when no_data_found then 
                  l_trmask := null;
              end;
-              -- меняем спецпараметры
-              set_sparam('0', x.acc, l_trmask);
+             if l_trmask.a_w4_nbs_ob22 is  null  --COBUMMFO-10606        
+               then
+                 Logger.info(h||'Для ACC='||l_trmask.a_w4_acc||' w4_nbs_ob22 is NULL');
+               else  
+                   -- меняем спецпараметры
+                   set_sparam('0', x.acc, l_trmask);
+              end if;
            end loop;
         end if;
 
