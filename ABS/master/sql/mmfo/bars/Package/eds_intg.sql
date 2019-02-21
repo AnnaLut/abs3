@@ -2,8 +2,6 @@ create or replace package eds_intg is
 
   gc_header_version constant varchar2(64)  := 'version 1.2 23.01.2019';
   
-  gc_iban constant boolean :=false;
-  
   st_request_new          constant number := -1; -- Новий запит
   st_declaration_register constant number :=  0; -- Запит зареєстровано
   st_declaration_prepared constant number :=  1; -- Декларація підготовлена
@@ -409,12 +407,12 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                        begin
                                        select sum(case when o.tt ='%%1' then o.s else 0 end) as sum_proc,
                                               sum(case when o.tt ='%%1' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_procq,
-                                              sum(case when o.tt ='%15' then o.s else 0 end) as sum_pdfo,
-                                              sum(case when o.tt ='%15' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_pdfoq,
-                                              sum(case when o.tt ='MIL' then o.s else 0 end) as sum_mil,
-                                              sum(case when o.tt ='MIL' then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_milq,
-                                              sum(case when o.tt in ('MIL','%15') then o.s else 0 end) as sum_totaly,
-                                              sum(case when o.tt in ('MIL','%15') then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_totalyq
+                                              sum(case when o.tt ='%15' and o.dk = 0 then o.s else 0 end) as sum_pdfo,
+                                              sum(case when o.tt ='%15' and o.dk = 0 then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_pdfoq,
+                                              sum(case when o.tt ='MIL' and o.dk = 0 then o.s else 0 end) as sum_mil,
+                                              sum(case when o.tt ='MIL' and o.dk = 0 then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_milq,
+                                              sum(case when o.tt in ('MIL','%15') and o.dk = 0 then o.s else 0 end) as sum_totaly,
+                                              sum(case when o.tt in ('MIL','%15') and o.dk = 0 then gl.p_icurval(account.kv ,o.s, o.fdat) else 0 end) as sum_totalyq
                                               into l_eds_dpt_data(l_eds_dpt_data.last).sum_proc,   l_eds_dpt_data(l_eds_dpt_data.last).sum_procq, 
                                                    l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfo,   l_eds_dpt_data(l_eds_dpt_data.last).sum_pdfoq,
                                                    l_eds_dpt_data(l_eds_dpt_data.last).sum_mil,    l_eds_dpt_data(l_eds_dpt_data.last).sum_milq,
