@@ -60,7 +60,8 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
         }
         public KendoDataSource<FileWorkflow> GetFileDetails(long fileId)
         {
-            BarsSql sql = SqlCreator.GetFileHistory(fileId);
+            SetFileDetailsId(fileId);
+            BarsSql sql = SqlCreator.GetFileHistory();
             return GetKendoDs<FileWorkflow>(sql);
         }
 
@@ -325,6 +326,22 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
             using (Stream stream = new MemoryStream(content))
             {
                 return HashFile.Gost34311Hash(stream);
+            }
+        }
+
+        public void SetFileDetailsId(long fileId)
+        {
+            using (OracleConnection con = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "pul.set_mas_ini";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new OracleParameter("tag_", OracleDbType.Varchar2, "FILE_ID", ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("val_", OracleDbType.Varchar2, fileId, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("comm_", OracleDbType.Varchar2, null, ParameterDirection.Input));
+
+                cmd.ExecuteNonQuery();
             }
         }
 

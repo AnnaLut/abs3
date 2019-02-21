@@ -207,5 +207,16 @@ namespace BarsWeb.Areas.SignStatFiles.Controllers.Api
             }
             catch (Exception ex) { return Error(ex); }
         }
+
+        [HttpGet]
+        public HttpResponseMessage SetFileDetailsId(long fileId)
+        {
+            try
+            {
+                _repo.SetFileDetailsId(fileId);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex) { return Error(ex); }
+        }
     }
 }
