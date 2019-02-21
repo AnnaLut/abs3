@@ -3428,7 +3428,6 @@ is
         savepoint before_doc;
 
         check_if_prev_line_accrued(p_reckoning_row.account_id, p_reckoning_row.interest_kind_id, p_reckoning_row.date_from);
-
         verify_reckoned_interest(p_reckoning_row);
         if (p_reckoning_row.interest_tail <> 0 or p_reckoning_row.interest_amount <> 0) then
 
@@ -3529,7 +3528,9 @@ is
                 acrn.acr_dati(p_reckoning_row.account_id,
                               p_reckoning_row.interest_kind_id,
                               l_document_id,
-                              l_int_accn_row.acr_dat,    -- зберігаємо значення дати, по яку нараховані відсотки
+                              case when l_int_accn_row.acr_dat is null then p_reckoning_row.date_through
+                                   else greatest(l_int_accn_row.acr_dat, p_reckoning_row.date_through)
+                              end,    -- зберігаємо значення дати, по яку нараховані відсотки
                               l_int_accn_row.s);  -- а також дробну частину залишку відсотків
 
                 if (p_reckoning_row.deal_id is not null) then
@@ -3551,7 +3552,6 @@ is
         else
             set_reckoning_state(p_reckoning_row.id, interest_utl.RECKONING_STATE_ACCR_DISCARDED);
         end if;
-
         update int_accn t
         set    t.acr_dat = case when t.acr_dat is null then p_reckoning_row.date_through
                                 else greatest(t.acr_dat, p_reckoning_row.date_through)
@@ -4752,7 +4752,6 @@ is
                       , i.BASEY as RECKONING_CALENDAR
                       , greatest(i.ACR_DAT,a.DAOS)+1 as DATE_FROM
                       , nvl2(i.STP_DAT,least(l_acr_dt,STP_DAT),l_acr_dt) as DATE_THROUGH
-  --                  , TT, ACRA, ACRB, S, TTB, KVB, NLSB, MFOB, NAMB, NAZN
                    from ACCOUNTS a
                    join INT_ACCN i
                      on ( i.ACC = a.ACC and i.ID = 1 )
@@ -4760,13 +4759,12 @@ is
                                      from NOTPORTFOLIO_NBS
                                     where PORTFOLIO_CODE = 'CURRENT_ACCOUNT'
                                       and USERID is null )
+                    -- exclude card accounts                  
+                    and a.tip not like 'W4%'                  
                     and a.DAZS Is Null
                     and lnnvl( i.STP_DAT <= i.ACR_DAT )
                )
       loop
-
---      BARS_AUDIT.TRACE( '%s: ACCOUNT_ID=%s, DATE_FROM=%s, DATE_THROUGH=%s.', title
---                      , to_char(c.ACCOUNT_ID), to_char(c.DATE_FROM,'dd.mm.yyyy'), to_char(c.DATE_THROUGH,'dd.mm.yyyy') );
 
         savepoint BEFORE_RECKONING;
 
@@ -4806,7 +4804,14 @@ is
                               , p_is_grouping_unit  => 'N'
                               , p_state_id          => null
                               , p_deal_id           => null );
-
+            -- устанавливаем дату начисления acr_dat в int_accn 
+            update int_accn t
+               set t.acr_dat = case when t.acr_dat is null then c.date_through
+                                    else greatest(t.acr_dat, c.date_through)
+                               end
+                  ,t.s = 0
+             where t.acc = c.account_id
+               and t.id = c.interest_kind;
           else
 
             l_grouping_id := null;
