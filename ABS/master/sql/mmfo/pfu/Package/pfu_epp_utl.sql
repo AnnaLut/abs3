@@ -1014,14 +1014,15 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
                                                           'state_id/text()'));
         l_message  := dbms_xslprocessor.valueof(l_row, 'message/text()');
 
-        if l_state_id = 30 then
-          set_epp_activate(l_id, l_message, sysdate, 1);
-        else
-          set_line_state(p_line_id          => l_id,
-                       p_state_id         => LINE_STATE_ACTIVATION_FAILED,
+        set_line_state(p_line_id          => l_id,
+                       p_state_id         => case l_state_id
+                                               when 30 then
+                                                 LINE_STATE_ACTIVATED
+                                               else
+                                                 LINE_STATE_ACTIVATION_FAILED
+                                             end,
                        p_tracking_comment => l_message,
                        p_stack_trace      => null);
-        end if;
       end loop;
       transport_utl.set_transport_state(p_id               => p_file_id,
                                         p_state_id         => transport_utl.TRANS_STATE_DONE,
