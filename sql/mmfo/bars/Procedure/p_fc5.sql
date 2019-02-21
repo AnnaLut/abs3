@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.002  28/01/2019 (17/01/2019)
+% VERSION : v.19.003  21/02/2019 (28/01/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -1360,8 +1360,7 @@ BEGIN
 
              sakt_ := k.suma;
 
-             srez_ := abs(k.szq);
-
+             srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
              srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
 
              sum_ := round(srez_ * k.koef);
@@ -1384,7 +1383,7 @@ BEGIN
 
              if nbs_ in ('2609','2629','2659') then
                 kodp_ := k.sign_rez||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
-             elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3548') then
+             elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
                 kodp_ := k.sign_rez||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              else
                 kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
@@ -1765,8 +1764,9 @@ BEGIN
              if nbs_ = '3599'then 
                 if substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
                    r011_ := '2';
-                else
+                elsif r011_ ='0'  then
                    r011_ := '1';
+                else     null;
                 end if;
              end if; 
 

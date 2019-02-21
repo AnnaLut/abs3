@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.003  11/02/2019 (31.01.2019)
+% VERSION     :  v.19.004  21/02/2019 (11/02/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -3100,6 +3100,7 @@ BEGIN
                 
                 sakt_ := k.suma;
 
+                srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
                 srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
              else
                 sumc_ := sumc_ + sum_;
