@@ -19,9 +19,8 @@ CREATE OR REPLACE FORCE VIEW BARS.V_XOZ_RU_CA AS
      FROM XOZ_DEB_ZAP Z, accounts a, xoz_ref X, regions R
      where z.REF1 = x.REF1 and z.stmt1 = x.stmt1 and z.KF = x.KF
        and x.acc  = a.acc  and a.KF    = x.KF 
-       and z.kf   = r.KF ;
+       and z.kf   = r.KF and z.sos != 2;
 
---order by z.sos
 
 
 GRANT SELECT ON BARS.V_XOZ_RU_CA TO BARS_ACCESS_DEFROLE;
