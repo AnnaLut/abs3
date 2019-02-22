@@ -2411,7 +2411,7 @@ from(
                                                                    null);
     l_ead_sync_que_list t_ead_sync_que_list := t_ead_sync_que_list();
 begin
-    for i in (SELECT /*+ index(q IND_EADSYNCQ_SEND*/ 
+    for i in (SELECT /*+ index(q IND_EADSYNCQ_SEND) */ 
                      id,
                      obj_id,
                      crt_date,
