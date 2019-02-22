@@ -30,7 +30,7 @@ BEGIN
 		 BEGIN
 		    SELECT sum(kos)
 			INTO nn_
-			FROM  salb
+			FROM  salb_fdat
 			WHERE acc  =  acc_   AND
 			      fdat >= fdat1_ AND
 				  fdat <= fdat2_ ;
