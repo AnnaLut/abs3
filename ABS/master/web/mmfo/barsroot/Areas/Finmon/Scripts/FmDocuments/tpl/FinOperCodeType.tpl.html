@@ -1,0 +1,192 @@
+﻿<label class="k-label">Код виду фінансової операції</label>
+<input type="text" class="k-textbox" id="totalValue" value="#= nullToStr(data.code) #" readonly/>
+
+<!-- Calculation -->
+<div class="container">
+    <label class="k-label" style="font-weight:bold;">Форма розрахунку</label>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="doc-info-table-editable2">
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="calculationProvidedCode" class="k-label" style="margin-right:7px;">Що надається</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="calculationProvidedCode" maxlength="1" value="#= nullToStr(data.Calculation.Provided.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="calculationProvidedName" value="#= nullToStr(data.Calculation.Provided.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="a"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="calculationReceivedCode" class="k-label" style="margin-right:7px;">Що отримується</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="calculationReceivedCode" maxlength="1" value="#= nullToStr(data.Calculation.Received.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="calculationReceivedName" value="#= nullToStr(data.Calculation.Received.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="a"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Asset -->
+<div class="container">
+    <label class="k-label" style="font-weight:bold;">Вид активу</label>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="doc-info-table-editable2">
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="assetProvidedCode" class="k-label" style="margin-right:7px;">Що надається</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="assetProvidedCode" maxlength="1" value="#= nullToStr(data.Asset.Provided.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="assetProvidedName" value="#= nullToStr(data.Asset.Provided.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="b"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="assetReceivedCode" class="k-label" style="margin-right:7px;">Що отримується</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="assetReceivedCode" maxlength="1" value="#= nullToStr(data.Asset.Received.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="assetReceivedName" value="#= nullToStr(data.Asset.Received.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="b"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Location -->
+<div class="container">
+    <label class="k-label" style="font-weight:bold;">Місце знаходження об'єкта</label>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="doc-info-table-editable2">
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="locationProvidedCode" class="k-label" style="margin-right:7px;">Що надається</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="locationProvidedCode" maxlength="1" value="#= nullToStr(data.Location.Provided.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="locationProvidedName" value="#= nullToStr(data.Location.Provided.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="c"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="locationReceivedCode" class="k-label" style="margin-right:7px;">Що отримується</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="locationReceivedCode" maxlength="1" value="#= nullToStr(data.Location.Received.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="locationReceivedName" value="#= nullToStr(data.Location.Received.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="c"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Object -->
+<div class="container">
+    <label class="k-label" style="font-weight:bold;">Об'єкт операції</label>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="doc-info-table-editable2">
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="objectProvidedCode" class="k-label" style="margin-right:7px;">Що надається</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="objectProvidedCode" maxlength="4" value="#= nullToStr(data.Object.Provided.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="objectProvidedName" value="#= nullToStr(data.Object.Provided.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="d"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: right;">
+                        <label for="objectReceivedCode" class="k-label" style="margin-right:7px;">Що отримується</label>
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="objectReceivedCode" maxlength="4" value="#= nullToStr(data.Object.Received.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="objectReceivedName" value="#= nullToStr(data.Object.Received.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="d"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- OpenCloseAcc -->
+<div class="container">
+    <label class="k-label" style="font-weight:bold;">Відкриття або закриття рахунку</label>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="doc-info-table-editable2">
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="text" class="k-textbox" id="openCloseAccProvidedCode" maxlength="1" value="#= nullToStr(data.OpenCloseAcc.Code) #" style="width:75px;" />
+                    </td>
+                    <td>
+                        <input type="text" class="k-textbox" id="openCloseAccProvidedName" value="#= nullToStr(data.OpenCloseAcc.Name) #" readonly style="width:400px;" />
+                    </td>
+                    <td>
+                        <a class="k-button" title="Вибрати з довідника" data-dict="e"><i class="pf-icon pf-16 pf-SEARCH_X"></i></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin:5px 5px 5px 5px;">
+    <div class="k-edit-buttons k-state-default">
+        <a id="codeTypeBtnCancel" class="k-button k-button-icontext k-grid-cancel modal-buttons" tabindex="3"><span class="k-icon k-cancel"></span>Відмінити</a>
+        <a id="codeTypeBtnSave" class="k-button k-button-icontext k-primary k-grid-update modal-buttons" tabindex="2"><span class="k-icon k-update"></span>Зберегти</a>
+    </div>
+</div>

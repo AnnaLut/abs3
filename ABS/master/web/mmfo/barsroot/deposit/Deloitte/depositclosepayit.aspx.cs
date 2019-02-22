@@ -507,14 +507,18 @@ public partial class DepositClosePayIt : Bars.BarsPage
 
             _dbLogger.Info("Розривати договір прийшла довірена особа з РНК = " + rnk.Value, "deposit");
 
+
             // Сума дозволена для отримання довіреною особою 
-            MaxSum.ValueDecimal = DepositAgreement.GetAllowedAmount(dpt.ID, Convert.ToDecimal(rnk.Value));
+            decimal AllowedAmount = DepositAgreement.GetAllowedAmount(dpt.ID, Convert.ToDecimal(rnk.Value));
 
             // якщо сума депозиту перевищує дозволену до зняття
-            if (dpt.dpt_f_sum > MaxSum.ValueDecimal)
+            if (dpt.dpt_f_sum > AllowedAmount)
             {
+                MaxSum.ValueDecimal = AllowedAmount == -1 ? dpt.dpt_f_sum : AllowedAmount;
                 SumToPay.ValueDecimal = MaxSum.ValueDecimal;
             }
+            else
+                throw new DepositException(String.Format("Сума депозиту: {0} менша, ніж сума за довіреністю: {1}", dpt.dpt_f_sum, AllowedAmount));
         }
 
         if (Request["inherit_id"] != null)

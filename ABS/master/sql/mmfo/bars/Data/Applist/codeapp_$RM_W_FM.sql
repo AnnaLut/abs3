@@ -1,3 +1,4 @@
+set define off
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_W_FM.sql =========*
 PROMPT ===================================================================================== 
@@ -291,12 +292,23 @@ begin
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => '²ìïîðò ôàéë³â ç ïåðåë³êîì ïóáë³÷íèõ ä³ÿ÷³â',
-                                                  p_funcname => '/barsroot/finmon/finmon/ImportPublicFigures',
+                                                  p_name     => '²ìïîðò ôàéë³â ç ïåðåë³êîì Ê²Ñ',
+                                                  p_funcname => '/barsroot/finmon/finmon/ImportFile?fileType=KIS',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
 
+                                                  
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Ñòâîðþºìî ôóíêö³þ ²ìïîðò ôàéë³â ç ïåðåë³êîì PEP ********** ');
+          --  Ñòâîðþºìî ôóíêö³þ ²ìïîðò ôàéë³â ç ïåðåë³êîì ïóáë³÷íèõ ä³ÿ÷³â
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => '²ìïîðò ôàéë³â ç ïåðåë³êîì PEP',
+                                                  p_funcname => '/barsroot/finmon/finmon/ImportFile?fileType=PEP',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Ñòâîðþºìî ôóíêö³þ ²ìïîðò ôàéëó òåðîðèñò³â ********** ');
           --  Ñòâîðþºìî ôóíêö³þ ²ìïîðò ôàéëó òåðîðèñò³â
@@ -304,7 +316,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '²ìïîðò ôàéëó òåðîðèñò³â',
-                                                  p_funcname => '/barsroot/finmon/finmon/importterrorists',
+                                                  p_funcname => '/barsroot/finmon/finmon/ImportFile?fileType=Terr',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -314,6 +326,9 @@ begin
           --  Ñòâîðþºìî ôóíêö³þ ÔÌ. Çá³ã ÏÅÏ ÁÀÇÎÂÈÉ
       l := l +1;
       l_function_ids.extend(l);
+      update operlist
+      set funcname = '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_FINMON_PUBLIC_CUSTOMERS'
+      where funcname = '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=FINMON_PUBLIC_CUSTOMERS';
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ÔÌ. Çá³ã ÏÅÏ ÁÀÇÎÂÈÉ',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_FINMON_PUBLIC_CUSTOMERS',
@@ -345,14 +360,24 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Ñòâîðþºìî ôóíêö³þ ÔÌ. Ïåðåâ³ðêà ÏÅÏ ÁÀÇÎÂÈÉ ********** ');
-          --  Ñòâîðþºìî ôóíêö³þ ÔÌ. Ïåðåâ³ðêà ÏÅÏ ÁÀÇÎÂÈÉ
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Âèäàëÿºìî ôóíêö³þ ÔÌ. Ïåðåâ³ðêà ÏÅÏ ÁÀÇÎÂÈÉ ********** ');
+    declare
+    l_c number;
+    begin
+        select codeoper into l_c from operlist where lower(funcname) like '%finmon_check_public%';
+        umu.remove_function(p_function_id => l_c);
+    exception
+        when no_data_found then null;
+    end;
+    
+    
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Ñòâîðþºìî ôóíêö³þ ÔÌ. Ïåðåâ³ðêà ÏÅÏ ********** ');
+          --  Ñòâîðþºìî ôóíêö³þ ÔÌ. Ïåðåâ³ðêà ÏÅÏ
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'ÔÌ. Ïåðåâ³ðêà ÏÅÏ ÁÀÇÎÂÈÉ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>finmon_check_public(0)][QST=>Âèêîíàòè ïåðåâ³ðêó âñ³õ êë³ºíò³â áàíêó?][MSG=>Âèêîíàíî!]',
+                                                  p_name     => 'ÔÌ. Ïåðåâ³ðêà ÏÅÏ',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=> fm_utl.run_deferred_task(''fm_public_utl.check_public'', ''Ïåðåâ³ðêó êë³ºíò³â íà ñïèñîê ïóáë. ä³ÿ÷³â çàâåðøåíî. Ïåðåâ³ðòå äîâ³äíèê ÏÅÏ.'')][QST=>Çàïóñòèòè ïåðåâ³ðêó âñ³õ êë³ºíò³â áàíêó?][MSG=>Ïåðåâ³ðêó çàïóùåíî, î÷³êóéòå ïîâ³äîìëåííÿ]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -438,6 +463,7 @@ umu.add_report2arm(376,'$RM_W_FM');
 umu.add_report2arm(997,'$RM_W_FM');
 umu.add_report2arm(998,'$RM_W_FM');
 umu.add_report2arm(1009,'$RM_W_FM');
+umu.add_reference2arm_bytabname('FINMON_PEP_DICT', '$RM_W_FM', umu.DIR_ACCESS_MODE_READ_ONLY, 1);
 commit;
 end;
 /
@@ -446,3 +472,4 @@ end;
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/Bars/Data/Applist/codeapp$RM_W_FM.sql =========**
 PROMPT ===================================================================================== 
+set define on

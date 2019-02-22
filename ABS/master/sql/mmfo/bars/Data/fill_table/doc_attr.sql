@@ -332,4 +332,32 @@ exception
      where ID   = 'CUST_DATEA_LIT';
 end;
 /
+
+begin 
+  execute immediate 
+q'[Insert into BARS.DOC_ATTR (ID, NAME, FIELD, SSQL)
+ Values ('CUST_VVORG', 'Анкета ФМ: Відомості про виконавчий орган', NULL, 'select nvl(trim(substr(f_get_custw_h(:ND,''VVORG'',f_get_cust_fmdat(:ADDS)),1,2000)),''Немає'') INTO :sValue from dual')]' ;
+exception when dup_val_on_index then 
+  null;
+end; 
+/
+
+begin 
+  execute immediate 
+q'[Insert into BARS.DOC_ATTR (ID, NAME, FIELD, SSQL)
+ Values ('CUST_NEDR', 'Анкета ФМ: Номер запису в ЄДР', NULL, 'select nvl(trim(substr(f_get_custw_h(:ND,''NEDR'',f_get_cust_fmdat(:ADDS)),1,2000)),''Немає'') INTO :sValue from dual')]' ;
+exception when dup_val_on_index then 
+  null;
+end; 
+/
+
+begin 
+  execute immediate 
+q'[Insert into BARS.DOC_ATTR (ID, NAME, FIELD, SSQL)
+ Values ('CUST_DEDR', 'Анкета ФМ: Дата запису в ЄДР', NULL, 'select nvl(trim(substr(f_get_custw_h(:ND,''DEDR'',f_get_cust_fmdat(:ADDS)),1,2000)),''Немає'') INTO :sValue from dual')]' ;
+exception when dup_val_on_index then 
+  null;
+end; 
+/
+
 COMMIT;

@@ -1280,11 +1280,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       END;
 
     -- берем все документы
-    for cur in (select id, rnk, ea_struct_id, agr_id, d.kf, da.deposit_id
+    for cur in (select id, rnk, ea_struct_id, agr_id, d.kf, da.deposit_id, type_id
                    from ead_docs d left outer join dpt_deposit_all da on d.agr_id = da.deposit_id
                  where d.EA_STRUCT_ID <> '333' and type_id = 'SCAN' and id > l_cdc_lastkey
+                       and not exists ( select 1 from ead_sync_queue where obj_id = to_char(d.id) and type_id = 'DOC' and crt_date > sysdate-0.05 )
                  union all
-                 select id, rnk, ea_struct_id, agr_id, d.kf, da.deposit_id
+                 select id, rnk, ea_struct_id, agr_id, d.kf, da.deposit_id, type_id
                    from ead_docs d left outer join dpt_deposit_all da on d.agr_id = da.deposit_id
                  where type_id = 'DOC' and d.EA_STRUCT_ID <> '333' and lnnvl(template_id = 'DPT_AGRMREG')  --  тікети 190 форми. COBUMMFO-6372
                        and not exists ( select 1 from ead_sync_queue where obj_id = to_char(d.id) and type_id = 'DOC' and crt_date > sysdate-1 )
@@ -1307,7 +1308,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
         end if;
 
         ead_pack.msg_create (l_type_id, TO_CHAR (cur.id), cur.rnk, cur.kf);
-        l_cdc_lastkey := cur.id;
+        
+        --обновление ключа захвата только для сканов, потому что доки не используют ключ
+        if cur.type_id = 'SCAN' then
+           l_cdc_lastkey := cur.id;
+        end if;
+        
     end loop;
 
       -- сохраняем ключ захвата
@@ -1869,7 +1875,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                    and au.idupd = ead_pack.check_acc_update(au.acc, l_cdc_lastkey_acc, l_cdc_newkey_acc) -- выгребаем последнюю запись с accounts_update, если она отличается от предпоследней
                    and au.tip not in ('DEP', 'DEN', 'NL8')
 */
-
+    /*13.11.2018 Лесняк С.Б.
                 select distinct 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
                   from accounts_update au
                  where au.idupd > l_cdc_lastkey_acc and au.idupd <= l_cdc_newkey_acc and au.kf member of kflist
@@ -1881,6 +1887,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                                            and ( ead_pack.get_acc_nbs(a.acc) in ( select nbs from EAD_NBS e where custtype = 2 and e.id = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22) ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
                                                 or ead_pack.get_acc_nbs(a.acc) = '2600' and a.ob22 in ('01', '02', '10') )
                        and au.tip not in ('DEP', 'DEN', 'NL8') )
+	*/
+	with x as ( select au.kf, au.rnk, au.acc, case when a.daos = trunc(a.dazs) and a.nbs is null then substr(a.nls, 1, 4) else a.nbs end as nbs, a.nls, a.tip, a.ob22
+
+              from bars.accounts_update au join  bars.accounts a on a.tip not in ('DEP', 'DEN', 'NL8') and a.kf = au.kf and a.acc = au.acc 
+             where au.idupd > l_cdc_lastkey_acc and au.idupd <= l_cdc_newkey_acc and au.kf member of kflist
+                   and au.CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)) 
+                   and exists ( select 1 from bars.customer c where case when custtype in (1, 2) then 2 when custtype = 3 and rtrim(sed) = '91' then 2 else 3 end = 2 and c.kf=au.kf and c.rnk=au.rnk )
+          )
+    select distinct 'ACC' as agr_type, x.acc, x.rnk, x.kf from x
+    where not exists ( select 1 from bars.dpu_accounts da where da.kf=x.kf and da.accid = x.acc ) and
+       case when x.nbs='2600' and x.ob22 in ('01', '02', '10') then 1
+            when x.nbs in ( select nbs from EAD_NBS e where e.custtype = 2 and e.id = bars.ead_integration.ead_nbs_check_param(x.nls, substr(x.tip,1,2), x.ob22) ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017) 
+              then 1 else 0 end = 1
+
          -- походу лишняк :) --09.08.2018
       /*    union
                 select distinct 'ACC' as agr_type, su.acc as acc, a.rnk as rnk, su.kf
@@ -2391,7 +2411,8 @@ from(
                                                                    null);
     l_ead_sync_que_list t_ead_sync_que_list := t_ead_sync_que_list();
 begin
-    for i in (SELECT id,
+    for i in (SELECT /*+ index(q IND_EADSYNCQ_SEND*/ 
+                     id,
                      obj_id,
                      crt_date,
                      status_id,
@@ -2399,16 +2420,17 @@ begin
                      err_count,
                      rowid,
                      type_id
-                FROM bars.ead_sync_queue
-               WHERE case when type_id = p_type then 1 else 0 end = 1
-                 AND status_id IN ('NEW', 'ERROR')
-                 AND err_count < 15
-                 AND kf = p_kf
-                 AND crt_date > sysdate - 3
+                FROM bars.ead_sync_queue q
+               WHERE type_id_Y  = p_type 
+                 AND send_Y     = 'Y'
+                 AND kf_Y       = p_kf
+                 AND crt_date_Y > sysdate - 3                 
+                 AND crt_date   > sysdate - 3 -- это не дубликат, а для отсечения партиций 
                     -- арифметична прогресія по формулі n(n+1)/2, додатково ділиться на '60*24' для переведення хвилин у дні
                  AND (crt_date + (p_retry_interval * err_count *
                      (err_count + 1)) / (2 * 60 * 24)) <= SYSDATE
-               ORDER BY status_id DESC, id ASC) loop
+               ORDER BY status_id DESC, id ASC
+	) loop
       if k = p_count then
         exit;
       end if;

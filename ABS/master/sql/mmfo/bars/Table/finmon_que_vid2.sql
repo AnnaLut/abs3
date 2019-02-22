@@ -114,6 +114,16 @@ exception when others then
  end;
 /
 
+PROMPT *** add order_id ***
+begin
+    execute immediate 'alter table bars.finmon_que_vid2 add (order_id number)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+comment on column bars.finmon_que_vid2.order_id is 'Порядковий номер для сортування';
 
 
 PROMPT *** Create  grants  FINMON_QUE_VID2 ***

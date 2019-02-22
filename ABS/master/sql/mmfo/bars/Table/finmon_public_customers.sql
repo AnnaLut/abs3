@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/FINMON_PUBLIC_CUSTOMERS.sql =========*
-PROMPT ===================================================================================== 
-
-
 PROMPT *** ALTER_POLICY_INFO to FINMON_PUBLIC_CUSTOMERS ***
-
-
 BEGIN 
         execute immediate  
           'begin  
@@ -43,9 +34,14 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
-
-
+prompt add pep_code
+begin
+    execute immediate 'alter table finmon_public_customers add pep_code number';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to FINMON_PUBLIC_CUSTOMERS ***
  exec bpa.alter_policies('FINMON_PUBLIC_CUSTOMERS');
@@ -58,12 +54,12 @@ COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.NMK IS 'Найменування клієнта в БД
 COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.CRISK IS 'Категорія ризику клієнта на дату перевірки';
 COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.CUST_RISK IS 'Критерії ризику клієнта на дату перевірки';
 COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.CHECK_DATE IS 'Дата перевірки клієнта на відповідність переліку публічних діячів';
-COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.RNK_REEL IS 'RNK пов'язаної особи';
-COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.NMK_REEL IS 'ПІБ/Назва пов'язаної особи';
-COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.NUM_REEL IS '№ пов'яз. особи в переліку публічних осіб';
+COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.RNK_REEL IS 'RNK пов''язаної особи';
+COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.NMK_REEL IS 'ПІБ/Назва пов''язаної особи';
+COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.NUM_REEL IS '№ пов''яз. особи в переліку публічних осіб';
 COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.COMMENTS IS 'Коментар';
 COMMENT ON COLUMN BARS.FINMON_PUBLIC_CUSTOMERS.KF IS '';
-
+comment on column finmon_public_customers.pep_code is 'Номер в списке ПЕП (pep.org.ua - finmon_pep_dict)';
 
 
 PROMPT *** Create  grants  FINMON_PUBLIC_CUSTOMERS ***
@@ -71,9 +67,3 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_PUBLIC_CUSTOMERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_PUBLIC_CUSTOMERS to BARS_DM;
 grant SELECT                                                                 on FINMON_PUBLIC_CUSTOMERS to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/FINMON_PUBLIC_CUSTOMERS.sql =========*
-PROMPT ===================================================================================== 

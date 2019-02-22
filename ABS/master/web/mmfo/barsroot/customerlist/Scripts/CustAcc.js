@@ -226,10 +226,10 @@ function fnCheckCustomer(rnk) {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
-                var flag = response.d.Flag;
-                if (flag != 0 && flag != -111 /*"-111" - exception*/) {
+                var compositeCode = response.d.CompositeCode;
+                if (compositeCode != "") {
                     var nmk = document.getElementById("lbNmk").innerText;
-                    var message = "Увага! Виявлено збіг з переліком публічних діячів № в переліку = " + flag + ", (" + nmk + "). \nЗверніться до підрозділу фінансового моніторингу!";
+                    var message = "Увага! Виявлено збіг з переліком публічних діячів № в переліку = " + compositeCode + ", (" + nmk + "). \nЗверніться до підрозділу фінансового моніторингу!";
                     alert(message);
                 }
                 document.location.href = "/barsroot/viewaccounts/accountform.aspx?type=4&acc=0&rnk=" + rnk + "&accessmode=1";

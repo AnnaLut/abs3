@@ -84,7 +84,7 @@ PROMPT *** Create  view V_FINMON_QUE_OPER ***
           tabval t2,
           finmon_que f,
           (  SELECT f.id AS id,
-                    LISTAGG (f.vid, ' ') WITHIN GROUP (ORDER BY (f.vid)) AS agg
+                    LISTAGG (f.vid, ' ') WITHIN GROUP (ORDER BY (coalesce(f.order_id,0))) AS agg
                FROM finmon_que_vid2 f
            GROUP BY f.id) fv2,
           (  SELECT f.id AS id,

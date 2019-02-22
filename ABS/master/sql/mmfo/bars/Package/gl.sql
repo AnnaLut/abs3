@@ -958,6 +958,20 @@ BEGIN
       end case;
    end;
 */
+
+-- COBUMMFO-10664 - запрет ввода даты валютирования меньше даты документа
+
+/*   if vdat_ is not null and vdat_ < gl.bDATE then
+     erm := '9399 Дата валютування менше дати банківського дня!';
+     Raise err;
+   end if;
+*/
+-- дата документа не может быть больше текущей системной
+/*   if data_ is not null and data_ > sysdate then
+     erm := '9399 Дата введення документа більше за поточну!';
+     raise err;
+   end if;
+*/
    IF uid_ IS NULL THEN
       id_ := gl.aUID;
    ELSE

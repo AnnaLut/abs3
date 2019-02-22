@@ -31,14 +31,18 @@ RETURN NUMERIC IS
 
   maket_    NUMERIC ;
   okpo_     Char(12);
-
   vvod_     NUMERIC ;    --  OperW/TAG='VVOD' = 1 - ввод було відкладено на ПісляОпЧас
                          --  для операцій 001,002,PKR
+
+  bussl_    Char(12);    --  Бизнеснапрямок Клиента:   ='1' - КБ,  ='2' - ММСБ
 
 --------------------------------------------------------------------------- 
 --
 --               Универсальная F_TARIF_RKO  -  для всех РУ               
 --                      
+--   Исходящие PS1, PS2       - ВСЕГДА идут по 205 тарифу (договірне списання).   
+--   Исходящие 001, 002, PKR  - МОГУТ идти по 205 тарифу - при наличии соотв. доп.реквизита.   
+--
 --------------------------------------------------------------------------- 
 BEGIN
 
@@ -51,16 +55,14 @@ BEGIN
       from   OperW 
       where  REF=REF_ and TAG='DOG_S' and VALUE='1';
     
-      sk_:=F_TARIF(205,kv_,nls_,s_);  ---  тариф 205 "Договірне списання"    
-      RETURN sk_;      
+      RETURN  F_TARIF(205, kv_, nls_, s_);  --- Договірне списання - по 205 тарифу
     
     EXCEPTION  WHEN NO_DATA_FOUND THEN
       null;
     End;
     
-    
     Begin                     ----  Доп.рекв "Ввод було відкладено на ПісляОпЧас"
-      Select 1 into vvod_ 
+      Select 1 into vvod_      --- Ввод було відкладено на ПісляОпЧас (этот флаг есть в '001','002')
       from   OperW 
       where  REF=REF_ and TAG='VVOD' and VALUE<>'0';
     EXCEPTION  WHEN NO_DATA_FOUND THEN
@@ -68,6 +70,8 @@ BEGIN
     End;
 
  End If;
+
+
 
 
 ----  Определяем kkk_ - Kод Корп.Клиента:
@@ -99,7 +103,7 @@ BEGIN
  END;
 
 
------  Исходящие PS0,PS1,PS2,PS5,PSG   -------------------- 
+-----  Исходящие PS0,PS1,PS2,PS5,PSG:
 
  If TT_ like 'PS%' and kod_<>15 then
 
@@ -108,11 +112,10 @@ BEGIN
        RETURN sk_;
     end if;
 
-    sk_:=F_TARIF(205,kv_,nls_,s_);  ---  тариф 205 "Договірне списання"    
+    sk_:=F_TARIF(205,kv_,nls_,s_);
     RETURN sk_;
 
  End if;
-
 
 
 
@@ -218,6 +221,11 @@ BEGIN
 -------- 1).  Определяем Опер.время:  -------------------------------------- 
 
 
+---                 В разных РУ - разное БАЗОВОЕ опер.время
+
+
+---  Это обычный день  ИЛИ  это  Пятница или ПредПразд.день:
+ 
  Begin                      --  peredsv=0 - обычный день           
    Select 1 into peredsv    --  peredsv=1 - пт. или предпраздн.день
    from   HOLIDAY                   
@@ -225,7 +233,6 @@ BEGIN
  EXCEPTION WHEN NO_DATA_FOUND THEN
    peredsv:=0; 
  END;                                    
-
 
 
  IF      gl.amfo = '302076'  then   --  1. Винница 
@@ -1041,7 +1048,7 @@ BEGIN
    Begin
       Select c.OKPO Into okpo_
       From   Accounts a, Customer c
-      Where  a.ACC=ACC_  and  a.RNK=c.RNK  and rownum=1;
+      Where  a.ACC=ACC_  and  a.RNK=c.RNK ;
    EXCEPTION  WHEN NO_DATA_FOUND THEN
       okpo_:='0';
    End;
@@ -1205,9 +1212,38 @@ BEGIN
  End If;
 
 
----============================================================
+---=====================  Заявка 6757  ========================================
 
----  Установлено ли Индивид.Опер.Время по счету ?
+---   Для счетов КБ   (bussl_ = '1'):  БАЗОВОЕ время  
+---   Для счетов ММСБ (bussl_ = '2'):  операции 001,002,PKR,MM2 - 14:00
+---                                    операции IB%, CL%        - 17:00
+
+ IF gl.amfo in ('353553','325796') and trunc(PDAT_) >= to_date('01/03/2019','dd/mm/yyyy') Then     ---  Львов, Чернигов
+  
+    Begin
+       Select trim(c.VALUE) Into bussl_
+       From   Accounts a, CustomerW c
+       Where  a.ACC=ACC_  and  a.RNK=c.RNK  and  c.TAG='BUSSL' ;
+    EXCEPTION  WHEN NO_DATA_FOUND THEN
+       bussl_ := '2';     ---  если не нашли, то считаем ММСБ
+    End;
+    
+    If bussl_ = '2' then             ----  Опер.Время для ММСБ:
+    
+       If  TT_ like 'IB%' or TT_ like 'CL%' then   
+           ----OprTime := '1700';                      --  Кл-Банк
+           NULL;
+       Else 
+           OprTime := '1400';                      --  ПН
+       End If;
+    
+    End If;
+
+ End If;
+
+---===========================================================================
+
+---  Установлено ли Индивид.Опер.Время по счету ?  Оно имеет наивысший приоритет !
 
  BEGIN
 
@@ -1218,19 +1254,17 @@ BEGIN
       and w.TAG = 'OPTIME1'
       and a.ACC = ACC_ ;
 
-   if OprTime1 is not NULL and 
-      to_number(OprTime1)>=800 and to_number(OprTime1)<=2400 then 
-
+   if OprTime1 is not NULL and  to_number(OprTime1)>=800 and to_number(OprTime1)<=2400 then 
       OprTime:=OprTime1;
-
    end if;
 
  EXCEPTION WHEN OTHERS THEN
    null; 
  END;
 
- BEGIN
 
+ If peredsv = 1 then              --  это Пятница или Передсвятковий день 
+ BEGIN
    SELECT trim(w.VALUE)
    INTO   OprTime2
    FROM   Accounts a, AccountsW w
@@ -1238,17 +1272,13 @@ BEGIN
       and w.TAG = 'OPTIME2'
       and a.ACC = ACC_ ;
 
-   if peredsv=1  and  OprTime2 is not NULL and
-      to_number(OprTime2)>=800 and to_number(OprTime2)<=2400 then
-
+      if peredsv=1  and  OprTime2 is not NULL and  to_number(OprTime2)>=800 and to_number(OprTime2)<=2400 then
       OprTime:=OprTime2;
-
    end if;
-
  EXCEPTION WHEN OTHERS THEN
-   null; 
+      null; 
  END;
-
+ End If;
 
 
 -- if trunc(PDAT_)=to_date('12/10/2015','dd/mm/yyyy') and 
@@ -1260,7 +1290,9 @@ BEGIN
 
 
 
--------- 2).  Расчет тарифа:  ------------------------------------------------ 
+-----------------------------------------------------------------------------------
+----------------------   2).     Расчет тарифа:  ---------------------------------- 
+-----------------------------------------------------------------------------------
 
 
  -------    29 особых счетов ГОУ :  -------------
@@ -1458,5 +1490,4 @@ BEGIN
 
 END f_tarif_rko ;
 /
-
 

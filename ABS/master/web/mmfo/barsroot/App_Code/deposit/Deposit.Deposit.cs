@@ -3332,7 +3332,7 @@ public class DepositAgreement
         {
             OracleCommand cmd = connect.CreateCommand();
 
-            cmd.CommandText = @"select LPAD(to_char(da.DENOM_COUNT),4,'0'), da.DENOM_AMOUNT
+            cmd.CommandText = @"select LPAD(to_char(da.DENOM_COUNT),4,'0'), nvl(da.DENOM_AMOUNT, -1)
                                   from DPT_AGREEMENTS da
                                  inner join DPT_TRUSTEE dt on (dt.id = da.trustee_id and dt.dpt_id = da.dpt_id)    
                                  where da.dpt_id = :p_dptid

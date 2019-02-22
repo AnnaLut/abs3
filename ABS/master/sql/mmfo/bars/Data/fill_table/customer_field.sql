@@ -13,3 +13,32 @@ begin
 commit;
  end;
 /
+
+begin 
+  execute immediate 
+    ' Insert into BARS.CUSTOMER_FIELD (TAG, NAME, U, TYPE, OPT, CODE, NOT_TO_EDIT, U_NREZ, F_NREZ, F_SPD)'||
+    ' Values (''DEDR '', ''Дата запису в ЄДР'', 2, ''D'', 1, ''GENERAL'', 0, 2, 2, 2) ';
+exception when dup_val_on_index then 
+  null;
+end;
+/
+
+begin 
+  execute immediate 
+    ' Insert into BARS.CUSTOMER_FIELD (TAG, NAME, U, TYPE, OPT, CODE, NOT_TO_EDIT, U_NREZ, F_NREZ, F_SPD)'||
+    ' Values (''NEDR '', ''Номер запису в ЄДР'', 2, ''N'', 1, ''GENERAL'', 0, 2, 2, 2) ';
+exception when dup_val_on_index then 
+  null;
+end;
+/
+
+begin 
+  execute immediate 
+    ' Insert into BARS.CUSTOMER_FIELD (TAG, NAME, U, TYPE, OPT, CODE, NOT_TO_EDIT, U_NREZ, F_NREZ, F_SPD)'||
+    ' Values (''VVORG'', ''Відомості про виконавчий орган'', 2, ''U'', 1, ''FM'', 0, 2, 2, 2) ';
+exception when dup_val_on_index then 
+  null;
+end;
+/
+
+COMMIT;	

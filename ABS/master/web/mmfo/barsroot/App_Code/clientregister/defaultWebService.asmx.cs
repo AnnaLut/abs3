@@ -3341,11 +3341,11 @@ namespace clientregister
             string PublicFlagMessage = "";
             string PublicFlag = String.Empty;
 
-            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+            OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
             OracleCommand cmd = con.CreateCommand();
 
-            cmd.CommandText = "select case when finmon_is_public(:p_nmk, null, 1)=0 then null else finmon_is_public(:p_nmk, null, 1) end fl from dual";
-            cmd.Parameters.Add("p_nmk", OracleDbType.Varchar2, nmk, ParameterDirection.Input);
+            cmd.CommandText = "select fm_public_utl.get_composite_public_code(:p_name) fl from dual";
+            cmd.Parameters.Add("p_name", OracleDbType.Varchar2, nmk, ParameterDirection.Input);
 
             try
             {
@@ -3370,10 +3370,10 @@ namespace clientregister
             string PublicFlagMessage = "";
             string PublicFlag = String.Empty;
 
-            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+            OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
             OracleCommand cmd = con.CreateCommand();
 
-            cmd.CommandText = "select case when finmon_is_public(null, :p_rnk, 1)=0 then null else finmon_is_public(null, :p_rnk, 1) end fl from dual";
+            cmd.CommandText = "select fm_public_utl.get_composite_public_code(c.nmk) fl from customer c where c.rnk = :p_rnk";
             cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, ParameterDirection.Input);
 
             try
@@ -3393,30 +3393,28 @@ namespace clientregister
 
         public class PublicFlagCust
         {
-            public int Flag
+            public string CompositeCode
             {
                 get; set;
             }
         }
 
         [WebMethod(EnableSession = true)]
-        public PublicFlagCust GetPublicFlagCust(string rnk, string namels)
+        public PublicFlagCust GetPublicFlagCust(string namels)
         {
-            //DbLoggerConstruct.NewDbLogger().Info(String.Format("GetPublicFlag starts, nmk={0}.", nmk), "ClientCustRegister");
-            var result = new PublicFlagCust { Flag = -111 };
-            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+            var result = new PublicFlagCust();
+            OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
             try
             {
                 using (OracleCommand cmd = con.CreateCommand())
                 {
-                    cmd.CommandText = @"select finmon_is_public(:p_name, :p_rnk, 1) fl from dual";
+                    cmd.CommandText = @"select fm_public_utl.get_composite_public_code(:p_name) fl from dual";
                     cmd.Parameters.Add("p_name", OracleDbType.Varchar2, namels, ParameterDirection.Input);
-                    cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, ParameterDirection.Input);
 
                     if (con.State != ConnectionState.Open)
                         con.Open();
 
-                    result.Flag = int.Parse(cmd.ExecuteScalar().ToString());
+                    result.CompositeCode = cmd.ExecuteScalar().ToString();
                 }
             }
             finally

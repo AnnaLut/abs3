@@ -96,9 +96,9 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (response) {
-                        var flag = response.d.Flag;
-                        if (flag != 0 && flag != -111 /*"-111" - exception*/) {
-                            var message = "Увага! Виявлено збіг з переліком публічних діячів № в переліку = " + flag + ", (" + nmk.value + "). \nЗверніться до підрозділу фінансового моніторингу!";
+                        var compositeCode = response.d.CompositeCode;
+                        if (compositeCode != "") {
+                            var message = "Увага! Виявлено збіг з переліком публічних діячів № в переліку = " + compositeCode + ", (" + nmk.value + "). \nЗверніться до підрозділу фінансового моніторингу!";
                             alert(message);
                         }
                     }
