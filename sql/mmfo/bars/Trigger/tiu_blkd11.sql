@@ -146,7 +146,7 @@ BEGIN
                RETURN;
          END;
 
-         IF :NEW.blkd in (19, 40) AND :old.nbs <> '2630' --COBUMMFO-9697
+         IF :OLD.blkd in (19, 40) and :old.nbs <> '2630' --COBUMMFO-9697
            THEN is_dp := 0;
          END IF;
          
