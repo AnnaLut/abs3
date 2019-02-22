@@ -38,7 +38,6 @@
 [WIDTH=73][ALIGN=CENTER][LMARGIN=0]
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  	         ЗАЯВА НА ПЕРЕКАЗ ГОТIВКИ N  [REF=ONumber,C,25] 
-
 [ALIGN=RIGHT]Дата здiйснення касової операцiї  [REF=ODay,N,2] [REF=OMonth,C,10] [REF=OYear,N,4] р.
 [ALIGN=RIGHT]Дата валютування  [REF=OVDay,N,2] [REF=OVMonth,C,10] [REF=OVYear,N,4] р.
 [ALIGN=LEFT]
@@ -82,19 +81,15 @@
 ________________________________________________________________________
 		    (дата видачі документа)
 
-
 [ALIGN=LEFT]
-[REF=DR_DT_R,C,10,,TRUE] [REF=DR_DATN,C,20,,TRUE]
-     (дата народження)
-[REF=DR_ADRES,C,61,,TRUE] [REF=DR_ADRS,C,61,,TRUE]
-     (місце проживання особи)
+[REF=DR_DT_R,C,10,,TRUE][REF=DR_DATN,C,10,,TRUE] [REF=DR_ADRES,C,61,,TRUE] [REF=DR_ADRS,C,61,,TRUE]
+     (дата народження)         (місце проживання особи)
 Додатковi реквiзити[REF=UCDAC,C,24,,TRUE]
 ________________________________________________________________________
     
 Пiдпис платника ______________      Підписи банку____________________
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		       КВИТАНЦIЯ N [REF=ONumber,C,25] 
-
 [ALIGN=RIGHT]Дата здiйснення касової операцiї  [REF=ODay,N,2] [REF=OMonth,C,10] [REF=OYear,N,4] р.
 [ALIGN=RIGHT]Дата валютування  [REF=OVDay,N,2] [REF=OVMonth,C,10] [REF=OVYear,N,4] р.
 [ALIGN=LEFT]
