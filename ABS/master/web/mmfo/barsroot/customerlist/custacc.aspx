@@ -11,7 +11,7 @@
     <link href="Styles.css" type="text/css" rel="stylesheet">
     <link href="\Common\WebGrid\Grid.css" type="text/css" rel="stylesheet">
 	<script language="JavaScript" src="Scripts\CloseNBSAccInfo.js"></script>
-    <script language="JavaScript" src="Scripts\CustAcc.js?v1.16"></script>
+    <script language="JavaScript" src="Scripts\CustAcc.js?v1.23"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery-ui.1.8.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.alerts.js"></script>
@@ -28,7 +28,7 @@
     <link href="/Common/CSS/jquery/jquery.1.8.css?v1.1" type="text/css" rel="stylesheet" />
     <link href="/Common/CSS/jquery/custom.css?v1.1" type="text/css" rel="stylesheet" />
     <script language="Javascript" src="/Common/Script/Localization.js"></script>
-    <script language="JavaScript" src="Scripts\Common.js?v.1.0"></script>
+    <script language="JavaScript" src="Scripts\Common.js?v.1.23"></script>
     <script type="text/javascript" src="/Common/WebEdit/NumericEdit.js"></script>
     <script language="JavaScript" src="\Common\WebGrid\Grid2005.js?v1.1"></script>
     <link href="../lib/alertify/css/alertify.core.css" rel="stylesheet" />
@@ -93,8 +93,23 @@
             margin: 8px 0;
             padding-bottom: 8px;
         }
-    </style>
-    <style>
+        #loader {
+          position: absolute;
+          left: 40%;
+          top: 50%;
+          z-index: 1;
+          margin: 15px;
+          padding: 15px;
+          background: white;
+          border: 3px solid #1F75CC;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          text-align:center;
+          align-items:center;
+        }
+ 
+
         .selected {
             background: #bdf;
         }
@@ -211,6 +226,7 @@
                 </tr>
             </table>
         </div>
+        <div id="loader" style="display:none;vertical-align:middle"> <asp:Image runat="server" ID="Im_run" ImageUrl="/Common/Images/loader.gif"/> </div>
         <div class="webservice" id="webService" showprogress="true"></div>
         <input runat="server" type="hidden" id="currentPageCulture" meta:resourcekey="currentPageCulture" value="ru" />
         <input runat="server" type="hidden" id="wgPageSizeText" meta:resourcekey="wgPageSizeText" value="Cтрок на странице:" />

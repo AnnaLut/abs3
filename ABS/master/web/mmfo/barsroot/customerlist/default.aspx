@@ -6,9 +6,9 @@
     <title>Перегляд контрагентів</title>
     <link href="Styles.css" type="text/css" rel="stylesheet">
     <link href="/Common/WebGrid/Grid.css" type="text/css" rel="stylesheet">
-    <script language="JavaScript" src="Scripts/Common.js?v1.6"></script>
+    <script language="JavaScript" src="Scripts/Common.js?v1.23"></script>
     <script language="JavaScript" src="/Common/WebGrid/Grid2005.js?v1.2"></script>
-    <script language="JavaScript" src="Scripts/Default.js?v1.6"></script>
+    <script language="JavaScript" src="Scripts/Default.js?v1.23"></script>
     <script language="javascript" src="/Common/Script/Localization.js"></script>
 
     <script language="javascript">

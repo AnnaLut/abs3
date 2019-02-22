@@ -19,7 +19,7 @@
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.custom.js"></script>
 
     <script language="javascript" src="Scripts/AccHistory.js?v1.4"></script>
-    <script language="JavaScript" src="Scripts/Common.js?v.1.6"></script>
+    <script language="JavaScript" src="Scripts/Common.js?v.1.23"></script>
     <script language="javascript" src="/Common/Script/Localization.js"></script>
     <script language="javascript" src="/Common/WebEdit/RadInput.js"></script>
     <script language="javascript">
