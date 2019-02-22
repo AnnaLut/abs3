@@ -18,7 +18,7 @@
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery-ui.1.8.js"></script>
     <script type="text/javascript" language="javascript" src="../lib/alertify/js/alertify.min.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.ui.datepicker-uk.js"></script>
-    <script type="text/javascript" language="javascript" src="Scripts\Common.js?v.1.6"></script>
+    <script type="text/javascript" language="javascript" src="Scripts\Common.js?v.1.23"></script>
     <script type="text/javascript" language="javascript" src="Scripts\CustHistory.js?v.1.0"></script>
     <script type="text/javascript" language="javascript" src="\Common\WebGrid\Grid2005.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/Script/Localization.js"></script>

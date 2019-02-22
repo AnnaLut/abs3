@@ -232,7 +232,7 @@ function fnCheckCustomer(rnk) {
                     var message = "Увага! Виявлено збіг з переліком публічних діячів № в переліку = " + compositeCode + ", (" + nmk + "). \nЗверніться до підрозділу фінансового моніторингу!";
                     alert(message);
                 }
-                document.location.href = "/barsroot/viewaccounts/accountform.aspx?type=4&acc=0&rnk=" + rnk + "&accessmode=1";
+                OpenInNewWindow("/barsroot/viewaccounts/accountform.aspx?type=4&acc=0&rnk=" + rnk + "&accessmode=1");
             }
         });
     }
@@ -260,9 +260,9 @@ function fnViewAcc() {
                 //window.location.replace('/barsroot/viewaccounts/accountform.aspx?type=' + type + '&acc=' + selectedRowId + '&rnk=' + rnk + '&accessmode=' + acces_mode);
 
                 if (result.rez === 1) {
-                    document.location.href = '/barsroot/viewaccounts/accountform.aspx?type=' + type + '&acc=' + selectedRowId + '&rnk=' + rnk + '&accessmode=1';
+                    OpenInNewWindow('/barsroot/viewaccounts/accountform.aspx?type=' + type + '&acc=' + selectedRowId + '&rnk=' + rnk + '&accessmode=1');
                 } else if (result.rez === 2) {
-                    document.location.href = '/barsroot/viewaccounts/accountform.aspx?type=' + type + '&acc=' + selectedRowId + '&rnk=' + rnk + '&accessmode=0';
+                    OpenInNewWindow('/barsroot/viewaccounts/accountform.aspx?type=' + type + '&acc=' + selectedRowId + '&rnk=' + rnk + '&accessmode=0');
                 } else {
                     bars.ui.alert({ text: result.msg });
                 }
@@ -553,7 +553,7 @@ function fnShowHist() {
     if (selectedRowId == null) return;
     else
         //window.location.replace("custhistory.aspx?mode=1&rnk=" + selectedRowId + "&type=" + type);
-        document.location.href = "custhistory.aspx?mode=1&rnk=" + selectedRowId + "&type=" + type;
+        OpenInNewWindow("custhistory.aspx?mode=1&rnk=" + selectedRowId + "&type=" + type);
 }
 //История счета
 function fnShowHistAcc() {
@@ -561,7 +561,7 @@ function fnShowHistAcc() {
     else {
         createCookie('prevXsltForm', v_XsltTemplateFileName);
         //window.location.replace("showhistory.aspx?acc=" + selectedRowId + "&type=" + type);
-        document.location.href = "showhistory.aspx?acc=" + selectedRowId + "&type=" + type;
+        OpenInNewWindow("showhistory.aspx?acc=" + selectedRowId + "&type=" + type);
     }
 }
 //Локализация
@@ -617,13 +617,13 @@ function fnClickLinkAcc() {
         var nls = document.getElementById("NLS_" + row_id).innerHTML;
         var lcv = document.getElementById("LCV_" + row_id).innerHTML;
 
-        document.location.href = '/barsroot/customerlist/custacc.aspx?type=6&nls=' + nls + '&lcv=' + lcv + '&mod=ro';
+        OpenInNewWindow('/barsroot/customerlist/custacc.aspx?type=6&nls=' + nls + '&lcv=' + lcv + '&mod=ro');
     }
 }
 
 function fnClickVal() {
     //document.location.href = '/barsroot/customerlist/total_currency.aspx';
-    document.location.href = '/barsroot/customerlist/customerlist/totalcurrency';
+    OpenInNewWindow('/barsroot/customerlist/customerlist/totalcurrency');
 }
 
 function fnClickTurn() {
@@ -631,7 +631,7 @@ function fnClickTurn() {
         alertify.alert("Не вибрано жодного рахунку");
     }
     else {
-        document.location.href = '/barsroot/customerlist/turn4day.aspx?acc=' + selectedRowId;
+        OpenInNewWindow('/barsroot/customerlist/turn4day.aspx?acc=' + selectedRowId);
     }
 }
 
@@ -645,7 +645,7 @@ function getParamFromUrlIfExists(param) {
 function fnClickTurnPeriod() {
 
     // window.showModalDialog('/barsroot/customerlist/dlg_date.aspx', top, 'status:no;resizable:no;help:no;scroll:no;dialogWidth:500Px;dialogHeight:400Px');
-	document.location.href = '/barsroot/customerlist/dlg_date.aspx?rnk=' + v_data[9] + getParamFromUrlIfExists("nd");
+	OpenInNewWindow('/barsroot/customerlist/dlg_date.aspx?rnk=' + v_data[9] + getParamFromUrlIfExists("nd"));
 
 }
 
@@ -655,7 +655,7 @@ function fnClickClientCard() {
     }
     else {
         var rnk = document.getElementById("RNK_" + row_id).innerHTML;
-        document.location.href = '/barsroot/clientregister/registration.aspx?readonly=1&rnk=' + rnk;
+        OpenInNewWindow('/barsroot/clientregister/registration.aspx?readonly=1&rnk=' + rnk);
     }
 }
 

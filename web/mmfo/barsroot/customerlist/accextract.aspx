@@ -8,7 +8,7 @@
 		<meta content="JavaScript" name="vs_defaultClientScript">
 		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
 		<LINK href="Styles.css" type="text/css" rel="stylesheet">
-		<script language="JavaScript" src="Scripts\Common.js?v.1.6"></script>
+		<script language="JavaScript" src="Scripts\Common.js?v.1.23"></script>
 		<script language="javascript" src="/Common/Script/Localization.js"></script>
 		<script language="javascript">
 			function checkPrintBtn() 

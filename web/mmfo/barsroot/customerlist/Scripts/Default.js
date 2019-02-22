@@ -125,7 +125,7 @@ function CheckCustType() {
 }
 function fnCredits() {
     if (selectedRowId == null) return;
-    document.location.href = "/barsroot/credit/default.aspx?rnk=" + selectedRowId;
+    OpenInNewWindow("/barsroot/credit/default.aspx?rnk=" + selectedRowId);
 }
 
 function CustomVS(obj) {
@@ -170,9 +170,9 @@ function fnRedirAcc() {
     if (selectedRowId == null) return;
     else {
         if (accessmode == "0")
-          document.location.href = "custacc.aspx?type=0&rnk=" + selectedRowId + "&mod=ro";
+          OpenInNewWindow("custacc.aspx?type=0&rnk=" + selectedRowId + "&mod=ro");
         else
-          document.location.href = "CustAcc.aspx?type=0&rnk=" + selectedRowId;
+          OpenInNewWindow("CustAcc.aspx?type=0&rnk=" + selectedRowId);
     }
 }
 //---------------------------------------------------------------------
@@ -184,7 +184,7 @@ function fnRegKontr() {
     else if (custtype == 2) url += "default.aspx?client=corp";
     else if (custtype == 3 || custtype == 4) url += "default.aspx?client=person";
     else url += "default.aspx?client=all";
-    document.location.href = url;
+    OpenInNewWindow(url);
 }
 //---------------------------------------------------------------------
 //Закрыть контрагента
@@ -228,24 +228,24 @@ function fnRedirPer() {
     if (selectedRowId == null) return;
     if (accessmode == "0") {
         if (custtype == "0")
-          document.location.href = "/barsroot/clientregister/registration.aspx?readonly=1&rnk=" + selectedRowId;
+          OpenInNewWindow("/barsroot/clientregister/registration.aspx?readonly=1&rnk=" + selectedRowId);
         else if (document.getElementById("r_" + row_id).BR_OWN == 1)
-          document.location.href = "/barsroot/clientregister/registration.aspx?readonly=2&rnk=" + selectedRowId;
+          OpenInNewWindow("/barsroot/clientregister/registration.aspx?readonly=2&rnk=" + selectedRowId);
         else
-          document.location.href = "/barsroot/clientregister/registration.aspx?readonly=3&rnk=" + selectedRowId;
+          OpenInNewWindow("/barsroot/clientregister/registration.aspx?readonly=3&rnk=" + selectedRowId);
     }
     else {
         if (document.getElementById("r_" + row_id).DAT_OFF != "") {
-          document.location.href = "/barsroot/clientregister/registration.aspx?readonly=1&rnk=" + selectedRowId;
+          OpenInNewWindow("/barsroot/clientregister/registration.aspx?readonly=1&rnk=" + selectedRowId);
         }
         else
-          document.location.href = "/barsroot/clientregister/registration.aspx?readonly=0&rnk=" + selectedRowId;
+          OpenInNewWindow("/barsroot/clientregister/registration.aspx?readonly=0&rnk=" + selectedRowId);
     }
 }
 //---------------------------------------------------------------------
 function fnShowHist() {
     if (selectedRowId == null) return;
-    else document.location.href = "CustHistory.aspx?mode=2&rnk=" + selectedRowId + "&type=0";
+    else OpenInNewWindow("CustHistory.aspx?mode=2&rnk=" + selectedRowId + "&type=0");
 }
 //---------------------------------------------------------------------
 //Нажатие
