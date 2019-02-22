@@ -17,9 +17,9 @@ is
 % DESCRIPTION : Процедура формирования 2KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.013    19.12.2018
+% VERSION     :  v.19.001    01.02.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := '  v.18.013 19.12.2018';
+  ver_            char(30)  := '  v.19.001  01.02.2019';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -113,12 +113,20 @@ BEGIN
                                  , to_char(acc.daos, с_date_fmt) as Q007_1
                                  , to_char(acc.dazs, с_date_fmt) as Q007_2
                                  , case when (nvl(acc.BLKD,0) + nvl(acc.BLKK, 0)) <> 0 then '02' else '99' end as Q031_1
-                                 , nvl(to_char(round(
-                                           gl.p_icurval (acc.kv, fost(acc.acc, to_date(cust.rnbod, с_date_fmt)), l_nbu_rpt_dt) 
-                                                       )), '0')     as T070_1
-                                 , nvl(to_char(round(
-                                           gl.p_icurval (acc.kv, fost(acc.acc, p_report_date), l_nbu_rpt_dt) 
-                                                       )), '0')     as T070_2
+                                 , (case
+                                       when nvl(gl.p_icurval (acc.kv, fost(acc.acc, to_date(cust.rnbod, с_date_fmt)), l_nbu_rpt_dt),0) <0
+                                          then '0'
+                                       else nvl(to_char(round(
+                                                    gl.p_icurval (acc.kv, fost(acc.acc, to_date(cust.rnbod, с_date_fmt)), l_nbu_rpt_dt) 
+                                                                )), '0')
+                                     end)     as T070_1     
+                                 , (case
+                                       when nvl(gl.p_icurval (acc.kv, fost(acc.acc, p_report_date), l_nbu_rpt_dt),0) <0
+                                          then '0'
+                                       else nvl(to_char(round(
+                                                    gl.p_icurval (acc.kv, fost(acc.acc, p_report_date), l_nbu_rpt_dt) 
+                                                                )), '0')
+                                     end)     as T070_2     
                                  --Параметры операции       
                                  , (
                                      case 

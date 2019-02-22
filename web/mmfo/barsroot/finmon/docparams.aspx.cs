@@ -454,12 +454,28 @@ public partial class finmon_docparams : Bars.BarsPage
             SQL_NONQUERY(String.Format("delete from {0} where id=:id", tabname));
         }
         // вставляем новые
-        foreach (var code in p_vids)
+        if (tabname == "finmon_que_vid2")
         {
-            ClearParameters();
-            SetParameters("id", DB_TYPE.Decimal, p_id, DIRECTION.Input);
-            SetParameters("code", DB_TYPE.Varchar2, code, DIRECTION.Input);
-            SQL_NONQUERY(String.Format("insert into {0}(id, vid) values(:id, :code)", tabname));
+            int order_id = 1;
+            foreach (var code in p_vids)
+            {
+                ClearParameters();
+                SetParameters("id", DB_TYPE.Decimal, p_id, DIRECTION.Input);
+                SetParameters("code", DB_TYPE.Varchar2, code, DIRECTION.Input);
+                SetParameters("order_id", DB_TYPE.Decimal, order_id, DIRECTION.Input);
+                SQL_NONQUERY(String.Format("insert into {0}(id, vid, order_id) values(:id, :code, :order_id)", tabname));
+                order_id++;
+            }
+        }
+        else
+        {
+            foreach (var code in p_vids)
+            {
+                ClearParameters();
+                SetParameters("id", DB_TYPE.Decimal, p_id, DIRECTION.Input);
+                SetParameters("code", DB_TYPE.Varchar2, code, DIRECTION.Input);
+                SQL_NONQUERY(String.Format("insert into {0}(id, vid) values(:id, :code)", tabname));
+            }
         }
     }
 

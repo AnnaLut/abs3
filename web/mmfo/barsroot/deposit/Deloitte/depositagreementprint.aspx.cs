@@ -844,4 +844,10 @@ public partial class DepositAgreementPrint : Bars.BarsPage
         return res;
     }
     # endregion
+	
+	protected void fullamount_CheckedChanged(object sender, EventArgs e)
+    {
+        nmAmount.Value = null;
+        nmAmount.Enabled = !fullamount.Checked;
+    }
 }

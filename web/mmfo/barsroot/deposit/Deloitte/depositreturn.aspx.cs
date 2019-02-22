@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Globalization;
 using Bars.DocHand;
@@ -268,8 +268,9 @@ public partial class DepositReturn : Bars.BarsPage
                 // якщо сума депозиту перевищує дозволену до зняття
                 if (dpt.dpt_f_sum >= AllowedAmount)
                 {
-                    InheritDeposit.ValueDecimal = AllowedAmount;
-                    InheritPercent.ValueDecimal = 0;
+                    InheritDeposit.ValueDecimal = AllowedAmount == -1 ? dpt.dpt_f_sum : AllowedAmount;
+					InheritPercent.ValueDecimal = (AllowedAmount != -1)? 0: dptPercentToPay.ValueDecimal;
+
                 }
                
                 //якщо на довірену особу є активний закит то виплата без картки, інакше авторизація по картці.

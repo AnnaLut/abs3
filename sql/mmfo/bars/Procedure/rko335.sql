@@ -21,13 +21,14 @@ l_s_all     INTEGER;        --Сума всего
 kkk_        number(3);      --Kод Корп.Клиента
 OprTime1    CHAR(4);
 OprTime2    CHAR(4);
-n_tarpak    number(6);      --Номер пакета
+n_tarpak    number(6);      --Номер пакета    --
+bussl_      CHAR(4);        --Бізнес-напрямок ( 1 - КБ, 2 - ММСБ )
 BEGIN
    BEGIN
       EXECUTE IMMEDIATE 'TRUNCATE TABLE RKO_335';
    END;
 
-FOR k IN (SELECT ACC, BRANCH, NLS
+FOR k IN (SELECT ACC,  BRANCH,  NLS,  RNK
           FROM   ACCOUNTS
           WHERE  NLS like P_nls and KV=980 and DAZS is NULL
             and  ACC in (Select ACC from RKO_LST)
@@ -39,13 +40,23 @@ FOR k IN (SELECT ACC, BRANCH, NLS
 
 ------   Определяем kkk_ - Kод Корп.Клиента  
    BEGIN  
-     Select r.KODK  Into  kkk_         
-     From   RNKP_KOD r, Accounts a
-     Where  a.NLS=k.NLS and a.KV=980 and  a.RNK=r.RNK  and  
-            r.RNK is not NULL and r.KODK is not NULL and rownum=1;
+     Select KODK  Into  kkk_         
+     From   RNKP_KOD 
+     Where  RNK=k.RNK and rownum=1;
    EXCEPTION  WHEN NO_DATA_FOUND THEN
      kkk_:=0;
    END;  
+
+
+-----   Определяем bussl_  -  Бізнес-напрямок Клиента
+   Begin
+      Select trim(c.VALUE) Into bussl_
+      From   Accounts a, CustomerW c
+      Where  a.ACC=k.ACC  and  a.RNK=c.RNK  and  c.TAG='BUSSL' ;
+   EXCEPTION  WHEN NO_DATA_FOUND THEN
+      bussl_:='2';       ---  если не нашли, то считаем за ММСБ
+   End;
+
 
 
 ------   Определяем ОперВремя: 
@@ -761,49 +772,52 @@ End If;
 
 ---------------------------------------------------------------
 ---
----      Поиск индивидуального опер.времени по счету
----      ---------------------------------------------
-
- BEGIN      
-
-   SELECT trim(w.VALUE)
-   INTO   OprTime1
-   FROM   Accounts a, AccountsW w
-   WHERE  a.ACC = w.ACC
-      and w.TAG = 'OPTIME1'
-      and a.ACC = k.ACC ;
-
-   if OprTime1 is not NULL     and 
-      to_number(OprTime1)>=800 and to_number(OprTime1)<=2400 then 
-
-         L_OPERTIME:=OprTime1;   --   Обычный день
-
-   end if;
-
- EXCEPTION WHEN OTHERS THEN
-   null; 
- END;
+---       ТЕПЕРЬ ЭТО ДЕЛАЕТСЯ В ФУНКЦИИ   F_OperTimeRKO.sql  
+----      =================================================
+---
+---          Поиск индивидуального опер.времени по счету
 
 
- BEGIN      
-
-   SELECT trim(w.VALUE)
-   INTO   OprTime2
-   FROM   Accounts a, AccountsW w
-   WHERE  a.ACC = w.ACC
-      and w.TAG = 'OPTIME2'
-      and a.ACC = k.ACC ;
-
-   if OprTime2 is not NULL     and 
-      to_number(OprTime2)>=800 and to_number(OprTime2)<=2400 then 
-
-         L_OPERTIME2:=OprTime2;  -- Пятница или ПредПразд.день
-
-   end if;
-
- EXCEPTION WHEN OTHERS THEN
-   null; 
- END;
+-- BEGIN      
+--
+--   SELECT trim(w.VALUE)
+--   INTO   OprTime1
+--   FROM   Accounts a, AccountsW w
+--   WHERE  a.ACC = w.ACC
+--      and w.TAG = 'OPTIME1'
+--      and a.ACC = k.ACC ;
+--
+--   if OprTime1 is not NULL     and 
+--      to_number(OprTime1)>=800 and to_number(OprTime1)<=2400 then 
+--
+--         L_OPERTIME:=OprTime1;   --   Обычный день
+--
+--   end if;
+--
+-- EXCEPTION WHEN OTHERS THEN
+--   null; 
+-- END;
+--
+--
+-- BEGIN      
+--
+--   SELECT trim(w.VALUE)
+--   INTO   OprTime2
+--   FROM   Accounts a, AccountsW w
+--   WHERE  a.ACC = w.ACC
+--      and w.TAG = 'OPTIME2'
+--      and a.ACC = k.ACC ;
+--
+--   if OprTime2 is not NULL     and 
+--      to_number(OprTime2)>=800 and to_number(OprTime2)<=2400 then 
+--
+--         L_OPERTIME2:=OprTime2;  -- Пятница или ПредПразд.день
+--
+--   end if;
+--
+-- EXCEPTION WHEN OTHERS THEN
+--   null; 
+-- END;
 
 
 BEGIN
@@ -924,9 +938,10 @@ If n_tarpak >= 38 then   ------    Бесплатные набираются только из Клиент-Банк  
                                                            AND t.DK=0
                                                            AND d.DK=0
                                                            AND (
-                TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),'HH24MI' )
+                TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),'HH24MI' )  ---  ВРЕМЯ платежа !
                                                                    <=
-                decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                ----  decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )      ---  ОперВремя
+                F_OperTimeRKO ( k.ACC, o.PDAT, L_OPERTIME, L_OPERTIME2, bussl_, d.TT)                                                    ---  ОперВремя
                                                                    OR
                ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
                                                                 )
@@ -972,7 +987,8 @@ If n_tarpak >= 38 then   ------    Бесплатные набираются только из Клиент-Банк  
                                                            AND (
                TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
                                                                     > 
-               decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+               ----decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                F_OperTimeRKO ( k.ACC, o.PDAT, L_OPERTIME, L_OPERTIME2, bussl_, d.TT)                                                    ---  ОперВремя
                                                                 AND
                not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
                                                                 )
@@ -1039,7 +1055,8 @@ If n_tarpak >= 38 then   ------    Бесплатные набираются только из Клиент-Банк  
                                                            AND (
                   TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
                                                                <=
-                  decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                  ----decode((Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                  F_OperTimeRKO ( k.ACC, o.PDAT, L_OPERTIME, L_OPERTIME2, bussl_, d.TT)                                                    ---  ОперВремя
                                                                 OR
                   ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
                                                                )
@@ -1085,7 +1102,8 @@ If n_tarpak >= 38 then   ------    Бесплатные набираются только из Клиент-Банк  
                                                            AND (
                     TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT),'HH24MI' )
                                                                    > 
-                    decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                    -----decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                    F_OperTimeRKO ( k.ACC, o.PDAT, L_OPERTIME, L_OPERTIME2, bussl_, d.TT)                                                    ---  ОперВремя
                                                                   AND
                     not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
                                                                )
@@ -1234,7 +1252,8 @@ ELSE            -----------    n_tarpak  <  38   -  Бесплатные набираются из ЛЮБ
                                                            AND (
                       TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
                                                                  <=
-                      decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                      ----decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                      F_OperTimeRKO ( k.ACC, o.PDAT, L_OPERTIME, L_OPERTIME2, bussl_, d.TT)                                                    ---  ОперВремя
                                                                  OR
                       ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
                                                                 )
@@ -1279,7 +1298,8 @@ ELSE            -----------    n_tarpak  <  38   -  Бесплатные набираются из ЛЮБ
                                                            AND (
                   TO_CHAR ( nvl2((Select 1 From RKO_REF where REF=o.REF), (Select max(DAT) from OPER_VISA where REF=o.REF and GROUPID not in (30,80)), o.PDAT), 'HH24MI' )
                                                                  > 
-                  decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                  -----decode( (Select count(*) from HOLIDAY where trunc(o.PDAT+1)=HOLIDAY and KV=980), 0, L_OPERTIME, L_OPERTIME2 )
+                  F_OperTimeRKO ( k.ACC, o.PDAT, L_OPERTIME, L_OPERTIME2, bussl_, d.TT)                                                    ---  ОперВремя
                                                                 AND
                   not ( o.TT in ('001','002')  and  exists ( Select 1 From OperW where TAG='VVOD' and VALUE='1' and REF=o.REF ) )
                                                                 )

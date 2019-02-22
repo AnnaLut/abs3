@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/Areas/Finmon/Scripts/FmDocuments/Common.js?27_12_2018__16_09_30"></script>
+<script src="~/Areas/Finmon/Scripts/FmDocuments/ExplaineAndConfirm.js?27_12_2018__16_09_30"></script>
+<script src="~/Areas/Finmon/Scripts/FmDocuments/SingleFmRulesEditor.js?27_12_2018__16_09_30"></script>
+<script src="~/Areas/Finmon/Scripts/FmDocuments/TerroristsForm.js?27_12_2018__16_09_30"></script>
+<script src="~/Areas/Finmon/Scripts/FmDocuments/FiltersForm.js?27_12_2018__16_09_30"></script>
+<script src="~/Areas/Finmon/Scripts/FmDocuments/DictForm.js?27_12_2018__16_09_30"></script>
+<script src="~/Areas/Finmon/Scripts/FmDocuments/CustomerForm.js?27_12_2018__16_09_30"></script>
+<script src="~/Areas/Finmon/Scripts/FmDocuments/FmDocumentsScripts.js?27_12_2018__16_09_30"></script>
+
+<link rel="stylesheet" href="~/Areas/Finmon/Content/FmDocuments/FmDocumentsStyle.css?27_12_2018__16_09_30" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<table style="width:100%;">
+    <tr style="width:100%;">
+        <td style="width:40%;padding-left:30px;">
+            <label class="k-label invisible" id="searchStatus" style="float:left;"></label>
+        </td>
+        <td style="width:50%;padding-right:30px;">
+            <label class="k-label display-filters" id="displayFiltersDateRule"></label>
+        </td>
+    </tr>
+</table>
+<hr style="margin:3px;" />
+
+<div id="documentsGrid"></div>
+<div id="text" style="position:absolute;visibility:hidden">This is some text</div>

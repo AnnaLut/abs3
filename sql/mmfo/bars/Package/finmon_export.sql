@@ -77,7 +77,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.FINMON_EXPORT IS
 /*
     03.01.2012 - Сменили при импорте для Надры простановку в реестр KL_ID при смене года!!!
 */
-g_body_version    constant varchar2(64)  := 'version 1.3 25/09/2017';
+g_body_version    constant varchar2(64)  := 'version 1.4 20/02/2019';
 G_TRACE  constant varchar2(10) := 'fmxy.';
 
 ALICENSE NUMBER := 0;
@@ -524,69 +524,69 @@ begin
          dbms_xslprocessor.valueOf(l_nd, 'date-of-birth-list/text()', l_tmp);
          r_lt.c13 := trim(dbms_xmlgen.convert(l_tmp,1));
          dbms_xslprocessor.valueOf(l_nd, 'place-of-birth-list/text()', l_tmp);
-         r_lt.c14 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c14 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'place-of-birth-list');
          dbms_xslprocessor.valueOf(l_nd, 'citizenchip-list/text()', l_tmp);
-         r_lt.c15 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c15 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'citizenchip-list');
          dbms_xslprocessor.valueOf(l_nd, 'nationality-list/text()', l_tmp);
-         r_lt.c16 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c16 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'nationality-list');
          dbms_xslprocessor.valueOf(l_nd, 'designation-list/text()', l_tmp);
-         r_lt.c17 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c17 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'designation-list');
          dbms_xslprocessor.valueOf(l_nd, 'working-list/text()', l_tmp);
-         r_lt.c18 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c18 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'working-list');
          dbms_xslprocessor.valueOf(l_nd, 'title-list/text()', l_tmp);
-         r_lt.c19 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c19 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'title-list');
          dbms_xslprocessor.valueOf(l_nd, 'id-number-list/text()', l_tmp);
          r_lt.c25 := trim(dbms_xmlgen.convert(l_tmp,1));
          dbms_xslprocessor.valueOf(l_nd, 'noted-on-conviction/text()', l_tmp);
-         r_lt.c35 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c35 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'noted-on-conviction');
          dbms_xslprocessor.valueOf(l_nd, 'noted-on-prosecution/text()', l_tmp);
-         r_lt.c36 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c36 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'noted-on-prosecution');
          dbms_xslprocessor.valueOf(l_nd, 'comments/text()', l_tmp);
          r_lt.c37 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)),'comments');
          dbms_xslprocessor.valueOf(l_nd, 'comments-record/text()', l_tmp);
-         r_lt.c38 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c38 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'comments-record');
          dbms_xslprocessor.valueOf(l_nd, 'noted-off-list/text()', l_tmp);
          r_lt.c39 := convert_to_date(l_tmp, 'noted-off-list');
          --document-list
          dbms_xslprocessor.valueOf(l_nd, 'document-list/document-id/text()', l_tmp);
-         r_lt.c20 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c20 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'document-id');
          dbms_xslprocessor.valueOf(l_nd, 'document-list/document-date/text()', l_tmp);
-         r_lt.c21 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c21 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'document-date');
          dbms_xslprocessor.valueOf(l_nd, 'document-list/document-country/text()', l_tmp);
-         r_lt.c22 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c22 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'document-country');
          dbms_xslprocessor.valueOf(l_nd, 'document-list/code-document-country/text()', l_tmp);
          r_lt.c23 := trim(dbms_xmlgen.convert(l_tmp,1));
          dbms_xslprocessor.valueOf(l_nd, 'document-list/document-reg/text()', l_tmp);
-         r_lt.c24 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c24 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'document-reg');
          --address-list
          dbms_xslprocessor.valueOf(l_nd, 'address-list/country/text()', l_tmp);
-         r_lt.c26 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c26 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'country');
          dbms_xslprocessor.valueOf(l_nd, 'address-list/country-code/text()', l_tmp);
-         r_lt.c27 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c27 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'country-code');
          dbms_xslprocessor.valueOf(l_nd, 'address-list/postal-code/text()', l_tmp);
-         r_lt.c28 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c28 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'postal-code');
          dbms_xslprocessor.valueOf(l_nd, 'address-list/state-province/text()', l_tmp);
-         r_lt.c29 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c29 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'state-province');
          dbms_xslprocessor.valueOf(l_nd, 'address-list/city/text()', l_tmp);
-         r_lt.c30 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c30 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'city');
          dbms_xslprocessor.valueOf(l_nd, 'address-list/address1/text()', l_tmp);
-         r_lt.c31 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c31 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'address1');
          dbms_xslprocessor.valueOf(l_nd, 'address-list/address2/text()', l_tmp);
-         r_lt.c32 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c32 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'address2');
          dbms_xslprocessor.valueOf(l_nd, 'address-list/address3/text()', l_tmp);
-         r_lt.c33 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c33 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'address3');
          begin
              dbms_xslprocessor.valueOf(l_nd, 'address-list/address/text()', l_tmp);
              l_tmp := substr(l_tmp, 1, 1000);
-             r_lt.c34 := trim(dbms_xmlgen.convert(l_tmp,1));
+             r_lt.c34 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'address');
          exception  when others then
              r_lt.c34 := null;
          end;
          --bank-list
          dbms_xslprocessor.valueOf(l_nd, 'bank-list/bank-inf/text()', l_tmp);
-         r_lt.c40 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c40 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'bank-inf');
          dbms_xslprocessor.valueOf(l_nd, 'bank-list/bank-count/text()', l_tmp);
-         r_lt.c41 := trim(dbms_xmlgen.convert(l_tmp,1));
+         r_lt.c41 := convert_to_varchar(trim(dbms_xmlgen.convert(l_tmp,1)), 'bank-count');
 
          insert into FINMON_REFT values r_lt;
 

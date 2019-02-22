@@ -112,6 +112,7 @@
                 </td>
                 <td>
                     <uc:TextBoxDecimal runat="server" ID="nmAmount" TabIndex="103" ValidationGroup="Params" />
+					<asp:CheckBox runat="server" ID="fullamount" Text="Вся сума депозиту" OnCheckedChanged="fullamount_CheckedChanged" AutoPostBack="true" />
                 </td>
             </tr>
             <tr id="trDover4" runat="server" visible="false">
