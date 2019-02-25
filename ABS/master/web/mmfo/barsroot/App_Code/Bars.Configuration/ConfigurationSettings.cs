@@ -463,7 +463,9 @@ namespace Bars.Configuration
             {
                 OracleCommand cmd = con.CreateCommand();
                 cmd.Parameters.Add("webuser", OracleDbType.Varchar2, webuser.ToLower(), System.Data.ParameterDirection.Input);
-                cmd.CommandText = "select webuser,dbuser,errmode,webpass,adminpass,comm,chgdate,blocked,attempts,user_id,shared_user,log_level,change_date, bank_date from bars.v_web_usermap where lower(webuser)=:webuser";
+                cmd.CommandText = @"select webuser,dbuser,errmode,webpass,adminpass,comm,chgdate,blocked,attempts,user_id,shared_user,log_level,change_date, bank_date
+									from bars.V_WEB_USERMAP$
+									where lower_webuser=:webuser";
                 OracleDataReader reader = cmd.ExecuteReader();
 
                 if (reader.Read())
