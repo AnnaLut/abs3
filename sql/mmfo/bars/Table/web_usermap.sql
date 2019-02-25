@@ -126,6 +126,19 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index UK_WEB_USERMAP ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.UK_WEB_USERMAP ON BARS.WEB_USERMAP (LOWER(WEBUSER)) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
 PROMPT *** Create  grants  WEB_USERMAP ***
 grant SELECT                                                                 on WEB_USERMAP     to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_USERMAP     to BARS_ACCESS_DEFROLE;
