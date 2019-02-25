@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.6 14.01.2019';
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.7 25.02.2019';
 -- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -109,7 +109,7 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 CREATE OR REPLACE PACKAGE BODY OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.6 14.01.2019';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.7 25.02.2019';
 /*
 10.07.2018 LitvinSO COBUMMFO-8388 - Проверка параметра Страхування кредиту при авторизации
 06.04.2018  Нач %% через JOB
@@ -181,11 +181,19 @@ end    Get_NLS ;
 procedure NEXT_LIM (p_acc8 number ) is  --  проверка на перелимиты с помещением с серую зону
   Sum_Deb number ;
 begin   ----- 2  Нов.ліміт<Деб.зал(Переліміт)  15
-  For k in (select * from accounts where p_acc8 in ( accc, acc) and tip <> 'SP ' and lim > 0 )
-  loop  If    k.acc = p_acc8 then
-              select NVL(sum(ostc),0)  into  sum_deb from accounts where ostc < 0 and accc = p_acc8 ;
+  bars_audit.info( 'OVRN=>NEXT_LIM '|| p_acc8 ||'   '||sysdate);
+  For k in (select * from accounts where p_acc8 in ( accc, acc) and tip <> 'SP ' and lim >= 0 )
+  loop  
+        bars_audit.info( 'OVRN=>NEXT_LIM '|| k.acc ||'   '||k.lim||'   '||sysdate);
+        If    k.acc = p_acc8 then
+              select NVL(sum(ostc),0)*(-1)  into  sum_deb from accounts where ostc < 0 and accc = p_acc8 ;
+              
+              ----------------------------------------------------------
+              -----если сюда попадает счет 89*, то, исходя из OVRN.ins_TRZ, в OVR_TERM_TRZ вообще никогда ничего не попадет (в этой строке нет смысла)
               If k.lim < Sum_Deb then                OVRN.ins_TRZ (k.acc, gl.bdate + 1, null, 2 )   ; end If ;  -- перелимит по дог
-        elsIf k.ostc <  0  and k.lim < -k.ostc then  OVRN.ins_TRZ (k.acc, gl.bdate + 1, null, 2 )   ;           -- перелимит по клиенту
+              ----------------------------------------------------------  
+                          
+        elsIf k.ostc <  0  and k.lim < k.ostc *(-1) then  OVRN.ins_TRZ (k.acc, gl.bdate + 1, null, 2 )   ;           -- перелимит по клиенту
         end if ;
   end loop     ;
 end NEXT_LIM   ;
@@ -294,10 +302,12 @@ procedure ins_TRZ -- помещение в серую зону
   p_trz int       -- Код "плохого" события  = Код причины помещения в серую зону
  )
 is
+
   New_datVZ date ;
   New_datSP date ;
   Old_DatSP date ;
 begin
+  bars_audit.info( 'OVRN=>ins_TRZ '|| p_acc1 ||'   '||p_trz||'   '||sysdate);
   New_DatVZ := NVL( p_datVZ, gl.bDate     ) ;
 
   If p_datSP is null then  -- расчетная по справочнику Причин "Серой зоны"  дата выноса на просрочку
@@ -321,13 +331,13 @@ begin
   select max (datSP) into Old_datSP from OVR_TERM_TRZ where acc1 = p_acc1 and trz = p_trz ;
 
   If    Old_datSP is null then    -- первая запись  счета-нарушителя. тянет за совой всех
-
+        bars_audit.info( 'OVRN=>ins_TRZ 1'|| p_acc1 ||'   '||p_trz||'   '||sysdate);
         insert into OVR_TERM_TRZ (acc1, acc,     datVZ,     datSP,   trz  )
                         select  p_acc1, acc, New_datVZ, New_DatSP, p_trz
                         from accounts  where accc = (select accc from accounts where acc = p_acc1) ;
 
   ElsIf Old_datSP < gl.bdate Or Old_datSP > New_DatSP  then
-
+        bars_audit.info( 'OVRN=>ins_TRZ 2'|| p_acc1 ||'   '||p_trz||'   '||sysdate);
        -- удалить прошедшие даты нарушителя , а также более поздние, чем  наша
         delete from OVR_TERM_TRZ where acc1 = p_acc1  and   trz =  p_trz ;
         insert into OVR_TERM_TRZ (acc1, acc,     datVZ,     datSP,   trz  )
@@ -440,6 +450,7 @@ OVR_TERM_TRZ.TRZ = Код события:
            OVRN.SetIR ( dd.nd, aaa, 1, gl_bdate, acrn.fprocn ( aaa.acc, 1, dd.sdate) )   ; -- по пасс для 2600+8998*
            If aaa.acc=a89.acc then OVRN.SetIR(dd.nd, aaa, 0, gl_bdate, acrn.fprocn ( aaa.acc, 0, dd.sdate) )   ;   -- восстанавливаем договорные ставки по активу  для 899*
            else                    delete from OVR_TERM_TRZ where acc = aaa.acc ;        -- для 2600 убираем планы выноCа на просрочку
+                                   bars_audit.info( 'OVRN=>UPD_SOS del OVR_TERM_TRZ'|| aaa.acc ||'   '||sysdate);
            end if;
 
         Else   ------------------------------------------------------------------------------- УВЫ ... Ухудшение...(sos=11,12,13)
@@ -579,6 +590,7 @@ begin
            l_Txt := 'Знято БЛОК: '      ;
            l_sos := null;
            delete from OVR_TERM_TRZ where acc1 = p_acc ; ---- and trz = 4;
+           bars_audit.info( 'OVRN=>STOP 1 del OVR_TERM_TRZ '|| p_acc ||'   '||sysdate);
      EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error (g_errn,'На рах.'||p_nls||' не було накладене ручне блокування та не знаходиться в сірій зоні');
      end ;
 
@@ -590,6 +602,7 @@ begin
            l_Txt := 'Установлено БЛОК: ';
            l_sos := 12 ;
            delete from OVR_TERM_TRZ where acc1 = p_acc and trz = 4;
+           bars_audit.info( 'OVRN=>STOP 2 del OVR_TERM_TRZ '|| p_acc ||'   '||sysdate);
            -- желтая зона 4 "Ручне" призупинення ОВР  30
            OVRN.ins_TRZ (p_acc1 => p_acc, p_datVZ => gl.bdate, p_datSP => null, p_trz => 4);
       end ;
@@ -861,12 +874,12 @@ begin
    end if;
 
     begin
-        -- первоначальный (договорной)
-        select max(fdat) into dTmp_ from OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat <= dat21_ and lim >0 ;
-        If dTmp_ is null then
-           raise_application_error(g_errn, g_errS||'Відсутні догов. ліміти НЕ =0 до Договору ref='||l_nd )  ;
-        end if;
-        select lim  into LD0_ from  OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat = dTmp_;
+  -- первоначальный (договорной)
+  select max(fdat) into dTmp_ from OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat <= dat21_ and lim >0 ;
+  If dTmp_ is null then
+     raise_application_error(g_errn, g_errS||'Відсутні догов. ліміти НЕ =0 до Договору ref='||l_nd )  ;
+  end if;
+  select lim  into LD0_ from  OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat = dTmp_;
     exception when others then
         bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));     
         LD0_:=0;
@@ -1648,7 +1661,6 @@ begin
                        ostf = (select sum(ostF) from accounts where accc= a8.acc)
                   where acc = a8.acc;
 
-
   OVRN.INT_OLD (aa.acc, DD.SDATE-1 ); ---------- Доначислить проц по <вчера>
 
   -----------------------------------------------------------------
@@ -2019,6 +2031,7 @@ begin
                   OVRN.SetIR(dd.nd,aaa, 0, l_date+1, acrn.fprocn ( aaa.acc, 0, dd.sdate) ) ;
                else                      -------------------------------------------- по 2600 : убираем планы выноCа на просрочку
                   delete from OVR_TERM_TRZ where acc = aaa.acc ;
+                  bars_audit.info( 'OVRN=>background del OVR_TERM_TRZ '|| aaa.acc ||'   '||sysdate);
                end if;
 
             else
@@ -2078,6 +2091,7 @@ begin
          OVRN.NEXT_LIM ( a89.acc ); -- проверка на перелимит после установки новых лимитов
 
       end if;  -- ФИНИШ
+
   end loop ; -- d
 
 end background ;
@@ -2102,7 +2116,7 @@ begin
                    next_date => sysdate,
                    interval  => null,
                    no_parse  => true);
-   bars_audit.info(l_job_what);                
+   bars_audit.info(l_job_what);
 exception when others then    rollback to savepoint before_job_start;   bars_audit.info('ERROR'||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));    -- произошли ошибки
 end intx;
 
@@ -2711,11 +2725,13 @@ If p_mode = 2 and l_donor <> 1 then    --- Вынос на просрочку тела
          begin OVRN.opl1(oo);
                OFF_SP (0, oo, a26, sp ) ;   gl.pay (2, oo.ref, oo.vdat);   OFF_SP ( 1, oo, a26, sp ) ;
                delete from OVR_TERM_TRZ where acc = a26.acc ;
+               bars_audit.info( 'OVRN=>BG1 1 del OVR_TERM_TRZ '|| a26.acc ||'   '||sysdate);
          EXCEPTION  WHEN OTHERS THEN sTmp_ := 'OVRN:'||oo.nlsa||'->'|| oo.nlsb||'. НЕможливо виконати '||oo.s||'='||sTmp_;  ROLLBACK TO do_SP2;   logger.error(sTmp_ ) ;
          end ;
       else     OVRN.opl1(oo);
                OFF_SP (0, oo, a26, sp ) ;   gl.pay (2, oo.ref, oo.vdat);   OFF_SP ( 1, oo, a26, sp ) ;
                delete from OVR_TERM_TRZ where acc = a26.acc ;
+               bars_audit.info( 'OVRN=>BG1 2 del OVR_TERM_TRZ '|| a26.acc ||'   '||sysdate);
       end if ;
    end loop  ; -- sp
    OVRN.UPD_SOS  (p_nd => dd.ND, p_sos => null ) ;
@@ -3159,6 +3175,7 @@ BEGIN
 
      ----чистка тормозной зоны по счету, который используется повторно уже с другим договором
      delete from OVR_TERM_TRZ where acc = k.ACC;
+     bars_audit.info( 'OVRN=>CLS del OVR_TERM_TRZ '|| k.ACC ||'   '||sysdate);
      ----обнуляем лимиты
      delete from OVR_LIM     where acc = k.ACC;
      delete from OVR_LIM_DOG where acc = k.ACC;
