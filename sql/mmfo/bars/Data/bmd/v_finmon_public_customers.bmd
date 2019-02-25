@@ -127,17 +127,19 @@ begin
   bars_metabase.add_column(l_tabid, 1, 'CHECK_DATE', 'D', 'Дата перевірки~клієнта на~відповідність~переліку ПД', '', 10, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'CRISK', 'C', 'Рівень ризику', '', 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'CUST_RISK', 'C', 'Критерії ризику ', '', 50, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', '№ в реєстрі ПД', '', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', '№ в реєстрі ПД КІС', '', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 5, 'NMK', 'C', 'ПІБ/Назва клієнта', '', 70, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'RNK клієнта', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'RNK_REEL', 'N', 'RNK пов''язаної особи', '', 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'NMK_REEL', 'C', 'ПІБ/Назва пов''язаної особи', '', 60, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NUM_REEL', 'N', '№ пов''яз.~особи в реєстрі ПД', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NUM_REEL', 'N', '№ пов''яз.~особи в реєстрі КІС', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'COMMENTS', 'C', 'Коментар', '', 150, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 11, 'KF', 'C', 'МФО~установи~Банку', '', 12, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'PERSON_BIRTH', 'C', 'Дата~народження~клієнта', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PUBLIC_RELS_BIRTH', 'C', 'Дата народження~особи з переліку~ПЕП', '', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-
+  bars_metabase.add_column(l_tabid, 13, 'PUBLIC_RELS_BIRTH', 'C', 'Дата народження~особи з переліку~КІС', '', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'PEP_CODE', 'N', '№ в переліку ПЕП', '', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PEP_BIRTH', 'C', 'Дата народження~особи з переліку~ПЕП', '', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 
