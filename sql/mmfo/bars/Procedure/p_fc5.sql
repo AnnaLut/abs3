@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.003  21/02/2019 (28/01/2019)
+% VERSION : v.19.004    26/02/2019 (21/02/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -2215,8 +2215,8 @@ BEGIN
          ) and
          v.seg_04 in ('2', '4')
          or
-        not (substr(v.seg_02,1,3) in ('150','300','301','310','311','321') or
-             v.seg_02 in ('1535','1536','1607','2386','2387','2396','2397','2456','2457','2607','2627','2657','3040', '3692') or
+        not (substr(v.seg_02,1,3) in ('150','181', '280', '300','301','304','310','311','314','321','351','354','900','912') or
+             v.seg_02 in ('1535','1536','1607','2386','2387','2396','2397','2456','2457','2607','2627','2657','2890','3040','3590','3690','3692') or
              v.seg_02 like '___6'  or
              v.seg_02 like '___8'  or
              v.seg_02 like '___9')
@@ -2305,8 +2305,6 @@ BEGIN
         or
         v.seg_02 = '3008' and v.seg_03 in ('6', 'B') and v.seg_04 in ('2')
         or
-        --v.seg_02 = '3010' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
-        --or
         v.seg_02 = '3011' and v.seg_03 in ('5') and v.seg_04 in ('9')
         or
         v.seg_02 = '3012' and v.seg_03 in ('9') and v.seg_04 in ('9')
@@ -2364,8 +2362,6 @@ BEGIN
         or
         v.seg_02 = '3108' and v.seg_03 in ('2','5','6','9') and v.seg_04 in ('2')
         or
-        --v.seg_02 = '3110' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
-        --or
         v.seg_02 = '3111' and v.seg_03 in ('5') and v.seg_04 in ('9')
         or
         v.seg_02 = '3112' and v.seg_03 in ('7') and v.seg_04 in ('9')
@@ -2407,8 +2403,6 @@ BEGIN
         v.seg_02 = k.r020 and
         (v.seg_01 = k.r012 or k.r012 = '3') and
         (
-        --v.seg_02 = '3210' and v.seg_03 in ('1','P')
-        --or
         v.seg_02 = '3211' and v.seg_03 in ('2')
         or
         v.seg_02 = '3212' and v.seg_03 in ('3')
@@ -2479,20 +2473,6 @@ BEGIN
     order by seg_02, seg_01, acc_num;
     commit;
    -----------------------------------------------------
-
-   --INSERT INTO otc_c5_proc
-   --         (datf, rnk, nd, acc, nls, kv, kodp, znap )
-   -- select /*+ parallel(8) */
-   --     dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
-   -- from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k, specparam s
-   -- where k.kf = '42' and k.ddd = '001' and
-   --     v.seg_02 = k.r020 and
-   --     (v.seg_01 = k.r012 or k.r012 = '3') and
-   --     v.seg_02 = '3692' and v.acc_num like '9129%' and
-   --     v.acc_id = s.acc and
-   --     nvl(trim(s.r013), '0') = '1'
-   -- order by seg_02, seg_01, acc_num;
-   -- commit;
 
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
