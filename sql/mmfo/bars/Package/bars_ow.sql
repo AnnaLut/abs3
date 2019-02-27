@@ -797,7 +797,13 @@ select
         left join address_street_type adst on adst.id=ca.street_type
         left join ADR_HOME_TYPE aht on aht.id=ca.home_type
         left join adr_room_type art on art.id=ca.room_type
-     where ca.rnk = p_rnk and ca.type_id = p_type; exception
+     where ca.rnk = p_rnk and ca.type_id = p_type; 
+ 
+    if p_flat is not null then p_flat:=', '||p_flat; end if; --10964 
+    if p_house is not null then p_house:=', '||p_house; end if;    
+    p_street:=p_street_type||' '||p_street||p_house||p_flat;     
+ 
+ exception
    when no_data_found then --null;
        p_city_type:=null;
        p_house:=null;
