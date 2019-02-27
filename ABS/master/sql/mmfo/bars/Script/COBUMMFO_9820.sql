@@ -1,4 +1,6 @@
 PROMPT *** Create  index UK_WEB_USERMAP ***
+delete from BARS.WEB_USERMAP where WEBUSER = 'WEB_OPER';
+commit;
 begin   
  execute immediate '
   CREATE UNIQUE INDEX BARS.UK_WEB_USERMAP ON BARS.WEB_USERMAP (LOWER(WEBUSER)) 
