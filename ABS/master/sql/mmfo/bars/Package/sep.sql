@@ -867,7 +867,7 @@ end if;
          main_bis.nam_b := nam_b_;
          main_bis.id_a  := id_a#;
          main_bis.id_b  := id_b#;
-         main_bis.ref_a := case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end;
+         main_bis.ref_a := to_number(case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end);
          main_bis.id_o  := id_o_;
       elsif bis_>1 then
          if main_bis.mfoa  <> mfoa_
@@ -883,7 +883,7 @@ end if;
          or main_bis.nam_b <> nam_b_
          or main_bis.id_a  <> id_a#
          or main_bis.id_b  <> id_b#
-         or main_bis.ref_a <> case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end
+         or main_bis.ref_a <> to_number(case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end)
          or main_bis.id_o  <> id_o_
          then
             if deb.debug then
@@ -1080,7 +1080,7 @@ endif
                    kv=kv_,s=s_,kv2=kv_,s2=s_,
                    dk=dk_,mfoa=mfoa_,nlsa=nlsa_,mfob=mfob_,nlsb=nlsb_,
                  vob=vob_,datd=data_,datp=datp_,id_a=id_a#,id_b=id_b#,
-                 ref_a=case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end,id_o=id_o_,sign=sign_,
+                 ref_a=to_number(case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end),id_o=id_o_,sign=sign_,
                  nd    = nd_,
                  nam_a = nam_a_, nam_b = nam_b_,
                  nazn  = nazn# , d_rec = d_rec#
@@ -1101,7 +1101,7 @@ endif
    logger.info('BIS1'||rec_);
 
    BEGIN                           -- Assure it is unique document
-      IF koda_=2 AND (bis_=0 OR bis_=1) AND (dk_=0 OR dk_=1) THEN
+      IF /*koda_=2 AND*/ (bis_=0 OR bis_=1) AND (dk_=0 OR dk_=1) THEN
          INSERT INTO ref_lst (datd, nd, mfoa, nlsa, mfob, nlsb, s, ref, rec )
                       VALUES (data_,nd_,mfoa_,nlsa_,mfob_,nlsb_,s_,ref_,rec_);
       END IF;
@@ -1130,7 +1130,7 @@ endif
           )
    VALUES (rec_,ref_,
           mfoa_,nlsa_,mfob_,nlsb_,dk_,s_,vob_,nd_,kv_,data_,datp_,
-          nam_a_,nam_b_,nazn#,naznk#,nazns_,id_a#,id_b#,id_o_,case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end,bis_,
+          nam_a_,nam_b_,nazn#,naznk#,nazns_,id_a#,id_b#,id_o_,to_number(case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end),bis_,
           sign_,fn_a_,rec_a_,dat_a#,d_rec#,sos_,blk_,
           fa_name_,fa_ln_,
           CASE 

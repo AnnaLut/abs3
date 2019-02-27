@@ -65,22 +65,10 @@ COMMENT ON COLUMN BARS.REF_LST.KF IS '';
 
 
 
-PROMPT *** Create  constraint CC_REF_LST_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REF_LST MODIFY (KF CONSTRAINT CC_REF_LST_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REFLST_REF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REF_LST MODIFY (REF CONSTRAINT CC_REFLST_REF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.REF_LST MODIFY (REF CONSTRAINT CC_REFLST_REF_NN NOT NULL DISABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,7 +80,19 @@ exception when others then
 PROMPT *** Create  constraint CC_REFLST_REC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REF_LST MODIFY (REC CONSTRAINT CC_REFLST_REC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.REF_LST MODIFY (REC CONSTRAINT CC_REFLST_REC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REF_LST_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REF_LST MODIFY (KF CONSTRAINT CC_REF_LST_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -112,6 +112,12 @@ exception when others then
  end;
 /
 
+
+begin
+  execute immediate 'alter  table ref_lst disable constraint CC_REFLST_REF_NN ';
+exception when others then null;
+end;
+/
 
 
 PROMPT *** Create  grants  REF_LST ***
