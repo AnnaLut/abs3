@@ -1,5 +1,10 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_REP_5752.sql =========*** Run
+PROMPT ===================================================================================== 
 prompt ===================================== 
-prompt == БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi 
+prompt == БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi
 prompt ===================================== 
 
 set serveroutput on
@@ -16,7 +21,7 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := 'БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi ';
+   l_zpr.name := 'БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi';
    l_zpr.pkey := '\BRS\SBER\REP\5752';
 
    l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
@@ -39,12 +44,12 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := 'БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi ';
+    l_zpr.name         := 'БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi';
     l_zpr.namef        := '';
     l_zpr.bindvars     := ':sFdat1=''''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'BZ001S.frx';
-    l_zpr.form_proc    := 'P_BAL_SNP( 0, to_date (:sFdat1,''dd-mm-yyyy''),'''' ,'''', '''' )';
+    l_zpr.form_proc    := 'P_BAL_SNP(1, to_date (:sFdat1, ''dd-mm-yyyy''), '''', '''', '''')';
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
@@ -89,7 +94,7 @@ select B1, K, R, G, NBS, DOS, KOS, OSTD, OSTK, SK, SR, SG, SB1, DAT, decode(rown
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi ';
+    l_rep.description :='БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi';
     l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',19,sFdat,sFdat,"",FALSE,FALSE';
     l_rep.ndat        :=1;
@@ -126,53 +131,25 @@ select B1, K, R, G, NBS, DOS, KOS, OSTD, OSTK, SK, SR, SG, SB1, DAT, decode(rown
           where id=l_rep.id;                 
        end;                                  
     end if;                                  
-    
-    begin
-      for cur in (select '$RM_AN01' as CODEAPP, 5752 as CODEREP, 1 as APPROVE, null as ADATE1, null as ADATE2,
-                         null as RDATE1, null as RDATE2, null as REVERSE, 0 as REVOKED, 20028 as GRANTOR, null as ACODE
-                    from dual
-                   union all
-                  select '$RM_ANI1', 5752, 1, null, null, null, null, null, 0, 20028, null
-                    from dual
-                   union all
-                  select '$RM_BUHG', 5752, 1, null, null, null, null, null, 0, 20028, null
-                    from dual
-                   union all
-                  select '$RM_REZR', 5752, 1, null, null, null, null, null, 0, 20028, null
-                    from dual
-                   union all
-                  select '$RM_TEHA', 5752, 1, null, null, null, null, null, 0, 20028, null
-                    from dual
-                   union all
-                  select '$RM_UCCK', 5752, 1, null, null, null, null, null, 0, 20028, null
-                    from dual
-                   union all
-                  select '$RM_DRU1', 5752, 1, null, null, null, null, null, 0, 20028, null
-                    from dual
-                   union all
-                  select '$RM_BVBB', 5752, 1, null, null, null, null, null, 0, 1, null
-                    from dual
-                   union all
-                  select '$RM_MAIN', 5752, 1, null, null, null, null, null, 0, 20028, null
-                    from dual
-                   union all
-                  select '$RM_BVB ', 5752, 1, null, null, null, null, null, 0, 1, null
-                    from dual)
-      loop
-        begin
-          insert into app_rep (CODEAPP, CODEREP, APPROVE, ADATE1, ADATE2, RDATE1, RDATE2, REVERSE, REVOKED, GRANTOR, ACODE)
-                       values (cur.codeapp, cur.coderep, cur.approve, cur.adate1, cur.adate2, cur.rdate1, cur.rdate2, cur.reverse, cur.revoked, cur.grantor, cur.acode);
-          l_message := l_message||nlchr||'Отчет добавлен в интерфейс '||cur.codeapp;
-        exception
-          when others then
-            l_message := l_message||nlchr||'Отчет уже существовал в интерфейсе '||cur.codeapp;
-        end;
-      end loop;
-    end;
-
     bars_report.print_message(l_message);   
 end;                                        
 /                                           
                                             
 commit;                                     
 
+exec umu.add_report2arm(5752,'$RM_AN01');
+exec umu.add_report2arm(5752,'$RM_ANI1');
+exec umu.add_report2arm(5752,'$RM_BUHG');
+exec umu.add_report2arm(5752,'$RM_REZR');
+exec umu.add_report2arm(5752,'$RM_TEHA');
+exec umu.add_report2arm(5752,'$RM_UCCK');
+exec umu.add_report2arm(5752,'$RM_DRU1');
+exec umu.add_report2arm(5752,'$RM_BVBB');
+exec umu.add_report2arm(5752,'$RM_MAIN');
+exec umu.add_report2arm(5752,'$RM_BVB ');
+commit;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_REP_5752.sql =========*** End
+PROMPT ===================================================================================== 
