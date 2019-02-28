@@ -1,8 +1,11 @@
 
 
 PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_bal_snp.sql =========*** Run ***
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_BAL_SNP.sql =========*** Run ***
 PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_BAL_SNP ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_BAL_SNP 
 ( p_id    number    -- режим (разрез)
@@ -262,6 +265,31 @@ begin
          group by substr(b.acc_num, 1, 4))
       group by nbs ';
 
+  --COBUMMFO-10403, COBUMMFO-10460 MDom 2019.02.07
+  elsif l_id1 = 1 and l_id2 = 0
+  then --report.id = 5752 (отчет 31) БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi
+    l_Sql := '
+      insert into tmp_bal(NBS, DOS, KOS, OSTD, OSTK)
+      select case
+               when :l_DAT1 <= a.dat_alt then substr(a.nlsalt, 1, 4)
+               else a.nbs
+             end nbs,
+             sum(b.dosq) DOS,
+             sum(b.kosq) KOS ,
+             sum(decode(sign(b.ostq), -1, -b.ostq, 0)) OSTD,
+             sum(decode(sign(b.ostq),  1,  b.ostq, 0)) OSTK
+        from SNAP_BALANCES b
+        join ACCOUNTS a on b.acc = a.acc
+       where b.FDAT = :l_DAT1 ' || l_Sql1 || l_Sql2 || '
+         and a.nbs not like ''8%''
+         and (b.dosq > 0 or b.kosq > 0 or b.ostq <> 0)
+         and a.BRANCH like sys_context(''bars_context'', ''user_branch_mask'')
+       group by case
+                  when :l_DAT1 <= a.dat_alt then substr(a.nlsalt, 1, 4)
+                  else a.nbs
+                end';
+  ----
+
   ElsIF l_id1 = 0 and l_id2 = 1
   then -- kodz=61 (отчет 61) БАЛ на конец мес з корр
 
@@ -387,6 +415,5 @@ grant EXECUTE                                                                on 
 
 
 PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_bal_snp.sql =========*** End ***
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_BAL_SNP.sql =========*** End ***
 PROMPT ===================================================================================== 
- 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="10/22/2018 09:51:22" ReportInfo.Modified="10/22/2018 16:34:02" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/22/2018 09:51:22" ReportInfo.Modified="01/30/2019 12:07:26" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQPc4O1lenzQ/SB/dU980Mmw=">
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIqilC2QMzRFsGGMYgr619U=">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 B1, NUM01 K, NUM02 R, NUM03 G, CHAR00 NBS, NUM04 DOS, NUM05 KOS, NUM06 OSTD, NUM07 OSTK, CHAR01 SK, CHAR02 SR, CHAR03 SG, CHAR04 SB1, CHAR05 DAT, NUM08 TITL from rs_tmp_report_data where session_id=:SESSION_ID order by id">
         <Column Name="B1" DataType="System.Decimal"/>
         <Column Name="K" DataType="System.Decimal"/>
@@ -52,123 +52,125 @@
   </Dictionary>
   <ReportPage Name="Page1">
     <ReportTitleBand Name="ReportTitle1" Top="20" Width="718.2" Height="141.75">
-      <TextObject Name="Text89" Left="368.55" Width="321.3" Height="18.9" Text="Надруковано [Date]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text90" Top="28.35" Width="718.2" Height="18.9" Text="[Table1.NAMEANDMFO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text91" Top="56.7" Width="718.2" Height="18.9" Text="БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text92" Top="75.6" Width="718.2" Height="18.9" Text="за [Table.DAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text93" Left="85.05" Top="103.95" Width="151.2" Height="18.9" Text="[Table.SB1]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text89" Left="368.55" Width="321.3" Height="18.9" CanBreak="false" Text="Надруковано [Date]" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+      <TextObject Name="Text90" Top="28.35" Width="718.2" Height="18.9" CanBreak="false" Text="[Table1.NAMEANDMFO]" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+      <TextObject Name="Text91" Top="56.7" Width="718.2" Height="18.9" CanBreak="false" Text="БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+      <TextObject Name="Text92" Top="75.6" Width="718.2" Height="18.9" CanBreak="false" Text="за [Table.DAT]" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+      <TextObject Name="Text93" Left="85.05" Top="103.95" Width="151.2" Height="18.9" CanBreak="false" Text="[Table.SB1]" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="181.75" Width="718.2" Height="132.3">
-      <TextObject Name="Text66" Left="37.8" Top="37.8" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text67" Left="132.3" Top="56.7" Width="103.95" Height="37.8" Text="Балансовий&#13;&#10;рахунок" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text68" Left="236.25" Top="56.7" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text69" Left="236.25" Top="75.6" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text70" Left="463.05" Top="56.7" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text71" Left="463.05" Top="75.6" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text72" Left="689.85" Top="56.7" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text73" Left="689.85" Top="75.6" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text77" Left="255.15" Top="56.7" Width="207.9" Height="18.9" Text="О Б О Р О Т И" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text78" Left="481.95" Top="56.7" Width="207.9" Height="18.9" Text="З А Л И Ш О К" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text79" Left="255.15" Top="75.6" Width="207.9" Height="18.9" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text88" Left="37.8" Top="18.9" Width="94.5" Height="18.9" Text="Лист № [Page]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text81" Left="37.8" Top="113.4" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text82" Left="255.15" Top="94.5" Width="94.5" Height="18.9" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text83" Left="368.55" Top="94.5" Width="94.5" Height="18.9" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text84" Left="481.95" Top="94.5" Width="94.5" Height="18.9" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text85" Left="595.35" Top="94.5" Width="94.5" Height="18.9" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text94" Left="37.8" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text95" Left="481.95" Top="75.6" Width="207.9" Height="18.9" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text76" Left="689.85" Top="94.5" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text74" Left="236.25" Top="94.5" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text86" Left="349.65" Top="94.5" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text75" Left="463.05" Top="94.5" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text87" Left="576.45" Top="94.5" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+    <PageHeaderBand Name="PageHeader1" Top="181.75" Width="718.2" Height="56.7">
+      <TextObject Name="Text94" Left="37.8" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+      <TextObject Name="Text88" Left="37.8" Top="18.9" Width="94.5" Height="18.9" CanBreak="false" Text="Лист № [Page]" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+      <TextObject Name="Text66" Left="37.8" Top="37.8" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
     </PageHeaderBand>
-    <GroupHeaderBand Name="GroupHeader4" Top="334.05" Width="718.2" Condition="[Table.B1]">
-      <GroupHeaderBand Name="GroupHeader1" Top="354.05" Width="718.2" Height="18.9" Condition="[Table.K]">
-        <TextObject Name="Text6" Left="37.8" Width="94.5" Height="18.9" Text="[Table.K]" VertAlign="Center" Font="Arial, 8pt"/>
-        <TextObject Name="Text7" Left="132.3" Width="585.9" Height="18.9" Text="[Table.SK]" VertAlign="Center" Font="Arial, 8pt"/>
-        <GroupHeaderBand Name="GroupHeader2" Top="392.95" Width="718.2" Height="18.9" Condition="[Table.R]">
-          <TextObject Name="Text8" Left="37.8" Width="94.5" Height="18.9" Text="[Table.R]" VertAlign="Center" Font="Arial, 8pt"/>
-          <TextObject Name="Text9" Left="132.3" Width="585.9" Height="18.9" Text="[Table.SR]" VertAlign="Center" Font="Arial, 8pt"/>
-          <GroupHeaderBand Name="GroupHeader3" Top="431.85" Width="718.2" Height="18.9" Condition="[Table.G]">
-            <TextObject Name="Text10" Left="37.8" Width="94.5" Height="18.9" Text="[Table.G]" VertAlign="Center" Font="Arial, 8pt"/>
-            <TextObject Name="Text11" Left="132.3" Width="585.9" Height="18.9" Text="[Table.SG]" VertAlign="Center" Font="Arial, 8pt"/>
-            <DataBand Name="Data1" Top="470.75" Width="718.2" Height="18.9" DataSource="Table">
-              <TextObject Name="Text1" Left="132.3" Width="113.4" Height="18.9" Text="[Table.NBS]" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text2" Left="245.7" Width="113.4" Height="18.9" Text="[[Table.DOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text3" Left="359.1" Width="113.4" Height="18.9" Text="[[Table.KOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text4" Left="472.5" Width="113.4" Height="18.9" Text="[[Table.OSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text5" Left="585.9" Width="113.4" Height="18.9" Text="[[Table.OSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+    <GroupHeaderBand Name="GroupHeader4" Top="354.05" Width="718.2" Condition="[Table.B1]">
+      <DataHeaderBand Name="DataHeader1" Top="258.45" Width="718.2" Height="75.6" RepeatOnEveryPage="true">
+        <TextObject Name="Text81" Left="37.8" Top="56.7" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text82" Left="255.15" Top="37.8" Width="94.5" Height="18.9" CanBreak="false" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text83" Left="368.55" Top="37.8" Width="94.5" Height="18.9" CanBreak="false" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text84" Left="481.95" Top="37.8" Width="94.5" Height="18.9" CanBreak="false" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text85" Left="595.35" Top="37.8" Width="94.5" Height="18.9" CanBreak="false" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text76" Left="689.85" Top="37.8" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text74" Left="236.25" Top="37.8" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text86" Left="349.65" Top="37.8" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text75" Left="463.05" Top="37.8" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text87" Left="576.45" Top="37.8" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text69" Left="236.25" Top="18.9" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text71" Left="463.05" Top="18.9" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text73" Left="689.85" Top="18.9" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text79" Left="255.15" Top="18.9" Width="207.9" Height="18.9" CanBreak="false" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text95" Left="481.95" Top="18.9" Width="207.9" Height="18.9" CanBreak="false" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text67" Left="132.3" Width="103.95" Height="37.8" CanBreak="false" Text="Балансовий&#13;&#10;рахунок" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text68" Left="236.25" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text70" Left="463.05" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text72" Left="689.85" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text77" Left="255.15" Width="207.9" Height="18.9" CanBreak="false" Text="О Б О Р О Т И" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+        <TextObject Name="Text78" Left="481.95" Width="207.9" Height="18.9" CanBreak="false" Text="З А Л И Ш О К" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt"/>
+      </DataHeaderBand>
+      <GroupHeaderBand Name="GroupHeader1" Top="374.05" Width="718.2" Height="18.9" Condition="[Table.K]">
+        <TextObject Name="Text6" Left="37.8" Width="94.5" Height="18.9" CanBreak="false" Text="[Table.K]" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text7" Left="132.3" Width="585.9" Height="18.9" CanBreak="false" Text="[Table.SK]" VertAlign="Center" Font="Arial, 8pt"/>
+        <GroupHeaderBand Name="GroupHeader2" Top="412.95" Width="718.2" Height="18.9" Condition="[Table.R]">
+          <TextObject Name="Text8" Left="37.8" Width="94.5" Height="18.9" CanBreak="false" Text="[Table.R]" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text9" Left="132.3" Width="585.9" Height="18.9" CanBreak="false" Text="[Table.SR]" VertAlign="Center" Font="Arial, 8pt"/>
+          <GroupHeaderBand Name="GroupHeader3" Top="451.85" Width="718.2" Height="18.9" Condition="[Table.G]">
+            <TextObject Name="Text10" Left="37.8" Width="94.5" Height="18.9" CanBreak="false" Text="[Table.G]" VertAlign="Center" Font="Arial, 8pt"/>
+            <TextObject Name="Text11" Left="132.3" Width="585.9" Height="18.9" CanBreak="false" Text="[Table.SG]" VertAlign="Center" Font="Arial, 8pt"/>
+            <DataBand Name="Data1" Top="490.75" Width="718.2" Height="18.9" DataSource="Table">
+              <TextObject Name="Text1" Left="132.3" Width="113.4" Height="18.9" CanBreak="false" Text="[Table.NBS]" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text2" Left="245.7" Width="113.4" Height="18.9" CanBreak="false" Text="[[Table.DOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text3" Left="359.1" Width="113.4" Height="18.9" CanBreak="false" Text="[[Table.KOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text4" Left="472.5" Width="113.4" Height="18.9" CanBreak="false" Text="[[Table.OSTD]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text5" Left="585.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[Table.OSTK]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
             </DataBand>
-            <GroupFooterBand Name="GroupFooter3" Top="509.65" Width="718.2" Height="18.9">
-              <TextObject Name="Text12" Left="132.3" Width="113.4" Height="18.9" Text="[Table.G]*" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text13" Left="245.7" Width="113.4" Height="18.9" Text="[[GSUMDOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text14" Left="359.1" Width="113.4" Height="18.9" Text="[[GSUMKOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text15" Left="472.5" Width="113.4" Height="18.9" Text="[[GSUMOSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-              <TextObject Name="Text16" Left="585.9" Width="113.4" Height="18.9" Text="[[GSUMOSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+            <GroupFooterBand Name="GroupFooter3" Top="529.65" Width="718.2" Height="18.9">
+              <TextObject Name="Text12" Left="132.3" Width="113.4" Height="18.9" CanBreak="false" Text="[Table.G]*" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text13" Left="245.7" Width="113.4" Height="18.9" CanBreak="false" Text="[[GSUMDOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text14" Left="359.1" Width="113.4" Height="18.9" CanBreak="false" Text="[[GSUMKOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text15" Left="472.5" Width="113.4" Height="18.9" CanBreak="false" Text="[[GSUMOSTD]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+              <TextObject Name="Text16" Left="585.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[GSUMOSTK]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
             </GroupFooterBand>
           </GroupHeaderBand>
-          <GroupFooterBand Name="GroupFooter2" Top="548.55" Width="718.2" Height="18.9">
-            <TextObject Name="Text17" Left="132.3" Width="113.4" Height="18.9" Text="[Table.R]**" VertAlign="Center" Font="Arial, 8pt"/>
-            <TextObject Name="Text18" Left="245.7" Width="113.4" Height="18.9" Text="[[RSUMDOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-            <TextObject Name="Text19" Left="359.1" Width="113.4" Height="18.9" Text="[[RSUMKOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-            <TextObject Name="Text20" Left="472.5" Width="113.4" Height="18.9" Text="[[RSUMOSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-            <TextObject Name="Text21" Left="585.9" Width="113.4" Height="18.9" Text="[[RSUMOSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+          <GroupFooterBand Name="GroupFooter2" Top="568.55" Width="718.2" Height="18.9">
+            <TextObject Name="Text17" Left="132.3" Width="113.4" Height="18.9" CanBreak="false" Text="[Table.R]**" VertAlign="Center" Font="Arial, 8pt"/>
+            <TextObject Name="Text18" Left="245.7" Width="113.4" Height="18.9" CanBreak="false" Text="[[RSUMDOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+            <TextObject Name="Text19" Left="359.1" Width="113.4" Height="18.9" CanBreak="false" Text="[[RSUMKOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+            <TextObject Name="Text20" Left="472.5" Width="113.4" Height="18.9" CanBreak="false" Text="[[RSUMOSTD]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+            <TextObject Name="Text21" Left="585.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[RSUMOSTK]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
           </GroupFooterBand>
         </GroupHeaderBand>
-        <GroupFooterBand Name="GroupFooter1" Top="587.45" Width="718.2" Height="18.9">
-          <TextObject Name="Text22" Left="132.3" Width="113.4" Height="18.9" Text="[Table.K]***" VertAlign="Center" Font="Arial, 8pt"/>
-          <TextObject Name="Text23" Left="245.7" Width="113.4" Height="18.9" Text="[[KSUMDOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-          <TextObject Name="Text24" Left="359.1" Width="113.4" Height="18.9" Text="[[KSUMKOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-          <TextObject Name="Text25" Left="472.5" Width="113.4" Height="18.9" Text="[[KSUMOSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-          <TextObject Name="Text26" Left="585.9" Width="113.4" Height="18.9" Text="[[KSUMOSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+        <GroupFooterBand Name="GroupFooter1" Top="607.45" Width="718.2" Height="18.9">
+          <TextObject Name="Text22" Left="132.3" Width="113.4" Height="18.9" CanBreak="false" Text="[Table.K]***" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text23" Left="245.7" Width="113.4" Height="18.9" CanBreak="false" Text="[[KSUMDOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text24" Left="359.1" Width="113.4" Height="18.9" CanBreak="false" Text="[[KSUMKOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text25" Left="472.5" Width="113.4" Height="18.9" CanBreak="false" Text="[[KSUMOSTD]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text26" Left="585.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[KSUMOSTK]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
         </GroupFooterBand>
       </GroupHeaderBand>
-      <GroupFooterBand Name="GroupFooter4" Top="626.35" Width="718.2" Height="37.8">
-        <TextObject Name="Text27" Left="132.3" Width="585.9" Height="18.9" Text="=======================================================================================" VertAlign="Center" Font="Arial, 8pt"/>
-        <TextObject Name="Text28" Left="132.3" Top="18.9" Width="113.4" Height="18.9" Text="БАЛАНС" VertAlign="Center" Font="Arial, 8pt"/>
-        <TextObject Name="Text29" Left="245.7" Top="18.9" Width="113.4" Height="18.9" Text="[[B1SUMDOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-        <TextObject Name="Text30" Left="359.1" Top="18.9" Width="113.4" Height="18.9" Text="[[B1SUMKOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-        <TextObject Name="Text31" Left="472.5" Top="18.9" Width="113.4" Height="18.9" Text="[[B1SUMOSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-        <TextObject Name="Text32" Left="585.9" Top="18.9" Width="113.4" Height="18.9" Text="[[B1SUMOSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+      <GroupFooterBand Name="GroupFooter4" Top="646.35" Width="718.2" Height="37.8">
+        <TextObject Name="Text27" Left="132.3" Width="585.9" Height="18.9" CanBreak="false" Text="=======================================================================================" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text28" Left="132.3" Top="18.9" Width="113.4" Height="18.9" CanBreak="false" Text="БАЛАНС" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text29" Left="245.7" Top="18.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[B1SUMDOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text30" Left="359.1" Top="18.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[B1SUMKOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text31" Left="472.5" Top="18.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[B1SUMOSTD]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text32" Left="585.9" Top="18.9" Width="113.4" Height="18.9" CanBreak="false" Text="[[B1SUMOSTK]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
       </GroupFooterBand>
     </GroupHeaderBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="684.15" Width="718.2" Height="264.6">
-      <TextObject Name="Text33" Left="85.05" Top="113.4" Width="226.8" Height="18.9" Text="Інформаційно 1-7 кл + 9 кл" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text34" Left="37.8" Top="132.3" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text56" Left="245.7" Top="226.8" Width="113.4" Height="18.9" Text="[[SUMDOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text57" Left="359.1" Top="226.8" Width="113.4" Height="18.9" Text="[[SUMKOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text58" Left="472.5" Top="226.8" Width="113.4" Height="18.9" Text="[[SUMOSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text59" Left="585.9" Top="226.8" Width="113.4" Height="18.9" Text="[[SUMOSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text60" Left="37.8" Top="245.7" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text61" Left="37.8" Top="94.5" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text62" Left="141.75" Top="28.35" Width="217.35" Height="18.9" Text="[Table1.NAME_BOSS]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text63" Left="141.75" Top="66.15" Width="217.35" Height="18.9" Text="[Table1.NAME_ACCMAN]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text64" Left="406.35" Top="28.35" Width="217.35" Height="18.9" Text="[Table1.BOSS]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text65" Left="406.35" Top="66.15" Width="217.35" Height="18.9" Text="[Table1.ACCMAN]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text96" Left="132.3" Top="151.2" Width="103.95" Height="37.8" Text="Балансовий&#13;&#10;рахунок" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text97" Left="236.25" Top="151.2" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text98" Left="236.25" Top="170.1" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text99" Left="463.05" Top="151.2" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text100" Left="463.05" Top="170.1" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text101" Left="689.85" Top="151.2" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text102" Left="689.85" Top="170.1" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text103" Left="255.15" Top="151.2" Width="207.9" Height="18.9" Text="О Б О Р О Т И" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text104" Left="481.95" Top="151.2" Width="207.9" Height="18.9" Text="З А Л И Ш О К" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text105" Left="255.15" Top="170.1" Width="207.9" Height="18.9" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text106" Left="37.8" Top="207.9" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text107" Left="255.15" Top="189" Width="94.5" Height="18.9" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text108" Left="368.55" Top="189" Width="94.5" Height="18.9" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text109" Left="481.95" Top="189" Width="94.5" Height="18.9" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text110" Left="595.35" Top="189" Width="94.5" Height="18.9" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text111" Left="481.95" Top="170.1" Width="207.9" Height="18.9" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text112" Left="689.85" Top="189" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text113" Left="236.25" Top="189" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text114" Left="349.65" Top="189" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text115" Left="463.05" Top="189" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text116" Left="576.45" Top="189" Width="18.9" Height="18.9" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text117" Left="37.8" Width="680.4" Height="18.9" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+    <ReportSummaryBand Name="ReportSummary1" Top="704.15" Width="718.2" Height="264.6">
+      <TextObject Name="Text33" Left="85.05" Top="113.4" Width="226.8" Height="18.9" CanBreak="false" Text="Інформаційно 1-7 кл + 9 кл" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text34" Left="37.8" Top="132.3" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text56" Left="245.7" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMDOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text57" Left="359.1" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMKOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text58" Left="472.5" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMOSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text59" Left="585.9" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMOSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text60" Left="37.8" Top="245.7" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text61" Left="37.8" Top="94.5" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text62" Left="141.75" Top="28.35" Width="217.35" Height="18.9" CanBreak="false" Text="[Table1.NAME_BOSS]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text63" Left="141.75" Top="66.15" Width="217.35" Height="18.9" CanBreak="false" Text="[Table1.NAME_ACCMAN]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text64" Left="406.35" Top="28.35" Width="217.35" Height="18.9" CanBreak="false" Text="[Table1.BOSS]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text65" Left="406.35" Top="66.15" Width="217.35" Height="18.9" CanBreak="false" Text="[Table1.ACCMAN]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text96" Left="132.3" Top="151.2" Width="103.95" Height="37.8" CanBreak="false" Text="Балансовий&#13;&#10;рахунок" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text97" Left="236.25" Top="151.2" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text98" Left="236.25" Top="170.1" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text99" Left="463.05" Top="151.2" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text100" Left="463.05" Top="170.1" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text101" Left="689.85" Top="151.2" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text102" Left="689.85" Top="170.1" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text103" Left="255.15" Top="151.2" Width="207.9" Height="18.9" CanBreak="false" Text="О Б О Р О Т И" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text104" Left="481.95" Top="151.2" Width="207.9" Height="18.9" CanBreak="false" Text="З А Л И Ш О К" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text105" Left="255.15" Top="170.1" Width="207.9" Height="18.9" CanBreak="false" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text106" Left="37.8" Top="207.9" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text107" Left="255.15" Top="189" Width="94.5" Height="18.9" CanBreak="false" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text108" Left="368.55" Top="189" Width="94.5" Height="18.9" CanBreak="false" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text109" Left="481.95" Top="189" Width="94.5" Height="18.9" CanBreak="false" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text110" Left="595.35" Top="189" Width="94.5" Height="18.9" CanBreak="false" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text111" Left="481.95" Top="170.1" Width="207.9" Height="18.9" CanBreak="false" Text="------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text112" Left="689.85" Top="189" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text113" Left="236.25" Top="189" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text114" Left="349.65" Top="189" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text115" Left="463.05" Top="189" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text116" Left="576.45" Top="189" Width="18.9" Height="18.9" CanBreak="false" Text="|" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text117" Left="37.8" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
     </ReportSummaryBand>
   </ReportPage>
 </Report>
