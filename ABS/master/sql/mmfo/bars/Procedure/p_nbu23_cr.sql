@@ -7,9 +7,10 @@ PROMPT *** Create  procedure P_NBU23_CR ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_NBU23_CR (p_dat01 date) IS
 
-/* Версия 6.4   19-07-2018  08-02-2018  29-01-2018  28-12-2017  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017 
+/* Версия 6.5   21-02-2019   19-07-2018  08-02-2018  29-01-2018  28-12-2017  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017 
    Заполнение данных в NBU23_REZ
    -------------------------------------
+13) 21-02-2019(6.5)/COBUSUPABS-7263(COBUSUPABS-7190)/ - kol26 для МБДК и коррахунків
 12) 19-07-2018(6.4) - rez_cr.poci => nbu23_rez.arjk
 11) 26-02-2018(6.3)/COBUMMFO-6811/ - уточнено условие для параметра tag='ISSPE' and nvl(trim(value),'0') = '1' и кроме дебиторки tipa not in (17,21)
 10) 29-01-2018(6.2) - s080 Для клиентов SPE 
@@ -61,6 +62,14 @@ BEGIN
    commit;
    z23.to_log_rez (user_id , 351 , p_dat01   ,'Додаткові параметри');
    FIN_REP.KOL_REZCR(p_dat01);
+   if sys_context('bars_context','user_mfo') = '300465' THEN
+      for k in (select  r.rowid ri , nd, REPLACE( ( select ConcatStr(KOD) from nd_oznaka_351 where nd = r.nd) ,',',';') kol_26 from rez_cr r where r.fdat = p_dat01 and r.tipa in (5, 6))
+      LOOP
+         if k.kol_26 is not null THEN
+            update rez_cr set kol26 = k.kol_26 where rowid=k.RI;
+         end if;
+      end loop;
+   end if;
    for k in (select r.rowid RI ,r.* from rez_cr r where fdat = p_dat01 and fin_z is not null)
    LOOP
       if k.tipa = 17               THEN l_s080 := null; k.fin_z := NULL; 
@@ -136,7 +145,7 @@ BEGIN
              from     REZ_CR where fdat = p_dat01 
              group by FDAT  , RNK    , ACC    , KV      , NLS   , nbs   , ND     , VIDD   , FIN , VKR , KOL  , FIN23, kpz   , NMK, SDATE, wdate, TIPA, 
                       LGD   , bv02   , bv02q  , OVKR    , P_DEF , OVD   , OPD    , CCF    , PD_0, RZ  , FIN_Z, cc_id, ISTVAL, RPB, S250 , TIP  , TEXT, 
-                      GRP   , S080   , DDD_6B , custtype, OB22  , s080_z, FIN_KOL, FIN_KOR, Z   , POCI, OKPO)
+                      GRP   , S080   , DDD_6B , custtype, OB22  , s080_z, FIN_KOL, FIN_KOR, Z   , POCI, OKPO )
    LOOP
       begin
          select DECODE (TRIM (sed),'91', DECODE (custtype, 3, 2, custtype), custtype) 
@@ -209,6 +218,7 @@ BEGIN
       l_spec   := rez.id_specrez(k.sdate, k.istval, k.kv, l_idr, k.custtype);
       --p_par_23(to_date('01-01-2017','dd-mm-yyyy'), k.acc, k.nd, l_ta, p_fin, p_obs, p_kat, p_k, p_irr);
       p_par_accounts(k.acc, p_isp, p_branch, p_ob22);
+
       if k.zal_bv<>0 THEN
          p_par_zalog(p_dat01, k.acc, p_zal_bl, p_zal_blq, p_zal, p_zalQ, p_SUM_IMP, p_SUMQ_IMP, p_zal_sv, p_zal_svq);
       else    
@@ -226,7 +236,7 @@ BEGIN
              ZAL_BL  , ZAL_BLQ  , ND_CP  , SUM_IMP  , SUMQ_IMP  , VKR      , ZAL_SV   , ZAL_SVQ   , GRP    , REZ23     , REZQ23 , KAT23 , 
              S250_23 , EAD      , EADQ   , CR       , CRQ       , KOL_351  , FIN_351  , KPZ       , LGD    , OVKR      , P_DEF  , OVD   , 
              OPD     , RC       , RCQ    , ZAL_351  , ZALQ_351  , CCF      , TIP_351  , PD_0      , FIN_Z  , ISTVAL_351, RPB    , S080  , 
-             arjk    , DDD_6B   , PVZ    , PVZQ     , tipa      , S080_z   , FIN_P    , FIN_D     , Z      , OKPO_GCIF)                                                           
+             arjk    , DDD_6B   , PVZ    , PVZQ     , tipa      , S080_z   , FIN_P    , FIN_D     , Z      , OKPO_GCIF )
       values                                                                                                       
            ( k.FDAT  , l_ID     , k.RNK  , k.NBS    , k.kv      , k.ND     , k.CC_ID  , k.ACC     , k.NLS  , P_BRANCH  , k.FIN  , 1     , 
              P_ZAL   , k.BV     , k.CR   , k.CRQ    , DD_       , DDD_     , k.BVQ    , k.CUSTTYPE, l_IDR  , k.WDATE   , l_OKPO , k.NMK , 
@@ -234,7 +244,7 @@ BEGIN
              P_ZAL_BL, P_ZAL_BLQ, L_ND_CP, P_SUM_IMP, P_SUMQ_IMP, k.VKR    , P_ZAL_SV , P_ZAL_SVQ , k.GRP  , k.CR      , k.CRQ  , P_KAT , 
              k.s250  , k.EAD    , k.EADQ , k.CR     , k.CRQ     , k.KOL    , k.FIN    , k.KPZ     , k.LGD  , k.OVKR    , k.P_DEF, k.OVD , 
              k.OPD   , k.RC     , k.RCQ  , k.ZAL_BV , k.ZAL_BVQ , k.CCF    , k.TIPA   , k.PD_0    , k.FIN_Z, k.ISTVAL  , k.RPB  , k.s080, 
-             k.poci  , k.DDD_6B , k.zal  , k.zalq   , l_ta      , k.s080_z , k.FIN_KOL, k.FIN_KOR , k.Z    , k.OKPO    );
+             k.poci  , k.DDD_6B , k.zal  , k.zalq   , l_ta      , k.s080_z , k.FIN_KOL, k.FIN_KOR , k.Z    , k.OKPO   );
       exception when others then
            --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
            if SQLCODE = -00001 then NULL;

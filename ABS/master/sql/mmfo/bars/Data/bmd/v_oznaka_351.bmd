@@ -58,10 +58,10 @@ declare
 
 begin
 
-  l_tabsemantic := 'Перегляд/заповнення параметрiв угод КП Банки для резерву 23';
+  l_tabsemantic := 'Ознаки';
   l_tablinesdef := '50';
   l_tabselect_statement := '';
-  l_tabname     := 'NBU23_CCK_BN';
+  l_tabname     := 'V_OZNAKA_351';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
@@ -124,101 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CC_ID', 'C', '№угоди~рах', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FIN23', 'N', 'Клас~боржника', '', null, 5, 0, 0, 0, 1, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'K23', 'N', 'Пок.~ризику', '', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KAT23', 'N', 'Категорi~якостi', '', null, 14, 0, 0, 0, 1, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф~-acc', '', null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OBS23', 'N', 'Обсл.~боргу ', '', null, 10, 0, 0, 0, 1, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК кл', '', null, 16, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'TOBO', 'C', 'Бранч', '', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'VIDD', 'N', 'Вид', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'WDATE', 'D', 'Дата заверш', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'VNCRR', 'C', 'Вн.кред.~рейтинг', '', null, 11, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'KHIST', 'N', 'Кредитна~iсторiя', '', null, 12, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NEINF', 'N', 'Iнша ~негат iнф', '', null, 13, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'B', 'D', 'Звiтна~дата', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'ZDAT', 'C', 'Звітний~період', '', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'FIN_351', 'N', 'Клас~боржника-(пост.351)', '', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'PD', 'N', 'PD~(імовірність~дефолту)', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ND', 'N', '№угоди', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'TXT', 'C', 'Ознака~відповідно~до Положення~N351', '10', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'KOD', 'N', 'Код~ознаки', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'PR', 'B', 'Признак~наявності', '.5', 22, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ID', 'N', 'ID', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
 
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('STAN_FIN23S');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'FIN23');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 2, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица STAN_FIN23S для описания сложного поля таблицы NBU23_CCK_BN.');
-  end if;
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'P_EDIT_OZNAKA(0,:ND,:PR,:KOD,:ID)');
 
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('STAN_KAT23');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'KAT');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 4, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица STAN_KAT23 для описания сложного поля таблицы NBU23_CCK_BN.');
-  end if;
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'P_EDIT_OZNAKA(1,:ND,:PR,:KOD,:ID)');
 
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('STAN_OBS23');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'OBS');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 6, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица STAN_OBS23 для описания сложного поля таблицы NBU23_CCK_BN.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('CUSTOMER');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'RNK');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 7, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица CUSTOMER для описания сложного поля таблицы NBU23_CCK_BN.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('CCK_RATING');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'CODE');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 12, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица CCK_RATING для описания сложного поля таблицы NBU23_CCK_BN.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('CCK_HISTORY');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 13, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица CCK_HISTORY для описания сложного поля таблицы NBU23_CCK_BN.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('CCK_NEINF');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 14, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица CCK_NEINF для описания сложного поля таблицы NBU23_CCK_BN.');
-  end if;
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 5, 3, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 9, 1, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 10, 2, 'ASC ');
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'P_EDIT_OZNAKA(2,:ND,:PR,:KOD,:ID)');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, '1) Ознака події дефолту (постанова 351)', '', '', 'ONCE', '', '', '', '', 'sPar=V_OZNAKA_351[ACCESSCODE=>2][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X'')][EXEC=>BEFORE][showDialogWindow=>false][CONDITIONS=> nd=:ND]', 111);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

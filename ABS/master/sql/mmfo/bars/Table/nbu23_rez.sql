@@ -471,7 +471,7 @@ exception when others then
   if SQLCODE = - 01430 then null;   else raise; end if; 
 end;
 /
-COMMENT ON COLUMN NBU23_REZ.OKPO  IS 'Œ œŒ-GCIF';
+COMMENT ON COLUMN NBU23_REZ.OKPO_GCIF  IS 'Œ œŒ-GCIF';
 
 
 PROMPT *** Create  grants  NBU23_REZ ***
