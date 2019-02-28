@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="02/20/2019 18:22:39" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="02/28/2019 15:59:13" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -300,7 +300,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="edecl" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQKWUOV7U7Yq/IbsylnnT8kY=">
+    <OracleDataConnection Name="edecl" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJCEBd1f6t4e27vpqDQwGDg=">
       <TableDataSource Name="Table" Alias="salary" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,replace(ps.name,'ў','і') as name  &#13;&#10;from bars.eds_w4_data s, bars.eds_decl d , bars.ps &#13;&#10;where s.req_id=d.id and s.acc_type='SALARY' and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4) and decl_id=:p_decl_id">
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="DECL_ID" DataType="System.Decimal"/>
@@ -469,7 +469,7 @@ namespace FastReport
   </Dictionary>
   <ReportPage Name="Page1">
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="56.7">
-      <TextObject Name="Text1" Left="122.85" Width="491.4" Height="18.9" Text="Виписка про фінансовий стан для заповнення декларації" Font="Arial, 12pt"/>
+      <TextObject Name="Text1" Left="122.85" Width="491.4" Height="18.9" Text="Довідка про фінансовий стан для заповнення декларації" Font="Arial, 12pt"/>
       <TextObject Name="Text107" Left="9.45" Top="37.8" Width="321.3" Height="18.9" Text="Вих. № ________________ від _______________"/>
       <TextObject Name="Text113" Left="481.95" Top="37.8" Width="170.1" Height="18.9" Fill.Color="WhiteSmoke" Text="[eds_decls_info.DECL_ID]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="0" AutoWidth="true"/>
       <TextObject Name="Text114" Left="349.65" Top="37.8" Width="179.55" Height="18.9" Text="Номер декларації:  " Font="Arial, 10pt, style=Bold"/>
@@ -490,7 +490,7 @@ namespace FastReport
         <TextObject Name="Text6" Left="132.3" Top="330.75" Width="94.5" Height="18.9" Text="календарна дата" Font="Times New Roman, 8pt, style=Italic"/>
         <TextObject Name="Text9" Left="245.7" Top="311.85" Width="94.5" Height="18.9" Fill.Color="WhiteSmoke" Text="[eds_decls_info.BANKDATE]" Format="Custom" Format.Format="dd.MM.yyyy" AutoWidth="true"/>
         <TextObject Name="Text17" Left="226.8" Top="311.85" Width="18.9" Height="18.9" Text="/"/>
-        <TextObject Name="Text18" Left="9.45" Top="359.1" Width="585.9" Height="28.35" Text="Увага! Інформація наведена у виписці містить рекомендаційний характер.&#13;&#10;Декларант несе особисту відповідальність за достовірність та повноту даних при заповнені декларації." Font="Times New Roman, 8pt, style=Italic"/>
+        <TextObject Name="Text18" Left="9.45" Top="359.1" Width="585.9" Height="28.35" Text="Увага! Інформація наведена у довідці містить рекомендаційний характер.&#13;&#10;Декларант несе особисту відповідальність за достовірність та повноту даних при заповнені декларації." Font="Times New Roman, 8pt, style=Italic"/>
         <TextObject Name="Text28" Left="66.15" Top="9.45" Width="406.35" Height="18.9" Fill.Color="WhiteSmoke" Text="[eds_decls_info.CUST_NAME]" AutoWidth="true"/>
         <TextObject Name="Text29" Left="132.3" Top="37.8" Width="85.05" Height="18.9" Fill.Color="WhiteSmoke" Text="[eds_decls_info.BIRTH_DATE]" Format="Custom" Format.Format="dd.MM.yyyy" AutoWidth="true"/>
         <TextObject Name="Text30" Left="47.25" Top="66.15" Width="264.6" Height="18.9" Fill.Color="WhiteSmoke" Text="[eds_decls_info.OKPO]" AutoWidth="true"/>
