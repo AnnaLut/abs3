@@ -1,4 +1,4 @@
-CREATE OR REPLACE procedure BARS.P_zay_val_control_do (
+CREATE OR REPLACE procedure BARS.P_zay_val_control_do  (
        p_iddo     varchar2,/* I -insert, E- end ,R-повернення,  UM - оновити при розбитті заявки */
        p_zay_id   number,
        p_sum      number          default null,
