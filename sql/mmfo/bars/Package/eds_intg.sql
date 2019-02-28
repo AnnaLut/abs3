@@ -352,22 +352,23 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                         l_eds_w4_data(l_eds_w4_data.last).kf:=account.kf;
                                         
                                begin
-                               select sum(case when (account.grp_code= 'SALARY' and o.tt in ('PKS','KL1','IB6','IB5','PKB','CL5')) or
-                                                    (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and o.tt ='PKX') or
+                               select sum(case when (account.grp_code= 'SALARY' and (o.tt in ('PKS','KL1','IB6','IB5','PKB','CL5') or (o.tt='R01' and op.value='PAYSAL'))) or
+                                                    (account.grp_code in ('PENSION', 'MOYA_KRAYINA')  and account.code not like 'SOC_%' and (o.tt ='PKX' or (o.tt='R01' and op.value='PAYPENS'))) or
                                                     (account.grp_code not in ('PENSION', 'MOYA_KRAYINA', 'SALARY') or account.grp_code is null)
                                               then o.s else 0 end) as AMOUNT,
-                                      sum(case when (account.grp_code= 'SALARY' and o.tt in ('PKS','KL1','IB6','IB5','PKB','CL5')) or
-                                                    (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and o.tt ='PKX') or
+                                      sum(case when (account.grp_code= 'SALARY' and (o.tt in ('PKS','KL1','IB6','IB5','PKB','CL5') or (o.tt='R01' and op.value='PAYSAL'))) or
+                                                    (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and (o.tt ='PKX' or (o.tt='R01' and op.value='PAYPENS'))) or
                                                     (account.grp_code not in ('PENSION', 'MOYA_KRAYINA', 'SALARY') or account.grp_code is null)
                                               then gl.p_icurval(account.kv, o.s, o.fdat) else 0 end) as AMOUNT,
-                                      sum(case when (account.grp_code= 'SALARY' and o.tt not in ('PKS','KL1','IB6','IB5','PKB','CL5')) or
-                                                    (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and account.code not like 'SOC_%' and o.tt <>'PKX')
+                                      sum(case when (account.grp_code= 'SALARY' and not(o.tt in ('PKS','KL1','IB6','IB5','PKB','CL5') or (o.tt='R01' and op.value='PAYSAL'))) or
+                                                    (account.grp_code in ('PENSION', 'MOYA_KRAYINA') and not((o.tt='PKX' and account.code not like 'SOC_%') or (o.tt='R01' and op.value='PAYPENS')))
                                                then o.s else 0 end) AMOUNT_OTH
                                         into l_eds_w4_data(l_eds_w4_data.last).amount_period,
                                              l_eds_w4_data(l_eds_w4_data.last).amount_periodq, 
                                              l_eds_w4_data(l_eds_w4_data.last).other_accruals
                                         from opldok o
                                         left join opldok o2 on o.ref = o2.ref and o2.dk = 1-o.dk and  o2.stmt = o.stmt
+                                        left join operw op on op.ref=o.ref and op.tag='W4MSG'
                                        where o.acc=account.acc
                                          and o.kf = account.kf
                                          and not exists (select 1 from w4_acc_inst i where i.acc_pk = account.acc and i.acc = o2.acc and i.trans_mask = 'ACC_2203I') --не рахуємо кредити instolment
@@ -873,7 +874,6 @@ end create_fill_job;
     l_mfo               varchar2(6);
     l_id                varchar2(36);
     l_decl_id           number;
-    l_act               varchar2(255) := gc_pkg||'.parse_request ';
     l_eds_decl          eds_decl%rowtype;
     unknown_action_type exception;
   begin
