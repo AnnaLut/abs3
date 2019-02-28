@@ -9,8 +9,8 @@ var g_isGridFilesInited = false;
 var g_recordStatusData = null;
 
 function getGridRecordsUrl(ID) {
-    var arr_statenames = []
-    var v_arr_statenames = []
+    var arr_statenames = [];
+    var v_arr_statenames = [];
     return bars.config.urlContent("/api/pfu/filesgrid/linecatalog?id=" + ID);
 }
 
@@ -27,7 +27,6 @@ var FILES_GRID_FIELDS = {
     rest_date: { type: "date" },
     rest: { type: "number" },
     acc: { type: "string" }
-
 };
 var FILES_GRID_HISTORY_FIELDS = {
     id: { type: "number" },
@@ -49,8 +48,7 @@ var FILES_GRID_HISTORY_FIELDS = {
     payback_sum: { type: "number" },
     pay_date: { type: "date" },
     receiver_mfo: { type: "number" },
-    pfu_branch_name: { type: 'string' },
-    acc: {type:'string'}
+    pfu_branch_name: { type: 'string' }
 };
 
 var FILES_GRID_COLUMNS = [
@@ -152,51 +150,51 @@ var FILES_GRID_COLUMNS = [
 ];
 
 var FILES_GRID_HISTORY_COLUMNS = [
-        {
-            field: "env_id",
-            title: "ID конверту",//"Дата/час залишку",
-            width: "150px",
-            filterable: {
-                ui: function (element) {
-                    element.kendoNumericTextBox({
-                        format: "n0"
-                    });
-                }
+    {
+        field: "env_id",
+        title: "ID конверту",//"Дата/час залишку",
+        width: "150px",
+        filterable: {
+            ui: function (element) {
+                element.kendoNumericTextBox({
+                    format: "n0"
+                });
             }
-        },
-        {
-            field: "date_env_crt",
-            title: "Дата конверту",//"Дата/час залишку",
-            width: "150px",
-            template: "<div style='text-align:center;'>#=kendo.toString(date_env_crt,'dd.MM.yyyy')#</div>"
-        },
-     {
-         field: "id",
-         title: "ID<br/>реєстру",
-         width: "100px",
-         filterable: {
-             ui: function (element) {
-                 element.kendoNumericTextBox({
-                     format: "n0"
-                 });
-             }
-         }
-     },
-     {
-         field: "receiver_mfo",
-         title: "МФО",
-         width: "150px"
-     },
-      {
-          field: "pfu_branch_name",
-          title: "Найменування <br/> платника",
-          width: "150px"
-      },
-            {
-                field: "acc",
-                title: "Рахунок <br/> одержувача",
-                width: "150px"
-            },
+        }
+    },
+    {
+        field: "date_env_crt",
+        title: "Дата конверту",//"Дата/час залишку",
+        width: "150px",
+        template: "<div style='text-align:center;'>#=kendo.toString(date_env_crt,'dd.MM.yyyy')#</div>"
+    },
+    {
+        field: "id",
+        title: "ID<br/>реєстру",
+        width: "100px",
+        filterable: {
+            ui: function (element) {
+                element.kendoNumericTextBox({
+                    format: "n0"
+                });
+            }
+        }
+    },
+    {
+        field: "receiver_mfo",
+        title: "МФО",
+        width: "150px"
+    },
+    {
+        field: "pfu_branch_name",
+        title: "Найменування платника",
+        width: 350
+    },
+    {
+        field: "acc",
+        title: "Рахунок <br/> одержувача",
+        width: "150px"
+    },
     {
         field: "file_name",
         title: "Назва файлу<br/>реєстру",
@@ -272,53 +270,52 @@ var FILES_GRID_HISTORY_COLUMNS = [
         width: "150px",
         template: "#: PrintRestData(pay_date) #"
     },
-        {
-            field: "payed_sum",
-            title: "Сума<br/>фактична<br/>зарахування на<br/>рахунки пенсіонерів",//"Дата/час залишку",
-            width: "150px"
-        },
-                {
-                    field: "payback_sum",
-                    title: "Сума фактична<br/>повернення в ПФУ",
-                    width: "150px"
-                },
+    {
+        field: "payed_sum",
+        title: "Сума<br/>фактична<br/>зарахування на<br/>рахунки пенсіонерів",//"Дата/час залишку",
+        width: "150px"
+    },
+    {
+        field: "payback_sum",
+        title: "Сума фактична<br/>повернення в ПФУ",
+        width: "150px"
+    },
     {
         field: "state_name",
         title: "Статус",
-        width: "150px"
+        width: 250
     }
-   
+
 ];
 
-var drop_el = ""
-
-
+var drop_el = "";
+var fileType = '';
 
 GetSum = function (sum) {
     if (sum == null) {
         return "";
     }
     else
-        return kendo.toString(sum, "n")
-}
+        return kendo.toString(sum, "n");
+};
 
 var g_dropDownData = null;        // global variable: list for all block types
 var selectedRow = null;
 var tabStrip = null;
 var tabstripConverts = null;
 var gridFiles = null;
-var arr_statenames = []
-var v_arr_statenames = []
+var arr_statenames = [];
+var v_arr_statenames = [];
 
 function getStatusById(state) {
     var namestate = getNameById(state, g_recordStatusData, 'STATE', 'STATE_NAME');
-    fillStatesName(namestate, state)
+    fillStatesName(namestate, state);
     return namestate;
 }
 
 function fillStatesName(state, svalue) {
     //  
-    flag = true
+    flag = true;
     if (v_arr_statenames.length === 0) {
         v_arr_statenames.push(svalue)
         arr_statenames.push({
@@ -328,14 +325,14 @@ function fillStatesName(state, svalue) {
     }
     for (var i = 0; i < arr_statenames.length; i++) {
         if (v_arr_statenames[i] === svalue)
-            flag = false
+            flag = false;
     }
     if (flag) {
         arr_statenames.push({
             name: state,
             value: svalue
         });
-        v_arr_statenames.push(svalue)
+        v_arr_statenames.push(svalue);
     }
 }
 // население грида с строками реестра
@@ -446,9 +443,9 @@ function getLineData(FileId) {
             },
             {
                 field: "payment_date",
-                title: "Дата<br>зарахування",
-                width: 100,
-                template: "<div style='text-align:center;'>#=kendo.toString(payment_date,'dd.MM.yyyy')#</div>"
+                title: "Дата зарахування",
+                width: 125,
+                template: "<div style='text-align:center;'>#= payment_date ? kendo.toString(payment_date,'dd.MM.yyyy') : '' #</div>"
             },
             {
                 field: "num_acc",
@@ -463,7 +460,7 @@ function getLineData(FileId) {
             {
                 field: "sum_pay",
                 title: "Сума",
-                template: '#=kendo.toString(sum_pay,"n")#',
+                template: '#= sum_pay ? kendo.toString(sum_pay,"n") : "" #',
                 format: '{0:n}',
                 attributes: { "class": "money" },
                 width: "5%"
@@ -472,7 +469,7 @@ function getLineData(FileId) {
                 field: "state",
                 title: "Статус",
                 width: 250,
-                hidden:true,
+                hidden: true,
                 filterable: {
                     extra: false
                     //ui: function (element) {
@@ -509,7 +506,7 @@ function getLineData(FileId) {
             {
                 field: "state_name",
                 title: "Статус",
-                width: 120,
+                width: 300,
                 filterable: {
                     extra: false,
                     ui: StateFilter
@@ -518,29 +515,28 @@ function getLineData(FileId) {
             {
                 field: "err_mess_trace",
                 title: "Опис помилки",
-                width: 120
-                            
-            },
-            
+                width: 300
+
+            }
         ],
         dataBound: function () {
             Waiting(false);
-            v_arr_statenames = []
-            arr_statenames = []
+            v_arr_statenames = [];
+            arr_statenames = [];
             if (type !== "envelop") {
                 $("#removeFromPayBtn").show();
             }
             grid = this;
-            data = grid._data
-            var state = ""
-            var namestate = ""
+            data = grid._data;
+            var state = "";
+            var namestate = "";
             for (var i = 0; i < data.length; i++) {
 
                 state = data[i].state;
                 namestate = getNameById(state, g_recordStatusData, 'STATE', 'STATE_NAME');
-                flag = true
+                flag = true;
                 if (v_arr_statenames.length === 0) {
-                    v_arr_statenames.push(state)
+                    v_arr_statenames.push(state);
                     arr_statenames.push({
                         name: namestate,
                         value: state
@@ -548,14 +544,14 @@ function getLineData(FileId) {
                 }
                 for (var j = 0; j < v_arr_statenames.length; j++) {
                     if (v_arr_statenames[j] === state)
-                        flag = false
+                        flag = false;
                 }
                 if (flag) {
                     arr_statenames.push({
                         name: namestate,
                         value: state
                     });
-                    v_arr_statenames.push(state)
+                    v_arr_statenames.push(state);
                 }
             }
         },
@@ -579,7 +575,7 @@ function getLineData(FileId) {
 var StateDrop = 0
 var selectedline = 0
 function StateFilter(element) {
-     
+
     StateDrop = element;
     var gview = $("#gridFiles").data("kendoGrid");
     selectedline = gview.dataItem(gview.select());
@@ -596,17 +592,17 @@ function StateFilter(element) {
                     }
                 }
             },
-            
+
             schema: { data: "Data", model: { fields: { state: { type: "number" }, state_name: { type: "string" } } } }
         },
-        dataTextField: "state_name", dataValueField: "state_name",open:onOpenStateFilter,
+        dataTextField: "state_name", dataValueField: "state_name", open: onOpenStateFilter,
         filter: "contains"
     });
 
 }
 
 function onOpenStateFilter() {
-     
+
     console.log(">>>");
     var gview = $("#gridFiles").data("kendoGrid");
     selectedline = gview.dataItem(gview.select());
@@ -617,7 +613,7 @@ function onOpenStateFilter() {
 var filterFilesGrid = null;
 // население грида с реестрами
 function initFilesGrid(qv) {
-     
+
     //  
     filterFilesGrid = qv;
     var dataSource = new kendo.data.DataSource({
@@ -752,7 +748,7 @@ function initFiles(qv) {
                 $("#payFileBtn").prop("disabled", true);
             }
             else if (selected.file_sum_rec <= selected.rest_2909 && selected.state == "CHECKING_PAY") {
-                 $("#payFileBtn").prop("disabled", false);
+                $("#payFileBtn").prop("disabled", false);
             }
             $("#gridRecords").data("kendoGrid").dataSource.read();
         },
@@ -780,7 +776,7 @@ function initFiles(qv) {
 }
 
 function getSearchData(qv) {
-     
+
     filterFilesGrid = qv;
     var grid = $("#gridFiles").data("kendoGrid");
     if (grid)
@@ -814,29 +810,44 @@ function getFileStatus() {
         transport: { read: { url: bars.config.urlContent("/api/pfu/filesgrid/pfufilestatus") } },
         schema: { model: { fields: { state: { type: "string" }, state_name: { type: "string" } } } }
     }, {
-        dataBound: function () {
-            var dataSource = this.dataSource;
-            var data = dataSource.data();
+            dataBound: function () {
+                var dataSource = this.dataSource;
+                var data = dataSource.data();
 
-            if (!this._adding) {
-                this._adding = true;
+                if (!this._adding) {
+                    this._adding = true;
 
-                data.splice(0, 0, {
-                    "state": "null",
-                    "state_name": "Всі"
-                });
+                    data.splice(0, 0, {
+                        "state": "null",
+                        "state_name": "Всі"
+                    });
 
-                this._adding = false;
-                var dropdownlist = this;
-                dropdownlist.value("null");
-            }
+                    this._adding = false;
+                    var dropdownlist = this;
+                    dropdownlist.value("null");
+                }
 
-        },
-        //value: "null",
-        dataTextField: "state_name",
-        dataValueField: "state"
-    });
+            },
+            //value: "null",
+            dataTextField: "state_name",
+            dataValueField: "state"
+        });
     //  
+    fillDropDownList("#searchFileType", {
+        transport: { read: { url: bars.config.urlContent("/api/pfu/filesgrid/GetFileTypes") } },
+        schema: { model: { fields: { Id: { type: "string" }, Name: { type: "string" } } } }
+    },
+        {
+            dataBound: function () {
+                var dataSource = this.dataSource;
+                var data = dataSource.data();
+
+                var dropdownlist = this;
+                dropdownlist.value(data[0].Id);
+            },
+            dataTextField: "Name",
+            dataValueField: "Id"
+        });
 }
 
 function getEnvelopState() {
@@ -844,10 +855,10 @@ function getEnvelopState() {
         transport: { read: { url: bars.config.urlContent("/api/pfu/filesgrid/pfuenvelopstate") } },
         schema: { model: { fields: { Id: { type: "string" }, Name: { type: "string" } } } }
     }, {
-        value: STATE_CHECKED,
-        dataTextField: "Name",
-        dataValueField: "Id"
-    });
+            value: STATE_CHECKED,
+            dataTextField: "Name",
+            dataValueField: "Id"
+        });
 }
 
 // делаем кнопку "Запит залишку в РУ" disabled или abled
@@ -856,7 +867,7 @@ function CheckBalancePaymentBtn(selectedCatalog) {
     var info = [];
     info.push();
     var now = new Date();
-     
+
     var restdate = kendo.parseDate(selectedCatalog.restdate, 'yyyy-MM-dd');
     var diff = (now - restdate) / 1000;
     debugger;
@@ -876,29 +887,29 @@ function CheckBalancePaymentBtn(selectedCatalog) {
             $('#balanceReq').prop("disabled", true);
             $('#payCommonBtn').prop("disabled", true);
         }
-         if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest === null && diff < 3600) {//diff> 3600 $('#balanceReq').prop("disabled", false);
+        if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest === null && diff < 3600) {//diff> 3600 $('#balanceReq').prop("disabled", false);
             info.push("Повторний запит залишку неможливий. Запит залишку вже відправлено в РУ, очікуйте появи залишку.");
             info.push("Створити загальний платіж неможливо.  Залишок по рахунку 2560 відсутній");
             $('#balanceReq').prop("disabled", true);
             $('#payCommonBtn').prop("disabled", true);
         }
-         if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest < selectedCatalog.file_sum_rec && diff < 3600) {
+        if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest < selectedCatalog.file_sum_rec && diff < 3600) {
 
             info.push("Створити загальний платіж неможливо.  Залишок по рахунку 2560 не достатній для оплати");
             $('#balanceReq').prop("disabled", false);
             $('#payCommonBtn').prop("disabled", true);
         }
-         if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest === null && (selectedCatalog.restdate === null || diff > 3600)) {
+        if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest === null && (selectedCatalog.restdate === null || diff > 3600)) {
             info.push("Створити загальний платіж неможливо.  Залишок по рахунку 2560 відсутній!!");
             $('#balanceReq').prop("disabled", false);
             $('#payCommonBtn').prop("disabled", true);
         }
-         if (selectedCatalog.file_sum_rec > 0 && diff > 3600) {
+        if (selectedCatalog.file_sum_rec > 0 && diff > 3600) {
             info.push("Створити загальний платіж неможливо.  Залишок по рахунку 2560 відсутній!!!");
             $('#balanceReq').prop("disabled", false);
             $('#payCommonBtn').prop("disabled", true);
         }
-         if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest >= selectedCatalog.file_sum_rec && diff < 3600) {
+        if (selectedCatalog.file_sum_rec > 0 && selectedCatalog.rest >= selectedCatalog.file_sum_rec && diff < 3600) {
             info.push("Повторний запит залишку неможливий. Залишок на 2560 є актуальним.");
             $('#balanceReq').prop("disabled", true);
             $('#payCommonBtn').prop("disabled", false);
@@ -954,7 +965,7 @@ PrintRestData = function (value) {
 function goToLines(needSwitchTab) {
     //  
     grid = $("#gridRecords");
-     
+
     if (grid.data("kendoGrid"))
         $("#gridRecords").data("kendoGrid").dataSource.filter([]);
     var gview = $("#gridFiles").data("kendoGrid");
@@ -1111,8 +1122,10 @@ openPayWindowdow = function () {
 // оплата на общую сумму реестра (кнопка "Створити загальний платіж")
 function payCommon() {
 
-    bars.ui.alert({ text: "До проведення оплати необхідно здійснити відправлення Квитанції 1 в ПФУ.<br />" +
-    "Відправлення Квитанції 1 здійснюється в функції \"Підтвердження відправлення даних в ПФУ\".",title: "Увага!" },openPayWindowdow);
+    bars.ui.alert({
+        text: "До проведення оплати необхідно здійснити відправлення Квитанції 1 в ПФУ.<br />" +
+            "Відправлення Квитанції 1 здійснюється в функції \"Підтвердження відправлення даних в ПФУ\".", title: "Увага!"
+    }, openPayWindowdow);
 
 }
 
@@ -1155,7 +1168,7 @@ function showDocInputWindow(data) {
                 }
                 else {
                     bars.ui.confirm({ text: 'Документ не оплачено, закрити вікно ?' },
-                    function () { win.close(); });
+                        function () { win.close(); });
                 }
             }
         }]
@@ -1176,10 +1189,10 @@ function goToCatalogs() {
     qv.State = NullOrValue($("#searchState").val());
     qv.PayDate = kendo.toString(PayDate, "MM.dd.yyyy");
     qv.EnvelopeId = null;
+    qv.fileType = NullOrValue($("#searchFileType").val());
 
     getSearchData(qv);
     tabStrip.select(0);
-
 }
 
 function switchTab(index) {
@@ -1192,7 +1205,7 @@ function switchTab(index) {
 //**************************
 
 function initSentConvertsgrid() {
-     
+
     //filterSentConvertsgrid = qv;
     $("#SentConvertsgrid").kendoGrid({
         dataSource: {
@@ -1237,7 +1250,7 @@ function initSentConvertsgrid() {
         },
         change: function () {
             if (selectedSentConvertRow())
-                getSearchData({ EnvelopeId: selectedSentConvertRow().ID, State: null, IdCatalog: null, Mfo: null, CatalogDate: null, PayDate: null });
+                getSearchData({ EnvelopeId: selectedSentConvertRow().ID, State: null, IdCatalog: null, Mfo: null, CatalogDate: null, PayDate: null, fileType: null });
         },
 
         columns: [
@@ -1245,21 +1258,21 @@ function initSentConvertsgrid() {
                 field: "ID",
                 title: "ID запиту"
             },
-             {
-                 field: "PFU_ENVELOP_ID",
-                 title: " ID конверту",
-                 filterable: {
-                     ui: function (element) {
-                         element.kendoNumericTextBox({
-                             format: "n0"
-                         });
-                     }
-                 }
-             },
+            {
+                field: "PFU_ENVELOP_ID",
+                title: " ID конверту",
+                filterable: {
+                    ui: function (element) {
+                        element.kendoNumericTextBox({
+                            format: "n0"
+                        });
+                    }
+                }
+            },
             {
                 field: "REGISTER_DATE",
                 title: " Дата отримання",
-                template:"#: PrintData(REGISTER_DATE) #"
+                template: "#: PrintData(REGISTER_DATE) #"
             },
             {
                 field: "CRT_DATE",
@@ -1419,7 +1432,7 @@ function initEnvelopGrid(qv) {
         filterMenuInit: function (e) { e.container.addClass("widerMenu"); },
         change: function () {
             if (selectedEnvelopeRow())
-                getSearchData({ EnvelopeId: selectedEnvelopeRow().id, State: null, IdCatalog: null, Mfo: null, CatalogDate: null, PayDate: null });
+                getSearchData({ EnvelopeId: selectedEnvelopeRow().id, State: null, IdCatalog: null, Mfo: null, CatalogDate: null, PayDate: null, fileType: null });
             //else
             //    $('#gridCatalog').empty();
         },
@@ -1434,7 +1447,7 @@ function initEnvelopGrid(qv) {
                 if (!g_isGridFilesInited) {
                     Waiting(true);
                     g_isGridFilesInited = true;
-                    initFilesGrid({ State: null, IdCatalog: null, Mfo: null, CatalogDate: null, EnvelopeId: selectedEnvelopeRow().id, PayDate: null });
+                    initFilesGrid({ State: null, IdCatalog: null, Mfo: null, CatalogDate: null, EnvelopeId: selectedEnvelopeRow().id, PayDate: null, fileType: null });
                 }
                 else {
                     //getSearchData({ State: null, IdCatalog: null, Mfo: null, CatalogDate: null, EnvelopeId: selectedEnvelopeRow().id });
@@ -1460,12 +1473,12 @@ function approveMatching() {
     var tabStrip = $(".k-state-active");
     var namegrid = "";
     if (tabStrip[0].innerText === "Перелік конвертів ПФУ")
-        namegrid= "#gridEnvelope"
+        namegrid = "#gridEnvelope"
     else
         namegrid = "#SentConvertsgrid"
     $('#approveMatching').attr("disabled", "disabled");
     $('#approveMatchingConvert').attr("disabled", "disabled");
-    
+
     var gview = $(namegrid).data("kendoGrid");
     var selectedEnvelope = gview.dataItem(gview.select());
     selected_ids = []
@@ -1480,7 +1493,7 @@ function approveMatching() {
         return;
     }
     initSign(selected_ids, 1, namegrid);
-     
+
 
 }
 
@@ -1503,8 +1516,8 @@ function initHistoryGrid() {
         transport: { read: { url: bars.config.urlContent("/api/pfu/filesgrid/searchcataloghistory") } },
         schema: { model: { fields: FILES_GRID_HISTORY_FIELDS } }
     }, {
-        columns: FILES_GRID_HISTORY_COLUMNS
-    }, "#historyTitle-template");
+            columns: FILES_GRID_HISTORY_COLUMNS
+        }, "#historyTitle-template");
 }
 
 function LoadRegExel() {
@@ -1516,7 +1529,7 @@ function LoadRegExel() {
 
 
 function LoadInfExel(e) {
-     
+
 
     //id: { type: "number" },
     //full_name: { type: "string" },
@@ -1532,14 +1545,14 @@ function LoadInfExel(e) {
     var grid = $("#gridRecords").getKendoGrid();
     var rows = [{
         cells: [
-          { value: "ID" },
-          { value: "ПіБ отримувача" },
-        { value: "ІПн" },
-        { value: "Дата зарахування" },
-        { value: "Номер рахунку" },
-          { value: "Код МФО" },
-      { value: "Сума" },
-{ value: "Статус" }
+            { value: "ID" },
+            { value: "ПіБ отримувача" },
+            { value: "ІПн" },
+            { value: "Дата зарахування" },
+            { value: "Номер рахунку" },
+            { value: "Код МФО" },
+            { value: "Сума" },
+            { value: "Статус" }
         ]
     }];
     var trs = $("#gridRecords").find('tr');
@@ -1548,14 +1561,14 @@ function LoadInfExel(e) {
         var dataItem = grid.dataItem(trs[i]);
         rows.push({
             cells: [
-              { value: dataItem.id },
-              { value: dataItem.full_name },
-              { value: dataItem.numident },
-              { value: dataItem.date_enr },
-              { value: dataItem.num_acc },
-              { value: dataItem.mfo },
-              { value: dataItem.sum_pay },
-              { value: getStatusById(dataItem.state) }
+                { value: dataItem.id },
+                { value: dataItem.full_name },
+                { value: dataItem.numident },
+                { value: dataItem.date_enr },
+                { value: dataItem.num_acc },
+                { value: dataItem.mfo },
+                { value: dataItem.sum_pay },
+                { value: getStatusById(dataItem.state) }
             ]
         })
 
@@ -1568,14 +1581,14 @@ function excelExport(rows) {
 
     var workbook = new kendo.ooxml.Workbook({
         sheets: [
-          {
-              columns: [
-                { autoWidth: '150px' },
-                { autoWidth: '150px' }
-              ],
-              title: "Інформаційні рядки реєстру",
-              rows: rows
-          }
+            {
+                columns: [
+                    { autoWidth: '150px' },
+                    { autoWidth: '150px' }
+                ],
+                title: "Інформаційні рядки реєстру",
+                rows: rows
+            }
         ]
     });
     $("#gridRecords").getKendoGrid().saveAsExcel();
@@ -1585,7 +1598,7 @@ function excelExport(rows) {
 
 function BalanceRequest() {
     //  
-     
+
     var grid = $('#gridFiles').data("kendoGrid");
     if (grid) {
         debugger;
@@ -1649,7 +1662,7 @@ $(document).ready(function () {
         $("#dvFilesFilter").hide();
         // getEnvelopState();
         initEnvelopGrid({ State: "PARSED", CreatingDate: null, Id: null });
-         
+
         initSentConvertsgrid();
 
         $('#SelectFiles').click(function () {
@@ -1675,7 +1688,7 @@ $(document).ready(function () {
         $("#title").html("Перегляд та оплата реєстрів ПФУ");
         getFileStatus();
         //$("#searchState").data("kendoDropDownList").dataSource.add({ "state": "new Item", "state_name": 1000 });
-        initFiles({ State: null, IdCatalog: null, Mfo: null, CatalogDate: null, EnvelopeId: null, PayDate: null });
+        initFiles({ State: null, IdCatalog: null, Mfo: null, CatalogDate: null, EnvelopeId: null, PayDate: null, fileType: null });
         $("#searchDate").kendoDatePicker({ format: "dd.MM.yyyy" });
         $("#searchPayDate").kendoDatePicker({ format: "dd.MM.yyyy" });
         $('#SearchFiles').click(goToCatalogs);
@@ -1694,31 +1707,22 @@ $(document).ready(function () {
 
 
         $("#LoadInfExelBtn").on('click', function (e) {
-             
+
             var grid = $("#gridRecords").data("kendoGrid");
             grid.saveAsExcel();
         });
 
         $('textarea').keyup(function (e) {
             if (e.keyCode == 13) {
-                goToCatalogs()
+                goToCatalogs();
             }
         });
 
-        $("#searchState").change(function () {
-            goToCatalogs()
-        });
-        $("#searchMfo").change(function () {
-            goToCatalogs()
-        });
-        $("#searchId").change(function () {
-            goToCatalogs()
-        });
-        $("#searchDate").change(function () {
-            goToCatalogs()
-        });
-        $("#searchPayDate").change(function () {
-            goToCatalogs()
+        //debugger;
+        //fileType = bars.extension.getParamFromUrl('fileType', window.location.href);
+
+        $("#searchState, #searchMfo, #searchId, #searchDate, #searchPayDate, #searchFileType").change(function () {
+            goToCatalogs();
         });
     }
 });
