@@ -10,5 +10,6 @@ namespace BarsWeb.Areas.Pfu.Models.Grids
         public string Mfo { get; set; }
         public decimal? EnvelopeId { get; set; }
         public string State { get; set; }
+        public string FileType { get; set; }
     }
 }

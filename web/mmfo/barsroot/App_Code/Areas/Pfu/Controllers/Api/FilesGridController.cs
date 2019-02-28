@@ -365,13 +365,13 @@ namespace BarsWeb.Areas.Pfu.Controllers.Api
 
         [HttpGet]
         //[GET("/api/pfu/filesgrid/searchcatalog")]
-        public HttpResponseMessage SearchCatalog([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, string State, decimal? IdCatalog, string Mfo, DateTime? CatalogDate, decimal? EnvelopeId, DateTime? PayDate)
+        public HttpResponseMessage SearchCatalog([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, string State, decimal? IdCatalog, string Mfo, DateTime? CatalogDate, decimal? EnvelopeId, DateTime? PayDate, string fileType)
         {
             try
             {
                 if (State == "null")
                     State = null;
-                var search = new SearchCatalog { State = State, IdCatalog = IdCatalog, Mfo = Mfo, CatalogDate = CatalogDate, PayDate = PayDate, EnvelopeId = EnvelopeId };
+                var search = new SearchCatalog { State = State, IdCatalog = IdCatalog, Mfo = Mfo, CatalogDate = CatalogDate, PayDate = PayDate, EnvelopeId = EnvelopeId, FileType = fileType };
                 var dataCount = _repo.CountCatalog(search, request);
                 var data = _repo.Catalog(search, request);
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
@@ -447,7 +447,7 @@ namespace BarsWeb.Areas.Pfu.Controllers.Api
         {
             try
             {
-                var search = new SearchRegisterEpc {RegisterId = RegisterId, RegisterDate = RegisterDate};
+                var search = new SearchRegisterEpc { RegisterId = RegisterId, RegisterDate = RegisterDate };
                 var data = _repo.SearchRegisterEpc(search, request);
                 var dataCount = _repo.CountRegisterEpc(search, request);
 
@@ -518,7 +518,7 @@ namespace BarsWeb.Areas.Pfu.Controllers.Api
                 return response;
             }
         }
-        
+
         [HttpGet]
         //[GET("/api/pfu/filesgrid/GetSentConvert")]
         public HttpResponseMessage GetSentConvert([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
@@ -844,6 +844,21 @@ namespace BarsWeb.Areas.Pfu.Controllers.Api
             }
             return HttpUtility.UrlDecode(bytes, Encoding.UTF8);
             //return Encoding.UTF8.GetString(bytes);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetFileTypes()
+        {
+            try
+            {
+                IEnumerable<FileType> _data = _repo.GetFileTypes();
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, new { Data = _data });
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
     }
 }

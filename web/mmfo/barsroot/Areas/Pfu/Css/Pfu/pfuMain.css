@@ -16,7 +16,8 @@
 #gridFiles th.k-header {
     text-align: center;
 }
-.k-tabstrip>.k-content, .k-panelbar .k-tabstrip>.k-content  {
+
+.k-tabstrip > .k-content, .k-panelbar .k-tabstrip > .k-content {
     padding: 0em;
 }
 
@@ -35,15 +36,32 @@
 .widerMenu .k-datetimepicker,
 .widerMenu .k-numerictextbox,
 .widerMenu .k-dropdown,
-.widerMenu .k-textbox
-{
+.widerMenu .k-textbox {
     width: 200px;
 }
 
 select {
-  font-size: 16px;
+    font-size: 16px;
 }
 
-select option {
-    font-size: 16px;   
+    select option {
+        font-size: 16px;
+    }
+
+.well {
+    margin-bottom: 5px;
+    padding: 15px 5px 5px 15px;
+}
+
+.form-group {
+    margin-bottom: 5px;
+}
+
+.ra-well-title {
+    padding-bottom: 5px;
+    margin-bottom: 0px;
+}
+
+#tabstrip-1, #tabstrip-2, body {
+    overflow-x: hidden;
 }

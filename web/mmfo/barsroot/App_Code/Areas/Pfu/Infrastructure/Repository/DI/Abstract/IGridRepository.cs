@@ -55,7 +55,7 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Abstract
         IEnumerable<V_PFU_DESTROYED_EPC> SearchDestroyedEpc(SearchDestroyedEpcQuery qv, DataSourceRequest request);
         decimal CountSearchDestroyedEpc(SearchDestroyedEpcQuery qv, DataSourceRequest request);
         IEnumerable<SignEPC> GetSignsEPC();
-        void DestroyEpc(IList<DestroyEpc> pensioners);        
+        void DestroyEpc(IList<DestroyEpc> pensioners);
         IEnumerable<V_PFU_REGISTERS_EPC> SearchRegisterEpc(SearchRegisterEpc search, DataSourceRequest request);
         decimal CountRegisterEpc(SearchRegisterEpc search, DataSourceRequest request);
         IEnumerable<V_PFU_REGISTERS_LINES_EPC> SearchRegisterEpcLine(SearchRegisterLinesEpc search, DataSourceRequest request);
@@ -112,6 +112,8 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Abstract
         void GenNoTurnover(FileForNoTurnOver d);
         string GetBranch();
 
+
+        IEnumerable<FileType> GetFileTypes();
     }
 
 }

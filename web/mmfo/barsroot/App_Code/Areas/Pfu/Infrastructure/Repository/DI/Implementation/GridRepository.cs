@@ -369,30 +369,40 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
         #region Search Catalog (Перелік реєстрів)
         private BarsSql InitSearchCatalog(SearchCatalog qv)
         {
-            return new BarsSql()
-            {
-                SqlText = @"select * from pfu.v_pfu_registers
+            string sql = @"select * from pfu.v_pfu_registers
                     where (id = :id or :id is null)
                       and (receiver_mfo = :mfo or :mfo is null)
                       and (state= :state or :state is null)
                       and (register_date = :register_date or :register_date is null)
                       and (env_id = :env_id or :env_id is null)
-                      and (payment_date = :payment_date or :payment_date is null)",
-                SqlParams = new object[]
-                {
-                    new OracleParameter(":id", OracleDbType.Varchar2) { Value = qv.IdCatalog },
-                    new OracleParameter(":id", OracleDbType.Varchar2) { Value = qv.IdCatalog },
-                    new OracleParameter(":mfo", OracleDbType.Varchar2) { Value = qv.Mfo },
-                    new OracleParameter(":mfo", OracleDbType.Varchar2) { Value = qv.Mfo },
-                    new OracleParameter(":state", OracleDbType.Varchar2) { Value = qv.State },
-                    new OracleParameter(":state", OracleDbType.Varchar2) { Value = qv.State },
-                    new OracleParameter(":register_date", OracleDbType.Date) { Value = qv.CatalogDate },
-                    new OracleParameter(":register_date", OracleDbType.Date) { Value = qv.CatalogDate },
-                    new OracleParameter(":env_id", OracleDbType.Varchar2) { Value = qv.EnvelopeId },
-                    new OracleParameter(":env_id", OracleDbType.Varchar2) { Value = qv.EnvelopeId },
-                    new OracleParameter(":payment_date", OracleDbType.Date) { Value = qv.PayDate},
-                    new OracleParameter(":payment_date", OracleDbType.Date) { Value = qv.PayDate }
-                }
+                      and (payment_date = :payment_date or :payment_date is null)";
+
+            List<OracleParameter> _params = new List<OracleParameter>
+            {
+                new OracleParameter(":id", OracleDbType.Varchar2) { Value = qv.IdCatalog },
+                new OracleParameter(":id", OracleDbType.Varchar2) { Value = qv.IdCatalog },
+                new OracleParameter(":mfo", OracleDbType.Varchar2) { Value = qv.Mfo },
+                new OracleParameter(":mfo", OracleDbType.Varchar2) { Value = qv.Mfo },
+                new OracleParameter(":state", OracleDbType.Varchar2) { Value = qv.State },
+                new OracleParameter(":state", OracleDbType.Varchar2) { Value = qv.State },
+                new OracleParameter(":register_date", OracleDbType.Date) { Value = qv.CatalogDate },
+                new OracleParameter(":register_date", OracleDbType.Date) { Value = qv.CatalogDate },
+                new OracleParameter(":env_id", OracleDbType.Varchar2) { Value = qv.EnvelopeId },
+                new OracleParameter(":env_id", OracleDbType.Varchar2) { Value = qv.EnvelopeId },
+                new OracleParameter(":payment_date", OracleDbType.Date) { Value = qv.PayDate},
+                new OracleParameter(":payment_date", OracleDbType.Date) { Value = qv.PayDate }
+            };
+
+            if (null != qv.FileType)
+            {
+                sql += null == qv.FileType ? "" : " and file_type = :p_file_type";
+                _params.Add(new OracleParameter(":p_file_type", OracleDbType.Varchar2) { Value = qv.FileType });
+            }
+
+            return new BarsSql()
+            {
+                SqlText = sql,
+                SqlParams = _params.ToArray()
             };
         }
         private BarsSql InitSearchCatalogInPay(SearchCatalog qv)
@@ -1123,7 +1133,7 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
             }
             if (datefrom != "null" && dateto != "null")
             {
-                add_sql_dates = !issql ? " (BATCH_DATE BETWEEN TO_DATE(:bdate2, 'DD/MM/YY') and TO_DATE(:bdate1, 'DD/MM/YY'))" : " and "+ " (BATCH_DATE BETWEEN TO_DATE(:bdate2, 'DD/MM/YY') and TO_DATE(:bdate1, 'DD/MM/YY'))";
+                add_sql_dates = !issql ? " (BATCH_DATE BETWEEN TO_DATE(:bdate2, 'DD/MM/YY') and TO_DATE(:bdate1, 'DD/MM/YY'))" : " and " + " (BATCH_DATE BETWEEN TO_DATE(:bdate2, 'DD/MM/YY') and TO_DATE(:bdate1, 'DD/MM/YY'))";
                 p.Add("bdate1", dbType: DbType.String, size: 50, value: dateto, direction: ParameterDirection.Input);
                 p.Add("bdate2", dbType: DbType.String, size: 50, value: datefrom, direction: ParameterDirection.Input);
                 issql = true;
@@ -1377,7 +1387,7 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
             };
             _pfu.ExecuteStoreCommand(command, parameters);
         }
-#endregion
+        #endregion
 
         #region  Моніторинг джобів
         public IQueryable<V_PFU_JOB_INFO> GetJobList()
@@ -1473,6 +1483,10 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
             return _pfu.ExecuteStoreQuery<string>(SqlText).FirstOrDefault();
         }
 
+        public IEnumerable<FileType> GetFileTypes()
+        {
+            return _pfu.ExecuteStoreQuery<FileType>("select id, name from pfu.PFU_FILE_TYPE", null).AsEnumerable();
+        }
     }
 
     public class DummyEppLine
