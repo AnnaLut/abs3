@@ -19,32 +19,14 @@ namespace BarsWeb.Areas.Zay.Controllers.Api
         {
             _dictionary = dictionary;
         }
-
+		
         [HttpGet]
         [GET("api/zay/F092/")]
-        public HttpResponseMessage GetSellingF092(
-            [ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
+        public HttpResponseMessage GetF092([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
         {
             try
             {
-                var data = _dictionary.F092SellingDictionary().ToList();
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
-                    data.ToDataSourceResult(request));
-                return response;
-            }
-            catch (Exception exception)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message);
-            }
-        }
-
-        [HttpGet]
-        [GET("api/zay/F092/")]
-        public HttpResponseMessage GetBuyingF092([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
-        {
-            try
-            {
-                var data = _dictionary.F092BuyingDictionary().ToList();
+                var data = _dictionary.F092Dictionary().ToList();
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
                     data.ToDataSourceResult(request));
                 return response;

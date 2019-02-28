@@ -180,7 +180,7 @@ bars.helper = bars.helper || {
                     read: {
                         type: "GET",
                         dataType: "json",
-                        url: bars.config.urlContent("/api/zay/F092/GetBuyingF092")
+                        url: bars.config.urlContent("/api/zay/F092/GetF092")
                     }
                 },
                 schema: {
