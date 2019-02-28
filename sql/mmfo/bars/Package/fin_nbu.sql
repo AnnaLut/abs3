@@ -4858,6 +4858,9 @@ Is
     x_ int;
     l_dat_ date;
 
+    v_rez number;
+    v_sna number;
+    v_ead number;
 begin
 
 
@@ -5189,9 +5192,10 @@ begin
 
  -- Сформований резерв у відсотках
         Begin
-          select sum(nvl(bv,0)),  sum(nvl(rez39,0))
-            into l_bv   ,  l_rez
-            from nbu23_rez
+          select sum(nvl(bv,0)),  sum(nvl(rez39,0)), sum(nvl(t.rez,0)),
+             sum(abs(nvl(t.pv,0))), sum(t.ead)
+            into l_bv   ,  l_rez, v_rez, v_sna, v_ead
+            from nbu23_rez t
            where rnk = RNK_          and
                  nd  = ND_           and
                  tip in ('SS', 'SP','SN','SPN','SNO','SL') and    --,'CR9'
@@ -5199,12 +5203,17 @@ begin
            exception when NO_DATA_FOUND then l_bv := 0; l_rez := 0;
         end;
 
-    If     l_bv!= 0 then
+/*    If     l_bv!= 0 then
           sTmp0 :=     (l_rez*100) / l_bv;
     else  sTmp0 :=     0;
+    end if;*/
+    if nvl(v_ead,0) != 0 then
+      sTmp0 := 100 * (nvl(v_rez,0) + nvl(v_sna,0)) / v_ead;
+    else
+      sTmp0 := 0;
     end if;
-
     fin_nbu.record_fp_nd('SRKA', sTmp0, 52, DAT_);
+
 
     if  sTmp0 > 50
             then  fin_nbu.record_fp_nd('PD1', 1, 53, DAT_);
@@ -6273,7 +6282,7 @@ begin
        else null;
     end case;
 
-	
+
 	case
        when ZN_P_ND('RG2', 59, DAT_) = 1 and ZN_P_ND('RG3', 59, DAT_) = 1 then
          l_klass := greatest(l_klass, 9); -- не менше 8
