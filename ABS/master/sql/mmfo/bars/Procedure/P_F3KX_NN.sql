@@ -13,12 +13,12 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.19.003          06.02.2019
+% VERSION     :   v.19.004          28.02.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-    ver_           varchar2(30)        := ' v.19.003    06.02.2019';
+    ver_           varchar2(30)        := ' v.19.004    28.02.2019';
 /*
    Структура показателя    DDDD NNN
 
@@ -254,30 +254,19 @@ IS
          p_value_ :=
                     NVL (LPAD (TRIM (SUBSTR (d1#3K_, 1, 3)), 3, '0'), '000');
 
-/*         IF ko_ = 1
-         THEN
-            p_value_ :=
-                    NVL (LPAD (TRIM (SUBSTR (p_value_, 1, 2)), 2, '0'), '00');
-         END IF;
-*/
          IF ko_ = 2
          THEN
-/*            if d1#D3_ is not null then
-                p_value_ :=
-                        NVL (LPAD (TRIM (SUBSTR (d1#D3_, 1, 2)), 2, '1'), '00');
-            else
-                p_value_ :=
-                        NVL (LPAD (TRIM (SUBSTR (p_value_, 1, 2)), 2, '1'), '00');
-            end if;
-*/
             if nls_ like '2900205%' and nlsk_ like '29003%' or
-               --nls_ like '2909%' and nlsk_ like '2900%' or
-               nls_ like '2625%' and nlsk_ like '2900%' or
-               nls_ like '2625%' and nlsk_ like '3800%' or
-               nls_ like '2620%' and nlsk_ like '3800%'
+               nls_ like '2625%' and nlsk_ like '2900%' 
             then
                p_value_ := '216';
                d1#D3_ := '16';
+            end if;
+            if nls_ like '2625%' and nlsk_ like '3800%' or
+               nls_ like '2620%' and nlsk_ like '3800%'
+            then
+               p_value_ := '215';
+               d1#D3_ := '15';
             end if;
 
             if ( nls_ like '2610%'  or  nls_ like '2615%'  or
@@ -290,11 +279,6 @@ IS
             end if;
          END IF;
 
-/*         IF ko_ = 3
-         THEN
-            p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 2), '00');
-         END IF;
-*/
          d1#70_ := p_value_;
       ELSIF p_i_ = 2
       THEN
@@ -910,7 +894,7 @@ BEGIN
                f089_ := '2';                          --неконсолидированные данные
                refd_ := null;
                comm_ := null;
-
+/*
                if ko_ = 2
                then
                    BEGIN
@@ -955,7 +939,7 @@ BEGIN
                      d1#D3_ := NULL;
                   END;
                end if;
-
+*/
                -- проверка есть ли для данной проводки доп. реквизиты
                SELECT count( * )
                   INTO koldop_
@@ -995,7 +979,7 @@ BEGIN
                   SELECT SUBSTR (VALUE, 1, 70)
                     INTO d1#3K_
                     FROM operw
-                   WHERE REF = refd_ AND tag = 'D1#3K';
+                   WHERE REF = ref_ AND tag = 'D1#3K';
                EXCEPTION
                   WHEN NO_DATA_FOUND
                   THEN
@@ -1338,7 +1322,7 @@ BEGIN
                         nlsd like '3800%' 
                  GROUP BY kv
      ) loop
-          comm_ := '"зеркальные: операции';
+          comm_ := '"зеркальные" операции';
           nnnn_ := nnnn_+1;
           p_ins (nnnn_, 'F091', '3');
           p_ins (nnnn_, 'R030', LPAD (u.kv, 3,'0'));
@@ -1380,7 +1364,7 @@ BEGIN
                                                  'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 ='216'
+                        where  f091 ='4' and f092 in ('216','215')
                            and ( f089 ='1' or f089 ='2' and t071<kons_sum_/f_cur(dat_,r030) )
                      )
                group by f091, r030, f092
@@ -1419,7 +1403,7 @@ BEGIN
            values ( mfo_, dat_, '#3K', nbuc_, 'F089'||kodp_,  f089_ );
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
-           values ( mfo_, dat_, '#3K', nbuc_, 'F092'||kodp_,  '216' );
+           values ( mfo_, dat_, '#3K', nbuc_, 'F092'||kodp_,  u.f092 );
 
           update nbur_detail_protocols
              set description = substr(substr(field_code,5,3)||' консолідовано'||description,1,200),
@@ -1445,7 +1429,7 @@ BEGIN
                                                  'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 ='216' and r030 =u.r030
+                        where  f091 ='4' and f092 =u.f092 and r030 =u.r030
                            and ( f089 ='1' or f089 ='2' and t071<kons_sum_/f_cur(dat_,r030) )
                                       ) );
                                     
@@ -1581,7 +1565,7 @@ BEGIN
               GROUP BY '4', o.rnkd, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
     ) loop
 
-         comm_ := 'FOREX Викуп валюти';
+         comm_ := 'FOREX Викуп валюти  ';
          nnnn_ :=nnnn_+1;
 
          kv_ := u.kv;
@@ -1590,13 +1574,17 @@ BEGIN
 
          f091_ := u.ko;
          if f091_ ='3'  then
+              acc_ := u.acck;
               nls_ := u.nlsk;
               rnk_ := u.rnk;
+              comm_ := comm_ ||u.nlsd;
          else
+              acc_ := u.accd;
               nls_ := u.nlsd;
               rnk_ := u.rnk;
+              comm_ := comm_ ||u.nlsk;
          end if;
-         refd_ := u.ref;
+         ref_ := u.ref;
 
          p_ins (nnnn_, 'F091', f091_);
          p_ins (nnnn_, 'R030', LPAD (r030_, 3,'0'));
@@ -1643,7 +1631,7 @@ BEGIN
                                                  'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 ='216' and f089 ='1') );
+                        where  f091 ='4' and f092 in ('215','216') and f089 ='1') );
 ----------------------------------------
    logger.info ('P_F3KX etap 6 after consolidation 2');
 
