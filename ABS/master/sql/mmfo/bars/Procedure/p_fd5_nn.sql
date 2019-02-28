@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :    v.18.021  19/02/2019 (12/02/2019)
+% VERSION     :    v.18.023  22/02/2019 (20/02/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -33,7 +33,13 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
  27     I          S190 код строку прострочення погашення боргу
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 18.12.2018   підготовка D5X: зміна скрипта для l_ekp, abs(znap)
+ 22/02/2019 - тип залишку для рахунків типу "SDF" буде формуватися "2"
+              і параметр R013 буде вибиратися із NBUR_LOG_FD5X а не із 
+              SPECPARAM
+ 20/02/2019 - для бал.рах. 2046, 2396 в VIEW V_TMP_REZ_RISK 
+              буде заповнено поле ZPR і по типу рахунку буде формуватися
+              значення параметру R013                                                
+ 18/12/2018 - підготовка D5X: зміна скрипта для l_ekp, abs(znap)
  11/12/2018 - показник середній залишок по рахунку для рахунків дисконту
               буде формуватися якщо є визнані процентні доходи
  07/12/2018 - для рахунків дисконту параметр S032 формуємо із основного
@@ -239,6 +245,7 @@ CURSOR SALDO IS
                a.dos96, a.kos96, a.dosq96, a.kosq96, s.isp, s.accc, s.tip, s.mdate
        FROM otcn_saldo a, accounts s
        WHERE a.acc=s.acc AND
+             not ((s.nls like '204%' or s.nls like '239%') and s.tip = 'SDF') AND 
              ((s.nbs NOT IN ('1600','2600','2605','2620','2625','2650','2655') AND  
                a.ost-a.dos96+a.kos96 <> 0) OR
               (s.nbs IN ('1600','2600','2605','2620','2625','2650','2655') AND  
@@ -1384,17 +1391,19 @@ BEGIN
                            t.s080, t.rnk, t.nd nd, t.tobo,
                            r.acc, r.odate, r.kodp, r.comm, r.nd ndr, t.id, nvl(s.r013, '0') r013,
                            substr(r.kodp,7,1) r011, t.accr, t.accr_30,
-                           t.nbs, t.ob22, t.okpo, t.custtype, t.mdate
-                    from v_tmp_rez_risk t, rnbu_trace r, specparam s, agg_monbals m 
+                           t.nbs, t.ob22, t.okpo, t.custtype, t.mdate, a.tip, t.zpr discont_SDF
+                    from v_tmp_rez_risk t, accounts a, rnbu_trace r, nbur_log_fd5x s, agg_monbals m  -- вместо specparam будем использовать nbur_log_fd5 
                     where t.dat=Dat23_
                       and t.acc = r.acc
+                      and a.acc = t.acc 
                       and not ( substr(r.kodp,3,4) like '15_9' or 
                                 substr(r.kodp,3,4) like '2__9' or
                                 substr(r.kodp,3,4) like '369_' 
                               ) 
                       and substr(r.kodp,3,4) not in ('2607', '2627', '2657')
                       and r.kodp like '1%' || (case when dat_ > dat_izm3 then '2' else '' end) || (case when dat_ >= dat_izm4 then '_' else '' end)
-                      and t.acc = s.acc(+)
+                      and t.acc = s.acc_id(+)
+                      and s.report_date = dat_
                       and t.acc = m.acc 
                       and m.fdat = dats_
                       and m.ost - m.crdos + m.crkos <> 0                            
@@ -1404,14 +1413,16 @@ BEGIN
                             t.s080, t.rnk, t.nd nd, t.tobo,
                            r.acc, r.odate, r.kodp, r.comm, r.nd ndr, t.id, nvl(s.r013, '0') r013,
                            substr(r.kodp,7,1) r011, t.accr, t.accr_30,
-                           t.nbs, t.ob22, t.okpo, t.custtype, t.mdate
-                    from v_tmp_rez_risk t, rnbu_trace r, specparam s
+                           t.nbs, t.ob22, t.okpo, t.custtype, t.mdate, a.tip, t.zpr discont_SDF
+                    from v_tmp_rez_risk t, accounts a, rnbu_trace r, nbur_log_fd5x s  -- вместо specparam будем использовать nbur_log_fd5
                     where t.dat=Dat23_
                       and substr(r.kodp,3,4) in ('2607', '2627', '2657')
                       and t.nbs = substr(r.kodp,3,4) 
                       and t.acc = r.acc 
+                      and a.acc = t.acc 
                       and r.kodp like '1%' || (case when dat_ > dat_izm3 then '2' else '' end) || (case when dat_ >= dat_izm4 then '_' else '' end)
-                      and t.acc = s.acc(+)
+                      and t.acc = s.acc_id(+)
+                      and s.report_date = dat_
                    )
           loop
              se_ := NVL(k.sz1, k.szq);
@@ -1585,6 +1596,34 @@ BEGIN
                        comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
 
              end if;
+
+             -- новий блок для визначення R013 для груп бал.рахунків 204, 239 
+             if k.discont_SDF <> 0 then
+                l_r013 := (case when trim(k.tip) in ('SS', 'SP') then '4' else k.r013 end);
+
+                kodp_:= '1' || '2' || substr(k.nls,1,3) || '6' || r011_ || k111_ || k072_ || k140_ ||
+                           s183_ || re_ || k051_ || s032_ ||
+                           LPAD(kv_,3,'0') || LPAD(country_, 3, '0')  || s080_ || s260_ || '2' || NVL(trim(s190_), '0');
+
+                znap_ := to_char(round(gl.p_icurval(k.kv, k.discont_SDF, dat_)));
+
+                comm_ := SUBSTR(' дисконт SDF ', 1,100);
+
+                INSERT INTO rnbu_trace
+                   (nls, kv, odate, kodp, znap, nbuc, isp, rnk, acc, comm, nd)
+                VALUES
+                   (nls_, kv_, data_, kodp_, znap_, nbuc_, isp_, rnk_, acc_, comm_, nd_);
+
+                insert into nbur_log_fd5x(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r013, r030, k040,
+                                        k072, k111, k140, f074, s032, s080, s183, s190, s241, s260, f048, t070, description,
+                                        acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
+                values(dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, '2', substr(k.nls,1,3)||'6', r011_, l_r013, 
+                       coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
+                       k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(znap_)),
+                       comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
+
+             end if;
+
           end loop;
           
           -- блок для формирования разницы остатков по счетам 1590,1592,2400,2401,3590,3690
@@ -2913,5 +2952,3 @@ BEGIN
     logger.info ('P_FD5_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));    
 END P_Fd5_Nn;
 /
-
-show err;
