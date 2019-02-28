@@ -237,6 +237,12 @@ begin
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 1, 'Дод. параметри МСФЗ', '', '', '', '', '', '', '', 'sPar=V_DOPPARAM_MSFZ[NSIFUNCTION][ACCESSCODE=>0][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, '''')][EXEC=>BEFORE][OpenInWindow]', 41);
 
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 2, 'test', 'PUL.Set_Mas_Ini(''ND'',:ND, '''')', '', 'SELECTED_ONE', '', '', '', '', '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=FIN_DEBVX', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Ознака події дефолту (постанова 351)', '', '', 'ONCE', '', '', '', '', 'sPar=V_OZNAKA_351[ACCESSCODE=>2][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X'')][EXEC=>BEFORE][showDialogWindow=>false][CONDITIONS=> nd=:ND]', 111);
+
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 1, null, ':NDI = :ND ', 2, 'COLOR_Sky');
 
