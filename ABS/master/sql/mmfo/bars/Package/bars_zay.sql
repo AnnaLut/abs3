@@ -4416,7 +4416,8 @@ is
         update zayavka set isp = r_rt.isp, tobo = r_rt.tobo where id = l_id;
         --оскільки тут вставляються заявки, які отримали від розбиття однієї
         --ми суму не чекаємо а просто пишемо в контроль.
-        if (r_rt.dk = 1 and r_rt.basis=F_ZAY_GET_BCONTL) then
+
+        if (r_rt.dk = 1 and F_ZAY_GET_BCONTL(r_rt.f092)>0) then
                 p_zay_val_control_do(p_iddo=>'I',p_zay_id =>r_rt.id);
         end if;
  end;
@@ -5148,27 +5149,29 @@ end set_conv_kurs;
     p_code_2c  in zayavka.code_2c%type      default null,
     p_p12_2c   in zayavka.p12_2c%type       default null)
 is
-    l_upd   varchar2(4000);
 begin
-    l_upd := 'update zayavka set verify_opt = '||p_verify_opt;
-    if p_meta is not null then l_upd := l_upd||', meta = '||p_meta; end if;
-    if p_f092 is not null then l_upd := l_upd||', f092 = '||p_f092; end if;
-    if p_contract is not null then l_upd := l_upd||', contract = '''||p_contract||''''; end if;
-    if p_dat2_vmd is not null then l_upd := l_upd||', dat2_vmd = '''||p_dat2_vmd ||''''; end if;
-    if p_dat_vmd is not null then l_upd := l_upd||', dat_vmd = '''||p_dat_vmd||''''; end if;
-    if p_dat5_vmd is not null then l_upd := l_upd||', dat5_vmd = '''||p_dat5_vmd || ''''; end if;
-    if p_country is not null then l_upd := l_upd||', country = '||p_country; end if;
-    if p_basis is not null then l_upd := l_upd||', basis = '''||p_basis||''''; end if;
-    if p_benefcountry is not null then l_upd := l_upd||', benefcountry = '||p_benefcountry; end if;
-    if p_bank_name is not null then l_upd := l_upd||', bank_name = '''||replace(p_bank_name,'''','''''')||''''; end if;
-    if p_bank_code is not null then l_upd := l_upd||', bank_code = '''||p_bank_code||''''; end if;
-    if p_product_group is not null then l_upd := l_upd||', product_group = '||p_product_group; end if;
-    if p_num_vmd is not null then l_upd := l_upd||', num_vmd = '''||p_num_vmd||''''; end if;
-    if p_code_2c is not null then l_upd := l_upd||', code_2c = '''||p_code_2c||''''; end if;
-    if p_p12_2c is not null then l_upd := l_upd||', p12_2c = '''||p_p12_2c||''''; end if;
-    l_upd := l_upd||' where id = '||p_id;
-    execute immediate l_upd;
-end;
+
+    --10940
+    update zayavka set 
+           verify_opt     = p_verify_opt,
+           meta           = coalesce(p_meta,meta),
+           f092           = coalesce(p_f092,f092),
+           contract       = coalesce(contract,p_contract),
+           dat2_vmd       = coalesce(dat2_vmd,p_dat2_vmd),
+           dat_vmd        = coalesce(dat_vmd,p_dat_vmd),
+           dat5_vmd       = coalesce(dat5_vmd,p_dat5_vmd),
+           country        = coalesce(country,p_country),
+           basis          = coalesce(basis,p_basis),
+           benefcountry   = coalesce(benefcountry,p_benefcountry),
+           bank_name      = coalesce(bank_name,p_bank_name),
+           bank_code      = coalesce(bank_code,p_bank_code),
+           product_group  = coalesce(product_group,p_product_group),
+           num_vmd        = coalesce(num_vmd,p_num_vmd),
+           code_2c        = coalesce(code_2c,p_code_2c),
+           p12_2c         = coalesce(p12_2c,p_p12_2c)
+    where id = p_id;
+    
+end set_visa_parameters;
 -------------------------------------------------------------------------------
 procedure check_lim (p_id number,p_mode varchar2 ) as
  l_dk zayavka.dk%type;
@@ -5222,9 +5225,9 @@ begin
     
     
   -------------------------------
-  --якщо заявка на купівлю ,F_092=164., ФО купує все або ЮЛ купує метал
+  --якщо заявка на купівлю ,F_092 in (082,140)., ФО купує все або ЮЛ купує метал
   if (l_dk=1
-       and l_f092=F_ZAY_GET_BCONTL --164 з F_092
+       and F_ZAY_GET_BCONTL(l_f092)>0
        and (l_custtype=3 --фізик/ФОП
              or (l_custtype=2 and l_prv=1)/* ЮО метал*/ ) )
    then
@@ -5253,11 +5256,6 @@ begin
        l_check_result_m:=F_zay_eqv_check(p_zay_id =>p_id,p_mode=>'M');--перевірка за місяць , яка включає перевірку за день. 
         if  l_check_result_m <0 then
              raise_application_error (-20001, 'Помилка! <br> Перевищення ліміту купівлі валюти/БМ <br>Перевищено на '||abs(l_check_result_m/100)||' грн.<br> Відмовлено в операції');
-            --         else
-            --            l_check_result_d:=F_zay_eqv_check(p_zay_id =>p_id,p_mode=>'D');--перевірка за день
-            --             if  l_check_result_d <0 then
-            --               raise_application_error (-20001, 'Помилка! <br> Перевищення ліміту купівлі валюти/БМ <br>Перевищено на '||abs(l_check_result_d/100)||' грн.<br> Відмовлено в операції');
-            --             
         else p_zay_val_control_do (p_iddo=>'I',p_zay_id =>p_id); --додаємо заявку в таблицю контролю
              
         end if;
@@ -5637,7 +5635,7 @@ begin
         
         select dk,f092 into l_dk,l_f092 from zayavka where id = p_id and branch = l_branch;        
         /**v. 5 **********  перевірка на ліміти **************/
-        if (l_dk=1 and l_f092=F_ZAY_GET_BCONTL ) then
+        if (l_dk=1 and F_ZAY_GET_BCONTL(l_f092)>0 ) then
             check_lim(p_id,'ZAY52'); --ділер остаточно візує заявку. Ставимо додаткову перевіркку на ліміт на день.
         end if;
         
@@ -5656,7 +5654,7 @@ begin
            begin
             select f092 into l_f092 from zay_val_control where zay_id= l_reqid;
            /**v. 5 **********  перевірка на ліміти **************/
-            if (l_dk=1 and l_f092=F_ZAY_GET_BCONTL ) then
+             if (l_dk=1 and F_ZAY_GET_BCONTL(l_f092)>0 ) then
              check_lim(p_id,'ZAY52'); --ділер остаточно візує заявку. Ставимо додаткову перевіркку на ліміт на день.
             end if;
            exception
