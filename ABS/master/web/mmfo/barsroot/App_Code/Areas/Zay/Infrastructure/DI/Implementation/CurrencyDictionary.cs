@@ -38,16 +38,9 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
             return _entities.ExecuteStoreQuery<ZAY_BuyContract>(query, param);
         }
 
-
-        public IEnumerable<F092Model> F092SellingDictionary()
+        public IEnumerable<F092Model> F092Dictionary()
         {
-            var query = @"select f092 as F092_Code, txt as F092_Name from f092 where to_number(f092,'999') >199";
-            return _entities.ExecuteStoreQuery<F092Model>(query);
-        }
-
-        public IEnumerable<F092Model> F092BuyingDictionary()
-        {
-            var query = @"select f092 as F092_Code, txt as F092_Name from f092 where to_number(f092,'999') <200";
+            var query = @"select f092 as F092_Code, txt as F092_Name from f092";
             return _entities.ExecuteStoreQuery<F092Model>(query);
         }
 

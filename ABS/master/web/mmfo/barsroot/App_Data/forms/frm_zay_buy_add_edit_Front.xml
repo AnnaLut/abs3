@@ -308,7 +308,7 @@
           <uicontrol type="DropDownList" addemptyitem="true" table="(select p63,  p63||' '||substr(txt,1,100) name from kod_70_2 order by p63)" keyfield="p63" valuefield="name" controlwidth="157"></uicontrol>
         </customfield>
         <customfield name="P_F092" label="Підстава для купівлі (510)" datatype="String" required="false" size="50" datasourcefield="F092" columnindex="3" index="3">
-          <uicontrol type="DropDownList" addemptyitem="true" table="(select f092 as id, f092||' '||txt as name  from f092 where to_number(f092,'999')&lt;200)" keyfield="id" valuefield="name" controlwidth="157"></uicontrol>
+          <uicontrol type="DropDownList" addemptyitem="true" table="(select f092 as id, f092||' '||txt as name  from f092)" keyfield="id" valuefield="name" controlwidth="157"></uicontrol>
         </customfield>
         <customfield name="P_BENEFCOUNTRY" label="Код країни бенеф." datatype="Decimal" datasourcefield="BENEFCOUNTRY" columnindex="3" index="4">
           <uicontrol type="DropDownList" addemptyitem="true" table="(select country, country||' '||name name from country order by 1)" keyfield="country" valuefield="NAME" controlwidth="157"></uicontrol>

@@ -10,8 +10,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Abstract
     {
         IEnumerable<ZAY_AIMS> ZayAimsDictionary(bool isBuying);
         IEnumerable<ZAY_BuyContract> ContractDictionary(decimal rnk);
-        IEnumerable<F092Model> F092SellingDictionary();
-        IEnumerable<F092Model> F092BuyingDictionary();
+        IEnumerable<F092Model> F092Dictionary();
         IEnumerable<Country> CountryDictionary();
         IEnumerable<v_rc_bnk> RcBankDictionary(); 
         IEnumerable<v_kod_70_2> Kod70_2Dictionary();

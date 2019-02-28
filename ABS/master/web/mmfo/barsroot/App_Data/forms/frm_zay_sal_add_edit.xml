@@ -317,7 +317,7 @@
           <uicontrol type="DecimalInput" controlwidth="148" />
         </customfield>
         <customfield name="P_F092" label="Мета продажу (510)" datatype="String" required="true" size="50" datasourcefield="F092" columnindex="2" index="6">
-          <uicontrol type="DropDownList" addemptyitem="true" table="(select f092 as id, f092||' '||txt as name  from f092 where to_number(f092,'999')&gt;200)" keyfield="id" valuefield="name" controlwidth="157"></uicontrol>
+          <uicontrol type="DropDownList" addemptyitem="true" table="(select f092 as id, f092||' '||txt as name  from f092)" keyfield="id" valuefield="name" controlwidth="157"></uicontrol>
         </customfield>
         <customfield name="P_CONTRACT" label="Контракт/кред.логовор №" datatype="String" size="100" datasourcefield="CONTRACT" columnindex="2" index="7">
           <uicontrol type="TextBox" controlwidth="150" />
