@@ -37,7 +37,11 @@ create or replace type t_core_person under t_core_object
     k060                  bars.string_list,                        -- тип пов’язаної з банком особи
 	k020                  VARCHAR2(20),
     coddocum              number(2),
-    isKr                  number(1), 
+    isKr                  number(1),
+	education             varchar2(4),
+	typew                 number(1),
+    codedrpou             varchar2(20),
+    namew                 varchar2(254),	
 
     constructor function t_core_person(
         p_report_id in integer,
@@ -114,7 +118,14 @@ create or replace type body t_core_person is
 
          k020            :=l_person_row.k020;
          coddocum        :=l_person_row.coddocum;
+		 
          isKR            :=l_person_row.iskr;
+		 
+		 education       :=l_person_row.education;
+		 typew           :=l_person_row.typew;
+         codedrpou       :=l_person_row.codedrpou;
+         namew           :=l_person_row.namew;
+		 
 
          core_object_kf  := p_person_kf;
          core_object_id  := p_person_id;
@@ -194,22 +205,36 @@ create or replace type body t_core_person is
                  l_attributes(7) := json_utl.make_json_value('address', '[' || bars.tools.words_to_string(l_address_attributes, p_splitting_symbol => ', ', p_ignore_nulls => 'Y') || ']');
              end if;*/
          end if;
+		 if (education is not null) then
+         l_attributes(10) := json_utl.make_json_value('education',  '['||education||']' ,p_mandatory => true);
+         --else 
+         --l_attributes(10) := json_utl.make_json_value('education',  'null' ,p_mandatory => true);
+         end if;
+         
+         if (typew is not null and codedrpou is not null and namew is not null) then
+         l_attributes(11) := json_utl.make_json_value('organization', '[{ ' ||
+                                                                    json_utl.make_json_value('typeW', typew, p_mandatory => true) || ', ' ||
+                                                                    json_utl.make_json_string('codEdrpou', codedrpou, p_mandatory => true)|| ', ' ||
+                                                                    json_utl.make_json_string('nameW', namew, p_mandatory => true) ||
+                                                                       ' }]');
+         
+         end if; 
 
-         l_attributes(10) := json_utl.make_json_value('profit', '{ ' ||
+         l_attributes(12) := json_utl.make_json_value('profit', '{ ' ||
                                                                     json_utl.make_json_value('real6month', real6month, p_mandatory => true) || ', ' ||
                                                                     json_utl.make_json_value('noreal6month', noreal6month, p_mandatory => true) ||
                                                                ' }');
 
-         l_attributes(11) := json_utl.make_json_value('family', '{ ' ||
+         l_attributes(13) := json_utl.make_json_value('family', '{ ' ||
                                                                      json_utl.make_json_value('status', status, p_mandatory => true) || ', ' ||
                                                                      json_utl.make_json_value('members', members, p_mandatory => true) ||
                                                                 ' }');
 
-         l_attributes(12) := json_utl.make_json_value('k060',
+         l_attributes(14) := json_utl.make_json_value('k060',
                                                       '["' || nvl(bars.tools.words_to_string(k060, p_splitting_symbol => '", "', p_ignore_nulls => 'Y'), '99') || '"]',
                                                       p_mandatory => true);
 
-         l_attributes(13) := json_utl.make_json_value('isKr', isKr);
+         l_attributes(15) := json_utl.make_json_value('isKr', isKr);
          dbms_lob.createtemporary(l_clob, false);
 
          dbms_lob.append(l_clob, '{ "data": { ');

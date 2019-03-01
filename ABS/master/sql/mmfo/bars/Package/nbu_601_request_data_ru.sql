@@ -176,10 +176,18 @@ create or replace package body nbu_601_request_data_ru is
                            case when c.okpo is not null then 11
                                 when c.okpo is null and c.codcagent in (5,6) then decode (p.passp, 1,14, 2,49, 3,49, 6,49, 4,49, 5,21, 11,15, 12,16, 13,32, 14,18, 99,49, 15,49, 16,49, 17,49, 7,12, 18,11)
                                 when c.OKPO is null and p.passp is null and p.numdoc is null then 33
-                             end codDocum
+                             end codDocum,
+                             param_ed.value as education,
+                             param_typew.value as typew,
+                             param_edrpo.value as codedrpou,
+                             param_namew.value as namew
 
                     from   customer c
                     join   person p on p.rnk = c.rnk
+                    left join (select rnk,kf,value from customerw where tag='EDUCA') param_ed on param_ed.rnk=c.rnk and param_ed.kf=c.kf
+                    left join (select rnk,kf,value from customerw where tag='TYPEW') param_typew on param_typew.rnk=c.rnk and param_typew.kf=c.kf
+                    left join (select rnk,kf,value from customerw where tag='EDRPO') param_edrpo on param_edrpo.rnk=c.rnk and param_edrpo.kf=c.kf
+                    left join (select rnk,kf,value from customerw where tag='NAMEW') param_namew on param_namew.rnk=c.rnk and param_namew.kf=c.kf
                     where  c.sed <> 91 and
                            c.custtype = 3 and
                            c.rnk in (select a.rnk
@@ -204,8 +212,11 @@ create or replace package body nbu_601_request_data_ru is
                     null,
 					          kf_,                          -- kf              varchar2(6) not null,
                     fiz.K020,                     --Ê020             VARCHAR2(20),
-                    fiz.codDocum                  --codDocum         NUMBER(2)
-                    );
+                    fiz.codDocum,                 --codDocum         NUMBER(2)
+                    fiz.education,
+                    fiz.typew,
+                    fiz.codedrpou,
+                    fiz.namew);
         end loop;
         commit;
         bars_context.home();
@@ -1211,10 +1222,10 @@ procedure  p_nbu_credit_pledge (kf_ in varchar2)
                               dep.nd as numdogdp, dep.date_begin as dogdaydp, dep.kv as r030dp , limit as  sumdp, '' as status ,
                        case when (select s031  from cc_pawn cp where cp.pawn=p.pawn)=34 then  fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  end sumBail,
                        case when (select s031  from cc_pawn cp where cp.pawn=p.pawn) in (11 , 12,  13, 14, 16, 20, 23, 31, 60, 61, 62, 63, 64, 65) then
-                             fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))end sumGuarantee
+                             fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))end sumGuarantee,c1.nd
                    from accounts ac
-                            left join (select rnk,max(c.dogday) creditdate from nbu_credit c
-                                         group by rnk) c1 on c1.rnk=ac.rnk
+                            left join (select rnk,nd,max(c.dogday) creditdate from nbu_credit c
+                                         group by rnk,nd) c1 on c1.rnk=ac.rnk
                             left join (select acc,tag,kf from accountsw where tag='Z_POLIS') fins on fins.acc=ac.acc and fins.kf=ac.kf,
                         pawn_acc p
                             left join (select nd,d.acc,a.kv as kv ,dat_begin as date_begin ,sum as limit,dpu_id as  deposit_id from dpu_deal d,accounts a where a.acc=d.acc
@@ -1223,10 +1234,10 @@ procedure  p_nbu_credit_pledge (kf_ in varchar2)
                                        where ac.acc=p.acc)
                       loop
     insert into  nbu_pledge_dep(rnk,acc,ordernum,numberpledge,pledgeday,s031,r030,sumpledge,pricepledge,lastpledgeday,codrealty,ziprealty,squarerealty, real6income,
-                                 noreal6income,flaginsurancepledge,numdogdp,dogdaydp,r030dp,sumdp,status,kf,sumBail,sumGuarantee) values
+                                 noreal6income,flaginsurancepledge,numdogdp,dogdaydp,r030dp,sumdp,status,kf,sumBail,sumGuarantee,nd) values
                                  (n.rnk,n.acc,n.ordernum, n.numberpledge,n.pledgeday,n.s031,n.r030,n.sumppladge,n.pricepledge,n.lastpledgeday ,n.codrealty,
                                  n.ziprealty,n.squarerealty,n.real6income,n.noreal6income,n.flaginsurancepledge,n.numdogdp,n.dogdaydp,n.r030dp,n.sumdp,n.status,kf_,
-                                 n.sumBail,n.sumGuarantee) ;
+                                 n.sumBail,n.sumGuarantee,n.nd) ;
                       end loop;
             commit;
         bars_context.home();

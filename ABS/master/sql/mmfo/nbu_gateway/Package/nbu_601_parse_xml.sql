@@ -156,7 +156,15 @@ end;*/
 
              l_PERSON_FO (l_PERSON_FO.last).K020:=trim(dbms_xslprocessor.valueOf(l_row,'K020/text()'));
 
-             l_PERSON_FO (l_PERSON_FO.last).coddocum:=to_number(dbms_xslprocessor.valueOf(l_row,'coddocum/text()'));
+             l_PERSON_FO (l_PERSON_FO.last).CODDOCUM:=to_number(dbms_xslprocessor.valueOf(l_row,'CODDOCUM/text()'));
+
+			 l_PERSON_FO (l_PERSON_FO.last).EDUCATION:=dbms_xslprocessor.valueof(l_row,'EDUCATION/text()');
+			 
+			 l_PERSON_FO (l_PERSON_FO.last).TYPEW:=dbms_xslprocessor.valueOf(l_row,'TYPEW/text()');
+			 
+             l_PERSON_FO (l_PERSON_FO.last).CODEDRPOU:=dbms_xslprocessor.valueOf(l_row,'CODEDRPOU/text()');
+			 
+             l_PERSON_FO (l_PERSON_FO.last).NAMEW:=dbms_xslprocessor.valueOf(l_row,'NAMEW/text()');
 
          END LOOP;
 
@@ -186,7 +194,11 @@ end;*/
                                               status,
                                               kf,
                                               k020,
-                                              coddocum)
+                                              coddocum,
+											  education,
+											  typew,
+											  codedrpou,
+                                              namew)
                     VALUES (
                              l_check_id,
                              l_PERSON_FO(j).rnk,
@@ -201,8 +213,11 @@ end;*/
                              l_PERSON_FO(j).status,
                              l_PERSON_FO(j).kf,
                              l_PERSON_FO(j).k020,
-                             l_PERSON_FO(j).coddocum
-                           );
+                             l_PERSON_FO(j).coddocum,
+							 l_PERSON_FO(j).education,
+							 l_PERSON_FO(j).typew,
+							 l_PERSON_FO(j).codedrpou,
+                             l_PERSON_FO(j).namew);
 
                end loop;
              END;
@@ -556,7 +571,7 @@ procedure p_parse_person_uo (p_id in  VARCHAR2)
 
              l_PERSON_UO (l_PERSON_UO.last).K020:=dbms_xslprocessor.valueOf(l_row,'K020/text()');
 
-             l_PERSON_UO (l_PERSON_UO.last).coddocum:=to_number(dbms_xslprocessor.valueOf(l_row,'coddocum/text()'));
+             l_PERSON_UO (l_PERSON_UO.last).coddocum:=to_number(dbms_xslprocessor.valueOf(l_row,'CODDOCUM/text()'));
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
              l_PERSON_UO (l_PERSON_UO.last).KF := trim(l_str);
@@ -1878,6 +1893,9 @@ procedure p_parse_pledge_dep (p_id in  VARCHAR2)
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
              l_NBU_PLEDGE_DEP (l_NBU_PLEDGE_DEP.last).KF:= to_number(l_str);
+			 
+			 dbms_xslprocessor.valueOf (l_row,'ND/text()', l_str);
+             l_NBU_PLEDGE_DEP (l_NBU_PLEDGE_DEP.last).ND:= to_number(l_str);
 
          END LOOP;
 
@@ -1917,7 +1935,8 @@ procedure p_parse_pledge_dep (p_id in  VARCHAR2)
                                                 sumdp,
                                                 kf,
                                                 sumbail,
-                                                sumguarantee)
+                                                sumguarantee,
+												nd)
 
                     VALUES ( l_check_id,
                              l_NBU_PLEDGE_DEP(j).rnk,
@@ -1942,7 +1961,8 @@ procedure p_parse_pledge_dep (p_id in  VARCHAR2)
                              l_NBU_PLEDGE_DEP(j).sumdp,
                              l_NBU_PLEDGE_DEP(j).kf,
                              l_NBU_PLEDGE_DEP(j).sumbail,
-                             l_NBU_PLEDGE_DEP(j).sumguarantee
+                             l_NBU_PLEDGE_DEP(j).sumguarantee,
+							 l_NBU_PLEDGE_DEP(j).nd
                             );
 
 
@@ -2039,6 +2059,7 @@ procedure p_parse_credit_tranche (p_id in  VARCHAR2)
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).DAYPROCTR:=to_number(dbms_xslprocessor.valueOf(l_row,'DAYPROCTR/text()'));
 
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).FACTENDDAYTR:=to_date((dbms_xslprocessor.valueOf(l_row,'FACTENDDAYTR/text()')),'dd.mm.yy');
+
 
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).KLASSTR:=to_number(dbms_xslprocessor.valueOf(l_row,'KLASSTR/text()'));
 

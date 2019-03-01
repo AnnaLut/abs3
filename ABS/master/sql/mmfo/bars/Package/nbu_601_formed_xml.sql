@@ -42,7 +42,7 @@ function get_xml_person_fo return clob
           xmlelement("REPORTING_DATE",to_char(trunc(sysdate,'mm'),'dd.mm.yyyy')),
           xmlelement("USER_KF", sys_context('bars_context','user_mfo')),
           XmlElement("PERSON_FO_FOS",
-        xmlagg(XmlElement("PERSON_FO",
+          xmlagg(XmlElement("PERSON_FO",
                            Xmlelement("RNK", p.rnk),
                            Xmlelement("LASTNAME",p.lastname),
                            Xmlelement("FIRSTNAME", p.firstname),
@@ -53,7 +53,11 @@ function get_xml_person_fo return clob
                            xmlelement("CONTERYCODNEREZ", p.countrycodnerez),
                            xmlelement("K060", p.k060),
                            xmlelement("K020",p.k020),
-                           xmlelement("coddocum",p.coddocum),
+                           xmlelement("CODDOCUM",p.coddocum),
+						   xmlelement("EDUCATION",p.education),
+						   xmlelement("TYPEW",p.typew),
+						   xmlelement("CODEDRPOU",p.codedrpou),
+                           xmlelement("NAMEW",p.namew),
                            xmlelement("STATUS", p.status),
                            xmlelement("KF",p.kf)
                            ))
@@ -152,7 +156,7 @@ function get_xml_person_uo  return clob
                                xmlelement("ISAUDIT",p.isaudit),
                                xmlelement("k060",p.k060),
                                xmlelement("K020",p.k020),
-                               xmlelement("coddocum",p.coddocum),
+                               xmlelement("CODDOCUM",p.coddocum),
                                xmlelement("STATUS",p.status),
                                xmlelement("KF",p.kf)
                             )))
@@ -487,7 +491,8 @@ function get_xml_pledge_dep return clob
                                 xmlelement("SUMBAIL",c.sumbail),
                                 xmlelement("SUMGUARANTEE",c.sumguarantee),  
                                 xmlelement("STATUS",c.status),
-                                xmlelement("KF",c.kf)
+                                xmlelement("KF",c.kf),
+								xmlelement("ND",c.nd)
                               )))
                  )
     into l_xml_pledge_dep

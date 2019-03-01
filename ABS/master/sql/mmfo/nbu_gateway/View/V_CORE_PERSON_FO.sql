@@ -4,7 +4,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CORE_PERSON_FO ***
 create or replace view V_CORE_PERSON_FO as 
-select "REQUEST_ID","RNK","LASTNAME","FIRSTNAME","MIDDLENAME","ISREZ","INN","BIRTHDAY","COUNTRYCODNEREZ","K060","PERSON_CODE","DEFAULT_PERSON_KF","DEFAULT_PERSON_ID","PERSON_OBJECT_ID","STATUS","STATUS_MESSAGE","KF"
+select "REQUEST_ID","RNK","LASTNAME","FIRSTNAME","MIDDLENAME","ISREZ","INN","BIRTHDAY","COUNTRYCODNEREZ","K060","EDUCATION","TYPEW","CODEDRPOU","NAMEW","PERSON_CODE","DEFAULT_PERSON_KF","DEFAULT_PERSON_ID","PERSON_OBJECT_ID","STATUS","STATUS_MESSAGE","KF"
   from CORE_PERSON_FO t
  where t.request_id in (select max(r.id)
                           from nbu_core_data_request r

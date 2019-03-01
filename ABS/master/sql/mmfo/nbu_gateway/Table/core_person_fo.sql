@@ -32,33 +32,6 @@ exception
 end;
 /
 
-begin
-    execute immediate
-    'alter table CORE_PERSON_FO add iskr number';
-exception
-    when others then
-         null;
-end;
-/
-
-begin
-    execute immediate
-    'alter table CORE_PERSON_FO add coddocum number';
-exception
-    when others then
-         null;
-end;
-/
-
-begin
-    execute immediate
-    'alter table CORE_PERSON_FO add k020 varchar2(20)';
-exception
-    when others then
-         null;
-end;
-/
-
 comment on table core_person_fo is 'Боржник ФО';
 comment on column core_person_fo.rnk is 'Регистрационный номер';
 comment on column core_person_fo.lastname is 'Прізвище';
@@ -74,6 +47,17 @@ declare
     pragma exception_init(name_already_used, -955);
 begin
     execute immediate 'create unique index ui_core_person_fo on core_person_fo (request_id, rnk) tablespace brsmdli local compress 1';
+exception
+    when name_already_used then
+         null;
+end;
+/
+
+declare
+    name_already_used exception;
+    pragma exception_init(name_already_used, -955);
+begin
+    execute immediate 'create index I_CORE_PERSON_FO_RNK on CORE_PERSON_FO (RNK) tablespace BRSMDLD';
 exception
     when name_already_used then
          null;
@@ -100,3 +84,32 @@ exception
  when others then if sqlcode=-955 then null; end if;
 end;
 /
+
+begin
+  execute immediate'alter table CORE_PERSON_FO add education number(1)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+  execute immediate'alter table CORE_PERSON_FO add typew number(1)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+	execute immediate'alter table CORE_PERSON_FO add codedrpou varchar(20)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+  execute immediate'alter table CORE_PERSON_FO add namew varchar(254)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
