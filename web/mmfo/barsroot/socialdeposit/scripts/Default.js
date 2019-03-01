@@ -584,7 +584,7 @@ function ckFields()
     var arr = result.value;
     
     if (arr[0] == "1")  
-        if (isEmpty(document.getElementById('textDZ').value))
+        if (isEmpty(document.getElementById('textDZ').value) && !ExceptedTypesForCheckNls())
         {
             alert('Заповніть рахунок дебеторської заборгованості!');
             document.getElementById('textDZ').focus();
@@ -763,7 +763,7 @@ function GetRequiredFields()
     
     var arr = result.value;
     
-    if (arr[0] == "1")  document.getElementById('lbBZM1').style.visibility = 'visible';
+    if ((arr[0] == "1") && !ExceptedTypesForCheckNls()) document.getElementById('lbBZM1').style.visibility = 'visible';
     if (arr[1] == "1")  document.getElementById('lbKZM1').style.visibility = 'visible';
     if (arr[2] == "1")  document.getElementById('lbCZM1').style.visibility = 'visible';
     if (arr[3] == "1")  document.getElementById('lbMZM1').style.visibility = 'visible';
@@ -1408,4 +1408,15 @@ function PayOff()
 		DPF(dpf,document.getElementById("kv").value,
 		document.getElementById("contract_id").value,dop_rec);
 	}
+}
+
+function ExceptedTypesForCheckNls() {
+    if (document.getElementById('listAgencyType').value) { //indexOf IE8..
+        return document.getElementById('listAgencyType').value == "1" ||
+            document.getElementById('listAgencyType').value == "2" ||
+            document.getElementById('listAgencyType').value == "3" ||
+            document.getElementById('listAgencyType').value == "4";
+    }
+    else
+        return false;
 }
