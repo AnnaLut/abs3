@@ -44,10 +44,22 @@ exception
          null;
 end;
 /
-ALTER TABLE NBU_GATEWAY.NBU_SESSION ADD (
-  CONSTRAINT PK_NBU_SESSION
-  PRIMARY KEY
-  (ID)
-  USING INDEX NBU_GATEWAY.PK_NBU_SESSION
-  ENABLE VALIDATE);
+
+
+declare
+    name_already_used exception;
+    pragma exception_init(name_already_used, -955);
+begin
+    execute immediate 'create index Idx_NBU_SESSION_LAST_ACT on nbu_session (last_activity_at , id) tablespace brsmdli';
+exception
+    when name_already_used then
+         null;
+end;
+/
+declare
+begin
+    execute immediate 'alter table NBU_GATEWAY.NBU_SESSION add constraint PK_NBU_SESSION primary key (ID) using index  tablespace BRSMDLI';
+exception
+    when others then null;
+end;
 /

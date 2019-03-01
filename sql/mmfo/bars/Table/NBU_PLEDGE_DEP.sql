@@ -98,16 +98,14 @@ COMMENT ON COLUMN BARS.NBU_PLEDGE_DEP.kf IS 'Код филиала';
 
 exec bpa.alter_policies('NBU_PLEDGE_DEP');
 
-declare
-    name_already_used exception;
-    pragma exception_init(name_already_used, -955);
+
 begin
-    execute immediate 'create unique index UI_NBU_PLEDGE_DEP on NBU_PLEDGE_DEP (KF, ACC) TABLESPACE BRSMDLI local';
+    execute immediate 'drop index UI_NBU_PLEDGE_DEP';
 exception
-    when name_already_used then
-         null;
+    when others then null;
 end;
 /
+
 
 begin 
 execute immediate 'alter table NBU_PLEDGE_DEP add sumBail NUMBER(32)'; 
@@ -122,4 +120,23 @@ exception
 	when others then if sqlcode=-955 then null; end if;
 end;
 /	
+
+begin 
+execute immediate 'alter table NBU_PLEDGE_DEP add nd NUMBER(30)'; 
+exception 
+	when others then if sqlcode=-955 then null; end if;
+end;
+/	
+
+declare
+    name_already_used exception;
+    pragma exception_init(name_already_used, -955);
+begin
+    execute immediate 'create unique index UI_NBU_PLEDGE_DEP on NBU_PLEDGE_DEP (KF,ACC,ND) TABLESPACE BRSMDLI local';
+exception
+    when name_already_used then
+         null;
+end;
+/
+
 grant all on NBU_PLEDGE_DEP to BARS_ACCESS_DEFROLE;

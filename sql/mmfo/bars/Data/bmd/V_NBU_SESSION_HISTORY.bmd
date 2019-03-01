@@ -138,6 +138,8 @@ begin
   bars_metabase.add_column(l_tabid, 12, 'STATE_ID', 'N', 'STATE_ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'SESSION_STATE', 'C', 'Статус сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'SESSION_DETAILS', 'C', 'Деталі сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OBJ', 'C', 'Перехід на об''єкт', '', 2, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/:OBJECT_LINK ', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'OBJECT_LINK ', 'C', 'Об''єкт', '', 2, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

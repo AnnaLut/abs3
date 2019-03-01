@@ -92,6 +92,17 @@ exception
 end;
 /
 
+declare
+    name_already_used exception;
+    pragma exception_init(name_already_used, -955);
+begin
+    execute immediate 'create index I_CORE_PERSON_UO_RNK on CORE_PERSON_UO (RNK) tablespace BRSMDLD';
+exception
+    when name_already_used then
+         null;
+end;
+/
+
 begin
 	execute immediate'alter table core_person_uo add k020 VARCHAR2(20)';
 exception

@@ -83,11 +83,20 @@ comment on column core_pledge_dep.dogdaydp is 'Дата укладання депозитного догово
 comment on column core_pledge_dep.r030dp is 'Код валюти за депозитом';
 comment on column core_pledge_dep.sumdp is 'Сума депозиту';
 
+
+
+begin
+    execute immediate 'drop index i_core_pledge_dep';
+exception
+    when others then null;
+end;
+/
+
 declare
     name_already_used exception;
     pragma exception_init(name_already_used, -955);
 begin
-    execute immediate 'create unique index i_core_pledge_dep on core_pledge_dep (request_id, acc) tablespace brsmdli local compress 1';
+    execute immediate 'create unique index i_core_pledge_dep on core_pledge_dep (request_id,acc,ND) tablespace brsmdli local compress 1';
 exception
     when name_already_used then
          null;
@@ -100,13 +109,20 @@ exception
 end;
 /	
 
-
 begin 
 execute immediate 'alter table core_pledge_dep add sumGuarantee NUMBER(32)'; 
 exception 
 	when others then if sqlcode=-955 then null; end if;
 end;
 /	
+
+begin 
+execute immediate 'alter table core_pledge_dep add nd NUMBER(30)'; 
+exception 
+	when others then if sqlcode=-955 then null; end if;
+end;
+/	
+
 
 
 
