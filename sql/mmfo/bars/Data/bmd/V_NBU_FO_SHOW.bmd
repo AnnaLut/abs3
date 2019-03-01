@@ -141,16 +141,20 @@ begin
   bars_metabase.add_column(l_tabid, 15, 'FLATNO', 'C', 'Квартира', '', 2, 15, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 16, 'COUNTRYCODNEREZ', 'C', 'Код країни', '', 2, 16, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 17, 'STATUS_F', 'C', 'Сімейний стан ~Боржника', '', 2, 17, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'MEMBERS', 'N', 'Кількість осіб, що~ перебувають на  ~утриманні Боржника', 2.5, 2, 18, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'MEMBERS', 'N', 'Кількість осіб, що~ перебувають на  ~утриманні Боржника', '2.5', 2, 18, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 19, 'ISREZ', 'C', 'Ознака особи', '', 2, 19, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'K060', 'C', 'K060', '', 2, 20, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'REAL6MONTH', 'N', 'Підтверджений~ дохід ~Боржника ', '', 2, 21, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'NOREAL6MONTH', 'N', 'Непідтверджений~ дохід ~Боржника', '', 2, 22, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'STATUS', 'C', 'Статус', '', 2, 23, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'STATUS_MESSAGE', 'C', 'Деталі', '', 2, 24, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'CREDIT', 'C', 'Кредити', '', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_NBU_CREDIT[CONDITIONS=> RNK=:RNK]', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'PLEGE', 'C', 'Застави', '', null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_NBU_PLEDGE_DEP[CONDITIONS=> RNK=:RNK]', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'DOCUMENT', 'C', 'Документ що ~посвідчує особу', '', null, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_NBU_DOCUMENT_FO[CONDITIONS=> RNK=:RNK]', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'REAL6MONTH', 'N', 'Підтверджений~ дохід ~Боржника ', '', 2, 25, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'NOREAL6MONTH', 'N', 'Непідтверджений~ дохід ~Боржника', '', 2, 26, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'STATUS', 'C', 'Статус', '', 2, 27, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'STATUS_MESSAGE', 'C', 'Деталі', '', 2, 28, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'CREDIT', 'C', 'Кредити', '', null, 29, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_NBU_CREDIT[CONDITIONS=> RNK=:RNK]', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'PLEGE', 'C', 'Застави', '', null, 30, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_NBU_PLEDGE_DEP[CONDITIONS=> RNK=:RNK]', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'DOCUMENT', 'C', 'Документ що ~посвідчує особу', '', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_NBU_DOCUMENT_FO[CONDITIONS=> RNK=:RNK]', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'EDUCATION', 'N', 'Освіта', '', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'TYPEW', 'N', 'Тип роботодавця', '', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'CODEDRPOU', 'C', 'Код ЄДРПОУ роботодавця', '3', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'NAMEW', 'C', 'Найменування роботодавця', '3', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

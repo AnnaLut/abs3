@@ -99,4 +99,33 @@ exception
 end;
 /
 
+begin
+	execute immediate'alter table NBU_PERSON_FO add education number(1)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+	execute immediate'alter table NBU_PERSON_FO add typew number(1)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+	execute immediate'alter table NBU_PERSON_FO add codedrpou varchar(20)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+	execute immediate'alter table NBU_PERSON_FO add namew varchar(254)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+
 grant all on NBU_PERSON_FO to BARS_ACCESS_DEFROLE;
