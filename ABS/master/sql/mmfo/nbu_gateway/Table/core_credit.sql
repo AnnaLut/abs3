@@ -83,3 +83,14 @@ exception
          null;
 end;
 /
+
+declare
+    name_already_used exception;
+    pragma exception_init(name_already_used, -955);
+begin
+    execute immediate 'create index I_CREDIT_ND on core_credit(nd) tablespace BRSMDLI ';
+exception
+    when name_already_used then
+         null;
+end;
+/

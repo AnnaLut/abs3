@@ -32,6 +32,33 @@ exception
 end;
 /
 
+begin
+    execute immediate
+    'alter table CORE_PERSON_FO add iskr number';
+exception
+    when others then
+         null;
+end;
+/
+
+begin
+    execute immediate
+    'alter table CORE_PERSON_FO add coddocum number';
+exception
+    when others then
+         null;
+end;
+/
+
+begin
+    execute immediate
+    'alter table CORE_PERSON_FO add k020 varchar2(20)';
+exception
+    when others then
+         null;
+end;
+/
+
 comment on table core_person_fo is 'Боржник ФО';
 comment on column core_person_fo.rnk is 'Регистрационный номер';
 comment on column core_person_fo.lastname is 'Прізвище';
@@ -63,6 +90,7 @@ exception
          null;
 end;
 /
+
 
 begin
 	execute immediate'alter table core_person_fo add k020 VARCHAR2(20)';

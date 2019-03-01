@@ -36,12 +36,28 @@ select s.id,
        end session_type_name,
        s.state_id,
        bars.list_utl.get_item_name('NBU_601_SESSION_STATE', s.state_id) session_state,
-       (select min(st.tracking_comment) keep (dense_rank last order by st.id) from nbu_session_tracking st where st.session_id = s.id) session_details
-from   nbu_session s
-join   nbu_reported_object o on o.id = s.object_id
+       (select min(st.tracking_comment) keep (dense_rank last order by st.id) from nbu_session_tracking st where st.session_id = s.id) session_details,
+      case when o.object_type_id in (1,2) then 'clientregister/registration.aspx?readonly=1'||chr(38)||'rnk='||c.core_customer_id
+           when o.object_type_id=3 then (select 'CreditUi/provide/Index/?id='||a.nd from core_pledge_dep a where pl.core_pledge_id=a.acc and rownum=1)
+		   when o.object_type_id=4 then (select case when cc.type_credit=1 and cc.check_person=1 then 'CreditUi/NewCredit/?custtype=3'||chr(38)||'nd='||cc.nd
+													 when cc.type_credit=1 and cc.check_person=2 then 'CreditUi/NewCredit/?custtype=2'||chr(38)||'nd='||cc.nd
+													 when cc.type_credit=2 and cc.check_person=1 then 'Way4Bpk/Way4Bpk?okpo='||cn.customer_code
+													 when cc.type_credit=2 and cc.check_person=2 then 'way4bpk/way4bpk?custtype=2'||chr(38)||'okpo='||cn.customer_code
+
+                                                   end way_link
+                                                   from  v_nbu_check_credit cc,nbu_reported_customer cn
+                                                   where cc.nd=cr.core_loan_id and cc.kf=cr.core_loan_kf
+                                                         and cr.customer_object_id=cn.id and cc.rnk=cn.core_customer_id)
+
+       end object_link,
+       'Перейти' as obj,
+       s.last_activity_at
+
+from nbu_session s
+join nbu_reported_object o on o.id = s.object_id
 left join nbu_reported_customer c on c.id = s.object_id
 left join nbu_reported_pledge pl on pl.id = s.object_id
 left join nbu_reported_loan cr on cr.id = s.object_id
-order by s.last_activity_at desc, s.id desc;
-
+--order by s.last_activity_at desc, s.id desc
+;
 grant select on v_nbu_session_history to BARS_ACCESS_DEFROLE;

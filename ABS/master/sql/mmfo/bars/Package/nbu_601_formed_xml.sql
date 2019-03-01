@@ -493,6 +493,7 @@ function get_xml_pledge_dep return clob
                                 xmlelement("STATUS",c.status),
                                 xmlelement("KF",c.kf),
 								xmlelement("ND",c.nd)
+								xmlelement("ND",c.nd)
                               )))
                  )
     into l_xml_pledge_dep
