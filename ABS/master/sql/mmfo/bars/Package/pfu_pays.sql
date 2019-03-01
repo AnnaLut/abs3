@@ -86,6 +86,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
     l_err           varchar2(4000);
     l_doc           varchar2(30);
     l_date_off      date;
+    l_file_type     varchar2(2 char);
 	l_rnk           customer.rnk%type;
     --l_rec_resources exchange_of_resources%rowtype;
     l_branch        branch.branch%type;
@@ -101,6 +102,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
       from pfu.pfu_file_records d
      where d.id = p_id
        for update;
+       
+    select pf.file_type
+      into l_file_type
+      from pfu.pfu_file pf
+     where pf.id = l_rec_row.file_id;
 
     select p.okpo, p.rnk into l_okpo, l_rnk
       from pfu.pfu_pensioner p
@@ -161,11 +167,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
       select a.acc_num
         into g_grc_nls_trans
         from pfu.pfu_acc_trans_2909 a
-       where a.kf = l_rec_row.mfo;
+       where a.kf = l_rec_row.mfo
+         and a.file_type = l_file_type;
     exception
       when others then
         raise_application_error(-20000,
-                                'Невозможно получить счет T00 ГРЦ',
+                                'Невозможно получить счет 2909 для вида выплат:'|| l_file_type,
                                 true);
     end;
 
@@ -191,7 +198,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
       else
         l_mfo_b := l_rec_row.mfo;
       end if;
-      l_nazn  := substr('Оплата пенсійних реєстрів;'||l_rec_row.full_name||';'||l_rec_row.numident||';'||to_char(l_rec_row.payment_date,'DD.MM.YYYY'), 1, 160);
+      if l_file_type = '01' then
+        l_nazn  := substr('Оплата пенсійних реєстрів;'||l_rec_row.full_name||';'||l_rec_row.numident||';'||to_char(l_rec_row.payment_date,'DD.MM.YYYY'), 1, 160);
+      elsif l_file_type = '51' then
+        l_nazn  := substr('Виплата субсидії згідно ПКМУ від 21.10.1995 № 848', 1, 160);
+      end if;  
     end;
 
       begin

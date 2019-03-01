@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_PFU_REGISTERS ***
 
-  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_REGISTERS ("ID", "RECEIVER_MFO", "ENVELOPE_REQUEST_ID", "DATE_ENV_CRT", "PFU_BRANCH_NAME", "FILE_NAME", "REGISTER_DATE", "ENV_ID", "PAYMENT_DATE", "FILE_SUM", "FILE_LINES_COUNT", "FILE_SUM_REC", "FILE_COUNT_REC", "PAYED_SUM", "PAYED_CNT", "PAYBACK_SUM", "PAYBACK_CNT", "PAY_DATE", "STATE", "STATE_NAME", "CRT_DATE", "REST", "RESTDATE", "REST_2909", "ACC") AS 
+  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_REGISTERS ("ID", "RECEIVER_MFO", "ENVELOPE_REQUEST_ID", "DATE_ENV_CRT", "PFU_BRANCH_NAME", "FILE_NAME", "REGISTER_DATE", "ENV_ID", "PAYMENT_DATE", "FILE_SUM", "FILE_LINES_COUNT", "FILE_SUM_REC", "FILE_COUNT_REC", "PAYED_SUM", "PAYED_CNT", "PAYBACK_SUM", "PAYBACK_CNT", "PAY_DATE", "STATE", "STATE_NAME", "CRT_DATE", "REST", "RESTDATE", "REST_2909", "ACC", "FILE_TYPE") AS 
   SELECT f.id,
           er.receiver_mfo,
           f.envelope_request_id,
@@ -65,9 +65,11 @@ PROMPT *** Create  view V_PFU_REGISTERS ***
              FROM bars.accounts a
             WHERE a.nls = (SELECT at2.acc_num
                              FROM pfu_acc_trans_2909 at2
-                            WHERE at2.kf = LTRIM (er.receiver_mfo, '0')))
+                            WHERE at2.kf = LTRIM (er.receiver_mfo, '0')
+                              AND at2.file_type = f.file_type))
                                   rest_2909,
-          pat.acc_num acc
+          pat.acc_num acc,
+          f.file_type
      FROM pfu_file f
           JOIN pfu_envelope_request er
              ON er.id = f.envelope_request_id

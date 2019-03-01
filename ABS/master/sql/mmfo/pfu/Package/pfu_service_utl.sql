@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/PFU/package/pfu_service_utl.sql =========*** Run 
  PROMPT ===================================================================================== 
@@ -2130,6 +2128,74 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
                         'Всі частини пакету відповіді зібрані разом');
       l := p_sessions.next(l);
     end loop;
+  end;
+  
+  procedure gather_envelope_list_parts(p_request_id in integer) is
+    l_response_data clob;
+    l_request_data clob;
+    
+    l_xml  xmltype;
+    
+    i            pls_integer;
+
+    l_sessions     number_list := number_list();
+  begin
+    dbms_lob.createtemporary(l_response_data, false);
+
+
+    for i in (select s.id,
+                     extract(xmltype(s.response_xml_data), 'requestdata/rd_data/text()')
+                     .getclobval() response_data_part
+                from pfu_session s
+               where s.request_id = p_request_id
+                 and s.session_type_id =
+                     pfu_service_utl.SESS_TYPE_GET_ENVELOPE_LIST
+                 and s.state_id in
+                     (pfu_service_utl.SESS_STATE_DATA_PART_RECEIVED,
+                      pfu_service_utl.SESS_STATE_PROCESSED)
+               order by to_char(extract(xmltype(s.response_xml_data), 'requestdata/part/text()')
+                                .getclobval())) loop
+      dbms_lob.append(l_response_data, i.response_data_part);
+      l_sessions.extend (1);
+      l_sessions(l_sessions.last) := i.id;
+    end loop;
+    
+    
+        -- decode from base64
+    l_request_data := pfu_utl.decodeclobfrombase64(l_response_data);
+        -- convert from utf8  !Twice
+    l_request_data := pfu_utl.utf8todeflang(l_request_data);
+    l_request_data := pfu_utl.utf8todeflang(l_request_data);
+
+        -- <paymentlists><row><id>581</id><opfu_code>20001</opfu_code><opfu_name>Головне управління ПФУ в Харківській обл.</opfu_name>...
+    for r in (select extractvalue(value(p), '/row/id/text()') as envelope_id,
+                     extractvalue(value(p), '/row/opfu_code/text()') as opfu_code,
+                     extractvalue(value(p), '/row/opfu_name/text()') as opfu_name,
+                     extractvalue(value(p), '/row/date_cr/text()') as date_cr,
+                     extractvalue(value(p), '/row/MFO_filia/text()') as mfo_filia,
+                     extractvalue(value(p), '/row/filia_num/text()') as filia_num,
+                     extractvalue(value(p), '/row/filia_name/text()') as filia_name,
+                     extractvalue(value(p), '/row/full_sum/text()') as full_sum,
+                     extractvalue(value(p), '/row/full_lines/text()') as full_lines
+                from table(xmlsequence(extract(xmltype(l_request_data),
+                                               '/paymentlists/row'))) p) loop
+
+      create_envelope(p_session_id           => l_sessions(1),
+                      p_pfu_envelope_id      => to_number(r.envelope_id),
+                      p_pfu_branch_code      => r.opfu_code,
+                      p_pfu_branch_name      => r.opfu_name,
+                      p_register_date        => r.date_cr,
+                      p_receiver_mfo         => r.mfo_filia,
+                      p_receiver_branch      => r.filia_num,
+                      p_receiver_name        => r.filia_name,
+                      p_envelope_full_sum    => to_number(replace(r.full_sum,
+                                                                  ',',
+                                                                  '.')) * 100, --???? скорее всего сумма приходит не в копейках
+                      p_envelope_lines_count => to_number(r.full_lines));
+
+    end loop;
+
+    finish_data_part_sessions(l_sessions);
   end;
 
   procedure gather_envelope_parts(p_request_id in integer) is
@@ -4439,7 +4505,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
     l_lang_context number := dbms_lob.default_lang_ctx;
     l_warning      integer;
   begin
-    for i in (select m.batch_request_id, r.pfu_batch_id, m.xml_data 
+    for i in (select m.batch_request_id, r.pfu_batch_id, m.xml_data
               from pfu_matching_request2 m
                    inner join pfu_epp_batch_request r on r.id = m.batch_request_id
               where state = 'NEW')
@@ -5700,46 +5766,17 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
 
       elsif (l_session_row.session_type_id =
             pfu_service_utl.SESS_TYPE_GET_ENVELOPE_LIST) then
-        l_xml := xmltype(l_session_row.response_xml_data);
-
-        l_request_data := l_xml.extract('requestdata/rd_data/text()')
-                          .getclobval();
-        -- decode from base64
-        l_request_data := pfu_utl.decodeclobfrombase64(l_request_data);
-        -- convert from utf8  !Twice
-        l_request_data := pfu_utl.utf8todeflang(l_request_data);
-        l_request_data := pfu_utl.utf8todeflang(l_request_data);
-
-        -- <paymentlists><row><id>581</id><opfu_code>20001</opfu_code><opfu_name>Головне управління ПФУ в Харківській обл.</opfu_name>...
-        for r in (select extractvalue(value(p), '/row/id/text()') as envelope_id,
-                         extractvalue(value(p), '/row/opfu_code/text()') as opfu_code,
-                         extractvalue(value(p), '/row/opfu_name/text()') as opfu_name,
-                         extractvalue(value(p), '/row/date_cr/text()') as date_cr,
-                         extractvalue(value(p), '/row/MFO_filia/text()') as mfo_filia,
-                         extractvalue(value(p), '/row/filia_num/text()') as filia_num,
-                         extractvalue(value(p), '/row/filia_name/text()') as filia_name,
-                         extractvalue(value(p), '/row/full_sum/text()') as full_sum,
-                         extractvalue(value(p), '/row/full_lines/text()') as full_lines
-                    from table(xmlsequence(extract(xmltype(l_request_data),
-                                                   '/paymentlists/row'))) p) loop
-
-          create_envelope(p_session_id           => l_session_row.id,
-                          p_pfu_envelope_id      => to_number(r.envelope_id),
-                          p_pfu_branch_code      => r.opfu_code,
-                          p_pfu_branch_name      => r.opfu_name,
-                          p_register_date        => r.date_cr,
-                          p_receiver_mfo         => r.mfo_filia,
-                          p_receiver_branch      => r.filia_num,
-                          p_receiver_name        => r.filia_name,
-                          p_envelope_full_sum    => to_number(replace(r.full_sum,
-                                                                      ',',
-                                                                      '.')) * 100, --???? скорее всего сумма приходит не в копейках
-                          p_envelope_lines_count => to_number(r.full_lines));
-        end loop;
-
+        l_part := get_node_value(l_doc, 'requestdata/part/text()');
         set_session_state(l_session_row.id,
-                          pfu_service_utl.SESS_STATE_PROCESSED,
-                          'Обробку сесії завершено - отримано список конвертів');
+                          pfu_service_utl.SESS_STATE_DATA_PART_RECEIVED,
+                          'Отримана частина даних відповіді - номер частини: ' ||
+                          l_part);
+
+        -- перевіряємо, чи всі частини відповіді з даними отримані і запускаємо зборку пакету даних
+        if (check_if_all_parts_received(l_session_row.request_id,
+                                        l_session_row.session_type_id)) then
+          gather_envelope_list_parts(l_session_row.request_id);
+        end if;    
       elsif (l_session_row.session_type_id in
             (pfu_service_utl.SESS_TYPE_GET_ENVELOPE)) then
 
@@ -6065,7 +6102,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
       transport_utl.check_unit_state(i);
     end loop;
   end;
-  
+
   procedure send_data_to_bank_units_lock --відправка пакетів на РУ
    is
   begin
@@ -6243,7 +6280,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
 
     end loop;
   end;
-  
+
   procedure process_receipt_lock is
 
     l_warning      integer;
@@ -6379,7 +6416,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
     process_receipt_ebp;
     prepare_cardkill_claim();
   end;
-  
+
   procedure process_transport_lock_stage is
   begin
     send_data_to_bank_units_lock;

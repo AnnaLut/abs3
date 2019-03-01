@@ -333,6 +333,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
     l_flen    number;
     l_buffer  varchar2(32767);
     l_numline pls_integer := 0;
+    l_type_f  varchar2(2 char);
 
     l_row          pfu_file_records%rowtype;
     l_envelope_row pfu_envelope_request%rowtype;
@@ -430,6 +431,11 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
             checking_record(l_row, l_row.state, l_row.err_mess_trace);
             -- save
             insert into pfu_file_records values l_row;
+          else 
+             l_type_f := substr(l_buffer, 90, 2);
+             update pfu_file pf 
+                set pf.file_type = l_type_f
+              where pf.id = p_fileid;
           end if;
         end if;
       exception

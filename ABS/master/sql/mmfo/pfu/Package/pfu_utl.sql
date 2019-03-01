@@ -855,7 +855,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
                 null,
                 null,
                 null,
-                null)
+                null,
+                '01') -- cobummfо-10812 - добавление типа выплат в связи с монетизацией
         returning id
         into l_file_id;
         commit;
