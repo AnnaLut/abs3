@@ -365,12 +365,13 @@ public partial class SocialAgencies : System.Web.UI.Page
 
             while (rdr.Read())
             {
+                string[] ExceptedTypesForNls = { "1", "2", "3", "4" };
                 String par = Convert.ToString(rdr.GetOracleString(0).Value);
                 if (par == "C")
-                    lbCZM1.Style.Add("visibility","visible");
+                    lbCZM1.Style.Add("visibility", "visible");
                 else if (par == "K")
-                    lbKZM1.Style.Add("visibility","visible");
-                else if (par == "D")
+                    lbKZM1.Style.Add("visibility", "visible");
+                else if ((par == "D") && (Array.IndexOf(ExceptedTypesForNls,listAgencyType.SelectedValue)) == -1)
                     lbBZM1.Style.Add("visibility","visible");
                 else if (par == "M")
                     lbMZM1.Style.Add("visibility","visible");
