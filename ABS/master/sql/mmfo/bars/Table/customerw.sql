@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CUSTOMERW'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CUSTOMERW'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''CUSTOMERW'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''CUSTOMERW'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -24,7 +24,8 @@ PROMPT *** Create  table CUSTOMERW ***
 begin 
   execute immediate q'[
   CREATE TABLE BARS.CUSTOMERW 
-   (	RNK NUMBER(38,0), 
+   (KF VARCHAR2(6) default sys_context('bars_context', 'user_mfo'),
+    RNK NUMBER(38,0), 
 	TAG CHAR(5), 
 	VALUE VARCHAR2(500), 
 	ISP NUMBER(38,0)
@@ -86,21 +87,14 @@ exception when others then
 end; 
 /
 
-
-
-
 PROMPT *** ALTER_POLICIES to CUSTOMERW ***
  exec bpa.alter_policies('CUSTOMERW');
-
 
 COMMENT ON TABLE BARS.CUSTOMERW IS 'Хранилище реквизитов клиентов';
 COMMENT ON COLUMN BARS.CUSTOMERW.RNK IS 'Рег.№ клиента';
 COMMENT ON COLUMN BARS.CUSTOMERW.TAG IS 'Код реквизита';
 COMMENT ON COLUMN BARS.CUSTOMERW.VALUE IS 'Значение реквизита';
 COMMENT ON COLUMN BARS.CUSTOMERW.ISP IS 'Исполнитель заполнения реквизита';
-
-
-
 
 PROMPT *** Create  constraint PK_CUSTOMERW ***
 begin   
@@ -112,9 +106,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index PK_CUSTOMERW ***
 begin   
@@ -147,7 +138,16 @@ exception
 end;
 /
 
+prompt add default value for KF
+alter table customerw modify kf default sys_context('bars_context', 'user_mfo');
 
+begin
+    execute immediate 'alter table customerw add constraint CC_CUSTOMERW_KF_NN check (KF is not null) enable validate';
+exception
+    when others then
+        if sqlcode = -2264 then null; else raise; end if;
+end;
+/
 
 PROMPT *** Create  grants  CUSTOMERW ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMERW       to ABS_ADMIN;
