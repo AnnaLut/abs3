@@ -2,6 +2,7 @@
 using AttributeRouting.Web.Http;
 using BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.Pfu.Models.ApiModels;
 using BarsWeb.Areas.Pfu.Models.Grids;
 using Ionic.Zip;
 using Kendo.Mvc.Extensions;
