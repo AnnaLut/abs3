@@ -2780,11 +2780,17 @@ begin
   -- пошук / відкриття рахунків
   bars_audit.trace('%s пошук / відкриття рахунків для ОСЗ...', title);
   begin
+    --COBUMMFO-10094 - если ОСЗ 1,2,3 или 4 , то дебетовый необязательный
+   if p_debitaccnum is null and p_agntype in (1,2,3,4) then
+     bars_audit.trace('%s Для ОСЗ 1,2,3,4 дебетовий рахунок необовязковий...', title);
+   else
     get_agency_acc (p_agntype  =>  p_agntype,
                     p_acctype  =>  'D',
                     p_branch   =>  p_branch,
                     p_accnum   =>  p_debitaccnum,
                     p_accid    =>  l_debitaccid);
+   end if;
+                    
   exception
     when bars_error.err then
       bars_error.raise_nerror(g_modcode, 'SOC_AGENCY_DEBIT_ACC_ERROR', p_debitaccnum, sqlerrm);
