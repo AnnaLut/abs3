@@ -16,7 +16,10 @@ select b.id, b.name, b.okpo, p.code, p.name, p.grp_code
   from bpk_proect b, w4_product p
  where b.product_code = p.code
    and p.grp_code = 'SALARY'
-   and nvl(b.used_w4,0) = 1;
+   and nvl(b.used_w4,0) = 1
+   and p.kf=b.kf
+;
+
 
 PROMPT *** Create  grants  V_BPK_PROECT_ONLY ***
 grant SELECT                                                                 on V_BPK_PROECT_ONLY    to BARSREADER_ROLE;
