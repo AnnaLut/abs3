@@ -67,7 +67,7 @@ SELECT nd,
      inner join tabval$global t on t.kv=a.kv
      inner join tips s on s.tip=a.tip
      inner join customer c on c.rnk=a.rnk
-     inner join w4_nbs_ob22 n on n.nbs=a.nbs and  n.ob22=a.ob22
+     inner join w4_nbs_ob22 n on n.nbs=a.nbs and  n.ob22=a.ob22   and n.tip=a.tip
      inner join w4_card wc on wc.code=o.card_code and wc.kf=a.kf  and wc.date_close is null
 WHERE
     w.tag = 'PK_PRCT'
