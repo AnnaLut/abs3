@@ -70,7 +70,7 @@ begin
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KKW', name='KKW - видача кредиту на ПК', dk=null, nlsm='#(cck_dop.get_kk1_crd(#(NLSB),#(KVA),#(NLSA)))', kv=null, nlsk='#(cck_dop.get_kkw_crd(#(REF)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='cck_dop.get_amount_kkw(#(ref))', s2=null, sk=null, proc=null, s3800='0', rang=null, flags='0001100000000000000000000001000000010000000000100000000000000000', nazn=null
+         set tt='KKW', name='KKW - видача кредиту на ПК', dk=null, nlsm='#(cck_dop.get_kk1_crd(#(NLSB),#(KVA),#(NLSA)))', kv=null, nlsk='#(cck_dop.get_kkw_crd(#(REF)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='cck_dop.get_amount_kkw(#(REF))', s2=null, sk=null, proc=null, s3800='0', rang=null, flags='0001100000000000000000000001000000010000000000100000000000000000', nazn=null
        where tt='KKW';
   end;
   --------------------------------
