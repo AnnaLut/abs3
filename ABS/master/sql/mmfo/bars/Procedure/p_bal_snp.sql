@@ -341,6 +341,8 @@ begin
      end if;
   elsif l_id1 = 0 and l_id2 = 0 then
     execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1;
+  elsif l_id1 = 1 and l_id2 = 0 then --COBUMMFO-10403, COBUMMFO-10460 MDom 2019.02.07
+    execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1;
   else
      execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1 ;
   end if;

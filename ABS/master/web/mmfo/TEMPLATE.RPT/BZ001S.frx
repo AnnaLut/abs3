@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="10/22/2018 09:51:22" ReportInfo.Modified="01/30/2019 12:07:26" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/22/2018 09:51:22" ReportInfo.Modified="02/08/2019 10:50:00" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIqilC2QMzRFsGGMYgr619U=">
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQOXJunQLbdV8tIXE36MzRcI=">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 B1, NUM01 K, NUM02 R, NUM03 G, CHAR00 NBS, NUM04 DOS, NUM05 KOS, NUM06 OSTD, NUM07 OSTK, CHAR01 SK, CHAR02 SR, CHAR03 SG, CHAR04 SB1, CHAR05 DAT, NUM08 TITL from rs_tmp_report_data where session_id=:SESSION_ID order by id">
         <Column Name="B1" DataType="System.Decimal"/>
         <Column Name="K" DataType="System.Decimal"/>
@@ -139,10 +139,10 @@
     <ReportSummaryBand Name="ReportSummary1" Top="704.15" Width="718.2" Height="264.6">
       <TextObject Name="Text33" Left="85.05" Top="113.4" Width="226.8" Height="18.9" CanBreak="false" Text="Інформаційно 1-7 кл + 9 кл" VertAlign="Center" Font="Arial, 8pt"/>
       <TextObject Name="Text34" Left="37.8" Top="132.3" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text56" Left="245.7" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMDOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text57" Left="359.1" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMKOS]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text58" Left="472.5" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMOSTD]/100]" VertAlign="Center" Font="Arial, 8pt"/>
-      <TextObject Name="Text59" Left="585.9" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMOSTK]/100]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text56" Left="245.7" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMDOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text57" Left="359.1" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMKOS]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text58" Left="472.5" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMOSTD]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text59" Left="585.9" Top="226.8" Width="113.4" Height="18.9" CanBreak="false" Text="[[SUMOSTK]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center" Font="Arial, 8pt"/>
       <TextObject Name="Text60" Left="37.8" Top="245.7" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
       <TextObject Name="Text61" Left="37.8" Top="94.5" Width="680.4" Height="18.9" CanBreak="false" Text="-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
       <TextObject Name="Text62" Left="141.75" Top="28.35" Width="217.35" Height="18.9" CanBreak="false" Text="[Table1.NAME_BOSS]" VertAlign="Center" Font="Arial, 8pt"/>
