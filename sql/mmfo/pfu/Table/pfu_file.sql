@@ -22,7 +22,8 @@ begin
 	DATA_SIGN CLOB, 
 	USERID NUMBER(38,0), 
 	PAY_DATE DATE, 
-	MATCH_DATE DATE
+	MATCH_DATE DATE,
+        FILE_TYPE VARCHAR2(2 CHAR) default ''01'' not null
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -39,21 +40,20 @@ end;
 /
 
 
-COMMENT ON TABLE PFU.PFU_FILE IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.ID IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.ENVELOPE_REQUEST_ID IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.CHECK_SUM IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.CHECK_LINES_COUNT IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.PAYMENT_DATE IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.FILE_NUMBER IS 'Порядковий номер файлу в конверті';
-COMMENT ON COLUMN PFU.PFU_FILE.FILE_NAME IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.FILE_DATA IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.STATE IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.CRT_DATE IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.DATA_SIGN IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.USERID IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.PAY_DATE IS '';
-COMMENT ON COLUMN PFU.PFU_FILE.MATCH_DATE IS '';
+comment on column pfu.pfu_file.ID is 'ID файлу';
+comment on column pfu.pfu_file.ENVELOPE_REQUEST_ID is 'Номер конверту';
+comment on column pfu.pfu_file.CHECK_SUM is 'Сума';
+comment on column pfu.pfu_file.CHECK_LINES_COUNT is 'Кількість рядків реєстрі';
+comment on column pfu.pfu_file.PAYMENT_DATE is 'Планова дата оплати реєстру';
+comment on column pfu.pfu_file.FILE_NUMBER is 'Порядковий номер файлу в конверті';
+comment on column pfu.pfu_file.FILE_NAME is 'Назва файлу';
+comment on column pfu.pfu_file.FILE_DATA is 'Дата файлу';
+comment on column pfu.pfu_file.STATE is 'Стан файлу';
+comment on column pfu.pfu_file.CRT_DATE is 'Дата «прийому» реєстру';
+comment on column pfu.pfu_file.DATA_SIGN is 'Підпис';
+comment on column pfu.pfu_file.USERID is 'ID користувача';
+comment on column pfu.pfu_file.PAY_DATE is 'Дата оплати реєстру';
+comment on column pfu.pfu_file.MATCH_DATE is 'Дата відправки 2-ї квитанції';
 
 
 
@@ -94,6 +94,19 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+-- Add/modify columns 
+begin
+    execute immediate 'alter table PFU_FILE add file_type VARCHAR2(2 CHAR) default ''01'' not null';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+-- Add comments to the columns 
+comment on column PFU_FILE.file_type
+  is 'Тип реєстру(1-пенсія, 2-монетизація)';
 
 
 

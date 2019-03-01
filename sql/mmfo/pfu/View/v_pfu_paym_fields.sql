@@ -10,7 +10,8 @@ PROMPT *** Create  view V_PFU_PAYM_FIELDS ***
   CREATE OR REPLACE FORCE VIEW PFU.V_PFU_PAYM_FIELDS ("ACC_2909", "OKPO_2909", "MFO_2909", "NAME_2909", "ACC_2560", "OKPO_2560", "MFO_2560", "NAME_2560", "DEBET_TTS", "SUM", "NAZN", "ID") AS 
   select (select acc.acc_num
           from pfu_acc_trans_2909 acc
-         where acc.kf = ltrim(per.receiver_mfo,'0')) acc_2909,
+         where acc.kf = ltrim(per.receiver_mfo,'0')
+           and acc.file_type = pf.file_type) acc_2909,
        nvl((select nvl(cu.okpo,'123456789')
           from bars.accounts ac,
                bars.customer cu
@@ -19,7 +20,8 @@ PROMPT *** Create  view V_PFU_PAYM_FIELDS ***
            and ac.kv = '980'
            and ac.nls = (select acc.acc_num
                            from pfu_acc_trans_2909 acc
-                          where acc.kf = ltrim(per.receiver_mfo,'0'))),'123456789') okpo_2909,
+                          where acc.kf = ltrim(per.receiver_mfo,'0')
+                            and acc.file_type = pf.file_type)),'123456789') okpo_2909,
        '300465' mfo_2909,
        nvl((select nvl(ac.nms,'Транзитний рахунок 2909')
           from bars.accounts ac
@@ -27,7 +29,8 @@ PROMPT *** Create  view V_PFU_PAYM_FIELDS ***
            and ac.kv = '980'
            and ac.nls = (select acc.acc_num
                            from pfu_acc_trans_2909 acc
-                          where acc.kf = ltrim(per.receiver_mfo,'0'))),'Транзитний рахунок 2909') name_2909,
+                          where acc.kf = ltrim(per.receiver_mfo,'0')
+                            and acc.file_type = pf.file_type)),'Транзитний рахунок 2909') name_2909,
        (select acc.acc_num
           from pfu_acc_trans_2560 acc
          where acc.kf = ltrim(per.receiver_mfo,'0')) acc_2560,
