@@ -1879,6 +1879,11 @@ COBUMMFO-7118
     end if;*/
 -- вызов стандартной процедуры авторизации
   cck.cc_autor(p_nd, p_saim, p_urov);
+  
+  -- jeka 2019-01-21
+  if l_cd_row.prod like '2044%' or l_cd_row.prod like '2071%' then
+    cck_app.Set_ND_TXT(p_nd,'LIZASUM','Taк');
+  end if;
   -- во всех остальных случаях по старому
   declare
      l_nls9     tts.nlsm%type      ; l_nms9     accounts.nms%type             ;
