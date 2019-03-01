@@ -21,3 +21,5 @@ grant select on v_sto_payment_report to bars_access_defrole;
 grant select on sto_formed_order_190_v to bars_access_defrole;
 
 grant execute on sto_ui to bars_access_defrole;
+
+grant execute on bars.compare_report_351_601 to BARS_ACCESS_DEFROLE;
