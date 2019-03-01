@@ -1,0 +1,18 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8">
+    <h2>Перевірка повноти передачі кредитів до 601 форми</h2>
+</head>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Compare_351_601/Scripts/Compare_351_601/Main.js?v1.0"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<link rel="stylesheet" href="~/Areas/Compare_351_601/Css/Compare_351_601/Main.css" />
+<div ng-controller="Compare_351_601Ctrl">
+    <div class="page-header"><h1>{{Title}}</h1></div>
+    <div kendo-grid k-options="MainGridOptions"></div>
+</div>
+
