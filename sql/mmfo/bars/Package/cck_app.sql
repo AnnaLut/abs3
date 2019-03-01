@@ -635,6 +635,7 @@ is
  l_eibis fm_yesno.id%type;
  l_nd_txt nd_txt.nd%type;
  l_tag nd_txt.tag%type;
+ l_liz_sum number;
 begin
   bars_audit.trace(g_pack_name || l_proc_name ||
                    'Start. Params: ND=%s, tag=%s, TXT=%s',
@@ -652,6 +653,27 @@ begin
     raise_application_error(-20201,'\   CCK_APP.Set_ND_TXT : Відповідно до вимог з 01.04.2018 заборонено видавати енергокредити для багатоквартирних будинків',TRUE);
   end if;
 
+   if p_tag = 'LIZSUM' then
+    if Get_ND_TXT(p_ND, 'LIZASUM' ) = 'Taк' then
+      raise_application_error(-20203,'\    CCK_APP.Set_ND_TXT :Для договору Реф='||p_ND||' Встановлена автоматична зміна вартості предмета лізингу, тому редаговання тегу LIZSUM заборонено' ,TRUE);
+    end if;
+  end if;
+  
+  if p_tag = 'LIZASUM' then
+    if p_txt = 'Taк' then 
+      select (sum(a.ostc)/100)*(-1)
+      into l_liz_sum
+      from nd_acc n, accounts a 
+      where n.nd  = p_ND
+        and n.acc = a.acc
+        and a.nbs in (2044,2071);  --фін лізинг
+    end if;  
+
+     update  nd_txt set txt=nvl(l_liz_sum,0) where nd=p_nd and tag='LIZSUM';  
+     if sql%rowcount = 0 then
+       insert into nd_txt (nd, tag, txt) values (p_nd, 'LIZSUM', nvl(l_liz_sum,0));
+     end if;
+  end if;  
 
   if p_txt is null then
     delete from nd_txt where nd=p_nd and tag=p_tag;
