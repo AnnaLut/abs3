@@ -17,7 +17,8 @@ select p.REPORT_DATE
      , p.K021
      , p.Q001_1
      , p.Q001_2
-     , p.Q002
+     , p.Q002_1
+     , p.Q002_2
      , p.Q003_2
      , p.Q003_3
      , p.Q007_1
@@ -36,6 +37,7 @@ select p.REPORT_DATE
      , p.Q006
      , p.T070
      , p.T071
+     , p.F105
      , p.ACC_ID
      , p.ACC_NUM
      , p.KV
@@ -66,7 +68,8 @@ comment on column V_NBUR_36X_DTL.K020        is 'Код резидента';
 comment on column V_NBUR_36X_DTL.K021        is 'Ознака коду';        
 comment on column V_NBUR_36X_DTL.Q001_1      is 'Повне найменування резидента';        
 comment on column V_NBUR_36X_DTL.Q001_2      is 'Повне найменування нерезидента (згідно з контрактом)';        
-comment on column V_NBUR_36X_DTL.Q002        is 'Місцезнаходження резидента';        
+comment on column V_NBUR_36X_DTL.Q002_1        is 'Місцезнаходження резидента';        
+comment on column V_NBUR_36X_DTL.Q002_2        is 'Місцезнаходження нерезидента';        
 comment on column V_NBUR_36X_DTL.Q003_2      is 'Умовний порядковий номер контракта';        
 comment on column V_NBUR_36X_DTL.Q003_3      is 'Номер зовнішньоекономічного контракту';        
 comment on column V_NBUR_36X_DTL.Q007_1      is 'Дата укладення зовнішньоекономічного контракту';        
@@ -85,6 +88,7 @@ comment on column V_NBUR_36X_DTL.Q023        is 'Код підрозділу банку, який лікв
 comment on column V_NBUR_36X_DTL.T071        is 'Сума неповернених коштів у валюті';        
 comment on column V_NBUR_36X_DTL.T070        is 'Сума неповернених коштів у гривневому еквіваленті';        
 comment on column V_NBUR_36X_DTL.Q006        is 'Примітка';  
+comment on column V_NBUR_36X_DTL.F105        is 'Код ознаки повідомлення про незавершені розрахунки';  
 comment on column V_NBUR_36X_DTL.ACC_ID      is 'Ід. рахунка';
 comment on column V_NBUR_36X_DTL.ACC_NUM     is 'Номер рахунка';
 comment on column V_NBUR_36X_DTL.KV          is 'Ід. валюти';

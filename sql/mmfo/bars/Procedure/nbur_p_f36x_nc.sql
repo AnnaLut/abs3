@@ -13,7 +13,7 @@ CREATE OR REPLACE PROCEDURE NBUR_P_F36X_nc(
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 % VERSION     :  24.10.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    параметры: p_report_date - отчетная дата
+    параметры: p_report_date - дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
    NBUR_P_F36X (p_kod_filii, p_report_date, p_form_id, 'C');

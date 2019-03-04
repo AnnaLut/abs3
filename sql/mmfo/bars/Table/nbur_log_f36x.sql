@@ -49,7 +49,8 @@ begin
 , K021            varchar2(1 CHAR)  
 , Q001_1          varchar2(135 CHAR)
 , Q001_2          varchar2(135 CHAR)
-, Q002            varchar2(135 CHAR)
+, Q002_1            varchar2(135 CHAR)
+, Q002_2            varchar2(135 CHAR)
 , Q003_2          varchar2(4 CHAR)
 , Q003_3          varchar2(35 CHAR)
 , Q007_1          date
@@ -68,6 +69,7 @@ begin
 , Q006            varchar2(3 CHAR)
 , T070            number(24)
 , T071            number(24)
+, F105		  varchar2(2 CHAR)
 , ACC_ID          number(38)
 , ACC_NUM         VARCHAR2(20)
 , KV              NUMBER(3)
@@ -163,7 +165,8 @@ comment on column NBUR_LOG_F36X.K020        is 'Код резидента';
 comment on column NBUR_LOG_F36X.K021        is 'Ознака коду';        
 comment on column NBUR_LOG_F36X.Q001_1      is 'Повне найменування резидента';        
 comment on column NBUR_LOG_F36X.Q001_2      is 'Повне найменування нерезидента (згідно з контрактом)';        
-comment on column NBUR_LOG_F36X.Q002        is 'Місцезнаходження резидента';        
+comment on column NBUR_LOG_F36X.Q002_1      is 'Місцезнаходження резидента';        
+comment on column NBUR_LOG_F36X.Q002_2      is 'Місцезнаходження нерезидента';        
 comment on column NBUR_LOG_F36X.Q003_2      is 'Умовний порядковий номер контракта';        
 comment on column NBUR_LOG_F36X.Q003_3      is 'Номер зовнішньоекономічного контракту';        
 comment on column NBUR_LOG_F36X.Q007_1      is 'Дата укладення зовнішньоекономічного контракту';        
@@ -181,8 +184,10 @@ comment on column NBUR_LOG_F36X.R030        is 'Код валюти розрахунку';
 comment on column NBUR_LOG_F36X.Q023        is 'Код підрозділу банку, який ліквідовано';        
 comment on column NBUR_LOG_F36X.T071        is 'Сума неповернених коштів у валюті';        
 comment on column NBUR_LOG_F36X.T070        is 'Сума неповернених коштів у гривневому еквіваленті';        
+comment on column NBUR_LOG_F36X.F105        is 'Код ознаки повідомлення про незавершені розрахунки';        
 comment on column NBUR_LOG_F36X.Q006        is 'Примітка';        
 
+                                                                                        
 prompt -- ======================================================
 prompt -- Grants
 prompt -- ======================================================

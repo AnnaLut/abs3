@@ -13,7 +13,7 @@ is
 
 -- g_header_version    constant varchar2 (64) := 'version 1.00.01 17/07/2015';
 --   g_header_version    constant varchar2 (64) := 'version 1.00.02 16/11/2015';
-   g_header_version    constant varchar2 (64) := 'version 1.01.01 27/09/2018';
+   g_header_version    constant varchar2 (64) := 'version 1.02.01 27/02/2019';
 
    g_awk_header_defs   constant varchar2 (512) := '';
 
@@ -58,7 +58,7 @@ is
      p2038                number,
      p2042                number
    );
-   
+
     type t_indicators_f504 is record (
      contr_id             number,
      p090                 number,
@@ -73,39 +73,41 @@ is
    );
 
 
-    type t_contracts is record ( 
-      contr_id                cim_contracts.contr_id%type, 
-      contr_type              cim_contracts.contr_type%type, 
-      contr_type_name         cim_contract_types.contr_type_name%type, 
-      num                     cim_contracts.num%type,  
-      subnum                  cim_contracts.subnum%type, 
-      rnk                     cim_contracts.rnk%type, 
-      okpo                    customer.okpo%type, 
+    type t_contracts is record (
+      contr_id                cim_contracts.contr_id%type,
+      contr_type              cim_contracts.contr_type%type,
+      contr_type_name         cim_contract_types.contr_type_name%type,
+      num                     cim_contracts.num%type,
+      subnum                  cim_contracts.subnum%type,
+      rnk                     cim_contracts.rnk%type,
+      okpo                    customer.okpo%type,
       nmk                     corps.nmku%type,--customer.nmk%type,
-      nmkk                    customer.nmkk%type, 
-      custtype                customer.custtype%type, 
+      nmkk                    customer.nmkk%type,
+      custtype                customer.custtype%type,
       nd                      customer.nd%type,
-      status_id               cim_contracts.status_id%type, 
+      status_id               cim_contracts.status_id%type,
       status_name             cim_contract_statuses.status_name%type,
-      comments                cim_contracts.comments%type,       
-      branch_own              cim_contracts.branch%type,           
+      comments                cim_contracts.comments%type,
+      branch_own              cim_contracts.branch%type,
       branch_own_name         branch.name%type,
-      kv                      cim_contracts.kv%type,           
-      s                       cim_contracts.s%type,           
-      open_date               cim_contracts.open_date%type,           
-      close_date              cim_contracts.close_date%type,           
-      owner_uid               cim_contracts.owner_uid%type,           
+      kv                      cim_contracts.kv%type,
+      s                       cim_contracts.s%type,
+      open_date               cim_contracts.open_date%type,
+      close_date              cim_contracts.close_date%type,
+      owner_uid               cim_contracts.owner_uid%type,
       owner_fio               staff$base.fio%type,
-      benef_id                cim_contracts.benef_id%type,           
+      benef_id                cim_contracts.benef_id%type,
       benef_name              cim_beneficiaries.benef_name%type,
       benef_adr               cim_beneficiaries.benef_adr%type,
       country_id              cim_beneficiaries.country_id%type,
       country_name            country.name%type,
       deadline                cim_contracts_trade.deadline%type,
-      branch_service          cim_contracts.service_branch%type,           
+      branch_service          cim_contracts.service_branch%type,
       branch_service_name     branch.name%type
                                );
-    type t_arr_contracts is table of t_contracts;                           
+    type t_arr_contracts is table of t_contracts;
+    
+    type t_arr_nbur_36x  is table of nbur_log_f36X%rowtype;
    --------------------------------------------------------------------------------
    -- Константи
    --
@@ -132,6 +134,8 @@ function p_f503(p_date in date :=bankdate, p_contr_id in number :=null, p_error 
 function p_f504(p_date in date :=bankdate, p_contr_id in number :=null, p_error out varchar2) return clob;
 
 function p_f531(p_date in date :=bankdate, p_error out varchar2) return clob;
+function p_f531_2(p_date in date :=bankdate)
+  return t_arr_nbur_36x pipelined PARALLEL_ENABLE;
 
   --Процедура заселення/дозаселення попередніми данними для подальшої зміни і вигрузки
   procedure prepare_f503_change(p_date_to date);
@@ -182,14 +186,14 @@ function p_f531(p_date in date :=bankdate, p_error out varchar2) return clob;
 
    procedure get_indicators_f503(p_contract_n number, p_date_z_begin date, p_date_z_end date, p_indicators_f503 out t_indicators_f503);
    procedure get_indicators_f504(p_contract_n number, p_date_to date, p_date_z_begin date, p_indicators_f504 in out t_indicators_f504);
-   
-  function get_contracts_list(p_mfo         varchar2,--cim_contracts.kf%type, 
-                              p_date_from   cim_contracts.open_date%type, 
+
+  function get_contracts_list(p_mfo         varchar2,--cim_contracts.kf%type,
+                              p_date_from   cim_contracts.open_date%type,
                               p_date_to     cim_contracts.open_date%type,
                               p_contr_type  varchar2,--cim_contracts.contr_type%type,
                               p_kv          varchar2,--cim_contracts.kv%type,
                               p_status      varchar2--cim_contracts.status_id%type
-                              )  
+                              )
    return t_arr_contracts pipelined PARALLEL_ENABLE;
 
 END cim_reports;
@@ -200,12 +204,7 @@ is
    --  CIM_REPORTS
    --
 
--- g_body_version      constant varchar2 (64) := 'version 1.00.01 17/07/2015';
--- g_body_version      constant varchar2 (64) := 'version 1.00.02 16/11/2015';
--- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
--- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
--- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.15 25/01/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.04 01/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -690,6 +689,9 @@ begin
   return l_result;
 end  p_f504;
 
+/* використовується за основу для показника A36001 [xml версія]
+   необхідно переписати для спрощення супроводження коду 
+*/
 function p_f531(p_date in date :=bankdate, p_error out varchar2) return clob
 is l_txt varchar2(4000); -- Текст повідомлення
    l_txt_clob clob;
@@ -711,6 +713,8 @@ is l_txt varchar2(4000); -- Текст повідомлення
    l_p27 number :=1;
    l_benef_name varchar2(256);
    l_p22 number;
+   
+   l_lim_day  number := F_get_CURR_LIM_DAY1;--Добовий ліміт купівлі безготівкової валюти(коп)
 begin
   if sys_context('bars_context','user_mfo') is null then
     bars_audit.error('CIM p_f531 : user_id '||user_id()||' kf '||sys_context('bars_context','user_mfo'));
@@ -740,18 +744,16 @@ begin
   select nvl(max(create_date), add_months(l_date_z_end,-1))
   into l_last_date
   from cim_f36
-  where branch like sys_context('bars_context', 'user_mfo_mask');
+  where branch like sys_context('bars_context', 'user_mfo_mask')
+    and manual_include = 0;
 
-  if l_last_date=l_date_z_end and
-          (to_char(l_sysdate,'yyyymm')=to_char(l_last_date,'yyyymm') and to_number(to_char(l_sysdate,'dd'))<=10 or
-           to_number(to_char(l_sysdate,'yyyymm'))<to_number(to_char(l_last_date,'yyyymm'))) or
-        add_months(l_last_date,1)=l_date_z_end and
-          (to_number(to_char(l_sysdate,'yyyymm'))+1=to_number(to_char(l_date_z_end,'yyyymm')) and to_number(to_char(l_sysdate,'dd'))>10 or
-           to_number(to_char(l_sysdate,'yyyymm'))+1>to_number(to_char(l_date_z_end,'yyyymm')) )
+  bars_audit.info('CIM p_f531  l_last_date='||l_last_date||' l_date_z_end='||l_date_z_end);
+
+  if l_last_date <= l_date_z_end -- перезаповнюється лише за останню дату (верхню)
   then
-    delete from cim_f36 where create_date=l_date_z_end and branch like sys_context('bars_context', 'user_mfo_mask') and nvl(manual_include, 0) != 1;
-    insert into cim_f36 (b041, k020, p17, p16, doc_date, p21, p14, p01, p22, p15, p18, create_date)
-                 values (0, 0, '0', to_date('01/01/2015', 'dd/mm/yyyy'), '01012015', to_date('01/01/2015', 'dd/mm/yyyy'), 0, 0, 0, 0, 0, l_date_z_end);
+    delete from cim_f36 where create_date=l_date_z_end and branch like sys_context('bars_context', 'user_mfo_mask');
+    insert into cim_f36 (b041, k020, p17, p16, doc_date, p21, p14, p01, p22, p15, p18, create_date, is_fragment)
+                 values (0, 0, '0', to_date('01/01/2015', 'dd/mm/yyyy'), '01012015', to_date('01/01/2015', 'dd/mm/yyyy'), 0, 0, 0, 0, 0, l_date_z_end, 0);
 
     for l in
     (
@@ -760,30 +762,34 @@ begin
                case when a.p15 is null or a.p22=3 then a.f_p01 else a.p01 end as p01,
                decode(a.p22, 3, nvl(a.f_p02_old, a.f_p02), a.p02) as p02, decode(a.p22, 3, nvl(a.f_p06_old, a.f_p06), a.p06) as p06,
                substr(decode(a.p22, 3, nvl(a.f_p07_old, a.f_p07), a.p07), 1, 135) as p07, decode(a.p22, 3, nvl(a.f_p08_old, a.f_p08), a.p08) as p08,
-               decode(a.p22, 3, a.f_p09, a.p09) as p09, decode(a.p22, 3, 0, cim_mgr.val_convert(to_date(l_date_z_end-1), a.p15, a.p14, 980)) as p13,
+               decode(a.p22, 3, a.f_p09, a.p09) as p09, a.p13,
                nvl2(a.p15, a.p14, a.f_p14) as p14, decode(a.p22, 3, 0, a.p15) as p15, case when a.p15 is null or a.m_p22=3 then a.f_p16 else a.p16 end as p16,
                case when a.p15 is null or a.m_p22=3 then a.f_p17 else a.p17 end as p17,
-               decode(a.p22, 1, a.p18, a.f_p18) as p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
+               a.p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
                case when a.p15 is null or a.m_p22=3 then a.f_p21 else nvl(a.f_p21,a.p21) end as p21, a.p22, decode(a.p22, 2, l_date_z_end, null) as p23,
                decode(a.p22, 3, case when a.p15=0 then a.max_pdat else null end, null) as p24, case when a.p27=0 then null else to_char(a.p27, 'fm999') end as p27, a.doc_date,
-               case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk
+               case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk, a.benef_adr as q002_2, a.is_fragment, a.type_id, a.bound_id
          from
          ( select nvl(m.m_p22,
                       case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null then 3
-                           when x.f_b041 is null then 1
+                           when x.f_b041 is null             
+                               --Зміни до відображення взяття на контроль
+                                                 and (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) then 1
                            when x.f_p02 != e.k112 or x.f_p06 != k.nmk or x.f_p07 != nvl(x.adr, k.adr) or x.f_p08 != substr(b.benef_name,1,135) or
                                 x.f_p09 != b.country_id or x.f_p15 != x.p15 or x.f_p19 != x.p19 then 2 else -1 end ) as p22,
                       x.b041, x.k020, x.p01, e.k112 as p02, x.f_p02, x.f_p02_old, k.nmk as p06 , x.f_p06, x.f_p06_old, nvl(x.adr, k.adr) as p07, x.f_p07, x.f_p07_old,
                       substr(b.benef_name,1,135) as p08, x.f_p08, x.f_p08_old, to_char(b.country_id, 'fm000') as p09, x.f_p09, x.p14, x.p15, x.p16, x.p17, x.p18, x.f_p18,
                       x.p19, x.f_p19, x.p20, x.f_p20, x.p21, x.max_pdat, x.contr_id, x.doc_date,
-                      x.f_b041, x.f_k020, x.f_p01, x.f_p14, x.f_p16, x.f_p17, x.f_p21, x.f_p21_new, m.m_p22, x.p27, x.rnk
+                      x.f_b041, x.f_k020, x.f_p01, x.f_p14, x.f_p16, x.f_p17, x.f_p21, x.f_p21_new, m.m_p22, x.p27, x.rnk, b.benef_adr, x.is_fragment, x.p13,
+                      x.type_id, x.bound_id
              from
              ( select x.*, (select substr(b.b040,9,12) from branch b where b.branch=x.branch) as b041,
                       (select nvl2(zip, zip || ', ', '') || case when upper(domain) like '%МІСТО%' and upper(domain) like '%'||upper(locality)||'%' then '' else nvl2(domain, domain || ', ', '') end ||
                               case when upper(region) like '%МІСТО%' and upper(region) like '%'||upper(locality)||'%' then '' else nvl2(region, region || ', ', '') end ||
                               nvl2(locality, locality || ', ', '') || address
                          from customer_address a where a.type_id=1 and a.rnk=x.rnk) as adr,
-                      nvl2(x.min_ddat, case when x.p21+1095<l_date_z_end then 4 else 0 end,case when x.p21+1095<l_date_z_end then 1 else 2 end) as p19
+                      nvl2(x.min_ddat, case when x.p21+1095<l_date_z_end then 4 else 0 end,case when x.p21+1095<l_date_z_end then 1 else 2 end) as p19, 
+                      decode(x.p15, 0, 0, cim_mgr.val_convert(to_date(l_date_z_end-1), x.p15, x.p14, 980)) as p13
                  from
                  ( select min(d.min_ddat) as min_ddat, max(d.max_pdat) as max_pdat, d.p01, d.p14, d.p21, sum(d.p15) as p15, max(d.p20) as p20,
                           c.branch, max(c.rnk) as rnk, c.benef_id, lpad(c.okpo,10,'0') as k020, c.num as p17, c.open_date as p16, min(t.subject_id)+1 as p18,
@@ -791,11 +797,12 @@ begin
                           max(f.p09) as f_p09, max(f.p15) as f_p15, max(f.p18) as f_p18, max(f.p19) as f_p19, max(f.p20) as f_p20,
                           max(f.p02_old) as f_p02_old, max(f.p06_old) as f_p06_old, max(f.p07_old) as f_p07_old, max(f.p08_old) as f_p08_old,
                           max(d.contr_id) as contr_id, nvl(d.doc_date, f.doc_date) as doc_date, max(f.k020) as f_k020, max(f.p01) as f_p01,
-                          max(f.p14) as f_p14, max(f.p16) as f_p16, max(f.p17) as f_p17, max(f.p21) as f_p21, max(f.p21_new) as f_p21_new, max(t.p27_f531) as p27
+                          max(f.p14) as f_p14, max(f.p16) as f_p16, max(f.p17) as f_p17, max(f.p21) as f_p21, max(f.p21_new) as f_p21_new, max(t.p27_f531) as p27,
+                          max(t.is_fragment) as is_fragment, max(d.type_id) as type_id, max(d.bound_id) as bound_id
                      from
                      ( select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
                               decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
-                              max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15
+                              max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15, d.type_id, d.bound_id
                          from
                          ( select d.p14, d.p21, d.p20, d.d_k, d.type_id, d.bound_id, d.contr_id, d.s, d.s_vk, d.doc_date, d.ls, d.l_create_date,
                                   decode(d.d_k, 0, nvl2(d.vmd_id, (select v.dat from customs_decl v join cim_vmd_bound b on v.cim_id=b.vmd_id where b.bound_id=d.vmd_id),
@@ -854,9 +861,9 @@ begin
     )
     loop
       begin
-        insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, rnk, create_date)
+        insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, rnk, create_date, q002_2, is_fragment, type_id, bound_id)
                      values (l.b041, l.k020, l.doc_date, l.p01, l.p02, l.p06, l.p07, l.p08, l.p09, l.p13, l.p14, l.p15, l.p16, l.p17, l.p18,
-                             l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l.rnk, l_date_z_end);
+                             l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l.rnk, l_date_z_end, l.q002_2, l.is_fragment, l.type_id, l.bound_id);
       --COBUMMFO-9323
       exception
         when dup_val_on_index then
@@ -876,7 +883,11 @@ begin
                  f36.p23 = l.p23,
                  f36.p24 = l.p24,
                  f36.p27 = l.p27,
-                 f36.rnk = l.rnk
+                 f36.rnk = l.rnk,
+                 f36.q002_2      = l.q002_2,
+                 f36.is_fragment = l.is_fragment,
+                 f36.type_id     = l.type_id,
+                 f36.bound_id    = l.bound_id
            where f36.BRANCH = sys_context('bars_context', 'user_branch')
              and f36.B041 = l.b041
              and f36.K020 = l.k020
@@ -886,13 +897,15 @@ begin
              and f36.P21 = l.p21
              and f36.P14 = l.p14
              and f36.P01 = l.p01
-             and f36.CREATE_DATE = l_date_z_end;
+             and f36.CREATE_DATE = l_date_z_end
+             and f36.manual_include = 0;
       ----
       end;
     end loop;
     commit;
   elsif l_date_z_end>l_last_date then
-    p_error:='Формування звіту #36 за '||to_char(l_date_z_end,'dd.mm.yyyy')||'р. неможливе! Дата останнього сформованого звіту #36 - '||to_char(l_last_date,'dd.mm.yyyy')||'р.'; return '';
+    p_error:='Формування звіту #36 за '||to_char(l_date_z_end,'dd.mm.yyyy')||'р. неможливе! Дата останнього сформованого звіту #36 - '||to_char(l_last_date,'dd.mm.yyyy')||'р.'; 
+    return '';
   end if;
 
   for l in
@@ -902,6 +915,7 @@ begin
        and f.create_date=l_date_z_end
        and F.P22 > 0
        and f.branch like sys_context('bars_context', 'user_mfo_mask')
+       and f.manual_include = 0
      order by f.b041, f.k020, f.p16, f.p17, f.p08, f.p21, f.p01 )
   loop
     if l_okpo != l.k020 or l_contr_date != l.p16 or l_contr_num != l.p17 then
@@ -961,6 +975,386 @@ begin
   return l_result;
 end  p_f531;
 
+/* використовується для показника A36002 [xml версія]
+   необхідно переписати архіткектурно так щоб все було одноманітно і логічно
+   з першою устарілою частиною організованою процедурою p_f531
+   для спрощення супроводження коду 
+*/
+  function p_f531_2(p_date in date :=bankdate)
+  return t_arr_nbur_36x pipelined
+  is
+    l_title          CONSTANT VARCHAR2 (50) := 'CIM_REPORTS.p_f531_2: ';
+    l_nbur_36x                nbur_log_f36X%rowtype;
+    l_date_z_end              date := last_day(add_months(p_date,-1))+1;
+    l_n                       pls_integer;
+  begin
+    bars_audit.info(l_title||' l_date_z_end='||l_date_z_end);
+    --F105=1
+    for cur in (select op.*, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
+                      from 
+                     (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
+                              decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
+                              max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15
+                         from
+                         ( select d.p14, d.p21, d.p20, d.d_k, d.type_id, d.bound_id, d.contr_id, d.s, d.s_vk, d.doc_date, d.ls, d.l_create_date,
+                                  decode(d.d_k, 0, nvl2(d.vmd_id, (select v.dat from customs_decl v join cim_vmd_bound b on v.cim_id=b.vmd_id where b.bound_id=d.vmd_id),
+                                                                  (select v.allow_date from cim_acts v join cim_act_bound b on v.act_id=b.act_id where b.bound_id=d.act_id)),
+                                                   nvl2(d.payment_id, (select v.vdat from oper v join cim_payments_bound b on v.ref=b.ref where b.bound_id=d.payment_id),
+                                                                      (select v.val_date from cim_fantom_payments v join cim_fantoms_bound b on v.fantom_id=b.fantom_id where b.bound_id=d.fantom_id))
+                                        ) as l_doc_date
+                             from
+                             ( select o.kv as p14, cim_mgr.get_control_date(0, 0, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, 0 as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, NVL( (SELECT MAX (fdat) FROM opldok WHERE REF = o.REF ), o.vdat ) as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_payments_bound d JOIN oper o ON o.REF = d.REF
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.payment_id=d.bound_id
+                                where d.delete_date is null and
+                                      d.contr_id is not null and contr_id != 0
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                                  and decode(d.is_doc, 1, 'Так', 'Ні') = 'Ні'
+                               union all
+                               select f.kv as p14, cim_mgr.get_control_date(0, f.payment_type, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, f.payment_type as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, f.val_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_fantoms_bound d JOIN cim_fantom_payments f ON f.fantom_id = d.fantom_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.fantom_id=d.bound_id
+                                where d.delete_date is null and
+                                       f.payment_type in (1, 4) and d.contr_id is not null and contr_id != 0
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                                  and decode(d.is_doc, 1, 'Так', 'Ні') = 'Ні'
+                               union all
+                               select v.kv as p14, cim_mgr.get_control_date(1, 0, d.bound_id)+1 as p21, d.borg_reason as p20,
+                                      1 as d_k, 0 as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_dat as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_vmd_bound d join customs_decl v on v.cim_id=d.vmd_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.vmd_id=d.bound_id
+                                where d.delete_date is null
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                                  and decode(d.is_doc, 1, 'Так', 'Ні') = 'Ні'
+                               union all
+                               select v.kv as p14, cim_mgr.get_control_date(1, v.act_type, d.bound_id)+1 as p21, d.borg_reason as p20,
+                                      1 as d_k, v.act_type as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_act_bound d join cim_acts v on v.act_type in (1, 3, 4) and v.act_id=d.act_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.act_id=d.bound_id
+                                where d.delete_date is null
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask') 
+                                  and decode(d.is_doc, 1, 'Так', 'Ні') = 'Ні') d ) d
+                       group by d.d_k, d.type_id, d.bound_id ) op
+                       join cim_contracts c on c.contr_type+1=op.p01 and c.contr_id=op.contr_id
+                       join cim_contracts_trade t on t.contr_id=op.contr_id  
+                       join branch b on b.branch = c.branch
+                       left outer join customer k on k.rnk=c.rnk
+                       left outer join cim_beneficiaries ben on ben.benef_id=c.benef_id
+                       left outer join kl_k110 e on e.d_close is null and e.k110=k.ved)
+    loop
+      l_nbur_36x.B040       := cur.b040;
+      l_nbur_36x.K020       := lpad(cur.okpo,10,'0');
+      l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+      l_nbur_36x.F105       := 1;
+      l_nbur_36x.CUST_ID    := cur.rnk;
+      l_nbur_36x.BRANCH     := cur.branch;
+      l_nbur_36x.KV         := cur.p14;
+      l_nbur_36x.T071       := cur.p15;
+      l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+      l_nbur_36x.Q006       := '';--p27;
+      l_nbur_36x.Q023       := cur.b040;
+      l_nbur_36x.K112       := cur.k112;
+      l_nbur_36x.F008       := cur.p18;
+      l_nbur_36x.D070       := cur.p01;
+      l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+      l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+--      l_nbur_36x.Q007_4     := null; --  p24; заповнюється при F105  = 6;
+--      l_nbur_36x.Q007_2     := null; --  p21; заповнюється при F105  = 6;
+      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+      l_nbur_36x.Q003_3     := cur.num;
+      l_nbur_36x.Q002_1     := cur.adr;
+      l_nbur_36x.Q001_2     := cur.p08;
+      l_nbur_36x.Q001_1     := cur.p06;
+      
+      pipe row (l_nbur_36x);
+    end loop;
+    l_nbur_36x := null;
+    
+    bars_audit.info(l_title||' l_date_z_end='||l_date_z_end||' F105=3 ');
+    --F105=3
+    --інформація про всі закриті рахунки вибираються в друкований звіт №5700
+    for cur in (select op.*, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
+                      from 
+                     (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
+                              decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
+                              max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15
+                         from
+                         ( select d.p14, d.p21, d.p20, d.d_k, d.type_id, d.bound_id, d.contr_id, d.s, d.s_vk, d.doc_date, d.ls, d.l_create_date,
+                                  decode(d.d_k, 0, nvl2(d.vmd_id, (select v.dat from customs_decl v join cim_vmd_bound b on v.cim_id=b.vmd_id where b.bound_id=d.vmd_id),
+                                                                  (select v.allow_date from cim_acts v join cim_act_bound b on v.act_id=b.act_id where b.bound_id=d.act_id)),
+                                                   nvl2(d.payment_id, (select v.vdat from oper v join cim_payments_bound b on v.ref=b.ref where b.bound_id=d.payment_id),
+                                                                      (select v.val_date from cim_fantom_payments v join cim_fantoms_bound b on v.fantom_id=b.fantom_id where b.bound_id=d.fantom_id))
+                                        ) as l_doc_date
+                             from
+                             ( select o.kv as p14, cim_mgr.get_control_date(0, 0, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, 0 as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, NVL( (SELECT MAX (fdat) FROM opldok WHERE REF = o.REF ), o.vdat ) as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_payments_bound d JOIN oper o ON o.REF = d.REF
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.payment_id=d.bound_id
+                                where d.delete_date is null and
+                                      d.contr_id is not null and contr_id != 0
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                               union all
+                               select f.kv as p14, cim_mgr.get_control_date(0, f.payment_type, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, f.payment_type as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, f.val_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_fantoms_bound d JOIN cim_fantom_payments f ON f.fantom_id = d.fantom_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.fantom_id=d.bound_id
+                                where d.delete_date is null and
+                                       f.payment_type in (1, 4) and d.contr_id is not null and contr_id != 0
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                               union all
+                               select v.kv as p14, cim_mgr.get_control_date(1, 0, d.bound_id)+1 as p21, d.borg_reason as p20,
+                                      1 as d_k, 0 as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_dat as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_vmd_bound d join customs_decl v on v.cim_id=d.vmd_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.vmd_id=d.bound_id
+                                where d.delete_date is null
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                               union all
+                               select v.kv as p14, cim_mgr.get_control_date(1, v.act_type, d.bound_id)+1 as p21, d.borg_reason as p20,
+                                      1 as d_k, v.act_type as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_act_bound d join cim_acts v on v.act_type in (1, 3, 4) and v.act_id=d.act_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.act_id=d.bound_id
+                                where d.delete_date is null
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask') 
+                                  ) d ) d
+                       group by d.d_k, d.type_id, d.bound_id ) op
+                       join cim_contracts c on c.contr_type+1=op.p01 and c.contr_id=op.contr_id and op.p15 > 0
+                                               and c.okpo in (select c.okpo --звіт 5700
+                                                                from accounts a, customer c
+                                                               where   a.rnk=c.rnk
+                                                                 and (a.dazs between trunc(l_date_z_end-1, 'MM') and l_date_z_end-1+0.9999)
+                                                                 and (A.NBS in ('2512', '2513', '2520', '2523', '2526', '2530', '2531', '2541', '2542', '2544', '2545',
+                                                                               '2550', '2551', '2552', '2553', '2554', '2555', '2556', '2560', '2561', '2562', '2565', '2570', '2571', 
+                                                                               '2572', '2600', '2601', '2602', '2603', '2604', '2605', '2606', '2640','2641','2642','2643','2644','2655')
+                                                                              or (a.nbs='2650' and A.OB22 in ('01','09'))))
+                       join cim_contracts_trade t on t.contr_id=op.contr_id  
+                       join branch b on b.branch = c.branch
+                       left outer join customer k on k.rnk=c.rnk
+                       left outer join cim_beneficiaries ben on ben.benef_id=c.benef_id
+                       left outer join kl_k110 e on e.d_close is null and e.k110=k.ved)
+    loop
+--      bars_audit.info(l_title||' l_date_z_end='||l_date_z_end||' F105=3 cur.p15='||cur.p15||' cur.okpo='||cur.okpo);
+      l_nbur_36x.B040       := cur.b040;
+      l_nbur_36x.K020       := lpad(cur.okpo,10,'0');
+      l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+      l_nbur_36x.F105       := 3;
+      l_nbur_36x.CUST_ID    := cur.rnk;
+      l_nbur_36x.BRANCH     := cur.branch;
+      l_nbur_36x.KV         := cur.p14;
+      l_nbur_36x.T071       := cur.p15;
+      l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+      l_nbur_36x.Q006       := '';--p27;
+      l_nbur_36x.Q023       := cur.b040;
+      l_nbur_36x.K112       := cur.k112;
+      l_nbur_36x.F008       := cur.p18;
+      l_nbur_36x.D070       := cur.p01;
+      l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+      l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+      l_nbur_36x.Q003_3     := cur.num;
+      l_nbur_36x.Q002_1     := cur.adr;
+      l_nbur_36x.Q001_2     := cur.p08;
+      l_nbur_36x.Q001_1     := cur.p06;
+      
+      pipe row (l_nbur_36x);
+    end loop;
+    l_nbur_36x := null;
+    
+     --F105=4
+    ---	Операція вибирається в разі, якщо, операція закрита шляхом прив’язки платежу/МД в АРМі ВК фантомом з типом «Взаємозалік». 
+    for cur in (select f.*, b.b040
+                from cim_f36 f, branch b   
+                where f.manual_include != 1 and create_date = l_date_z_end and p22 in (2, 3))
+    loop
+      l_n := 0;
+      if cur.p01 = 1 then --єксп
+        if cur.type_id = 0 then --перевіряєм чи лінкували Взаємозалік до ВМД
+          select count(*)
+           into l_n
+           from cim_link c, cim_fantoms_bound f, cim_fantom_payments p
+           where c.vmd_id = cur.bound_id
+             and c.fantom_id = f.bound_id
+             and f.fantom_id = p.fantom_id and p.payment_type = 5/*Взаємозалік*/;
+          else -- до акту
+            select count(*)
+            into l_n
+            from cim_link c, cim_fantoms_bound f, cim_fantom_payments p
+            where c.act_id = cur.bound_id
+             and c.fantom_id = f.bound_id
+             and f.fantom_id = p.fantom_id and p.payment_type = 5/*Взаємозалік*/;
+        end if;  
+      end if;  
+      if cur.p01 = 2 then --імп
+        if cur.type_id = 0 then --перевіряєм чи лінкували Взаємозалік до Платежу
+           select count(*)
+           into l_n
+           from cim_link c, cim_act_bound a, cim_acts p
+           where c.payment_id = cur.bound_id
+             and c.act_id = a.bound_id
+             and a.act_id = p.act_id and p.act_type = 5/*Взаємозалік*/;          
+          else -- до Фантому
+           select count(*)
+           into l_n
+           from cim_link c, cim_act_bound a, cim_acts p
+           where c.fantom_id = cur.bound_id
+             and c.act_id = a.bound_id
+             and a.act_id = p.act_id and p.act_type = 5/*Взаємозалік*/;          
+        end if;  
+      end if;  
+      if l_n > 0 then
+        l_nbur_36x.B040       := cur.b040;
+        l_nbur_36x.K020       := lpad(cur.k020,10,'0');
+        l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+        l_nbur_36x.F105       := 4;
+        l_nbur_36x.BRANCH     := cur.branch;
+        l_nbur_36x.KV         := cur.p14;
+        l_nbur_36x.T071       := cur.p15;
+        l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+        l_nbur_36x.Q006       := cur.p27;
+        l_nbur_36x.Q023       := cur.b040;
+        l_nbur_36x.F008       := cur.p18;
+        l_nbur_36x.D070       := cur.p01;
+        l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+        l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+        l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+        l_nbur_36x.Q003_3     := cur.p17;
+        l_nbur_36x.Q002_1     := cur.p07;
+        l_nbur_36x.Q001_2     := cur.p08;
+        l_nbur_36x.Q001_1     := cur.p06;
+        
+        pipe row (l_nbur_36x);        
+      end if;  
+    end loop;    
+    l_nbur_36x := null;
+    --F105=5
+    --- Чужа МД
+    for cur in (select t.*, b.b040
+                from cim_f36 t, branch b 
+                where t.branch = b.branch
+                  and t.manual_include = 1 and t.create_date = l_date_z_end)
+    loop
+      l_nbur_36x.B040       := cur.b040;
+      l_nbur_36x.K020       := lpad(cur.k020,10,'0');
+      l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+      l_nbur_36x.F105       := 5;
+      l_nbur_36x.BRANCH     := cur.branch;
+      l_nbur_36x.KV         := cur.p14;
+      l_nbur_36x.T071       := cur.p15;
+      l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+      l_nbur_36x.Q006       := cur.p27;
+      l_nbur_36x.Q023       := cur.b040;
+      l_nbur_36x.F008       := cur.p18;
+      l_nbur_36x.D070       := cur.p01;
+      l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+      l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+      l_nbur_36x.Q003_3     := cur.p17;
+      l_nbur_36x.Q002_1     := cur.p07;
+      l_nbur_36x.Q001_2     := cur.p08;
+      l_nbur_36x.Q001_1     := cur.p06;
+      
+      pipe row (l_nbur_36x);
+    end loop;    
+    l_nbur_36x := null;
+    
+    --F105=7
+    -- -	Операція вибирається в разі якщо граничний строк розрахунків був перевищений в звітному календарному місяці але у тому ж місяці розрахунки були завершені.
+    for cur in (select op.*, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
+                      from 
+                     (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
+                              decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
+                              max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15
+                         from
+                         ( select d.p14, d.p21, d.p20, d.d_k, d.type_id, d.bound_id, d.contr_id, d.s, d.s_vk, d.doc_date, d.ls, d.l_create_date,
+                                  decode(d.d_k, 0, nvl2(d.vmd_id, (select v.dat from customs_decl v join cim_vmd_bound b on v.cim_id=b.vmd_id where b.bound_id=d.vmd_id),
+                                                                  (select v.allow_date from cim_acts v join cim_act_bound b on v.act_id=b.act_id where b.bound_id=d.act_id)),
+                                                   nvl2(d.payment_id, (select v.vdat from oper v join cim_payments_bound b on v.ref=b.ref where b.bound_id=d.payment_id),
+                                                                      (select v.val_date from cim_fantom_payments v join cim_fantoms_bound b on v.fantom_id=b.fantom_id where b.bound_id=d.fantom_id))
+                                        ) as l_doc_date
+                             from
+                             ( select o.kv as p14, cim_mgr.get_control_date(0, 0, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, 0 as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, NVL( (SELECT MAX (fdat) FROM opldok WHERE REF = o.REF ), o.vdat ) as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_payments_bound d JOIN oper o ON o.REF = d.REF
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.payment_id=d.bound_id
+                                where d.delete_date is null and
+                                      d.contr_id is not null and contr_id != 0
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                               union all
+                               select f.kv as p14, cim_mgr.get_control_date(0, f.payment_type, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, f.payment_type as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, f.val_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_fantoms_bound d JOIN cim_fantom_payments f ON f.fantom_id = d.fantom_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.fantom_id=d.bound_id
+                                where d.delete_date is null and
+                                       f.payment_type in (1, 4) and d.contr_id is not null and contr_id != 0
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                               union all
+                               select v.kv as p14, cim_mgr.get_control_date(1, 0, d.bound_id)+1 as p21, d.borg_reason as p20,
+                                      1 as d_k, 0 as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_dat as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_vmd_bound d join customs_decl v on v.cim_id=d.vmd_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.vmd_id=d.bound_id
+                                where d.delete_date is null
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                               union all
+                               select v.kv as p14, cim_mgr.get_control_date(1, v.act_type, d.bound_id)+1 as p21, d.borg_reason as p20,
+                                      1 as d_k, v.act_type as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_act_bound d join cim_acts v on v.act_type in (1, 3, 4) and v.act_id=d.act_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.act_id=d.bound_id
+                                where d.delete_date is null
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask') 
+                                  ) d ) d
+                       group by d.d_k, d.type_id, d.bound_id ) op
+                       join cim_contracts c on c.contr_type+1=op.p01 and c.contr_id=op.contr_id 
+                       join cim_contracts_trade t on t.contr_id=op.contr_id  
+                       join branch b on b.branch = c.branch
+                       left outer join customer k on k.rnk=c.rnk
+                       left outer join cim_beneficiaries ben on ben.benef_id=c.benef_id
+                       left outer join kl_k110 e on e.d_close is null and e.k110=k.ved                       
+                       where op.p15 = 0 and last_day(op.p21)+1=l_date_z_end and op.max_pdat > op.p21) 
+    loop
+      l_nbur_36x.B040       := cur.b040;
+      l_nbur_36x.K020       := lpad(cur.okpo,10,'0');
+      l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+      l_nbur_36x.F105       := 7;
+      l_nbur_36x.CUST_ID    := cur.rnk;
+      l_nbur_36x.BRANCH     := cur.branch;
+      l_nbur_36x.KV         := cur.p14;
+      l_nbur_36x.T071       := cur.p15;
+      l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+      l_nbur_36x.Q006       := '';--p27;
+      l_nbur_36x.Q023       := cur.b040;
+      l_nbur_36x.K112       := cur.k112;
+      l_nbur_36x.F008       := cur.p18;
+      l_nbur_36x.D070       := cur.p01;
+      l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+      l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+      l_nbur_36x.Q003_3     := cur.num;
+      l_nbur_36x.Q002_1     := cur.adr;
+      l_nbur_36x.Q001_2     := cur.p08;
+      l_nbur_36x.Q001_1     := cur.p06;
+      
+      pipe row (l_nbur_36x);
+    end loop;
+    l_nbur_36x := null;                       
+    
+    bars_audit.info(l_title||' l_date_z_end='||l_date_z_end||' END');
+  end p_f531_2;
+  
+  
+      
   --текст для збереження в файл
   procedure get_text_file_f503(p_clob out clob, p_namefile out varchar2)
     as

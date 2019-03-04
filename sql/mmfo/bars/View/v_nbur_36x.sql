@@ -16,7 +16,8 @@ select
           , extractValue(COLUMN_VALUE, 'DATA/K021') as K021
           , extractValue(COLUMN_VALUE, 'DATA/Q001_1') as Q001_1
           , extractValue(COLUMN_VALUE, 'DATA/Q001_2') as Q001_2
-          , extractValue(COLUMN_VALUE, 'DATA/Q002') as Q002
+          , extractValue(COLUMN_VALUE, 'DATA/Q002_1') as Q002_1
+          , extractValue(COLUMN_VALUE, 'DATA/Q002_2') as Q002_2
           , extractValue(COLUMN_VALUE, 'DATA/Q003_2') as Q003_2
           , extractValue(COLUMN_VALUE, 'DATA/Q003_3') as Q003_3
           , extractValue(COLUMN_VALUE, 'DATA/Q007_1') as Q007_1
@@ -34,6 +35,7 @@ select
           , extractValue(COLUMN_VALUE, 'DATA/Q023') as Q023
           , extractValue(COLUMN_VALUE, 'DATA/T071') as T071
           , extractValue(COLUMN_VALUE, 'DATA/T070') as T070
+          , extractValue(COLUMN_VALUE, 'DATA/F105') as F105
           , extractValue(COLUMN_VALUE, 'DATA/Q006') as Q006
     from  NBUR_REF_FILES f
           , NBUR_LST_FILES v
@@ -54,7 +56,8 @@ comment on column V_NBUR_36X.K020        is 'Код резидента';
 comment on column V_NBUR_36X.K021        is 'Ознака коду';        
 comment on column V_NBUR_36X.Q001_1      is 'Повне найменування резидента';        
 comment on column V_NBUR_36X.Q001_2      is 'Повне найменування нерезидента (згідно з контрактом)';        
-comment on column V_NBUR_36X.Q002        is 'Місцезнаходження резидента';        
+comment on column V_NBUR_36X.Q002_1        is 'Місцезнаходження резидента';        
+comment on column V_NBUR_36X.Q002_2        is 'Місцезнаходження нерезидента';        
 comment on column V_NBUR_36X.Q003_2      is 'Умовний порядковий номер контракта';        
 comment on column V_NBUR_36X.Q003_3      is 'Номер зовнішньоекономічного контракту';        
 comment on column V_NBUR_36X.Q007_1      is 'Дата укладення зовнішньоекономічного контракту';        
@@ -72,6 +75,7 @@ comment on column V_NBUR_36X.R030        is 'Код валюти розрахунку';
 comment on column V_NBUR_36X.Q023        is 'Код підрозділу банку, який ліквідовано';        
 comment on column V_NBUR_36X.T071        is 'Сума неповернених коштів у валюті';        
 comment on column V_NBUR_36X.T070        is 'Сума неповернених коштів у гривневому еквіваленті';        
+comment on column V_NBUR_36X.F105        is 'Код ознаки повідомлення про незавершені розрахунки';        
 comment on column V_NBUR_36X.Q006        is 'Примітка'; 
 
 PROMPT ===================================================================================== 
