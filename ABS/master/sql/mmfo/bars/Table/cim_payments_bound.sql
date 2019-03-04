@@ -220,6 +220,24 @@ end;
 / 
 COMMENT ON COLUMN BARS.CIM_PAYMENTS_BOUND.DEADLINE IS 'Контрольний строк по документу';
 
+begin
+    execute immediate 'alter table bars.CIM_PAYMENTS_BOUND add (IS_DOC NUMBER(1) default 0)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_PAYMENTS_BOUND.IS_DOC IS 'Наявність документів у Банку:  1 - Так';
+
+PROMPT *** Create  index IDX_CIMPAYMENTS_ISDOC ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMPAYMENTS_ISDOC ON BARS.CIM_PAYMENTS_BOUND (DECODE(IS_DOC,1,''Так'',''Ні''))';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 
 PROMPT *** Create  grants  CIM_PAYMENTS_BOUND ***

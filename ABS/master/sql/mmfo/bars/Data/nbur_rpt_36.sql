@@ -76,14 +76,15 @@ begin
        (FILE_CODE, DESC_XML, DATE_START)
      Values
        ('#36', 'select EKP, KU, B040, F021, K020, K021, 
-                    Q001_1, Q002, Q003_2, Q003_3, 
+                    Q001_1, Q002_1, Q002_2, Q003_2, Q003_3, 
                     to_char(Q007_1, ''dd.mm.yyyy'') as Q007_1, 
                     Q001_2, K040, D070, F008, K112, 
                     to_char(Q007_5, ''dd.mm.yyyy'') as Q007_5,                     
                     to_char(Q007_2, ''dd.mm.yyyy'') as Q007_2, 
                     F019, F020, R030, T071, T070, Q006, Q023,
                     to_char(Q007_3, ''dd.mm.yyyy'') as Q007_3, 
-                    to_char(Q007_4, ''dd.mm.yyyy'') as Q007_4 
+                    to_char(Q007_4, ''dd.mm.yyyy'') as Q007_4,
+                    F105
             from nbur_log_f36X 
             where report_date = :p_rpt_dt
                        and kf = :p_kf ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));

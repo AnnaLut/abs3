@@ -225,6 +225,15 @@ end;
 / 
 COMMENT ON COLUMN BARS.CIM_VMD_BOUND.IS_DOC IS 'Наявність документів у Банку:  1 - Так';
 
+PROMPT *** Create  index IDX_CIMVMDB_ISDOC ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMVMDB_ISDOC ON BARS.CIM_VMD_BOUND (DECODE(IS_DOC,1,''Так'',''Ні''))';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 
 PROMPT *** Create  grants  CIM_VMD_BOUND ***

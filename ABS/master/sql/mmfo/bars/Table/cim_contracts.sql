@@ -269,8 +269,6 @@ exception when others then
  end;
 /
 
-
-
 PROMPT *** Create  grants  CIM_CONTRACTS ***
 grant SELECT                                                                 on CIM_CONTRACTS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACTS   to BARS_ACCESS_DEFROLE;

@@ -225,6 +225,15 @@ end;
 / 
 COMMENT ON COLUMN BARS.CIM_ACT_BOUND.IS_DOC IS 'Наявність документів у Банку:  1 - Так';
 
+PROMPT *** Create  index IDX_CIMACTB_ISDOC ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMACTB_ISDOC ON BARS.CIM_ACT_BOUND (DECODE(IS_DOC,1,''Так'',''Ні''))';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 PROMPT *** Create  grants  CIM_ACT_BOUND ***
 grant SELECT                                                                 on CIM_ACT_BOUND   to BARSREADER_ROLE;

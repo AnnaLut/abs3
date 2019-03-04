@@ -782,7 +782,7 @@ is
    --  Currency Inspection Module - Модуль валютного контролю
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.04 07/02/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.05 28/02/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -4524,7 +4524,7 @@ begin
   return l_txt;
 end change_link_date;
 
--- 6.	На форму «Нерозібрані МД» добавити кнопку «Чужа МД. Включити у 531 форму».
+-- 6.  На форму «Нерозібрані МД» добавити кнопку «Чужа МД. Включити у 531 форму».
 -- інформація про МД повинна бути включена у 531 звіт за місяць, до якого відноситься дата реєстру МД (поле DAT таблиці CUSTOMS_DECL). Це можна реалізувати добавленням стрічки у таблицю CIM_F36
 --
 function add_into_f36(p_vmd_id in number, p_vmd_type in number default 0) return varchar2
@@ -4534,6 +4534,9 @@ function add_into_f36(p_vmd_id in number, p_vmd_type in number default 0) return
   l_date_z_end            date;
   l_cim_f36               cim_f36%rowtype;
   l_customer              customer%rowtype;
+  l_n                     pls_integer; 
+  l_max_27                cim_f36.p27%type;--примітка Q006
+  l_rowid                 rowid;
 begin
   --l_txt:='В розробці...';
   bars_audit.info(g_trace_module||' add_into_f36 START.  p_vmd_id:'||p_vmd_id||' p_vmd_type:'||p_vmd_type);
@@ -4565,7 +4568,7 @@ begin
   end;
 
   --інформація про МД повинна бути включена у 531 звіт за місяць, до якого відноситься дата реєстру МД (поле DAT таблиці CUSTOMS_DECL).
-  l_date_z_end:=last_day(add_months(l_v_cim_unbound_vmd.f_date,-1))+1;
+  l_date_z_end:=last_day(l_v_cim_unbound_vmd.f_date)+1;
 
   l_cim_f36.manual_include := 1;
   l_cim_f36.create_date    := l_date_z_end;
@@ -4599,6 +4602,21 @@ begin
   l_cim_f36.p21 := l_date_z_end;
   l_cim_f36.p22 := -1;
   l_cim_f36.branch := sys_context('bars_context', 'user_branch');
+  
+  select count(*), max(c.p27), max(rowid) 
+    into l_n, l_max_27, l_rowid
+  from cim_f36 c 
+  where c.manual_include = 1 and c.create_date = l_date_z_end 
+    and c.p17 = l_v_cim_unbound_vmd.contract_num and c.p08 != l_v_cim_unbound_vmd.benef_name;
+  
+  if l_n > 0 then
+    if l_n = 1 then
+      update cim_f36 set p27 = 1 where rowid = l_rowid;
+      l_cim_f36.p27 := 2;
+      else
+        l_cim_f36.p27 := l_max_27 + 1;
+    end if;  
+  end if;    
 
   insert into cim_f36
        values l_cim_f36;

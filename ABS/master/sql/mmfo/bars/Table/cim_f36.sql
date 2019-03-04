@@ -105,7 +105,7 @@ COMMENT ON COLUMN BARS.CIM_F36.P24 IS 'Дата зняття з контролю резидента';
 COMMENT ON COLUMN BARS.CIM_F36.P25 IS 'Код підрозділу, який ліквідовано';
 COMMENT ON COLUMN BARS.CIM_F36.CREATE_DATE IS 'Дата створення';
 COMMENT ON COLUMN BARS.CIM_F36.P27 IS 'Примітка (порядковий номер запису для записів з однаковими номерами контрактів та різними назвами нерезидентів)';
-COMMENT ON COLUMN BARS.CIM_F36.RNK IS 'РНК контрагента';
+COMMENT ON COLUMN BARS.CIM_F36.RNK IS 'RNK контрагента';
 
 
 
@@ -265,6 +265,43 @@ begin
 end;
 / 
 COMMENT ON COLUMN BARS.CIM_F36.manual_include IS '1-МД включена вручну';
+
+begin
+    execute immediate 'alter table bars.CIM_F36 add (q002_2 varchar2(256))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F36.q002_2 IS 'місцезнаходження нерезидента';
+
+begin
+    execute immediate 'alter table bars.CIM_F36 add (is_fragment number(1))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F36.is_fragment IS 'Ознака дроблення 1 - Так';
+
+begin
+    execute immediate 'alter table bars.CIM_F36 add (type_id number)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F36.type_id IS 'Тип звязку';
+
+begin
+    execute immediate 'alter table bars.CIM_F36 add (bound_id number)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F36.bound_id IS 'Ідентифікатор звязку';
+
 
 
 PROMPT *** Create  grants  CIM_F36 ***

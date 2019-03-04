@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CIM_BOUND_VMD ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CIM_BOUND_VMD ("BOUND_ID", "CONTR_ID", "VMD_ID", "DIRECT", "TYPE_ID", "DOC_TYPE", "NUM", "DOC_DATE", "ALLOW_DATE", "VT", "S_VT", "RATE_VK", "S_VK", "FILE_DATE", "FILE_NAME", "CONTRACT_NUM", "CONTRACT_DATE", "S_PL_VK", "Z_VT", "Z_VK", "S_PL_AFTER_VK", "CONTROL_DATE", "OVERDUE", "COMMENTS", "CREATE_DATE", "MODIFY_DATE", "BORG_REASON", "EA_URL", "DEADLINE_DOC", "ZQ_VT", "IS_DOC", "DATE_MAX_BOUND_DOC") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CIM_BOUND_VMD ("BOUND_ID", "CONTR_ID", "VMD_ID", "DIRECT", "TYPE_ID", "DOC_TYPE", "NUM", "DOC_DATE", "ALLOW_DATE", "VT", "S_VT", "RATE_VK", "S_VK", "FILE_DATE", "FILE_NAME", "CONTRACT_NUM", "CONTRACT_DATE", "S_PL_VK", "Z_VT", "Z_VK", "S_PL_AFTER_VK", "CONTROL_DATE", "OVERDUE", "COMMENTS", "CREATE_DATE", "MODIFY_DATE", "BORG_REASON", "EA_URL", "DEADLINE_DOC", "ZQ_VT", "IS_DOC", "DATE_MAX_BOUND_DOC", "BRANCH") AS 
   select a.bound_id, a.contr_id, a.vmd_id, a.direct, 0, (select max(name) from cim_act_types where type_id=0), a.num,
           a.allow_dat, a.allow_dat, a.vt, a.s_vt, a.rate_vk, a.s_vk, a.file_date, a.file_name, a.doc, a.sdate,
           a.s, round(a.s_vt*(1-a.s/a.s_vk),2), a.s_vk-a.s, a.s_after, a.control_date,
@@ -17,7 +17,7 @@ PROMPT *** Create  view V_CIM_BOUND_VMD ***
            '&'||'typecode=30&'||'number='||cim_mgr.form_url_encode(a.num)||'&'||'date='||to_char(a.allow_dat, 'yyyy-mm-dd') as ea_url,
           a.deadline_doc,
           cim_mgr.val_convert(nvl(a.date_max_bound_doc, a.allow_dat), round(a.s_vt*(1-a.s/a.s_vk),2)/*z_vt*/ * 100, a.vt, 980) / 100 as zq_vt,
-          a.is_doc, a.date_max_bound_doc
+          a.is_doc, a.date_max_bound_doc, a.branch
    from (select b.bound_id, b.contr_id, b.vmd_id, b.direct, v.cnum_cst||'/'||v.cnum_year||'/'||to_char(v.cnum_num,'fm000000') as num, v.cim_date as doc_date,
                 trunc(v.allow_dat) as allow_dat, v.kv as vt, round(b.s_vt/100,2) as s_vt, b.rate_vk, round(b.s_vk/100,2) as s_vk, v.dat as file_date,
                 v.fn as file_name, b.comments, cim_mgr.get_control_date(1, 0, b.bound_id) as control_date, translatedos2win(v.doc) as doc,
@@ -33,7 +33,7 @@ PROMPT *** Create  view V_CIM_BOUND_VMD ***
                (select max(nvl2(l.payment_id,
                                   (select max(vdat) from oper where ref=(select max(ref)from cim_payments_bound where bound_id=l.payment_id)),
                                   (select max(val_date) from cim_fantom_payments where fantom_id=(select max(fantom_id) from cim_fantoms_bound where bound_id=l.fantom_id))))
-                  from cim_link l where l.delete_date is null and l.vmd_id=b.bound_id) as date_max_bound_doc
+                  from cim_link l where l.delete_date is null and l.vmd_id=b.bound_id) as date_max_bound_doc, b.branch
          from cim_vmd_bound b, customs_decl v, cim_contracts_trade c
          where v.cim_id=b.vmd_id and b.delete_date is null and c.contr_id=b.contr_id
         ) a
@@ -48,7 +48,7 @@ PROMPT *** Create  view V_CIM_BOUND_VMD ***
            to_char(a.allow_date, 'yyyy-mm-dd') as ea_url,
           a.deadline_doc,
           cim_mgr.val_convert(nvl(a.date_max_bound_doc, a.allow_date), round(a.s_vt*(1-a.s/a.s_vk),2)/*z_vt*/ * 100, a.kv, 980) / 100 as zq_vt,
-          a.is_doc, a.date_max_bound_doc
+          a.is_doc, a.date_max_bound_doc, a.branch
    from (select b.contr_id, b.bound_id, b.act_id, b.direct, a.act_type, a.file_name, a.file_date,
                 (select max(name) from cim_act_types where type_id=a.act_type) as type_name,
                 a.num, a.act_date, a.allow_date, a.kv, round(b.s_vt/100,2) as s_vt, b.rate_vk, round(b.s_vk/100,2) as s_vk, b.comments,
@@ -66,12 +66,12 @@ PROMPT *** Create  view V_CIM_BOUND_VMD ***
                                  (select max(vdat) from oper where ref=(select max(ref)from cim_payments_bound where bound_id=l.payment_id)),
                                  (select max(val_date) from cim_fantom_payments where fantom_id=(select max(fantom_id) from cim_fantoms_bound where bound_id=l.fantom_id))))
                    from cim_link l where l.delete_date is null and l.act_id=b.bound_id
-                ) as date_max_bound_doc
+                ) as date_max_bound_doc, b.branch
          from cim_act_bound b, cim_acts a, cim_contracts_trade c
          where  a.act_id=b.act_id and b.delete_date is null and c.contr_id=b.contr_id
         ) a;
 
-comment on table V_CIM_BOUND_VMD is 'Прив`язані ВМД v 1.00.05';
+comment on table V_CIM_BOUND_VMD is 'Прив`язані ВМД v 1.00.06';
 comment on column V_CIM_BOUND_VMD.BOUND_ID is 'Id прив''язки';
 comment on column V_CIM_BOUND_VMD.CONTR_ID is 'Внутрішній код контракту';
 comment on column V_CIM_BOUND_VMD.VMD_ID is 'id ВМД';
@@ -104,6 +104,7 @@ comment on column V_CIM_BOUND_VMD.DEADLINE_DOC is 'Контрольний строк по документ
 comment on column V_CIM_BOUND_VMD.ZQ_VT is 'Грн.екв.останньої події незавершеного розрахунку';
 comment on column V_CIM_BOUND_VMD.IS_DOC is 'Наявність документів у Банку';
 comment on column V_CIM_BOUND_VMD.DATE_MAX_BOUND_DOC is 'Дата привязки останньої події';
+comment on column V_CIM_BOUND_VMD.BRANCH is 'Підрозділ';
 
 PROMPT *** Create  grants  V_CIM_BOUND_VMD ***
 grant SELECT                                                                 on V_CIM_BOUND_VMD to BARSREADER_ROLE;
