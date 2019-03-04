@@ -78,7 +78,8 @@ PROMPT *** Create  view V_PFU_REGISTERS ***
           LEFT JOIN pfu_acc_rest ar
              ON ar.fileid = f.id
           LEFT JOIN pfu_acc_trans_2560 pat
-             ON pat.kf = LTRIM (er.receiver_mfo, '0')
+             ON pat.kf = LTRIM (er.receiver_mfo, '0') ON pat.kf = LTRIM (er.receiver_mfo, '0') and
+                pat.file_type = f.file_type
 ;
 
 
