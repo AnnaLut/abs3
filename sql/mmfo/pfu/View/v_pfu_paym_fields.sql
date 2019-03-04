@@ -33,10 +33,12 @@ PROMPT *** Create  view V_PFU_PAYM_FIELDS ***
                             and acc.file_type = pf.file_type)),'Транзитний рахунок 2909') name_2909,
        (select acc.acc_num
           from pfu_acc_trans_2560 acc
-         where acc.kf = ltrim(per.receiver_mfo,'0')) acc_2560,
+         where acc.kf = ltrim(per.receiver_mfo,'0')
+           and acc.file_type = pf.file_type) acc_2560,
        (select acc.edrpu
           from pfu_acc_trans_2560 acc
-         where acc.kf = ltrim(per.receiver_mfo,'0')) okpo_2560,
+         where acc.kf = ltrim(per.receiver_mfo,'0')
+           and acc.file_type = pf.file_type) okpo_2560,
        ltrim(per.receiver_mfo,'0') mfo_2560,
        'Транзитний рахунок 2560' name_2560,
        case ltrim(per.receiver_mfo,'0') when '300465' then 'PFX'
