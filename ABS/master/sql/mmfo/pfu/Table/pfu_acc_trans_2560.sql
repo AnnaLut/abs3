@@ -11,7 +11,8 @@ begin
   CREATE TABLE PFU.PFU_ACC_TRANS_2560 
    (	ACC_NUM VARCHAR2(20), 
 	KF VARCHAR2(10), 
-	EDRPU VARCHAR2(10)
+	EDRPU VARCHAR2(10),
+        FILE_TYPE VARCHAR2(2 CHAR) default ''01'' not null
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -26,6 +27,15 @@ COMMENT ON TABLE PFU.PFU_ACC_TRANS_2560 IS 'Справочнок транзитных счетов 2560';
 COMMENT ON COLUMN PFU.PFU_ACC_TRANS_2560.ACC_NUM IS '';
 COMMENT ON COLUMN PFU.PFU_ACC_TRANS_2560.KF IS '';
 COMMENT ON COLUMN PFU.PFU_ACC_TRANS_2560.EDRPU IS '';
+
+begin
+    execute immediate 'alter table PFU_ACC_TRANS_2560 add file_type VARCHAR2(2 CHAR) default ''01'' not null';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
 
 
 
