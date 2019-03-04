@@ -1,16 +1,26 @@
-CREATE OR REPLACE PACKAGE rko IS
+DROP PACKAGE BARS.RKO;
+
+CREATE OR REPLACE PACKAGE BARS.rko IS
+
 /*
---***************************************************************--
-              Плата за расчетно-кассовое обслуживание
-
-
--- 14/11/2017 COBUMMFO-5332:  3570/03 -> 3570/37 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
-
-
- Накопление идет по Opldok.FDAT !!!
- ------------------------------------
-
---***************************************************************--
+--*****************************************************************************************************************************************
+--                                 Плата за расчетное обслуживание   (АРМ Плата за РО)
+--                                 -------------------------------
+--   На ММФО: 
+--  ===========
+--  1).  Процедуры  acr('1') + pay('1') -  Рассчет сумм + Формир.проводок по начислению  (Дт3570 Кт6510)  -  выполняются при Закрытии 
+--                                       посл.раб.дня месяца функцией "Нарахування комісії за РКО 3570-6110"   
+--
+--  2).  Процедура  pay('2') -  Формир.проводок по списанию начисленной платы (Дт2600 - Кт3570) - выполняется ЕЖЕДНЕВНО при Открытии дня 
+--                              функцией "Погашення комісії за РКО 2600-3570,3579"  
+--
+--  3).  Процедура  pay('3') -  Формир.проводок по переносу на просрочку 3570/03 -> 3570/37  (Дт3570/37 - Кт3570/03) выполняется 6-го числа 
+--                              при Открытии дня функцией "Перенесення заборгованості на просрочку 3570-3579".  
+--                              ВНИМАНИЕ !   3570/03 -> 3570/37 - переносится ВХОДЯЩИЙ на 01 число остаток счета 3570/03
+--
+--  Рассчет идет по времени Opldok.FDAT 
+--
+--*****************************************************************************************************************************************--
 */
 
 
@@ -37,13 +47,17 @@ PROCEDURE er(acc_ NUMBER);
 END;
 /
 
+GRANT EXECUTE ON BARS.RKO TO BARS_ACCESS_DEFROLE;
 
------------------------------------------------------------------------------------------------
+GRANT EXECUTE ON BARS.RKO TO RKO;
+
+GRANT EXECUTE ON BARS.RKO TO WR_ALL_RIGHTS;
+DROP PACKAGE BODY BARS.RKO;
 
 CREATE OR REPLACE PACKAGE BODY BARS.rko IS
 
 /*
-  
+
 
   COBUMMFO-5332:  3570/03 -> 3570/37 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570/03
 
@@ -72,7 +86,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.rko IS
 
 PROCEDURE START_FINISH (p_mode int, ---- 1 = фініш,  2 = старт,  .....НЕважл.
                         p_dat DATE DEFAULT NULL  -- Банк.дата
-                       ) is    
+                       ) is
    l_dat date ;
 begin If p_mode not in (1,2) then RETURN; end if;
 
@@ -93,7 +107,7 @@ begin If p_mode not in (1,2) then RETURN; end if;
       -- 6 числа кожного місяця
 
       if To_Number( to_char (l_DAT,'DD') ) >= 6               and    --- тек  дд = 6 или  7, 8 если 6 -выходной
-         To_Number( to_char (DAT_NEXT_U(l_DAT,-1),'DD') ) < 6 then   -- -пред дд < 6 
+         To_Number( to_char (DAT_NEXT_U(l_DAT,-1),'DD') ) < 6 then   -- -пред дд < 6
 
          RKO.PAY( 3, l_DAT, NULL );
       end if;
@@ -170,7 +184,7 @@ BEGIN
 
    else
 
-      --  Определяем дату последнего раб.дня текущего КВАРТАЛА,  
+      --  Определяем дату последнего раб.дня текущего КВАРТАЛА,
       --  по КОНЕЧНОЙ дате dat_ :
              --------
 
@@ -707,7 +721,7 @@ begin
        WHEN NO_DATA_FOUND THEN
 		  -- Если ничего не нашли - ничего не восстанавливаем
           -- Просто пишем в лог
-          bars_audit.error('RKO.OP_BS_OB_LOCAL Помилка: Рахунок '||aa.nbs||'/'||aa.ob22||' по відділенню '||p.BRANCH||'не знайдено');         
+          bars_audit.error('RKO.OP_BS_OB_LOCAL Помилка: Рахунок '||aa.nbs||'/'||aa.ob22||' по відділенню '||p.BRANCH||'не знайдено');
     end;
   end loop;
 
@@ -775,10 +789,10 @@ nam_b_ VARCHAR2(38);
 nam_c_ VARCHAR2(38);
 nam_d_ VARCHAR2(38);
 okpo_  VARCHAR2(14);
-tobo_a     tobo.tobo%type;-- код ТОБО счета 2600
-mfo_a      VARCHAR2(12);-- "MFO процесс.рахунку" счета 2600, если он в BANK_ACC
-nlsb_tobo  VARCHAR2(15);-- счет 6510 из TOBO_PARAMS: TOBO=tobo_a, TAG='RKO6110'
-nam_b_tobo VARCHAR2(38);-- Accounts.NMS счета nlsb_tobo
+tobo_a     tobo.tobo%type; -- код ТОБО счета 2600
+mfo_a      VARCHAR2(12);   -- "MFO процесс.рахунку" счета 2600, если он в BANK_ACC
+nlsb_tobo  VARCHAR2(15);   -- счет 6510
+nam_b_tobo VARCHAR2(38);   -- Accounts.NMS счета nlsb_tobo
 
 
 nd_rko_    VARCHAR2(50);
@@ -802,6 +816,12 @@ dat0a_t  DATE;
 dat0b_t  DATE;
 
 blkd_    NUMBER;     --  блокированность на Дт счета-плательщика
+
+acc_6510    NUMBER;         --  ACC 6510
+acc_6510_1  NUMBER;         --  ACC "примерного" 6*
+rnk_6510    NUMBER;
+isp_6510    NUMBER;
+
 
 NO_MONEY EXCEPTION;
 PRAGMA EXCEPTION_INIT(NO_MONEY, -20203);
@@ -833,7 +853,7 @@ BEGIN
    END;
 --------------------------------------------------------------------
 
---  Удаляем 3570 ( RKO_LST.ACC1 = null ) у счетов 2600, которые сидят в "Плате за РО", если 
+--  Удаляем 3570 ( RKO_LST.ACC1 = null ) у счетов 2600, которые сидят в "Плате за РО", если
 --  этот же 3570 встречается в счетах 2600, сидящих в "Плате за РО - только на 3570".
 --  То же самое делаем с 3579 (3570/37 - в новом ПС)
 
@@ -841,7 +861,7 @@ BEGIN
    UPDATE RKO_LST set ACC1=null where
       ACC not in (Select ACC from RKO_3570)   and
       ACC1 in (Select ACC1 from RKO_LST where ACC in (Select ACC from RKO_3570));
-            
+
    UPDATE RKO_LST set ACC2=null where
       ACC not in (Select ACC from RKO_3570)   and
       ACC2 in (Select ACC2 from RKO_LST where ACC in (Select ACC from RKO_3570));
@@ -939,18 +959,17 @@ BEGIN
            nlsb_tobo := NULL;
          END;
       End If;
-
                                        -- 2). Ищем 6510 по ОВ22 в этом или
-                                       --     вышестоящем BRANCH-e:       
-      IF nlsb_tobo is NULL THEN        
+                                       --     вышестоящем BRANCH-e:
+      IF nlsb_tobo is NULL THEN
 
          nlsb_tobo := NBS_OB22_NULL( '6510','06',tobo_a );
 
          If nlsb_tobo is NULL  then    --    Не найден счет 6510/06.  Открываем !
------------ raise_application_error(-20000,'Не найден счет 6510/06 на '||substr(tobo_a,1,15), true);   
+----------- raise_application_error(-20000,'Не найден счет 6510/06 на '||substr(tobo_a,1,15), true);
             nlsb_tobo := RKO.Get_NLS_random ('6510') ;  -- получение № лиц.сч 6510 по случ.числам
             Select ISP, RNK, ACC into isp_6510, rnk_6510, acc_6510_1  --- для нахождения ISP,RNK и доступа берем любой счет 6% этого бранча
-            from   Accounts 
+            from   Accounts
             where  NBS like '6%' and DAZS is NULL and BRANCH = substr(tobo_a,1,15) and rownum = 1 ;
 
             OP_REG(99, 0, 0, grp_, tmp_, rnk_6510, nlsb_tobo, 980, 'За обробку документів субєктів господарювання','ODB', isp_6510, acc_6510);
@@ -960,7 +979,6 @@ BEGIN
 
          End If;
 
-         END IF;
       END IF;
 
       BEGIN             ---  Определяем NMS счета  nlsb_tobo (6510)
@@ -981,9 +999,9 @@ BEGIN
          s1_ := 0 ;
       ELSE                     --     s1_  - остаток на ACC1 (3570/03)
          BEGIN
-            SELECT nls,-ostc INTO nlsc_, s1_ 
+            SELECT nls,-ostc INTO nlsc_, s1_
             FROM   accounts
-            WHERE  acc=acc1_ ;   
+            WHERE  acc=acc1_ ;
          EXCEPTION WHEN NO_DATA_FOUND THEN
             s1_:=0;
          END;
@@ -993,9 +1011,9 @@ BEGIN
          s2_:=0;
       ELSE                     --     s2_  - остаток на ACC2 (3570/37)
          BEGIN
-            SELECT nls,-ostc INTO nlsd_, s2_ 
+            SELECT nls,-ostc INTO nlsd_, s2_
             FROM   accounts
-            WHERE  acc=acc2_ ;   
+            WHERE  acc=acc2_ ;
          EXCEPTION WHEN NO_DATA_FOUND THEN
             s2_:=0;
          END;
@@ -1109,16 +1127,16 @@ BEGIN
             From   RKO_LST
             WHERE  acc=acc_;
 
-               UPDATE rko_lst 
+               UPDATE rko_lst
                SET  dat1a=dat0a_t,
                                 dat1b=dat0b_t,
-                    s0=0, 
+                    s0=0,
                     comm=NULL,
                                 KOLDOK=0,
                                 SUMDOK=0
                                                 WHERE acc=acc_;
 
-               UPDATE rko_lst 
+               UPDATE rko_lst
                SET  dat1a=dat0a_t,
                     dat1b=dat0b_t
                WHERE ACC1=acc1_;
@@ -1151,7 +1169,7 @@ BEGIN
          IF s2_ > 0 AND ostc_ > 0  AND  blkd_ = 0 THEN
             IF   ostc_ < s2_ THEN
                  s2a_:= ostc_;
-               ELSE 
+               ELSE
 			        s2a_:=s2_;
             END IF;
 
@@ -1329,12 +1347,12 @@ BEGIN
          ---  Находим s1_01  ( OSTC) - входящий на нач.месяца ост.3570:
          BEGIN
            Select nvl(ostf-dos+kos,0)
-           Into   s1_01 
-           From   SaldoA 
-           Where  ACC=acc1_ 
+           Into   s1_01
+           From   SaldoA
+           Where  ACC=acc1_
              and  (ACC,FDAT)=
-                      (Select ACC, max(FDAT) from Saldoa 
-                       where ACC=acc1_ and 
+                      (Select ACC, max(FDAT) from Saldoa
+                       where ACC=acc1_ and
                          FDAT < ADD_MONTHS(TRUNC(gl.bdate,'MM'),0 )
                        group by ACC)
              and nvl(ostf-dos+kos,0)<0;
@@ -1345,13 +1363,13 @@ BEGIN
          ---  Находим сумму KOS по 3570 с начала месяца по тек.момент:
          Select nvl(sum(KOS),0)
          Into   kos_3570
-         From   SaldoA 
-         Where  ACC=acc1_ 
+         From   SaldoA
+         Where  ACC=acc1_
            and  FDAT>=ADD_MONTHS(TRUNC(gl.bdate,'MM'),0)  and
                 FDAT<=gl.bdate ;
-            
 
-         -----   Переносимая ACC1->ACC2 (3570/03->3570/37) сумма:    
+
+         -----   Переносимая ACC1->ACC2 (3570/03->3570/37) сумма:
 
          s1_ := ABS( least( 0, s1_01 + kos_3570 ));
 
@@ -1359,7 +1377,7 @@ BEGIN
 
             BEGIN
                SAVEPOINT beforko6;
-   
+
                acc2_zakr:=1;
                if acc2_ is not NULL then
                   Begin
@@ -1370,12 +1388,12 @@ BEGIN
                     acc2_zakr:=0;   --- acc2_ или ЗАКРЫТ или такого acc2_
                   END;              --- вообще нет в ACCOUNTS
                end if;
-   
+
                IF acc2_ IS NULL  or  acc2_zakr=0  THEN
-   
+
                   nlsd_:= RKO.Get_NLS_random ('3570') ;  -- Получение № лиц.сч 3570/37 по случ.числам
-  
-                  OP_REG(99,0,0,grp_,tmp_,rnk_,nlsd_,kva_,    substr('Простр.РКО до 31д. '||nam_a_,1,70),'ODB',isp_,acc2_);
+
+                  OP_REG(99,0,0,grp_,tmp_,rnk_,nlsd_,kva_,    substr('Простр.РКО '||nam_a_,1,70),'ODB',isp_,acc2_);
                   p_setAccessByAccmask(acc2_,accd_);
                   Update RKO_LST  set ACC2 = acc2_  WHERE acc = acc_;
                   Update ACCOUNTS set TOBO = br_    WHERE acc = acc2_;
@@ -1385,21 +1403,21 @@ BEGIN
                   Accreg.setAccountSParam( acc2_, 'S240', 'C'  ) ;
 
                END IF; ---------------- END  открытия 3579*   -----------
-   
+
                gl.ref (ref_);
-   
+
                Insert into OPER (ref,tt,vob,nd,dk,pdat,vdat,datd, datP,   nlsa,nam_a,mfoa,nlsb,nam_b,mfob,  kv,s,kv2,s2,id_a,id_b,userid,nazn)
                VALUES (ref_,tt_,6,case when length(ref_)>10 then substr(ref_, -10) else to_char(ref_) end,1,SYSDATE,gl.bDATE,gl.bDATE, gl.bDATE,
                    nlsd_,nam_a_,gl.aMFO,nlsc_,nam_a_,gl.aMFO,kva_,s1_,kvb_,s1_,
                     okpo_,okpo_,gl.aUID,
                'Прострочена сума комiсiї за розрахункове обслуговування рах. '||nlsosn_
                       );
-   
+
                GL.PAYV(flg_,ref_,gl.bDATE,tt_,1,980,nlsd_,s1_,980,nlsc_,s1_);
-   
+
                insert into oper_visa (ref, dat, userid, status)
                values (ref_, sysdate, user_id, 0);
-   
+
                IF s2_ > 0 THEN   -- раньше был долг
                   UPDATE rko_lst SET dat2b=dat1b,comm=NULL WHERE acc=acc_;
                ELSE
@@ -1443,3 +1461,9 @@ BEGIN
 END;
 END;
 /
+
+GRANT EXECUTE ON BARS.RKO TO BARS_ACCESS_DEFROLE;
+
+GRANT EXECUTE ON BARS.RKO TO RKO;
+
+GRANT EXECUTE ON BARS.RKO TO WR_ALL_RIGHTS;
