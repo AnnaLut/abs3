@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования F4X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.002 14/09/2018 (02/09/2018) 
+% VERSION     :  v.1.003 04/03/2019 )14/09/2018) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.002  14/09/2018';
+  ver_              char(30)  := 'v.1.003  04/03/2019';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   c_old_file_code   constant varchar2(3 char) := '#F4';
@@ -89,7 +89,7 @@ BEGIN
              , K072
              , K111
              , K140
-             , F074
+             , (case when ekp = 'AF44F2' then '000' else F074 end) as F074
              , S180
              , D020
              , T070
