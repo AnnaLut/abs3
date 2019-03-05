@@ -1,9 +1,10 @@
 CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-/* Версия 15.2   19-11-2018  23-10-2018  10-09-2018  12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017 
+/* Версия 15.3   20-02-2019  19-11-2018  23-10-2018  10-09-2018  12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017 
    Розрахунок кредитного ризику по кредитах + БПК
 
    ----------------------------------------------
+34) 20-02-2019(15.3) - (COBUSUPABS-7264) - Застава по непрацюючих кредитах+KVED
 33) 19-11-2018(15.2) - Кредити+БПК+ОВЕР+МБДК+Коррахунки
 32) 23-10-2018(15.1) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 31) 10-09-2018(15.0) - ОВЕР - 2600 добавлен 
@@ -50,7 +51,7 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
       10 - ОВЕРДРАФТЫ
       41 - старый процессинг (карточки)
       42 - новый  процессинг (карточки)
-      44 - поцессинг (instolment)
+      44 -        процессинг (instolment)
       90 - фінансові зобов`язання - ОВЕРДРАФТЫ (9129)
       94 - фінансові зобов`язання - БПК (9129)
 
@@ -65,17 +66,20 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
  l_s080   specparam.s080%type  ; l_ddd   kl_f3_29.ddd%type  ; l_s240      specparam.s240%type; l_s250      rez_cr.s250%type;
  l_grp    rez_cr.grp%type      ; l_poci  rez_cr.poci%type   ;
 
- l_kol      NUMBER; acc8_     NUMBER; l_idf      NUMBER; l_fin      NUMBER; l_tipa     NUMBER; l_fin23     NUMBER; l_f        NUMBER;
- l_fp       NUMBER; l_pd_0    NUMBER; l_tip_fin  NUMBER; l_kz       NUMBER; srok       NUMBER; l_pd        NUMBER; l_CRQ      NUMBER; 
- l_EAD      NUMBER; l_zal     NUMBER; l_EADQ     NUMBER; l_LGD      NUMBER; l_CR       NUMBER; l_RC        NUMBER; l_bv       NUMBER; 
- l_BVQ      NUMBER; l_bv02    NUMBER; l_BV02q    NUMBER; l_ccf      NUMBER; l_srok     NUMBER; L_RCQ       NUMBER; L_CR_LGD   NUMBER; 
- l_zalq     NUMBER; l_zal_BV  NUMBER; l_zal_BVq  NUMBER; l_dv       NUMBER; l_polis    NUMBER; l_zal_lgd   NUMBER; l_s        NUMBER; 
- l_EADR     NUMBER; l_RZ      NUMBER; l_tip_kv   NUMBER; l_fin_okpo NUMBER; l_lgd_51   NUMBER;
+ l_kol         NUMBER; acc8_     NUMBER; l_idf      NUMBER; l_fin      NUMBER; l_tipa     NUMBER; l_fin23     NUMBER; l_f        NUMBER;
+ l_fp          NUMBER; l_pd_0    NUMBER; l_tip_fin  NUMBER; l_kz       NUMBER; srok       NUMBER; l_pd        NUMBER; l_CRQ      NUMBER; 
+ l_EAD         NUMBER; l_zal     NUMBER; l_EADQ     NUMBER; l_LGD      NUMBER; l_CR       NUMBER; l_RC        NUMBER; l_bv       NUMBER; 
+ l_BVQ         NUMBER; l_bv02    NUMBER; l_BV02q    NUMBER; l_ccf      NUMBER; l_srok     NUMBER; L_RCQ       NUMBER; L_CR_LGD   NUMBER; 
+ l_zalq        NUMBER; l_zal_BV  NUMBER; l_zal_BVq  NUMBER; l_dv       NUMBER; l_polis    NUMBER; l_zal_lgd   NUMBER; l_s        NUMBER; 
+ l_EADR        NUMBER; l_RZ      NUMBER; l_tip_kv   NUMBER; l_fin_okpo NUMBER; l_lgd_51   NUMBER;
+ l_kol_fin_max NUMBER; l_k       NUMBER; l_g_kved   NUMBER;
         
  VKR_       varchar2(3);  l_txt  varchar2(1000);  l_vkr   varchar2(50)  ;  l_real  varchar2(3);  l_text  VARCHAR2(250) ; l_kf varchar2(6);
  l_poci_    varchar2(3);
+ l_kved     varchar2(5);
 
- l_dat31  date;
+ l_dat31        date;
+ l_dat_fin_max  date;
 
  TYPE CurTyp IS REF CURSOR;
  c0   CurTyp;
@@ -165,6 +169,10 @@ begin
       --logger.info('S080 1 : nd = ' || d.nd || ' l_tip_fin = '||l_tip_fin || ' l_fin = ' || l_fin || ' s080 = ' || l_s080 ) ;
       l_tipa := d.tipa;
 
+      l_kved   := fin_nbu.GET_KVED (d.RNK, FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, p_DAT01, d.nd, d.rnk),1);
+      l_g_kved := fin_nbu.GET_GVED (d.rnk, FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, p_dat01, d.nd, d.rnk)  );
+      --logger.info('KVED 1 : nd = ' || d.nd || ' rnk = '||d.rnk || ' l_kved = ' || l_kved || ' g_kved = ' || l_g_kved ) ;
+
       DECLARE
          TYPE r0Typ IS RECORD
             ( TIP       accounts.tip%type,
@@ -196,6 +204,7 @@ begin
          loop
             FETCH c0 INTO s;
             EXIT WHEN c0%NOTFOUND;
+            l_ccf := 100;
             l_grp   := f_get_port (d.nd, d.rnk);
             if  l_grp <>0 THEN  l_s250 := '8';
             else                l_s250 := null; l_grp := null;
@@ -209,6 +218,33 @@ begin
             end if;
             if l_fin is null and d.tipa in (41,42) THEN l_fin := 5; VKR_ := 'Г'; end if; -- не санкционированный ОВЕРДРАФТ
             l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);
+
+            if s.nbs like '9%' THEN
+               if d.tipa = 10 THEN l_tipa := 90;
+               else                l_tipa :=  9;
+               end if;
+               if s.nbs in ('9000','9001','9122') and f_zal_ccf(p_dat01, d.nd) = 1 THEN l_CCF := 0;   -- COBUMMFO-7561
+               else
+                  if d.wdate is not null and d.sdate is not null THEN
+                     l_srok := d.wdate-d.sdate;
+                     if    l_srok <  365 THEN srok := 1;
+                     elsif l_srok < 1095 THEN srok := 2;
+                     else                     srok := 3;
+                     end if;
+                  else                        srok := 3;
+                  end if;
+                  l_CCF := F_GET_CCF (s.nbs, s.ob22, srok);
+               end if;
+            else l_tipa := d.tipa;
+            end if;
+
+            if l_tip_fin = 2 and l_fin = 10 or l_tip_fin = 1 and l_fin = 5 THEN 
+               l_dat_fin_max := F_FIN_MAX (p_dat01, d.nd, l_fin, l_tipa);
+               l_kol_fin_max := p_dat01 - l_dat_fin_max;
+            else 
+               l_dat_fin_max := null;
+               l_kol_fin_max := 0;
+            end if;
 
             if l_s240 in ('C','D','E','F','G','H','Z') and d.tipa not in (5, 6, 41, 42, 44) THEN
                update ex_kl351 set kl_351 = 0 where acc = s.acc and pawn = 28;
@@ -236,7 +272,7 @@ begin
 
           if s.s > 0 and s.tip not in ('SDI','SDA','SDM','SDF') THEN
             --logger.info('REZ_351 1 : nd = ' || d.nd || ' s.acc = '|| s.acc || ' VKR = ' || VKR_ || 'Остаток = ' || s.s) ;
-            for z in ( select NVL(f_zal_accs (p_dat01, d.nd, a.acc),0) zal_lgd, a.acc, a.kv, -ost_korr(a.acc,l_dat31,null,a.nbs) BV02,
+            for z in ( select NVL(f_zal_accs (p_dat01, d.nd, a.acc,s.rnk,l_kol_fin_max),0) zal_lgd, a.acc, a.kv, -ost_korr(a.acc,l_dat31,null,a.nbs) BV02,
                               f_bv_sna   (p_dat01, d.nd ,a.acc, kv) osta, m.*
                        from   accounts a,
                             ( select accs, ost, round (ost*sall / sum(sall) over  (partition by 1), 0) bv, sall, nvl(tip,0) tip, pawn, kl_351, kpz, rpb,
@@ -253,7 +289,7 @@ begin
                       )
             LOOP
 
-               l_ccf := 100; l_pd_0 := 0; l_text := NULL;
+               l_pd_0 := 0; l_text := NULL; 
  
                if    d.vidd in ( 1, 2, 3) and d.prod like '21%'                THEN l_idf := 70; l_f := 76; l_fp := 48;
                elsif d.vidd in ( 1, 2, 3)                                      THEN l_idf := 50; l_f := 56;
@@ -267,46 +303,24 @@ begin
                else                                                                 l_idf := 65; l_f := 60; l_fp := 45;
                end if;
 
-               if s.nbs like '9%' THEN
-                  if d.tipa = 10 THEN l_tipa := 90;
-                  else                l_tipa :=  9;
-                  end if;
-                  if s.nbs in ('9000','9001','9122') and f_zal_ccf(p_dat01, d.nd) = 1 THEN l_CCF := 0;   -- COBUMMFO-7561
-                  else
-                     if d.wdate is not null and d.sdate is not null THEN
-                        l_srok := d.wdate-d.sdate;
-                        if    l_srok <  365 THEN srok := 1;
-                        elsif l_srok < 1095 THEN srok := 2;
-                        else                     srok := 3;
-                        end if;
-                     else                        srok := 3;
-                     end if;
-                     l_CCF := F_GET_CCF (s.nbs, s.ob22, srok);
-                  end if;
-               else l_tipa := d.tipa;
-               end if;
 
-/*
-               if s.nbs in ('9129','9122') and l_r013 = '1' THEN  -- 351 (п.104)
-                  if d.wdate is not null and d.sdate is not null THEN
-                     l_srok := d.wdate-d.sdate;
-                     if    l_srok <  365 THEN l_CCF :=  20;
-                     elsif l_srok < 1095 THEN l_CCF :=  50;
-                     else                     L_CCF := 100;
-                     end if;
-                  end if;
-               elsif s.nbs in ('9000') and s.rnk = 274267401 and d.nd in (18023180901,18023181501,18023182001) THEN
-                  l_CCF :=  50;
-               end if;
-*/
+               l_k := F_K_ZAL (s.rnk, d.nd, z.kod_351, l_kol_fin_max); 
+               --logger.info('ZAL_351 1 : nd = ' || ' l_k :=' || l_k || ' kod_351 = ' || z.kod_351 || ' kol_max = ' ||l_kol_fin_max ) ;
+               l_text := l_text || ' l_k :=' || l_k || ' kod_351 = ' || z.kod_351 || ' kol_max = ' ||l_kol_fin_max;
+               --if l_k = 0 THEN 
+               --   z.zal_lgd:=0;
+               --end if;
+               l_zal  := (nvl(z.sall,0) * nvl(z.kl_351,0) * nvl(l_k,1))/100; l_zal_lgd := z.zal_lgd/100;
+
                --logger.info('REZ_351 4 : nd = ' || d.nd || ' s.rnk=' || s.rnk ||  ' l_fin=' || l_fin || ' VKR = ' || VKR_  ||' l_idf='|| l_idf ) ;
-               if l_real ='Ні' and z.kod_351 BETWEEN 11 AND 26 THEN  l_text := 'REAL = Ні, pawn = ' || z.pawn ;
-                                                                     l_zal  :=  0; l_zal_lgd := 0 ; z.tip :=  0; z.kl_351 := 0;
+               if l_real ='Ні' and z.kod_351 BETWEEN 12 AND 27 THEN  l_text := 'REAL = Ні, pawn = ' || z.pawn ;
+                                                                     --l_zal  :=  0; l_zal_lgd := 0 ; z.tip :=  0; z.kl_351 := 0;
                   if     d.vidd in (11,12,13) and z.kv  = 980  THEN  l_idf  := 62; l_f       := 60; l_fp  := 42;
                   elsif  d.vidd in (11,12,13) and z.kv <> 980  THEN  l_idf  := 65; l_f       := 60; l_fp  := 45;
                   end if;
-               else                                                  l_zal  := (nvl(z.sall,0) * nvl(z.kl_351,0))/100; l_zal_lgd := z.zal_lgd/100;
+               --else                                                  l_zal  := (nvl(z.sall,0) * nvl(z.kl_351,0))/100; l_zal_lgd := z.zal_lgd/100;
                end if;
+
                --logger.info('REZ_351 40 : nd = ' || d.nd || ' vidd =' || d.vidd || ' tipa =' || d.tipa || ' s.custtype=' ||s.custtype ) ;
                if d.pd is not null THEN l_pd := d.pd;
                else
@@ -400,14 +414,14 @@ begin
                                    CR     , CRQ   , bv     , bvq   , VKR     , IDF    , KOL       , FIN23   , TEXT    , tipa    , pawn     ,
                                    zal    , zalq  , kpz    , vidd  , tip_zal , LGD    , CUSTTYPE  , CR_LGD  , nbs     , zal_bv  , zal_bvq  ,
                                    S250   , dv    , RC     , RCQ   , BV02    , tip    , bv02q     , KL_351  , sdate   , RZ      , s080     , 
-                                   ob22   , grp   , cc_id  , pd_0  , istval  , wdate  , CCF       , okpo    , poci    , ddd_6B  , tip_fin  , 
-                                   rpb    )
+                                   ob22   , grp   , cc_id  , pd_0  , istval  , wdate  , CCF       , okpo    , poci    , ddd_6B  , tip_fin  , rpb,
+                                   k_ZAL  , kved  , g_kved , dat_fin_max     , kol_fin_max     )
                            VALUES (p_dat01, s.RNK , d.NMK  , d.nd  , s.kv    , s.nls  , s.acc     , l_ead   , l_eadq  , l_fin   , l_pd     ,
                                    l_CR   , l_CRQ , l_bv   , l_bvq , VKR_    , l_idf  , l_kol     , d.fin23 , l_text  , l_tipa  , z.pawn   ,
                                    l_zal  , l_zalq, z.kpz  , d.vidd, z.tip   , l_LGD  , d.CUSTTYPE, l_CR_LGD, s.nbs   , l_zal_bv, l_zal_bvq,
                                    l_S250 , l_dv  , l_RC   , l_RCQ , l_bv02  , s.tip  , l_bv02q   , z.kl_351, d.sdate , d.RZ    , l_s080   , 
-                                   s.ob22 , l_grp , d.cc_id, l_pd_0, l_istval, d.wdate, l_ccf     , d.okpo  , l_poci  , l_ddd   , l_tip_fin, 
-                                   nvl(z.rpb,0));
+                                   s.ob22 , l_grp , d.cc_id, l_pd_0, l_istval, d.wdate, l_ccf     , d.okpo  , l_poci  , l_ddd   , l_tip_fin, nvl(z.rpb,0),
+                                   L_K    , l_kved, l_g_kved, l_dat_fin_max, l_kol_fin_max );
 
             end LOOP;
            elsif s.s <> 0  and s.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') THEN
@@ -420,14 +434,16 @@ begin
                       l_BVQ  := p_icurval(s.kv,s.s,l_dat31)/100;
                       update rez_cr set tip = s.tip where fdat = p_dat01 and acc = s.acc;
                       IF SQL%ROWCOUNT=0 then
-                         INSERT INTO REZ_CR (fdat   , RNK       , NMK      , ND    , KV     , NLS     , ob22   , ACC  , EAD    , EADQ  , FIN   ,
-                                             PD     , CR        , CRQ      , bv    , bvq    , VKR     , IDF    , KOL  , FIN23  , TEXT  , tipa  ,
-                                             vidd   , CUSTTYPE  , nbs      , S250  , dv     , BV02    , tip    , bv02q, sdate  , RZ    , grp   ,
-                                             okpo   , poci      , ddd_6B, tip_fin  , s080  , cc_id  , istval  , wdate  , pd_0   )
-                                     VALUES (p_dat01, s.RNK     , d.NMK , d.nd     , s.kv  , s.nls  , s.ob22  , s.acc  , 0      , 0     , l_fin ,
-                                             l_pd   , 0         , 0        , l_bv  , l_bvq  , VKR_    , l_idf  , l_kol, d.fin23, l_text, d.tipa,
-                                             d.vidd , d.CUSTTYPE, s.nbs , l_S250   , l_dv  , l_bv   , s.tip   , l_bvq  , d.sdate, d.RZ  , l_grp ,
-                                             d.okpo , l_poci    , l_ddd , l_tip_fin, l_s080, d.cc_id, l_istval, d.wdate, 0      );
+                         INSERT INTO REZ_CR (fdat   , RNK       , NMK     , ND           , KV    , NLS    , ob22    , ACC    , EAD    , EADQ  , FIN   ,
+                                             PD     , CR        , CRQ     , bv           , bvq   , VKR    , IDF     , KOL    , FIN23  , TEXT  , tipa  ,
+                                             vidd   , CUSTTYPE  , nbs     , S250         , dv    , BV02   , tip     , bv02q  , sdate  , RZ    , grp   ,
+                                             okpo   , poci      , ddd_6B  , tip_fin      , s080  , cc_id  , istval  , wdate  , pd_0   ,
+                                             k_ZAL  , kved      , g_kved  , dat_fin_max  , kol_fin_max    )
+                                     VALUES (p_dat01, s.RNK     , d.NMK   , d.nd         , s.kv  , s.nls  , s.ob22  , s.acc  , 0      , 0     , l_fin ,
+                                             l_pd   , 0         , 0       , l_bv         , l_bvq , VKR_   , l_idf   , l_kol  , d.fin23, l_text, d.tipa,
+                                             d.vidd , d.CUSTTYPE, s.nbs   , l_S250       , l_dv  , l_bv   , s.tip   , l_bvq  , d.sdate, d.RZ  , l_grp ,
+                                             d.okpo , l_poci    , l_ddd   , l_tip_fin    , l_s080, d.cc_id, l_istval, d.wdate, 0      ,
+                                             L_K    , l_kved    , l_g_kved, l_dat_fin_max, l_kol_fin_max );      
                       end if;
                    --end if;
                 --END LOOP;
