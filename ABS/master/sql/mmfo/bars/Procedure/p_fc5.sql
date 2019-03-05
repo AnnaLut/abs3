@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.004    26/02/2019 (21/02/2019)
+% VERSION : v.19.005   27/02/2019 (26/02/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -58,6 +58,7 @@ IS
  kodf_ Varchar2(2) := 'C5';
  sheme_ Varchar2(1) := 'G';
  acc_ NUMBER;
+ acc_proc_sna NUMBER := 0;
  nbs_ VARCHAR2 (4);
  nbs1_ VARCHAR2 (4);
  nls_ VARCHAR2 (15);
@@ -594,7 +595,7 @@ BEGIN
                           WHERE s.ost <> 0 and
                                 s.acc = a.acc and
                                 s.acc = cc.acc(+) and
-                                a.tip <> ''REZ'' and
+                                a.tip not in (''REZ'',''SNA'') and
                                 not ((a.nls like ''204%'' or a.nls like ''239%'') and a.tip = ''SDF'')
                          ) a
                          join customer c
@@ -1261,7 +1262,8 @@ BEGIN
                     cnt, rnum, decode(suma, 0, 1, sump / suma) koef, r013, rz, discont, prem,
                     round(discont * decode(suma, 0, 1, sump / suma)) discont_row,
                     round(prem * decode(suma, 0, 1, sump / suma)) prem_row,
-                    nd, id, ob22, custtype, accr, accr_30, tip, discont_SDF,
+                    nd, id, ob22, custtype, accr, accr_30, tip, 
+                    discont_SDF, proc_SNA, 
                     (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez
              from (
                  select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
@@ -1276,7 +1278,8 @@ BEGIN
                         nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                         nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                         t.nd, t.id,
-                        a.ob22, c.custtype, t.accr, t.accr_30, a.tip, t.zpr discont_SDF
+                        a.ob22, c.custtype, t.accr, t.accr_30, a.tip, 
+                        t.zpr discont_SDF, t.pv proc_SNA
                  from v_tmp_rez_risk_c5 t,
                       (select acc, kodp, substr(kodp,7,1) R013, sum(to_number(znap)) sump
                        from rnbu_trace
@@ -1481,6 +1484,24 @@ BEGIN
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
           end if;
+
+          -- нарах. в_дсотки (тип рахунку SNA)
+          if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
+             kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8);
+             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+             comm_ := SUBSTR(' нарах. в_дсотки SNA c1', 1,100);
+             
+             insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+             values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+          end if;
       else
          if k.discont_SDF <> 0 then
             r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
@@ -1502,6 +1523,24 @@ BEGIN
                        comm_, k.nd, nbuc_, k.tobo );
          end if;
 
+         -- нарах. в_дсотки (тип рахунку SNA)
+         if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
+            kodp_ := '2'||nbs_||substr(k.kodp,6,1)||(case when TP_SND then k.r013 else '4' end)||substr(k.kodp,8);
+            znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+            comm_ := SUBSTR(' нарах. в_дсотки SNA for rez=0 c1', 1,100);
+             
+            insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+            values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+         end if; 
+
          if k.rnum = 1 then
               discont_ := k.discont;
               premiy_ := k.prem;
@@ -1512,7 +1551,7 @@ BEGIN
    for k in (select acc, nbs, nls, kv, rnk, s080, szq, isp, mdate, tobo, r031, r030,
                     r011, r013, s580, rez, discont, prem, nd, id, ob22, custtype, accr, tip, s240,
                     (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez,
-                    discont_SDF
+                    discont_SDF, proc_SNA
                from ( select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                              gl.p_icurval(t.kv, t.sz - t.rez_30, dat_) szq,
                              a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
@@ -1521,7 +1560,7 @@ BEGIN
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                              t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr,
-                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF
+                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF, t.pv proc_SNA
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
                        where t.dat = datr_
@@ -1552,7 +1591,7 @@ BEGIN
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                              t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr_30 accr,
-                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF
+                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF, t.pv proc_SNA
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
                        where t.dat = datr_
@@ -1804,6 +1843,25 @@ BEGIN
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
           end if;
+
+          -- нарах. в_дсотки (тип рахунку SNA)
+          if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
+             kodp_ := '2'||nbs_||r011_||r013_||substr(kodp_,8);
+             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+             comm_ := SUBSTR(' нарах. в_дсотки SNA c2', 1,100);
+             acc_proc_sna := k.acc;
+
+             insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+             values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+          end if;
       else
          if k.discont_SDF <> 0 then
             kodp_ := '2'||substr(k.nls,1,3)||'6'||'6'||(case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
@@ -1821,6 +1879,25 @@ BEGIN
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
          end if;
+
+         -- нарах. в_дсотки (тип рахунку SNA)
+         if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
+            kodp_ := '2'||nbs_||r011_||(case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
+            znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+            comm_ := SUBSTR(' нарах. в_дсотки SNA for rez=0 c2', 1,100);
+            acc_proc_sna := k.acc;
+       
+            insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+            values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+         end if; 
 
          discont_ := k.discont;
          premiy_ := k.prem;
