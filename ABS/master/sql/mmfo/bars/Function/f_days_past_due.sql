@@ -7,8 +7,8 @@
   CREATE OR REPLACE FUNCTION BARS.F_DAYS_PAST_DUE (p_dat date, p_acc number, p_DEL number) RETURN integer is
 -- Определение к-ва дней просрочки по счету (с учетом параметров просрочки по договору для кредитов)
 
-/* Версия 4.2   06-10-2017  10-03-2017  04-10-2016 (2) 22-08-2016 --  (1) 29-07-2016
-
+/* Версия 4.3   20-02-2019  06-10-2017  10-03-2017  04-10-2016 (2) 22-08-2016 --  (1) 29-07-2016
+   20-02-2019(4.3) - Для дебиторки учитывать s180  COBUSUPABS-7190(COBUSUPABS-7264)
    06-10-2017(4.2) - Балансовые счета через ф-цию rez_f_deb
    06-10-2017(4.1) - Ускорила расчет
    10-03-2017 - Попадала отчетная дата включительно
@@ -32,16 +32,8 @@ begin
       EXCEPTION WHEN NO_DATA_FOUND THEN l_kol := 0; l_ostc := 0; return l_kol;
       END;
       l_s180k := 0;
-
-      if rez_f_deb (l_nbs) = 2  THEN  -- хоз.дебиторка
-         begin
-            select  case when  regexp_like(value,'^(\d{2}.\d{2}.\d{4})$')
-                    then to_date(value,'dd-mm-yyyy')
-                    else to_date(value,'dd-mon-yyyy')
-                    end  into l_datvz from accountsw aw where tag='DATVZ' and aw.acc=p_acc;
-         EXCEPTION WHEN NO_DATA_FOUND THEN l_datvz := null;
-         end;
-         /*  еще не утверждено
+      if l_nbs<>'3710' and  rez_f_deb (l_nbs) in (1) THEN
+         -- утверждено COBUSUPABS-7190(COBUSUPABS-7264)
          If    l_s180 is null then l_s180k :=    0 ;
          ElsIf l_s180 = '3'   then l_s180k :=    7 ;       -- Вiд   2 до 7 дня
          ElsIf l_s180 = '4'   then l_s180k :=   21 ;       -- Вiд   8 до 21 дня
@@ -56,12 +48,20 @@ begin
          ElsIf l_s180 = 'E'   then l_s180k := 1095 ;       -- Більше 2 до 3 років
          ElsIf l_s180 = 'F'   then l_s180k := 1826 ;       -- Більше 3 до 5 років
          ElsIf l_s180 = 'G'   then l_s180k := 3652 ;       -- Більше 5 до 10 років
-         Else                      l_s180k := 9999 ;       -- Понад 10 років
+         ElsIf l_s180 = 'H'   then l_s180k := 9999 ;       -- Понад 10 років
+         else                      l_s180k :=    0 ;       -- мусор 
          End if;
-         */
-         l_s180k := 0;
-      else
-         l_s180k := 0;
+      elsif l_nbs = '3710'    then l_s180k :=    5 ;
+      end if;
+
+      if rez_f_deb (l_nbs) = 2  THEN  -- хоз.дебиторка
+         begin
+            select  case when  regexp_like(value,'^(\d{2}.\d{2}.\d{4})$')
+                    then to_date(value,'dd-mm-yyyy')
+                    else to_date(value,'dd-mon-yyyy')
+                    end  into l_datvz from accountsw aw where tag='DATVZ' and aw.acc=p_acc;
+         EXCEPTION WHEN NO_DATA_FOUND THEN l_datvz := null;
+         end;
       end if;
 
       if    l_mdate is not null and rez_f_deb (l_nbs) = 1 THEN  l_KOL := greatest(0,p_DAT - l_mdate);
