@@ -1,8 +1,9 @@
 CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 12.7  23-10-2018  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   
+/* Версия 12.8  18-02-2019  23-10-2018  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 
    Розрахунок кредитного ризику по ЦП
 
+24) 18-02-2019(12.8) - Добавила тип (SDM)
 23) 23-10-2018(12.7) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 22) 12-07-2018(12.6) - Новые счета ('SDI','SDA','SDM','SDF','SRR')
 21) 26-01-2018(12.5) - PD_0 - для пассивных = l , было =0!
@@ -104,7 +105,7 @@ begin
 
       for s in (select kv, acc, rnk, NVL(nbs,SUBSTR(NLS,1,4)) NBS, tip, nls, ob22, BV, f_bv_sna_cp (p_dat01 , d.ref , acc) osta
                 from ( select kv, acc, rnk, nbs, tip, nls, nvl(ob22,'01') ob22, -ost_korr (acc,l_dat31,z23.di_,nbs)  BV from  accounts
-                       where acc in (select cp_acc from cp_accounts c where c.cp_ref = d.ref and c.cp_acctype in ('N','D','RD','EXPN','EXPR','P','R','R2','R3','S','S2','UNREC'))  
+                       where acc in (select cp_acc from cp_accounts c where c.cp_ref = d.ref and c.cp_acctype in ('N','D','RD','EXPN','EXPR','P','R','R2','R3','S','S2','UNREC','SDM'))  
                          and nls not like '8%' and substr(nls,1,4) not in ('4103','4203')
                              --and ost_korr (acc,l_dat31,null,nbs) < 0
                       )
