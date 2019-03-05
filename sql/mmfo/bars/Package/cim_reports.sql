@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.04 01/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.05 05/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -765,7 +765,7 @@ begin
                decode(a.p22, 3, a.f_p09, a.p09) as p09, a.p13,
                nvl2(a.p15, a.p14, a.f_p14) as p14, decode(a.p22, 3, 0, a.p15) as p15, case when a.p15 is null or a.m_p22=3 then a.f_p16 else a.p16 end as p16,
                case when a.p15 is null or a.m_p22=3 then a.f_p17 else a.p17 end as p17,
-               a.p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
+               decode(a.p22, 3, a.f_p18, a.p18) as p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
                case when a.p15 is null or a.m_p22=3 then a.f_p21 else nvl(a.f_p21,a.p21) end as p21, a.p22, decode(a.p22, 2, l_date_z_end, null) as p23,
                decode(a.p22, 3, case when a.p15=0 then a.max_pdat else null end, null) as p24, case when a.p27=0 then null else to_char(a.p27, 'fm999') end as p27, a.doc_date,
                case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk, a.benef_adr as q002_2, a.is_fragment, a.type_id, a.bound_id
@@ -1003,7 +1003,8 @@ end  p_f531;
                                                                       (select v.val_date from cim_fantom_payments v join cim_fantoms_bound b on v.fantom_id=b.fantom_id where b.bound_id=d.fantom_id))
                                         ) as l_doc_date
                              from
-                             ( select o.kv as p14, cim_mgr.get_control_date(0, 0, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                             (/*Імпортні контракти нетягнути поки не буде поставлена заявка на прод по реалізації простановки НІ/ТАК .  
+                             select o.kv as p14, cim_mgr.get_control_date(0, 0, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
                                       0 as d_k, 0 as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, NVL( (SELECT MAX (fdat) FROM opldok WHERE REF = o.REF ), o.vdat ) as doc_date,
                                       l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
                                  from cim_payments_bound d JOIN oper o ON o.REF = d.REF
@@ -1022,7 +1023,7 @@ end  p_f531;
                                        f.payment_type in (1, 4) and d.contr_id is not null and contr_id != 0
                                   and d.branch like sys_context('bars_context', 'user_mfo_mask')
                                   and decode(d.is_doc, 1, 'Так', 'Ні') = 'Ні'
-                               union all
+                               union all*/
                                select v.kv as p14, cim_mgr.get_control_date(1, 0, d.bound_id)+1 as p21, d.borg_reason as p20,
                                       1 as d_k, 0 as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_dat as doc_date,
                                       l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
