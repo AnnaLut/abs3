@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.05 05/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.06 05/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -990,7 +990,7 @@ end  p_f531;
   begin
     bars_audit.info(l_title||' l_date_z_end='||l_date_z_end);
     --F105=1
-    for cur in (select op.*, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
+    for cur in (select op.*, c.okpo, c.rnk, c.open_date, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
                       from 
                      (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
                               decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
@@ -1040,7 +1040,10 @@ end  p_f531;
                                       left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.act_id=d.bound_id
                                 where d.delete_date is null
                                   and d.branch like sys_context('bars_context', 'user_mfo_mask') 
-                                  and decode(d.is_doc, 1, 'Так', 'Ні') = 'Ні') d ) d
+                                  and decode(d.is_doc, 1, 'Так', 'Ні') = 'Ні'
+                                  ) d
+                                  where last_day(d.doc_date)+1 = l_date_z_end 
+                                  ) d
                        group by d.d_k, d.type_id, d.bound_id ) op
                        join cim_contracts c on c.contr_type+1=op.p01 and c.contr_id=op.contr_id
                        join cim_contracts_trade t on t.contr_id=op.contr_id  
@@ -1067,7 +1070,7 @@ end  p_f531;
       l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
 --      l_nbur_36x.Q007_4     := null; --  p24; заповнюється при F105  = 6;
 --      l_nbur_36x.Q007_2     := null; --  p21; заповнюється при F105  = 6;
-      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+      l_nbur_36x.Q007_1     := nvl(cur.open_date, to_date('01.01.1900', 'DD.MM.YYYY')); --  p16; 
       l_nbur_36x.Q003_3     := cur.num;
       l_nbur_36x.Q002_1     := cur.adr;
       l_nbur_36x.Q001_2     := cur.p08;
@@ -1080,7 +1083,7 @@ end  p_f531;
     bars_audit.info(l_title||' l_date_z_end='||l_date_z_end||' F105=3 ');
     --F105=3
     --інформація про всі закриті рахунки вибираються в друкований звіт №5700
-    for cur in (select op.*, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
+    for cur in (select op.*, c.open_date,  c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
                       from 
                      (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
                               decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
@@ -1144,29 +1147,33 @@ end  p_f531;
                        left outer join kl_k110 e on e.d_close is null and e.k110=k.ved)
     loop
 --      bars_audit.info(l_title||' l_date_z_end='||l_date_z_end||' F105=3 cur.p15='||cur.p15||' cur.okpo='||cur.okpo);
-      l_nbur_36x.B040       := cur.b040;
-      l_nbur_36x.K020       := lpad(cur.okpo,10,'0');
-      l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
-      l_nbur_36x.F105       := 3;
-      l_nbur_36x.CUST_ID    := cur.rnk;
-      l_nbur_36x.BRANCH     := cur.branch;
-      l_nbur_36x.KV         := cur.p14;
-      l_nbur_36x.T071       := cur.p15;
-      l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
-      l_nbur_36x.Q006       := '';--p27;
-      l_nbur_36x.Q023       := cur.b040;
-      l_nbur_36x.K112       := cur.k112;
-      l_nbur_36x.F008       := cur.p18;
-      l_nbur_36x.D070       := cur.p01;
-      l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
-      l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
-      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
-      l_nbur_36x.Q003_3     := cur.num;
-      l_nbur_36x.Q002_1     := cur.adr;
-      l_nbur_36x.Q001_2     := cur.p08;
-      l_nbur_36x.Q001_1     := cur.p06;
+      --потрібно вказувати в файлі якщо закриті всі рахунки у клієнта
+      select count(*) into l_n from accounts where rnk = cur.rnk and dazs is null;
+      if l_n = 0 then
+        l_nbur_36x.B040       := cur.b040;
+        l_nbur_36x.K020       := lpad(cur.okpo,10,'0');
+        l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+        l_nbur_36x.F105       := 3;
+        l_nbur_36x.CUST_ID    := cur.rnk;
+        l_nbur_36x.BRANCH     := cur.branch;
+        l_nbur_36x.KV         := cur.p14;
+        l_nbur_36x.T071       := cur.p15;
+        l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+        l_nbur_36x.Q006       := '';--p27;
+        l_nbur_36x.Q023       := cur.b040;
+        l_nbur_36x.K112       := cur.k112;
+        l_nbur_36x.F008       := cur.p18;
+        l_nbur_36x.D070       := cur.p01;
+        l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+        l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+        l_nbur_36x.Q007_1     := nvl(cur.open_date, to_date('01.01.1900', 'DD.MM.YYYY')); --  p16; 
+        l_nbur_36x.Q003_3     := cur.num;
+        l_nbur_36x.Q002_1     := cur.adr;
+        l_nbur_36x.Q001_2     := cur.p08;
+        l_nbur_36x.Q001_1     := cur.p06;
       
-      pipe row (l_nbur_36x);
+        pipe row (l_nbur_36x);
+      end if;  
     end loop;
     l_nbur_36x := null;
     
@@ -1226,7 +1233,7 @@ end  p_f531;
         l_nbur_36x.D070       := cur.p01;
         l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
         l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
-        l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+        l_nbur_36x.Q007_1     := nvl(cur.p16, to_date('01.01.1900', 'DD.MM.YYYY')); --  p16;
         l_nbur_36x.Q003_3     := cur.p17;
         l_nbur_36x.Q002_1     := cur.p07;
         l_nbur_36x.Q001_2     := cur.p08;
@@ -1257,7 +1264,7 @@ end  p_f531;
       l_nbur_36x.D070       := cur.p01;
       l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
       l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
-      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; 
       l_nbur_36x.Q003_3     := cur.p17;
       l_nbur_36x.Q002_1     := cur.p07;
       l_nbur_36x.Q001_2     := cur.p08;
@@ -1269,7 +1276,7 @@ end  p_f531;
     
     --F105=7
     -- -	Операція вибирається в разі якщо граничний строк розрахунків був перевищений в звітному календарному місяці але у тому ж місяці розрахунки були завершені.
-    for cur in (select op.*, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
+    for cur in (select op.*, c.open_date, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
                       from 
                      (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
                               decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
@@ -1341,7 +1348,7 @@ end  p_f531;
       l_nbur_36x.D070       := cur.p01;
       l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
       l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
-      l_nbur_36x.Q007_1     := to_date('01.01.1900', 'DD.MM.YYYY'); --  p16; заповнюється при F105  = 6;
+      l_nbur_36x.Q007_1     := nvl(cur.open_date, to_date('01.01.1900', 'DD.MM.YYYY')); --  p16; 
       l_nbur_36x.Q003_3     := cur.num;
       l_nbur_36x.Q002_1     := cur.adr;
       l_nbur_36x.Q001_2     := cur.p08;
