@@ -24,6 +24,7 @@ CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5
    ACCR_30,
    DAT_MI,
    ZPR,
+   PV, 
    NBS
 )
 AS
@@ -51,7 +52,13 @@ AS
             NVL (NVL (acc_rez, acc_rezn), acc_rez_30) accr,
             NVL (acc_rez_30, NVL (acc_rez, acc_rezn)) accr_30,
             dat_mi,
-            SUM((case when nbs not like '204%' then 0 else nvl(zpr, 0) *100 end)) zpr,
+            SUM (
+               (CASE
+                   WHEN nbs NOT LIKE '204%' THEN 0
+                   ELSE NVL (zpr, 0) * 100
+                END))
+               zpr,
+            SUM ( NVL (pv, 0) * 100 ) pv,
             nbs
        FROM nbu23_rez a
       WHERE rez <> 0 OR diskont <> 0

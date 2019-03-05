@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.004  21/02/2019 (11/02/2019)
+% VERSION     :  v.19.006  01/03/2019 (27/02/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -107,6 +107,7 @@ IS
    ret_            NUMBER;
    add_            NUMBER;
    acc_            NUMBER;
+   acc_proc_sna NUMBER := 0;
    nbs_            VARCHAR2 (4);
    nbs1_           VARCHAR2 (4);
    nls_            VARCHAR2 (15);
@@ -1002,7 +1003,7 @@ BEGIN
                                      s.dapp, ''0'' pr, s.tobo
                                 FROM otcn_saldo aa, otcn_acc s
                                WHERE aa.acc = s.acc and
-                                     s.tip <> ''REZ'' and
+                                     s.tip not in (''REZ'', ''SNA'') and
                                      not ((s.nls like ''204%'' or s.nls like ''239%'') and s.tip = ''SDF'')) a,
                              kl_r030 l,
                              specparam p,
@@ -2947,7 +2948,7 @@ BEGIN
                     cnt, rnum, decode(suma, 0, 1, sump / suma) koef, r011, r013, rz, discont, prem,
                     round(discont * decode(suma, 0, 1, sump / suma)) discont_row,
                     round(prem * decode(suma, 0, 1, sump / suma)) prem_row,
-                    nd, id, ob22, custtype, accr, accr_30, tip, discont_SDF,
+                    nd, id, ob22, custtype, accr, accr_30, tip, discont_SDF, proc_SNA,
                     (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez
              from (select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                         nvl(gl.p_icurval(t.kv, t.sz, dat_), 0) szq,
@@ -2960,7 +2961,8 @@ BEGIN
                         s.r011, s.r013, NVL (DECODE (c.country, 804, '1', '2'), '1') rz,
                         nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                         nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                        t.nd, t.id, a.ob22, c.custtype, t.accr, t.accr_30, a.tip, t.zpr discont_SDF
+                        t.nd, t.id, a.ob22, c.custtype, t.accr, t.accr_30, a.tip, 
+                        t.zpr discont_SDF, t.pv as proc_SNA
                  from v_tmp_rez_risk_c5_new t,
                       (select acc, mdate, kodp, substr(kodp, 9, 1) s240,
                             substr(kodp, 6, 1) R011,
@@ -3091,18 +3093,18 @@ BEGIN
              -- для рахунків нарахованих %, де є розбивка по R013
              kodp_ := k.sign_rez||nbs_||r011_||r013_||s181_||s242_||k.rz||substr(k.kodp, 11, 4);
 
-             srez_ := abs(k.szq);
-
-             sum_ := round(srez_ * k.koef);
-
              if k.rnum = 1 then
-                sumc_  := sum_;
-                
                 sakt_ := k.suma;
 
                 srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
                 srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
+                
+                sum_ := round(srez_ * k.koef);
+                
+                sumc_  := sum_;
              else
+                sum_ := round(srez_ * k.koef);
+                
                 sumc_ := sumc_ + sum_;
              end if;
 
@@ -3188,7 +3190,6 @@ BEGIN
 
             -- превышение резерва при наличии только одной строки проц.счета
              if k.cnt =1 and k.nls like '3118%' then
-
                 if r013_30 = 1 then
                    --   rez_30 нужно показать с R013=B
                    --        оставшийся нераспределенный резерв:  R013=r013_,R012=B
@@ -3271,6 +3272,24 @@ BEGIN
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
           end if;
+
+          -- нарах. відсотки (тип рахунку SNA)
+          if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
+             kodp_ := '2' || nbs_ || substr(k.kodp,6,1) || r013_ || substr(k.kodp,8);
+             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+             comm_ := SUBSTR(' нарах. відсотки SNA c1', 1,100);
+             
+             insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+             values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+          end if;
       else
          if k.discont_SDF <> 0 then
             r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
@@ -3291,6 +3310,24 @@ BEGIN
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
          end if;
+
+        -- нарах. в_дсотки (тип рахунку SNA)
+         if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
+            kodp_ := '2' || nbs_ || substr(k.kodp,6,1) || (case when TP_SND then k.r013 else '4' end) || substr(k.kodp,8);
+            znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+            comm_ := SUBSTR(' нарах. відсотки SNA for rez=0 c1', 1,100);
+             
+            insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+            values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+         end if; 
 
          if k.rnum = 1 then
             discont_ := k.discont;
@@ -3318,135 +3355,135 @@ BEGIN
                     acc, nbs, nls, kv, rnk, s080, szq, isp, mdate, tobo, s240, s180, r031, r030,
                     r011, r013, rez, discont, prem, nd, id, ob22, custtype, accr, tip, s190,
                     (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez,
-                    discont_SDF
+                    discont_SDF, proc_SNA
              from (
                  SELECT
-                 T.ACC,
-                 T.NLS,
-                 DECODE(T.KV, 974, 933, T.KV) KV,
-                 T.RNK,
-                 T.S080,
-                 GL.P_ICURVAL (T.KV, T.SZ - T.REZ_30, dat_) SZQ,
-                 A.ISP,
-                 A.MDATE,
-                 A.TOBO,
-                 nvl(a.nbs, substr(a.nls, 1,4)) NBS,
-                 NVL (S.S240, '0') S240,
-                 NVL (S.S180, '0') S180,
-                 L.R031,
-                 DECODE(LPAD (L.R030, 3, '0'), '974', '933', LPAD (L.R030, 3, '0')) R030,
-                 NVL (S.R011, '0') R011, NVL (S.R013, '0') R013,
-                 NVL (DECODE (C.COUNTRY, 804, '1', '2'), '1') REZ,
-                 nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
-                 nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                 T.ND,T.ID,a.ob22, t.zpr discont_SDF, c.custtype,
-                 t.accr, a.tip, nvl(s.s190, '0') s190
-            FROM V_TMP_REZ_RISK_C5_NEW T,
-                 ACCOUNTS A,
-                 SPECPARAM S,
-                 CUSTOMER C,
-                 KL_R030 L
-           WHERE T.DAT = datr_
-                 AND NOT exists (SELECT ACC FROM RNBU_TRACE r
-                                  where r.acc = T.ACC and substr(kodp,1,5) not in ('21600', '22600', '22605', '22620', '22625', '22650', '22655',
-                                                                         '11419','11429','11519','11529','12039',
-                                                                         '12069','12089','12109','12119','12129',
-                                                                         '12139','12209','12239') )
-                 and T.ID not LIKE 'NLO%'
-                 AND T.ACC = A.ACC
-                 AND T.ACC = S.ACC(+)
-                 AND A.KV = TO_NUMBER (L.R030)
-                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
-                 AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('410','420')
-                 AND A.RNK = C.RNK
-                 and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
-                      mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
-      union
-             SELECT
-                 T.ACC,
-                 T.NLS,
-                 DECODE(T.KV, 974, 933, T.KV) KV,
-                 T.RNK,
-                 T.S080,
-                 GL.P_ICURVAL (T.KV, T.REZ_30, dat_) SZQ,
-                 A.ISP,
-                 A.MDATE,
-                 A.TOBO,
-                 nvl(a.nbs, substr(a.nls, 1,4)) NBS,
-                 NVL (S.S240, '0') S240,
-                 NVL (S.S180, '0') S180,
-                 L.R031,
-                 DECODE(LPAD (L.R030, 3, '0'), '974', '933', LPAD (L.R030, 3, '0')) R030,
-                 NVL (S.R011, '0') R011, NVL (S.R013, '0') R013,
-                 NVL (DECODE (C.COUNTRY, 804, '1', '2'), '1') REZ,
-                 nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
-                 nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                 T.ND, T.ID, a.ob22, t.zpr discont_SDF, c.custtype,
-                 t.accr_30 accr, a.tip, nvl(s.s190, '0') s190
-            FROM V_TMP_REZ_RISK_C5_NEW T,
-                 ACCOUNTS A,
-                 SPECPARAM S,
-                 CUSTOMER C,
-                 KL_R030 L
-           WHERE T.DAT = datr_
-                 AND NOT exists (SELECT ACC FROM RNBU_TRACE r
-                                  where r.acc = T.ACC and substr(kodp,1,5) not in ('21600', '22600', '22605', '22620', '22625', '22650', '22655',
-                                                                         '11419','11429','11519','11529','12039',
-                                                                         '12069','12089','12109','12119','12129',
-                                                                         '12139','12209','12239') )
-                 and T.ID not LIKE 'NLO%'
-                 AND T.ACC = A.ACC
-                 AND T.ACCR_30 = S.ACC(+)
-                 AND A.KV = TO_NUMBER (L.R030)
-                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
-                 AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('204','239','410','420')
-                 AND A.RNK = C.RNK
-                 and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
-                      mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
-                 and t.nbs not like '204%'
-                 and t.nbs not like '239%'
-      union
-            SELECT
-                T.ACC,
-                 T.NLS,
-                 DECODE(T.KV, 974, 933, T.KV) KV,
-                 T.RNK,
-                 T.S080,
-                 GL.P_ICURVAL (T.KV, T.SZ, dat_) SZQ,
-                 A.ISP,
-                 A.MDATE,
-                 A.TOBO,
-                 nvl(a.nbs, substr(a.nls, 1,4)) NBS,
-                 NVL (S.S240, '0') S240,
-                 NVL (S.S180, '0') S180,
-                 L.R031,
-                 DECODE(LPAD (L.R030, 3, '0'), '974', '933', LPAD (L.R030, 3, '0')) R030,
-                 NVL (S.R011, '0') R011, NVL (S.R013, '0') R013,
-                 NVL (DECODE (C.COUNTRY, 804, '1', '2'), '1') REZ,
-                 nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
-                 nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                 T.ND, T.ID, a.ob22, t.zpr discont_SDF, c.custtype,
-                 t.accr, a.tip, nvl(s.s190, '0') s190
-            FROM V_TMP_REZ_RISK_C5_NEW T,
-                 ACCOUNTS A,
-                 SPECPARAM S,
-                 CUSTOMER C,
-                 KL_R030 L
-           WHERE T.DAT = datr_
-                 and (T.ID LIKE 'NLO%')
-                 AND T.ACC = A.ACC
-                 AND T.ACC = S.ACC(+)
-                 AND A.KV = TO_NUMBER (L.R030)
-                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
-                 AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('204','239','410','420')
-                 AND A.RNK = C.RNK
-                 and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
-                      mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
-                 and t.nbs not like '204%'
-                 and t.nbs not like '239%'
-                        )
-            where szq <> 0 or discont <> 0 or prem <> 0
-            order by tobo, acc, s240)
+                     T.ACC,
+                     T.NLS,
+                     DECODE(T.KV, 974, 933, T.KV) KV,
+                     T.RNK,
+                     T.S080,
+                     GL.P_ICURVAL (T.KV, T.SZ - T.REZ_30, dat_) SZQ,
+                     A.ISP,
+                     A.MDATE,
+                     A.TOBO,
+                     nvl(a.nbs, substr(a.nls, 1,4)) NBS,
+                     NVL (S.S240, '0') S240,
+                     NVL (S.S180, '0') S180,
+                     L.R031,
+                     DECODE(LPAD (L.R030, 3, '0'), '974', '933', LPAD (L.R030, 3, '0')) R030,
+                     NVL (S.R011, '0') R011, NVL (S.R013, '0') R013,
+                     NVL (DECODE (C.COUNTRY, 804, '1', '2'), '1') REZ,
+                     nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
+                     nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
+                     T.ND,T.ID,a.ob22, t.zpr discont_SDF, c.custtype,
+                     t.accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA
+                FROM V_TMP_REZ_RISK_C5_NEW T,
+                     ACCOUNTS A,
+                     SPECPARAM S,
+                     CUSTOMER C,
+                     KL_R030 L
+               WHERE T.DAT = datr_
+                     AND NOT exists (SELECT ACC FROM RNBU_TRACE r
+                                      where r.acc = T.ACC and substr(kodp,1,5) not in ('21600', '22600', '22605', '22620', '22625', '22650', '22655',
+                                                                             '11419','11429','11519','11529','12039',
+                                                                             '12069','12089','12109','12119','12129',
+                                                                             '12139','12209','12239') )
+                     and T.ID not LIKE 'NLO%'
+                     AND T.ACC = A.ACC
+                     AND T.ACC = S.ACC(+)
+                     AND A.KV = TO_NUMBER (L.R030)
+                     AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
+                     AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('410','420')
+                     AND A.RNK = C.RNK
+                     and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
+                          mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
+          union
+                 SELECT
+                     T.ACC,
+                     T.NLS,
+                     DECODE(T.KV, 974, 933, T.KV) KV,
+                     T.RNK,
+                     T.S080,
+                     GL.P_ICURVAL (T.KV, T.REZ_30, dat_) SZQ,
+                     A.ISP,
+                     A.MDATE,
+                     A.TOBO,
+                     nvl(a.nbs, substr(a.nls, 1,4)) NBS,
+                     NVL (S.S240, '0') S240,
+                     NVL (S.S180, '0') S180,
+                     L.R031,
+                     DECODE(LPAD (L.R030, 3, '0'), '974', '933', LPAD (L.R030, 3, '0')) R030,
+                     NVL (S.R011, '0') R011, NVL (S.R013, '0') R013,
+                     NVL (DECODE (C.COUNTRY, 804, '1', '2'), '1') REZ,
+                     nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
+                     nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
+                     T.ND, T.ID, a.ob22, t.zpr discont_SDF, c.custtype,
+                     t.accr_30 accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA
+                FROM V_TMP_REZ_RISK_C5_NEW T,
+                     ACCOUNTS A,
+                     SPECPARAM S,
+                     CUSTOMER C,
+                     KL_R030 L
+               WHERE T.DAT = datr_
+                     AND NOT exists (SELECT ACC FROM RNBU_TRACE r
+                                      where r.acc = T.ACC and substr(kodp,1,5) not in ('21600', '22600', '22605', '22620', '22625', '22650', '22655',
+                                                                             '11419','11429','11519','11529','12039',
+                                                                             '12069','12089','12109','12119','12129',
+                                                                             '12139','12209','12239') )
+                     and T.ID not LIKE 'NLO%'
+                     AND T.ACC = A.ACC
+                     AND T.ACCR_30 = S.ACC(+)
+                     AND A.KV = TO_NUMBER (L.R030)
+                     AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
+                     AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('204','239','410','420')
+                     AND A.RNK = C.RNK
+                     and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
+                          mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
+                     and t.nbs not like '204%'
+                     and t.nbs not like '239%'
+          union
+                SELECT
+                    T.ACC,
+                     T.NLS,
+                     DECODE(T.KV, 974, 933, T.KV) KV,
+                     T.RNK,
+                     T.S080,
+                     GL.P_ICURVAL (T.KV, T.SZ, dat_) SZQ,
+                     A.ISP,
+                     A.MDATE,
+                     A.TOBO,
+                     nvl(a.nbs, substr(a.nls, 1,4)) NBS,
+                     NVL (S.S240, '0') S240,
+                     NVL (S.S180, '0') S180,
+                     L.R031,
+                     DECODE(LPAD (L.R030, 3, '0'), '974', '933', LPAD (L.R030, 3, '0')) R030,
+                     NVL (S.R011, '0') R011, NVL (S.R013, '0') R013,
+                     NVL (DECODE (C.COUNTRY, 804, '1', '2'), '1') REZ,
+                     nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
+                     nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
+                     T.ND, T.ID, a.ob22, t.zpr discont_SDF, c.custtype,
+                     t.accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA
+                FROM V_TMP_REZ_RISK_C5_NEW T,
+                     ACCOUNTS A,
+                     SPECPARAM S,
+                     CUSTOMER C,
+                     KL_R030 L
+               WHERE T.DAT = datr_
+                     and (T.ID LIKE 'NLO%')
+                     AND T.ACC = A.ACC
+                     AND T.ACC = S.ACC(+)
+                     AND A.KV = TO_NUMBER (L.R030)
+                     AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
+                     AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('204','239','410','420')
+                     AND A.RNK = C.RNK
+                     and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
+                          mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
+                     and t.nbs not like '204%'
+                     and t.nbs not like '239%'
+                            )
+                where szq <> 0 or discont <> 0 or prem <> 0
+                order by tobo, acc, s240)
    loop
       IF typ_ > 0 THEN
          if k.accr is not null and mfo_ = '322669' then
@@ -3741,8 +3778,27 @@ BEGIN
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
          end if;
+
+         -- нарах. відсотки (тип рахунку SNA)
+         if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
+             kodp_ := '2' || nbs_ || r011_ || r013_ || substr(kodp_,8);
+             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+             comm_ := SUBSTR(' нарах. відсотки SNA c2', 1,100);
+             acc_proc_sna := k.acc;
+
+             insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+             values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+         end if;   
       else
-         if     k.tip in ('SK9','SP ','SPN','XPN','OFR','KSP','KK9','KPN','SNA') and
+         if k.tip in ('SK9','SP ','SPN','XPN','OFR','KSP','KK9','KPN','SNA') and
             substr(k.nls, 1, 4) not in ('2607','2627','1819','2809','3519','3559')
          then
             s240_ := 'Z';
@@ -3782,6 +3838,25 @@ BEGIN
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
          end if;
+         
+         -- нарах. в_дсотки (тип рахунку SNA)
+         if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
+            kodp_ := '2'||nbs_||r011_||(case when TP_SND then k.r013 else '4' end)||s181_||'Z'||k.rez||s190_||k.r030;
+            znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             
+            comm_ := SUBSTR(' нарах. відсотки SNA for rez=0 c2', 1,100);
+            acc_proc_sna := k.acc;
+       
+            insert into rnbu_trace
+                     ( recid, userid,
+                       nls, kv, odate, kodp,
+                       znap, acc, rnk, isp, mdate,
+                       comm, nd, nbuc, tobo )
+            values ( s_rnbu_record.NEXTVAL, userid_,
+                       k.nls, k.kv, data_, kodp_,
+                       znap_, k.acc, k.rnk, k.isp, k.mdate,
+                       comm_, k.nd, nbuc_, k.tobo );
+         end if; 
       end if;
    end loop;
 
