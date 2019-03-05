@@ -45,6 +45,18 @@ begin
       else raise;
       end if;
   end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('VOVDP', 'DP2', 'O',    1,         0,  '0', null);
+  exception
+    when dup_val_on_index then null;
+    when others then 
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''VOVDP'', ''DP2'', ''M'', 0, 0, ''0'', null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  
   --------------------------------
   ------ Связанные операции ------
   --------------------------------
