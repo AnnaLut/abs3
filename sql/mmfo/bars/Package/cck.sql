@@ -8672,6 +8672,7 @@ end if;
                 FROM cc_deal d, cc_prol c
                WHERE (p_nd = 0 OR p_nd = d.nd)
                  AND d.nd = c.nd
+                 and not d.prod like '9%'
                  AND d.vidd IN (1, 2, 3, 11, 12, 13)
                  AND d.sos < 15
                  AND c.dmdat = p_dat
