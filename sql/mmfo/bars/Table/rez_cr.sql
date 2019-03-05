@@ -273,6 +273,17 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I5_REZ_CR_ND_FDAT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I5_REZ_CR_FDAT_ACC ON BARS.REZ_CR (nd, FDAT, tipa, pd_0) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 begin
  execute immediate   'alter table REZ_CR add (z_grp number) ';
 exception when others then
@@ -410,6 +421,52 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+begin
+ execute immediate   'alter table REZ_CR add (dat_fin_max date) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.dat_fin_max IS 'Дата виникнення найгіршого фин.класу';
+
+begin
+ execute immediate   'alter table REZ_CR add (kol_fin_max integer) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.kol_fin_max IS 'К-ть днів виникнення найгіршого фин.класу';
+
+begin
+ execute immediate   'alter table REZ_CR add (KVED varchar2(5)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.KVED IS 'КВЕД';
+
+begin
+ execute immediate   'alter table REZ_CR add (G_KVED number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.G_KVED IS 'Группа КВЕД';
+
+begin
+ execute immediate   'alter table REZ_CR add (k_zal number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.kol_fin_max IS 'Коефіцієнт коригування забезпечення по просроч. > 730 днів';
+
 
 
 PROMPT *** Create  grants  REZ_CR ***
