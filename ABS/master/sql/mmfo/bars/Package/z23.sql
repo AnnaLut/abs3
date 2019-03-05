@@ -238,11 +238,13 @@ END Z23;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 24.1 18-01-2019'; 
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 24.3 05-03-2019'; 
 
 /*
+121) 20-02-2019(24.3) - (COBUMMFO-10053) - сума лізингу в справедливу вартість LIZSUM - 
+120) 10-02-2019(24.2) - (COBUMMFO-10322) - Дата формування архіву по фін. та хоз. дебіторці 
 119) 18-01-2019(24.1) - (COBUMMFO-10630) - Распределение ('SDI','SDA','SDM','SDF','SNA','SRR')     
-118) 23-10-2018(24.0) - (COBUMMFO-7488) - Добавлены процедура и функция 
+118) 23-10-2018(24.0) - (COBUMMFO-7488)  - Добавлены процедура и функция 
                          procedure Set_OK_18   ( p_Dat01 date, p_KF varchar2, p_NPP int ); 
                          function  Get_REZ_LOG ( p_KF char, p_dat date, p_txt varchar2) return varchar2 ;  
 117) 24-09-2018(23.9) - Перестраивать архив пока не выгрузят T0
@@ -2168,7 +2170,6 @@ begin
 
      --z23.to_log_rez (user_id , 351 , p_dat01 ,' cck_arc_cc_lim');
      --cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 );
-     
      select count(*) into l_cnt from xoz_ref_arc  cl where cl.mdat = p_dat01 and chgdate >= p_dat01 and chgdate is not null;
 
      if l_cnt = 0  THEN
@@ -2204,7 +2205,7 @@ begin
      from prvn_fin_deb f
      where not exists (select 1 from fin_deb_arc cl where cl.mdat= p_dat01 and rownum=1);
      commit;
-    
+
      -- формування 
      begin
         delete from rez_par_9200 where fdat = p_dat01; 
@@ -2227,27 +2228,36 @@ begin
 --------------------------------------
 
   If nvl(p_mode ,0) in ( 0,1) then
-
-     begin
-        for k in (select to_number(nvl(cck_app.Get_ND_TXT (nd, 'ZAL_LIZ'),'0')) pawn,n.nd ,  a.acc from nd_acc n, accounts a
-                  where (a.nbs like '207%' or a.nbs in ('2044')) and ost_korr(a.acc,dat31_,null,a.nbs)<>0 and a.acc = n.acc
+        -- фінансовий лізінг (розгортання забезпечення) 
+        -- сума лізингу в справедливу вартість LIZSUM - (COBUMMFO-10053)
+        begin
+        for k in (select to_number(nvl(cck_app.Get_ND_TXT (nd, 'ZAL_LIZ'),'0' )) pawn,
+                         to_number(nvl(cck_app.Get_ND_TXT (nd, 'LIZSUM') ,NULL))*100 sv  ,
+                         n.nd,  
+                         a.acc 
+                  from   nd_acc n, accounts a
+                  where (a.nbs like '207%' or a.nbs in ('2044')) 
+                   and   ost_korr(a.acc,dat31_,null,a.nbs)<>0 
+                   and   a.acc = n.acc
                  )
         LOOP
            if k.pawn <>0 THEN
               begin
                  insert into cc_accp (ACC,  ACCS, ND, PR_12, IDZ) values ( k.acc, k.acc, k.nd, 0, k.nd);
               exception when others then
-                 --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
+                 --ORA-00001: unique constraint  violated
                  if SQLCODE = -00001 then NULL;
                  else raise;
                  end if;
               end;
               begin
-                 insert into pawn_acc  (acc, pawn,mpawn ) values (k.acc, k.pawn, 1);
+                 insert into pawn_acc  (acc, pawn, mpawn, sv ) values (k.acc, k.pawn, 1, k.sv);
               exception when others then
-                 --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
-                 if SQLCODE = -00001 then NULL;
-                 else raise;
+                 --ORA-00001: unique constraint  violated
+                 if SQLCODE = -00001 then 
+                    update pawn_acc set pawn = k.pawn, sv = k.sv where acc=k.acc;
+                 else 
+                    raise;
                  end if;
               end;
            end if;
@@ -5905,7 +5915,7 @@ BEGIN
  -------------------------------
  delete from NBU23_REZ where id like 'CACP%' and fdat = dat01_;
  -- пересчитать переоценку в связи с изменением невизнанних доходів
- update cp_pereoc_v set fl_alg23=fl_alg23 where fl_alg23<>0;
+ -- update cp_pereoc_v set fl_alg23=fl_alg23 where fl_alg23<>0;
 
 /*
  -- Новая переоценка пока не стоит
@@ -6393,4 +6403,4 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/z23.sql =========*** End *** =======
  PROMPT ===================================================================================== 
-
+ 

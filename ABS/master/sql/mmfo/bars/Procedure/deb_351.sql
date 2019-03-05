@@ -11,7 +11,9 @@ PROMPT *** Create  procedure DEB_351 ***
 
 /*   Розрахунок кредитного ризику по дебіторці
      -----------------------------------------
-    Версия 7.8      16-01-2019  29-01-2018  25-10-2017  03-10-2017  28-09-2017  25-09-2017  18-09-2017 11-07-2017  16-05-2017   
+    Версия 7.9      20-02-2019  16-01-2019  29-01-2018  25-10-2017  03-10-2017  28-09-2017  25-09-2017  
+
+24) 20-02-2019(7.9) - (COBUSUPABS-7264) - KVED
 14) 16.01.2019(7.8) - (ND_VAL через ОКПО)
 13) 23-10-2018(7.7) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 12) 29-01-2018(7.6) - Определение типа XOZ через ф-цию f_tip_xoz (если нет в картотеке заносится в таблицу rez_xoz_tip)
@@ -48,11 +50,14 @@ PROMPT *** Create  procedure DEB_351 ***
 
  l_del    number;  l_EAD  number;  l_del_kv  number;  l_tip_fin number ;  l_RC   number ;  l_pd   number;  l_fin      number;  l_CV  number;
  l_fin23  number;  l_kol  number;  l_CR      number;  l_EADQ    number ;  l_CRQ  number ;  l_RCQ  NUMBER;  l_xoz_new  number;
- l_pd_0  INTEGER;  l_nd  integer;  l_MAX    integer;  l_deb     integer;  l_LGD  integer;
+ l_pd_0   INTEGER; l_nd  integer;  l_MAX    integer;  l_deb     integer;  l_LGD  integer;
+ l_g_kved NUMBER;  l_kol_fin_max NUMBER;
 
  l_Text  varchar2(250) := '' ;  l_deb_bez varchar2(1) := '0';  l_txt  varchar2(1000);  l_tx  varchar2(30);  l_RNK_FIN char(1); l_kf char(6);
+ l_kved  varchar2(5);
 
  l_dat31  date;  l_sdate  date;  l_wdate  date;
+ l_dat_fin_max  date;
 
  TYPE CurTyp IS REF CURSOR;
  c0   CurTyp;
@@ -148,7 +153,11 @@ begin
             l_ddd := f_ddd_6B(k.nbs);
             --l_tip_fin := f_get_nd_tip_fin (k.nd, p_dat01,k.rnk, k.tipa);
             l_tip_fin := f_get_nd_val_n ('TIP_FIN',k.nd, p_dat01, k.tipa, k.okpo);
-             if l_tip_fin is null THEN
+
+            l_kved    := fin_nbu.GET_KVED (k.RNK, FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, p_DAT01, K.nd, K.rnk),0);
+            l_g_kved  := fin_nbu.GET_GVED (k.rnk, FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, p_dat01, k.nd, k.rnk)  );
+
+            if l_tip_fin is null THEN
                if k.deb in (1,2) THEN l_tip_fin := 0; end if;
                  -- если не нашло реальный TIP_FIN нельзя переопеределять как ЮЛ или ФЛ (причины: Изменили РНК, внесли остаток корректирующими)
                  -- if k.cus=2 THEN                   l_tip_fin := 2;
@@ -189,6 +198,13 @@ begin
                l_PD  := 0;
             end if;
             if k.nbs = '3541' THEN l_fin := 2; l_pd := 1; end if;
+            if l_tip_fin = 2 and l_fin = 10 or l_tip_fin = 1 and l_fin = 5 or l_tip_fin = 0 and l_fin = 2 THEN 
+               l_dat_fin_max := F_FIN_MAX (p_dat01, k.nd, l_fin, k.tipa);
+               l_kol_fin_max := p_dat01 - l_dat_fin_max;
+            else 
+               l_dat_fin_max := null;
+               l_kol_fin_max := 0;
+            end if;
             l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);
             l_EAD  := k.bv/100;
             l_EADQ := p_icurval(k.kv,k.bv,l_dat31)/100;
@@ -200,10 +216,12 @@ begin
             l_CRQ  := p_icurval(k.kv,L_CR*100,l_dat31)/100;
             INSERT INTO REZ_CR (fdat   , RNK   , NMK   , ND      , SDATE   , KV    , NLS   , ACC      , EAD   , EADQ   , FIN  , PD      , BV    ,
                                 CR     , CRQ   , TIPA  , bv02    , bv02q   , s180  , pd_0  , rz       , RC    , RCQ    , nbs  , custtype, BVQ   ,
-                                okpo   , LGD   , s250  , grp     , istval  , s080  , ddd_6B, tip_fin  , ob22  , wdate  , tip  , KOL     , FIN23   , TEXT  )
+                                okpo   , LGD   , s250  , grp     , istval  , s080  , ddd_6B, tip_fin  , ob22  , wdate  , tip  , KOL     , FIN23   , TEXT,
+                                kved   , g_kved, dat_fin_max     , kol_fin_max   )
                         VALUES (p_dat01, k.RNK , k.NMK , k.nd    , l_sdate , k.kv  , k.nls , k.acc    , l_ead , l_eadq , l_fin, l_pd    , l_ead ,
                                 l_CR   , l_CRQ , k.tipa, l_ead   , l_eadq  , l_s180, l_pd_0, k.rz     , l_RC  , l_RCQ  , k.nbs, k.cus   , l_eadq,
-                                k.okpo , l_LGD , l_s250, l_grp   , l_istval, l_s080, l_ddd , l_tip_fin, k.ob22, k.wdate, k.tip, l_kol   , l_fin23 , l_TEXT || ' Фин.= ' || l_fin);
+                                k.okpo , l_LGD , l_s250, l_grp   , l_istval, l_s080, l_ddd , l_tip_fin, k.ob22, k.wdate, k.tip, l_kol   , l_fin23 , l_TEXT || ' Фин.= ' || l_fin,
+                                l_kved , l_g_kved, l_dat_fin_max, l_kol_fin_max);
          end if;
       END loop;
       z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Дебиторка 351 ');

@@ -1,10 +1,10 @@
 CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 12.8  18-02-2019  23-10-2018  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 
+/* Версия 12.8  20-02-2019  23-10-2018  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 
    Розрахунок кредитного ризику по ЦП
-
-24) 18-02-2019(12.8) - Добавила тип (SDM)
-23) 23-10-2018(12.7) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
+25) 20-02-2019(12.8) - (COBUSUPABS-7190) - s.nbs in ('3012','3112','3212') THEN  l_pd := 0
+24) 20-02-2019(12.8) - (COBUSUPABS-7264) - Застава по непрацюючих кредитах+KVED
+23) 23-10-2018(12.7) - (COBUMMFO-7488)   - Добавлено ОКПО в REZ_CR
 22) 12-07-2018(12.6) - Новые счета ('SDI','SDA','SDM','SDF','SRR')
 21) 26-01-2018(12.5) - PD_0 - для пассивных = l , было =0!
 20) 03-01-2018(12.4) - R013='' - символьный
@@ -36,16 +36,19 @@ CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0
                                 
  l_kol      INTEGER;  l_pd_0    INTEGER;  l_tip_fin   INTEGER;  acc8_       INTEGER;  l_idf     INTEGER;  l_fin      INTEGER;
  l_tipa     INTEGER;  l_fin23   INTEGER;                                
- l_pd       NUMBER ;  l_CRQ     NUMBER ;  l_EAD       NUMBER ;  l_zal       NUMBER ;  l_zalq    NUMBER ;  l_zal_BV   NUMBER ; 
- l_zal_BVq  NUMBER ;  l_EADQ    NUMBER ;  l_LGD       NUMBER ;  l_CR        NUMBER ;  l_RC      NUMBER ;  l_bv       NUMBER ;  
- l_BVQ      NUMBER ;  l_bv02    NUMBER ;  l_BV02q     NUMBER ;  cp_acc_     number ;  cp_accp_  number ;  cp_accd_   number ;  
- cp_accs_   number ;  cp_accr_  number ;  cp_accr2_   number ;  l_accexpr   number ;  l_accr3   number ;  l_RCQ      number ;  
- l_dv       NUMBER ;  l_CR_LGD  NUMBER ;  l_RZ        NUMBER ;  l_zal_lgd   NUMBER ;  l_fin_351 NUMBER ;  l_pd_351   NUMBER ;  
- l_fin_okpo NUMBER ;  l_s       NUMBER ;  l_lgd_51    NUMBER ;
+ l_pd       NUMBER ;  l_CRQ     NUMBER ;  l_EAD         NUMBER ;  l_zal       NUMBER ;  l_zalq    NUMBER ;  l_zal_BV   NUMBER ; 
+ l_zal_BVq  NUMBER ;  l_EADQ    NUMBER ;  l_LGD         NUMBER ;  l_CR        NUMBER ;  l_RC      NUMBER ;  l_bv       NUMBER ;  
+ l_BVQ      NUMBER ;  l_bv02    NUMBER ;  l_BV02q       NUMBER ;  cp_acc_     number ;  cp_accp_  number ;  cp_accd_   number ;  
+ cp_accs_   number ;  cp_accr_  number ;  cp_accr2_     number ;  l_accexpr   number ;  l_accr3   number ;  l_RCQ      number ;  
+ l_dv       NUMBER ;  l_CR_LGD  NUMBER ;  l_RZ          NUMBER ;  l_zal_lgd   NUMBER ;  l_fin_351 NUMBER ;  l_pd_351   NUMBER ;  
+ l_fin_okpo NUMBER ;  l_s       NUMBER ;  l_lgd_51      NUMBER ;
+ l_k        NUMBER ;  l_g_kved  NUMBER ;  l_kol_fin_max NUMBER;                    
 
- VKR_  varchar2(3);  l_txt  varchar2(1000); l_vkr  varchar2(50); l_nbs  char(4); l_kf varchar2(6);
+ VKR_   varchar2(3);  l_txt  varchar2(1000); l_vkr  varchar2(50); l_nbs  char(4); l_kf varchar2(6);
+ l_kved varchar2(5);
 
- l_sdate  date;  l_dat31  date;  
+ l_sdate        date;  l_dat31  date;  
+ l_dat_fin_max  date;
 
 begin                                                                                    
    pul_dat(to_char(p_dat01,'dd-mm-yyyy'),'');
@@ -70,6 +73,9 @@ begin
    LOOP 
       l_dv := 0;
       l_vkr:= 'Ценные бумаги ';
+
+      l_kved   := fin_nbu.GET_KVED (d.RNK, FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, p_DAT01, d.ref, d.rnk),1);
+      l_g_kved := fin_nbu.GET_GVED (d.rnk, FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, p_dat01, d.ref, d.rnk)  );
 
       begin 
          SELECT  CASE WHEN REGEXP_LIKE(value,'^[ |.|,|0-9]+$')  THEN 0+REPLACE(REPLACE(value ,' ',''),',','.') 
@@ -166,14 +172,24 @@ begin
                END; 
                if l_r013 in ('2','V') THEN l_pd := 0; end if;
             end if;
+            if s.nbs in ('3012','3112','3212') THEN  l_pd := 0; end if;  -- COBUSUPABS-7190
 
             if l_pawn = 11 THEN l_pd := 0; l_pd_0 := 1; l_fin := 1; end if;
 
             l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);             
+
+            if l_tip_fin = 2 and l_fin = 10 or l_tip_fin = 1 and l_fin = 5 THEN 
+               l_dat_fin_max := F_FIN_MAX (p_dat01, d.ref, l_fin, l_tipa);
+               l_kol_fin_max := p_dat01 - l_dat_fin_max;
+            else 
+               l_dat_fin_max := null;
+               l_kol_fin_max := 0;
+            end if;
+
 --logger.info('REZ_351_cp 2   : nd = ' || d.ref || ' s.acc = '|| s.acc || ' bv = '|| s.bv || ' s.tip = '|| s.tip) ;   
          if s.bv > 0 and s.tip not in ('SDI','SDA','SDM','SDF')  THEN      
-            for z in (select NVL(f_zal_accs (p_dat01, d.ref, a.acc),0) zal_lgd, a.acc, a.kv, -ost_korr(a.acc,l_dat31,null,a.nbs) BV02, 
-                             f_bv_sna_cp  (p_dat01, d.ref ,a.acc) osta, m.* 
+            for z in (select NVL(f_zal_accs (p_dat01, d.ref, a.acc, d.rnk, l_kol_fin_max),0) zal_lgd, a.acc, a.kv, -ost_korr(a.acc,l_dat31,null,a.nbs) BV02, 
+                            f_bv_sna_cp  (p_dat01, d.ref ,a.acc) osta, m.* 
                       from   accounts a,  
                             (select accs, ost, round (ost*sall / sum(sall) over  (partition by 1), 0) bv, sall, nvl(tip,0) tip, pawn, 
                                     kl_351, kpz, rpb, round (bv_all*sall / sum(sall) over  (partition by 1), 0) bv_all, kod_351
@@ -193,13 +209,17 @@ begin
                --l_EAD  := nvl(s.osta,s.bv); 
                l_lgd     := 0;
                l_zal_lgd := 0; 
+               l_k       := F_K_ZAL (s.rnk, d.ref, z.kod_351, l_kol_fin_max); 
+               --if l_k = 0 THEN 
+               --   z.zal_lgd:=0;
+               --end if;
+               l_zal  := (nvl(z.sall,0) * nvl(z.kl_351,0) * nvl(l_k,1))/100; l_zal_lgd := z.zal_lgd/100;
+               l_zal     := round(l_zal,2);
+               l_zalq    := p_icurval(s.kv,l_zal*100,l_dat31)/100;      
                l_EAD     := nvl(z.bv,z.osta);
                l_EAD     := greatest(l_EAD,0); 
                l_EAD     := round(l_EAD / 100,2);
                --l_zal  := 0;
-               l_zal     := (nvl(z.sall,0) * nvl(z.kl_351,0))/100; l_zal_lgd := z.zal_lgd/100;
-               l_zal     := round(l_zal,2);
-               l_zalq    := p_icurval(s.kv,l_zal*100,l_dat31)/100;      
                l_s       := z.osta/100;
                if l_ead = 0 or nvl(l_zal,0) + nvl(L_RC,0) = 0 THEN L_LGD := 1;
                else                                                l_LGD := round(greatest(0,1 - (l_zal_lgd + L_RC) / l_s),8); 
@@ -232,13 +252,15 @@ begin
                                    tipa   , pawn  , zal     , zalq  , kpz     , vidd     , tip_zal , LGD      , OVKR  , P_DEF     , 
                                    OVD    , OPD   , istval  , dv    , CR_LGD  , nbs      , zal_bv  , zal_bvq  , tip   , custtype  , 
                                    RC     , RCQ   , cc_id   , s080  , ddd_6B  , tip_fin  , ob22    , pd_0     , RZ    , KL_351    , 
-                                   okpo   , wdate )     
+                                   okpo   , wdate ,
+                                   kved   , g_kved, dat_fin_max  , kol_fin_max)     
                            VALUES (p_dat01, d.RNK , d.NMK   , d.ref , l_sdate , d.kv     , s.nls   , s.acc    , l_ead , l_eadq    , 
                                    l_fin  , l_pd  , l_CR    , l_CRQ , l_bv    , l_bvq    , D.vncrr , l_idf    , l_kol , d.fin23   , 
                                    l_tipa , z.pawn, l_zal   , l_zalq, z.kpz   , null     , z.tip   , l_LGD    , l_OVKR, l_PDEF    , 
                                    l_OVD  , l_OPD , l_istval, l_dv  , l_CR_LGD, l_nbs    , l_zal_bv, l_zal_bvq, s.tip , d.custtype, 
                                    l_RC   , L_RCQ , d.cp_id , l_s080, l_ddd   , l_tip_fin, s.ob22  , l_pd_0   , d.rz  , z.kl_351  , 
-                                   d.okpo , d.datp);  
+                                   d.okpo , d.datp,
+                                   l_kved , l_g_kved, l_dat_fin_max, l_kol_fin_max);  
             end loop;
          elsif s.bv<>0 THEN
 --logger.info('REZ_351_cp 4   : nd = ' || d.ref ) ;   
@@ -261,11 +283,13 @@ begin
                   INSERT INTO REZ_CR (fdat    , RNK   , NMK  , ND    , KV     , NLS      , ACC  , EAD    , EADQ   , FIN  , PD        , 
                                       CR      , CRQ   , bv   , bvq   , VKR    , IDF      , KOL  , FIN23  , tipa   , vidd , CUSTTYPE  , 
                                       nbs     , dv    , BV02 , s080  , ddd_6B , tip_fin  , tip  , bv02q  , sdate  , RZ   , cc_id     , 
-                                      okpo   , istval  , wdate , pd_0  , ob22   )                                        
-                              VALUES (p_dat01, d.RNK   , d.NMK , d.ref , s.kv   , s.nls    , s.acc, 0      , 0      , l_fin, l_pd      ,
+                                      okpo    , istval  , wdate , pd_0  , ob22 ,
+                                      kved    , g_kved  , dat_fin_max  , kol_fin_max  )                                        
+                              VALUES (p_dat01 , d.RNK   , d.NMK , d.ref , s.kv   , s.nls    , s.acc, 0      , 0      , l_fin, l_pd      ,
                                       0       , 0     , l_bv , l_bvq , D.vncrr, l_idf    , l_kol, d.fin23, l_tipa , null , d.CUSTTYPE, 
-                                      s.nbs  , l_dv    , l_bv  , l_s080, l_ddd  , l_tip_fin, s.tip, l_bvq  , l_sdate, d.RZ , d.cp_id   , 
-                                      d.okpo , l_istval, d.datp, l_pd_0, nvl(s.ob22,'01') ) ;  
+                                      s.nbs   , l_dv    , l_bv  , l_s080, l_ddd  , l_tip_fin, s.tip, l_bvq  , l_sdate, d.RZ , d.cp_id   , 
+                                      d.okpo  , l_istval, d.datp, l_pd_0, nvl(s.ob22,'01'),
+                                      l_kved  , l_g_kved,l_dat_fin_max, l_kol_fin_max ) ;  
                END IF;
             --END LOOP;
          end if;
