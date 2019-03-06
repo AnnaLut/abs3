@@ -8856,8 +8856,9 @@ end if;
                                 'S9N',
                                 'S8V',
                                 'S36') OR
-                     (a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26'))
+                     (a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26')
                      or a.nbs in ('9601','9611')
+                     )
                  AND (a.ostc <> 0 OR a.ostb <> 0 OR a.ostf <> 0 OR
                      a.dos + a.kos > 0 AND a.dapp >= gl.bdate)) LOOP
       serr_ := serr_ || ' Ñ÷ ' || k.nls || '/' || k.kv ||
