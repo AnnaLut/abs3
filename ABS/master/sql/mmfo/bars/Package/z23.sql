@@ -2172,6 +2172,8 @@ begin
      --cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 );
      select count(*) into l_cnt from xoz_ref_arc  cl where cl.mdat = p_dat01 and chgdate >= p_dat01 and chgdate is not null;
 
+     select count(*) into l_cnt from xoz_ref_arc  cl where cl.mdat = p_dat01 and chgdate >= p_dat01 and chgdate is not null;
+
      if l_cnt = 0  THEN
         z23.to_log_rez (user_id , 351 , p_dat01 ,'DELETE xoz_ref_arc');
         delete from xoz_ref_arc where mdat=p_dat01;           
@@ -2205,7 +2207,7 @@ begin
      from prvn_fin_deb f
      where not exists (select 1 from fin_deb_arc cl where cl.mdat= p_dat01 and rownum=1);
      commit;
-
+    
      -- формування 
      begin
         delete from rez_par_9200 where fdat = p_dat01; 
