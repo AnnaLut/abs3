@@ -22,7 +22,6 @@ prompt -- ======================================================
 begin
   bars.bpa.alter_policy_info( 'NBUR_REF_FILES', 'WHOLE',  Null, Null, Null, Null );
   bars.bpa.alter_policy_info( 'NBUR_REF_FILES', 'FILIAL', NULL,  'E',  'E',  'E' );
-  bars.bpa.alter_policy_info( 'NBUR_REF_FILES', 'CENTER', NULL,  'E',  'E',  'E' );
 end;
 /
 
@@ -47,6 +46,8 @@ begin
 , FLAG_TURNS           NUMBER(1)
 , FILE_FMT             VARCHAR2(3)   DEFAULT 'TXT'
                                      CONSTRAINT CC_REFFILES_FILEFMT_NN    NOT NULL
+, FILE_PRIORITY        NUMBER(1)     DEFAULT  1            
+                                     CONSTRAINT CC_REFFILES_FILEPRT_NN    NOT NULL                    
 , constraint PK_NBURREFFILES PRIMARY KEY ( ID ) USING INDEX TABLESPACE BRSMDLI
 , constraint UK_NBURREFFILES UNIQUE (FILE_CODE) USING INDEX TABLESPACE BRSMDLI
 , constraint FK_NBURREFFILES_PERIODTP FOREIGN KEY (PERIOD_TYPE) REFERENCES BARS.NBUR_REF_PERIODS (PERIOD_TYPE)
@@ -67,6 +68,11 @@ prompt -- ======================================================
 
 begin
   NBUR_UTIL.SET_COL( 'NBUR_REF_FILES','FILE_CODE_ALT', 'VARCHAR2(3)' );
+end;
+/
+
+begin
+  NBUR_UTIL.SET_COL( 'NBUR_REF_FILES','FILE_PRIORITY', 'NUMBER(1)', '1' );
 end;
 /
 
@@ -104,6 +110,8 @@ comment on column NBUR_REF_FILES.VALUE_TYPE_IND     IS 'Тип значення показника';
 comment on column NBUR_REF_FILES.VIEW_NM            IS 'Назва в`юхи (для БМД)';
 comment on column NBUR_REF_FILES.FLAG_TURNS         IS 'ознака наявності оборотів у файлі (0 - немає, 1 - є)';
 comment on column NBUR_REF_FILES.FILE_FMT           IS 'Формат файлу (TXT/XML)';
+comment on column NBUR_REF_FILES.FILE_PRIORITY      IS 'Приорітет обробки файлів від 0 до 9 (0 - найвищий)';
+
 
 prompt -- ======================================================
 prompt -- Grants
