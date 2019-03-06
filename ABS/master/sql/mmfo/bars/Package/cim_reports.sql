@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.06 05/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.07 06/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -1042,7 +1042,7 @@ end  p_f531;
                                   and d.branch like sys_context('bars_context', 'user_mfo_mask') 
                                   and decode(d.is_doc, 1, 'връ', 'ЭГ') = 'ЭГ'
                                   ) d
-                                  where last_day(d.doc_date)+1 = l_date_z_end 
+                                  where trunc(last_day(d.doc_date)+1) = l_date_z_end 
                                   ) d
                        group by d.d_k, d.type_id, d.bound_id ) op
                        join cim_contracts c on c.contr_type+1=op.p01 and c.contr_id=op.contr_id
