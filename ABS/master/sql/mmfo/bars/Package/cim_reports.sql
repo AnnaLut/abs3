@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.07 06/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.08 06/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -771,12 +771,12 @@ begin
                case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk, a.benef_adr as q002_2, a.is_fragment, a.type_id, a.bound_id
          from
          ( select nvl(m.m_p22,
-                      case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null then 3
-                           when x.f_b041 is null             
-                               --Зміни до відображення взяття на контроль
-                                                 and (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) then 1
+                      case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null or not (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) then 3
+                           when x.f_b041 is null and (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) then 1
                            when x.f_p02 != e.k112 or x.f_p06 != k.nmk or x.f_p07 != nvl(x.adr, k.adr) or x.f_p08 != substr(b.benef_name,1,135) or
-                                x.f_p09 != b.country_id or x.f_p15 != x.p15 or x.f_p19 != x.p19 then 2 else -1 end ) as p22,
+                                x.f_p09 != b.country_id or x.f_p15 != x.p15 or x.f_p19 != x.p19 then 2 
+                           when x.f_b041 is not null then -1 
+                           else -2 end ) as p22,
                       x.b041, x.k020, x.p01, e.k112 as p02, x.f_p02, x.f_p02_old, k.nmk as p06 , x.f_p06, x.f_p06_old, nvl(x.adr, k.adr) as p07, x.f_p07, x.f_p07_old,
                       substr(b.benef_name,1,135) as p08, x.f_p08, x.f_p08_old, to_char(b.country_id, 'fm000') as p09, x.f_p09, x.p14, x.p15, x.p16, x.p17, x.p18, x.f_p18,
                       x.p19, x.f_p19, x.p20, x.f_p20, x.p21, x.max_pdat, x.contr_id, x.doc_date,
@@ -861,9 +861,11 @@ begin
     )
     loop
       begin
-        insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, rnk, create_date, q002_2, is_fragment, type_id, bound_id)
-                     values (l.b041, l.k020, l.doc_date, l.p01, l.p02, l.p06, l.p07, l.p08, l.p09, l.p13, l.p14, l.p15, l.p16, l.p17, l.p18,
-                             l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l.rnk, l_date_z_end, l.q002_2, l.is_fragment, l.type_id, l.bound_id);
+        if l.p22 != -2 then --Взяття на контроль непотрібне, бо сума менше 150000 і немає ознаки дроблення
+          insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, rnk, create_date, q002_2, is_fragment, type_id, bound_id)
+                       values (l.b041, l.k020, l.doc_date, l.p01, l.p02, l.p06, l.p07, l.p08, l.p09, l.p13, l.p14, l.p15, l.p16, l.p17, l.p18,
+                               l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l.rnk, l_date_z_end, l.q002_2, l.is_fragment, l.type_id, l.bound_id);
+        end if;                       
       --COBUMMFO-9323
       exception
         when dup_val_on_index then
