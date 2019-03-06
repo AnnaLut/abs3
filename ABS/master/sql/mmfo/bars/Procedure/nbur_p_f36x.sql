@@ -18,7 +18,7 @@ is
 %
 % VERSION     :  v.18.002    07/12/2018 (24/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_      char(30)  := 'v.19.003   06/03/2019';
+  ver_      char(30)  := 'v.19.004   06/03/2019';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -140,18 +140,31 @@ BEGIN
                                k112, f019, f020, 
                                r030, q023, q006, t070, t071, f105,
                                acc_id, acc_num, kv, cust_id, branch)
-    SELECT  p_report_date as REPORT_DATE, p_kod_filii as KF, l_version_id AS VERSION_ID, p_kod_filii as NBUC,
-            'A36002' as EKP, f_get_ku_by_nbuc(p_kod_filii) as KU,
-            b040,
-            '#' as F021,
-            k020, substr(f_nbur_get_k020_by_rnk(CUST_ID), 1, 1) as k021, Q001_1, Q001_2, Q002_1, Q002_2,
-            to_char(row_number() over (order by K020, Q003_3, Q007_1, Q007_5), 'fm0000')  as Q003_2, Q003_3, 
-            Q007_1, Q007_2, Q007_3, Q007_4,
-            Q007_5, K040, D070, F008, 
-            K112, '#' as F019, '#' as F020,
-            R030, Q023, Q006, T070, T071, F105,
-            null as ACC_ID, null as ACC_NUM, KV, CUST_ID, BRANCH
-    from table(cim_reports.p_f531_2(l_date_z_end));
+    select report_date, kf, version_id, nbuc, 
+                               ekp, ku, 
+                               b040, 
+                               f021, 
+                               k020, k021, q001_1, q001_2, q002_1, q002_2, 
+                               case when length(Q003_2) > 4 then '9999' else Q003_2 end  as Q003_2,
+                               q003_3, 
+                               q007_1, q007_2, q007_3, q007_4,
+                               q007_5, k040, d070, f008, 
+                               k112, f019, f020, 
+                               r030, q023, q006, t070, t071, f105,
+                               acc_id, acc_num, kv, cust_id, branch
+    from                                                      
+        (SELECT  p_report_date as REPORT_DATE, p_kod_filii as KF, l_version_id AS VERSION_ID, p_kod_filii as NBUC,
+                'A36002' as EKP, f_get_ku_by_nbuc(p_kod_filii) as KU,
+                b040,
+                '#' as F021,
+                k020, substr(f_nbur_get_k020_by_rnk(CUST_ID), 1, 1) as k021, Q001_1, Q001_2, Q002_1, Q002_2,
+                to_char(row_number() over (order by K020, Q003_3, Q007_1, Q007_5), 'fm0000')  as Q003_2, Q003_3, 
+                Q007_1, Q007_2, Q007_3, Q007_4,
+                Q007_5, K040, D070, F008, 
+                K112, '#' as F019, '#' as F020,
+                R030, Q023, Q006, T070, T071, F105,
+                null as ACC_ID, null as ACC_NUM, KV, CUST_ID, BRANCH
+        from table(cim_reports.p_f531_2(l_date_z_end)));
 
 
     logger.info (c_title || ' end for date = '||to_char(p_report_date, c_date_fmt));
