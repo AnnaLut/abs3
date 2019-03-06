@@ -18,7 +18,7 @@ is
 %
 % VERSION     :  v.18.002    07/12/2018 (24/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_      char(30)  := 'v.19.002   01/03/2019';
+  ver_      char(30)  := 'v.19.003   06/03/2019';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -111,13 +111,15 @@ BEGIN
                else p22
              end) as F021,
             k020, substr(f_nbur_get_k020_by_rnk(rnk), 1, 1) as k021, p06 as Q001_1, p08 as Q001_2, p07 as Q002_1, q002_2,
-            to_char(row_number() over (order by k020, p17, p16, to_date(doc_date, 'ddmmyyyy')), 'fm0000')  as Q003_2, p17 as Q003_3, 
+            case when length(Q003_2) > 4 then '9999' else Q003_2 end  as Q003_2, --по Івано-Франківську якась лажа вилізла, більше 9999
+            p17 as Q003_3, 
             p16 as Q007_1, p21 as Q007_2, p23 as Q007_3, p24 as Q007_4,
             to_date(doc_date, 'ddmmyyyy') as Q007_5, lpad(p09, 3, '0') as K040, p01 as D070, p18 as F008, 
             substr(p02,1,1) as K112, nvl(p20, '9') as F019, p19 as F020,
             lpad(p14, 3, '0') as R030, l_b040_8 || b041 as Q023, p27 as Q006, p13 as T070, p15 as T071, '#' as f105,
             null as ACC_ID, null as ACC_NUM, p14 as KV, rnk as CUST_ID, BRANCH
-    from (select f.*, l_b040_8 || b041 as b040
+    from (select f.*, l_b040_8 || b041 as b040,
+                 to_char(row_number() over (order by f.k020, f.p17, f.p16, to_date(f.doc_date, 'ddmmyyyy')))  as Q003_2
           from cim_f36 f
           where f.create_date = l_date_z_end
             and f.branch like '/'||p_kod_filii||'/'
