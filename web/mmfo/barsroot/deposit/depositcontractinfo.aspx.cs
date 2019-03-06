@@ -567,7 +567,7 @@ public partial class DepositContractInfo : Page
                     OracleCommand cmdDepositInfo = new OracleCommand();
                     cmdDepositInfo.Connection = connect;
                     cmdDepositInfo.CommandText = " select nvl(nvl((SELECT 1 FROM dpt_deposit d,accounts a WHERE a.nbs = '2620' " +
-                                                 " and a.ob22 in ('20','21','33','34') AND d.deposit_id = :dpt_id AND d.acc = a.acc), " +
+                                                 " and a.ob22 in ('20','21','33','34','39') AND d.deposit_id = :dpt_id AND d.acc = a.acc), " +
                                                  " (SELECT sum(o.s) FROM dpt_deposit d, accounts a, dpt_payments dp, opldok o WHERE a.nbs = '2620'  " +
                                                  " AND d.deposit_id = :dpt_id AND d.deposit_id = dp.dpt_id AND d.acc = a.acc AND dp.REF = o.REF " +
                                                  " AND o.fdat >= a.daos AND o.tt = 'KD6' AND o.sos > 0)),0) from dual  ";
