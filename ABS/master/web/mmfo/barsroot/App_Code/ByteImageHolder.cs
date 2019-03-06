@@ -24,8 +24,8 @@ namespace Bars.Utils
 
         public static byte[] GetImageFromSession(HttpSessionState session, string imageDataSessionID)
         {
-            using (ByteData d = GetImageByteDataFromSession(session, imageDataSessionID)) 
-                return d != null ? d.Data : null;
+            ByteData d = GetImageByteDataFromSession(session, imageDataSessionID);
+            return d != null ? d.Data : null;
         }
 
         public static void SetImageIntoSession(HttpSessionState session, string imageDataSessionID, ByteData data)
