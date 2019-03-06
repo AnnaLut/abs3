@@ -206,6 +206,7 @@ namespace Bars.UserControls
             finally
             {
                 wrpt.Dispose();
+                rpt.Dispose();
             }
         }
         public String Export(FrxExportTypes exportType)
@@ -853,7 +854,7 @@ namespace Bars.UserControls
                     doc.Print(FrxExportTypes.Pdf);
                 }
                 catch (System.Exception ex) {
-                    _dbLogger.Info("FrxDocLocal:try alt template");
+                    _dbLogger.Info(String.Format("FrxDocLocal:try alt template; FrxDocLocal_1: {0} , {1}", ex.Message, ex.StackTrace));
                     doc = new FrxDocLocal(
                     FrxDocLocal.GetTemplatePathByFileName(FrxDocLocal.GetTemplateFileNameByID(TemplateID).Replace(".frx", "_alt.frx")),
                     pars,
@@ -863,6 +864,7 @@ namespace Bars.UserControls
                         doc.Print(FrxExportTypes.Pdf);
                     }
                     catch(System.Exception ex2) {
+                        _dbLogger.Info(String.Format("FrxDocLocal_2: {0} , {1}", ex.Message, ex.StackTrace));
                         HttpContext.Current.Response.Write(ex2.Message);
                     }
                 }
@@ -872,6 +874,7 @@ namespace Bars.UserControls
             }
             catch (DepositException ex)
             {
+                _dbLogger.Info(String.Format("FrxDocLocal_3: {0} , {1}", ex.Message, ex.StackTrace));
                 throw new DepositException(ex.Message, ex.InnerException);
             }
 
