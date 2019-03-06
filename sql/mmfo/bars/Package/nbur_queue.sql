@@ -1,4 +1,4 @@
-create or replace package NBUR_QUEUE
+CREATE OR REPLACE PACKAGE BARS.NBUR_QUEUE
 is
 
   g_header_version  constant varchar2(64)  := 'version 4.8  2018.05.15';
@@ -83,6 +83,7 @@ is
   function f_check_queue_without_objects(p_period_type in number, p_kf in varchar2 default null) return number;
     -- p_period_type = 1 - обробляються щоденні та декадні файли
     -- p_period_type = 2 - обробляються інші файли
+    -- p_period_type = 3 - обробляються пріорітетні файли
 
   -- розбір черги з файлів
   function f_check_queue_forms(p_version_id   in number,
@@ -127,17 +128,13 @@ is
 
 end NBUR_QUEUE;
 /
-
 show errors;
 
-create or replace package body NBUR_QUEUE 
+CREATE OR REPLACE PACKAGE BODY BARS.NBUR_QUEUE
 is
-  g_body_version  constant varchar2(64)  := 'version 7.5  2018.09.20';
+  g_body_version  constant varchar2(64)  := 'version 7.6  2019.02.28';
   g_body_defs     constant varchar2(512) := '';
 
-  -- COBUMMFO-7501
-  gc_block_date   constant date := to_date('15122017', 'ddmmyyyy');
-  
   MODULE_PREFIX   constant varchar2(10)  := 'NBUR';
 
   --
@@ -236,8 +233,10 @@ is
            where proc_type = p_proc_type and
                  id in (select id
                         from NBUR_REF_FILES
-                        where p_period_type = 1 and period_type in ('D', 'T') or
-                              p_period_type = 2 and period_type not in ('D', 'T')) and
+                        where (p_period_type = 1 and period_type in ('D', 'T') or
+                               p_period_type = 2 and period_type not in ('D', 'T')) and file_priority <> 0 or
+                              p_period_type = 3 and file_priority = 0
+                        ) and
                  (p_kf is null or nvl(kf, p_kf) = p_kf);
         end if;
 
@@ -261,40 +260,6 @@ is
             p_send_message(p_txt_mes, k.usr_id);
         end loop;
     end;
-
-    function f_try_old_proc(p_report_date      in date,
-                            p_kodf             in varchar2,
-                            p_a017             in varchar2,
-                            p_kf               in varchar2
-                          ) return number
-    is
-        l_ret         number  := 0;
-        l_proc_name   varchar2(100);
-    begin
-        select max(p.name) proc_name
-        into l_proc_name
-        from kl_f00 f, rep_proc p
-        where f.kodf= p_kodf and
-              f.procc = p.procc;
-
-         begin
-             execute immediate
-                  'begin '||l_proc_name||'(:dat_); end; '
-             using p_report_date;
-
-             p_send_message('Файл #'||p_kodf||'('||p_a017||') за дату '||
-                  to_char(p_report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||' успішно сформовано!', user_id);
-         exception
-              when others then
-                      p_send_message('При формування файлу #'||p_kodf||'('||p_a017||') за дату '||
-                          to_char(p_report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||' виникла помилка!', user_id);
-
-                      p_errors_log('ERROR LOAD #'||p_kodf||'('||p_a017||')'||
-                         ' dat='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf);
-         end;
-
-        return l_ret;
-    end f_try_old_proc;
 
     -- отримання локального ідентифікатора останньої версії даних для звітної дати та філії
     function f_get_local_version(p_report_date      in date,
@@ -520,8 +485,10 @@ is
               kf = p_kf and
               id in (select id
                      from NBUR_REF_FILES
-                     where p_period_type = 1 and period_type in ('D', 'T') or
-                           p_period_type = 2 and period_type not in ('D', 'T')) and
+                     where (p_period_type = 1 and period_type in ('D', 'T') or
+                            p_period_type = 2 and period_type not in ('D', 'T')) and file_priority <> 0 or
+                           p_period_type = 3 and file_priority = 0
+                     ) and
               status = 1;
     end p_clear_queue_forms;
 
@@ -547,6 +514,9 @@ is
         l_ret_mes         varchar2(200);
         l_ret_mes_add     varchar2(200);
         l_wokdday         date;
+        
+        -- COBUMMFO-7501
+        lc_block_date   constant date := to_date('01012019', 'ddmmyyyy');
     begin
         select count(*)
         into l_cnt
@@ -570,13 +540,14 @@ is
 
            return l_ret_mes;
         end if;
-        
-        if p_report_date <= to_date('15122017', 'ddmmyyyy') and p_file_code <> '@87' then
+
+        -- COBUMMFO-7501
+        if (p_report_date <= lc_block_date and sysdate >= lc_block_date) and p_file_code <> '@87' then
            l_ret_mes := 'Дата '||to_char(p_report_date, 'dd.mm.yyyy')||' не доступна для формування, бо вже перейшли на новий план рахунків!'||
-                        ' Виберіть іншу дату, що більша за 15.12.2017!';
+                        ' Виберіть іншу дату, що більша за '||to_char(lc_block_date, 'dd.mm.yyyy')||'!';
 
            return l_ret_mes;
-        end if;        
+        end if;
 
         select count(*)
         into l_cnt
@@ -674,9 +645,9 @@ is
                         ' в чергу. Зверніться до адміністратора!';
         end if;
 
-    return l_ret_mes;
+        return l_ret_mes;
 
-  end f_put_queue_form;
+    end f_put_queue_form;
 
   --
   -- вставка всіх залежних файлів в чергу
@@ -727,7 +698,7 @@ is
         l_ret := F_PUT_QUEUE_FORM_BY_ID( k.file_id, p_bank_date, p_report_date, k.kf, p_userid, p_status );
       end loop;
 
-    when p_type = 2 
+    when p_type = 2
     then -- вставка в чергу файлів, що залежать від списку файлів NBUR_QUEUE_FORMS
 
       for k in ( select distinct l.file_dep_id, q.kf
@@ -763,8 +734,7 @@ is
     when ( p_type = 3 )
     then -- вставка в чергу XML файлів, що залежать (дублюють) TXT файли в черзі
 
-      for k in ( select distinct q.KF
-                      , f.ID as RPT_ID
+      for k in ( select distinct q.KF, f.ID as RPT_ID, q.user_id
                    from NBUR_QUEUE_FORMS q
                    join NBUR_LNK_FILES_FILES d
                      on ( d.FILE_ID = q.ID )
@@ -778,7 +748,7 @@ is
                )
       loop
         -- вставка в чергу
-        l_ret := F_PUT_QUEUE_FORM_BY_ID( k.RPT_ID, p_bank_date, p_report_date, k.KF, p_userid, p_status );
+        l_ret := F_PUT_QUEUE_FORM_BY_ID( k.RPT_ID, p_bank_date, p_report_date, k.KF, k.user_id, p_status );
       end loop;
 
     else
@@ -815,7 +785,7 @@ is
          and proc_type in ('F', 'O')
          and ( date_finish is null or date_finish > p_report_date );
     exception
-      when no_data_found 
+      when no_data_found
       then l_type_proc := 0;
     end;
 
@@ -827,7 +797,7 @@ is
        and report_date = p_report_date
        and kf = p_kf;
 
-    if ( l_exists > 0 ) 
+    if ( l_exists > 0 )
     then -- вже є в черзі
       return -3;
     else -- вставка в чергу
@@ -1129,6 +1099,7 @@ is
     l_global_version_id     number;
     l_version_blc_id        number;
     l_user_id               number;
+    l_branch_name   varchar2(100) := branch_utl.get_branch_name('/' || p_kf || '/') ;
   begin
         l_user_id := user_id;
 
@@ -1232,12 +1203,15 @@ is
                 --проставляємо статус про призупинення оформування файлу, бо не вистачає даних
                 l_ret := nbur_files.f_finish_form_file(l_version_id, k.file_id,
                                     k.report_date, k.kf, 'STOPPED');
+                                    
+            -- вилучаємо файл з черги
+            p_clear_queue_one_form(k.report_date, k.kf, k.file_id);
 
-                -- вилучаємо файл з черги
-                p_clear_queue_one_form(k.report_date, k.kf, k.file_id);
-
-                p_send_message('Формування файлу призупинено через помилку при завантаженні даних!'||
-                                    ' Зверніться до адміністратора!', k.user_id);
+            p_send_message('Формування файлу ' || nbur_files.f_get_kodf(k.file_id) ||
+                           ' за дату ' || to_char(k.report_date, 'dd.mm.yyyy') ||
+                           ' по МФО=' || k.kf ||' (' || l_branch_name || ') '||
+                           ' призупинено через помилку при завантаженні даних!'||
+                           ' Зверніться до адміністратора!', k.user_id);
             end loop;
 
             -- очистка черги
@@ -1281,7 +1255,8 @@ is
     -- розбір черги без об'єктів
     function f_check_queue_without_objects(p_period_type in number, p_kf in varchar2 default null) return number
     -- p_period_type = 1 - обробляються щоденні та декадні файли
-    -- p_period_type = 2 - обробляються інші файли
+    -- p_period_type = 2 - обробляються інші файли (місячні, квартальні та річні)
+    -- p_period_type = 3 - обробляються пріорітетні файли
     is
         l_ret                   number;
         l_report_date           date;
@@ -1311,13 +1286,16 @@ is
                         o.status = 1 and
                         o.id in (select id
                                  from NBUR_REF_FILES
-                                 where p_period_type = 1 and period_type in ('D', 'T') or
-                                       p_period_type = 2 and period_type not in ('D', 'T')) and
+                                 where (p_period_type = 1 and period_type in ('D', 'T') or
+                                        p_period_type = 2 and period_type not in ('D', 'T')) and file_priority <> 0 or
+                                       p_period_type = 3 and file_priority = 0
+                                       ) and
                         o.proc_type in (0, 2)
                   order by 1 desc, 2)
         loop
             l_report_date := p.report_date;
             l_kf := p.kf;
+            
 
             -- створення версії для завантаження
             -- якщо завантажуєм всі kf, то для всіх - однаковий номер версії
@@ -1335,8 +1313,10 @@ is
                       where status = 1 and
                             id in (select id
                                    from NBUR_REF_FILES
-                                   where p_period_type = 1 and period_type in ('D', 'T') or
-                                         p_period_type = 2 and period_type not in ('D', 'T')) and
+                                   where (p_period_type = 1 and period_type in ('D', 'T') or
+                                          p_period_type = 2 and period_type not in ('D', 'T')) and file_priority <> 0 or
+                                         p_period_type = 3 and file_priority = 0
+                                       ) and
                             proc_type in (0, 2) and
                             report_date = l_report_date and
                             nvl(f.kf, l_kf) = l_kf and
@@ -1412,8 +1392,12 @@ is
                                 (case when p_period_type is null then ' '
                                       else
                                          (case when p_period_type = 1
-                                               then 'g.period_type in (''D'', ''T'') and '
-                                               else 'g.period_type not in (''D'', ''T'') and '
+                                               then 'g.period_type in (''D'', ''T'') and g.file_priority <> 0 and '
+                                               when p_period_type = 2
+                                               then 'g.period_type not in (''D'', ''T'') and g.file_priority <> 0 and '
+                                               when p_period_type = 3
+                                               then '(q.proc_type = 3 or g.file_priority = 0) and '
+                                               else ' '
                                          end)
                                 end) ||
                                 'q.id = g.id)
@@ -1465,8 +1449,10 @@ is
     l_ret                   number;
     l_version_blc_id        number;
     l_message               clob;
+    l_message_p             varchar2(1000);
     l_flagOK                number;
     l_error_mes             clob;
+    l_branch_name           varchar2(100);
   begin
 
     p_info_log('Begin PP for group from '||to_char(p_file_id)||' to '||to_char(p_file_id_end)||
@@ -1502,8 +1488,10 @@ is
                   and nvl(q.kf, p_kf) = p_kf
                   and nvl(q.kf, p_kf) = l.kf
                   and ( p_period_type is null
-                     or p_period_type = 1 and g.period_type in ('D', 'T')
-                     or p_period_type = 2 and g.period_type not in ('D', 'T')
+                     or (p_period_type = 1 and g.period_type in ('D', 'T')
+                         or 
+                         p_period_type = 2 and g.period_type not in ('D', 'T')) and g.file_priority <> 0 
+                     or p_period_type = 3 and g.file_priority = 0
                       )
                 order by case when g.PERIOD_TYPE in ('D', 'T') then 1
                               when g.PERIOD_TYPE = 'M' then 2
@@ -1514,6 +1502,12 @@ is
         bars_audit.trace( 'NBUR_QUEUE.F_CHECK_QUEUE_GROUP_FORMS: k.FILE_CODE='||k.FILE_CODE );
 
         l_message := '';
+        
+        l_branch_name := branch_utl.get_branch_name('/' || k.kf || '/');
+        
+        l_message_p := k.object_name || ' за дату ' || to_char(k.report_date, 'dd.mm.yyyy') ||
+                       ' по МФО=' || k.kf || ' '|| l_branch_name;
+                       
         l_flagOK := 1;
 
         l_version_blc_id := F_BLC_FILE_VERSION( k.REPORT_DATE, k.KF, k.FILE_ID );
@@ -1541,125 +1535,47 @@ is
           -- формування файлу
           if k.PROC_NAME is not null
           then
-
             begin
 
-              if p_proc_type = 2 
+              if p_proc_type = 2
               then
                 p_info_log(k.PROC_NAME||' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy')||CHR(10));
               end if;
 
-              DBMS_APPLICATION_INFO.SET_CLIENT_INFO('Файл '||k.file_code||' за '||to_char(k.report_date, 'dd.mm.yyyy')||' по МФО='||k.kf);
+                  DBMS_APPLICATION_INFO.SET_CLIENT_INFO('Файл '||l_message_p);          
+                  
+                  l_message_p := l_message_p || ' (версія ' || to_char(p_version_id) || ')';
 
-              execute immediate 'begin '||k.PROC_NAME||'(:dat_, :kf_, :form_id ); end;'
-                using k.REPORT_DATE, k.KF, l_ret;
+                  execute immediate 'begin '||k.PROC_NAME||'(:dat_, :kf_, :form_id ); end;'
+                    using k.REPORT_DATE, k.KF, l_ret;
 
-              if p_proc_type = 2 
-              then
-                p_info_log(k.PROC_NAME||' end for date = '||to_char(p_report_date, 'dd.mm.yyyy')||CHR(10));
-              end if;
+                  if p_proc_type = 2
+                  then
+                    p_info_log(k.PROC_NAME||' end for date = '||to_char(p_report_date, 'dd.mm.yyyy')||CHR(10));
+                  end if;
 
-              l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||
-                           ' (версія '||to_char(p_version_id)||') успішно сформовано!';
+                  l_message := 'Файл ' || l_message_p || ' успішно сформовано!';
+                exception
+                  when others then
+                    l_flagOK := 0;
 
-            exception
-              when others then
+                    l_message := 'При формування файлу ' || l_message_p || ' виникла помилка! Зверніться до адміністратора!';
 
-                l_flagOK := 0;
-
-                l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
-                            ' по МФО='||p_kf||' виникла помилка!';
-
-                l_error_mes := 'ERROR LOAD '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf;
+                    l_error_mes := 'ERROR FORM '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf;
 
                 p_errors_log( k.report_date, k.kf, k.FILE_ID, k.file_code, p_version_id, k.userid, l_error_mes );
 
             end;
-
           else
+            l_flagOK := 0;
 
-            if k.FILE_CODE like '#%' 
-            or k.FILE_CODE like '@51%'
-            then
+            l_error_mes := 'EMPTY PROC '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf;
 
-              begin
+            p_errors_log( k.report_date, k.kf, k.FILE_ID, k.file_code, p_version_id, k.userid, l_error_mes );
+            
+            l_message_p := l_message_p || ' (версія ' || to_char(p_version_id) || ')';
 
-                 insert
-                   into nbur_agg_protocols
-                      ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ERROR_MSG, ADJ_IND )
-                 select unique datf, kf, k.file_code, nvl(trim(nbuc), p_kf) nbuc, kodp, nvl(znap, ' '), ERR_MSG, fl_mod
-                   from TMP_NBU
-                  where KODF = substr(k.file_code,2,2)
-                    and DATF = k.report_date
-                    and KF   = k.kf;
-
-                  insert
-                    into NBUR_DETAIL_PROTOCOLS
-                       ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, DESCRIPTION
-                       , ACC_ID, ACC_NUM, KV, MATURITY_DATE, CUST_ID, REF, ND, BRANCH )
-                  select unique k.report_date, k.kf, k.file_code, nvl(trim(nbuc), p_kf) nbuc, kodp, nvl(znap, ' '), COMM
-                       , ACC, NLS, KV, MDATE, RNK,REF,  ND, TOBO
-                   from RNBU_TRACE_ARCH
-                  where kodf = substr(k.file_code,2,2)
-                    and datf = k.report_date
-                    and kf   = k.kf;
-
-                  l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||
-                               ' (версія '||to_char(p_version_id)||') успішно сформовано!';
-
-              exception
-                when others then
-
-                  l_flagOK := 0;
-
-                  l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
-                                ' по МФО='||p_kf||' виникла помилка!';
-
-                  l_error_mes := 'ERROR LOAD '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf;
-
-                  p_errors_log( l_error_mes );
-
-              end;
-
-            else
-
-              begin
-
-                insert into nbur_agg_protocols(REPORT_DATE, KF, REPORT_CODE, NBUC,
-                    FIELD_CODE, FIELD_VALUE, ERROR_MSG, ADJ_IND)
-                select unique datf, kf, '@'||kodf, nvl(trim(nbuc), p_kf) nbuc, kodp, nvl(znap, ' '), ERR_MSG, fl_mod
-                from tmp_irep
-                where kodf=substr(k.file_code,2,2) and
-                      datf = k.report_date and
-                      kf = k.kf;
-
-                       insert into NBUR_DETAIL_PROTOCOLS(REPORT_DATE, KF, REPORT_CODE, NBUC,
-                          FIELD_CODE, FIELD_VALUE, DESCRIPTION, ACC_ID, ACC_NUM, KV,
-                          MATURITY_DATE, CUST_ID, REF, ND, BRANCH)
-                       select unique k.report_date, k.kf, k.file_code, nvl(trim(nbuc), p_kf) nbuc, kodp, nvl(znap, ' '), COMM, ACC,
-                          NLS, KV, MDATE, RNK,REF,  ND, TOBO
-                       from rnbu_trace_int_arch
-                       where kodf=substr(k.file_code,2,2) and
-                            datf = k.report_date and
-                            kf = k.kf;
-
-                l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||
-                             ' (версія '||to_char(p_version_id)||') успішно сформовано!';
-
-              exception
-                when others then
-
-                  l_flagOK := 0;
-
-                  l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
-                                ' по МФО='||p_kf||' виникла помилка!';
-
-                  p_errors_log( 'ERROR LOAD '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf );
-
-              end;
-
-            end if;
-
+            l_message := 'При формування файлу ' || l_message_p ||' виникла помилка! Зверніться до адміністратора!';
           end if;
 
           commit;
@@ -1668,18 +1584,14 @@ is
                                                 , case when l_flagOK = 0 then 'ERROR' else 'FINISHED' end );
 
           -- зберігаємо версію лише, якщо все сформувалось
-          if l_flagOK = 1 
+          if l_flagOK = 1
           then
-
             NBUR_OBJECTS.SAVE_FILE_VERSION( k.REPORT_DATE, k.KF, p_version_id, k.FILE_ID );
-
           end if;
-
         else
-
           l_flagOK := 0;
 
-          l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' заблоковано у версії '||to_char(l_version_blc_id);
+          l_message := 'Файл '|| l_message_p ||' заблоковано у версії '||to_char(l_version_blc_id);
 
           p_info_log(l_message);
 
@@ -1783,7 +1695,7 @@ is
                              else null
                            end as RPT_DT
                      from NBUR_REF_FILES
-                     where file_code not in ('#2C', '#3A', '#42', '#8B', '#12') and
+                     where file_code not in ('#2C', '#2G', '#3A', '#42', '#8B', '#12') and
                            PERIOD_TYPE in ('D', 'T')
                  ) f
            cross
@@ -1809,8 +1721,6 @@ is
 
     end DAILY_TASK;
 
-
-
 BEGIN
 
   -- Set user kf value
@@ -1821,8 +1731,4 @@ BEGIN
 
 END NBUR_QUEUE;
 /
-
-show err;
-
-grant EXECUTE on NBUR_QUEUE to BARS_ACCESS_DEFROLE;
-grant EXECUTE on NBUR_QUEUE to RPBN002;
+show errors;

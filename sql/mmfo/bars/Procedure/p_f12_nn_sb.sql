@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F12_NN_SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #12 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 11/12/2012 
+% VERSION     : 21/02/2018 (11/12/2012) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
     sheme_ - схема формирования
@@ -47,6 +47,7 @@ tt_      Varchar2(3);  -- з OPLDOK
 tt_pr    varchar2(3);
 o_tt_    Varchar2(3);  -- з OPER
 dat1_    DATE;        -- дата начала декады !!!
+datp_    date;
 dc_      INTEGER;
 dk_      NUMBER;
 dk1_     NUMBER;
@@ -62,38 +63,32 @@ mfou_    Number;
 
 -- исходящие остатки
 CURSOR SALDO IS
-   SELECT  o.acc, o.nls, o.kv, sa.FDAT, sa.ostf-sa.dos+sa.kos
-   FROM SALDOA sa, ACCOUNTS o
+   SELECT  o.acc, o.nls, o.kv, sa.FDAT, sa.ost
+   FROM snap_balances sa, ACCOUNTS o
    WHERE o.tip='KAS'    AND
          o.nbs in ('1001','1002','1003','1004') AND
          o.kv=980       AND
          o.acc=sa.acc   AND
-         sa.FDAT  IN ( SELECT MAX ( bb.FDAT )
-                  FROM  SALDOA bb
-                  WHERE o.acc = bb.acc AND bb.FDAT  <= Dat_) ;
+         sa.FDAT = Dat_;
 
 -- входящие остатки
 CURSOR SALDO2 IS
-   SELECT  o.acc, o.nls, o.kv, sa.FDAT, sa.ostf-sa.dos+sa.kos
-   FROM SALDOA sa, ACCOUNTS o
+   SELECT  o.acc, o.nls, o.kv, sa.FDAT, sa.ost
+   FROM snap_balances sa, ACCOUNTS o
    WHERE o.tip='KAS'    AND
          o.nbs in ('1001','1002','1003','1004') AND
          o.kv=980       AND
          o.acc=sa.acc   AND
-         sa.FDAT  IN ( SELECT MAX ( bb.FDAT )
-                  FROM  SALDOA bb
-                  WHERE o.acc = bb.acc AND bb.FDAT  < Dat1_) ;
+         sa.FDAT  = datp_;
 
 CURSOR BaseL IS
    SELECT kodp,nbuc, SUM (znap)
    FROM RNBU_TRACE
-   WHERE userid=userid_
    GROUP BY kodp,nbuc
    ORDER BY kodp;
 
 BEGIN
 -------------------------------------------------------------------
---SELECT id INTO userid_ FROM STAFF WHERE UPPER(logname)=UPPER(USER);
 userid_ := user_id;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
@@ -137,6 +132,11 @@ END IF;
 
 -- если начало декады (или месяца) - след. день после выходных - то включить обороты за выходные
 Dat1_:=Calc_Pdat(Dat1_);
+
+select max(fdat)
+into datp_ 
+from fdat 
+where fdat < dat1_; 
 
 INSERT INTO RNBU_TRACE (nls, kv, odate, kodp, znap, nbuc, acc, ref, comm) 
 select '1XXX', 980, datf, kodp, znap, nbuc, null, null, 'З щоденного @12'
