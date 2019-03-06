@@ -15,9 +15,11 @@ select d.id,
        d.passp_serial,
        d.passp_num,
        d.idcard_num,
-       d.corp2_id
+       d.corp2_id,
+       a.rnk as staff_rnk
 from bars.zp_payroll_doc d
-     left join bars.oper o on o.ref = d.ref;
+     left join bars.oper o on o.ref = d.ref
+     left join bars.accounts a on a.nls = d.nlsb and a.kf = d.mfob and a.kv = 980;
 
 PROMPT *** Create comments on bars.v_mbm_zp_payroll_doc ***
 
@@ -33,6 +35,7 @@ comment on column V_MBM_ZP_PAYROLL_DOC.passp_serial is 'Серія парспорта';
 comment on column V_MBM_ZP_PAYROLL_DOC.passp_num    is 'Номер паспорта';
 comment on column V_MBM_ZP_PAYROLL_DOC.idcard_num   is 'Номер паспорта нового зразка';
 comment on column V_MBM_ZP_PAYROLL_DOC.corp2_id     is 'id corp2';
+comment on column V_MBM_ZP_PAYROLL_DOC.staff_rnk    is 'rnk отримувача';
 
 PROMPT *** Create  grants  v_mbm_zp_payroll_doc ***
 

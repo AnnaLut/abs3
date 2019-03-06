@@ -15,9 +15,11 @@ select p.id,
        p.sos,
        p.sos_name,
        p.corp2_id,
-       p.nls_2909
+       p.nls_2909,
+       d.id as ProjectId
 from bars.v_zp_payroll p
-     inner join bars.zp_deals d on d.id = p.zp_id;
+     inner join bars.zp_deals d on d.id = p.zp_id
+     left join accounts a29 on a29.acc = d.acc_2909;
 
 PROMPT *** Create comments on bars.v_mbm_zp_payroll ***
 
@@ -33,6 +35,7 @@ comment on column V_MBM_ZP_PAYROLL.CMS         is 'сума комісії – сума комісії з
 comment on column V_MBM_ZP_PAYROLL.SOS         is 'статус – поточний статус ЗП відомості';
 comment on column V_MBM_ZP_PAYROLL.corp2_id    is 'id corp2';
 comment on column V_MBM_ZP_PAYROLL.nls_2909    is 'Номер рахунка зарахування';
+comment on column V_MBM_ZP_PAYROLL.ProjectId   is 'id договору';
 
 PROMPT *** Create  grants  v_mbm_zp_payroll ***
 
