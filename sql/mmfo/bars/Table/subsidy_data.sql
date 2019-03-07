@@ -131,6 +131,15 @@ begin
 end;
 / 
 
+begin
+    execute immediate 'alter table SUBSIDY_DATA add paytype NUMBER(1)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
 -- Add comments to the columns 
 comment on column SUBSIDY_DATA.payeraccnum
   is 'Номер рахунку відправника';
@@ -140,3 +149,5 @@ comment on column SUBSIDY_DATA.feerate
   is 'Процент коміссії';
 comment on column SUBSIDY_DATA.receiverrnk
   is 'РНК отримувача';
+comment on column SUBSIDY_DATA.paytype
+  is 'Тип виплати реєстру(1-виплати комуналні, 2 -виплати монетизації)';
