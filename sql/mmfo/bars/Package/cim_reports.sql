@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.08 06/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.09 07/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -1182,7 +1182,8 @@ end  p_f531;
      --F105=4
     ---	Операція вибирається в разі, якщо, операція закрита шляхом прив’язки платежу/МД в АРМі ВК фантомом з типом «Взаємозалік». 
     for cur in (select f.*, b.b040
-                from cim_f36 f, branch b   
+                from cim_f36 f
+                join branch b on b.branch = f.branch  
                 where f.manual_include != 1 and create_date = l_date_z_end and p22 in (2, 3))
     loop
       l_n := 0;
