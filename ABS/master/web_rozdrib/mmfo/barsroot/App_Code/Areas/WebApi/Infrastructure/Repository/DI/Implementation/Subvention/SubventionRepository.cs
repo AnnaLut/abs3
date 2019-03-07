@@ -5,6 +5,7 @@ using BarsWeb.Areas.WebApi.Subvention.Models;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Web;
@@ -43,8 +44,9 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
             }
         }
 
-        public AccBalance GetAccBalance(string accNum, string accMfo, string _from, string _to)
+        public Response<AccBalance> GetAccBalance(string accNum, string accMfo, string _from, string _to)
         {
+            Response<AccBalance> res = new Response<AccBalance>();
             LoginUser();
             DateTime from = DateTime.ParseExact(_from, "ddMMyyyy", ci);
             DateTime to = DateTime.ParseExact(_to, "ddMMyyyy", ci);
@@ -57,7 +59,7 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
                                   pErrCode = new OracleParameter("p_errcode", OracleDbType.Decimal, ParameterDirection.Output),
                                    pErrMsg = new OracleParameter("p_errmsg", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
             {
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.BindByName = true;
                 cmd.CommandText = "bars.subsidy.getaccbalance";
                 cmd.Parameters.Add(new OracleParameter("p_datefrom", OracleDbType.Date, from, ParameterDirection.Input));
@@ -71,22 +73,25 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
                 cmd.Parameters.Add(pErrMsg);
                 cmd.ExecuteNonQuery();
 
-                ProcessError(pErrCode, pErrMsg);
+                res = ProcessError<AccBalance>(pErrCode, pErrMsg);
 
                 OracleDecimal _currentBalance = (OracleDecimal)pCurrentBalance.Value;
                 OracleDecimal _creditTurnOver = (OracleDecimal)pCreditTurnOver.Value;
                 OracleString _accNum = (OracleString)pAccNum.Value;
 
-                return new AccBalance
+                res.ResultMessage = new AccBalance
                 {
                     AccNum = _accNum.IsNull ? "" : _accNum.Value,
                     CreditTurnover = _creditTurnOver.IsNull ? 0 : Convert.ToInt64(_creditTurnOver.Value),
                     CurrentBalance = _currentBalance.IsNull ? 0 : Convert.ToInt64(_currentBalance.Value)
                 };
+
+                return res;
             }
         }
-        public string HouseholdPayments(HHPayments data)
+        public Response<string> HouseholdPayments(HHPayments data)
         {
+            Response<string> res = new Response<string>();
             LoginUser();
             using (OracleConnection con = OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = con.CreateCommand())
@@ -105,15 +110,18 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
                 cmd.Parameters.Add(pBulkId);
                 cmd.ExecuteNonQuery();
 
-                ProcessError(pErrCode, pErrMsg);
+                res = ProcessError<string>(pErrCode, pErrMsg);
 
                 OracleString _res = (OracleString)pBulkId.Value;
-                return _res.Value;
+                res.ResultMessage = _res.Value;
+                return res;
             }
-        }       
+        }
 
-        public string GetTicket(string requestId)
+        public Response<string> GetTicket(string requestId)
         {
+            Response<string> res = new Response<string>();
+
             LoginUser();
             using (OracleConnection con = OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = con.CreateCommand())
@@ -130,20 +138,27 @@ namespace BarsWeb.Areas.WebApi.Subvention.Infrastructure.DI.Implementation
                 cmd.Parameters.Add(pTicket);
                 cmd.ExecuteNonQuery();
 
-                ProcessError(pErrCode, pErrMsg);
+                res = ProcessError<string>(pErrCode, pErrMsg, 3);
 
                 using (OracleClob _clobRes = (OracleClob)pTicket.Value)
                 {
-                    return _clobRes.Value;
+                    res.ResultMessage = _clobRes.Value;
+                    return res;
                 }
             }
         }
 
-        private void ProcessError(OracleParameter code, OracleParameter msg)
+        private Response<T> ProcessError<T>(OracleParameter code, OracleParameter msg, params decimal[] okaysArr)
         {
+            List<decimal> okays = new List<decimal>();
+            okays.Add(0);
+            if (null != okaysArr) okays.AddRange(okaysArr);
+
             OracleDecimal _errCode = (OracleDecimal)code.Value;
             OracleString _errMsg = (OracleString)msg.Value;
-            if (!_errCode.IsNull && _errCode.Value != 0) throw new SubException(_errMsg.Value, _errCode.Value);
+
+            if (!_errCode.IsNull && !okays.Contains(_errCode.Value)) throw new SubException(_errMsg.Value, _errCode.Value);
+            return new Response<T> { ResultCode = Convert.ToInt32(_errCode.Value) };
         }
     }
 

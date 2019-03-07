@@ -76,10 +76,7 @@ namespace BarsWeb.Areas.WebApi.Subvention
         {
             try
             {
-                AccBalance result = _repo.GetAccBalance(accNum, accMfo, from, to);
-                Response<AccBalance> resp = new Response<AccBalance>();
-                resp.ResultMessage = result;
-
+                Response<AccBalance> resp = _repo.GetAccBalance(accNum, accMfo, from, to);
                 return Request.CreateResponse(HttpStatusCode.OK, resp);
             }
             catch (Exception ex) { return Error(ex); }
@@ -97,10 +94,7 @@ namespace BarsWeb.Areas.WebApi.Subvention
                 if (string.IsNullOrWhiteSpace(data)) throw new ArgumentNullException("Content", "Тіло запиту не може бути пустим");
 
                 HHPayments _data = JsonConvert.DeserializeObject<HHPayments>(data);
-
-                string requestId = _repo.HouseholdPayments(_data);
-                Response<string> resp = new Response<string>();
-                resp.ResultMessage = requestId;
+                Response<string> resp = _repo.HouseholdPayments(_data);
 
                 return Request.CreateResponse(HttpStatusCode.OK, resp);
             }
@@ -115,8 +109,7 @@ namespace BarsWeb.Areas.WebApi.Subvention
             {
                 //throw new NotImplementedException("Метод HouseholdReceive не доступний.");
 
-                Response<string> resp = new Response<string>();
-                resp.ResultMessage = _repo.GetTicket(requestId);
+                Response<string> resp = _repo.GetTicket(requestId);
 
                 return Request.CreateResponse(HttpStatusCode.OK, resp);
             }
