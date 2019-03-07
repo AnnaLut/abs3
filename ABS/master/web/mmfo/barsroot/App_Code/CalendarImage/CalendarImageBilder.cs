@@ -38,7 +38,7 @@ public class CalendarImageBuilder
         //поиск праздника
         var holiday = FindHoliday();
 
-       //инфо о созданном файле
+        //инфо о созданном файле
         return new ImageInfo
         {
             Image = _img,
@@ -81,19 +81,24 @@ public class CalendarImageBuilder
     {
         var font = new Font(FamilyName, fontSize);
         var sz = _canvas.MeasureString(text, font);
-        _canvas.DrawString(text, font, color, (ImgWidth - sz.Width)/2, yOffset);
+        _canvas.DrawString(text, font, color, (ImgWidth - sz.Width) / 2, yOffset);
     }
 
     private DayImageFile FindHoliday()
     {
         //список праздничных дней
         Stream fs = File.OpenRead(HttpContext.Current.Server.MapPath(HolidayListPath));
-        var ser = new DataContractJsonSerializer(typeof (List<DayImageFile>));
-        var res = (List<DayImageFile>) ser.ReadObject(fs);
+        var ser = new DataContractJsonSerializer(typeof(List<DayImageFile>));
+        var res = (List<DayImageFile>)ser.ReadObject(fs);
 
-        var holiday =
-            res.SingleOrDefault(s => _date >= GetFileDate(s).AddDays(- s.Remind) && _date <= GetFileDate(s).AddDays(1));
-        return holiday;
+        var holidays = res.Where(s => _date >= GetFileDate(s).AddDays(-s.Remind) && _date <= GetFileDate(s).AddDays(1));
+        if (holidays.Count() > 1)
+        {
+            var c = holidays.Where(hh => hh.Remind == holidays.Min(h => h.Remind));
+            return c.FirstOrDefault();
+        }
+
+        return holidays.FirstOrDefault();
     }
     private DateTime GetEasterDate(int year)
     {
@@ -121,7 +126,7 @@ public class CalendarImageBuilder
         {
             var customColor = Color.FromArgb(alpha, Color.White);
             var shadowBrush = new SolidBrush(customColor);
-            gfx.FillRectangles(shadowBrush, new RectangleF[] {new Rectangle(0, 0, _img.Width, height),});
+            gfx.FillRectangles(shadowBrush, new RectangleF[] { new Rectangle(0, 0, _img.Width, height), });
         }
     }
 
