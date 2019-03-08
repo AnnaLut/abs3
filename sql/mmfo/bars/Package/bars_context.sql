@@ -299,7 +299,7 @@ is
     -- Константы
     --
     --
-    VERSION_BODY          constant varchar2(64)  := 'version 1.42 09.07.2018';
+    VERSION_BODY          constant varchar2(64)  := 'version 1.5 06.03.2019';
     VERSION_BODY_DEFS     constant varchar2(512) := ''
                           || 'KF            Мультифилиальная схема с полем ''KF'''                   || chr(10)
                           || 'POLICY_GROUP  Использование групп политик'                             || chr(10)
@@ -372,25 +372,17 @@ is
         end if;
 
         -- Читаем глобальные параметры
-        select max(decode(par, 'SECALARM', val)),
-               max(decode(par, 'GLB-MFO',  val))
-          into l_secalarm, l_mfog
-          from params$global
-         where par in ('SECALARM', 'GLB-MFO');
+        l_secalarm := branch_attribute_utl.get_value( p_branch_code => '/',   p_attribute_code => 'SECALARM') ;
+        l_mfog     := branch_attribute_utl.get_value( p_branch_code => '/',   p_attribute_code => 'GLB-MFO') ;
 
-    -- Получаем код филиала из кода отделения
+         -- Получаем код филиала из кода отделения
         l_kf := extract_mfo(p_branch);
 
 
         if (l_kf is not null) then
-
             -- Читаем параметры филиала
-            select max(decode(par, 'MFOP',     val)) mfop,
-                   max(decode(par, 'BANKDATE', val)) bankdate
-              into l_mfop, l_bankdate
-              from params$base
-             where par in ('MFOP', 'BANKDATE')
-               and kf = l_kf;
+            l_mfop     := branch_attribute_utl.get_value( p_branch_code => '/'||l_kf||'/',   p_attribute_code => 'MFOP') ; 
+            l_bankdate := branch_attribute_utl.get_value( p_branch_code => '/'||l_kf||'/',   p_attribute_code => 'BANKDATE'); 
         end if;
 
         l_clientid := sys_context('userenv', 'client_identifier');
