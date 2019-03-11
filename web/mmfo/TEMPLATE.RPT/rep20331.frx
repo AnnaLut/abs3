@@ -1,0 +1,537 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="10/18/2018 09:46:50" ReportInfo.Modified="11/19/2018 15:54:37" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+                       
+
+    private void Table58_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.NLSTYPE&quot;)==9
+      &amp;&amp; (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)==1)
+      {
+        Table58.Visible = true;
+      }
+      else
+      {
+        Table58.Visible = false;
+      }  
+    }
+
+
+
+    private void Table27_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)==1)
+      {
+        Table27.Visible = false;
+      }
+      else
+      {
+        Table27.Visible = true;
+      }   
+    }
+
+
+
+    private void Table28_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)==1)
+      {
+        Table28.Visible = true;
+      }
+      else
+      {
+        Table28.Visible = false;
+      }  
+    }
+
+
+
+    private void Table30_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)==1)
+      {
+        Table30.Visible = false;
+      }
+      else
+      {
+        Table30.Visible = true;
+      }
+    }
+
+    private void Table31_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)==1)
+      {
+        Table31.Visible = true;
+      }
+      else
+      {
+        Table31.Visible = false;
+      }  
+    }
+
+    private void GroupFooter6_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)== 0)
+      {
+        GroupFooter6.Visible = true;
+      }
+      else
+      {
+        GroupFooter6.Visible = false;
+      }   
+    }
+
+    private void Table32_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.NLSTYPE&quot;)== 1)
+      {
+        Table31.Visible = true;
+      }
+      else
+      {
+        Table31.Visible = false;
+      }  
+    }
+
+    private void Table59_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.NLSTYPE&quot;)&lt;9
+       &amp;&amp; (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)==0)
+        {
+          Table59.Visible = true;
+        }
+        else
+        {
+          Table59.Visible = false;
+        }  
+    }
+
+    private void Table60_BeforePrint(object sender, EventArgs e)
+    {
+      if( (Decimal)Report.GetColumnValue(&quot;203.NLSTYPE&quot;)&lt;9
+       &amp;&amp; (Decimal)Report.GetColumnValue(&quot;203.FLG&quot;)==0
+       &amp;&amp; (Decimal)Report.GetColumnValue(&quot;203.KV&quot;)!=980)
+        {
+          Table60.Visible = true;
+        }
+        else
+        {
+          Table60.Visible = false;
+        }  
+    }
+
+    private void Cell667_BeforePrint(object sender, EventArgs e)
+    {
+      if  (Length( ((String)Report.GetColumnValue(&quot;203.FIO&quot;)))&gt;0)
+      {  Cell667.Visible = true; }
+      else
+      {
+        Cell667.Visible = false;      
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQAnSsJxSXy4eeM/MOJZx98Q=" CommandTimeout="6000">
+      <TableDataSource Name="Table" Alias="203" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 FLG, CHAR00 SHIFT, NUM01 NLSTYPE, CHAR01 NLS, NUM02 KV, CHAR02 KVNAME, CHAR03 NMS, NUM03 OSTF, NUM04 SDB, NUM05 SKR, NUM06 SDBQ, NUM07 SKRQ, NUM08 SQ, NUM09 OBDB, NUM10 OBKR, NUM11 OST, CHAR04 TT, CHAR05 TTNAME, CHAR06 FIO, NUM12 DOCCNT, CHAR07 STIME, CHAR08 ETIME, CHAR09 STR_DAT1, CHAR10 BRANCH, CHAR11 BRANCHNAME from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="FLG" DataType="System.Decimal"/>
+        <Column Name="SHIFT" DataType="System.String"/>
+        <Column Name="NLSTYPE" DataType="System.Decimal"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KVNAME" DataType="System.String"/>
+        <Column Name="NMS" DataType="System.String"/>
+        <Column Name="OSTF" DataType="System.Decimal"/>
+        <Column Name="OBDB" DataType="System.Decimal"/>
+        <Column Name="OBKR" DataType="System.Decimal"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="STIME" DataType="System.String"/>
+        <Column Name="ETIME" DataType="System.String"/>
+        <Column Name="SDB" DataType="System.Decimal"/>
+        <Column Name="SKR" DataType="System.Decimal"/>
+        <Column Name="SDBQ" DataType="System.Decimal"/>
+        <Column Name="SKRQ" DataType="System.Decimal"/>
+        <Column Name="TTNAME" DataType="System.String"/>
+        <Column Name="DOCCNT" DataType="System.Decimal"/>
+        <Column Name="STR_DAT1" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCHNAME" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table7" Alias="f_ourmfo" DataType="System.Int32" Enabled="true" SelectCommand="select f_ourmfo from dual">
+        <Column Name="F_OURMFO" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table8" Alias="NAME" DataType="System.Int32" Enabled="true" SelectCommand="SELECT val  FROM params WHERE par='NAME'">
+        <Column Name="VAL" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+    <Total Name="TotalOSTF" Expression="[203.OSTF]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalOBKR" Expression="[203.OBKR]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalOBDB" Expression="[203.OBDB]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalOST" Expression="[203.OST]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalSKR" Expression="[203.SKR]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalSDB" Expression="[203.SDB]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalSKRQ" Expression="[203.SKRQ]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalSDBQ" Expression="[203.SDBQ]" Evaluator="Data1" PrintOn="GroupFooter4"/>
+    <Total Name="TotalSKRQF" Expression="[203.SKRQ]" Evaluator="Data1" PrintOn="GroupFooter6"/>
+    <Total Name="TotalSDBQF" Expression="[203.SDBQ]" Evaluator="Data1" PrintOn="GroupFooter6"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="132.3">
+      <TableObject Name="Table2" Width="1053.1" Height="132.3">
+        <TableColumn Name="Column113" Width="138.6"/>
+        <TableColumn Name="Column114" Width="138.6"/>
+        <TableColumn Name="Column115" Width="129.15"/>
+        <TableColumn Name="Column116" Width="110.25"/>
+        <TableColumn Name="Column117" Width="110.25"/>
+        <TableColumn Name="Column118" Width="100.8"/>
+        <TableColumn Name="Column119" Width="157.5"/>
+        <TableColumn Name="Column120" Width="166.95"/>
+        <TableColumn Name="Column121" Width="1"/>
+        <TableRow Name="Row52">
+          <TableCell Name="Cell423" ColSpan="6"/>
+          <TableCell Name="Cell424"/>
+          <TableCell Name="Cell425"/>
+          <TableCell Name="Cell426"/>
+          <TableCell Name="Cell427"/>
+          <TableCell Name="Cell448"/>
+          <TableCell Name="Cell449" Text="Надруковано [Date]" ColSpan="3"/>
+          <TableCell Name="Cell450"/>
+          <TableCell Name="Cell451"/>
+        </TableRow>
+        <TableRow Name="Row53">
+          <TableCell Name="Cell428" Text="[NAME.VAL] [f_ourmfo.F_OURMFO]" ColSpan="9"/>
+          <TableCell Name="Cell429"/>
+          <TableCell Name="Cell430"/>
+          <TableCell Name="Cell431"/>
+          <TableCell Name="Cell432"/>
+          <TableCell Name="Cell452"/>
+          <TableCell Name="Cell453"/>
+          <TableCell Name="Cell454"/>
+          <TableCell Name="Cell455"/>
+        </TableRow>
+        <TableRow Name="Row54">
+          <TableCell Name="Cell433" Text="Установа банку: [203.BRANCHNAME]" ColSpan="9"/>
+          <TableCell Name="Cell434"/>
+          <TableCell Name="Cell435"/>
+          <TableCell Name="Cell436"/>
+          <TableCell Name="Cell437"/>
+          <TableCell Name="Cell456"/>
+          <TableCell Name="Cell457"/>
+          <TableCell Name="Cell458"/>
+          <TableCell Name="Cell459"/>
+        </TableRow>
+        <TableRow Name="Row55">
+          <TableCell Name="Cell438" ColSpan="9"/>
+          <TableCell Name="Cell439"/>
+          <TableCell Name="Cell440"/>
+          <TableCell Name="Cell441"/>
+          <TableCell Name="Cell442"/>
+          <TableCell Name="Cell460"/>
+          <TableCell Name="Cell461"/>
+          <TableCell Name="Cell462"/>
+          <TableCell Name="Cell463"/>
+        </TableRow>
+        <TableRow Name="Row56">
+          <TableCell Name="Cell443" Text="Реєстр операцій по ТВБВ [IIf( Length([203.FIO])&gt;0, &quot;по виконавцях &quot;, &quot; &quot;)]  за [203.STR_DAT1]" HorzAlign="Center" VertAlign="Center" ColSpan="9"/>
+          <TableCell Name="Cell444" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell445" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell446" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell447" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell464" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell465" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell466" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell467" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row57">
+          <TableCell Name="Cell468" Text="Зміна № [203.SHIFT]. Час роботи [203.STIME] - [203.ETIME]" HorzAlign="Center" VertAlign="Center" ColSpan="9"/>
+          <TableCell Name="Cell469" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell470" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell471" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell472" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell473" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell474" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell475" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell476" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row58">
+          <TableCell Name="Cell477" ColSpan="9"/>
+          <TableCell Name="Cell478"/>
+          <TableCell Name="Cell479"/>
+          <TableCell Name="Cell480"/>
+          <TableCell Name="Cell481"/>
+          <TableCell Name="Cell482"/>
+          <TableCell Name="Cell483"/>
+          <TableCell Name="Cell484"/>
+          <TableCell Name="Cell485"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="136.3" Width="1047.06" Height="37.8" Condition="[203.NLSTYPE]">
+      <TableObject Name="Table1" Width="1048.95" Height="37.8">
+        <TableColumn Name="Column122" Width="37.8"/>
+        <TableColumn Name="Column123" Width="103.95"/>
+        <TableColumn Name="Column124" Width="141.75"/>
+        <TableColumn Name="Column125" Width="47.25"/>
+        <TableColumn Name="Column126" Width="47.25"/>
+        <TableColumn Name="Column127" Width="37.8"/>
+        <TableColumn Name="Column128" Width="113.4"/>
+        <TableColumn Name="Column129" Width="113.4"/>
+        <TableColumn Name="Column130" Width="406.35"/>
+        <TableRow Name="Row60" Height="37.8">
+          <TableCell Name="Cell495" Border.Lines="Top" Border.Style="Double" Text="[IIf([203.NLSTYPE]==2, &quot;БЕЗГОТІВКОВІ&quot;, (IIf([203.NLSTYPE]&lt;2, &quot;ГОТІВКА&quot;, &quot;ЦІННОСТІ&quot;)))]" HorzAlign="Center" VertAlign="Center" ColSpan="9"/>
+          <TableCell Name="Cell496" Border.Lines="Top" Border.Style="Double"/>
+          <TableCell Name="Cell497" Border.Lines="Top" Border.Style="Double" VertAlign="Center"/>
+          <TableCell Name="Cell498" Border.Lines="Top" Border.Style="Double"/>
+          <TableCell Name="Cell499" Border.Lines="Top" Border.Style="Double"/>
+          <TableCell Name="Cell500" Border.Lines="Top" Border.Style="Double"/>
+          <TableCell Name="Cell501" Border.Lines="Top" Border.Style="Double"/>
+          <TableCell Name="Cell502" Border.Lines="Top" Border.Style="Double"/>
+          <TableCell Name="Cell503" Border.Lines="Top" Border.Style="Double"/>
+        </TableRow>
+      </TableObject>
+      <GroupHeaderBand Name="GroupHeader7" Top="178.1" Width="1047.06" Height="18.9" Guides="18.9,18.9" Condition="[203.FIO]">
+        <TableObject Name="Table101" Width="1048.1" Height="18.9">
+          <TableColumn Name="Column212" Width="500"/>
+          <TableColumn Name="Column213" Width="274.05"/>
+          <TableColumn Name="Column214" Width="274.05"/>
+          <TableRow Name="Row93">
+            <TableCell Name="Cell667" BeforePrintEvent="Cell667_BeforePrint" Text="Виконавець: [203.FIO]" ColSpan="3"/>
+            <TableCell Name="Cell668"/>
+            <TableCell Name="Cell669"/>
+          </TableRow>
+        </TableObject>
+        <GroupHeaderBand Name="GroupHeader2" Top="201" Width="1047.06" Height="85.05" Guides="9.45" KeepWithData="true" Condition="[203.FLG]">
+          <TableObject Name="Table31" Top="28.35" Width="1048.95" Height="56.7" BeforePrintEvent="Table31_BeforePrint">
+            <TableColumn Name="Column140" Width="141.75"/>
+            <TableColumn Name="Column141" Width="113.4"/>
+            <TableColumn Name="Column142" Width="160.65"/>
+            <TableColumn Name="Column143" Width="151.2"/>
+            <TableColumn Name="Column144" Width="160.65"/>
+            <TableColumn Name="Column145" Width="103.95"/>
+            <TableColumn Name="Column146" Width="56.7"/>
+            <TableColumn Name="Column147" Width="103.95"/>
+            <TableColumn Name="Column148" Width="56.7"/>
+            <TableRow Name="Row64" Height="28.35">
+              <TableCell Name="Cell531" Border.Lines="Bottom" Border.Style="Dash" Text="Зведена довідка:" VertAlign="Center" ColSpan="3"/>
+              <TableCell Name="Cell532" Border.Lines="Top, Bottom" Border.Style="Dash"/>
+              <TableCell Name="Cell533"/>
+              <TableCell Name="Cell534"/>
+              <TableCell Name="Cell535"/>
+              <TableCell Name="Cell536" ColSpan="2"/>
+              <TableCell Name="Cell537"/>
+              <TableCell Name="Cell538" ColSpan="2"/>
+              <TableCell Name="Cell539"/>
+            </TableRow>
+            <TableRow Name="Row65" Height="28.35">
+              <TableCell Name="Cell540" Border.Lines="All" Border.Style="Dash" Text="Рахунок" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell541" Border.Lines="All" Border.Style="Dash" Text="Назва рахунку" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+              <TableCell Name="Cell542" Border.Lines="All" Border.Style="Dash" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell543" Border.Lines="All" Border.Style="Dash" Text="Вхідн.зал." HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell544" Border.Lines="All" Border.Style="Dash" Text="Надходж." HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell545" Border.Lines="All" Border.Style="Dash" Text="Видаток" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+              <TableCell Name="Cell546" Border.Lines="All" Border.Style="Dash" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell547" Border.Lines="All" Border.Style="Dash" Text="Залишок" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+              <TableCell Name="Cell548" Border.Lines="All" Border.Style="Dash" HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+          <TableObject Name="Table30" Top="9.45" Width="1048.95" Height="18.9" BeforePrintEvent="Table30_BeforePrint">
+            <TableColumn Name="Column215" Width="141.75"/>
+            <TableColumn Name="Column216" Width="113.4"/>
+            <TableColumn Name="Column217" Width="255.15"/>
+            <TableColumn Name="Column218" Width="56.7"/>
+            <TableColumn Name="Column219" Width="160.65"/>
+            <TableColumn Name="Column220" Width="103.95"/>
+            <TableColumn Name="Column221" Width="56.7"/>
+            <TableColumn Name="Column222" Width="103.95"/>
+            <TableColumn Name="Column223" Width="56.7"/>
+            <TableRow Name="Row95">
+              <TableCell Name="Cell679" Border.Lines="All" Border.Style="Dash" Text="Код ОП" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell680" Border.Lines="All" Border.Style="Dash" Text="Назва операції" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+              <TableCell Name="Cell681" Border.Lines="All" Border.Style="Dash" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell682" Border.Lines="All" Border.Style="Dash" Text="К-ть" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell683" Border.Lines="All" Border.Style="Dash" Text="Надходж. ном." HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell684" Border.Lines="All" Border.Style="Dash" Text="Видаток ном." HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+              <TableCell Name="Cell685" Border.Lines="All" Border.Style="Dash" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell686" Border.Lines="All" Border.Style="Dash" Text="Еквівалент" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+              <TableCell Name="Cell687" Border.Lines="All" Border.Style="Dash" HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+          <GroupHeaderBand Name="GroupHeader5" Top="290.05" Width="1047.06" Height="28.35" KeepWithData="true" Condition="[203.KV]">
+            <TableObject Name="Table6" Width="1048.66" Height="28.35">
+              <TableColumn Name="Column155" Width="500"/>
+              <TableColumn Name="Column192" Width="274.33"/>
+              <TableColumn Name="Column193" Width="274.33"/>
+              <TableRow Name="Row72" Height="28.35">
+                <TableCell Name="Cell555" Text="([ToString([203.KV])])  [203.KVNAME]" VertAlign="Center" ColSpan="3"/>
+                <TableCell Name="Cell643"/>
+                <TableCell Name="Cell644"/>
+              </TableRow>
+            </TableObject>
+            <GroupHeaderBand Name="GroupHeader6" Top="322.4" Width="1047.06" Visible="false" Condition="[203.NLS]">
+              <DataBand Name="Data1" Top="326.4" Width="1047.06" Height="37.8" Guides="75.6,75.6,75.6" DataSource="Table">
+                <TableObject Name="Table27" Width="1048.95" Height="18.9" BeforePrintEvent="Table27_BeforePrint">
+                  <TableColumn Name="Column224" Width="141.75"/>
+                  <TableColumn Name="Column225" Width="113.4"/>
+                  <TableColumn Name="Column226" Width="255.15"/>
+                  <TableColumn Name="Column227" Width="56.7"/>
+                  <TableColumn Name="Column228" Width="160.65"/>
+                  <TableColumn Name="Column229" Width="103.95"/>
+                  <TableColumn Name="Column230" Width="56.7"/>
+                  <TableColumn Name="Column231" Width="103.95"/>
+                  <TableColumn Name="Column232" Width="56.7"/>
+                  <TableRow Name="Row96">
+                    <TableCell Name="Cell688" Text="[203.TT]" HorzAlign="Center" VertAlign="Center"/>
+                    <TableCell Name="Cell689" Text="[203.TTNAME]" VertAlign="Center" ColSpan="2"/>
+                    <TableCell Name="Cell690" HorzAlign="Center" VertAlign="Center"/>
+                    <TableCell Name="Cell691" Text="[203.DOCCNT]" HorzAlign="Right" VertAlign="Center"/>
+                    <TableCell Name="Cell692" Text="[[203.SKR]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                    <TableCell Name="Cell693" Text="[[203.SDB]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" ColSpan="2"/>
+                    <TableCell Name="Cell694" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                    <TableCell Name="Cell695" Text="[[203.SQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" ColSpan="2"/>
+                    <TableCell Name="Cell696" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  </TableRow>
+                </TableObject>
+                <TableObject Name="Table28" Top="18.9" Width="1048.95" Height="18.9" BeforePrintEvent="Table28_BeforePrint">
+                  <TableColumn Name="Column233" Width="141.75"/>
+                  <TableColumn Name="Column234" Width="113.4"/>
+                  <TableColumn Name="Column235" Width="160.65"/>
+                  <TableColumn Name="Column236" Width="151.2"/>
+                  <TableColumn Name="Column237" Width="160.65"/>
+                  <TableColumn Name="Column238" Width="103.95"/>
+                  <TableColumn Name="Column239" Width="56.7"/>
+                  <TableColumn Name="Column240" Width="103.95"/>
+                  <TableColumn Name="Column241" Width="56.7"/>
+                  <TableRow Name="Row98">
+                    <TableCell Name="Cell706" Text="[203.NLS]" HorzAlign="Center" VertAlign="Center"/>
+                    <TableCell Name="Cell707" Text="[203.NMS]" VertAlign="Center" ColSpan="2"/>
+                    <TableCell Name="Cell708" HorzAlign="Center" VertAlign="Center"/>
+                    <TableCell Name="Cell709" Text="[[203.OSTF]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                    <TableCell Name="Cell710" Text="[[203.OBKR]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                    <TableCell Name="Cell711" Text="[[203.OBDB]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" ColSpan="2"/>
+                    <TableCell Name="Cell712" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                    <TableCell Name="Cell713" Text="[[203.OST]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" ColSpan="2"/>
+                    <TableCell Name="Cell714" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  </TableRow>
+                </TableObject>
+              </DataBand>
+              <GroupFooterBand Name="GroupFooter1" Top="368.2" Width="1047.06" Visible="false"/>
+            </GroupHeaderBand>
+            <GroupFooterBand Name="GroupFooter4" Top="372.2" Width="1047.06" Height="56.7">
+              <TableObject Name="Table58" Width="1048.95" Height="18.9" BeforePrintEvent="Table58_BeforePrint">
+                <TableColumn Name="Column242" Width="132.3"/>
+                <TableColumn Name="Column243" Width="113.4"/>
+                <TableColumn Name="Column244" Width="170.1"/>
+                <TableColumn Name="Column245" Width="151.2"/>
+                <TableColumn Name="Column246" Width="160.65"/>
+                <TableColumn Name="Column247" Width="160.65"/>
+                <TableColumn Name="Column248" Width="160.65"/>
+                <TableRow Name="Row99">
+                  <TableCell Name="Cell715" Text="Всього по валюті:" ColSpan="3"/>
+                  <TableCell Name="Cell716"/>
+                  <TableCell Name="Cell717"/>
+                  <TableCell Name="Cell718" Border.Lines="Top" Border.Style="Dash" Text="[[TotalOSTF]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell719" Border.Lines="Top" Border.Style="Dash" Text="[[TotalOBKR]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell720" Border.Lines="Top" Border.Style="Dash" Text="[[TotalOBDB]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell721" Border.Lines="Top" Border.Style="Dash" Text="[[TotalOST]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                </TableRow>
+              </TableObject>
+              <TableObject Name="Table60" Top="37.8" Width="1048.95" Height="18.9" BeforePrintEvent="Table60_BeforePrint">
+                <TableColumn Name="Column256" Width="132.3"/>
+                <TableColumn Name="Column257" Width="113.4"/>
+                <TableColumn Name="Column258" Width="170.1"/>
+                <TableColumn Name="Column259" Width="151.2"/>
+                <TableColumn Name="Column260" Width="160.65"/>
+                <TableColumn Name="Column261" Width="160.65"/>
+                <TableColumn Name="Column262" Width="160.65"/>
+                <TableRow Name="Row105">
+                  <TableCell Name="Cell761" Text="Всього в еквіваленті:" ColSpan="3"/>
+                  <TableCell Name="Cell762"/>
+                  <TableCell Name="Cell763"/>
+                  <TableCell Name="Cell764" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell765" Text="[[TotalSKRQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell766" Text="[[TotalSDBQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell767" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                </TableRow>
+              </TableObject>
+              <TableObject Name="Table59" Top="18.9" Width="1048.95" Height="18.9" BeforePrintEvent="Table59_BeforePrint">
+                <TableColumn Name="Column263" Width="132.3"/>
+                <TableColumn Name="Column264" Width="113.4"/>
+                <TableColumn Name="Column265" Width="170.1"/>
+                <TableColumn Name="Column266" Width="151.2"/>
+                <TableColumn Name="Column267" Width="160.65"/>
+                <TableColumn Name="Column268" Width="160.65"/>
+                <TableColumn Name="Column269" Width="160.65"/>
+                <TableRow Name="Row106">
+                  <TableCell Name="Cell768" Text="Всього по валюті:" ColSpan="3"/>
+                  <TableCell Name="Cell769"/>
+                  <TableCell Name="Cell770"/>
+                  <TableCell Name="Cell771" Border.Lines="Top" Border.Style="Dash" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell772" Border.Lines="Top" Border.Style="Dash" Text="[[TotalSKR]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell773" Border.Lines="Top" Border.Style="Dash" Text="[[TotalSDB]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                  <TableCell Name="Cell774" Border.Lines="Top" Border.Style="Dash" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                </TableRow>
+              </TableObject>
+            </GroupFooterBand>
+          </GroupHeaderBand>
+          <GroupFooterBand Name="GroupFooter6" Top="432.9" Width="1047.06" Height="18.9" BeforePrintEvent="GroupFooter6_BeforePrint">
+            <TableObject Name="Table32" Width="888.3" Height="18.9" BeforePrintEvent="Table32_BeforePrint">
+              <TableColumn Name="Column249" Width="132.3"/>
+              <TableColumn Name="Column250" Width="113.4"/>
+              <TableColumn Name="Column251" Width="264.6"/>
+              <TableColumn Name="Column252" Width="56.7"/>
+              <TableColumn Name="Column253" Width="160.65"/>
+              <TableColumn Name="Column254" Width="160.65"/>
+              <TableRow Name="Row102">
+                <TableCell Name="Cell740" Text="Всього в еквіваленті по всім валютам:" ColSpan="4"/>
+                <TableCell Name="Cell741"/>
+                <TableCell Name="Cell742"/>
+                <TableCell Name="Cell743" Border.Lines="Top" Border.Style="Dash" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                <TableCell Name="Cell744" Border.Lines="Top" Border.Style="Double" Text="[[TotalSKRQF]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+                <TableCell Name="Cell745" Border.Lines="Top" Border.Style="Double" Text="[[TotalSDBQF]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+              </TableRow>
+            </TableObject>
+          </GroupFooterBand>
+        </GroupHeaderBand>
+        <GroupFooterBand Name="GroupFooter2" Top="455.8" Width="1047.06"/>
+      </GroupHeaderBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="459.8" Width="1047.06" Height="56.7">
+      <TableObject Name="Table9" Width="414.95" Height="56.7">
+        <TableColumn Name="Column204" Width="414.95"/>
+        <TableRow Name="Row88">
+          <TableCell Name="Cell649" Text="Контролер:"/>
+        </TableRow>
+        <TableRow Name="Row89">
+          <TableCell Name="Cell651"/>
+        </TableRow>
+        <TableRow Name="Row90">
+          <TableCell Name="Cell653" Text="Касир:"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>
