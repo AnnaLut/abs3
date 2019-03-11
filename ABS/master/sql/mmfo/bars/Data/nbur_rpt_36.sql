@@ -73,7 +73,7 @@ commit;
 begin
     delete from NBUR_REF_PREPARE_XML WHERE FILE_CODE = '#36'; 
     Insert into NBUR_REF_PREPARE_XML
-       (FILE_CODE, DESC_XML, DATE_START)
+       (FILE_CODE, DESC_XML, DATE_START, ATTR_NIL)
      Values
        ('#36', 'select EKP, KU, B040, F021, K020, K021, 
                     Q001_1, Q002_1, Q002_2, Q003_2, Q003_3, 
@@ -87,7 +87,8 @@ begin
                     F105
             from nbur_log_f36X 
             where report_date = :p_rpt_dt
-                       and kf = :p_kf ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+                       and kf = :p_kf ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+       'Q007_2,Q002_2,Q023,Q001_1,Q002_1,Q001_2,Q006,Q007_3,Q007_4');
     COMMIT;
 end;
 /
