@@ -233,8 +233,241 @@ begin
 end;
 / 
 COMMENT ON COLUMN BARS.CIM_F503.F057 IS '¬Ë‰ Á‡ÔÓÁË˜ÂÌÌˇ';
+PROMPT *** Create  constraint FK_F503_F057 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F503 ADD CONSTRAINT FK_F503_F057 FOREIGN KEY (F057)
+	  REFERENCES BARS.F057 (F057) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
+begin
+    execute immediate 'alter table bars.cim_f503 add (F009 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.F009 IS ' Ó‰ ÚËÔÛ ‰ÊÂÂÎ‡ Ù≥Ì‡ÌÒÛ‚‡ÌÌˇ';
+PROMPT *** Create  constraint FK_F503_F009 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F503 ADD CONSTRAINT FK_F503_F009 FOREIGN KEY (F009)
+	  REFERENCES BARS.F009 (F009) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
         
+begin
+    execute immediate 'alter table bars.cim_f503 add (F010 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.F010 IS ' Ó‰ ÚËÔÛ Û„Ó‰Ë';
+PROMPT *** Create  constraint FK_F503_F010 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F503 ADD CONSTRAINT FK_F503_F010 FOREIGN KEY (F010)
+	  REFERENCES BARS.F010 (F010) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (F011 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.F011 IS ' Ó‰ „‡Ù≥Í‡ ÔÓ„‡¯ÂÌÌˇ ÔÎ‡ÚÂÊ≥‚';
+PROMPT *** Create  constraint FK_F503_F011 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F503 ADD CONSTRAINT FK_F503_F011 FOREIGN KEY (F011)
+	  REFERENCES BARS.F011 (F011) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (F012 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.F012 IS ' Ó‰ ÚËÔÛ ÙÓÏË ‚Î‡ÒÌÓÒÚ≥';
+PROMPT *** Create  constraint FK_F503_F012 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F503 ADD CONSTRAINT FK_F503_F012 FOREIGN KEY (F012)
+	  REFERENCES BARS.F012 (F012) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (F014 CHAR(1))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.F014 IS ' Ó‰ ‚Ë‰Û ÔÓ‰‡ÌÌˇ Á‚≥ÚÛ';
+PROMPT *** Create  constraint FK_F503_F014 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F503 ADD CONSTRAINT FK_F503_F014 FOREIGN KEY (F014)
+	  REFERENCES BARS.F014 (F014) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (F036 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.F036 IS ' Ó‰ ‚ËÍÓËÒÚ‡ÌÌˇ ÔÓˆÂÌÚÌÓø ÒÚ‡‚ÍË Á‡ ÍÂ‰ËÚÓÏ';
+PROMPT *** Create  constraint FK_F503_F036 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F503 ADD CONSTRAINT FK_F503_F036 FOREIGN KEY (F036)
+	  REFERENCES BARS.F036 (F036) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q001_2	 VARCHAR2(70))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q001_2 IS '√¿–¿Õ“ « ¡Œ ” œŒ«»◊¿À‹Õ» ¿';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q001_4	 VARCHAR2(70))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q001_4 IS '√¿–¿Õ“ « ¡Œ ”  –≈ƒ»“Œ–¿';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q007_1	 DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q007_1 IS 'ƒ¿“¿ œ≈–ÿŒ√Œ ¿Ã¿–“»«¿÷≤…ÕŒ√Œ œÀ¿“≈∆”';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q007_2	 DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q007_2 IS 'ƒ¿“¿ Œ—“¿ÕÕ‹Œ√Œ ¿Ã¿““»«¿÷≤…ÕŒ√Œ œÀ¿“≈∆”';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q007_3	 DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q007_3 IS 'œŒ◊¿“ Œ¬¿ ƒ¿“¿ œ≈–≤Œƒ”  ŒÕ—ŒÀ≤ƒ¿÷≤Ø';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q007_4	 DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q007_4 IS ' ≤Õ÷≈¬¿ ƒ¿“¿ œ≈–≤Œƒ”  ŒÕ—ŒÀ≤ƒ¿÷≤Ø';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q007_6	 DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q007_6 IS 'ƒ¿“¿ œ≈–ÿŒ√Œ œÀ¿“≈∆” «¿ œ–Œ÷≈Õ“¿Ã»';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q007_7	 DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q007_7 IS 'ƒ¿“¿ Œ—“¿ÕÕ‹Œ√Œ œÀ¿“≈∆” « œ–Œ÷≈Õ“¿Ã»';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q007_8	 DATE)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q007_8 IS 'ƒ¿“¿ , œŒ◊»Õ¿ﬁ◊» « ﬂ ŒØ œ–Œ÷≈Õ“» —œÀ¿◊»¬¿ﬁ“‹—ﬂ «¿ ƒ–. œ–Œ÷. —“¿¬ Œﬁ ¿¡Œ ƒ–”√≈ «Õ¿◊≈ÕÕﬂ Ã¿–∆≤';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q009	 VARCHAR2(230))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q009 IS 'Ã≈“¿ œŒ«» »';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q010_1	 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q010_1 IS 'œ≈–≤Œƒ ◊¿—” ” Ã≤—ﬂ÷ﬂ’';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q011_1	 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q011_1 IS ' ≤À‹-—“‹ ¿ÃŒ–“»«¿÷≤…Õ»’ œÀ¿“≈∆≤¬';
+
+begin
+    execute immediate 'alter table bars.cim_f503 add (Q011_2	 NUMBER(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.Q011_2 IS ' ≤À‹-—“‹ œÀ¿“≈∆≤¬ «¿ –≤ ';
+
 
 
 PROMPT *** Create  grants  CIM_F503 ***
