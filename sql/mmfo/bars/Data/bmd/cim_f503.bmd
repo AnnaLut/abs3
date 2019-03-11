@@ -190,6 +190,26 @@ begin
   bars_metabase.add_column(l_tabid, 70, 'P3200', 'N', '(3200)~Код ~типу ~реорганізації', null, 2, 61, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 71, 'P3300', 'C', '(3300)~Код ~валюти~розрахунків', null, 3, 61, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 72, 'F057', 'C', 'Код ~виду ~запозичення', null, 3, 72, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 73, 'F009', 'C', 'Код типу ~джерела ~фінансування', null, 3, 73, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 74, 'F010', 'C', 'Код типу~ угоди', null, 3, 74, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 75, 'F011', 'C', 'Код графіка~ погашення~ платежів', null, 3, 75, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 76, 'F012', 'C', 'Код типу~ форми власності', null, 3, 76, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 77, 'F014', 'C', 'Код виду~ подання звіту', null, 3, 77, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 78, 'F036', 'C', 'Код використання~ процентної ставки~ за кредитом', null, 3, 78, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 79, 'Q001_2', 'C', 'ГАРАНТ ~З БОКУ ~ПОЗИЧАЛЬНИКА', null, 70, 79, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 80, 'Q001_4', 'C', 'ГАРАНТ ~З БОКУ ~КРЕДИТОРА', null, 70, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 81, 'Q007_1', 'D', 'ДАТА ПЕРШОГО ~АМАРТИЗАЦІЙНОГО ~ПЛАТЕЖУ', 3, null, 81, 0, 0, 0, 0, '', 'dd/MM/yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 82, 'Q007_2', 'D', 'ДАТА ОСТАННЬОГО ~АМАТТИЗАЦІЙНОГО~ ПЛАТЕЖУ', 3, null, 82, 0, 0, 0, 0, '', 'dd/MM/yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 83, 'Q007_3', 'D', 'ПОЧАТКОВА ДАТА ~ПЕРІОДУ КОНСОЛІДАЦІЇ', 3, null, 83, 0, 0, 0, 0, '', 'dd/MM/yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 84, 'Q007_4', 'D', 'КІНЦЕВА ДАТА ~ПЕРІОДУ КОНСОЛІДАЦІЇ', 3, null, 84, 0, 0, 0, 0, '', 'dd/MM/yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 85, 'Q007_6', 'D', 'ДАТА ПЕРШОГО ~ПЛАТЕЖУ ЗА ПРОЦЕНТАМИ', 3, null, 85, 0, 0, 0, 0, '', 'dd/MM/yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 86, 'Q007_7', 'D', 'ДАТА ОСТАННЬОГО ~ПЛАТЕЖУ З ПРОЦЕНТАМИ', 3, null, 86, 0, 0, 0, 0, '', 'dd/MM/yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 87, 'Q007_8', 'D', 'ДАТА , ПОЧИНАЮЧИ ~З ЯКОЇ ПРОЦЕНТИ ~СПЛАЧИВАЮТЬСЯ ЗА ДР. ~ПРОЦ. СТАВКОЮ', 3, null, 87, 0, 0, 0, 0, '', 'dd/MM/yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 88, 'Q009', 'C', 'МЕТА ПОЗИКИ', null, 108, 88, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 89, 'Q010_1', 'N', 'ПЕРІОД ~ЧАСУ У ~МІСЯЦЯХ', null, 2, 89, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 90, 'Q011_1', 'N', 'КІЛЬ-СТЬ ~АМОРТИЗАЦІЙНИХ ~ПЛАТЕЖІВ', null, 2, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 91, 'Q011_2', 'N', 'КІЛЬ-СТЬ ~ПЛАТЕЖІВ ~ЗА РІК', null, 2, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('v_cim_kod_51_1');
@@ -370,6 +390,62 @@ begin
   else
     dbms_output.put_line('В БМД не описана таблица F057 для описания сложного поля таблицы CIM_F503.');
   end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('F009');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'F009');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 73, l_newtabid, l_newcolid, 'u', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица F009 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('F010');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'F010');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 74, l_newtabid, l_newcolid, 'v', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица F010 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('F011');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'F011');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 75, l_newtabid, l_newcolid, 'w', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица F011 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('F012');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'F012');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 76, l_newtabid, l_newcolid, 'h', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица F012 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('F014');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'F014');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 77, l_newtabid, l_newcolid, 'i', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица F014 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('F036');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'F036');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 78, l_newtabid, l_newcolid, 'j', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица F036 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
 
 
   -- очищаем описание функций на справочник
