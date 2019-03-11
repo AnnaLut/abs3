@@ -18,7 +18,7 @@ prompt -- ======================================================
 
 begin
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F36X', 'WHOLE' , NULL, NULL, NULL, NULL );
-  BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F36X', 'FILIAL',  'M', NULL,  'E',  'E' );
+  BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F36X', 'FILIAL',  'M', NULL,  NULL,  'E' );
 end;
 /
 

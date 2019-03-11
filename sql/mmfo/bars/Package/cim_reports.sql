@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.09 07/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.10 11/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -771,7 +771,7 @@ begin
                case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk, a.benef_adr as q002_2, a.is_fragment, a.type_id, a.bound_id
          from
          ( select nvl(m.m_p22,
-                      case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null or not (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) then 3
+                      case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null or (not (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) and x.f_b041 is not null) then 3
                            when x.f_b041 is null and (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) then 1
                            when x.f_p02 != e.k112 or x.f_p06 != k.nmk or x.f_p07 != nvl(x.adr, k.adr) or x.f_p08 != substr(b.benef_name,1,135) or
                                 x.f_p09 != b.country_id or x.f_p15 != x.p15 or x.f_p19 != x.p19 then 2 
@@ -1064,7 +1064,7 @@ end  p_f531;
       l_nbur_36x.T071       := cur.p15;
       l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
       l_nbur_36x.Q006       := '';--p27;
-      l_nbur_36x.Q023       := cur.b040;
+--      l_nbur_36x.Q023       := cur.b040;
       l_nbur_36x.K112       := cur.k112;
       l_nbur_36x.F008       := cur.p18;
       l_nbur_36x.D070       := cur.p01;
@@ -1162,7 +1162,7 @@ end  p_f531;
         l_nbur_36x.T071       := cur.p15;
         l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
         l_nbur_36x.Q006       := '';--p27;
-        l_nbur_36x.Q023       := cur.b040;
+--        l_nbur_36x.Q023       := cur.b040;
         l_nbur_36x.K112       := cur.k112;
         l_nbur_36x.F008       := cur.p18;
         l_nbur_36x.D070       := cur.p01;
@@ -1231,7 +1231,7 @@ end  p_f531;
         l_nbur_36x.T071       := cur.p15;
         l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
         l_nbur_36x.Q006       := cur.p27;
-        l_nbur_36x.Q023       := cur.b040;
+--        l_nbur_36x.Q023       := cur.b040;
         l_nbur_36x.F008       := cur.p18;
         l_nbur_36x.D070       := cur.p01;
         l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
@@ -1262,7 +1262,7 @@ end  p_f531;
       l_nbur_36x.T071       := cur.p15;
       l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
       l_nbur_36x.Q006       := cur.p27;
-      l_nbur_36x.Q023       := cur.b040;
+--      l_nbur_36x.Q023       := cur.b040;
       l_nbur_36x.F008       := cur.p18;
       l_nbur_36x.D070       := cur.p01;
       l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
@@ -1345,7 +1345,7 @@ end  p_f531;
       l_nbur_36x.T071       := cur.p15;
       l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
       l_nbur_36x.Q006       := '';--p27;
-      l_nbur_36x.Q023       := cur.b040;
+--      l_nbur_36x.Q023       := cur.b040;Не заповнюється.
       l_nbur_36x.K112       := cur.k112;
       l_nbur_36x.F008       := cur.p18;
       l_nbur_36x.D070       := cur.p01;

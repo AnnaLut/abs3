@@ -18,7 +18,7 @@ is
 %
 % VERSION     :  v.18.002    07/12/2018 (24/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_      char(30)  := 'v.19.004   06/03/2019';
+  ver_      char(30)  := 'v.19.005   07/03/2019';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -37,7 +37,7 @@ is
   l_clob                  clob;
   l_error                 varchar2(2000);
 
-  --l_lim_day               number := F_get_CURR_LIM_DAY1;--Добовий ліміт купівлі безготівкової валюти(коп)
+  l_n                     pls_integer;
 
   --Exception
   e_ptsn_not_exsts exception;
@@ -126,6 +126,20 @@ BEGIN
             and f.b041 > '0'
             and f.manual_include = 0)
     order by b041, k020, p17, p08, p16, p21, p01;
+    
+    --обнулити Q006 якщо в порушення не попали інші нерезиденти з одним номером контракту (в модулі оригінал cim_contracts_trade.P27_F531)
+    for cur in (select t.rowid, t.q003_3, t.q001_2 from nbur_log_f36X t where t.q006 is not null and t.report_date = p_report_date and t.kf = p_kod_filii)
+    loop
+      select count(*) into l_n from nbur_log_f36X where rowid != cur.rowid and report_date = p_report_date and kf = p_kod_filii
+                                                    and q003_3 = cur.q003_3 and q001_2 != cur.q001_2;
+      if l_n = 0 then
+        --dbms_output.put_line('Потрібно апдейтнуть для rowid='||cur.rowid||' p17='||cur.p17||' p08='||cur.p08);
+        logger.info (c_title || ' Обнуляю примітку Q006 для q003_3='||cur.q003_3||' q001_2='||cur.q001_2);
+        update nbur_log_f36X 
+           set q006 = null 
+         where rowid = cur.rowid;  
+      end if;  
+    end loop;   
     
     --    
     --A36002
