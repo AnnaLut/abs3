@@ -1,4 +1,4 @@
-
+ 
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_cash.sql =========*** Run *** =
@@ -266,7 +266,7 @@ end bars_cash;
 
 show error
 
-create or replace package body BARS_CASH 
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_CASH
 is
     -----------------------------------------------------------------
     --                                                             --
@@ -277,6 +277,9 @@ is
     -----------------------------------------------------------------
     --  онстанты                                                   --
     -----------------------------------------------------------------
+	
+	
+	
 
     VERSION_BODY      constant varchar2(64)  := 'version 6.4 15.05.2018';
     G_MODULE          constant varchar2(4)   := 'CSH';
@@ -1066,10 +1069,10 @@ is
               -- ¬ыбор документов, кот. вводились исполнител€ми нашего отделени€ по не кассовым счетам нашего бранча
               -- в период работы указнаой смены
               insert    into  tmp_cashpayed(
-                     datatype, branch,
+                     datatype, ref, branch,
                      kv, tt, optype,  s, sq,
                      post_userid)
-              select 1, sys_context('bars_context','user_branch'),
+              select 1, o.ref, sys_context('bars_context','user_branch'),
                      v.kv, l.tt, l.dk,  l.s,
                      decode(o.kv, o.kv2, decode( v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)), o.s2 ) sq,
                      o.userid
@@ -1521,9 +1524,9 @@ is
           -- ¬ыбор документов, кот. вводились исполнител€ми нашего отделени€ по не кассовым счетам нашего бранча
           -- в период работы указнаой смены
           insert into     tmp_cashpayed(
-                        datatype, branch,
+                        datatype, ref, branch,
                         kv, tt, optype,  s, sq, post_userid)
-          select  1, sys_context('bars_context','user_branch'), v.kv, l.tt, l.dk,  l.s,
+          select  1, o.ref, sys_context('bars_context','user_branch'), v.kv, l.tt, l.dk,  l.s,
                   decode(v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)) sq,
                   o.userid
            from   oper         o,
@@ -1936,18 +1939,18 @@ is
 
            if l_iscash = 1 then
              begin
-               
+
                select branch into l_branch
                  from staff$base
                 where id = c.userid;
-             
+
                bars_audit.info(l_trace||'l_branch='||l_branch||' ref= '||c.ref);
                -- есть пользователи,кто зареган на /, но они визируют, тогда в≥ставл€ем бранч в код филиала из oper_visa,
                -- поскольку невозможно узнать на каком бранче б≥л представлен пользователь, когда в≥полн€л визирование
                if l_branch = '/' then
                   l_branch := '/'||c.kf||'/';
                end if;
-              
+
              end;
 
              begin
