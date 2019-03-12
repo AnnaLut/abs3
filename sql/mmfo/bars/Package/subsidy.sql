@@ -418,7 +418,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                        sk_    => null,
                        data_  => l_bdate,
                        datp_  => l_bdate,
-                       nam_a_ => l_accounts_line.nms,
+                       nam_a_ => substr(l_accounts_line.nms,1,38),
                        nlsa_  => l_nls,
                        mfoa_  => l_mfo,
                        nam_b_ => substr(l_sybsidy_list(i).receivername,1,38),
