@@ -72,7 +72,7 @@ begin
                            '               sum(  decode(optype, 0, t.s, 0))  sdb,   sum(  decode(optype, 1, t.s, 0))  skr, '||nlchr||
                            '               sum(  decode(optype, 0, t.sq, 0))  sdbq,    sum(  decode(optype, 1, t.sq, 0)) skrq, '||nlchr||
                            '               sum(t.sq) sq,'||nlchr||
-                           '               0 obdb, 0 obkr, 0 ost, stime, etime, count(DISTINCT t.ref) doccnt'||nlchr||
+                           '               0 obdb, 0 obkr, 0 ost, stime, etime, count(*) doccnt'||nlchr||
                            '          from tmp_cashpayed t,  tts'||nlchr||
                            '          where datatype = ''1'' and t.tt = tts.tt'||nlchr||
                            '          group by t.kv, t.tt, tts.name, stime, etime'||nlchr||

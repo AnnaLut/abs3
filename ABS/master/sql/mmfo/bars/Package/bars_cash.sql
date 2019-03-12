@@ -1524,9 +1524,9 @@ is
           -- Выбор документов, кот. вводились исполнителями нашего отделения по не кассовым счетам нашего бранча
           -- в период работы указнаой смены
           insert into     tmp_cashpayed(
-                        datatype, ref, branch,
+                        datatype,  branch,
                         kv, tt, optype,  s, sq, post_userid)
-          select  1, o.ref, sys_context('bars_context','user_branch'), v.kv, l.tt, l.dk,  l.s,
+          select  1,  sys_context('bars_context','user_branch'), v.kv, l.tt, l.dk,  l.s,
                   decode(v.kv, 980, l.s, gl.p_icurval( v.kv, l.s, pdat)) sq,
                   o.userid
            from   oper         o,
