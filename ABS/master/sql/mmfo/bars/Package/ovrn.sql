@@ -183,16 +183,16 @@ procedure NEXT_LIM (p_acc8 number ) is  --  проверка на перелимиты с помещением 
 begin   ----- 2  Нов.ліміт<Деб.зал(Переліміт)  15
   bars_audit.info( 'OVRN=>NEXT_LIM '|| p_acc8 ||'   '||sysdate);
   For k in (select * from accounts where p_acc8 in ( accc, acc) and tip <> 'SP ' and lim >= 0 )
-  loop  
+  loop
         bars_audit.info( 'OVRN=>NEXT_LIM '|| k.acc ||'   '||k.lim||'   '||sysdate);
         If    k.acc = p_acc8 then
               select NVL(sum(ostc),0)*(-1)  into  sum_deb from accounts where ostc < 0 and accc = p_acc8 ;
-              
+
               ----------------------------------------------------------
               -----если сюда попадает счет 89*, то, исходя из OVRN.ins_TRZ, в OVR_TERM_TRZ вообще никогда ничего не попадет (в этой строке нет смысла)
               If k.lim < Sum_Deb then                OVRN.ins_TRZ (k.acc, gl.bdate + 1, null, 2 )   ; end If ;  -- перелимит по дог
-              ----------------------------------------------------------  
-                          
+              ----------------------------------------------------------
+
         elsIf k.ostc <  0  and k.lim < k.ostc *(-1) then  OVRN.ins_TRZ (k.acc, gl.bdate + 1, null, 2 )   ;           -- перелимит по клиенту
         end if ;
   end loop     ;
@@ -390,8 +390,15 @@ OVR_TERM_TRZ.TRZ = Код события:
   EXCEPTION WHEN NO_DATA_FOUND THEN  null;
   end;
 
-  delete from OVR_TERM_TRZ t
-   where TRZ < 4 and ( DATSP < gl_bdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  OR OVRN.fost_sal(t.acc, gl_bdate) >= 0  )  ;
+/*  delete from OVR_TERM_TRZ t
+   where TRZ < 4 and ( DATSP < gl_bdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  OR OVRN.fost_sal(t.acc, gl_bdate) >= 0  )  ;*/
+   
+   delete from OVR_TERM_TRZ t
+   where TRZ < 4 and ( 
+                     DATSP < sysdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  
+                     OR 
+                     exists (select 1 from accounts a where a.acc= t.acc and OVRN.fost_sal(a.acc, sysdate) >= 0 )
+                     );
 
   begin -- Просроченные проценты несвоевременная оплата %/комиссии,
      select 11 into n_sos from accounts a, nd_acc n where n.nd = dd.ND and a.acc= n.acc and a.nbs = SB_2069.R020 and tip ='SPN' and a.ob22 = SB_2069.ob22 and OSTC < 0  and rownum = 1 ;
@@ -868,9 +875,9 @@ begin
      end if;
      select lim  into LDT_ from  OVR_LIM  where nd = l_ND and acc = ACC8_ and fdat = dTmp_ and ok = 1 ;
     exception when others then
-        bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));     
+        bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));
         LDT_:=0;
-    end; 
+    end;
    end if;
 
     begin
@@ -881,10 +888,10 @@ begin
   end if;
   select lim  into LD0_ from  OVR_LIM_DOG  where nd = l_ND and acc = acc8_ and fdat = dTmp_;
     exception when others then
-        bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));     
+        bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));
         LD0_:=0;
-    end;   
-  
+    end;
+
   LDN_ := CDO_ * PD_ /100  ;  -- • ЛДн = ЧД *ПД.
   nTmp_ := div0( Abs(LDN_-LDT_), LDT_ );
 
@@ -1761,7 +1768,7 @@ begin
   if l_count <=1 then
     raise_application_error(g_errn, 'Єдиний учасник не може бути видалений –скористайтеся функцією закриття договору!' ) ;
   end if;
-  
+
   begin select *    into dd    from cc_deal             where   nd  = p_ND and vidd   =  10 ;
         select n.nd into l_ndu from cc_deal d, nd_acc n where d.ndi = p_ND and d.vidd = 110 and d.nd = n.nd and n.acc= p_acc ;
   EXCEPTION WHEN NO_DATA_FOUND THEN RETURN;
