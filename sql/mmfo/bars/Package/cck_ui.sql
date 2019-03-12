@@ -7,6 +7,7 @@
 
  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.4 02.04.2018';
 /*
+  02.04.2018 VPogoda Добавлена процедура объединения нескольких "однородных" траншей
   03.03.2018 Sta Добавлена процедура OP_OFR (p_acc) для открытия счета OFR.Прострочена Фін.дебіторка	          для произвольного счета фин.деб ( не SK0) = p_acc
 
   20.07.2017 Sta COBUMMFO-4088  розділення  PROCEDURE trs_upd   та об'єднання траншів  PROCEDURE trs_add
@@ -271,6 +272,13 @@ type tbl_tip_ndg is table of row_tip_ndg;
   --
   procedure calc_comission_4_gpk (p_nd in number);
 
+  procedure unite_transh (p_doc_lst in     t_dictionary_list
+                         ,p_errmsg  out    varchar2);
+
+
+  function trace_call
+    return varchar2;
+
   ------------------
   FUNCTION header_version RETURN VARCHAR2;
   FUNCTION body_version RETURN VARCHAR2;
@@ -279,12 +287,13 @@ END cck_ui;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.0 06.11.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.94 21.02.2019';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK_UI:';
 
 /*
-  06.11.2018 - COBUMMFO-8866 modified close deal
+  12.10.2018 - COBUMMFO-8866 modified close deal
+  02.04.2018 VPogoda Добавлена процедура объединения нескольких "однородных" траншей  - unite_transh
   16.03.2018 STA По открытию счета просрочки 3578 (фин.дебиторка) попросили изменить формирование названия счета на такое :
                  <Номер договора><Название заемщика>+ <номер счета 3578 основного оdb>. Слово "просроченный" убрать.
 
@@ -296,6 +305,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
   LSO ver.2.1.6 09/03/2017 Фикс Подбор счетов при ручніх операциях
   LSO acc_add добавлен OB22 если приходит из формы то проставляем с проверкой
   Открытие счетов SK9 берем из таблицы cck_ob22  не SK9_31 а SK9
+	25/04/2014 COBUMMFO-7467 - доработки по одноразовой комиссии
 
   дополнительный пакедж к CCK по реализации в ВЄБ
 */
@@ -2096,8 +2106,8 @@ null;
       return;
     end if;
     IF p_type = 1 THEN
-          logger.tms_info(title||'Start Нарахування відсотків,комісій,пені по КП ФО');
-             p_interest_cck1(11, NULL);
+          logger.tms_info(title||'Start Нарахування відсотків,комісій (за винятком пені) по КП ФО');
+             p_interest_cck1(111, NULL);
                cdb_mediator.pay_accrued_interest;
     ELSIF p_type = 2 THEN
 			      logger.tms_info(title||'Start Нарахування відсотків,комісій,пені по КП ЮО');
@@ -3498,7 +3508,63 @@ bars_audit.info('ГПК, комиссия, договор '||p_nd||', % ставка = '||v_rate);
                                                                                                 ',кол-во дней = '||q.second_int ||', лимит = '||q.second_amn||')');
     end loop;
   end;
- 
+
+  procedure unite_transh (p_doc_lst in     t_dictionary_list
+                         ,p_errmsg  out    varchar2)
+  is
+    v_arr number_list := number_list();
+    v_first_transh cc_trans.npp%type;
+    v_amn_v        cc_trans.sv%type;
+    v_amn_z        cc_trans.sz%type;
+    v_comment      cc_trans.comm%type;
+    v_acc          cc_trans.acc%type;
+  begin
+    for r in p_doc_lst.first..p_doc_lst.last
+    loop
+
+      for i in p_doc_lst(r).first..p_doc_lst(r).last
+      loop
+        bars_audit.info('UNITE_TRANSH: transh_id = '||p_doc_lst(r)(i).value||' (key= '||p_doc_lst(r)(i).key||')');
+        v_arr.extend();
+        v_arr(nvl(v_arr.last,1)) := p_doc_lst(r)(i).value;
+      end loop;
+    end loop;
+
+    for r in (select column_value, c.sv, c.sz, c.comm, c.acc
+                from table(cast (v_arr as number_list)) t,
+                     cc_trans c
+                where c.npp = t.column_value
+                order by column_value)
+    loop
+      if v_first_transh is null then
+        v_first_transh := r.column_value;
+        v_amn_v        := r.sv;
+        v_amn_z        := r.sz;
+        v_comment      := r.comm;
+        v_acc          := r.acc;
+      elsif v_acc != r.acc then
+        raise_application_error(-20000,'Обрані транши для різних рахунків. Об"єднання неможливе!');
+      else
+        CCT.Del_TRANSH(r.column_value);
+        v_amn_v       := v_amn_v + r.sv;
+        v_amn_z       := v_amn_z + r.sz;
+        v_comment      := NVL(v_comment, 'Об`єднання в один транш')|| '+' || r.column_value;
+      end if;
+bars_audit.info('v_first_transh = '||v_first_transh||', v_amn_v = '||r.sv||'('||v_amn_v||')');
+bars_audit.info('v_comment = '||v_comment);
+    end loop;
+
+    CCT.Upd_TRANSH( v_first_transh , v_amn_v , v_amn_z, v_comment) ;
+    p_errmsg := 'Everything is OK';
+  end;
+
+  function trace_call
+    return varchar2
+    is
+  begin
+    bars_audit.info('CCK_UI. ND = '||pul.get_mas_ini_val('ND'));
+    return 'Ok';
+  end;
   ------------------------------------------------------------------------------------------------
   FUNCTION header_version RETURN VARCHAR2 IS
   BEGIN
