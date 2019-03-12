@@ -11,6 +11,7 @@
  ) IS
 
    /*
+     21/02/2018  Pogoda   для щомісячного нарахування по портфелю ФО відключено пеню (додано новий тип розрахунку = 111)
      26/02/2018  Pogoda   додано розрахунок комісії по методу "відсоток від залишку"
      05/11/2017  Pivanova додано умову для нарахування basey=2 i basem=0
      18/07/2017  Pivanova додано додаткові умови для нрахування по ануїтету
@@ -48,7 +49,7 @@
  BEGIN
 
    IF p_type >= 0
-      AND p_type NOT IN (1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 17, 18) THEN
+      AND p_type NOT IN (1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 17, 18, 111) THEN
      RETURN;
    END IF;
    interest_utl.start_reckoning;
@@ -105,7 +106,7 @@
           AND sos < 14
           AND vidd IN (1, 2, 3, 11, 12, 13);
 
-   ELSIF p_type IN (1, 11) THEN
+   ELSIF p_type IN (1, 11, 111) THEN
 
      -- НА ВИМОГУ- по ВСІМ
      OPEN k1 FOR
@@ -238,14 +239,16 @@
                      ,i.metr
                      ,i.id
                      ,n.nd
-
                  FROM accounts a, int_accn i, nd_acc n
                    WHERE n.nd = dd.nd
                      AND n.acc = a.acc
                      AND a.acc = i.acc
                      AND (i.stp_dat IS NULL or i.stp_dat >=ddat2_)
-                     AND (a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9','CR9') AND
-                          i.id IN (0, 2) OR i.metr = 4 AND i.id = 1)
+                     AND (
+                          (a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9','CR9') AND (i.id = 0 or (i.id = 2 and p_type != 111)))
+                          OR 
+                          (i.metr = 4 AND i.id = 1)
+                         )
                      AND i.acra IS NOT NULL
                      AND i.acrb IS NOT NULL
                      AND i.acr_dat < ddat2_
@@ -266,8 +269,9 @@
                      AND d.ndg=dd.nd
                      AND a.acc = i.acc
                      AND (i.stp_dat IS NULL or i.stp_dat >= ddat2_)
-                     AND (a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9', 'CR9') AND
-                         i.id IN (0, 2) OR i.metr = 4 AND i.id = 1)
+                     AND ((a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9', 'CR9') AND (i.id  = 0 or (i.id = 1 and p_type != 111)))
+                          OR (i.metr = 4 AND i.id = 1)
+                         )
                      AND i.acra IS NOT NULL
                      AND i.acrb IS NOT NULL
                      AND i.acr_dat < ddat2_)
@@ -352,18 +356,18 @@
              if l_num != 0 then
                begin
                  acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
-  
+
                  l_nazn := substr('Амортизація рах.(пропорц.) ' || p.nls /*||
                                   '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
                                   ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
                                  ,1
                                  ,160);
-  
+
                exception when others  then
                 IF SQLCODE = -01476 THEN
                   logger.info('P_INTEREST_CCK1: договор '||p.nd||', acc = '||p.acc||', ошибка: '||sqlerrm);
                   continue;
-                else RAISE;    
+                else RAISE;
                 end if;
                end;
 
@@ -376,7 +380,7 @@
 /*Получен ответ от Банка (Фастованова А, Рыбалко Е) :
 прямолинейную амортизацию по гарантиям (Продукты = 90%) необходимо оставить в АБС (тип счета SDI, БС=3648)
 */
-         and p.nls like '3648%' 
+         and p.nls like '3648%'
          and dd.prod like '90%'
 --            1=0    -- cobuprvnix-161 отключение амортизации дисконта
          THEN
