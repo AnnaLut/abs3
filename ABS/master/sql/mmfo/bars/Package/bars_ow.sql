@@ -5766,6 +5766,8 @@ begin
             
             l_nls := get_newaccountnumber(l_pk_account.rnk, l_mask.nbs);
             
+            l_mask.nms := l_mask.nms||' '||customer_utl.read_customer(l_pk_account.rnk).nmkk; -- COBUMMFO-10330
+
             op_reg_ex(99, 0, 0, null, l_p4, l_pk_account.rnk,
                       l_nls, l_pk_account.kv, l_mask.nms, l_mask.tip, user_id(), l_acc,
                       '1', null, 0, null, null, null, null, null, null, null, null, null,
