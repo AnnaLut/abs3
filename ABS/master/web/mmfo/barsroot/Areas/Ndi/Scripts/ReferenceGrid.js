@@ -17,6 +17,7 @@
 
     //точка входа в приложение
     launch: function () {
+
         var thisApp = this;
         //заполняется из ViewBag в представлении
         var tableId = window.tableId;
@@ -61,7 +62,7 @@
                 
 
                 success: function (conn, response) {
-                    
+
                     //обработка при удачном запросе на сервер
                     var result = Ext.JSON.decode(conn.responseText);
                     if (result.success) {
@@ -85,7 +86,7 @@
             });
         }
         else if (isFuncOnly && isFuncOnly.toLowerCase() == 'true') {
-            
+
             Ext.Ajax.request({
                 url: '/barsroot/ndi/ReferenceBook/GetFuncOnlyMetaData',
                 params: {
@@ -138,13 +139,13 @@
 
     //вызвать процедуру перед населением таблицы
     callBeforeFunction: function (metadata) {
-        
+
         var thisApp = this;
         var thisController = thisApp.controllers.findBy(function (controller) { return controller.id = "refBook.RefGrid"; });
         var beforeFunc = Ext.Array.findBy(metadata.callFunctions, function (i) { return i.PROC_EXEC == "BEFORE" });
         //если нужно вызвать какую-то функцию перед тем как населить таблицу
         if (beforeFunc) {
-            
+
             thisController.fillCallFuncInfo(beforeFunc,metadata);
             var func = thisController.currentCalledSqlFunction;
             func.infoDialogTitle = beforeFunc.DESCR;

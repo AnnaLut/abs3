@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace Bars.CommonModels.ExternUtilsModels
 {
@@ -15,9 +16,12 @@ namespace Bars.CommonModels.ExternUtilsModels
         public BaseExternModel(AvailableExecTypes execType)
         {
             ExecType = execType.ToString();
-            TimeOut = 20000;
+            TimeOut = 200000;
         }
-        
+        [ScriptIgnore]
+        public string ExtUrlParam { get; set; }
+        [ScriptIgnore]
+        public string ExtUrl { get; set; }
         public  string ExecType { get; set; }
         public  int TimeOut { get; set; }
     }

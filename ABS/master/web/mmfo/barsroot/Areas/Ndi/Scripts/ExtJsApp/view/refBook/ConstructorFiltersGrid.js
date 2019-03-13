@@ -87,6 +87,7 @@ Ext.onReady(function () {
         extend: 'Ext.grid.Panel',
         store: store,
         id: 'ConstructorGrid',
+        columnLines: true,
         constructor: function (argument) {
             thisController = argument.thisController;
             var filterModel = {};

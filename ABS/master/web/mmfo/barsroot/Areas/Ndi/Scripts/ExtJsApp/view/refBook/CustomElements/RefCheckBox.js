@@ -18,6 +18,7 @@
         var thistExtBox = this;
         thistExtBox.listeners = {
             change: function (field, newValue, oldValue, eOpts) {
+                
                 //т.к. во время конвертации с true на 1 вызыется этот метод
                 if (newValue == oldValue)
                     return;

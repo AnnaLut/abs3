@@ -20,18 +20,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         [Inject]
         public IDbLogger Logger { get; set; }
         private IReferenceBookRepository _repository;
-        public RequestProvider()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
+
 
         public RequestProvider(IReferenceBookRepository repository)
         {
             this._repository = repository;
         }
-        public MainOptionsViewModel BuildResponseViewModel(RequestMolel requestModel)
+        public MainOptionsViewModel BuildResponseViewModel(RequestModel requestModel)
         {
             FunNSIEditFParams nsiEditParams = null;
 
@@ -117,25 +112,43 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
             return tableViwModel;
         }
-
+        
         //public MainOptionsViewModel BuildByCode(string code)
         //{
         //    MetaCallSettings metaCallSettings = _repository.GetMetaCallSettingsByCode(code);
         //    return null;
         //}
-        public FuncOnlyViewModel BuildFunctionOnlyRequest(RequestMolel requestModel)
+        public FuncOnlyViewModel BuildFunctionOnlyRequest(RequestModel requestModel)
         {
             FuncOnlyViewModel funcOnlyViewModel = new  FuncOnlyViewModel();
             if(!string.IsNullOrEmpty(requestModel.Code))
+            {
                 funcOnlyViewModel.Code = requestModel.Code;
+                funcOnlyViewModel.FunctionMetaInfo = _repository.GetFunctionsMetaInfo(null, requestModel.Code);
+
+            }
+              
             else
                 funcOnlyViewModel.CodeOper = requestModel.Spar;
 
             funcOnlyViewModel.ExternelFuncOnly = requestModel.ExternalFuncOnly;
             funcOnlyViewModel.DefParamModel.Base64ExternProcParams = FormatConverter.ConvertToUrlBase4UTF8(requestModel.JsonSqlParams);
             funcOnlyViewModel.HasCallbackFunction = requestModel.HasCallbackFunction;
+            if(requestModel.NsiTableId !=null && requestModel.NsiFuncId != null)
+            {
+                funcOnlyViewModel.FunctionMetaInfo = _repository.GetCallFunction(requestModel.NsiTableId.Value, requestModel.NsiFuncId.Value);
+                if(funcOnlyViewModel.FunctionMetaInfo != null)
+                {
+                    SqlStatementParamsParser.BuildFunction(funcOnlyViewModel.FunctionMetaInfo);
+                }
+                
+                funcOnlyViewModel.NsiFuncId = requestModel.NsiFuncId;
+                funcOnlyViewModel.NsiTableId = requestModel.NsiTableId;
+            }
+            
             return funcOnlyViewModel;
         }
+
 
     }
 }

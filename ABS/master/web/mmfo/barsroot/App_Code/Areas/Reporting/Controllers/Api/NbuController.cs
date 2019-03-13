@@ -19,8 +19,6 @@ using BarsWeb.Areas.Kernel.Models.KendoViewModels;
 using BarsWeb.Infrastructure.Helpers;
 using System.IO;
 using Bars.CommonModels;
-using BarsWeb.Infrastructure.ImportToFileHelper;
-using BarsWeb.Areas.Kernel.Infrastructure.Extentions;
 using BarsWeb.Core.Logger;
 using Ninject;
 using System.Diagnostics;

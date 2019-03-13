@@ -51,7 +51,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
         [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult UploadTemplateFile(string fieldFileName, int? tableId, int? funcId, int? codeOper, string jsonFuncParams = "", string procName = "", string msg = "",
-                  string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
+                  string web_form_name = "", string sPar = "")
         {
 
             //string[] supportedTypes = new string[]{
@@ -101,55 +101,56 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
 
         [HttpGet]
-        public ViewResult GetUploadFile(int? funcId, int? tabid, string code = null)
+        public ViewResult GetUploadFile(RequestModel requestModel)
         {
-            CallFunctionMetaInfo func = null;
+            RequestProvider request = new RequestProvider(_repository);
+            FuncOnlyViewModel funcViewResult = null;
+            //CallFunctionMetaInfo func = null;
             //try
-           // {
-
-
-                if (funcId != null && tabid != null)
-                {
-
-                    func = _repository.GetCallFunction(tabid.Value, funcId.Value);
-                if (func == null)
-                    throw new ArgumentNullException(String.Format("не знайдений опис процедузи з таблиці id = {0}, funcId = {1} ", tabid.Value, funcId.Value));
-
-                }
-                else
-                if (!string.IsNullOrEmpty(code))
-                {
-                    func = _repository.GetFunctionsMetaInfo(null, code);
-                    if(func == null)
-                    throw new ArgumentNullException(String.Format("не знайдений опис процедузи з таблиці meta_call_settings  code = {0}", code));
-
-                }
-
-
-                SqlStatementParamsParser.BuildFunction(func);
-                if (!string.IsNullOrEmpty(code) && code != "undefined")
-                    return View(func);
-                else
-                    return View("GetUploadFileWithParams", func);
-
-           // }
-
-            //catch (OracleException orex)
             //{
-            //    JsonResult.Status = JsonResponseStatus.Error;
-            //    JsonResult.Message = orex.Message;
-            //    JsonResult.Data = orex.Data;
-            //   return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
-            //}
-            //catch (Exception ex)
-            //{
-            //    JsonResult.Status = JsonResponseStatus.Error;
-            //    JsonResult.Message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
-            //     return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
-            //}
+            if (requestModel.NsiTableId != null && requestModel.NsiFuncId != null)
+            {
+                funcViewResult = request.BuildFunctionOnlyRequest(requestModel);
+                if (funcViewResult == null)
+                    throw new ArgumentNullException(String.Format("не знайдений опис процедузи з таблиці id = {0}, funcId = {1} ",
+                        funcViewResult.NsiTableId, funcViewResult.NsiFuncId));
+
+            }
+            else
+            if (!string.IsNullOrEmpty(requestModel.Code))
+            {
+                funcViewResult = request.BuildFunctionOnlyRequest(requestModel);
+                if (funcViewResult == null)
+                    throw new ArgumentNullException(String.Format("не знайдений опис процедузи з таблиці meta_call_settings  code = {0}", funcViewResult.Code));
+
+            }
 
 
-        }
+            //SqlStatementParamsParser.BuildFunction(func);
+            if (funcViewResult.FunctionMetaInfo != null && funcViewResult.FunctionMetaInfo.RowParamsNames !=null 
+                && funcViewResult.FunctionMetaInfo.RowParamsNames.Any(x => x == "p_ddate"))
+                return View("GetUploadFileWithParams", funcViewResult);
+            else
+                return View(funcViewResult);                   
+
+                //}
+
+                //catch (OracleException orex)
+                //{
+                //    JsonResult.Status = JsonResponseStatus.Error;
+                //    JsonResult.Message = orex.Message;
+                //    JsonResult.Data = orex.Data;
+                //   return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+                //}
+                //catch (Exception ex)
+                //{
+                //    JsonResult.Status = JsonResponseStatus.Error;
+                //    JsonResult.Message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+                //     return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
+                //}
+
+
+            }
 
         [HttpPost]
         public ActionResult PostUploadFileWithParams(string fileName, int? tabid, int? funcid, string date = null)
@@ -189,17 +190,26 @@ namespace BarsWeb.Areas.Ndi.Controllers
         }
 
         [HttpPost]
-        public ActionResult PostUploadFile(string fileName, int? tabid, int? funcid,string code = null)
+        public ActionResult PostUploadFile(string fileName, int? tabid, int? funcid, int? codeOper, string code = null, string jsonBase64Params = "")
         {
             var file = Request.Files[0];
 
             try
             {
-
+                List<FieldProperties> parameters = new List<FieldProperties>();
+                if(!string.IsNullOrEmpty(jsonBase64Params))
+                {
+                    string stringParameters = FormatConverter.ConvertFormBase64ToUTF8(jsonBase64Params);
+                    parameters = FormatConverter.JsonToObject<List<FieldProperties>>(stringParameters);
+                }
+              
                 string dirPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 List<FieldProperties> inputParams = new List<FieldProperties>();
                 inputParams.Add(new FieldProperties() { Name = "p_file_name", Type = "C", Value = fileName });
-                JsonResult.Message = _repository.CallParsExcelFunction(file, inputParams, tabid, funcid,code);
+                if (Path.GetExtension(fileName) == ".xlsx")
+                    JsonResult.Message = _repository.CallParsExcelFunction(file, inputParams, tabid, funcid, code);
+                else
+                    JsonResult.Message = _repository.UploadFile(file, parameters, tabid, funcid, codeOper, code);
                 JsonResult.Status = JsonResponseStatus.Ok;
                 return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
 
@@ -276,6 +286,10 @@ namespace BarsWeb.Areas.Ndi.Controllers
                 var result = new { success = false, errorMessage = e.Message };
                 return Json(result);
             }
+            finally
+            {
+                _repository.Dispose();
+            }
         }
 
         /// <summary>
@@ -292,9 +306,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// <param name="limit">Количество строк, которые должны быть отображены на странице (с сервера тянем на 1 больше для пэйджинга)</param>
         /// <param name="start">С какой строки начинать отбирать данные</param>
         /// <returns></returns>
-        //public ContentResult GetData(int tableId, string tableName, string gridFilter, string externalFilter, string startFilter, string dynamicFilter, string sort, int limit = 10,
-        //    int start = 0, int? nativeTabelId = null, int? codeOper = null, int? sParColumn = null, int? nsiTableId = null, int? nsiFuncId = null, string jsonSqlProcParams = "",
-        //    string base64jsonSqlProcParams = "", string filterCode = "", string executeBeforFunc = "", int? filterTblId = null, string kindOfFilter = "", bool isResetPages = false)
+       
         public ContentResult GetData(DataModel data)
         {
             try
@@ -320,16 +332,16 @@ namespace BarsWeb.Areas.Ndi.Controllers
         }
 
 
-        //public ActionResult GetCustomImg()
-        //{
-        //    byte[] res = _repository.GetCustomImage();
-        //    return File(res.ToArray(), "image/png");
-        //}
-        public ActionResult GetRefBookData(RequestMolel requestModel)
+        /// <summary>
+        /// Основная точка входа в БМД через url. 
+        /// </summary>
+        /// <param name="requestModel">Универсальная модель для входа в приложение по различным url</param>
+        /// <returns></returns>
+        public ActionResult GetRefBookData(RequestModel requestModel)
         {
             if (requestModel == null)
             {
-                throw new ArgumentNullException("обєкт requestModel порожній");
+                throw new ArgumentNullException("Об'єкт requestModel порожній");
             }
 
             try
@@ -606,7 +618,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
                 string req = Request.Form["insertUpdateModel"];
                 EditFilterModel editFilterModel = FormatConverter.JsonToObject<EditFilterModel>(req);
                 List<FilterRowInfo> filterRows = editFilterModel.FilterRows;
-                editFilterModel.JosnStructure = FormatConverter.ObjectToJsom(filterRows);
+                editFilterModel.JosnStructure = FormatConverter.ObjectToJson(filterRows);
                 if (filterRows == null || filterRows.Count <= 0)
                     return Json(new { status = "error", msg = "не заданно данних в фільтрі" });
                 if (string.IsNullOrEmpty(editFilterModel.TableName))
@@ -740,7 +752,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
                     InputParams = inputParams
                 };
 
-                string resultMessage = _repository.CallEachFuncWithMultypleRows(tableId, funcId, codeOper, columnId, dataModel, procName, msg,  code);
+                string resultMessage = _repository.CallEachFuncWithMultypleRows(tableId, funcId, codeOper, columnId, dataModel, procName, msg, code);
                 return Json(new { status = "ok", msg = resultMessage });
             }
             catch (Exception e)
@@ -778,7 +790,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         {
             try
             {
-                if (codeOper == null && string.IsNullOrEmpty(code)) 
+                if (codeOper == null && string.IsNullOrEmpty(code))
                     throw new Exception("ідентифікатор процедути пустий");
                 CallFunctionMetaInfo funcInfo = _repository.GetFunctionsMetaInfo(codeOper, code);
                 var result = new { success = true, funcMetaInfo = funcInfo };

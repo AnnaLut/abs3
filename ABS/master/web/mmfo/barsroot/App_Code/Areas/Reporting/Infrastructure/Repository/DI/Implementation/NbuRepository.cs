@@ -16,7 +16,6 @@ using BarsWeb.Areas.Kernel.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.Kernel.Models;
 using Kendo.Mvc.UI;
 using BarsWeb.Infrastructure.Helpers;
-using BarsWeb.Areas.Kernel.Infrastructure.Extentions;
 using Bars.Oracle.Factories;
 
 namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
@@ -816,9 +815,10 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
                 SqlParams = listParams.ToArray()
             };
             var query = _sqlTransformer.TransformSql(bSql, request);
-
-            List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
             
+            List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
+                if (isDtl)
+                    return GetOracleConnector.ReadDataLazy(query.SqlText, listParams.ToArray());
             using (OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = connection.CreateCommand())
             {

@@ -8,6 +8,7 @@ namespace BarsWeb.Areas.Ndi.Models
     public class CallFunctionMetaInfo
     {
         public CallFunctionMetaInfo(string webFormName, int colId, int tableId)
+           : this()
         {
             this.WEB_FORM_NAME = webFormName;
             this.TABID = tableId;
@@ -16,6 +17,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public CallFunctionMetaInfo()
         {
             this.SystemParamsInfo = new List<ParamMetaInfo>();
+            this.UploadParamsInfo = new List<UploadParamsInfo>();
         }
 
         public decimal? TABID { get; set; }

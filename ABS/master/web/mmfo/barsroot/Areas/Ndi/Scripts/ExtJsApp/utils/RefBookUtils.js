@@ -345,18 +345,18 @@
             if (srcQueryModel.QueryParamsInfo && srcQueryModel.QueryParamsInfo.length > 0)
                 srcQueryModel.QueryParams = [];
                 Ext.each(srcQueryModel.QueryParamsInfo, function (item) {
-                    var Value = selectedRow.data[item.COLNAME];
+                    var Value = selectedRow.data[item.Name];
                     if (Value !== undefined)
                     {
                         var param = {};
-                        param.Name = item.COLNAME;
-                        param.Type = item.COLTYPE;
+                        param.Name = item.Name;
+                        param.Type = item.Type;
                         param.Value = Value;
                         srcQueryModel.QueryParams.push(param);
                     }
 
             })
-            srcQueryModel.QueryParamsInfo = [];
+
             var queryModelString = Ext.JSON.encode(srcQueryModel);
             var dynamicUrl = '/barsroot/ndi/ReferenceBook/GerSrcQueryData?srcQueryModel=' + queryModelString;
             return dynamicUrl;
@@ -457,7 +457,7 @@
         replaceLastParameter:function (rowArray, strForReplace) {
             Ext.each(rowArray, function (param) {
                 var par = ':' + param.Name;
-                if (strForReplace.indexOf(par) > -1 && strForReplace.length == strForReplace.indexOf(par) + par.length)
+                if (strForReplace.indexOf(par) > -1 && strForReplace.length - 1 == strForReplace.indexOf(par) + par.length)
                     strForReplace = strForReplace.replace(par, param.Value)
             })
             return strForReplace;
@@ -909,9 +909,9 @@
 
         },
 
-        onBeforeEditFormByDependencies: function (form, record, columnsInfo) {
+
+        onBeforeEditFormByDependencies: function (form, record, depColsInfo) {
             var Util = this;
-            var depColsInfo = Ext.Array.filter(columnsInfo, function (item) { return item.Dependencies && item.Dependencies.length > 0 })
             if (!depColsInfo || depColsInfo.length < 1)
                 return;
 
@@ -934,6 +934,10 @@
                 })
             })
 
+        },
+
+        getDependColsInfo: function (columnsInfo) {
+            return Ext.Array.filter(columnsInfo, function (item) { return item.Dependencies && item.Dependencies.length > 0 });
         },
 
         parsDependencies: function (form, record, dependency) {

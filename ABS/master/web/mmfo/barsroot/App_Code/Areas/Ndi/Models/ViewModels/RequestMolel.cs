@@ -11,9 +11,9 @@ using System.Web;
 
 namespace BarsWeb.Areas.Ndi.Models.ViewModels
 {
-    public class RequestMolel
+    public class RequestModel
     {
-        public RequestMolel()
+        public RequestModel()
         {
             SaveFilterLocal = true;
             //
@@ -24,10 +24,25 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
         public string TableName { get; set; }
         public int? Spar { get; set; }
         public string JsonSqlParams { get; set; }
+        /// <summary>
+        /// Id колонки в meta_columns. Используется при клике на ячейку. 
+        /// </summary>
         public int? SparColumn { get; set; }
+        /// <summary>
+        /// используется при клике на ячейку(проваливание,выполнение процедуры). Для поиска метаописания по родительской таблице. 
+        /// </summary>
         public int? NativeTabelId { get; set; }
+        /// <summary>
+        /// Tabid в таблице meta_nsifunction
+        /// </summary>
         public int? NsiTableId { get; set; }
+        /// <summary>
+        /// FuncId в таблице meta_nsifunction
+        /// </summary>
         public int? NsiFuncId { get; set; }
+        /// <summary>
+        /// имена параметров
+        /// </summary>
         public string RowParamsNames { get; set; }
         public bool HasCallbackFunction { get; set; }
         public string FilterCode { get; set; }

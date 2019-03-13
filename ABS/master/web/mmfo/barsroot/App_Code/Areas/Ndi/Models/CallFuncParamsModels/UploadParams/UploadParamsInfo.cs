@@ -20,6 +20,10 @@ namespace BarsWeb.Areas.Ndi.Models
         {
            
         }
+        /// <summary>
+        /// допустима
+        /// </summary>
+        public string ExtValid { get; set; }
         //public string GetFrom { get; set; }
 
 

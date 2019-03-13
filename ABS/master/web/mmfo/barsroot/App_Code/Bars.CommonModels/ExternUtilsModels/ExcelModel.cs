@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BarsWeb.Areas.Ndi.Infrastructure.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -14,10 +15,12 @@ namespace Bars.CommonModels.ExternUtilsModels
         public SelectModel SelectModel { get; set; }
         public List<ColumnDesc> ColumnsInfo { get; set; }
         public LoginModel LoginModel { get; set; }
+        
+
         public ExcelExtModel()
             :base(AvailableExecTypes.ExceleExport)
         {
-
+            ExtUrlParam = UrlTamplates.ExternalUrlParam;
         }
       
 

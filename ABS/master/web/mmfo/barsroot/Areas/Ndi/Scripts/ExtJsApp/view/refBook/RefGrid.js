@@ -69,6 +69,7 @@ Ext.onReady(function () {
         maxHeight: document.body.offsetHeight - 20,
         layout: 'fit',
         padding: 4,
+        columnLines: true,
         //в данный метод пихаем конфигурацию, которую нужно получить динамически из метаданных
         initComponent: function () {
 
@@ -187,7 +188,7 @@ Ext.onReady(function () {
             }
 
 
-            
+            ;
             var getDataUrl = '/barsroot/ndi/ReferenceBook/GetData/?' +
                 'tableid=' +
                 getDataObj.TableId +

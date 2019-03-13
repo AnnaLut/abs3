@@ -1,26 +1,27 @@
 ﻿using Bars.Classes;
 using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
-
 /// <summary>
 /// Summary description for OracleCommandFactory
 /// </summary>
 namespace Bars.Oracle.Factories
 {
 
-    public class OracleConnectFactory
+    public class OracleConnectFactory : IDisposable
     {
+        public OracleClob CommandClob { get; set; }
+        public byte[] ParmeterBytes;
         public OracleConnectFactory()
         {
             //
             // TODO: Add constructor logic here
             //
         }
-
 
         private OracleConnection _conn = null;
 
@@ -56,56 +57,17 @@ namespace Bars.Oracle.Factories
                     if (_conn == null)
                         _conn = OraConnector.Handler.UserConnection;
                     _command = _conn.CreateCommand();
-                    //_command.CommandType = CommandType.StoredProcedure;
                 }
                 return _command;
             }
 
         }
-        public OracleCommand CreateCommandWithParams(string sql, CommandType type, params OracleParameter[] parameters)
-        {
-            if (_conn == null)
-                _conn = OraConnector.Handler.UserConnection;
-            var command = new OracleCommand(sql, _conn);
-            command.CommandType = type;
-            if (parameters != null && parameters.Length > 0)
-            {
-                OracleParameterCollection cmdParams = command.Parameters;
-                for (var i = 0; i < parameters.Length; i++) { cmdParams.Add(parameters[i]); }
-            }
-            return command;
-        }
-
-        public OracleCommand CreateCommandWithParams(string sql, CommandType type, params object[] parameters)
-        {
-            if (_conn == null)
-                _conn = OraConnector.Handler.UserConnection;
-            var command = new OracleCommand(sql, _conn);
-            command.CommandType = type;
-            if (parameters != null && parameters.Length > 0)
-                command.Parameters.AddRange(parameters);
-            return command;
-        }
-
-        public void ClearParametersFromProc()
-        {
-            if(_command != null & _command.Parameters !=null)
-            _command.Parameters.Clear();
-        }
-        public OracleDataReader GetDataReader(string storedProcedure, params OracleParameter[] parameters)
-        {
-            return CreateCommandWithParams(storedProcedure, CommandType.StoredProcedure, parameters).ExecuteReader();
-        }
-
-        public OracleDataReader GetDataReader(string storedProcedure,CommandType type, params object[] parameters)
-        {
-            return CreateCommandWithParams(storedProcedure, type, parameters).ExecuteReader();
-        }
-
         public OracleCommand CreateCommand
         {
             get
             {
+                if (_command != null)
+                    DisposeCommand();
                 if (_conn == null)
                     _conn = OraConnector.Handler.UserConnection;
                 _command = _conn.CreateCommand();
@@ -135,9 +97,6 @@ namespace Bars.Oracle.Factories
                         _myTransaction = _conn.BeginTransaction();
                     _command.Transaction = _myTransaction;
                 }
-                //if (command.Transaction == null)
-                //    command.Transaction = myTransaction;
-                //command.Transaction = myTransaction;
                 return _command;
             }
 
@@ -152,7 +111,6 @@ namespace Bars.Oracle.Factories
                     _myTransaction = _conn.BeginTransaction();
                 }
 
-                //command.Transaction = myTransaction;
                 return _conn;
             }
         }
@@ -170,14 +128,30 @@ namespace Bars.Oracle.Factories
             this._myTransaction.Commit();
             return true;
         }
+        private void DisposeCommand()
+        {
+            if (_command != null)
+            {
+                _command.Dispose();
+                _command = null;
+            }
+        }
         public void Dispose()
         {
             if (_command != null)
             {
-                if (_command.Connection.State == ConnectionState.Open)
-                    _command.Dispose();
-                _command = null;
+                DisposeCommand();
             }
+
+            if (CommandClob != null)
+            {
+                CommandClob.Close();
+                CommandClob.Dispose();
+                CommandClob = null;
+                ParmeterBytes = null;
+            }
+
+
             if (_conn != null && _conn.State == ConnectionState.Open)
             {
                 _conn.Close();
@@ -191,10 +165,71 @@ namespace Bars.Oracle.Factories
             }
 
         }
+        /*
+        * Create this parameter when you want to pass Oracle User-Defined Type (Custom Type) which is table of Oracle User-Defined Types.                  
+        * This way you can pass mutiple records at once.
+        * 
+        * Parameters:
+        * name - Name of the UDT Parameter name in the Stored Procedure.
+        * oracleUDTName - Name of the Oracle User Defined Type with Schema Name. (Make sure this is all caps. For ex: DESTINY.COMPANYINFOLIST)
+        * 
+        * */
+        public static OracleParameter CreateCustomTypeArrayInputParameter(string name, string oracleUDTName, object value)
+        {
+            OracleParameter parameter = new OracleParameter();
+            parameter.ParameterName = name;
+            parameter.OracleDbType = OracleDbType.Array;
+            parameter.Direction = ParameterDirection.Input;
+            parameter.UdtTypeName = oracleUDTName;
+            parameter.Value = value;
+            return parameter;
+        }
+
+        public OracleCommand CreateCommandWithParams(string sql, CommandType type, params OracleParameter[] parameters)
+        {
+            var command = CreateCommand;
+            command.CommandText = sql;
+            command.CommandType = type;
+            if (parameters != null && parameters.Length > 0)
+            {
+                OracleParameterCollection cmdParams = command.Parameters;
+                for (var i = 0; i < parameters.Length; i++) { cmdParams.Add(parameters[i]); }
+            }
+            return command;
+        }
+
+        public OracleCommand CreateCommandWithParams(string sql, CommandType type, params Object[] parameters)
+        {
+            var command = CreateCommand;
+            command.CommandText = sql;
+            command.CommandType = type;
+            command.Parameters.AddRange(parameters);
+            return command;
+        }
+        public OracleDataReader GetDataReader(string storedProcedure, params OracleParameter[] parameters)
+        {
+            return CreateCommandWithParams(storedProcedure, CommandType.StoredProcedure, parameters).ExecuteReader();
+        }
+        
+        //public IEnumerable<Dictionary<string, object>> ReadDataLazy(string storedProcedure, params OracleParameter[] parameters)
+        //{
+        //    return CreateCommandWithParams(storedProcedure, CommandType.StoredProcedure, parameters).ExecuteReader().ReadAllLazy();
+        //}
+
+        public IEnumerable<Dictionary<string, object>> ReadDataLazy(string storedProcedure, params Object[] parameters)
+        {
+            return CreateCommandWithParams(storedProcedure, CommandType.Text, parameters).ExecuteReader().ReadAllLazy();
+        }
+        public static OracleParameter CreateCursorParameter(string name)
+        {
+            OracleParameter prm = new OracleParameter(name, OracleDbType.RefCursor);
+            prm.Direction = ParameterDirection.Output;
+            return prm;
+        }
 
         public void DisposeWithTransaction(bool result)
         {
-            if (_myTransaction != null)
+            if (_conn != null && _conn.State == ConnectionState.Open && _myTransaction != null)
             {
                 if (result)
                     _myTransaction.Commit();

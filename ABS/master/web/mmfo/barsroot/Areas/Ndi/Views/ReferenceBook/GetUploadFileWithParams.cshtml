@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
 }
 @using BarsWeb.Areas.Ndi.Models
-@model CallFunctionMetaInfo
+@model MainOptionsViewModel
 <div class="container">
     <h2>Завантаження файла</h2>
     
@@ -30,9 +30,10 @@
 </div>
 
 <script>
-    window.funcId = '@Model.FUNCID';
-    window.tabId = '@Model.TABID';
-
+    
+    window.funcId = '@Model.NsiFuncId';
+    window.tabId = '@Model.NsiTableId';
+    window.code = '@Model.Code';
 </script>
 <script src="@Url.Content("~/Areas/Ndi/Scripts/JS/UploadFile.js")"></script>
 <link rel="stylesheet" href="~/Areas/Ndi/CSS/MVC_CSS/FileUploadForm.css">
