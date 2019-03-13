@@ -512,7 +512,7 @@ public partial class DepositClosePayIt : Bars.BarsPage
             decimal AllowedAmount = DepositAgreement.GetAllowedAmount(dpt.ID, Convert.ToDecimal(rnk.Value));
 
             // якщо сума депозиту перевищує дозволену до зняття
-            if (dpt.dpt_f_sum > AllowedAmount)
+            if (dpt.dpt_f_sum >= AllowedAmount)
             {
                 MaxSum.ValueDecimal = AllowedAmount == -1 ? dpt.dpt_f_sum : AllowedAmount;
                 SumToPay.ValueDecimal = MaxSum.ValueDecimal;
