@@ -6,6 +6,8 @@ function dealController($scope, paramsService) {
         $scope.naznEditWindow.title("Бажаєте відкоректувати призначення?").open().center();
     }
 
+    $scope.RequirePRVN = function () { return $scope.p_nOp === 1; };
+
     $scope.setNazn = function () {
         paramsService.setNazn($scope.contractModel.REF_MAIN, $scope.contractModel.NAZN).then(function (response) {
             response;
@@ -44,8 +46,10 @@ function dealController($scope, paramsService) {
 
         $scope.cmb_pf.dataSource.read();
         $scope.cmb_ryn.dataSource.data([]);
-        $scope.dll_bus_mod.dataSource.read();
-        $scope.dll_sppi.dataSource.read();
+        if ($scope.RequirePRVN()) {
+            $scope.dll_bus_mod.dataSource.read();
+            $scope.dll_sppi.dataSource.read();
+        }
     });
 
     $scope.cmb_pf_options = {
@@ -85,7 +89,8 @@ function dealController($scope, paramsService) {
             $scope.cmb_ryn.dataSource.read();
             $scope.contractModel.PF = this.dataSource.data()[this.select()-1].PF;
             checkVisibilityRB_AI();
-            $scope.SetIFRS(this.value());
+            if ($scope.RequirePRVN())
+                $scope.SetIFRS(this.value());
         }
     }
 
