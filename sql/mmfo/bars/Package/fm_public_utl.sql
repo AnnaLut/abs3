@@ -6,7 +6,7 @@ created by lypskykh 25-OCT-2018
 Финмон, работа со списком публичных деятелей
 */
 
-g_version constant varchar2(150) := 'version 1.3  08.02.2019';
+g_version constant varchar2(150) := 'version 1.4  12.03.2019';
 
 --
 -- Получение версии пакета
@@ -406,9 +406,9 @@ begin
     end loop;
     bars_audit.info(l_trace||'XML разобран, записей: '||finmon_pep.last);
     /* удаляем старые данные */
-    delete from finmon_pep_names_dict;
-    delete from finmon_pep_rels_dict;
-    delete from finmon_pep_dict;
+    execute immediate 'truncate table finmon_pep_names_dict';
+    execute immediate 'truncate table finmon_pep_rels_dict';
+    execute immediate 'truncate table finmon_pep_dict';
     /* подгружаем новые */
     forall i in finmon_pep.first..finmon_pep.last
         insert into finmon_pep_dict values finmon_pep(i);
