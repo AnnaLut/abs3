@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE NBUR_P_F01X (p_kod_filii        varchar2
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F01X (p_kod_filii        varchar2
                                           , p_report_date    date
                                           , p_form_id        number
                                           , p_scheme           varchar2 default 'C'
@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 01X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  06/09/2018 
+% VERSION     :  v.1.004  13/03/2019 (25/01/2019) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.001  06/09/2018';
+  ver_              char(30)  := 'v.1.004  13/03/2019';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   c_old_file_code   constant varchar2(3 char) := '#01';
@@ -77,19 +77,49 @@ BEGIN
         p.seg_03 as R030, 
         lpad(trim(c.country), 3, '0') as K040, 
         p.field_value, p.acc_id, p.cust_id, p.nbuc, p.acc_num, p.kv, p.branch
-    from v_nbur_#01_dtl p
+    from (    
+        select /*+ parallel(8) */
+          p.REPORT_DATE,
+          p.KF,
+          p.VERSION_ID,
+          p.NBUC,
+          p.FIELD_CODE,
+          SUBSTR (p.FIELD_CODE, 1, 2) AS SEG_01,
+          SUBSTR (p.FIELD_CODE, 3, 4) AS SEG_02,
+          SUBSTR (p.FIELD_CODE, 7, 3) AS SEG_03,
+          SUBSTR (p.FIELD_CODE, 10, 1) AS SEG_04,
+          p.FIELD_VALUE,
+          p.DESCRIPTION,
+          p.ACC_ID,
+          p.ACC_NUM,
+          p.KV,
+          p.MATURITY_DATE,
+          p.CUST_ID,
+          p.ND,
+          p.REF,
+          p.BRANCH
+        from NBUR_DETAIL_PROTOCOLS_ARCH p
+        join NBUR_REF_FILES f ON (f.FILE_CODE = p.REPORT_CODE)
+        join NBUR_LST_FILES v
+         on (v.REPORT_DATE = p.REPORT_DATE
+             AND v.KF = p.KF
+             AND v.VERSION_ID = p.VERSION_ID
+             AND v.FILE_ID = f.ID)
+        where p.report_date = p_report_date and
+                p.kf = p_kod_filii and
+                p.report_code = '#01' AND 
+                v.FILE_STATUS IN ('FINISHED', 'BLOCKED')) p
     join customer c
     on (c.kf = p_kod_filii and
         p.cust_id = c.rnk)
     join (select R020, I010
             from KL_R020
-           where PREM = 'КБ'
+           where trim(PREM) = 'КБ'
              and D_OPEN <= l_datez
-             and lnnvl(D_CLOSE <= l_datez )
+             and (d_close is null or d_CLOSE >= l_datez )
         ) k
     on (p.seg_02 = k.r020)       
-    where p.report_date = p_report_date and
-        p.kf = p_kod_filii)
+    )
     pivot (max(field_value) for dd in ('0' as T070, '1' as T071))
     group by report_date, kf, ekp, ku, r020, t020, r030, k040, 
         acc_id, cust_id, nbuc, acc_num, kv, branch;
