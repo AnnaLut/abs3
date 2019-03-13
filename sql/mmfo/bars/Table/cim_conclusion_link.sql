@@ -125,6 +125,50 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index IDX_CIMCONCLLNK_CNC_ID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMCONCLLNK_CNC_ID ON BARS.CIM_CONCLUSION_LINK (CNC_ID)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMCONCLLNK_FANTOM ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMCONCLLNK_FANTOM ON BARS.CIM_CONCLUSION_LINK (FANTOM_ID)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMCONCLLNK_PAYMENT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMCONCLLNK_PAYMENT ON BARS.CIM_CONCLUSION_LINK (PAYMENT_ID)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMCONCLLNK_VMD ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMCONCLLNK_VMD ON BARS.CIM_CONCLUSION_LINK (VMD_ID)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMCONCLLNK_ACT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMCONCLLNK_ACT ON BARS.CIM_CONCLUSION_LINK (ACT_ID)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_CONCLUSION_LINK ***

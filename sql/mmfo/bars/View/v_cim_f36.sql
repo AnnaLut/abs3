@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CIM_F36 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CIM_F36 ("B041", "K020", "P17", "P16", "P21", "P21_NEW", "P14", "P01", "P22", "P02", "P02_OLD", "P06", "P06_OLD", "P07", "P07_OLD", "P08", "P08_OLD", "P09", "P15", "P18", "P19", "P20", "P23", "CREATE_DATE", "DOC_DATE", "BRANCH") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CIM_F36 ("B041", "K020", "P17", "P16", "P21", "P21_NEW", "P14", "P01", "P22", "P02", "P02_OLD", "P06", "P06_OLD", "P07", "P07_OLD", "P08", "P08_OLD", "P09", "P15", "P18", "P19", "P20", "P23", "CREATE_DATE", "DOC_DATE", "BRANCH", "IS_FRAGMENT", "TYPE_ID", "BOUND_ID") AS 
    SELECT f.b041,
           f.k020,
           f.p17,
@@ -33,7 +33,10 @@ PROMPT *** Create  view V_CIM_F36 ***
           NVL (b.p23, f.p23) AS p23,
           f.create_date,
           f.doc_date,
-          f.branch
+          f.branch,
+          f.is_fragment,
+          f.type_id,
+          f.bound_id
      FROM cim_f36 f
           LEFT OUTER JOIN (  SELECT b041,
                                     k020,
