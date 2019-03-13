@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.10 11/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.11 12/03/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -768,7 +768,8 @@ begin
                decode(a.p22, 3, a.f_p18, a.p18) as p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
                case when a.p15 is null or a.m_p22=3 then a.f_p21 else nvl(a.f_p21,a.p21) end as p21, a.p22, decode(a.p22, 2, l_date_z_end, null) as p23,
                decode(a.p22, 3, case when a.p15=0 then a.max_pdat else null end, null) as p24, case when a.p27=0 then null else to_char(a.p27, 'fm999') end as p27, a.doc_date,
-               case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk, a.benef_adr as q002_2, a.is_fragment, a.type_id, a.bound_id
+               case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk, a.benef_adr as q002_2, 
+               decode(a.p22, 3, a.f_is_fragment, a.is_fragment) as is_fragment, decode(a.p22, 3, a.f_type_id,a.type_id) as type_id, decode(a.p22, 3, a.f_bound_id, a.bound_id) as bound_id
          from
          ( select nvl(m.m_p22,
                       case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null or (not (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) and x.f_b041 is not null) then 3
@@ -781,7 +782,7 @@ begin
                       substr(b.benef_name,1,135) as p08, x.f_p08, x.f_p08_old, to_char(b.country_id, 'fm000') as p09, x.f_p09, x.p14, x.p15, x.p16, x.p17, x.p18, x.f_p18,
                       x.p19, x.f_p19, x.p20, x.f_p20, x.p21, x.max_pdat, x.contr_id, x.doc_date,
                       x.f_b041, x.f_k020, x.f_p01, x.f_p14, x.f_p16, x.f_p17, x.f_p21, x.f_p21_new, m.m_p22, x.p27, x.rnk, b.benef_adr, x.is_fragment, x.p13,
-                      x.type_id, x.bound_id
+                      x.type_id, x.bound_id, x.f_is_fragment, x.f_type_id, x.f_bound_id
              from
              ( select x.*, (select substr(b.b040,9,12) from branch b where b.branch=x.branch) as b041,
                       (select nvl2(zip, zip || ', ', '') || case when upper(domain) like '%МІСТО%' and upper(domain) like '%'||upper(locality)||'%' then '' else nvl2(domain, domain || ', ', '') end ||
@@ -798,7 +799,8 @@ begin
                           max(f.p02_old) as f_p02_old, max(f.p06_old) as f_p06_old, max(f.p07_old) as f_p07_old, max(f.p08_old) as f_p08_old,
                           max(d.contr_id) as contr_id, nvl(d.doc_date, f.doc_date) as doc_date, max(f.k020) as f_k020, max(f.p01) as f_p01,
                           max(f.p14) as f_p14, max(f.p16) as f_p16, max(f.p17) as f_p17, max(f.p21) as f_p21, max(f.p21_new) as f_p21_new, max(t.p27_f531) as p27,
-                          max(t.is_fragment) as is_fragment, max(d.type_id) as type_id, max(d.bound_id) as bound_id
+                          max(t.is_fragment) as is_fragment, max(d.type_id) as type_id, max(d.bound_id) as bound_id,
+                          max(f.is_fragment) as f_is_fragment, max(f.type_id) as f_type_id, max(f.bound_id) as f_bound_id
                      from
                      ( select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
                               decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
@@ -992,6 +994,7 @@ end  p_f531;
   begin
     bars_audit.info(l_title||' l_date_z_end='||l_date_z_end);
     --F105=1
+     bars_audit.info(l_title||' F105=1');
     for cur in (select op.*, c.okpo, c.rnk, c.open_date, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
                       from 
                      (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
@@ -1082,9 +1085,9 @@ end  p_f531;
     end loop;
     l_nbur_36x := null;
     
-    bars_audit.info(l_title||' l_date_z_end='||l_date_z_end||' F105=3 ');
     --F105=3
     --інформація про всі закриті рахунки вибираються в друкований звіт №5700
+    bars_audit.info(l_title||' F105=3');    
     for cur in (select op.*, c.open_date,  c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
                       from 
                      (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
@@ -1181,6 +1184,7 @@ end  p_f531;
     
      --F105=4
     ---	Операція вибирається в разі, якщо, операція закрита шляхом прив’язки платежу/МД в АРМі ВК фантомом з типом «Взаємозалік». 
+    bars_audit.info(l_title||' F105=4');    
     for cur in (select f.*, b.b040
                 from cim_f36 f
                 join branch b on b.branch = f.branch  
@@ -1228,8 +1232,14 @@ end  p_f531;
         l_nbur_36x.F105       := 4;
         l_nbur_36x.BRANCH     := cur.branch;
         l_nbur_36x.KV         := cur.p14;
-        l_nbur_36x.T071       := cur.p15;
-        l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+        if cur.p22 = 3 then
+          select nvl(sum(v.s_vt), 0) * 100, nvl(sum(v.zq_vt),0) * 100
+          into l_nbur_36x.T071, l_nbur_36x.T070
+          from v_cim_bound_vmd v where bound_id = cur.bound_id;
+          else
+            l_nbur_36x.T071       := cur.p15;
+            l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+        end if;   
         l_nbur_36x.Q006       := cur.p27;
 --        l_nbur_36x.Q023       := cur.b040;
         l_nbur_36x.F008       := cur.p18;
@@ -1248,6 +1258,7 @@ end  p_f531;
     l_nbur_36x := null;
     --F105=5
     --- Чужа МД
+    bars_audit.info(l_title||' F105=5');    
     for cur in (select t.*, b.b040
                 from cim_f36 t, branch b 
                 where t.branch = b.branch
@@ -1259,8 +1270,14 @@ end  p_f531;
       l_nbur_36x.F105       := 5;
       l_nbur_36x.BRANCH     := cur.branch;
       l_nbur_36x.KV         := cur.p14;
-      l_nbur_36x.T071       := cur.p15;
-      l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+      if cur.p22 = 3 then
+          select nvl(sum(v.s_vt), 0) * 100, nvl(sum(v.zq_vt),0) *100 
+          into l_nbur_36x.T071, l_nbur_36x.T070
+          from v_cim_bound_vmd v where bound_id = cur.bound_id;
+          else
+            l_nbur_36x.T071       := cur.p15;
+            l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+      end if;   
       l_nbur_36x.Q006       := cur.p27;
 --      l_nbur_36x.Q023       := cur.b040;
       l_nbur_36x.F008       := cur.p18;
@@ -1279,6 +1296,7 @@ end  p_f531;
     
     --F105=7
     -- -	Операція вибирається в разі якщо граничний строк розрахунків був перевищений в звітному календарному місяці але у тому ж місяці розрахунки були завершені.
+    bars_audit.info(l_title||' F105=7');    
     for cur in (select op.*, c.open_date, c.okpo, c.rnk, c.branch, c.num, b.b040, e.k112, t.subject_id + 1 as p18, to_char(ben.country_id, 'fm000') as p09, substr(ben.benef_name,1,135) as p08, k.adr, k.nmk as p06 
                       from 
                      (select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
@@ -1360,6 +1378,147 @@ end  p_f531;
       pipe row (l_nbur_36x);
     end loop;
     l_nbur_36x := null;                       
+    
+    --F105=2
+    -- Операція вибирається в разі, якщо користувачем під час прив’язування фантому для закриття операції, з довідника «Тип платежу» вибрано показник «Поставка товару» 
+    -- (Зміна умов договору, унаслідок чого виконання нерезидентом зобов’язань за операцією з експорту товару повністю або частково здійснюється шляхом поставки товару)
+    bars_audit.info(l_title||' F105=2');    
+    for cur in (select f.*, b.b040
+                from cim_f36 f
+                join branch b on b.branch = f.branch  
+                where f.manual_include != 1 and create_date = l_date_z_end and p22 in (2, 3))
+    loop
+      l_n := 0;
+      if cur.p01 = 1 then --єксп
+        if cur.type_id = 0 then --перевіряєм чи лінкували Взаємозалік до ВМД
+          select count(*)
+           into l_n
+           from cim_link c, cim_fantoms_bound f, cim_fantom_payments p
+           where c.vmd_id = cur.bound_id
+             and c.fantom_id = f.bound_id
+             and f.fantom_id = p.fantom_id and p.payment_type = 8/*Поставка товару*/;
+          else -- до акту
+            select count(*)
+            into l_n
+            from cim_link c, cim_fantoms_bound f, cim_fantom_payments p
+            where c.act_id = cur.bound_id
+             and c.fantom_id = f.bound_id
+             and f.fantom_id = p.fantom_id and p.payment_type = 8/*Поставка товару*/;
+        end if;  
+      end if;  
+      if l_n > 0 then
+        l_nbur_36x.B040       := cur.b040;
+        l_nbur_36x.K020       := lpad(cur.k020,10,'0');
+        l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+        l_nbur_36x.F105       := 2;
+        l_nbur_36x.BRANCH     := cur.branch;
+        l_nbur_36x.KV         := cur.p14;
+        if cur.p22 = 3 then
+          select nvl(sum(v.s_vt), 0), nvl(sum(v.zq_vt),0)
+          into l_nbur_36x.T071, l_nbur_36x.T070
+          from v_cim_bound_vmd v where bound_id = cur.bound_id;
+          else
+            l_nbur_36x.T071       := cur.p15;
+            l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+        end if;   
+        l_nbur_36x.Q006       := cur.p27;
+--        l_nbur_36x.Q023       := cur.b040;
+        l_nbur_36x.F008       := cur.p18;
+        l_nbur_36x.D070       := cur.p01;
+        l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+        l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+        l_nbur_36x.Q007_1     := nvl(cur.p16, to_date('01.01.1900', 'DD.MM.YYYY')); --  p16;
+        l_nbur_36x.Q003_3     := cur.p17;
+        l_nbur_36x.Q002_1     := cur.p07;
+        l_nbur_36x.Q001_2     := cur.p08;
+        l_nbur_36x.Q001_1     := cur.p06;
+        
+        pipe row (l_nbur_36x);        
+      end if;  
+    end loop;    
+    l_nbur_36x := null;  
+    
+    --F105=6
+    --	Операція вибирається в разі, якщо користувачем в параметрі «Висновки мінекономіки» функції «Стан контракту», обрано «Судовий орган».
+    -- (Прийняття до розгляду судом, міжнародним комерційним арбітражем позовної заяви резидента про стягнення з нерезидента заборгованості, що виникла внаслідок недотримання нерезидентом строку, передбаченого зовнішньоекономічним договором (контрактом), 
+    --  або прийняття до провадження уповноваженим органом відповідної країни документа про стягнення такої заборгованості з боржника-нерезидента на користь резидента в позасудовому (досудовому) примусовому порядку)
+    bars_audit.info(l_title||' F105=6');    
+    for cur in (select f.*, b.b040
+                from cim_f36 f
+                join branch b on b.branch = f.branch  
+                where f.manual_include != 1 and create_date = l_date_z_end)
+    loop
+      l_n := 0;
+      if cur.p01 = 1 then --єксп
+        if cur.type_id = 0 then --перевіряєм чи лінкували Судове до ВМД
+          select count(*)
+           into l_n
+           from cim_conclusion_link l, cim_conclusion c
+           where l.vmd_id = cur.bound_id
+             and l.cnc_id = c.id
+             and c.org_id = 2/*Судовий орган*/
+             and l.delete_date is null and c.delete_date is null;
+          else -- до акту
+            select count(*)
+            into l_n            
+            from cim_conclusion_link l, cim_conclusion c
+            where l.act_id = cur.bound_id
+              and l.cnc_id = c.id
+              and c.org_id = 2/*Судовий орган*/
+              and l.delete_date is null and c.delete_date is null;
+        end if;  
+      end if;  
+      if cur.p01 = 2 then --імп
+        if cur.type_id = 0 then --перевіряєм чи лінкували Судове до Платежу
+           select count(*)
+           into l_n
+           from cim_conclusion_link l, cim_conclusion c
+           where l.payment_id = cur.bound_id
+             and l.cnc_id = c.id
+             and c.org_id = 2/*Судовий орган*/
+             and l.delete_date is null and c.delete_date is null;     
+          else -- до Фантому
+            select count(*)
+            into l_n            
+            from cim_conclusion_link l, cim_conclusion c
+            where l.fantom_id = cur.bound_id
+              and l.cnc_id = c.id
+              and c.org_id = 2/*Судовий орган*/
+              and l.delete_date is null and c.delete_date is null;         
+        end if;  
+      end if;  
+      if l_n > 0 then
+        l_nbur_36x.B040       := cur.b040;
+        l_nbur_36x.K020       := lpad(cur.k020,10,'0');
+        l_nbur_36x.R030       := lpad(cur.p14, 3, '0');
+        l_nbur_36x.F105       := 6;
+        l_nbur_36x.BRANCH     := cur.branch;
+        l_nbur_36x.KV         := cur.p14;
+        if cur.p22 = 3 then
+          select nvl(sum(v.s_vt), 0) * 100, nvl(sum(v.zq_vt),0) * 100
+          into l_nbur_36x.T071, l_nbur_36x.T070
+          from v_cim_bound_vmd v where bound_id = cur.bound_id;
+          else
+            l_nbur_36x.T071       := cur.p15;
+            l_nbur_36x.T070       := case when cur.p15 = 0 then 0 else cim_mgr.val_convert(to_date(l_date_z_end-1), cur.p15, cur.p14, 980) end;
+        end if;         
+        l_nbur_36x.Q006       := cur.p27;
+--        l_nbur_36x.Q023       := cur.b040;
+        l_nbur_36x.F008       := cur.p18;
+        l_nbur_36x.D070       := cur.p01;
+        l_nbur_36x.K040       := lpad(cur.p09, 3, '0');
+        l_nbur_36x.Q007_5     := to_date(cur.doc_date, 'ddmmyyyy');
+        l_nbur_36x.Q007_1     := nvl(cur.p16, to_date('01.01.1900', 'DD.MM.YYYY')); --  p16;
+        l_nbur_36x.Q003_3     := cur.p17;
+        l_nbur_36x.Q002_1     := cur.p07;
+        l_nbur_36x.Q001_2     := cur.p08;
+        l_nbur_36x.Q001_1     := cur.p06;
+        
+        pipe row (l_nbur_36x);        
+      end if;  
+    end loop;    
+    l_nbur_36x := null;
+
     
     bars_audit.info(l_title||' l_date_z_end='||l_date_z_end||' END');
   end p_f531_2;
