@@ -17,14 +17,14 @@ namespace BarsWeb.Areas.Ndi.Models
 {
     public class FunNSIEditFParams
     {
- private string WebFormName;
+        private string WebFormName;
         public FunNSIEditFParams()
         {
         }
         public FunNSIEditFParams(string webFormName)
         {
-            if(string.IsNullOrEmpty(webFormName))
-            throw new Exception("строка параметрів порожня");
+            if (string.IsNullOrEmpty(webFormName))
+                throw new Exception("строка параметрів порожня");
             this.WebFormName = webFormName;
             BuildParams();
         }
@@ -56,10 +56,14 @@ namespace BarsWeb.Areas.Ndi.Models
 
         [MainOptionAttribute("INSERT_ROW_AFTER", true)]
         public bool InsertRowAfter { get; set; }
-        
+
         public AddEditRowsInform addEditRowsInform { get; set; }
         public string Code { get; set; }
+        /// <summary>
+        /// тип объекта который конвертируется из JSON в описании.
+        /// </summary>
         public Type TargetType { get; set; }
+        
         public CallFunctionMetaInfo TargetObject { get; set; }
         public string CustomOprions { get; set; }
         public bool ShowRecordsCount { get; set; }
@@ -67,6 +71,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public int? CodeOper { get; set; }
         public string TableName { get; set; }
         public string TableSemantic { get; set; }
+        public string SelectStatementWithParam { get; set; }
         public string[] FunNSIEditFParamsArray { get; set; }
         List<ParamMetaInfo> FunNSIEditFParamsInfo { get; set; }
         ThrowParams ThrowNsiParams { get; set; }
@@ -139,7 +144,7 @@ namespace BarsWeb.Areas.Ndi.Models
                 this.TableName = SqlStatementParamsParser.ReplaceParamsToValuesInSqlString(this.TableName, rowParams);
             if (!string.IsNullOrEmpty(this.Conditions) && this.Conditions.Contains("|:"))
                 this.Conditions = SqlStatementParamsParser.ReplaceParamsInSqlSelect(this.Conditions, rowParams);
-            if (!string.IsNullOrEmpty(this.TableSemantic) && this.TableSemantic.Contains("|:"))
+            if (!string.IsNullOrEmpty(this.TableSemantic) && this.TableSemantic.Contains(":") && SqlStatementParamsParser.GetSqlStatementParams(this.TableSemantic).Count > 0)
                 this.TableSemantic = SqlStatementParamsParser.ReplaceParamsToValuesInSqlString(this.TableSemantic, rowParams);
 
         }
@@ -264,7 +269,7 @@ namespace BarsWeb.Areas.Ndi.Models
             if (!string.IsNullOrEmpty(throwParams))
                 if (throwParams.Length > throwParams.IndexOf("THROW_PARAMS=>") + "THROW_PARAMS=>".Length)
                     this.ThrowNsiParamsString = throwParams.Substring(throwParams.IndexOf("THROW_PARAMS=>") + "THROW_PARAMS=>".Length).Trim();
-            
+
             if (string.IsNullOrEmpty(TableName) && !string.IsNullOrEmpty(this.PROC))
                 this.IsFuncOnly = true;
             else
@@ -416,9 +421,9 @@ namespace BarsWeb.Areas.Ndi.Models
                         func.PROC_EXEC = FuncProcNames.LINK_FUNC_BEFORE.ToString();
                 }
                 else
-                    if(func.MultiRowsParams != null && func.MultiRowsParams.Count() > 0 && func.MultiRowsParams.FirstOrDefault(x => x.Kind == "FROM_UPLOAD_EXCEL") != null)
+                    if (func.MultiRowsParams != null && func.MultiRowsParams.Count() > 0 && func.MultiRowsParams.FirstOrDefault(x => x.Kind == "FROM_UPLOAD_EXCEL") != null)
                 {
-                    func.PROC_EXEC ="FROM_UPLOAD_EXCEL";
+                    func.PROC_EXEC = "FROM_UPLOAD_EXCEL";
                 }
                 else
                     func.PROC_EXEC = this.EXEC;
@@ -467,7 +472,7 @@ namespace BarsWeb.Areas.Ndi.Models
                     }
                 }
             }
-         
+
         }
 
     }

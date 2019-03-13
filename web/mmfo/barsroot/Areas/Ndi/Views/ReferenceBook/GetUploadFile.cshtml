@@ -3,16 +3,21 @@
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
 }
 @using BarsWeb.Areas.Ndi.Models
-@model CallFunctionMetaInfo
+@model FuncOnlyViewModel
 <div class="container">
     <h2>Завантаження файла</h2>
+    <!--todo добавить множественную обработку файлов на бэкенде. На данный момент таких задач нет-->
     <form id="uploadForm" action="@Url.Action("PostUploadFile", "ReferenceBook")">
-        <div class="form-group">
-            <label class="control-label col-sm-2 col-sm-offset-2">оберіть Excel файл:</label>
-            <div class="col-sm-6 col-sm-offset-2 ">
-                <input name="file" id="uploadInput" type="file" accept=".xlsx" />
+        @foreach (var item in Model.FunctionMetaInfo.UploadParamsInfo.Where(x => x.Kind == "UPLOAD_FILE"))
+        {
+            <div class="form-group">
+                <label class="control-label col-sm-2 col-sm-offset-2">@item.Semantic;</label>
+                <div class="col-sm-6 col-sm-offset-2 ">
+                    <input name="file" id="uploadInput" type="file" accept=".@item.ExtValid" />
+                </div>
             </div>
-        </div>
+        }
+
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <button id="uploadBtn" onclick="fileUpload();">Завантажити файл</button>
@@ -22,8 +27,9 @@
 </div>
 
 <script>
-    window.funcId = '@Model.FUNCID';
-    window.tabId = '@Model.TABID';
+    
+    window.funcId = '@Model.NsiFuncId';
+    window.tabId = '@Model.NsiTableId';
     window.code = '@Model.Code';
 </script>
 <script src="@Url.Content("~/Areas/Ndi/Scripts/JS/UploadFile.js")"></script>

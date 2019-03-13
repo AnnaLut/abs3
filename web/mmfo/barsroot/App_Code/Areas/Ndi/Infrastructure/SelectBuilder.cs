@@ -6,10 +6,12 @@ using BarsWeb.Areas.Ndi.Models;
 using Oracle.DataAccess.Client;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
 using Bars.CommonModels.ExternUtilsModels;
+using Bars.CommonModels;
+using System.Text.RegularExpressions;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
-    using Bars.CommonModels;
+
 
     /// <summary>
     /// Класс для построения запросов на вычитку данных из справочников с применением различных условий фильтрации, сортировки и т.д.
@@ -17,7 +19,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
     public class SelectBuilder
     {
         List<string> SKIP_KEYS = new List<string> { "COL_ALL_ALIAS" };
-        public  SelectModel SelectCmdModel { get; set; }
+        public SelectModel SelectCmdModel { get; set; }
         /// <summary>
         /// Конструктор построителя запросов
         /// </summary>
@@ -132,11 +134,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
             });
             return listToClone;
-            
+
         }
 
 
-    
+
 
 
 
@@ -244,7 +246,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             {
                 return string.Format("( {0} ) {1}", this.SelectStatement, this.TableName);
             }
-         
+
         }
         public static List<ColumnMetaInfo> BuildExternalColumnsToColumns(List<ColumnMetaInfo> extCols)
         {
@@ -276,7 +278,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             bool hasSelectConditions = !string.IsNullOrEmpty(SelectConditions);
             bool hasDynamicFilter = !DynamicFilter.IsNullOrEmpty();
 
-            if (!hasGridFilter && !hasStartFilter && !hasExternalColumns && !hasExtFilters && !hasSelectConditions && !hasDynamicFilter && !hasFallDownFilter)
+            if (!hasGridFilter && !hasStartFilter && !hasExternalColumns && !hasExtFilters && !hasSelectConditions
+                && !hasDynamicFilter && !hasFallDownFilter)
             {
                 return;
             }
@@ -310,11 +313,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     //  BuildGridParameter(param);
                     selectCmd.Parameters.Add(param.ParamName, param.ParamValue);
                     SelectCmdModel.SqlParams.Add(new SqlParamModel()
-                                                     {
-                                                         Name =  param.Field,
-                                                         Type =  param.Type,
-                                                         Value = param.Value,
-                                                         ParamOrder = param.ParamOrder
+                    {
+                        Name = param.Field,
+                        Type = param.Type,
+                        Value = param.Value,
+                        ParamOrder = param.ParamOrder
                     });
                     //fullFilter.Append(" OR " + param.ParamName + "IS NULL");
                 }
@@ -327,7 +330,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     foreach (var data in SqlParams)
                     {
                         //временный кастыль. На днях сделать нормально.
-                        if (SelectConditions.Contains(":" + data.Name) && (System.Text.RegularExpressions.Regex.IsMatch(SelectConditions, ":" + data.Name + "[\\W]{1}") || SelectConditions.IndexOf(":" + data.Name) + data.Name.Length + 1 == SelectConditions.Length))
+                        if (SelectConditions.Contains(":" + data.Name) && Regex.IsMatch(SelectConditions, @"(:" + data.Name + @")\b"))
                         {
 
                             //SelectConditions =  SelectConditions.Replace(":" + data.Name, ":p_" + data.Name);
@@ -337,9 +340,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                             selectCmd.BindByName = true;
                             SelectCmdModel.SqlParams.Add(new SqlParamModel()
                             {
-                                Name =  data.Name,
-                                Value =  data.Value,
-                                Type =  data.Type
+                                Name = data.Name,
+                                Value = data.Value,
+                                Type = data.Type
                             });
                         }
 
@@ -349,6 +352,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     fullFilter.Append(" and ");
                 fullFilter.Append("(" + SelectConditions + ")");
             }
+
+
 
             // условия фильтрации по заполнению диалога фильтра перед населением таблицы
             if (hasStartFilter)
@@ -462,11 +467,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                             Convert.ChangeType(par.Value, SqlStatementParamsParser.GetCsTypeCode(par.Type)));
                     }
                     SelectCmdModel.SqlParams.Add(new SqlParamModel()
-                                                         {
-                                                             Name = par.Name,
-                                                             Type =  par.Type,
-                                                             Value = par.Value
-                                                         });
+                    {
+                        Name = par.Name,
+                        Type = par.Type,
+                        Value = par.Value
+                    });
                 }
 
                 if (!string.IsNullOrEmpty(fullFilter.ToString()))
@@ -653,7 +658,41 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             cmd.CommandText = SelectCmdModel.SelectString;
             //применяем параметеры фильтрации
             SetWhere(cmd);
+            BindParams(cmd);
             return cmd;
+        }
+
+        private void BindParams(OracleCommand selectCmd)
+        {
+            List<SqlParamModel> sqlParams = new List<SqlParamModel>();
+        bool hasSelectStatementCond = selectCmd.CommandText.Contains(':');
+            if (hasSelectStatementCond)
+            {
+                selectCmd.BindByName = true;
+                if (SqlParams != null && SqlParams.Count > 0)
+                    foreach (var data in SqlParams)
+                    {
+                        //временный кастыль. На днях сделать нормально.
+                        if (Regex.IsMatch(selectCmd.CommandText, @"(:" + data.Name + @")\b"))
+                        {
+
+                            //SelectConditions =  SelectConditions.Replace(":" + data.Name, ":p_" + data.Name);
+                            var parValue = Convert.ChangeType(data.Value, SqlStatementParamsParser.GetCsTypeCode(data.Type));
+                            var param = new OracleParameter(data.Name, parValue);
+
+                            if (!sqlParams.Any(x => x.Name == data.Name))
+                            {
+                                SelectCmdModel.SqlParams.Add(
+                                    new SqlParamModel() { Name = data.Name, Value = data.Value, Type = data.Type });
+
+                                sqlParams.Add(
+                                    new SqlParamModel() { Name = data.Name, Value = data.Value, Type = data.Type });
+                                selectCmd.Parameters.Add(param);
+                            }
+                        }
+
+                    }
+            }
         }
 
         /// <summary>
@@ -691,7 +730,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             if (!ExternalMetaColumns.IsNullOrEmpty())
             {
                 result.Append(",");
-                result.Append(string.Join(",", ExternalMetaColumns.Select(column => column.ColumnAlias)));
+                result.Append(string.Join(",", ExternalMetaColumns.Select(column => column.ColumnAlias).Distinct()));
             }
             if (!AdditionalColumns.IsNullOrEmpty())
             {
@@ -724,7 +763,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 if (!ExternalMetaColumns.IsNullOrEmpty())
                 {
                     result.Append(",");
-                    result.Append(string.Join(",", ExternalMetaColumns.Select(column => column.ResultColFullName + column.ColumnAliasWithAs)));
+                    List<string> colNames =  ExternalMetaColumns.Select(x => x.ResultColFullName + x.ColumnAliasWithAs).Distinct().ToList();
+                    result.Append(string.Join(",", colNames));
                 }
                 //result.Append(",COUNT(*) OVER (ORDER BY 0) AS COUNT_ROWS");
             }

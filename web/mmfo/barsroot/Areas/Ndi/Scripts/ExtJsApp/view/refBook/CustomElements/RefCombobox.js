@@ -82,7 +82,7 @@
                     return false;
                 var oldUrl = field.getStore().getProxy().url;
                 field.getStore().getProxy().url = dynamicUrl;
-                if(dynamicUrl != oldUrl)
+                if(dynamicUrl != oldUrl )
                     field.getStore().reload();
             }
             

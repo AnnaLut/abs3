@@ -257,7 +257,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         }
 
 
-        public static string ObjectToJsom(Object obj)
+        public static string ObjectToJson(Object obj)
         {
             string jsonRes = string.Empty;
             if (obj != null)
@@ -313,7 +313,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         {
             if (modelToConvert == null)
                 return string.Empty;
-            string jsonString = ObjectToJsom(modelToConvert);
+            string jsonString = ObjectToJson(modelToConvert);
             return StringToBase64(jsonString);
         }
         public static string ConvertFromUrlBase64UTF8(string param)

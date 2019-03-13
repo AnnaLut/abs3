@@ -16,7 +16,9 @@ namespace BarsWeb.Areas.Ndi.Models
             // TODO: Add constructor logic here
             //
             this.IsFuncOnly = true;
+            
         }
+        public CallFunctionMetaInfo FunctionMetaInfo { get; set; }
       
     }
 }

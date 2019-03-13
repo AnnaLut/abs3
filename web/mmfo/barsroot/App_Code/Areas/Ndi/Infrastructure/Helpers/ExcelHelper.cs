@@ -12,11 +12,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using BarsWeb.Infrastructure.ImportToFileHelper;
 using Bars.CommonModels;
 using Bars.CommonModels.ExternUtilsModels;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract;
 
 /// <summary>
 /// Summary description for ExcelHelper
@@ -25,7 +25,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
 {
     public class ExcelHelper
     {
-         
         public ExcelHelper()
         {
             //
@@ -34,7 +33,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
         }
 
         public static ExcelResulModel ExcelExport(string tableSemantic, GetDataResultInfo dataResult, List<ColumnMetaInfo> allColumnsInfo,
-            ExcelDataModel excelDataModel, GridFilter[] filterParams)
+            ExcelDataModel excelDataModel, GridFilter[] filterParams, IReferenceBookRepository repository)
         {
             List<string> values = excelDataModel.ColumnsVisible == null ? new List<string>() : excelDataModel.ColumnsVisible.Split(',').ToList();
             List<ColumnMetaInfo> allShowColumns = new List<ColumnMetaInfo>();
@@ -52,17 +51,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                 switch (excelResult.ExcelParam)
                 {
                     case "ALL_CSV":
-                        return ExcelExportToCSV('|', tableSemantic, dataResult, allShowColumns, excelDataModel.TableName, excelDataModel.Limit);
+                        return ExcelExportToCSV('|', tableSemantic, dataResult, allShowColumns, excelDataModel.TableName);
                     case "ALL_EXTERN":
-                        excelResult.ExcelModelRequest.Semantic = tableSemantic;
-                        excelResult.ExcelModelRequest.ColumnsInfo = allShowColumns.Select(
-                            x => new ColumnDesc
-                            {
-                                Semantic = x.SEMANTIC,
-                                Name = x.COLNAME,
-                                Format = x.SHOWFORMAT,
-                                Type = x.COLTYPE
-                            }).ToList();
+                        repository.BuildResultForExcel(excelResult,tableSemantic,allShowColumns);
                         return ExportExcelWithUtil(excelResult.ExcelModelRequest);
                 }
 
@@ -93,7 +84,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                     curCol = 1;
                     foreach (var colTitle in allShowColumns)
                     {
-                        worksheet.Cells[curRow, curCol++].Value = item[colTitle.COLNAME.Trim().ToUpper()];
+                        worksheet.Cells[curRow, curCol++].Value = item[colTitle.COLNAME.ToUpper()];
                     }
                     //Array sheetArray = worksheet.Cells.Value as Array;
                     if (hasFontPainter)
@@ -219,13 +210,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
         }
 
         public static ExcelResulModel ExcelExportToCSV(char columnSeparator, string tableSemantic, GetDataResultInfo resultInfo, List<ColumnMetaInfo> columnsInfo,
-            string fileName, int limit)
+            string fileName)
         {
 
             return new ExcelResulModel()
             {
                 FileName = fileName,
-                Path = new ImportToFile().ExcelExportToZipCSVFiles(columnSeparator, fileName, resultInfo.DataRecords, columnsInfo, limit)
+                Path = new ImportToFile().ExcelExportToZipCSVFiles(columnSeparator, fileName, resultInfo.DataRecords, columnsInfo)
             };
 
            
@@ -235,51 +226,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
         /// </summary>
         /// <param name="archiveZip"></param>
         /// <returns></returns>
-        public static bool ExportExcelWithUtil(ArchiveZip archiveZip)
-        {
-            ProcessStartInfo psinfo = new ProcessStartInfo(@"Utils\AbsCoreUtility.exe");
-            psinfo.UseShellExecute = false;
-
-            psinfo.RedirectStandardError = true;
-
-
-            string pathsString = FormatConverter.ObjectToJsonInBase64(archiveZip);
-            psinfo.Arguments = pathsString;
-            Process proc = Process.Start(psinfo);
-            try
-            {
-
-            if (proc != null)
-            {
-                string strError = proc.StandardError.ReadToEnd();
-                bool flagTerm = proc.WaitForExit(200000);
-                if (!flagTerm)
-                {
-                   
-                    throw new Exception(
-                        "Процес 'AbsCoreUtility.exe' не завершив роботу у відведений час (200000 сек).");
-                }
-                int nExitCode = proc.ExitCode;
-                if (0 != nExitCode)
-                {
-                    throw new Exception(
-                        "Процес 'AbsCoreUtility.exe' аварійно завершив работу. Код " + nExitCode + "."
-                        + "Опис коду повернення з потоку помилок: " + strError);
-                }
-            }
-            return true;
-
-            }
-            finally
-            {
-                if (proc != null && !proc.HasExited)
-                    proc.Kill();
-            }
-
-        }
+        
 
         public static ExcelResulModel ExportExcelWithUtil(ExcelExtModel externalExecModel)
         {
+            try
+            {
 
                 //ProcessStartInfo psinfo = new ProcessStartInfo("OracleManagmentBins/BarsCoreWorkerService.exe")
                 //{
@@ -288,8 +240,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                 //    RedirectStandardError = true
                 //};
 
-                var myContent = FormatConverter.ObjectToJsom(externalExecModel);
-                string baseAddress = "http://10.10.10.93:2610/";
+                var myContent = FormatConverter.ObjectToJson(externalExecModel);
+               // string baseAddress = "http://10.10.10.93:2610/";
                 var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -300,7 +252,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                 //psinfo.Arguments = pathsString;
                 //Process proc = Process.Start(psinfo);
 
-                var response = client.PostAsync(baseAddress + "BarsApiCoreWorker/api/ImportFile/GetExcel", byteContent).Result;
+                var response = client.PostAsync(externalExecModel.ExtUrl + "BarsApiCoreWorker/api/ImportFile/GetExcel", byteContent).Result;
                 if (!response.IsSuccessStatusCode)
                     throw new Exception(response.RequestMessage.ToString());
                 byte[] res = response.Content.ReadAsByteArrayAsync().Result;
@@ -323,6 +275,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
 
                 return new ExcelResulModel { FileName = externalExecModel.Semantic +  ".xlsx", ContentResult = res, ContentType = "application/ms-excel" };
 
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
 
         }
         public List<CallFuncRowParam> ParseExcelFile(HttpPostedFileBase parsedFile, CallFunctionMetaInfo func)
@@ -520,10 +478,10 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
             int dataStartsFromRow = semanticRow != null ? semanticRow.Value : 4;//to do as parameter
             int dataStartFromCol = 1;
             int curCol;
-            var stream = new StreamReader(parsedFile.InputStream);
 
 
-            using (ExcelPackage package = new ExcelPackage(stream.BaseStream))
+
+            using (ExcelPackage package = new ExcelPackage(parsedFile.InputStream))
             {
                 ExcelWorksheet worksheet;
                 try

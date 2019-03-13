@@ -15,13 +15,13 @@ namespace BarsWeb.Areas.Ndi.Models
             
         }
 
-        public SrcQueryModel(int tabid, int colId, List<ColumnMetaInfo> queryParamsInfo)
+        public SrcQueryModel(int tabid, int colId, List<FieldProperties> queryParamsInfo)
             : this(tabid, colId, queryParamsInfo, new List<FieldProperties>())
         {
             
         }
 
-        public SrcQueryModel(int tabid, int colId, List<ColumnMetaInfo> queryParamsInfo, List<FieldProperties> queryParams)
+        public SrcQueryModel(int tabid, int colId, List<FieldProperties> queryParamsInfo, List<FieldProperties> queryParams)
         {
             this.Tabid = tabid;
             this.ColId = colId;
@@ -35,7 +35,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public int Tabid { get; set; }
         public int ColId {get;set;}
 
-        public List<ColumnMetaInfo> QueryParamsInfo { get; set; }
+        public List<FieldProperties> QueryParamsInfo { get; set; }
         public List<FieldProperties> QueryParams {get;set;}
 
 

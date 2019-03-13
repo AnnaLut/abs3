@@ -13,7 +13,7 @@ var colorGridObject;
 Ext.onReady(function () {
     //Ext.QuickTips.init();
     var thisController;
-    
+
     var columnsFilterModel = Ext.decode(window.StringColumnModel);
     var thisWindow = this;
 

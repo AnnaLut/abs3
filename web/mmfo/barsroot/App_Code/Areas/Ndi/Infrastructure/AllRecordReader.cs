@@ -6,11 +6,10 @@ using Areas.Ndi.Models;
 using System;
 using BarsWeb.Areas.Ndi.Models.SelectModels;
 using Bars.CommonModels.ExternUtilsModels;
-using Bars.Oracle.Factories;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
-  
+    using Bars.Oracle.Factories;
 
     /// <summary>
     /// Конвертирует набор данных класса OracleDataReader в таблицу вида [ключ,значенне]. Удобно использовать для сериализации полученного набора в json.
@@ -190,7 +189,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 DataRecords = ReadAll(reader),
                 RecordsCount = 0,
                 TotalRecord = null,
-                ExcelParam = excelParam
+                ExcelParam = string.IsNullOrEmpty(excelParam) ? "ALL_CSV" : excelParam
             };
             
         }

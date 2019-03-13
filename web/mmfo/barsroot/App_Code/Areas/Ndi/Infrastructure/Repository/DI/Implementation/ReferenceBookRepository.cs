@@ -25,11 +25,13 @@ using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
 using BarsWeb.Areas.Ndi.Infrastructure.Constants;
 using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
 using Bars.CommonModels;
+using BarsWeb.Areas.Ndi.Models.SelectModels;
+using System.IO;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 {
 
-    public class ReferenceBookRepository : IReferenceBookRepository, IDisposable
+    public class ReferenceBookRepository : IReferenceBookRepository
     {
         private readonly NdiModel _entities;
         [Inject]
@@ -146,8 +148,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 var tableSemantic = _entities.META_TABLES.First(t => t.TABID == excelDataModel.TableId).SEMANTIC;
                 Logger.Info(string.Format("begin get data for excel export table: {0} ", excelDataModel.TableName), LoggerPrefix);
                 GetDataResultInfo dataResult = GetData(excelDataModel);
+
                 //Logger.Info(string.Format("begin excel export table: {0} dataCount: {1} ", excelDataModel.TableName, dataResult.DataRecords.Count()), LoggerPrefix);
-                return ExcelHelper.ExcelExport(tableSemantic, dataResult, allColumnsInfo, excelDataModel, selectBuilder.GetFilterParams());
+                return ExcelHelper.ExcelExport(tableSemantic, dataResult, allColumnsInfo, excelDataModel, selectBuilder.GetFilterParams(), this);
 
 
 
@@ -159,14 +162,33 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             // return result;
         }
 
-        public List<ExternalApiUrls> GetExternalApiByParamName(string paramName)
+        public void BuildResultForExcel(ResultForExcel excelResult, string tableSemantic, List<ColumnMetaInfo> allShowColumns)
+        {
+            excelResult.ExcelModelRequest.Semantic = tableSemantic;
+            excelResult.ExcelModelRequest.ColumnsInfo = allShowColumns.Select(
+                x => new ColumnDesc
+                {
+                    Semantic = x.SEMANTIC,
+                    Name = x.COLNAME,
+                    Format = x.SHOWFORMAT,
+                    Type = x.COLTYPE
+                }).ToList();
+            ExternalApiUrls urlModel = GetExternalApiByParamName(excelResult.ExcelModelRequest.ExtUrlParam);
+            if (urlModel == null)
+                throw new Exception(string.Format("{0} параметер не знайдений у таблиці {1} ", excelResult.ExcelModelRequest.ExtUrlParam, "MBM_PARAMETERS"));
+            excelResult.ExcelModelRequest.ExtUrl = urlModel.ParameterVlue;
+
+        }
+
+
+        public ExternalApiUrls GetExternalApiByParamName(string paramName)
         {
             var parameters = new OracleParameter[1];
             //parameters[0] = DbAccess.CreateCustomTypeArrayInputParameter("P_DYN_FILTER_COND_LIST", "BARS.T_DYN_FILTER_COND_LINE", filterRowList.ToArray());
             parameters[0] = new OracleParameter("p_parameterName", OracleDbType.Varchar2, paramName, ParameterDirection.Input);
             string sql = "SELECT PARAMETER_NAME as ParameterName, PARAMETER_VALUE as ParameterVlue, DESCRIPTION as Discription " +
                 "FROM MBM_PARAMETERS WHERE PARAMETER_NAME = :p_parameterName";
-            return _entities.ExecuteStoreQuery<ExternalApiUrls>(sql,parameters).ToList();
+            return _entities.ExecuteStoreQuery<ExternalApiUrls>(sql, parameters).FirstOrDefault();
         }
 
         public byte[] GetButtonImg()
@@ -475,7 +497,88 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     connection.Close();
             }
         }
+        public string CallRefFunction(CallFunctionMetaInfo func, List<FieldProperties> funcParams, List<FieldProperties> addParams = null)
+        {
+            OracleConnection connection = GetOracleConnector.GetConnOrCreate;
+            OracleCommand callFunctionCmd = GetOracleConnector.GetCommandOrCreate;
+            if (func == null)
+                return "процедура порожня";
+            try
+            {
+                CallFunctionMetaInfo callFunction = func;
 
+                string logAddParamsMessage = "add parameters in: " + callFunction.PROC_NAME + " ";
+
+                if (callFunction != null && !string.IsNullOrEmpty(callFunction.UploadParams))
+                {
+                    SqlStatementParamsParser.AddUploadParameters(callFunction, GetOracleConnector, funcParams, addParams);
+
+                }
+
+                foreach (var par in funcParams.Where(x => x.Type != "CLOB" && x.Type != "BLOB"))
+                {
+                    if (callFunction.PROC_NAME.Contains(":" + par.Name))
+                    {
+
+                        var paramName = par.Name;
+                        if (par.Type != "C" && string.IsNullOrEmpty(par.Value))
+                            par.Value = null;
+                        var paramValue = par.Value == null
+                            ? null
+                            : Convert.ChangeType(par.Value, SqlStatementParamsParser.GetCsTypeCode(par.Type));
+                        logAddParamsMessage += "parameter name:  " + paramName + "Value:  " + paramValue;
+
+                        var param = new OracleParameter(paramName, paramValue);
+                        callFunctionCmd.Parameters.Add(param);
+                    }
+                }
+                Logger.Info(logAddParamsMessage);
+                List<ParamMetaInfo> outParameters = null;
+                ParamMetaInfo outMessageParam = null;
+                string funcOutMessage = string.Empty;
+                if (callFunction != null && !string.IsNullOrEmpty(callFunction.OutParams))
+                {
+                    outParameters = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ParamMetaInfo>(callFunction.PROC_NAME, callFunction.OutParams);
+                    outMessageParam = outParameters.FirstOrDefault(x => x.ColType == "MESSAGE");
+                    if (outMessageParam != null)
+                        callFunctionCmd.Parameters.Add(outMessageParam.ColName, OracleDbType.Varchar2, 4000, funcOutMessage, ParameterDirection.Output);
+                }
+
+                //вызвать процедуру
+                callFunctionCmd.CommandText = string.Format(
+                    "begin " +
+                    "{0};" +
+                    " end;",
+                    callFunction.PROC_NAME);
+                callFunctionCmd.BindByName = true;
+                Logger.Info("ptocedure comand text: " + callFunctionCmd.CommandText);
+                callFunctionCmd.ExecuteNonQuery();
+                string successMessage = "Процедура виконана";
+                if (!string.IsNullOrEmpty(callFunction.MSG))
+                    successMessage = callFunction.MSG;
+
+
+                if (outMessageParam != null && !string.IsNullOrEmpty(outMessageParam.ColName))
+                {
+                    var res = callFunctionCmd.Parameters[outMessageParam.ColName].Value;
+                    funcOutMessage = Convert.ToString(res) == "null" ? "" : Convert.ToString(res);
+                    successMessage += "</br>" + funcOutMessage;
+
+                }
+
+                return successMessage;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(string.Format("message: {0},  trace: {1}", e.Message, e.StackTrace), LoggerPrefix + "ERROR");
+                throw e;
+            }
+            finally
+            {
+                GetOracleConnector.Dispose();
+            }
+
+        }
         /// <summary>
         /// Вызвать произвольную процедуру описанную в таблице META_NSIFUNCTION
         /// </summary>
@@ -521,6 +624,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 procText = SqlStatementParamsParser.ReplaceCenturaNullConstants(procText);
                 //callFunctionCmd.CommandText = procText;
                 string logAddParamsMessage = "add parameters in: " + procText + " ";
+
+                if (callFunction != null && !string.IsNullOrEmpty(callFunction.UploadParams))
+                {
+                    SqlStatementParamsParser.AddUploadParameters(callFunction, GetOracleConnector, funcParams, addParams);
+
+                }
+
                 foreach (var par in funcParams.Where(x => x.Type != "CLOB" && x.Type != "BLOB"))
                 {
                     if (procText.Contains(":" + par.Name))
@@ -535,7 +645,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                         var param = new OracleParameter(paramName, paramValue);
                         callFunctionCmd.Parameters.Add(param);
-                        callFunctionCmd.BindByName = true;
+
                     }
                 }
                 Logger.Info(logAddParamsMessage);
@@ -550,19 +660,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                         callFunctionCmd.Parameters.Add(outMessageParam.ColName, OracleDbType.Varchar2, 4000, funcOutMessage, ParameterDirection.Output);
                 }
 
-                List<UploadParamsInfo> uploadParams = null;
-                if (callFunction != null && !string.IsNullOrEmpty(callFunction.UploadParams))
-                {
-                    SqlStatementParamsParser.AddUploadParameters(callFunction, GetOracleConnector, funcParams, addParams);
-
-                }
                 //вызвать процедуру
                 callFunctionCmd.CommandText = string.Format(
                     "begin " +
                     "{0};" +
                     " end;",
                     procText);
-
+                callFunctionCmd.BindByName = true;
                 Logger.Info("ptocedure comand text: " + callFunctionCmd.CommandText);
                 callFunctionCmd.ExecuteNonQuery();
                 string successMessage = "Процедура виконана";
@@ -574,13 +678,10 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                 if (outMessageParam != null && !string.IsNullOrEmpty(outMessageParam.ColName))
                 {
-                    try
-                    {
-                        var res = callFunctionCmd.Parameters[outMessageParam.ColName].Value;
-                        funcOutMessage = Convert.ToString(res) == "null" ? "" : Convert.ToString(res);
-                        successMessage += "</br>" + funcOutMessage;
-                    }
-                    catch (Exception e) { throw e; }
+                    var res = callFunctionCmd.Parameters[outMessageParam.ColName].Value;
+                    funcOutMessage = Convert.ToString(res) == "null" ? "" : Convert.ToString(res);
+                    successMessage += "</br>" + funcOutMessage;
+
                 }
 
                 return successMessage;
@@ -595,7 +696,55 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 GetOracleConnector.Dispose();
             }
         }
+        public string UploadFile(HttpPostedFileBase postedFile, List<FieldProperties> funcParams, int? tabid, int? funcid, int? codeOper,
+            string code = null)
+        {
+            CallFunctionMetaInfo function = null;
+            BinaryReader b = new BinaryReader(postedFile.InputStream);
+            byte[] binData = b.ReadBytes(Convert.ToInt32(postedFile.ContentLength));
+            string fileName = postedFile.FileName;
+            if (fileName.Contains('\\'))
+                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+            if (tabid.HasValue && funcid.HasValue)
+                function = GetFunctionsMetaInfo(tabid.Value, funcid.Value);
+            else
+                if (codeOper.HasValue || !string.IsNullOrEmpty(code))
+                function = GetFunctionsMetaInfo(codeOper, code);
+            if (function == null)
+                throw new Exception("функція не знайдена");
+            SqlStatementParamsParser.BuildFunction(function);
+            //SqlStatementParamsParser.BuildFunctionParams(function);
+            //string result = Encoding.UTF8.GetString(binData);
+            List<FieldProperties> additionalParams = new List<FieldProperties>();
 
+            if (function.UploadParamsInfo.Count() > 0 && function.UploadParamsInfo.FirstOrDefault(c => c.ColType == "CLOB") != null)
+                funcParams.AddRange(function.UploadParamsInfo.Where(x => x.ColType == "CLOB").Select(c => new FieldProperties()
+                {
+                    Type = c.ColType,
+                    Name = c.ColName,
+                    Value = Encoding.UTF8.GetString(binData)
+                }));
+
+            if (function.UploadParamsInfo.Count() > 0 && function.UploadParamsInfo.FirstOrDefault(c => c.ColType == "BLOB") != null)
+                funcParams.AddRange(function.UploadParamsInfo.Where(x => x.ColType == "BLOB").Select(c => new FieldProperties()
+                {
+                    Type = c.ColType,
+                    Name = c.ColName,
+                    ByteBody = binData
+                }));
+
+
+            if (function.UploadParamsInfo.Count() > 0 && function.UploadParamsInfo.FirstOrDefault(c => c.GetFrom == "FILE_NAME") != null)
+                funcParams.AddRange(function.UploadParamsInfo.Where(x => x.GetFrom == "FILE_NAME").Select(c => new FieldProperties()
+                {
+                    Name = c.ColName,
+                    Type = c.ColType,
+                    Value = fileName
+                }));
+            string res = CallRefFunction(function, funcParams, additionalParams);
+            return res;
+
+        }
         public string CallEachFuncWithMultypleRows(int? tableId, int? funcId, int? codeOper, int? columnId, MultiRowParamsDataModel dataModel,
             string funcText = "", string msg = "", string code = "", CallFunctionMetaInfo callFunc = null)
         {
@@ -703,9 +852,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         public GetFileResult CallFunctionWithFileResult(int? tableId, int? funcId, int? codeOper, List<FieldProperties> funcParams,
           string funcText = "", string msg = "", string web_form_name = "", string jsonSqlProcParams = "")
         {
-            OracleConnection connection = OraConnector.Handler.UserConnection;
             CallFunctionMetaInfo callFunction = null;
-            OracleClob clob = null;
+            OracleClob clob = GetOracleConnector.CommandClob;
             Encoding windows = Encoding.GetEncoding("windows-1251");
             Encoding unicode = Encoding.Unicode;
             byte[] unicodeBytes;
@@ -726,7 +874,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 }
                 else if (string.IsNullOrEmpty(funcText))
                     return new GetFileResult() { Result = "input funcid or text prodedure" };
-                OracleCommand callFunctionCmd = connection.CreateCommand();
+                OracleCommand callFunctionCmd = GetOracleConnector.GetCommandOrCreate;
 
                 //строка вызова sql-процедуры находится задана в PROC_NAME
                 string procText = !string.IsNullOrEmpty(funcText) ? funcText : callFunction.PROC_NAME;
@@ -798,19 +946,19 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 if (clobParam != null && clobParam.Value != null)
                 {
                     //string retVal = ((OracleClob)callFunctionCmd.Parameters[clobParamName].Value).IsNull ? string.Empty : ((OracleClob)callFunctionCmd.Parameters[clobParamName].Value).Value;
-                    clob = clobParam.Value as OracleClob;
+                    GetOracleConnector.CommandClob = clobParam.Value as OracleClob;
                     name = fileNameParam ?? name;
                 }
 
 
-                if (clob != null)
+                if (GetOracleConnector.CommandClob != null)
                 {
-                    string clobRes = clob.IsNull ? string.Empty : clob.Value;
-                    unicodeBytes = unicode.GetBytes(clobRes.ToString());
-                    asciiBytes = Encoding.Convert(unicode, windows, unicodeBytes);
+                    string clobRes = GetOracleConnector.CommandClob.IsNull ? string.Empty : GetOracleConnector.CommandClob.Value;
+                    unicodeBytes = unicode.GetBytes(clobRes);
+                    GetOracleConnector.ParmeterBytes = Encoding.Convert(unicode, windows, unicodeBytes);
 
 
-                    result = new GetFileResult() { FileBytesBody = asciiBytes, FileName = !string.IsNullOrEmpty(name) ? name : "file.txt", Result = "ok" };
+                    result = new GetFileResult() { FileBytesBody = GetOracleConnector.ParmeterBytes, FileName = !string.IsNullOrEmpty(name) ? name : "file.txt", Result = "ok" };
 
                 }
 
@@ -823,20 +971,16 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                 return result;
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
             finally
             {
-                if (clob != null)
-                {
-                    clob.Close();
-                    clob.Dispose();
-                    clob = null;
-                }
+                //if (clob != null)
+                //{
+                //    clob.Close();
+                //    clob.Dispose();
+                //    clob = null;
+                //}
 
-                connection.Close();
+                GetOracleConnector.Dispose();
             }
         }
         /// <summary>
@@ -1081,7 +1225,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         {
             string srcQuery = GetSrcCondByMetaExtrnVal(tabId, colId);
             List<string> paramNames = SqlStatementParamsParser.GetSqlStatementParams(srcQuery);
-            List<ColumnMetaInfo> paramsInfo = columnsInfo.Where(x => paramNames.Contains(x.COLNAME)).ToList();
+            List<FieldProperties> paramsInfo = columnsInfo.Where(x => paramNames.Contains(x.COLNAME)).Select(e => new FieldProperties() { Name = e.COLNAME, Type = e.COLTYPE }).ToList();
             SrcQueryModel srcQueryModel = new SrcQueryModel(tabId, colId, paramsInfo);
             return srcQueryModel;
         }
@@ -1164,7 +1308,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             var dbMetaColumns = GetDbNativeColumnsMetaInfo(TableId);
             var nativeMetaColumns = DbColumnsToMetaColumnsForGetData(dbMetaColumns);
             bool lazyLoad = false;
-            
+
             if (dataModel is ExcelDataModel && dataModel.GetAll && nsiEditParams != null && !string.IsNullOrEmpty(nsiEditParams.ExcelParam))
             {
                 if (nsiEditParams.ExcelParam == "ALL_CSV")
@@ -1172,9 +1316,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     lazyLoad = true;
                     dataModel.Limit = 9999999;
                 }
-                if(nsiEditParams.ExcelParam.Contains("COUNT_"))
+                if (nsiEditParams.ExcelParam.Contains("COUNT_"))
                 {
-                   int limit = Convert.ToInt32(nsiEditParams.ExcelParam.Substring("COUNT_".Length));
+                    int limit = Convert.ToInt32(nsiEditParams.ExcelParam.Substring("COUNT_".Length));
                     dataModel.Limit = limit > 10000 ? 10000 : limit;
                 }
             }
@@ -1257,10 +1401,10 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 // получим основной набор данных
                 OracleCommand getDataCmd = selectBuilder.GetDataSelectCommand(connection);
                 if (dataModel is ExcelDataModel && dataModel.GetAll && nsiEditParams != null &&
-                    !string.IsNullOrEmpty(nsiEditParams.ExcelParam) && nsiEditParams.ExcelParam == "ALL_EXTERN")
+                    !string.IsNullOrEmpty(nsiEditParams.ExcelParam) && (nsiEditParams.ExcelParam == "ALL_EXTERN"))
                 {
                     int count = GetRecordsCount(selectBuilder);
-                    if (count > 1000)
+                    if (count > 100)
                     {
                         return AllRecordReader.GetExtResultExcelModel(selectBuilder, count);
                     }
@@ -1387,13 +1531,25 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                         MetaTable tableInfo = GetMetaTableByName(col.FunctionMetaInfo.TableName);
                         if (tableInfo == null)
                             throw new Exception(string.Format("Не знайдена таблиця {0}, посилання на неї в колонці  {1}", col.FunctionMetaInfo.TableName, col.COLNAME));
-                        if (!string.IsNullOrEmpty(tableInfo.SEMANTIC) && tableInfo.SEMANTIC.Contains("|:"))
+                        if (!string.IsNullOrEmpty(tableInfo.SEMANTIC) && tableInfo.SEMANTIC.Contains(":"))
                         {
+                            List<string> paramNames = SqlStatementParamsParser.GetSqlStatementParams(tableInfo.SEMANTIC);
                             col.FunctionMetaInfo.TableSemantic = tableInfo.SEMANTIC;
-                            par.AddItemToParamsNames(tableInfo.SEMANTIC);
-                            col.FunctionMetaInfo.RowParamsNames.AddRange(par.ParamsNames);
+                            par.ParamsNames.AddRange(paramNames);
+                        }
+                        if (!string.IsNullOrEmpty(tableInfo.SELECT_STATEMENT) && tableInfo.SELECT_STATEMENT.Contains(":"))
+                        {
+                            List<string> paramNames = SqlStatementParamsParser.GetSqlStatementParams(tableInfo.SELECT_STATEMENT);
+                            if (paramNames != null && paramNames.Count > 0)
+                                par.ParamsNames.AddRange(paramNames);
+
+                        }
+                        if (par.ParamsNames != null && par.ParamsNames.Count > 0)
+                        {
+                            col.FunctionMetaInfo.RowParamsNames.AddRange(par.ParamsNames.Distinct());
                             col.FunctionMetaInfo.RowParamsNames = col.FunctionMetaInfo.RowParamsNames.Distinct().ToList();
                         }
+
                     }
                 }
                 columnsInfo.Add(col);
@@ -1561,8 +1717,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                 //получим также инфу о внешних колонках из таблицы META_EXTRNVAL
                 var extColumnsInfo = GetExternalColumnsMeta(data.TableId).ToList();
-                //GetSrcSonditionColumns(data.TableId);
-                List<ColumnMetaInfo> colsWithSrcCondOnly = extColumnsInfo.Count() > 0 ? extColumnsInfo.Where(x => !string.IsNullOrEmpty(x.Src_Cond) && x.Src_Cond.ToUpper().Contains("SELECT")).ToList() : new List<ColumnMetaInfo>();
+                List<ColumnMetaInfo> colsWithSrcCondOnly = GetSrcSonditionColumns(data.TableId);
+                // List<ColumnMetaInfo> colsWithSrcCondOnly = extColumnsInfo.Count() > 0 ? extColumnsInfo.Where(x => !string.IsNullOrEmpty(x.Src_Cond) && x.Src_Cond.ToUpper().Contains("SELECT")).ToList() : new List<ColumnMetaInfo>();
                 if (colsWithSrcCondOnly.Count() > 0)
                     extColumnsInfo = extColumnsInfo.Where(x => colsWithSrcCondOnly.FirstOrDefault(c => c.COLID == x.COLID) == null).ToList();
 
@@ -1646,7 +1802,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     }
                     if (!string.IsNullOrEmpty(nsiPar.PROC))
                         callFunctions.Add(nsiPar.BuildToCallFunctionMetaInfo(new CallFunctionMetaInfo()));
-                    SqlStatementParamsParser.BuilFunctionParams(callFunctions, tableInfo);
+                    SqlStatementParamsParser.BuildFunctionParams(callFunctions, tableInfo);
 
                 }
 
@@ -1750,7 +1906,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
         public List<ColumnMetaInfo> GetSrcSonditionColumns(decimal tabid)
         {
-            const String sqlString = "SELECT N.* FROM META_EXTRNVAL N WHERE N.TABID = :P_TABID AND N.SRC_COND IS NOT NULL";
+            const String sqlString = "SELECT N.TABID, N.COLID, N.SRC_COND FROM META_EXTRNVAL N WHERE N.TABID = :P_TABID " +
+                "AND N.SRC_COND IS NOT NULL AND N.SRCTABID IS NULL";
             var pTabId = new OracleParameter("p_tabid", OracleDbType.Decimal).Value = tabid;
             return _entities.ExecuteStoreQuery<ColumnMetaInfo>(sqlString, pTabId).ToList();
 
@@ -1768,8 +1925,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                         LINESDEF = mt.LINESDEF,
                     }).Single();
 
-            if (tableInfo != null && tableInfo.SEMANTIC.Contains("|:"))
-                tableInfo.SemanticParamNames = SqlStatementParamsParser.GetParamNames(tableInfo.SEMANTIC);
+            if (tableInfo != null && tableInfo.SEMANTIC.Contains(":"))
+                tableInfo.SemanticParamNames = SqlStatementParamsParser.GetSqlStatementParams(tableInfo.SEMANTIC);
 
             return tableInfo;
         }
@@ -2172,29 +2329,27 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             string nsiString = "";
             FunNSIEditFParams nsiParams = null;
             if (callFunction == null)
-            { 
+            {
                 if (funcId.HasValue && tableId.HasValue)
                     callFunction = GetCallFunction(tableId.Value, funcId.Value);
-            if (callFunction != null)
-                SqlStatementParamsParser.BuildFunction(callFunction);
-            else if (codeOper.HasValue)
-            {
-                nsiString = GetFunNSIEditFParamsString(null, codeOper, null, null, null);
-                nsiParams = new FunNSIEditFParams(nsiString);
-                callFunction = nsiParams.BuildNsiWebFormName(new CallFunctionMetaInfo());
+                if (callFunction != null)
+                    SqlStatementParamsParser.BuildFunction(callFunction);
+                else if (codeOper.HasValue)
+                {
+                    nsiString = GetFunNSIEditFParamsString(null, codeOper, null, null, null);
+                    nsiParams = new FunNSIEditFParams(nsiString);
+                    callFunction = nsiParams.BuildNsiWebFormName(new CallFunctionMetaInfo());
+                }
+                else if (columnId.HasValue && tableId.HasValue)
+                {
+                    nsiString = GetFunNSIEditFParamsString(null, null, columnId.Value, tableId.Value, null);
+                    nsiParams = new FunNSIEditFParams(nsiString);
+                    callFunction = nsiParams.BuildNsiWebFormName(new CallFunctionMetaInfo());
+                }
+                else if (string.IsNullOrEmpty(funcText))
+                    throw new Exception("немає назви процедури");
+                SqlStatementParamsParser.BuildFunctionParams(callFunction);
             }
-            else if (columnId.HasValue && tableId.HasValue)
-            {
-                nsiString = GetFunNSIEditFParamsString(null, null, columnId.Value, tableId.Value, null);
-                nsiParams = new FunNSIEditFParams(nsiString);
-                callFunction = nsiParams.BuildNsiWebFormName(new CallFunctionMetaInfo());
-            }
-            else if (string.IsNullOrEmpty(funcText))
-                throw new Exception("немає назви процедури");
-            List<CallFunctionMetaInfo> funcs = new List<CallFunctionMetaInfo>();
-            funcs.Add(callFunction);
-            SqlStatementParamsParser.BuilFunctionParams(funcs);
-        }
             OracleCommand callFunctionCmd = GetOracleConnector.CreateCommand;
             callFunctionCmd.BindByName = true;
             //строка вызова sql-процедуры находится задана в PROC_NAME
@@ -2526,10 +2681,16 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         public CallFunctionMetaInfo GetFunctionsMetaInfo(int tabId, int funcId)
         {
             CallFunctionMetaInfo funcMetaInfo = GetCallFunction(tabId, funcId);
-            SqlStatementParamsParser.BuilFunctionParams(new List<CallFunctionMetaInfo>() { funcMetaInfo });
+
+            SqlStatementParamsParser.BuildFunctionParams(funcMetaInfo);
             return funcMetaInfo;
         }
-
+        /// <summary>
+        /// Информация по описаню конкретной функциональности(процедура, функция, определённое действие
+        /// </summary>
+        /// <param name="codeOper">параметр за operlist</param>
+        /// <param name="code">параметр з meta_call_settings</param>
+        /// <returns></returns>
         public CallFunctionMetaInfo GetFunctionsMetaInfo(int? codeOper, string code = "")
         {
             FunNSIEditFParams par = null;
@@ -2542,46 +2703,61 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     throw new Exception(string.Format("в таблиці meta_call_settings відсутній запис з ідентифікатором   {0}", code));
                 par = new FunNSIEditFParams(settings);
                 if (par.TargetObject != null)
+                {
+                    if (par.TargetObject.MultiRowsParams != null && par.TargetObject.MultiRowsParams.FirstOrDefault(x => x.Kind == "FROM_UPLOAD_EXCEL") != null)
+                    {
+                        MultiRowsParams multiUpload = par.TargetObject.MultiRowsParams.FirstOrDefault(x => x.Kind == "FROM_UPLOAD_EXCEL");
+                        par.TargetObject.UploadParamsInfo.Add(new UploadParamsInfo
+                        {
+                            Kind = "UPLOAD_FILE",
+                            Name = multiUpload.Name,
+                            ColType = multiUpload.ColType,
+                            Semantic = multiUpload.Semantic,
+                            ExtValid = "xlsx"
+                        });
+                    }
                     return par.TargetObject;
+                }
+
             }
             else
                 funNsiEditFParamsString = GetFunNSIEditFParamsString(null, codeOper, null, null, null);
             if (!string.IsNullOrEmpty(funNsiEditFParamsString))
                 par = new FunNSIEditFParams(funNsiEditFParamsString);
-                par.CodeOper = codeOper;
-                if (!string.IsNullOrEmpty(par.PROC))
-                    funcInfo = par.BuildToCallFunctionMetaInfo(new CallFunctionMetaInfo());
-            
-                if(!string.IsNullOrEmpty(code))
-                {
-                    funcInfo.Code = code;
-                    SqlStatementParamsParser.BuilFunctionParams(new List<CallFunctionMetaInfo>() { funcInfo });
-                string funcString = FormatConverter.ObjectToJsom(funcInfo);
-                }
-               
-                else
-                {
-                    // парсим строку вызова sql-функции и заполняем информацию о параметрах
-                    List<ParamMetaInfo> paramsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ParamMetaInfo>(funcInfo.PROC_NAME, funcInfo.PROC_PAR);
+            par.CodeOper = codeOper;
+            if (!string.IsNullOrEmpty(par.PROC))
+                funcInfo = par.BuildToCallFunctionMetaInfo(new CallFunctionMetaInfo());
+
+            if (!string.IsNullOrEmpty(code))
+            {
+                funcInfo.Code = code;
+                SqlStatementParamsParser.BuildFunctionParams(funcInfo);
+                //string funcString = FormatConverter.ObjectToJson(funcInfo);
+            }
+
+            else
+            {
+                // парсим строку вызова sql-функции и заполняем информацию о параметрах
+                List<ParamMetaInfo> paramsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ParamMetaInfo>(funcInfo.PROC_NAME, funcInfo.PROC_PAR);
 
 
-                    // преобразуем список информации о параметрах к формату, который ожидает клиент
-                    funcInfo.ParamsInfo = paramsInfo.Select(x => new ParamMetaInfo
+                // преобразуем список информации о параметрах к формату, который ожидает клиент
+                funcInfo.ParamsInfo = paramsInfo.Select(x => new ParamMetaInfo
+                {
+                    IsInput = x.IsInput,
+                    DefaultValue = x.DefaultValue,
+                    ColumnInfo = new ColumnViewModel
                     {
-                        IsInput = x.IsInput,
-                        DefaultValue = x.DefaultValue,
-                        ColumnInfo = new ColumnViewModel
-                        {
-                            COLNAME = x.ColName,
-                            COLTYPE = x.ColType,
-                            SEMANTIC = x.Semantic,
-                            SrcColName = x.SrcColName,
-                            SrcTableName = x.SrcTableName,
-                            SrcTextColName = x.SrcTextColName
-                        }
-                    }).ToList();
-                }
-            
+                        COLNAME = x.ColName,
+                        COLTYPE = x.ColType,
+                        SEMANTIC = x.Semantic,
+                        SrcColName = x.SrcColName,
+                        SrcTableName = x.SrcTableName,
+                        SrcTextColName = x.SrcTextColName
+                    }
+                }).ToList();
+            }
+
             return funcInfo;
         }
 
@@ -2595,7 +2771,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 getCustomFiltersSqlString = "select * from DYN_FILTER where USERID = :p_userId  and TABID = :p_tabid";
                 parameters = new object[] {
                      new OracleParameter("p_userId", OracleDbType.Decimal).Value = userId,
-                   pTableId
+                    pTableId
+
+
                };
             }
             else
@@ -2605,7 +2783,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                };
                 getCustomFiltersSqlString = "select * from DYN_FILTER where  USERID IS NULL and TABID = :p_tabid";
             }
-            return _entities.ExecuteStoreQuery<FilterInfo>(getCustomFiltersSqlString,parameters).ToList();
+            return _entities.ExecuteStoreQuery<FilterInfo>(getCustomFiltersSqlString, parameters).ToList();
         }
         public IEnumerable<FilterInfo> GetAllDynFilteFilters(int tableId)
         {
@@ -2674,9 +2852,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             string filterDbInfo = GetFilterDbInfo.UpdateFilter(editFilterModel);
             return filterDbInfo;
         }
-        
-      public string CallParsExcelFunction(HttpPostedFileBase excelFile,List<FieldProperties> inputParams, int? tabid, int? funcid,
-          string code = null)
+
+        public string CallParsExcelFunction(HttpPostedFileBase excelFile, List<FieldProperties> inputParams, int? tabid, int? funcid,
+            string code = null)
         {
             CallFunctionMetaInfo callFunction = null;
             if (tabid != null && funcid != null)
@@ -2689,12 +2867,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 SqlStatementParamsParser.BuildFunction(callFunction);
                 List<CallFunctionMetaInfo> callFuncs = new List<CallFunctionMetaInfo>();
                 callFuncs.Add(callFunction);
-                SqlStatementParamsParser.BuilFunctionParams(callFuncs);
+                SqlStatementParamsParser.BuildFunctionParams(callFuncs);
             }
             else if (!string.IsNullOrEmpty(code))
                 callFunction = this.GetFunctionsMetaInfo(null, code);
             string convertParams = callFunction.CUSTOM_OPTIONS;
-           // ExcelHelper excelHelper = new ExcelHelper();
+            // ExcelHelper excelHelper = new ExcelHelper();
             List<CallFuncRowParam> RowsData = new List<CallFuncRowParam>();// excelHelper.ParseExcelFile(excelFile, callFunction);
 
 
@@ -2705,7 +2883,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 UploadedFile = excelFile
             };
 
-            return CallEachFuncWithMultypleRows(tabid, funcid, null, null, dataModel,null,null,code,callFunction);
+            return CallEachFuncWithMultypleRows(tabid, funcid, null, null, dataModel, null, null, code, callFunction);
 
         }
 
@@ -2713,6 +2891,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         {
             this.GetOracleConnector.Dispose();
         }
+
 
 
         //public string GetFilterStructure(int dynFilterId)

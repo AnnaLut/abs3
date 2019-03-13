@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    
+    ;
     if ($("#choceDate"))
     $("#choceDate").kendoDatePicker({
         format: "dd/MM/yyyy",

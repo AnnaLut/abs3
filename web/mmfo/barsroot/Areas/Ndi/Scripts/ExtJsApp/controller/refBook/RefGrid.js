@@ -137,7 +137,6 @@
     },
 
     onCellclick: function (grid, cell, cellIndex, record, row, rowIndex, e) {
-        
         if (window.hasCallbackFunction && window.hasCallbackFunction.toUpperCase() == 'TRUE')
             return false;
         var thisController = this;
@@ -203,7 +202,7 @@
                 window.open(href, '_blank');
             else
                 // href = col.WEB_FORM_NAME;// + cell.innerText;
-                Ext.create('ExtApp.view.refBook.RNKWindow', {
+                Ext.create('ExtApp.view.refBook.refExtWindow', {
                     title: col.SEMANTIC + ":  " + cell.innerText,
                     items: [{
                         xtype: "component",
@@ -269,7 +268,8 @@
     },
 
     openWindowForUploadOnly: function (tabid,funcId,code) {
-        var url = '/barsroot/ndi/ReferenceBook/GetUploadFile?tabid=' + tabid + '&funcid=' + funcId +'&code=' + code;
+        code = code || '';
+        var url = '/barsroot/ndi/ReferenceBook/GetUploadFile?NsiTableId=' + tabid + '&NsiFuncId=' + funcId +'&code=' + code;
         var width = 1000;
         var height = 600;
         var params = 'width=' + width + ',' + 'height=' + height + ',' + 'scrollbars=1' + ',' + 'left=205,top=125';
@@ -296,7 +296,7 @@
     },
 
     openRefWindow: function (href, formTitle) {
-        Ext.create('ExtApp.view.refBook.RNKWindow', {
+        Ext.create('ExtApp.view.refBook.refExtWindow', {
             title: formTitle,
             items: [{
                 xtype: "component",
@@ -313,35 +313,20 @@
     onBeforeEdit: function (rowEditing, e) {
         if (!rowEditing.editor || !rowEditing.editor.form)
             return;
-        if (!e.record.phantom) {
-            var thisController = this;
-            var metadata = thisController.controllerMetadata;
+        var thisController = this;
+        var metadata = thisController.controllerMetadata;
+        var depColsInfo  = ExtApp.utils.RefBookUtils.getDependColsInfo(metadata.nativeMetaColumns);
+
+        if (!e.record.phantom && depColsInfo && depColsInfo.length > 0) {
             ExtApp.utils.RefBookUtils.onBeforeEditFormByDependencies(rowEditing.editor.form, e.record, metadata.nativeMetaColumns);
             return;
         }
-        
         var hasColsToInsert = false
-        var notEditCols = Ext.Array.filter(e.grid.metadata.columnsInfo, function (col) { return col.InputInNewRecord == 1; })
-        if (notEditCols && notEditCols.length && notEditCols.length > 0)
+        var insertColumns = Ext.Array.filter(e.grid.metadata.columnsInfo, function (col) { return col.InputInNewRecord == 1; })
+        if (insertColumns && insertColumns.length && insertColumns.length > 0)
             hasColsToInsert = true;
         //при редактировании запретить редактировать NOT_TO_EDIT колонки, а при добавлении разрешить
-        if (!hasColsToInsert)
-            Ext.each(e.grid.metadata.columnsInfo,
-                function () {
-                    var editorField = rowEditing.editor.form.findField(this.COLNAME);
-                    if (!editorField)
-                        return;
-                    if (this.NOT_TO_EDIT == 1) {
-                        //if (e.record.phantom) {
-                        //    editorField.enable();
-                        //} else {
-                        //    editorField.disable();
-                        //}
-                        editorField.disable();
-                    } else
-                        editorField.enable();
-                });
-        else
+        if (hasColsToInsert && e.record.phantom)
             Ext.each(e.grid.metadata.columnsInfo,
                 function () {
                     var editorField = rowEditing.editor.form.findField(this.COLNAME);
@@ -357,6 +342,23 @@
                     } else
                         editorField.enable();
                 });
+        else
+            Ext.each(e.grid.metadata.columnsInfo,
+                function () {
+                    var editorField = rowEditing.editor.form.findField(this.COLNAME);
+                    if (!editorField)
+                        return;
+                    if (this.NOT_TO_EDIT == 1) {
+                        //if (e.record.phantom) {
+                        //    editorField.enable();
+                        //} else {
+                        //    editorField.disable();
+                        //}
+                        editorField.disable();
+                    } else
+                        editorField.enable();
+                });
+
     },
 
     //вызывается при нажатии на кнопку "Зберегти" но до записи данных в строку на клиенте. 
@@ -1159,7 +1161,7 @@
     },
 
     uploadFile: function (e) {
-        
+
         var thisController = this;
         var referenceGrid = thisController.getGrid();
         //получаем выбранную строку грида и загружаем в форму данные этой строки
@@ -1310,7 +1312,7 @@
     },
 
     onToolBtnclick: function (button) {
-        
+        ;
         var thisController = this;
         var referenceGrid = thisController.getGrid();
         //каждый пункт меню содержит свойство metaInfo с информацией о вызываемой процедуре
@@ -1739,6 +1741,7 @@
                 //}),
                 btnOkProps: {
                     handler: function (btn) {
+                        
                         thisController.filterDialogOkBtnHandler(btn);
                     }
                 }
@@ -2434,7 +2437,7 @@
         };
         metaData.columnsInfo = [];
         var sort = grid.store.sorters.items;
-        
+        ;
         var oper = new Ext.data.Operation();
         grid.store.fireEvent('BeforeLoad', grid.store, oper);
 
@@ -2477,7 +2480,7 @@
         thisController.fillCallFuncInfo(funcMetaInfo,referenceGrid.metadata,function () {
             thisController.callFuncByType(funcMetaInfo);
         });
-        
+        ;
 
     },
     callFuncByType:  function(funcMetaInfo){
@@ -2486,7 +2489,7 @@
         var gridSelectModel = referenceGrid.getSelectionModel();
         var selectedRows;
         var func = thisController.currentCalledSqlFunction;
-        
+        ;
         switch (funcMetaInfo.PROC_EXEC) {
             //выполнение процедуры один раз, параметры не берутся из данных грида, а либо константы либо вводятся вручную
             case "ONCE":
@@ -2497,7 +2500,7 @@
 
                 if (funcMetaInfo.SystemParamsInfo && funcMetaInfo.SystemParamsInfo.length > 0)
                     thisController.setSystemParams();
-                
+                ;
 
                 if (func.paramsInfo.length > 0 &&
                     Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true }))
@@ -2587,7 +2590,7 @@
                 break;
             case "SELECTED_ONE":
             {
-                
+                ;
                 selectedRows = gridSelectModel.getSelection();
                 func.allFuncCallCount = selectedRows.length;
                 var qst = funcMetaInfo.QST;
@@ -3011,7 +3014,7 @@
     fillCallFuncInfo: function (funcMetaInfo,metadata,callBackFunc) {
 
         var thisController = this;
-        
+
         //метаинформация о параметрах
         var paramsMeta = funcMetaInfo.ParamsInfo;
         var systemParamsInfo = funcMetaInfo.SystemParamsInfo;
@@ -3095,7 +3098,7 @@
         });
         if (par.IsInput == true) {
 
-            
+            ;
             //конфигурируем поле ввода по метаописанию и устанавливаем значение по умолчанию, если есть
             var formField = ExtApp.utils.RefBookUtils.configFormField(par.ColumnInfo);
             if (par.DefaultValue) {
@@ -3108,7 +3111,7 @@
                         tabId : func.tableId, funcId: func.funcId, paramName: par.ColumnInfo.COLNAME
                     },
                     function (status, msg,data, controller) {
-                        
+                        ;
                         if(status == 'OK')
                             par.DefaultValue = data;
                         formField.value = par.DefaultValue;
@@ -3214,6 +3217,14 @@
 
         if (showForEachRow) {
             title += " для рядка " + (func.params[func.currentParamsInputIndex].rowIndex);
+        }
+        
+        if(Ext.Array.findBy(func.paramsInfo, function (param) { return param.kind == "UPLOAD_FILE" && param.IsInput == true; }) &&
+        !Ext.Array.findBy(func.paramsInfo, function (param) { return param.kind != "UPLOAD_FILE" && param.IsInput == true; }))
+        {
+            
+            thisController.openWindowForUploadOnly(func.tableId,func.funcId,func.Code ? func.code : '');
+            return;
         }
 
         Ext.create('ExtApp.view.refBook.refShowparamWindow', {
@@ -3405,7 +3416,7 @@
             return true;
         }
 
-        if(func.MultiRowsParams != null &&func.MultiRowsParams.length > 0 && func.MultiRowsParams[0].Kind =='FROM_UPLOAD_EXCEL')
+        if((func.MultiRowsParams != null &&func.MultiRowsParams.length > 0 && func.MultiRowsParams[0].Kind =='FROM_UPLOAD_EXCEL') || (func.UploadParams && func.UploadParams.length > 0))
         {
             thisController.openWindowForUploadOnly(func.tableId,func.funcId,func.Code);
             return;
@@ -3440,7 +3451,7 @@
                     ColumnId: func.ColumnId, procName: func.funcName, random: Math.random, base64ExternProcParams: func.base64ExternProcParams
                 },
                function (status, msg, controller) {
-                   
+                   ;
                     var callbackFunc;
                    if (window.hasCallbackFunction && window.hasCallbackFunction.toUpperCase() == 'TRUE' && window.ExternelFuncOnly &&  window.ExternelFuncOnly.toUpperCase() == 'TRUE')
                        callbackFunc =  window.parent.CallBackFunctionOnly;
@@ -3490,7 +3501,7 @@
     executeCurrentSqlFunctionWithUploadFile: function (functi, formWindow) {
         var form = formWindow.down('form').getForm();
         var thisController = this;
-        
+
         var func = thisController.currentCalledSqlFunction;
         var params = func.params[0].rowParams;
         var fileParam = Ext.Array.findBy(params, function (param) { return param.Type == "CLOB" || param.Type == "BLOB"; });

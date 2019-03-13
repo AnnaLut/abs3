@@ -12,19 +12,19 @@ using System.Text;
 using Oracle.DataAccess.Types;
 using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
-using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
-using BarsWeb.Areas.Ndi.Models.ViewModels;
-using System.Linq.Dynamic;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
+    using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
+    using BarsWeb.Areas.Ndi.Models.ViewModels;
+    using System.Linq.Dynamic;
 
     /// <summary>
     /// Парсер строки, содержащей параметры в формате "... :par1 :par2 ... :parN ..."
     /// </summary>
     public static class SqlStatementParamsParser
     {
-      
+
         /// <summary>
         /// Получить список параметров из SQL-выражения
         /// </summary>
@@ -114,7 +114,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 case "OracleDbType.Decimal":
                     return "N";
                 case "OracleDbType.Varchar2":
-                    return "C" ;
+                    return "C";
                 case "OracleDbType.Date":
                     return "D";
                 default:
@@ -210,101 +210,101 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             return paramsMetaInfo;
         }
 
-    
-        public static void BuilFunctionParams(List<CallFunctionMetaInfo> callFunctions, MetaTable tableInfo = null)
+        public static void BuildFunctionParams(CallFunctionMetaInfo func, MetaTable tableInfo = null)
+        {
+            if (func.PROC_PAR == "FROM_CUSTOM_OPTIONS" && !string.IsNullOrEmpty(func.CUSTOM_OPTIONS))
+            {
+                CallFunctionMetaInfo funcFromJson = FormatConverter.JsonToObject<CallFunctionMetaInfo>(func.CUSTOM_OPTIONS);
+                funcFromJson.CopyValuesTo(func);
+                return;
+            }
+            // парсим строку вызова sql-функции и заполняем информацию о параметрах
+            List<ParamMetaInfo> paramsInfo = GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.PROC_PAR);
+
+            if (!string.IsNullOrEmpty(func.SysPar))
+                func.SystemParamsInfo = GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.SysPar);
+
+            if (!string.IsNullOrEmpty(func.UploadParams))
+            {
+                func.UploadParamsInfo = GetSqlFuncCallParamsDescription<UploadParamsInfo>(func.PROC_NAME, func.UploadParams);
+                paramsInfo = paramsInfo.Where(x => !func.UploadParamsInfo.Select(b => b.Name).Contains(x.Name)).ToList();
+                paramsInfo.AddRange(func.UploadParamsInfo);
+            }
+
+            if (!string.IsNullOrEmpty(func.ConvertParams))
+            {
+                func.ConvertParamsInfo = GetSqlFuncCallParamsDescription<ConvertParams>(func.PROC_NAME, func.ConvertParams);
+            }
+            if (!string.IsNullOrEmpty(func.OutParams))
+            {
+                func.OutParamsInfo = GetSqlFuncCallParamsDescription<OutParamsInfo>(func.PROC_NAME, func.OutParams);
+                if (func.OutParamsInfo != null && func.OutParamsInfo.Count() > 0)
+                {
+                    if (paramsInfo != null && paramsInfo.Count() > 0)
+                        paramsInfo.RemoveAll(x => func.OutParamsInfo.Find(y => y.ColName == x.ColName) != null);
+
+
+                    if (func.OutParamsInfo.FirstOrDefault(x => x.Kind == "GET_FILE") != null)
+                        func.HasFileResult = true;
+
+
+                }
+
+            }
+
+            if (!string.IsNullOrEmpty(func.MultiParams))
+            {
+                func.MultiRowsParams = GetSqlFuncCallParamsDescription<MultiRowsParams>(func.PROC_NAME, func.MultiParams);
+                if (func.MultiRowsParams != null && Enumerable.Count(func.MultiRowsParams) > 0)
+                {
+                    List<ColMultiRowParam> colRowParams = new List<ColMultiRowParam>();
+                    paramsInfo.RemoveAll(x => func.MultiRowsParams.Find(y => y.ColName == x.ColName) != null);
+                    if (func.MultiRowsParams.Find(x => x.ListColumnNames != null && Enumerable.Count(x.ListColumnNames) > 0) != null)
+                    {
+                        func.MultiRowsParams.ForEach(x => colRowParams.AddRange(x.ListColumnNames.
+                        Select(y => new ColMultiRowParam() { ColName = y })));
+                        if (Enumerable.Count(colRowParams) > 0)
+                            paramsInfo.AddRange(Enumerable.Distinct(colRowParams));
+                    }
+
+                }
+
+
+            }
+            if (func.PROC_EXEC == "BEFORE" && tableInfo != null && tableInfo.SemanticParamNames.Count > 0)
+                paramsInfo.ForEach(item =>
+                {
+                    if (tableInfo.SemanticParamNames.Contains(item.ColName))
+                    {
+                        item.AdditionalUse.Add("ReplaseTableSemantic");
+                    }
+
+                });
+            // преобразуем список информации о параметрах к формату, который ожидает клиент
+            func.ParamsInfo = paramsInfo.Select(x => new ParamMetaInfo
+            {
+                IsInput = x.IsInput,
+                DefaultValue = x.DefaultValue,
+                Kind = x.Kind,
+                AdditionalUse = x.AdditionalUse,
+                ColumnInfo = new ColumnViewModel()
+                {
+                    COLNAME = x.ColName,
+                    COLTYPE = x.ColType,
+                    SEMANTIC = x.Semantic,
+                    SrcColName = x.SrcColName,
+                    SrcTableName = x.SrcTableName,
+                    SrcTextColName = x.SrcTextColName
+                }
+            }).ToList();
+
+        }
+        public static void BuildFunctionParams(List<CallFunctionMetaInfo> callFunctions, MetaTable tableInfo = null)
         {
             foreach (var func in callFunctions)
             {
-                if (func.PROC_PAR == "FROM_CUSTOM_OPTIONS" && !string.IsNullOrEmpty(func.CUSTOM_OPTIONS))
-                {
-                    CallFunctionMetaInfo funcFromJson = FormatConverter.JsonToObject<CallFunctionMetaInfo>(func.CUSTOM_OPTIONS);
-                    funcFromJson.CopyValuesTo(func);
-                    continue;
-                }
-                // парсим строку вызова sql-функции и заполняем информацию о параметрах
-                List<ParamMetaInfo> paramsInfo = GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.PROC_PAR);
-
-                if (!string.IsNullOrEmpty(func.SysPar))
-                    func.SystemParamsInfo = GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.SysPar);
-
-                if (!string.IsNullOrEmpty(func.UploadParams))
-                {
-                    func.UploadParamsInfo = GetSqlFuncCallParamsDescription<UploadParamsInfo>(func.PROC_NAME, func.UploadParams);
-                    paramsInfo = paramsInfo.Where(x => !func.UploadParamsInfo.Select(b => b.Name).Contains(x.Name)).ToList();
-                    paramsInfo.AddRange(func.UploadParamsInfo);
-                }
-
-                if (!string.IsNullOrEmpty(func.ConvertParams))
-                {
-                    func.ConvertParamsInfo = GetSqlFuncCallParamsDescription<ConvertParams>(func.PROC_NAME, func.ConvertParams);
-                }
-                if (!string.IsNullOrEmpty(func.OutParams))
-                {
-                    func.OutParamsInfo = GetSqlFuncCallParamsDescription<OutParamsInfo>(func.PROC_NAME, func.OutParams);
-                    if (func.OutParamsInfo != null && func.OutParamsInfo.Count() > 0)
-                    {
-                        if (paramsInfo != null && paramsInfo.Count() > 0)
-                            paramsInfo.RemoveAll(x => func.OutParamsInfo.Find(y => y.ColName == x.ColName) != null);
-
-
-                        if (func.OutParamsInfo.FirstOrDefault(x => x.Kind == "GET_FILE") != null)
-                            func.HasFileResult = true;
-
-
-                    }
-
-                }
-
-                if (!string.IsNullOrEmpty(func.MultiParams))
-                {
-                    func.MultiRowsParams = GetSqlFuncCallParamsDescription<MultiRowsParams>(func.PROC_NAME, func.MultiParams);
-                    if (func.MultiRowsParams != null && Enumerable.Count(func.MultiRowsParams) > 0)
-                    {
-                        List<ColMultiRowParam> colRowParams = new List<ColMultiRowParam>();
-                        paramsInfo.RemoveAll(x => func.MultiRowsParams.Find(y => y.ColName == x.ColName) != null);
-                        if(func.MultiRowsParams.Find(x => x.ListColumnNames != null && Enumerable.Count(x.ListColumnNames) > 0) != null)
-                        {
-                            func.MultiRowsParams.ForEach(x => colRowParams.AddRange(x.ListColumnNames.
-                            Select(y => new ColMultiRowParam() { ColName = y })));
-                            if (Enumerable.Count(colRowParams) > 0)
-                                paramsInfo.AddRange(Enumerable.Distinct(colRowParams));
-                        }
-                        
-                    }
-
-
-                }
-                if (func.PROC_EXEC == "BEFORE" && tableInfo != null && tableInfo.SemanticParamNames.Count > 0)
-                    paramsInfo.ForEach(item =>
-                    {
-                        if (tableInfo.SemanticParamNames.Contains(item.ColName))
-                        {
-                            item.AdditionalUse.Add("ReplaseTableSemantic");
-                        }
-
-                    });
-                // преобразуем список информации о параметрах к формату, который ожидает клиент
-                func.ParamsInfo = paramsInfo.Select(x => new ParamMetaInfo
-                {
-                    IsInput = x.IsInput,
-                    DefaultValue= x.DefaultValue,
-                    Kind = x.Kind,
-                    AdditionalUse = x.AdditionalUse,
-                    ColumnInfo = new ColumnViewModel()
-                    {
-                        COLNAME = x.ColName,
-                        COLTYPE = x.ColType,
-                        SEMANTIC = x.Semantic,
-                        SrcColName = x.SrcColName,
-                        SrcTableName = x.SrcTableName,
-                        SrcTextColName = x.SrcTextColName
-                    }
-                }).ToList();
-              
+                BuildFunctionParams(func, tableInfo);
             }
-               
-                
-
         }
 
         public static void AddUploadParameters(CallFunctionMetaInfo callFunction, OracleDbModel oracleConnector, List<FieldProperties> funcParams, List<FieldProperties> additionalParams)
@@ -318,23 +318,26 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 {
                     FieldProperties clobProp = funcParams.FirstOrDefault(x => x.Name == item.ColName);
                     oracleConnector.GetCommand.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Clob, clobProp.Value, ParameterDirection.Input));
+                    funcParams.Remove(clobProp);
                 }
                 if (item.ColType == "BLOB")
                 {
                     FieldProperties blobProp = funcParams.FirstOrDefault(x => x.Name == item.ColName);
                     oracleConnector.GetCommand.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Blob, blobProp.ByteBody, ParameterDirection.Input));
+                    funcParams.Remove(blobProp);
                 }
 
 
                 if (item.ColType == "S" && item.GetFrom == "FILE_NAME")
                 {
                     UploadFileName fileName = item as UploadFileName;
-                    FieldProperties fileNameProp = additionalParams.FirstOrDefault(x => x.Name == "FileName");
+                    FieldProperties fileNameProp = funcParams.FirstOrDefault(x => x.Name == fileName.ColName);
                     if (fileNameProp != null && !string.IsNullOrEmpty(fileNameProp.Value))
                     {
                         if (fileNameProp.Value.Contains('.') && fileName != null && fileName.WithoutExt)
                             fileNameProp.Value = fileNameProp.Value.Substring(0, fileNameProp.Value.LastIndexOf('.'));
                         oracleConnector.GetCommand.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Varchar2, 4000, fileNameProp.Value, ParameterDirection.Input));
+                        funcParams.Remove(fileNameProp);
                     }
 
                 }
@@ -351,7 +354,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             //return rowData.Where(x => paramsInfo.Contains(x.Name));
             return null;
         }
-        
+
         /// <summary>
         /// Получить словарь из строки вида "ключ1 = значение1, ключ2 = значение2..."
         /// </summary>
@@ -412,10 +415,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     case "REF":
                         // вытянем информацию для построения выпадающего списка
                         string tabName = option.Value;
-                        IReferenceBookRepository repository = new ReferenceBookRepository();
+                        using (IReferenceBookRepository repository = new ReferenceBookRepository())
+                        {
                             // получить tabId
                             //
-                        MetaTable table = repository.GetMetaTableByName(tabName);
+                            MetaTable table = repository.GetMetaTableByName(tabName);
                             if (table == null)
                                 throw new Exception(string.Format("таблиця за іменем {0} не описана в метаопису", tabName));
                             var tabId = table.TABID;
@@ -430,7 +434,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                             paramMetaInfo.SrcTableName = tabName;
                             paramMetaInfo.SrcColName = pkColumn;
                             paramMetaInfo.SrcTextColName = nameColumn;
-                        
+                        }
                         break;
                     case "DEF":
                         paramMetaInfo.DefaultValue = option.Value;
@@ -501,6 +505,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                         break;
                     case "GET_FROM":
                         paramMetaInfo.GetFrom = option.Value;
+                        break;
+                    case "EXT_VALID":
+                        paramMetaInfo.ExtValid = option.Value;
                         break;
                 }
             }
@@ -577,7 +584,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
 
         }
-        
+
 
         private static void AddOptionsFromDictionary(GetFileParInfo paramMetaInfo, Dictionary<string, string> options)
         {
@@ -638,12 +645,15 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
         public static string ReplaceParamsToValuesInSqlString(string sqlString, List<FieldProperties> paramValues)
         {
-
+            string regString = @"(:" + "{0}" + @")\b";
             foreach (var item in paramValues)
             {
                 string resValue = FormatConverter.ConvertFieldValueFromJsToSharpFormat(item);
-                sqlString = sqlString.Replace("|:" + item.Name + "|", resValue);
-                sqlString = sqlString.Replace(":" + item.Name, resValue);
+                //sqlString = sqlString.Replace("|:" + item.Name + "|", resValue);
+                //sqlString = sqlString.Replace(" :" + item.Name + " ", " " + resValue + " ");
+                if (Regex.IsMatch(sqlString, @"(:" + item.Name + @")\b"))
+                    sqlString = Regex.Replace(sqlString, @"(:" + item.Name + @")\b", item.Value);
+
             }
             return sqlString;
         }
@@ -712,11 +722,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 }
             }
 
-
+            BuildFunctionParams(function);
         }
 
 
-        public static List<FieldProperties> ParsConvertParams(CallFunctionMetaInfo func,List<string> semantics)
+        public static List<FieldProperties> ParsConvertParams(CallFunctionMetaInfo func, List<string> semantics)
         {
             char[] denied = new[] { ' ', '\n', '\t', '\r' };
             List<string> semWithoutChs = new List<string>();
@@ -728,8 +738,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     if (!denied.Contains(ch))
                         newString.Append(ch);
                 }
-                semWithoutChs.Add( newString.ToString());
-                
+                semWithoutChs.Add(newString.ToString());
+
             }
             if (string.IsNullOrEmpty(func.CUSTOM_OPTIONS))
                 throw new Exception(string.Format(
@@ -753,7 +763,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 FieldProperties field = convertProp.Find(x => x.Name == semWithoutChs[i]);
                 if (field != null)
                 {
-                    field.ColNum = i +1;
+                    field.ColNum = i + 1;
                     res.Add(field);
                 }
             }

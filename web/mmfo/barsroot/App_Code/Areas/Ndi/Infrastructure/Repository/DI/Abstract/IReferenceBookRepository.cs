@@ -12,10 +12,11 @@ using BarsWeb.Areas.Ndi.Models.DbModels;
 using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
 using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
 using System.Web;
+using BarsWeb.Areas.Ndi.Models.SelectModels;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
 {
-    public interface IReferenceBookRepository 
+    public interface IReferenceBookRepository : IDisposable
     {
         /// <summary>
         /// Выполнить экспорт данных в Excel
@@ -32,8 +33,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         /// <param name="getAllRecords">Экспорт всех строк. Если указано, то игнорируются параметры <see cref="start"/>, <see cref="limit"/></param>
         /// <returns></returns>
         ExcelResulModel ExportToExcel(ExcelDataModel excelDataModel);
+        void BuildResultForExcel(ResultForExcel resForExcel, string tableSemantic, List<ColumnMetaInfo> allShowColumns);
 
-       
         byte [] GetCustomImage();
 
         /// <summary>
@@ -83,9 +84,17 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         /// <exception cref="Exception"></exception>
         /// <returns>Признак успешной операции</returns>
         bool DeleteData(int tableId, string tableName, List<FieldProperties> deletableRow, bool isMultipleProcedure = false);
-
         /// <summary>
-        /// Вызвать произвольную процедуру описанную в таблице META_NSIFUNCTION
+        /// Выполнение процедуры
+        /// </summary>
+        /// <param name="func">описание процедуры, или функции</param>
+        /// <param name="funcParams">данные параметров</param>
+        /// <param name="addParams">дополнительные параметры(вспомогательные), для построения парметров процедуры</param>
+        /// <returns></returns>
+        string CallRefFunction(CallFunctionMetaInfo func, List<FieldProperties> funcParams, List<FieldProperties> addParams = null);
+        /// <summary>
+        /// Вызвать произвольную процедуру описанную в таблице META_NSIFUNCTION(funcid,tableId)
+        /// либо operlist(codeOper),либо meta_columns(columnId,tableId)
         /// </summary>
         /// <param name="tableId">ID таблицы</param>
         /// <param name="funcId">ID функции</param>
@@ -94,7 +103,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         /// <returns>Сообщение о выполнении</returns>
         string CallRefFunction(int? tableId, int? funcId,int? codeOper,int? columnId, List<FieldProperties> jsonFuncParams, 
             string procName = "", string msg = "", string web_form_name = "", string jsonSqlProcParams = "", List<FieldProperties> addParams = null);
-
+        string UploadFile(HttpPostedFileBase postedFile, List<FieldProperties> funcParams, int? tabid, int? funcid, int? codeOper, string code = null);
         string CallParsExcelFunction(HttpPostedFileBase excelFile, List<FieldProperties> inputParams, int? tabid,int? funcid,string code = null);
         string CallEachFuncWithMultypleRows(int? tableId, int? funcId, int? codeOper, int? columnId, MultiRowParamsDataModel dataModel, string funcText = "", string msg = "", string web_form_name = "", CallFunctionMetaInfo callFunc = null);
         /// <summary>

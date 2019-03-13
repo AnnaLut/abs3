@@ -9,7 +9,7 @@ using System.Net;
 using BarsWeb.Core.Logger;
 using Ninject;
 using System.IO;
-
+using BarsWeb.Infrastructure.Helpers;
 namespace BarsWeb.Areas.Reporting.Controllers
 {
     /// <summary>
@@ -170,48 +170,19 @@ namespace BarsWeb.Areas.Reporting.Controllers
         [HttpGet]
         public FileResult GetExcel(string fName)
         {
-            //DataSourceAdapter dataSourceAdapter = new DataSourceAdapter();
-            //WebDatasourceModel datasourceModel = JsonToObject<WebDatasourceModel>(gridData) ?? new WebDatasourceModel();
-            //var req = dataSourceAdapter.ParsDataSours(datasourceModel);
-
-            //List<Columns> columns = new List<Columns>();
-
-            //string vn = _repository.GetViewName(Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), true);
-            //List<AllColComments> tc = _repository.GetTableComments(vn);
-
-            //List<string[]> title = new List<string[]>();
-            //foreach (AllColComments col in tc)
-            //{
-            //    if (col.COLUMN_NAME != "DESCRIPTION")
-            //    {
-            //        title.Add(new string[] { col.COLUMN_NAME, col.COMMENTS });
-            //    }                
-            //}
-            //AllColComments columnDesc = tc.Find((col)=>col.COLUMN_NAME == "DESCRIPTION");
-            //if (columnDesc != null)
-            //{   
-            //    title.Add(new string[] { columnDesc.COLUMN_NAME, columnDesc.COMMENTS });  // put comments to the end of list
-            //}
-
-            //List<Dictionary<string, object>> res = _repository.GetDetailedReportDyn(req, vn, Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode);
-
-            //List<TableInfo> ti = _repository.GetTableInfo(vn);
-
-            //var exel = new ExcelHelpers<List<Dictionary<string, object>>>(res, title, ti, null);
-
-            // todo: add filters and sorts
-            //List<DetailedReport> res = _repository.GetDetailedReportList(Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode);
-            //var exel = new ExcelHelpers<DetailedReport>(res, true);
 
 
-            
+            string tempDirName = System.IO.Path.GetDirectoryName(fName);
+            FileResult result;
+
             if (string.IsNullOrEmpty(fName) || !System.IO.File.Exists(fName))
             {
                 return File(Encoding.UTF8.GetBytes(string.Format("Файл не знайдено {0}", fName)), "text/plain", "ExceptionGetFile.txt");
             }
+            string ext = fName.Substring(fName.LastIndexOf('.'));
             try
             {
-                string ext = fName.Substring(fName.LastIndexOf('.'));
+
                 switch (ext)
                 {
                     case ".zip":
@@ -221,8 +192,6 @@ namespace BarsWeb.Areas.Reporting.Controllers
                     default:
                         return File(System.IO.File.ReadAllBytes(fName), "attachment", DETAILED_FILE);
                 }
-                
-                    
 
             }
             catch (Exception ex)
@@ -233,7 +202,10 @@ namespace BarsWeb.Areas.Reporting.Controllers
             }
             finally
             {
-                System.IO.File.Delete(fName);
+                if (ext.Contains(".zip") || ext.Contains(".csv"))
+                    BaseIOHelper.DeleteDir(tempDirName);
+                else
+                    System.IO.File.Delete(fName);
 
             }
 
