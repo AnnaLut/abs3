@@ -375,13 +375,13 @@ function utf8todeflang(p_clob in    clob) return clob is
           if l_sybsidy_list(i).paytype = 1 then
             if substr(l_sybsidy_list(i).receiveraccnum, 1, 4) = '2603' then
               l_tt := 'SM3';
-            elsif substr(l_mfo,2,6) != l_sybsidy_list(i).receiverbankcode then
+            elsif substr(l_mfo,1,6) != l_sybsidy_list(i).receiverbankcode then
               l_tt := 'RSM';
             else
               l_tt := 'SM1';
             end if;
           elsif l_sybsidy_list(i).paytype = 2 then
-            if substr(l_mfo,2,6) != l_sybsidy_list(i).receiverbankcode then
+            if substr(l_mfo,1,6) != l_sybsidy_list(i).receiverbankcode then
               l_tt := 'PXR';
             else
               l_tt := 'PXS';

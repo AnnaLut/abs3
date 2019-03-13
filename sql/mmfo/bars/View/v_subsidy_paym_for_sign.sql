@@ -2,7 +2,7 @@ create or replace view v_subsidy_paym_for_sign as
 select o.ref
   from oper o,
        subsidy_data sd 
- where o.sos!=5
+ where o.sos not in (5, -1, -2)
    and sd.ref = o.ref
    and not exists (select 1 
                      from oper_visa ov
