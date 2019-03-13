@@ -59,6 +59,6 @@ public class FSaveModel
     public decimal? P_REPO { get; set; }
     
     public string IFRS { get; set; }
-    public decimal BUS_MOD { get; set; }
-    public byte SPPI { get; set; }
+    public decimal? BUS_MOD { get; set; }
+    public byte? SPPI { get; set; }
 }
