@@ -176,7 +176,7 @@ function OnConfirmClick(value) {
 }
 
 /// Оповещения
-function showNotification(text, errType, info) {
+function showNotification(text, errType, info, hidePreloader) {
     if (errType === 'error') {
         text = text === '' ? 'Виникла помилка при виконанні операції, зверніться будь ласка до адміністратора' : text;
         $('#teller-notify-head-text').addClass('teller-error-txt').text('Помилка');
@@ -189,7 +189,7 @@ function showNotification(text, errType, info) {
     $('#teller-notofication-txt').html('');
     $('#teller-notofication-txt').append($.parseHTML(text));
     showHide.showHideElements(['#teller-notification-window'], 'block');
-    if ($('#atm-window').length || $('#technical-buttons-window').length || $('#encashment-window').length || $('#teller-carrying-out-window').length)
+    if ($('#atm-window').length || $('#technical-buttons-window').length || $('#encashment-window').length || $('#teller-carrying-out-window').length || hidePreloader === false)
         showHide.hidePreloaderItems();
     else
         showHide.hidePreloader();
@@ -660,9 +660,13 @@ function activateTeller(activate) {
         url: '/barsroot/api/teller/teller/setteller',
         data: JSON.stringify({ IsTeller: activate }),
         success: function (result) {
-            showHide.hidePreloaderItems();
-            $('#main').loader();
-            document.location.href = document.location.href;
+            //$('#main').loader();
+            if (result)
+                showNotification(result, 'error', null, false);
+            else {
+                showHide.hidePreloader();
+                window.location = '/barsroot/account/login/';
+            }
         },
         error: DefaultError
     });
