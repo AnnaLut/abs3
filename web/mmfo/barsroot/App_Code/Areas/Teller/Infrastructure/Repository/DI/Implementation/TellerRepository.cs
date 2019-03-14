@@ -42,6 +42,16 @@ namespace BarsWeb.Areas.Teller.Infrastructure.DI.Implementation
         }
 
         /// <summary>
+        /// Выход пользователя
+        /// </summary>
+        public void BarsLogout()
+        {
+            String command = "bars_login.logout_user";
+            Object[] parameters = new Object[0];
+            OracleRequest(command, parameters);
+        }
+
+        /// <summary>
         /// Проверка суммы
         /// </summary>
         /// <param name="sum"></param>

@@ -26,9 +26,27 @@ namespace BarsWeb.Areas.Teller.Controllers.Api
         [HttpPost]
         public HttpResponseMessage SetTeller(TellerData o)
         {
-            _repo.SetTeller(o.IsTeller);
-            HttpContext.Current.Response.Cookies.Add(new HttpCookie("ASP.NET_SessionId", ""));
-            return Request.CreateResponse(HttpStatusCode.OK, new { });
+            String result = String.Empty;
+            try
+            {
+                _repo.SetTeller(o.IsTeller);
+            }
+            catch(Exception e)
+            {
+                if (e.Message.Contains("ORA-20100: Teller_Tools.SET_TELLER. Помилка при роботі: ORA-20100: УВАГА Можливість повторної активації теллера в банківському дні"))
+                {
+                    String bankDate = _repo.GetBankDate();
+                    result = String.Format("УВАГА Можливість повторної активації теллера в банківському дні {0} заборонена!", bankDate);
+                }
+                else
+                    result = e.Message;
+            }
+            if (String.IsNullOrEmpty(result))
+            {
+                _repo.BarsLogout();
+                HttpContext.Current.Response.Cookies.Add(new HttpCookie("ASP.NET_SessionId", ""));
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
         [HttpPost]

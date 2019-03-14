@@ -16,6 +16,11 @@ namespace BarsWeb.Areas.Teller.Infrastructure.DI.Abstract
         void SetTeller(bool isTeller);
 
         /// <summary>
+        /// Убить сессию!
+        /// </summary>
+        void BarsLogout();
+
+        /// <summary>
         /// Проверка суммы
         /// </summary>
         /// <param name="sum"></param>
