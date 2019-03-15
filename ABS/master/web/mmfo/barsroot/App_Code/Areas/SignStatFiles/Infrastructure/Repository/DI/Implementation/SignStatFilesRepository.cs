@@ -5,6 +5,7 @@ using BarsWeb.Areas.Kernel.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.Kernel.Models;
 using BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.SignStatFiles.Models;
+using BarsWeb.Core.Logger;
 using BarsWeb.Core.Models;
 using BarsWeb.Models;
 using ICSharpCode.SharpZipLib.Zip;
@@ -127,8 +128,10 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
 
                 if (UseIIT())
                 {
+                    string _res = "";
                     SignMaker sm = new SignMaker();
-                    p7sEnvelope = sm.Make(fileData, HexToByteArray(operation.Sign));
+                    p7sEnvelope = sm.Make(fileData, HexToByteArray(operation.Sign), out _res);
+                    DbLoggerConstruct.NewDbLogger().Info("IIT_LIB_RESULT_CODES " + _res, "SignStatFiles");
                 }
                 else
                 {
