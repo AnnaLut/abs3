@@ -136,11 +136,17 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
                     p7sEnvelope = p7sMaker.Make(HexToByteArray(operation.Sign), fileData);
                 }
 
-                string p7sEnvelopeStr = Convert.ToBase64String(p7sEnvelope);
-                operation.Sign = p7sEnvelopeStr;
-            }
+                if (null == p7sEnvelope || 0 == p7sEnvelope.Length) throw new Exception("Помилка формування p7s конверту");
 
-            SetFileOperationInDb(operation);
+                //string p7sEnvelopeStr = Convert.ToBase64String(p7sEnvelope);
+                //operation.Sign = p7sEnvelopeStr;
+
+                SetFileOperationInDb(operation, p7sEnvelope);
+            }
+            else
+            {
+                SetFileOperationInDb(operation);
+            }
         }
 
         private bool UseIIT()
@@ -165,8 +171,10 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
             return bytes;
         }
 
-        private void SetFileOperationInDb(FileOperation operation)
+        private void SetFileOperationInDb(FileOperation operation, byte[] cadesSign = null)
         {
+            bool isCades = null == cadesSign ? false : true;
+
             using (OracleConnection con = OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = con.CreateCommand())
             {
@@ -174,7 +182,8 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add(new OracleParameter("p_file_id", OracleDbType.Decimal, operation.FileId, ParameterDirection.Input));
                 cmd.Parameters.Add(new OracleParameter("p_oper_id", OracleDbType.Decimal, operation.OperationId, ParameterDirection.Input));
-                cmd.Parameters.Add(new OracleParameter("p_sign", OracleDbType.Clob, operation.Sign, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_sign", OracleDbType.Clob, isCades ? null : operation.Sign, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_envelope", OracleDbType.Blob, isCades ? cadesSign : null, ParameterDirection.Input));
                 cmd.Parameters.Add(new OracleParameter("p_reverse", OracleDbType.Decimal, operation.Reverse, ParameterDirection.Input));
 
                 cmd.ExecuteNonQuery();
@@ -286,7 +295,7 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
         {
             using (OracleConnection con = OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = con.CreateCommand())
-            using (OracleParameter pSign = new OracleParameter("p_sign", OracleDbType.Clob, ParameterDirection.Output))
+            using (OracleParameter pSign = new OracleParameter("p_sign", OracleDbType.Blob, ParameterDirection.Output))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "pkg_stat.get_last_sign";
@@ -296,14 +305,21 @@ namespace BarsWeb.Areas.SignStatFiles.Infrastructure.DI.Implementation
 
                 cmd.ExecuteNonQuery();
 
-                using (OracleClob _signClob = (OracleClob)pSign.Value)
+                using (OracleBlob _signBlob = (OracleBlob)pSign.Value)
                 {
-                    if (_signClob.IsNull || _signClob.IsEmpty) throw new Exception("Підписаний конверт пустий або відсутній.");
+                    if (_signBlob.IsNull || _signBlob.IsEmpty) throw new Exception("Підписаний конверт пустий або відсутній.");
 
-                    string signStr = _signClob.Value;
-                    return Convert.FromBase64String(signStr);
-                    //return Encoding.GetEncoding(1251).GetBytes(signStr);
+                    return _signBlob.Value;
                 }
+
+                //using (OracleClob _signClob = (OracleClob)pSign.Value)
+                //{
+                //    if (_signClob.IsNull || _signClob.IsEmpty) throw new Exception("Підписаний конверт пустий або відсутній.");
+
+                //    string signStr = _signClob.Value;
+                //    return Convert.FromBase64String(signStr);
+                //    //return Encoding.GetEncoding(1251).GetBytes(signStr);
+                //}
             }
         }
 
