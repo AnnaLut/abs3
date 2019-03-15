@@ -203,6 +203,9 @@ begin
 
 ', '', 'EACH', 'Вилучити учасника :NMK1 ?', 'Всі параметри угоди відмінено !', '', '', '', 5);
 
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 11, 'Переформування форвардних проводок', 'ovrn.reamort_3600(:ACC)', '', 'EACH', 'Переформувати?', 'Переформовано!', '', '', '', null);
+
   -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'MDATE');
   if (l_newcolid is not null) then

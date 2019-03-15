@@ -46,5 +46,7 @@ namespace BarsWeb.Areas.Way.Models
         public string ERR_TEXT { get; set; }
         public string URL { get; set; }
         public decimal? FAILURES_COUNT { get; set; }
+
+        public decimal? Doc_DRN { get; set; }
     }
 }

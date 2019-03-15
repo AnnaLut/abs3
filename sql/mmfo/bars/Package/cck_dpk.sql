@@ -1798,7 +1798,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     end if;
 
     -- 28.03.2014 Sta Модификация с уменьшением срока
-    select max(fdat) into Datk_new from tmp_gpk;
+    select max(fdat) into Datk_new from tmp_gpk where (nvl(lim2,0) + nvl(sumg,0)) > 0;
+--    select max(fdat) into Datk_new from tmp_gpk;
     if Datk_new < Datk_ then
       update cc_deal set wdate = Datk_new where nd = p_ND;
       for k in (select a.acc
@@ -1920,7 +1921,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
         dat_end date;
         dd      cc_deal%rowtype;
       begin
-        select max(fdat) into dat_end from cc_lim where nd = L_nd;
+        select max(fdat) into dat_end from cc_lim where nd = L_nd and (nvl(sumg,0) + nvl(lim2,0))>0;
         select * into dd from cc_deal where nd = L_nd;
         if dd.wdate <> dat_end then
           update cc_deal set wdate = dat_end where nd = L_nd;

@@ -57,11 +57,13 @@ namespace BarsWeb.Infrastructure.Helpers
             Create(childrenProperty, isAttributeName, header);
         }
 
-        public ExcelHelpers(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string header)
+
+        // isTotalAmount - якщо true, то додаються пілдсумкові строки "баланс", які містять суму всіх попередніх значень в документ для звітів "@12"
+        public ExcelHelpers(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string header, bool isTotalAmount=false)
         {
             _package = new ExcelPackage();
-
-            AddWorksheetDict(objects, title, ti, "");
+            
+            AddWorksheetDict(objects, title, ti, "", isTotalAmount: isTotalAmount);
         }
 
         public ExcelHelpers(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string header, List<string> docHat, string query="")
@@ -209,17 +211,15 @@ namespace BarsWeb.Infrastructure.Helpers
             }
         }
 
-        public void AddWorksheetDict(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string name = "")
+        // isTotalAmount - якщо true, то додаються пілдсумкові строки "баланс", які містять суму всіх попередніх значень в документ для звітів "@12"
+        public void AddWorksheetDict(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string name = "", List<string> headers = null, string query="", bool isTotalAmount = false)
         {
-            WorksheetDict(objects, title, ti, name, null);
+            WorksheetDict(objects, title, ti, name, headers, query, isTotalAmount);
         }
 
-        public void AddWorksheetDict(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string name = "", List<string> headers = null, string query="")
-        {
-            WorksheetDict(objects, title, ti, name, headers, query);
-        }
 
-        void WorksheetDict(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string name = "", List<string> headers = null, string query="")
+        // isTotalAmount - якщо true, то додаються пілдсумкові строки "баланс", які містять суму всіх попередніх значень в документ для звітів "@12"
+        void WorksheetDict(List<Dictionary<string, object>> objects, List<string[]> title, List<TableInfo> ti, string name = "", List<string> headers = null, string query="", bool isTotalAmount=false)
         {
 
 
@@ -285,15 +285,178 @@ namespace BarsWeb.Infrastructure.Helpers
                     worksheet.Column(i + 1).Style.Numberformat.Format = columnFormat;
                 }
 
-                for (int y = 0; y < objects.Count(); y++)
+                if (isTotalAmount==false)   //просто формуємо Excel документ
                 {
-                    for (int x = 0; x < title.Count; x++)
+                    for (int y = 0; y < objects.Count(); y++)
                     {
-                        object value = objects[y][title[x][0]];
-                        worksheet.Cells[y + 1 + 1 + verticalOffset, x + 1].Value = value;
-                        worksheet.Cells[y + 1 + 1 + verticalOffset, x + 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                        for (int x = 0; x < title.Count; x++)
+                        {
+
+                            object value = objects[y][title[x][0]];
+                            worksheet.Cells[y + 1 + 1 + verticalOffset, x + 1].Value = value;
+                            worksheet.Cells[y + 1 + 1 + verticalOffset, x + 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                        }
                     }
                 }
+
+                #region для звітів "@12" додаються підсумкові строки "баланс", які містять суму всіх попередніх значень в Excel документ
+                else // для звітів "@12" додаються підсумкові строки "баланс", які містять суму всіх попередніх значень в Excel документ
+                {
+                    System.Int32 field_Code = 0;  // значення поля "символ касових оборотів"
+
+                    System.Int64 balance = 0;    
+                    System.Int64 Amount = 0;   //підсумкова сума всіх значень поля "значення показника" по "символу касових оборотів" з 02 по 39 
+
+                    System.Int64 balance35 = 0;
+                    System.Int64 fieldCode35Amount = 0; //підсумкова сума всіх значень поля "значення показника" по "символу касових оборотів" 35
+
+                    System.Boolean isBalanceApplied = false;
+
+                    System.Int64 balance2 = 0;
+                    System.Int64 Amount2 = 0;  //підсумкова сума всіх значень поля "значення показника" по "символу касових оборотів" з 40 по 73
+
+                    System.Int64 balance70 = 0;
+                    System.Int64 fieldCode70Amount = 0;   //підсумкова сума всіх значень поля "значення показника" по "символу касових оборотів" 70
+
+                    for (int y = 0; y < objects.Count(); y++)
+                    {
+
+                        var code = objects[y][title[4][0]];
+                        field_Code = System.Int32.Parse(code as string);
+
+                        if (field_Code >= 2 && field_Code <= 39)
+                        {
+                            var sum = objects[y][title[6][0]] as string; //значення поля "значення показника"
+                            balance = System.Int64.Parse(sum); 
+                            Amount += balance;
+
+                            if(field_Code == 35)
+                            {
+                                var sumOfFieldCode35 = objects[y][title[6][0]] as string;
+                                balance35 = System.Int64.Parse(sumOfFieldCode35);
+                                fieldCode35Amount += balance35;
+                            }
+
+                            for (int x = 0; x < title.Count; x++)
+                            {
+                                object value = objects[y][title[x][0]];
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, x + 1].Value = value;
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, x + 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                            }
+                        }
+                        else if (field_Code > 39)
+                        {
+                            if (!isBalanceApplied)
+                            {
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 1].Value = "Баланс";
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Orange);
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 1].Style.Font.Bold = true;
+
+                                for (int x = 2; x < 7; x++)
+                                {
+                                    
+                                    worksheet.Cells[y + 1 + 1 + verticalOffset, x].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                                    worksheet.Cells[y + 1 + 1 + verticalOffset, x].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                                    worksheet.Cells[y + 1 + 1 + verticalOffset, x].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Orange);
+                                }
+
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 7].Value = Amount;
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 7].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 7].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 7].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Orange);
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 7].Style.Font.Bold = true;
+
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 8].Value = "Сума всіх символів по приходу (з 02 по 39)";
+                                worksheet.Cells[y + 1 + 1 + verticalOffset, 8].Style.Font.SetFromFont(new System.Drawing.Font("Times New Roman", 8));
+
+
+
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 1].Value = "Всього по приходу:";
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 1].Style.Font.Bold = true;
+
+                                for (int x = 2; x < 7; x++)
+                                {
+                                    worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, x].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                                }
+
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 7].Value = Amount- fieldCode35Amount;
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 7].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 7].Style.Font.Bold = true;
+
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 8].Value = "Сума символів по приходу (з 02 по 39)-35";
+                                worksheet.Cells[y + 1 + 1 + 1 + verticalOffset, 8].Style.Font.SetFromFont(new System.Drawing.Font("Times New Roman", 8));
+
+                                isBalanceApplied = true;
+                            }
+
+                            var sum2 = objects[y][title[6][0]] as string;
+                            balance2 = System.Int64.Parse(sum2);
+                            Amount2 += balance2;
+
+                            if (field_Code == 70)
+                            {
+                                var sumOfFieldCode70 = objects[y][title[6][0]] as string;
+                                balance70 = System.Int64.Parse(sumOfFieldCode70);
+                                fieldCode70Amount += balance70;
+                            }
+
+                            for (int x = 0; x < title.Count; x++)
+                            {
+                                object value = objects[y][title[x][0]];
+                                worksheet.Cells[y + 1 + 1 + 1 + 1 + verticalOffset, x + 1].Value = value;
+                                worksheet.Cells[y + 1 + 1 + 1 + 1 + verticalOffset, x + 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                            }
+
+                        }
+                    }
+
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 1].Value = "Баланс";
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Orange);
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 1].Style.Font.Bold = true;
+
+                    for (int x = 2; x < 7; x++)
+                    {
+
+                        worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, x].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                        worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, x].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                        worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, x].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Orange);
+                    }
+
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 7].Value = Amount2;
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 7].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 7].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 7].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Orange);
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 7].Style.Font.Bold = true;
+
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 8].Value = "Сума всіх символів по приходу (з 40 по 73)";
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + verticalOffset, 8].Style.Font.SetFromFont(new System.Drawing.Font("Times New Roman", 8));
+
+
+
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 1].Value = "Всього по видатку:";
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 1].Style.Font.Bold = true;
+
+                    for (int x = 2; x < 7; x++)
+                    {
+                        worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, x].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    }
+
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 7].Value = Amount2 - fieldCode70Amount;
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 7].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 7].Style.Font.Bold = true;
+
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 8].Value = "Сума символів по приходу (з 40 по 73)-70";
+                    worksheet.Cells[objects.Count() + 1 + 1 + 1 + 1 + 1 + verticalOffset, 8].Style.Font.SetFromFont(new System.Drawing.Font("Times New Roman", 8));
+
+                }
+                #endregion
+
 
                 worksheet.Column(1).Width = 19.29;
 

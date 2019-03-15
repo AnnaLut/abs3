@@ -1,0 +1,64 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/Scripts/respond.min.js?22_06_2018__09_37_20"></script>
+<script src="~/Areas/NbuIntegration/Scripts/CommonJS.js?22_06_2018__09_37_20"></script>
+<script src="~/Areas/NbuIntegration/Scripts/Sago/DateSelectForm.js?22_06_2018__09_37_20"></script>
+<script src="~/Areas/NbuIntegration/Scripts/Sago/ShowSimpleWindow.js?22_06_2018__09_37_20"></script>
+
+<script src="~/Areas/NbuIntegration/Scripts/Sago/Main.js?22_06_2018__09_37_20"></script>
+<link rel="stylesheet" href="~/Areas/NbuIntegration/Css/Sago/Main.css?22_06_2018__09_37_20" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div id="toolbox">
+    <div class="btn-group">
+        <button id="btnRefresh" type="button" class="k-button" title="Оновити"><i class="pf-icon pf-16 pf-reload_rotate"></i> Оновити</button>
+        <button id="btnImportDocuments" type="button" class="k-button" title="Виконати імпорт даних"><i class="pf-icon pf-16 pf-add"></i> Імпортувати документи</button>
+    </div>
+</div>
+
+<div class="grid-title-div">
+    <div style="float:left;">
+        <div class="inlineBlock">
+            <label class="k-label" for="date_from_receivedDocsGrid">З</label>
+            <input id="date_from_receivedDocsGrid" maxlength="10" />
+        </div>
+        <div class="inlineBlock">
+            <label class="k-label" for="date_to_receivedDocsGrid">По</label>
+            <input id="date_to_receivedDocsGrid" maxlength="10" />
+        </div>
+
+        <div class="inlineBlock invisible" style="float:right;">
+            <label class="k-label" for="filterByImports">Фільтр по реєстру</label>
+            <input id="filterByImports" title="Фільтрувати документи по реєстру" />
+        </div>
+
+        <button type="button" class="k-button" title="Застосувати фільтр по періоду до 'Реєстру документів'" onclick="filterGrid('receivedDocsGrid');"><i class="pf-icon pf-16 pf-filter-ok"></i></button>
+    </div>
+
+    <label class="k-label grid-title" id="receivedDocumentsGridTitle">Реєстр отриманих документів</label>
+</div>
+<div id="receivedDocsGrid"></div>
+<br />
+<div class="grid-title-div">
+    <div style="float:left;">
+        <div class="inlineBlock">
+            <label class="k-label" for="date_from_importsGrid">З</label>
+            <input id="date_from_importsGrid" maxlength="10" />
+        </div>
+        <div class="inlineBlock">
+            <label class="k-label" for="date_to_importsGrid">По</label>
+            <input id="date_to_importsGrid" maxlength="10" />
+        </div>
+        <button type="button" class="k-button" title="Застосувати фільтр по періоду до 'Реєстру запитів'" onclick="filterGrid('importsGrid');"><i class="pf-icon pf-16 pf-filter-ok"></i></button>
+    </div>
+
+    <label class="k-label grid-title" id="importsGridTitle">Реєстр запитів</label>
+</div>
+<div id="importsGrid"></div>
+
+<div class="search-main"></div>

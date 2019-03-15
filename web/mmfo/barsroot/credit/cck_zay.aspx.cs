@@ -111,6 +111,7 @@ select c.okpo
 , c.date_off
 , c.Prinsider
 , cw.value
+                                , c.crisk
 from customer c 
 left join customerw cw
 on (c.rnk = cw.rnk
@@ -141,6 +142,11 @@ where c.rnk = :p_rnk";
                     (FindControl(BaseID + "FIO") as TextBox).Text = "";
 
                     ShowError("Клієнт (" + RNK.ToString() + ") закритий");
+                }
+
+                if (rdr["crisk"] != DBNull.Value && NFIN.Items.Count > Convert.ToInt32(rdr["crisk"].ToString())) //crisk = 10
+                {
+                    NFIN.SelectedIndex = Convert.ToInt32(rdr["crisk"].ToString());
                 }
 
                 if (!btSend.Enabled)
@@ -537,6 +543,8 @@ where c.rnk = :p_rnk";
     protected override void OnPreRender(EventArgs e)
     {
         BindControls();
+        Panel_SumComObsl.Visible = Request.Params.Get("CUSTTYPE") == "3";                               //Комісія за обслуговування кредиту тільки для ФО також
+        attrSDI.GroupingText = Request.Params.Get("CUSTTYPE") == "3" ? "Разова комісія за надання кредиту" : "Одноразова комісія";
 
         base.OnPreRender(e);
     }
@@ -614,12 +622,13 @@ where c.rnk = :p_rnk";
             if (!IsPostBack)
             {
                 DataTable dtNFIN = new DataTable();
-                cmd.CommandText = "select fin as id, fin || ' - ' || name as name from stan_fin";
+                cmd.CommandText = "select fin as id, fin || ' - ' || name as name from stan_fin order by fin";
                 adr.Fill(dtNFIN);
 
                 NFIN.DataSource = dtNFIN;
                 NFIN.DataValueField = "ID";
                 NFIN.DataTextField = "NAME";
+                NFIN.SelectedIndex = 1;
                 NFIN.DataBind();
             }
 
@@ -708,6 +717,8 @@ where c.rnk = :p_rnk";
                 PAWN5.DataValueField = "ID";
                 PAWN5.DataTextField = "NAME";
                 PAWN5.DataBind();
+
+                PAWN.Width = PAWN2.Width = PAWN3.Width = PAWN4.Width = PAWN5.Width = 400;
             }
 
             // Порука
@@ -749,6 +760,8 @@ where c.rnk = :p_rnk";
                 PAWNP5.DataValueField = "ID";
                 PAWNP5.DataTextField = "NAME";
                 PAWNP5.DataBind();
+
+                PAWNP.Width = PAWNP2.Width = PAWNP3.Width = PAWNP4.Width = PAWNP5.Width = 400;
             }
         }
         finally
@@ -1016,6 +1029,16 @@ where c.rnk = :p_rnk";
                                                         :nBANK4,:NLS4,:NLS_NAME4,:NLS_OKPO4,
                                                         :nBANK5,:NLS5,:NLS_NAME5,:NLS_OKPO5, :CREDIT_ORDER);
                                     end;");
+
+                if (SumComObsl.Value.HasValue) {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = @"bars.cck_app.set_nd_txt";
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("p_ND", OracleDbType.Decimal, ND, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_TAG", OracleDbType.Varchar2, "S_S36", ParameterDirection.Input);
+                    cmd.Parameters.Add("p_TXT", OracleDbType.Varchar2, SumComObsl.Value.ToString(), ParameterDirection.Input);
+                    cmd.ExecuteNonQuery();
+                }
             }
             finally
             {

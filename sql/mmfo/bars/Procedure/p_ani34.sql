@@ -1,9 +1,12 @@
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_ani34.sql =========*** Run *** =
- PROMPT ===================================================================================== 
- 
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ANI34.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_ANI34 ***
+
   CREATE OR REPLACE PROCEDURE BARS.P_ANI34 (
    p_mode int ,  -----------         ------|34 = № 3. Фін.результат за період по похідним фін.інструментам
                                      ------|35 = № 3` Фінансовий результат за період по "коротким" Форекс-угодам   COBUMMFO-4428
@@ -85,8 +88,10 @@
                          sum(t.suma2) suma2,
                          min(t.KVb) KVb,
                          sum(t.sumb1) sumb1,
-                         sum(t.sumb2) sumb2
-                    from (select forex.get_forextype3(x.DEAL_TAG) kod,
+                         sum(t.sumb2) sumb2,
+                         w.value as initiator --MDom COBUMMFO-10773 2019.02.04
+                    from (select x.ref,
+                                 forex.get_forextype3(x.DEAL_TAG) kod,
                                  nvl(x.swap_tag, x.deal_tag) tag1,
                                  x.dat,
                                  x.ntik,
@@ -103,20 +108,38 @@
                            where NVL(l_tag, 0) in (0, x.swap_tag, x.deal_tag)
                              and greatest(x.dat_a, x.dat_b) >= l_dat1
                              and least(x.dat_a, x.dat_b) <= l_dat2) t
+                    left join operw w on w.ref = t.ref and w.tag = 'CP_IN' --MDom COBUMMFO-10773 2019.02.04
                    where t.kod like '_.SWAP\_%' escape '\' or t.kod = 'FORWARD'
                    group by upper(substr(case instr(t.kod, '_')
-                                        when 0 then t.kod
-                                        else substr(t.kod, 1, instr(t.kod, '_')-1)
-                                      end, 1, 9)), t.tag1, t.dat, t.ntik, t.rnk;
+                                           when 0 then t.kod
+                                           else substr(t.kod, 1, instr(t.kod, '_')-1)
+                                         end, 1, 9)),
+                            t.tag1, t.dat, t.ntik, t.rnk, w.value;
  
    -----------------------------------------------
-   CURSOR C_35 IS select X.kod, x.deal_tag,  x.dat, x.ntik,  x.rnk,  x.dat_a, x.dat_b, x.KVA,  x.suma, x.kvb, x.sumb, x.ref
-                    from (SELECT forex.get_forextype3 (xx.DEAL_TAG) KOD,  XX.*
-                 -- forex.get_forextype (dat,dat_a,dat_b) KOD,  XX.*
-                        FROM fx_deal XX
-                        WHERE nvl(xx.SWAP_TAG,0)=0 AND  NVL(l_tag,0) in (0, XX.deal_tag ) AND XX.SOS >0  and   least (xx.dat_a, xx.dat_b) <= l_dat2  and greatest (xx.dat_a, xx.dat_b) >= l_dat1
-                       ) x
-                  WHERE KOD IN ('TOD','SPOT') ;
+   CURSOR C_35 IS select x.kod,
+                         x.deal_tag,
+                         x.dat,
+                         x.ntik,
+                         x.rnk,
+                         x.dat_a,
+                         x.dat_b,
+                         x.KVA,
+                         x.suma,
+                         x.kvb,
+                         x.sumb,
+                         x.ref,
+                         w.value
+                    from (select forex.get_forextype3(xx.DEAL_TAG) KOD, XX.*
+                                 --forex.get_forextype(dat, dat_a, dat_b) KOD, XX.*
+                            from fx_deal XX
+                           where nvl(xx.SWAP_TAG, 0) = 0
+                             and nvl(l_tag, 0) in (0, XX.deal_tag)
+                             and XX.SOS > 0
+                             and least(xx.dat_a, xx.dat_b) <= l_dat2
+                             and greatest(xx.dat_a, xx.dat_b) >= l_dat1) x
+                    left join operw w on w.ref = x.ref and w.tag = 'CP_IN' --MDom COBUMMFO-10773 2019.02.04
+                   where KOD IN ('TOD', 'SPOT');
    -----------------------------------------------
  
    ------------
@@ -163,10 +186,10 @@
    end if;
    LOOP
       If    p_mode = 34 then
-        FETCH C_34 into Z_KOD, Z_tag1, /*Z_noga, */Z_dat, Z_ntik, Z_rnk, Z_dat_M, Z_dat_X, Z_KVA, Z_suma1, Z_suma2, Z_KVb, Z_sumb1, Z_sumb2;
+        FETCH C_34 into Z_KOD, Z_tag1, /*Z_noga, */Z_dat, Z_ntik, Z_rnk, Z_dat_M, Z_dat_X, Z_KVA, Z_suma1, Z_suma2, Z_KVb, Z_sumb1, Z_sumb2, tmp.g23;
         EXIT WHEN c_34%NOTFOUND;
       ElsIf p_mode = 35 then
-        FETCH C_35 into Z_KOD, Z_tag1,             Z_dat, Z_ntik, Z_rnk, Z_dat_M, Z_dat_X, Z_KVA, Z_suma1,          Z_KVb, Z_sumb1, z_Ref  ;
+        FETCH C_35 into Z_KOD, Z_tag1,             Z_dat, Z_ntik, Z_rnk, Z_dat_M, Z_dat_X, Z_KVA, Z_suma1,          Z_KVb, Z_sumb1, z_Ref, tmp.g23;
         EXIT WHEN c_35%NOTFOUND;
       else
         RETURN ;
@@ -214,7 +237,7 @@
               tmp.G13 := 0;
             end if;
  
-            insert into tmp_ani34(B, E, G01, G02, G03, G04, G05, G06, G07, G08, G08a, G08b, G09, G10, G11, G12, G13, G14, G15, G16, G17, G18, G19, G20, G21, G22)
+            insert into tmp_ani34(B, E, G01, G02, G03, G04, G05, G06, G07, G08, G08a, G08b, G09, G10, G11, G12, G13, G14, G15, G16, G17, G18, G19, G20, G21, G22, G23)
             select l_dat1,
                    l_dat2,
                    --COBUMMFO-8184 MDom 2018.10.25 закоментував та написав новий decode нижче (виправлення пункту 1)
@@ -247,46 +270,48 @@
                    (tmp.G13+tmp.G14+tmp.G16+tmp.G17)/100,
                    (tmp.G15+tmp.G18)/100,
                    (tmp.G13+tmp.G14+tmp.G15+tmp.G16+tmp.G17+tmp.G18)/100,
-                   CASE WHEN z_dat_X <= l_dat2 THEN 'Завершена' ELSE 'Відкрита' END g22
+                   CASE WHEN z_dat_X <= l_dat2 THEN 'Завершена' ELSE 'Відкрита' END g22,
+                   tmp.g23
               from customer where rnk = Z_rnk ;
- 
+   
          elsIf p_mode = 35 then
- 
-            insert into tmp_ani34 (B,E,G01,G02,G03,G04,G05,G06,G07, G08,G08a,G08b, G11,G12,  G14,G15, G19, G22, g13 )
-            select l_dat1, l_dat2 , z_kod G01, z_tag1 G02, z_ntik g03, z_rnk g04, substr(nmk,1,70) g05, z_dat g06,
+   
+            insert into tmp_ani34(B, E, G01, G02, G03, G04, G05, G06, G07, G08, G08a, G08b, G11, G12, G14, G15, G19, G22, g13, g23)
+            select l_dat1, l_dat2, z_kod G01, z_tag1 G02, z_ntik g03, z_rnk g04, substr(nmk,1,70) g05, z_dat g06,
                    z_dat_m g07,
                    z_dat_X g08,
                    z_KVA g08a, z_KVb g08b,
-                   z_suma1/100 g11, z_sumb1/100 g12, tmp.G14/100 g14, tmp.G15/100 g15,  (tmp.G14+tmp.G15)/100 g19, CASE WHEN z_dat_X <= l_dat2 THEN 'Завершена' ELSE 'Відкрита' END g22, z_ref g13
+                   z_suma1/100 g11, z_sumb1/100 g12, tmp.G14/100 g14, tmp.G15/100 g15, (tmp.G14+tmp.G15)/100 g19,
+                   CASE WHEN z_dat_X <= l_dat2 THEN 'Завершена' ELSE 'Відкрита' END g22, z_ref g13,
+                   tmp.g23
             from customer where rnk = Z_rnk ;
- 
+   
          else RETURN;
          end if;
       end if;
- 
-   end loop ; -- z
- 
-   If    p_mode = 34 then close C_34 ;
-   elsIf p_mode = 35 then close C_35 ;
+   
+   end loop; -- z
+   
+   If    p_mode = 34 then close C_34;
+   elsIf p_mode = 35 then close C_35;
    else  RETURN ;
    end if;
- 
- 
+   
+   
    PUL.Set_Mas_Ini( 'sFdat1', to_char(l_dat1,'dd.mm.yyyy'), 'sар.sFdat1' );
    PUL.Set_Mas_Ini( 'sFdat2', to_char(l_dat2,'dd.mm.yyyy'), 'sар.sFdat2' );
    PUL.Set_Mas_Ini( 'SWAP'  , to_char(l_tag),               'SWAP_TAG'   );
  end p_ani34;
  ------------------------------------------------------------------------------
 /
- show err;
- 
+show err;
+
 PROMPT *** Create  grants  P_ANI34 ***
 grant EXECUTE                                                                on P_ANI34         to START1;
 grant EXECUTE                                                                on P_ANI34         to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_ani34.sql =========*** End *** =
- PROMPT ===================================================================================== 
- 
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ANI34.sql =========*** End *** =
+PROMPT ===================================================================================== 

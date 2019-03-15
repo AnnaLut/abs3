@@ -704,7 +704,7 @@ begin
      select l_err+1 into l_err from accounts acc
      where tip in ( 'SK9', 'SP', 'SPN') and ostc != 0 and acc.rnk=p_rnk;
      if l_err>0 then
-       logger.info('BARS_OW.check_cust_kk:присутня прострочена заборгованість');
+       logger.info('BARS_OW.check_cust_dk:присутня прострочена заборгованість');
        return l_err;
      end if;
     exception
@@ -717,34 +717,44 @@ begin
       (select trunc(months_between(sysdate,p.bday)/12) from dual )>18 ;
     exception
       when no_data_found then l_err:=l_err+1 ;
-      logger.info('BARS_OW.check_cust_kk:вік клієнта не відповідає вимогам');
+      logger.info('BARS_OW.check_cust_dk:вік клієнта не відповідає вимогам');
       return l_err;
     end;
- /* --вже існує картка , що відкривається
+
+  --вже існує картка , що відкривається
     begin
-      select l_err+1 into l_err from  w4_deal where cust_rnk = p_rnk and card_code = p_card_code;
+      select  case when count('x')>0 then l_err+1  else l_err+0  end
+      into l_err from  w4_deal where cust_rnk = p_rnk and card_code =p_card_code;
      if l_err>0 then
-       logger.info('BARS_OW.check_cust_kkв:вже відкрита додаткова картка');
+       logger.info('BARS_OW.check_cust_dk:вже відкрита додаткова картка');
        return l_err;
      end if;
     exception
       when no_data_found then null;
-    end;*/
+    end;
+
   --валідний тип документа
     begin
      select l_err+0 into l_err  from person p where rnk =p_rnk and  passp in (1,7);
     exception
      when no_data_found then
       l_err:=l_err+1 ;
-      logger.info('BARS_OW.check_cust_kk:документ клієнта не відповідає вимогам');
+      logger.info('BARS_OW.check_cust_dk:документ клієнта не відповідає вимогам');
       return l_err;
     end;
-  --валідність кода ОКПО - відключити для тесту
+
+ --валідність кода ОКПО - відключити для тесту
     begin
---    select  f_validokpo(okpo)*(-1)+l_err into l_err from customer where rnk=p_rnk ;
-     select l_err+1 into l_err from customer where rnk=p_rnk and (f_validokpo(okpo)*(-1))!=0;
+       select case
+          when okpo = '0000000000' then 1
+          else f_validokpo(okpo) * (-1)
+        end validokpo
+        into l_err
+       from   customer
+       where  rnk = p_rnk;
+
      if l_err>0 then
-       logger.info('BARS_OW.check_cust_kk: код ОКПО  не коректний');
+       logger.info('BARS_OW.check_cust_dk: код ОКПО  не коректний');
        return l_err;
      end if;
     exception
@@ -790,8 +800,6 @@ select
             (select so.name from address_street_type so where so.id=ca.street_type )
      end street_type
      ,ca.street
-     --,aht.value aht
-     --,art.value art
      into p_city_type,p_house,p_flat,p_street_type,p_street
      from customer_address ca
         left join address_street_type adst on adst.id=ca.street_type
@@ -1731,6 +1739,7 @@ begin
            and q.sos = 1
            and o.sos > 0;
         -- COBUMMFO-7501 End
+
         /* Comment COBUMMFO-7501
         select a.acc, a.nls,  a.kv, q.dk, o.tt, decode(o.kv, o.kv2, o.s, decode(o.dk, 0, o.s, o.s2)), o.sos, o.currvisagrp, o.nextvisagrp, nvl2(trim(wt.tt),1,0), nvl2(ow.ref,1,0), decode(o.mfoa, o.mfob, 1, 0), o.s2
           into l_acc, l_nlsb, l_kv, l_dk, l_tt, l_s, l_sos, l_currvisagrp, l_nextvisagrp, l_tt_w4_flag, l_locpay_flag, l_isourmfo, l_s2
@@ -2588,15 +2597,15 @@ begin
      k:=0;
      loop
        k:=k+1;
-       c_doc:= c_AddData||'Parm[' || k || ']';  
+       c_doc:= c_AddData||'Parm[' || k || ']';
        if l_filebody.existsnode(c_doc) = 0 then
           exit;
-       end if; 
+       end if;
        l_xml_doc := xmltype(extract(l_filebody,c_doc,null));
-       if extract(l_xml_doc, '//ParmCode/text()', null)='SO_DTLS2' then 
+       if extract(l_xml_doc, '//ParmCode/text()', null)='SO_DTLS2' then
          l_rec.cnt_clientregnumber:=extract(l_xml_doc, '//Value/text()', null);
        end if;
-     end loop;   
+     end loop;
 -----------------------------------
 
      i := 0;
@@ -3060,6 +3069,12 @@ begin
                         l_rec_commision.doc_rrn:=l_str;
 
                     end if;
+                    if l_str_if='DRN' --7226
+                    then
+                        dbms_xslprocessor.valueof(l_parm_ref, 'Value/text()', l_str);
+                        l_rec.doc_drn:=l_str;                       
+                    end if;                   
+
                   end loop;
 
           l_str:=null;
@@ -3182,7 +3197,7 @@ begin
          l_rec.doc_descr:=null;
          end if;
 
-         if l_doc_pay=8 and l_rec.postingstatus='Posted'
+         if l_doc_pay>=7 and l_rec.postingstatus='Posted'     --7226
          then
          insert into ow_oic_documents_data values l_rec;
                  if l_fee_doc=1 and l_rec_commision.postingstatus='Posted'
@@ -9781,18 +9796,25 @@ begin
        or l_person.organ is null
        or l_person.bday  is null
        or l_person.sex   is null
-       or l_person.teld  is null ) and
+       or l_person.teld  is null
+       or l_person.actual_date is null   --COBUMMFO-9385
+       or l_person.eddr_id is null ) and --COBUMMFO-9385
         ( p_clientdata.paspissuer is not null
        or p_clientdata.paspdate   is not null
        or p_clientdata.bday       is not null
        or p_clientdata.gender     is not null
-       or p_clientdata.phone_home is not null ) then
+       or p_clientdata.phone_home is not null 
+       or p_clientdata.pasp_end_date is not null  --COBUMMFO-9385
+       or p_clientdata.pasp_eddrid_id is not null --COBUMMFO-9385
+       ) then
         update person
            set pdate = nvl(pdate, p_clientdata.paspdate),
                organ = nvl(organ, substr(trim(p_clientdata.paspissuer),1,70)),
                bday  = nvl(bday,  p_clientdata.bday),
                sex   = nvl(sex,   p_clientdata.gender),
-               teld  = nvl(teld,  p_clientdata.phone_home)
+               teld  = nvl(teld,  p_clientdata.phone_home),
+               actual_date = nvl(actual_date,  p_clientdata.pasp_end_date), --COBUMMFO-9385
+               eddr_id = nvl(eddr_id,  p_clientdata.pasp_eddrid_id)         --COBUMMFO-9385
          where rnk = p_rnk;
      end if;
 ------------------address
@@ -12054,7 +12076,7 @@ if    not regexp_like(upper(l_cmclient.paspissuer),q'{^[АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУ
     p_street      =>l_cmclient.addr2_street );
 
 ---##############-----------------------------------------------------
-     --перевірка заповнення обов"язкових полів (COBUMMFO-7587)
+    /* --перевірка заповнення обов"язкових полів (COBUMMFO-7587)
     if l_cmclient.clienttype=3 then
      check_address_client(p_rnk => l_cmclient.rnk,p_cm_err_msg=>l_cm_err_msg);
      if length(l_cm_err_msg)>0
@@ -12062,7 +12084,8 @@ if    not regexp_like(upper(l_cmclient.paspissuer),q'{^[АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУ
      end if;
      l_cm_err_msg:='';
     end if;
-   -----------
+   -----------відключено по COBUMMFO-9385 
+*/
 
   insert into cm_client_que values l_cmclient;
   if l_iscrm = '1' then
@@ -13920,6 +13943,15 @@ begin
      (not check_digit(p_project.paspnum) or length(p_project.paspnum) <> 9)) then
      append_msg('Невірно заповнено номер паспорту');
   end if;
+  --COBUMMFO-9385{
+  if (nvl(p_project.type_doc,0)) = 7 then
+   begin 
+    select 'x' into p_project.str_err from V_DICT_DMSU_DEPTS where code = p_project.paspissuer;
+   exception when no_data_found then 
+     append_msg('Невірно вказано орган видачі ID картки');          
+   end;  
+  end if;--}
+
   if p_project.email is not null and not check_email(upper(p_project.email)) then
      append_msg('Невірний e-mail');
   end if;
@@ -14045,6 +14077,12 @@ begin
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/MIDDLE_NAME/text()', null);
      l_project.middle_name    := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,70);
      l_project.type_doc       := extract(p_xml, '/ROWSET/ROW['||i||']/TYPE_DOC/text()', null);
+           --COBUMMFO-9385{
+      if l_project.type_doc=7 then
+        l_project.pasp_end_date:=to_date(extract(p_xml, '/ROWSET/ROW['||i||']/PASSPORT_END_DATE/text()', null),'dd.mm.yyyy');
+        l_project.pasp_eddrid_id:=extract(p_xml, '/ROWSET/ROW['||i||']/PASSPORT_EDDR_ID/text()', null);
+      end if; --}      
+
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/PASPSERIES/text()', null);
      l_project.paspseries     := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,16);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/PASPNUM/text()', null);

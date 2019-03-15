@@ -1,0 +1,129 @@
+.search-catalog {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+}
+
+#tabstrip .k-content {
+    min-height: 10px !important;
+}
+
+#tabstrip h2 {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#gridFiles th.k-header {
+    text-align: center;
+}
+
+.search-box {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+    padding: 10px;
+    max-width: 1111px;
+    position: relative;
+}
+
+.widerMenu .k-combobox,
+.widerMenu .k-datepicker,
+.widerMenu .k-timepicker,
+.widerMenu .k-datetimepicker,
+.widerMenu .k-numerictextbox,
+.widerMenu .k-dropdown,
+.widerMenu .k-textbox {
+    width: 200px;
+}
+
+.k-filter-menu [type="submit"] {
+    width: 54%;
+    margin-right: 1%;
+}
+
+.k-filter-menu [type="reset"] {
+    width: 44%;
+    margin-left: 1%;
+}
+
+.page-header {
+    margin: 5px 5px 5px 5px;
+}
+
+#toolbox {
+    margin-bottom: 15px;
+}
+
+.inlineBlock {
+    display: inline-block;
+    margin-left: 3px;
+}
+
+.invisible {
+    display: none;
+}
+
+.k-grid-filter.k-state-active {
+    background-color: lightgray;
+}
+
+.k-grid td {
+    padding: .2em .3em;
+    line-height: 1.5em;
+}
+
+.modal-buttons {
+    float: right;
+    margin: 5px;
+}
+
+.modal-buttons-left {
+    float: left;
+    margin: 5px;
+}
+
+.grid-title-div {
+    text-align: right;
+    width: 100%;
+    margin-bottom: 3px;
+    padding-right: 15px;
+}
+
+.grid-title {
+    margin-left: -390px;
+    font-size: 1.3em;
+    margin-right: 10px;
+    color: black;
+    text-decoration: underline;
+}
+
+h1.app-title, h1 {
+    padding: 0px;
+}
+
+.abs-document-ref {
+    color: blue;
+    text-decoration: underline;
+}
+
+    .abs-document-ref:hover {
+        color: gray;
+        text-decoration: underline;
+    }
+
+.error-btn {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.simple-window-content {
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    font: san-serif;
+}
+
+.k-dropdown-wrap.k-state-default .k-input {
+    text-align: left;
+}

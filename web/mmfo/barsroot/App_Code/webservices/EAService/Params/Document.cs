@@ -25,7 +25,7 @@ namespace Bars.EAD.Structs.Params
         [JsonProperty("doc_request_number")]
         public String DocRequestNumber;
         [JsonProperty("agr_code")]
-        public UInt64? AgrCode;
+        public String AgrCode;
         [JsonProperty("agr_type")]
         public String AgrType;
         [JsonProperty("account_type")]
@@ -66,7 +66,7 @@ namespace Bars.EAD.Structs.Params
                         res.DocPagesCount = rdr["doc_pages_count"] == DBNull.Value ? (UInt16?)null : Convert.ToUInt16(rdr["doc_pages_count"]);
                         res.DocBinaryData = rdr["doc_binary_data"] == DBNull.Value ? String.Empty : Convert.ToBase64String((Byte[])rdr["doc_binary_data"]);
                         res.DocRequestNumber = Convert.ToString(rdr["doc_request_number"]);
-                        res.AgrCode = rdr["agr_code"] == DBNull.Value ? (UInt64?)null : Convert.ToUInt64(rdr["agr_code"]);
+                        res.AgrCode = rdr["agr_code"] == DBNull.Value ? String.Empty : Convert.ToString(rdr["agr_code"]);
                         res.AgrType = Convert.ToString(rdr["agr_type"]);
                         res.AccountType = Convert.ToString(rdr["account_type"]);
                         res.AccountNumber = Convert.ToString(rdr["account_number"]);

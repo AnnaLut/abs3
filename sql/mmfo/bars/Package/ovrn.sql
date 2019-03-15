@@ -75,6 +75,8 @@ procedure INTX               ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 numb
 procedure INTXJ  ( p_User int,p_branch varchar2, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- Собственно расчет  %%
 procedure INTB       ( p_mode int); --- Генерация проводок согласно итоговому протоколу
 procedure OP_3600    ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a36 IN OUT accounts%rowtype) ;   -- откр дисконта  3600
+   -- переформирование форвардных проводок
+procedure REAMORT_3600  (p_acc in accounts.acc%type); --реф договора 110 (участника)
 procedure OP_SP      ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a67 IN OUT accounts%rowtype, a69 IN OUT accounts%rowtype) ;   -- откр просрочки 2067 + 2069
 procedure BG1        ( p_ini  int, p_mode int, p_dat date, dd cc_deal%rowtype, a26 accounts%rowtype, x26 accounts%rowtype ) ;   -- БЭК-сопровождение одного 2600
 function  SP         ( p_mode int, p_nd number, p_rnk number) return number ;
@@ -2422,6 +2424,131 @@ begin
   OVRN.ins_110 (d_nd => dd.ND, p_acc26 => a26.acc, p_ACC => a36.acc, u_nd => U_ND ) ;  -- добавить 3600 в дог 110
 
 end OP_3600;
+
+
+ -- амортизация = форв платежм
+procedure AMORT_3600 (oo in out oper%rowtype, 
+                      p_ddate_b in date, 
+                      p_ddate_e in date, 
+                      p_nd      in cc_deal.nd%type, 
+                      p_kod   in NUMBER)
+is
+  itog_ number ;
+  s1_   number ;
+  Dat0_     date;
+  spl1_     number;
+  KOLD_     int;
+  cc_id_    cc_deal.cc_id%type;
+  sdate_    cc_deal.sdate%type;
+begin 
+   Dat0_    := p_ddate_b;
+   itog_    := oo.s;
+   s1_      := oo.s;
+   KOLD_    := (p_ddate_e - p_ddate_b +1 ) ;
+   
+   begin
+     select cc_id, sdate 
+     into   cc_id_, sdate_
+     from cc_deal cc 
+     where cc.nd=p_nd;
+   exception when NO_DATA_FOUND then
+      raise_application_error (g_errn,'Договір  ND = '||p_nd||' не знайдено!');  
+   end;
+
+   FOR x in (select TRUNC(add_months(p_ddate_b,c.num),'MM')-1 dat31 from conductor c where TRUNC(add_months(p_ddate_b,c.num),'MM')-1 <p_ddate_e
+             union all select p_ddate_e from dual
+             order by 1   )
+   loop
+      If x.dat31 = p_ddate_e then spl1_ := itog_ ;
+      else                       spl1_ := ROUND(  S1_ * (x.dat31-Dat0_) / KOLD_ -0.5 ,0) ;
+      end if;
+
+      If spl1_ > 0 then
+         itog_ := itog_ - spl1_ ;
+         oo.ref   := null    ;
+         oo.s2    := spl1_   ;
+         oo.s     := spl1_   ;
+         oo.vdat  := x.dat31 ;
+         oo.nazn  := Substr(
+                    'Щомiсячна фмортизацiя поч.комiсiї по Дог.№ '|| cc_id_  ||
+                    ' вiд '|| to_char(sdate_, 'dd.mm.yyyy') || '. Період з ' || to_char( (Dat0_+1), 'dd.mm.yyyy') ||
+                    ' по ' || to_char(oo.vdat , 'dd.mm.yyyy')
+                    , 1, 160 ) ;
+         OVRN.opl1(oo);  gl.pay (2, oo.ref, oo.vdat);
+         if p_kod is not null then
+           insert into operw (ref,tag, value) values (oo.Ref, 'KTAR ', to_char ( p_kod ) ) ;
+         end if;  
+      end if ; 
+      Dat0_ := x.dat31;
+   end loop  ; 
+end;           
+
+
+ -- переформирование форвардных проводок
+procedure REAMORT_3600  (p_acc in accounts.acc%type) --реф договора 110 (участника)
+is
+  oo    oper%rowtype;
+  a36   accounts%rowtype;
+  ccd   cc_deal%rowtype; --договор 10 (основной)
+begin
+  oo.vob  := 6        ;
+  oo.mfoa := gl.aMfo  ;
+  oo.mfob := gl.aMfo  ;
+  oo.dk   := 1;  
+         oo.nam_b := 'Доходи вiд обслуговування дог.ОВР';
+         oo.id_b  := gl.aOkpo ;
+         oo.tt    := '%%1'   ;
+       begin       
+         select cc.ndi, cc.wdate, nbs_ob22_null( SB_6020.R020, SB_6020.ob22, substr(a.branch,1,15) ),c.okpo
+         into ccd.nd, ccd.wdate, oo.nlsb, oo.id_a
+         from accounts  a, 
+              nd_acc n,
+              cc_deal cc,
+              customer c
+         where a.acc   = p_acc
+           and a.acc   = n.acc 
+           and n.nd    = cc.nd
+           and cc.vidd = g_VID1
+           and cc.sos  < 15
+           and a.rnk = c.rnk;
+       exception when too_many_rows then  
+                    raise_application_error (g_errn,'Знайдено декілька договрів по рахунку ACC = '||p_acc||' !');   
+                 when no_data_found then  
+                    raise_application_error (g_errn,'Договорів по рахунку ACC = '||p_acc||' не знайдено!');      
+       end;       
+       begin
+         select a.*
+         into a36
+         from accounts  a, 
+              nd_acc n
+         where a.acc = n.acc 
+           and n.nd = ccd.nd 
+           and a.NBS = '3600' 
+           and a.ostc <> 0
+           and a.ostc = a.ostb;
+       exception when too_many_rows then  
+                    raise_application_error (g_errn,'Знайдено декілька рахунків 3600 по договору  ND = '||ccd.nd||' !');   
+                 when no_data_found then  
+                    raise_application_error (g_errn,'Рахунку 3600 по договору  ND = '||ccd.nd||' не знайдено або некоректні залишки по рахунку 3600(нульовий фактичний залишок або нерівність планового та фактичного залишків)!');
+       end;    
+         
+        oo.kv   := a36.kv   ;
+        oo.kv2  := a36.kv   ;  
+        oo.nlsa := a36.nls ;
+        oo.S    := A36.OSTC;
+        oo.nam_a := substr( a36.nms,1,38);    
+        for k in (select o.ref from opldok o where o.sos=3 and o.fdat >= gl.bdate and o.acc=a36.ACC )
+        loop 
+             ful_bak( k.Ref); -- бекнем все форварды
+        end loop;  
+            
+        AMORT_3600(oo, 
+                   trunc(gl.bDATE,'mm'), 
+                   ccd.wdate, 
+                   ccd.nd,
+                   null);
+end;  
+
 -----------------------------------------
 procedure OP_SP (dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a67 IN OUT accounts%rowtype , a69 IN OUT accounts%rowtype) IS   -- откр просрочки 2067 + 2069
   p4_  int;
@@ -2608,16 +2735,23 @@ If p_mode = 0 then    --- Первонач комиссия
          end ;
 
          -- амортизация = форв платежм
-         Dat0_    := dd.sdate -1 ;
-         itog_    := oo.s ;
+         --Dat0_    := dd.sdate -1 ;
+         --itog_    := oo.s ;
          oo.nlsb  := nbs_ob22_null( SB_6020.R020, SB_6020.ob22, substr(a26.branch,1,15) );
          oo.nam_b := 'Доходи вiд обслуговування дог.ОВР';
          oo.nam_a := substr( a36.nms,1,38);
          oo.nlsa  := a36.nls ;
          oo.id_b  := gl.aOkpo ;
          oo.tt    := '%%1'   ;
-         s1_      := oo.s    ;
-         FOR x in (select TRUNC(add_months(dd.sdate,c.num),'MM')-1 dat31 from conductor c where TRUNC(add_months(dd.sdate,c.num),'MM')-1 <dd.wdate
+         --s1_      := oo.s    ;
+         
+         AMORT_3600(oo, 
+                    dd.sdate-1, 
+                    dd.wdate, 
+                    dd.nd,
+                    k.kod );
+         
+/*         FOR x in (select TRUNC(add_months(dd.sdate,c.num),'MM')-1 dat31 from conductor c where TRUNC(add_months(dd.sdate,c.num),'MM')-1 <dd.wdate
                    union all select dd.wdate from dual
                    order by 1   )
          loop
@@ -2637,12 +2771,10 @@ If p_mode = 0 then    --- Первонач комиссия
                           ' по ' || to_char(oo.vdat , 'dd.mm.yyyy')
                           , 1, 160 ) ;
                OVRN.opl1(oo);  gl.pay (2, oo.ref, oo.vdat);
----------------gl.payv( 0, oo.REF, x.dat31, '%%1', 1, gl.baseval,  oo.nlsa, oo.s,  gl.baseval,  oo.nlsb , oo.s );
                insert into operw (ref,tag, value) values (oo.Ref, 'KTAR ', to_char ( k.kod ) ) ;
-            end if ; --    If spl1_ > 0 then
+            end if ; 
             Dat0_ := x.dat31;
-
-         end loop  ; --- x
+         end loop  ; --- x*/
       end if ;  -- if oo.s > 0 then
    end loop ;  --- k  по тарифам комиссий
 
@@ -3119,7 +3251,7 @@ BEGIN
 
   -- 0) ДОПЛАТА ФОРВАРДНОЙ КОМИССИИ ПРИ ДОСРОЧНОМ ЗАКРЫТИИ
   If DD.wdate >=  gl.bdate then
-     Declare Par2_  Number ;    Par3_   Varchar2 (200);
+   --  Declare Par2_  Number ;    Par3_   Varchar2 (200);
      begin -- цикл по счетам 3600, их мюбю несколько = кол-ву участников
          FOR a36 in (select a.* from accounts  a, nd_acc n where a.acc = n.acc and n.nd = dd.nd and a.NBS = '3600' and a.ostf <> 0 )
          LOOP oo := null;

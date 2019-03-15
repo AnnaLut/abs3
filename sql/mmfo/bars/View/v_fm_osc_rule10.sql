@@ -22,7 +22,7 @@ PROMPT *** Create  view V_FM_OSC_RULE10 ***
                         '2909',
                         '3720')
           AND (
-                regexp_like(upper(o.nazn), '(^| )(ÑÒÐÀÕ|ÏÅÐÅÑÒÐÀÕ)')
+                regexp_like(upper(o.nazn), '(^|.)(ÑÒÐÀÕ|ÏÅÐÅÑÒÐÀÕ)')
                )
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=
                  15000000

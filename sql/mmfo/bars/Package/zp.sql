@@ -3,7 +3,7 @@ PROMPT *** Run *** ========== Scripts /sql/bars/package/zp.sql =========*** Run 
 PROMPT ===================================================================================== 
 
 create or replace package bars.zp is
-  g_head_version  constant varchar2(64)  := 'version 1.21 01.08.2018';
+  g_head_version  constant varchar2(64)  := 'version 1.25 25.02.2019';
 
   --
   -- определение версии заголовка пакета
@@ -15,16 +15,18 @@ create or replace package bars.zp is
   function body_version   return varchar2;
 
   procedure send_central ;
-  procedure create_deal(p_rnk            customer.rnk%type,
-                      p_deal_name      zp_deals.deal_name%type,
-                      p_start_date     date,
-                      p_deal_premium   zp_deals.deal_premium%type,
-                      p_central        zp_deals.central%type,
-                      p_kod_tarif      zp_deals.kod_tarif%type,
-                      p_acc            number   default null,
-                      p_fs             zp_deals.fs%type default 2,
-                      p_branch         branch.branch%type default null
-                      );
+  procedure create_deal(p_rnk          in customer.rnk%type,
+                        p_deal_name    in zp_deals.deal_name%type,
+                        p_start_date   in date,
+                        p_deal_premium in zp_deals.deal_premium%type,
+                        p_central      in zp_deals.central%type,
+                        p_kod_tarif    in zp_deals.kod_tarif%type,
+                        p_acc          in number               default null,
+                        p_fs           in zp_deals.fs%type     default 2,
+                        p_branch       in branch.branch%type   default null,
+                        p_source       in zp_deals.source%type default 1,
+                        p_id          out zp_deals.id%type
+                        );
 
   procedure approve_deal(p_id zp_deals.id%type, p_comm_reject zp_deals.comm_reject%type);
 
@@ -110,7 +112,17 @@ function get_payroll_buffer (p_id zp_payroll.id%type)
    return varchar2;
 function get_user_key_id
    return varchar2;
-procedure set_central(p_mfo varchar2,p_nls varchar2, p_central number);
+
+  -----------------------------------------------------------------------------------------
+  --  set_central
+  --
+  --    Метод проставляє ознаку централізованості 
+  --
+  --      p_mfo     - МФО
+  --      p_nls     - номер рахунку 2909
+  --      p_central - ознака централізованості (0/1)
+  --
+  procedure set_central(p_mfo varchar2, p_nls varchar2, p_central number);
 
   -----------------------------------------------------------------------------------------
   --  get_doc_person
@@ -134,13 +146,27 @@ procedure set_central(p_mfo varchar2,p_nls varchar2, p_central number);
                            p_actual_date out person.actual_date%type);
 
   -- пошук рахунка 6510. функція для використання у view (подавляються всі exception)
-  function get_nls_6510(p_fs in zp_deals.fs%type) return accounts.nls%type;
+  function get_nls_6510(p_fs     in zp_deals.fs%type,
+                        p_branch in branch.branch%type default null) return accounts.nls%type;
+
+  -----------------------------------------------------------------------------------------
+  --  get_nls_ref
+  --
+  --    Пошук рухцнку по:  NBS + ОВ22 + RNK
+  --    Переписана функція nbs_ob22_rnk для ЗП проекту
+  --
+  function get_nls_ref(p_nbs2 in accounts.nbs%type,
+                       p_ob22 in accounts.ob22%type,
+                       p_nls1 in accounts.nls%type,
+                       p_kv   in accounts.kv%type default null,
+                       p_ref  in oper.ref%type    default null
+                       ) return accounts.nls%type;
 end;
 /
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.28 19.10.2018';
+g_body_version   constant varchar2(64)   := 'version 1.32 25.02.2019';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -387,64 +413,98 @@ else
 end if;
 end;
 
-procedure pay_doc(p_oper in out oper%rowtype)
-is
-l_sos    number := null;
+  procedure fill_operw_tbl (
+    p_tbl in out t_operw,
+    p_ref in     operw.ref%type,
+    p_tag in     operw.tag%type,
+    p_val in     operw.value%type )
+  is
+  begin
+    if p_val is not null then
+       p_tbl.extend;
+       p_tbl(p_tbl.count).ref   := p_ref;
+       p_tbl(p_tbl.count).tag   := p_tag;
+       p_tbl(p_tbl.count).value := p_val;
+       p_tbl(p_tbl.count).kf    := sys_context('bars_context','mfo');
+    end if;
+  end fill_operw_tbl;
 
-l_tt     varchar2(3);
-begin
+  ------------------------------------------------------------------------------------------------------
+  -- pay_doc
+  --
+  --   Оплата
+  --
+  --     p_oper - параметри операції
+  --     p_nls_3570 - рахунок комісії для використання в операції !1E (дочірня до 01E - оплата відомості)
+  --
+  procedure pay_doc(p_oper in out oper%rowtype,
+                    p_nls_3570 in accounts.nls%type default null) 
+  is
+    l_sos       number := null;
+    l_tt        varchar2(3);
+    l_operw_tbl t_operw := t_operw();
+  begin
 
-     gl.ref     (p_oper.ref);
+       gl.ref     (p_oper.ref);
 
-     gl.in_doc3 (ref_  => p_oper.ref,
-                 tt_   => p_oper.tt,
-                 vob_  => p_oper.vob,
-                 nd_   => p_oper.nd,
-                 pdat_ => p_oper.pdat,
-                 vdat_ => p_oper.vdat ,
-                 dk_   => p_oper.dk,
-                 kv_   => p_oper.kv,
-                 s_    => p_oper.s,
-                 kv2_  => p_oper.kv2,
-                 s2_   => p_oper.s2,
-                 sk_   => p_oper.sk  ,
-                 data_ => gl.bdate,
-                 datp_ => p_oper.datp,
-                 nam_a_=> p_oper.nam_a,
-                 nlsa_ => p_oper.nlsa,
-                 mfoa_ => p_oper.mfoa,
-                 nam_b_=> p_oper.nam_b,
-                 nlsb_ => p_oper.nlsb,
-                 mfob_ => p_oper.mfob,
-                 nazn_ => p_oper.nazn,
-                 d_rec_=> p_oper.d_rec   ,
-                 id_a_ => p_oper.id_a,
-                 id_b_ => p_oper.id_b,
-                 id_o_ => p_oper.id_o   ,
-                 sign_ => p_oper.sign,
-                 sos_  => p_oper.sos,
-                 prty_ => p_oper.prty,
-                 uid_  => null );
-        gl.dyntt2(     l_sos,
-                   0,  -- ?
-                   null,
-                   p_oper.ref,
-                   p_oper.vdat,
-                   p_oper.vdat,
-                   p_oper.tt,
-                   p_oper.dk,
-                   p_oper.kv,
-                   p_oper.mfoa,
-                   p_oper.nlsa,
-                   p_oper.s,
-                   p_oper.kv,
-                   p_oper.mfob,
-                   p_oper.nlsb,
-                   p_oper.s2,
-                   null,
-                   null);
+       gl.in_doc3 (ref_  => p_oper.ref,
+                   tt_   => p_oper.tt,
+                   vob_  => p_oper.vob,
+                   nd_   => p_oper.nd,
+                   pdat_ => p_oper.pdat,
+                   vdat_ => p_oper.vdat ,
+                   dk_   => p_oper.dk,
+                   kv_   => p_oper.kv,
+                   s_    => p_oper.s,
+                   kv2_  => p_oper.kv2,
+                   s2_   => p_oper.s2,
+                   sk_   => p_oper.sk  ,
+                   data_ => gl.bdate,
+                   datp_ => p_oper.datp,
+                   nam_a_=> p_oper.nam_a,
+                   nlsa_ => p_oper.nlsa,
+                   mfoa_ => p_oper.mfoa,
+                   nam_b_=> p_oper.nam_b,
+                   nlsb_ => p_oper.nlsb,
+                   mfob_ => p_oper.mfob,
+                   nazn_ => p_oper.nazn,
+                   d_rec_=> p_oper.d_rec   ,
+                   id_a_ => p_oper.id_a,
+                   id_b_ => p_oper.id_b,
+                   id_o_ => p_oper.id_o   ,
+                   sign_ => p_oper.sign,
+                   sos_  => p_oper.sos,
+                   prty_ => p_oper.prty,
+                   uid_  => null );
 
-end;
+          if p_nls_3570 is not null then
+            -- для операції оплати комісії передаєм рахунок комісії із договору
+            fill_operw_tbl(l_operw_tbl, p_oper.ref, 'S3570', p_nls_3570);
+            -- вставка в допреквізит
+            forall i in 1 .. l_operw_tbl.count
+            insert into operw values l_operw_tbl(i);
+          end if;
+
+          gl.dyntt2(     l_sos,
+                     0,  -- ?
+                     null,
+                     p_oper.ref,
+                     p_oper.vdat,
+                     p_oper.vdat,
+                     p_oper.tt,
+                     p_oper.dk,
+                     p_oper.kv,
+                     p_oper.mfoa,
+                     p_oper.nlsa,
+                     p_oper.s,
+                     p_oper.kv,
+                     p_oper.mfob,
+                     p_oper.nlsb,
+                     p_oper.s2,
+                     null,
+                     null);
+
+  end pay_doc;
 
 function get_okpo(p_rnk customer.rnk%type)
 return varchar2
@@ -461,21 +521,6 @@ begin
 
 return l_okpo;
 end;
-procedure fill_operw_tbl (
-  p_tbl in out t_operw,
-  p_ref in     operw.ref%type,
-  p_tag in     operw.tag%type,
-  p_val in     operw.value%type )
-is
-begin
-  if p_val is not null then
-     p_tbl.extend;
-     p_tbl(p_tbl.count).ref   := p_ref;
-     p_tbl(p_tbl.count).tag   := p_tag;
-     p_tbl(p_tbl.count).value := p_val;
-     p_tbl(p_tbl.count).kf    := sys_context('bars_context','mfo');
-  end if;
-end fill_operw_tbl;
 
 function get_6510_ob22(p_fs zp_deals.fs%type)
 return varchar2
@@ -490,15 +535,46 @@ exception when no_data_found
     then  raise_application_error(-20000, 'По данному ЗП договору не знайдено OB22 для вказаної форми власності');
 end;
 
-  -- пошук рахунка 6510. функція для використання у view (подавляються всі exception)
-  function get_nls_6510(p_fs in zp_deals.fs%type) return accounts.nls%type
+  -- пошук рахунка
+  function get_nls(p_nbs    in accounts.nbs%type,
+                   p_ob22   in accounts.ob22%type,
+                   p_branch in branch.branch%type default null) return accounts.nls%type
   is
-    l_nls accounts.nls%type;
+    l_nls    accounts.nls%type;
+    l_branch branch.branch%type := coalesce(p_branch, sys_context('bars_context','user_branch'));
   begin
+    if length(l_branch) = 8 then
+      l_branch := l_branch||'000000/';
+    elsif p_nbs = '6510' then
+      -- COBUMMFO-9829
+      l_branch := substr(l_branch,1,15);
+    end if;
 
-      l_nls := bars.nbs_ob22('6510', get_6510_ob22(p_fs));
-      return l_nls;
+    l_nls := nbs_ob22_null(p_nbs, p_ob22, l_branch);
 
+    if l_nls is null then
+      raise_application_error(-20203, '\9356 - Не найден счет Бал='|| p_nbs||' OB22='||p_ob22||' для уровня = ' || l_branch, TRUE);
+    end if;
+
+    return l_nls;
+
+  exception 
+    when others then
+      return null;
+  end get_nls;
+
+  -- пошук рахунка 6510. функція для використання у view (подавляються всі exception)
+  function get_nls_6510(p_fs     in zp_deals.fs%type,
+                        p_branch in branch.branch%type default null) return accounts.nls%type
+  is
+    l_nls  accounts.nls%type;
+    l_ob22 accounts.ob22%type;
+  begin
+    l_ob22 := get_6510_ob22(p_fs);
+    l_nls := get_nls(p_nbs    => '6510',
+                     p_ob22   => l_ob22,
+                     p_branch => p_branch);
+    return l_nls;
   exception 
     when others then
       return null;
@@ -742,27 +818,27 @@ end;
 --==============================
 --Заведення договору
 --==============================
-procedure create_deal(p_rnk            customer.rnk%type,
-                      p_deal_name      zp_deals.deal_name%type,
-                      p_start_date     date,
-                      p_deal_premium   zp_deals.deal_premium%type,
-                      p_central        zp_deals.central%type,
-                      p_kod_tarif      zp_deals.kod_tarif%type,
-                      p_acc            number,
-                      p_fs             zp_deals.fs%type,
-                      p_branch         branch.branch%type default null
+procedure create_deal(p_rnk          in customer.rnk%type,
+                      p_deal_name    in zp_deals.deal_name%type,
+                      p_start_date   in date,
+                      p_deal_premium in zp_deals.deal_premium%type,
+                      p_central      in zp_deals.central%type,
+                      p_kod_tarif    in zp_deals.kod_tarif%type,
+                      p_acc          in number               default null,
+                      p_fs           in zp_deals.fs%type     default 2,
+                      p_branch       in branch.branch%type   default null,
+                      p_source       in zp_deals.source%type default 1,
+                      p_id          out zp_deals.id%type
                       )
 is
-l_zp_deals   zp_deals%rowtype;
-l_accounts   accounts%rowtype;
-l_okpo       customer.okpo%type;
-l_nmkk       customer.nmkv%type;
-l_tmp        number;
-n            number;
-l_nls_2909   accounts.nls%type;
-
-l_sync_id    ead_sync_queue.id%TYPE;
-
+  l_zp_deals   zp_deals%rowtype;
+  l_accounts   accounts%rowtype;
+  l_okpo       customer.okpo%type;
+  l_nmkk       customer.nmkv%type;
+  l_tmp        number;
+  n            number;
+  l_nls_2909   accounts.nls%type;
+  l_sync_id    ead_sync_queue.id%TYPE;
 begin
 
     -- перевірка чи відкрито договір клієнта з таким рахунком 2909
@@ -830,6 +906,7 @@ begin
     l_zp_deals.crt_date     := sysdate;
     l_zp_deals.upd_date     := sysdate;
     l_zp_deals.fs           := p_fs;
+    l_zp_deals.source       := p_source;
 
     if p_branch is not null then
       l_zp_deals.branch := p_branch;
@@ -882,7 +959,8 @@ begin
       l_zp_deals.acc_2909:=p_acc;
      end if;
 
-     insert into zp_deals values l_zp_deals;
+     insert into zp_deals values l_zp_deals
+     returning id into p_id;
 
      --если надо, можем передавать клиента(во всех передачах в ЕА сначала кидают клиента в очередь, на всякий случай)
      ead_pack.msg_create ('UCLIENT', TO_CHAR (l_zp_deals.rnk), l_zp_deals.rnk, l_zp_deals.kf);
@@ -1133,7 +1211,14 @@ l_sync_id     ead_sync_queue.id%type;
 
 begin
 
-   select * into l_v_zp_deals from v_zp_deals where id=p_id;
+  begin
+    select * into l_v_zp_deals from v_zp_deals where id=p_id;
+  exception
+    when no_data_found then
+      raise_application_error(-20001, 'Договір не знайдено. id='||to_char(p_id));
+    when others then
+      raise;
+  end;
 
   if l_v_zp_deals.sos = 1
   then
@@ -1206,9 +1291,12 @@ begin
       ead_pack.msg_create ('UAGR', 'SALARY;'||l_v_zp_deals.id||';1', l_v_zp_deals.rnk,  l_v_zp_deals.kf);
       ead_pack.msg_create('UACC', 'SALARY_OPEN/'||l_v_zp_deals.id||';' || to_char(l_v_zp_deals.acc_2909), l_v_zp_deals.rnk, l_v_zp_deals.kf);
 
-       if l_v_zp_deals.central=1
-       then
-            add_central_queue (l_v_zp_deals.nls_2909, 1);
+       if l_v_zp_deals.central=1 then
+         -- add_central_queue (l_v_zp_deals.nls_2909, 1);
+         -- в рамках ММФО просто проставляєм ознаку централізованості. старий механізм передачі ознаки по сервісу в РУ втратив актуальність
+         set_central(p_mfo     => f_ourmfo,
+                     p_nls     => l_v_zp_deals.nls_2909,
+                     p_central => 1);
        end if;
 
   elsif l_v_zp_deals.sos = 3
@@ -1217,16 +1305,23 @@ begin
        set_sos(p_id,5);
 
        --если были изменения признака централизации
-
-       if instr(l_v_zp_deals.comm_reject,'централізованості')>0
-         then add_central_queue (l_v_zp_deals.nls_2909, l_v_zp_deals.central);
+       if instr(l_v_zp_deals.comm_reject,'централізованості')>0 then 
+         --add_central_queue (l_v_zp_deals.nls_2909, l_v_zp_deals.central);
+         -- в рамках ММФО просто проставляєм ознаку централізованості. старий механізм передачі ознаки по сервісу в РУ втратив актуальність
+         set_central(p_mfo     => f_ourmfo,
+                     p_nls     => l_v_zp_deals.nls_2909,
+                     p_central => l_v_zp_deals.central);
        end if;
 
   elsif l_v_zp_deals.sos = 6
   then
 
        close_deal_author(p_id);
-       add_central_queue (l_v_zp_deals.nls_2909, 0); --удаляем на регионах из OW_IIC_MSGCODE
+       --add_central_queue (l_v_zp_deals.nls_2909, 0); --удаляем на регионах из OW_IIC_MSGCODE
+       -- в рамках ММФО просто проставляєм ознаку централізованості. старий механізм передачі ознаки по сервісу в РУ втратив актуальність
+       set_central(p_mfo     => f_ourmfo,
+                   p_nls     => l_v_zp_deals.nls_2909,
+                   p_central => 0);
 
   end if;
 
@@ -1892,6 +1987,36 @@ begin
   return regexp_replace(p_sqlerrm, 'ORA-\d{1,}: *','');
 end format_errmsg;
 
+  -----------------------------------------------------------------------------------------
+  --  get_nls_ref
+  --
+  --    Пошук рухцнку по:  NBS + ОВ22 + RNK
+  --    Переписана функція nbs_ob22_rnk для ЗП проекту
+  --
+  function get_nls_ref(p_nbs2 in accounts.nbs%type,
+                       p_ob22 in accounts.ob22%type,
+                       p_nls1 in accounts.nls%type,
+                       p_kv   in accounts.kv%type default null,
+                       p_ref  in oper.ref%type    default null
+                       ) return accounts.nls%type
+  is
+    l_nls accounts.nls%type;
+  begin
+    -- рахунок комісії із договору, якщо передано в доп параметр (оплата комісії в pay_payroll, передається доп параметром 'S3570')
+    if p_ref is not null then
+      l_nls := f_dop(p_ref, 'S3570');
+      if l_nls is not null then
+        return l_nls;
+      end if;
+    end if;
+    
+    -- якщо по доп параметру не знайдено, використовуєм стандартний метод пошуку
+    -- #(nbs_ob22_RNK('3570','29',#(NLSA),980))
+    l_nls := nbs_ob22_RNK(p_nbs2, p_ob22, p_nls1, p_kv);
+    
+    return l_nls;
+  end get_nls_ref;
+
 --==============================
 -- Підтвердження відомості(формування доків та оплата)
 --==============================
@@ -1971,9 +2096,9 @@ begin
          then raise_application_error(-20000, 'Не знайдено рахунок 2909 для ЗП договору - '|| l_zp_deals.deal_id||', або рахунок закрито.');
     end;
 
-    if nbs_ob22_rnk('3570','29',l_accounts_2909.nls,980)<>l_accounts_3570.nls
+    /*if nbs_ob22_rnk('3570','29',l_accounts_2909.nls,980)<>l_accounts_3570.nls
            then raise_application_error(-20000, 'Для операції 01E не корректно підбираеться рахунок 3570 - '||nbs_ob22_rnk('3570','29',l_accounts_2909.nls,980)||', повинен бути - '||l_accounts_3570.nls);
-    end if;
+    end if;*/
 
 
     begin
@@ -2023,14 +2148,14 @@ begin
         l_oper_cms.nlsa  := case when l_mode=2 then  l_accounts_3570.nls when l_mode=1 then  l_accounts_2909.nls end ;
         l_oper_cms.mfoa  := gl.amfo;
 
-        l_oper_cms.nlsb  := nbs_ob22 ('6510',l_ob22_6510);
+        l_oper_cms.nlsb  := get_nls('6510',l_ob22_6510, l_accounts_2909.branch);
 
            begin
               select substr(nms,1,38),rnk into l_oper_cms.nam_b,l_rnk  from accounts where nls=l_oper_cms.nlsb and kv=980 and dazs is null;
            exception
               when no_data_found
                then rollback to sp_payroll;
-               raise_application_error(-20000, 'Не знайдено рахунок 6510  - '|| l_oper_cms.nlsb||', або рахунок закрито.') ;
+               raise_application_error(-20000, 'Не знайдено рахунок 6510 на другому рівні - '|| l_oper_cms.nlsb||', або рахунок закрито.') ;
             end;
 
         l_okpob:=get_okpo(l_rnk);
@@ -2054,7 +2179,8 @@ begin
             pay3570 (l_accounts_3570.acc);
         end if;
 
-        pay_doc (l_oper_cms);
+        pay_doc (p_oper     => l_oper_cms, 
+                 p_nls_3570 => case when l_mode = 1 then l_accounts_3570.nls else null end);
 
         gl.pay(2,l_oper_cms.ref,gl.bdate);
 
@@ -2763,25 +2889,33 @@ when no_data_found
     then   raise_application_error(-20000, 'По користувачу не знайдено ключ для підпису');
 end get_user_key_id;
 
-procedure set_central(p_mfo varchar2,p_nls varchar2, p_central number)
-is
-begin
+  -----------------------------------------------------------------------------------------
+  --  set_central
+  --
+  --    Метод проставляє ознаку централізованості 
+  --
+  --      p_mfo     - МФО
+  --      p_nls     - номер рахунку 2909
+  --      p_central - ознака централізованості (0/1)
+  --
+  procedure set_central(p_mfo varchar2, p_nls varchar2, p_central number)
+  is
+  begin
 
+      if     p_central=1
+        then
+        begin
+          insert into  OW_IIC_MSGCODE (tt,mfoa,nlsa,msgcode) values ('R01',p_mfo,p_nls,'PAYSAL');
+        exception when dup_val_on_index
+          then null;
+        end;
+      elsif  p_central=0
+        then
+          delete OW_IIC_MSGCODE
+          where nlsa=p_nls and mfoa=p_mfo and msgcode='PAYSAL' and tt='R01';
+      end if;
 
-    if     p_central=1
-      then
-      begin
-        insert into  OW_IIC_MSGCODE (tt,mfoa,nlsa,msgcode) values ('R01',p_mfo,p_nls,'PAYSAL');
-      exception when dup_val_on_index
-        then null;
-      end;
-    elsif  p_central=0
-      then
-        delete OW_IIC_MSGCODE
-        where nlsa=p_nls and mfoa=p_mfo and msgcode='PAYSAL' and tt='R01';
-    end if;
-
-end;
+  end;
 
   -----------------------------------------------------------------------------------------
   --  get_doc_person

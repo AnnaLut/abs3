@@ -48,6 +48,7 @@ update tickets_par p
    commit;
 /
 
+
 begin 
 insert into tickets_par (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
 values ('MEMORDD', 'MUO', 'select 1 from oper where ref=:nRecID and tt in (''MUO'',''MUN'')', null, 'TIC'); 
@@ -66,6 +67,162 @@ begin
 insert into tickets_par (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
 values ('MEMORDD', 'LUO_NLSB', 'select a.nls from opldok o, accounts a  where o.ref = :nRecID and a.acc = o.acc and ((o.tt = ''LUN'' and o.dk = 1) or (o.tt = ''LUO'' and o.dk = 0))', null, 'TIC');
 commit;
+exception when others then null;
+end;
+/
+
+
+begin 
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'MO2', 'SELECT  *
+from oper o
+where o.ref=:nRecID
+ and (o.tt not in (''03B'', ''00J''))', 'исключения 03B и 00J', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+begin
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'MO1', 'SELECT  *
+from oper o
+where o.ref=:nRecID
+ and (o.tt in (''03B''))', 'Меморільного ордеру 03B', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+
+begin
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'MO4', 'SELECT  *
+from oper o
+where o.ref=:nRecID
+ and (o.tt not in (''00J''))', 'Меморільного ордеру 00j исключения', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'M00J', 'SELECT  *
+from oper o
+where o.ref=:nRecID
+ and (o.tt in (''00J''))', 'Меморільного ордеру 00J', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'VLASN2', 'select b.value from oper a, operw b where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''FIO''
+', 'ФИО+данние', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+
+
+begin
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'VLASN3', 'select b.value from oper a, operw b where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''FIOP''
+', 'ФИО+данние', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+
+begin
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'DR_PO_N10', 'select b.value from oper a, operw b where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''VA_KC''
+', 'ФИО+данние', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+   (REP_PREFIX, PAR, TXT, COMM, MOD_CODE)
+ Values
+   ('DEFAULT', 'VLASN4', 'select value from oper a, operw b 
+where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''VA_KC'' and  b.ref=(select ref from  operw c where c.ref=a.ref and tag in (''FIOP''))
+', 'ФИО+данние', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+      (REP_PREFIX, PAR, TXT, MOD_CODE)
+ Values
+   ('DEFAULT', 'PASP1', 'select b.value from oper a, operw b 
+where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''PASP'' and a.s2>14999999', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+      (REP_PREFIX, PAR, TXT, MOD_CODE)
+ Values
+   ('DEFAULT', 'DR_POKPO1', 'select b.value from oper a, operw b 
+where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''POKPO'' and a.s2>14999999', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+     (REP_PREFIX, PAR, TXT, MOD_CODE)
+ Values
+   ('DEFAULT', 'DR_PASPN1', 'select b.value from oper a, operw b 
+where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''PASPN'' and a.s2>14999999', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+    (REP_PREFIX, PAR, TXT, MOD_CODE)
+ Values
+   ('DEFAULT', 'DR_ATRT1', 'select b.value from oper a, operw b 
+where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''ATRT'' and a.s2>14999999', 'TIC');
+COMMIT;
+exception when others then null;
+end;
+/
+
+begin
+Insert into BARS.TICKETS_PAR
+      (REP_PREFIX, PAR, TXT, MOD_CODE)
+ Values
+   ('DEFAULT', 'DR_PASP21', 'select b.value from oper a, operw b 
+where b.ref=a.ref  and  a.ref=:nRecID  and  b.tag=''PASP2'' and a.s2>14999999', 'TIC');
+COMMIT;
 exception when others then null;
 end;
 /

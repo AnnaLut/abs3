@@ -77,6 +77,17 @@ begin
 end;
 /
 
+PROMPT *** add source ***
+begin
+    execute immediate 'alter table bars.zp_deals add source number(1) default 1 not null';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+comment on column bars.zp_deals.source is 'Джерело створення договору: 1 - АБС, 2 - Корплайт';
+
 grant select,delete,update,insert on bars.ZP_DEALS to bars_access_defrole;
 
 PROMPT ===================================================================================== 

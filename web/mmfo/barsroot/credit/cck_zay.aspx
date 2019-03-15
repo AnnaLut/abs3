@@ -189,7 +189,7 @@
         <div class="pageTitle">
             <asp:Label ID="lbPageTitle" runat="server" Text="Розміщення заявки на кредит"></asp:Label>
         </div>
-        <div style="text-align: center; padding: 10px 0px 10px 10px">
+        <div style="text-align: left; padding: 10px 0px 10px 10px">
             <table border="0" cellpadding="3" cellspacing="0" style="text-align: left">
                 <tr>
                     <td>
@@ -427,6 +427,26 @@
                                             </td>
                                             <td>
                                                 <bec:TextBoxDecimal ID="prSDI" runat="server" OnValueChanged="prSDI_ValueChanged" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </ContentTemplate>
+                            </asp:UpdatePanel>
+                        </asp:Panel>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Panel  ID="Panel_SumComObsl" runat="server" GroupingText="Комісія за обслуговування кредиту (сплачується перед видачею кредиту)" CssClass="cck_zay_panel">
+                            <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Conditional">
+                                <ContentTemplate>
+                                    <table border="0" cellpadding="3" cellspacing="0">
+                                        <tr>
+                                            <td>
+                                                <asp:Label ID="Label1" runat="server" Text="Сума : "></asp:Label>
+                                            </td>
+                                            <td>
+                                                <bec:TextBoxDecimal ID="SumComObsl" runat="server"  />
                                             </td>
                                         </tr>
                                     </table>

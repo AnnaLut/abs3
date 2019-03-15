@@ -21,32 +21,33 @@ PROMPT *** Create  table TMP_ANI34 ***
 begin 
   execute immediate '
   CREATE TABLE BARS.TMP_ANI34 
-   (	B DATE, 
-	E DATE, 
-	G01 VARCHAR2(9), 
-	G02 NUMBER, 
-	G03 VARCHAR2(15), 
-	G04 NUMBER, 
-	G05 VARCHAR2(70), 
-	G06 DATE, 
-	G07 DATE, 
-	G08 DATE, 
-	G08A NUMBER, 
-	G08B NUMBER, 
-	G09 NUMBER, 
-	G10 NUMBER, 
-	G11 NUMBER, 
-	G12 NUMBER, 
-	G13 NUMBER, 
-	G14 NUMBER, 
-	G15 NUMBER, 
-	G16 NUMBER, 
-	G17 NUMBER, 
-	G18 NUMBER, 
-	G19 NUMBER, 
-	G20 NUMBER, 
-	G21 NUMBER, 
-	G22 VARCHAR2(9)
+   (  B DATE, 
+  E DATE, 
+  G01 VARCHAR2(9), 
+  G02 NUMBER, 
+  G03 VARCHAR2(15), 
+  G04 NUMBER, 
+  G05 VARCHAR2(70), 
+  G06 DATE, 
+  G07 DATE, 
+  G08 DATE, 
+  G08A NUMBER, 
+  G08B NUMBER, 
+  G09 NUMBER, 
+  G10 NUMBER, 
+  G11 NUMBER, 
+  G12 NUMBER, 
+  G13 NUMBER, 
+  G14 NUMBER, 
+  G15 NUMBER, 
+  G16 NUMBER, 
+  G17 NUMBER, 
+  G18 NUMBER, 
+  G19 NUMBER, 
+  G20 NUMBER, 
+  G21 NUMBER, 
+  G22 VARCHAR2(9), 
+  G23 VARCHAR2(2)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -56,7 +57,14 @@ exception when others then
 end; 
 /
 
-
+PROMPT *** add column G23 ***
+begin 
+  execute immediate '
+  alter table tmp_ani34 add G23 VARCHAR2(2)';
+exception when others then       
+  if sqlcode=-01430 then null; else raise; end if; 
+end; 
+/
 
 
 PROMPT *** ALTER_POLICIES to TMP_ANI34 ***
@@ -90,14 +98,15 @@ COMMENT ON COLUMN BARS.TMP_ANI34.G19 IS 'Усього ~нереаліз. р-т~19';
 COMMENT ON COLUMN BARS.TMP_ANI34.G20 IS 'Усього ~реаліз. р-т~20';
 COMMENT ON COLUMN BARS.TMP_ANI34.G21 IS 'Усього~фін. р-т ~21';
 COMMENT ON COLUMN BARS.TMP_ANI34.G22 IS 'Статус~угоди~22';
+COMMENT ON COLUMN BARS.TMP_ANI34.G23 IS 'Ініціатор~23';
 
 
 
 PROMPT *** Create  grants  TMP_ANI34 ***
-grant SELECT                                                                 on TMP_ANI34       to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_ANI34       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_ANI34       to BARS_DM;
 grant SELECT                                                                 on TMP_ANI34       to START1;
+grant SELECT                                                                 on TMP_ANI34       to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_ANI34       to BARS_DM;
+grant SELECT                                                                 on TMP_ANI34       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ANI34       to UPLD;
 
 

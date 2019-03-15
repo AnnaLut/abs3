@@ -1,8 +1,8 @@
+
+ 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sps.sql =========*** Run *** =======
 PROMPT ===================================================================================== 
-
-
 
   CREATE OR REPLACE PACKAGE BARS.SPS is
 
@@ -137,9 +137,9 @@ PROCEDURE PAY_PEREKR023(
 procedure pay_some_perekr (p_union_id number);
 
 end sps;
-/
 
-CREATE OR REPLACE PACKAGE BODY BARS.sps is
+/
+CREATE OR REPLACE PACKAGE BODY BARS.SPS is
 
   ------------------------------------------------------------------------------
   --  Author : yurii.hrytsenia, sergey.gorobets
@@ -403,18 +403,13 @@ is
                         a.KF as MFOA,
                         rownum as U_ID,
                         (select sys_context('bars_global', 'user_id') from dual) as US_ID
-                   from SPECPARAM pa,
-                        PEREKR_B  pb,
-                        %STRTABN  a,
-                        TABVAL    t,
-                        CUSTOMER  k,
-                        CUST_ACC  c
-                  WHERE pa.ids = pb.ids
-                    AND pa.acc = a.acc
-                    AND a.kv = t.kv
-                    AND c.acc = a.acc
-                    AND c.rnk = k.rnk
-                    AND pa.idg = %GRP
+                   from SPECPARAM pa
+                   join PEREKR_B  pb on pb.ids = pa.ids
+                   join %STRTABN  a  on a.acc = pa.acc
+                   join TABVAL    t  on t.kv = a.kv
+                   join CUST_ACC  c  on c.acc = a.acc
+                   join CUSTOMER  k  on k.rnk = c.rnk
+                  WHERE pa.idg = %GRP
                     AND pb.koef > 0
                     AND %sSps <> 0]'||
                     case
@@ -509,7 +504,7 @@ is
           
           if instr(l_str, '#(S)') > 0 then
             l_str := replace (l_str, '#(S)', to_char(round(A.suma_sps*B.koef, 0)));
-          end if; --сума: загальний залишок на рахунку А * на коефіцієнт 
+          end if; --сума: загальний залишок на рахунку А * на коефіцієнт
 
           --вирахування по формулі
           begin
@@ -1051,10 +1046,13 @@ mfoa:=gl.amfo;
 
 END;
 
+
 --процедура оплати груп рахунків (для технологів)
 procedure pay_some_perekr (p_union_id number)
 is
 /*
+13.12.2018 - COBUMMFO-9230 MDom додав довідник групувань sps_union із параметром sps,
+який передається в sps.SEL015 при p_union_id not in (1, 2)
 02.04.2018 - для таблиці SPS_GROUP_RU додано колонку ID
 для черговості виконання розрахунків перекриття по групам
 (н-д: треба щоб спочатку виконалося перекриття по 104 групі, 
@@ -1084,58 +1082,89 @@ l_branch    varchar2(8);
 l           number;
 l_date      date;
 l_err       varchar2(4000);
-l_union_id  number;
 
 begin
  --bc.home; --прибрати при відправці в прод
  l_branch:= sys_context('bars_context', 'user_branch');
+
  -- перевірка чи функція запускається з рівня /
   if l_branch <> '/' then  RAISE_APPLICATION_ERROR (-20000,' Перейдіть на бранч /  '); end if ;
- l_union_id:=p_union_id;
- for c in (select distinct ru from SPS_GROUP_RU) --цикл по РУ, які прописані в довіднику
+
+  for c in (select distinct ru
+              from SPS_GROUP_RU
+             where union_id = p_union_id) --цикл по РУ, які прописані в довіднику
   loop
     bc.go( c.ru ); --представлення відділенням
+
      --прохід по всім групам відповідно до МФО РУ
-     for k in (select group_sps from SPS_GROUP_RU where ru = c.ru and union_id = l_union_id order by id )
+    for k in (/*select group_sps from SPS_GROUP_RU where ru = c.ru and union_id = p_union_id order by id
+              --COBUMMFO-9230 MDom 2018.12.13 закоментував і додав наступну умову*/
+              select sps_gr_ru.group_sps, coalesce(sps_u.sps, 01) as sps
+                from SPS_GROUP_RU sps_gr_ru
+                left join sps_union sps_u on sps_u.union_id = sps_gr_ru.union_id
+               where sps_gr_ru.ru = c.ru
+                 and sps_gr_ru.union_id = p_union_id
+               order by sps_gr_ru.id)
        loop
         insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps); --log
         --DBMS_OUTPUT.PUT_LINE('SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps);
+
         logger.info('SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps);
+
         --перевірка чи існує група на рівні РУ, яку прописали в довіднику
         begin
         select 1 into l from PEREKR_G where idg = k.group_sps;
-         exception when no_data_found then begin
+      exception
+        when no_data_found then
                                             logger.info ('SPS: Заданої групи: '||k.group_sps||' не існує на рівні МФО: '||c.ru);
                                             insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: Заданої групи: '||k.group_sps||' не існує на рівні МФО: '||c.ru); --log
-                                            end;
+
           continue; --якщо групи не має, пишемо запис в sec_audit і пропускаємо ітерацію
         end;
+
         --формування перекриття
-        SPS.SEL015(11,k.group_sps,01,'A');
+      /*SPS.SEL015(11,k.group_sps,01,'A'); --COBUMMFO-9230 MDom 2018.12.13 закоментував і додав наступну умову*/
+      if p_union_id in (1, 2) then
+        SPS.SEL015(11, k.group_sps, 01, 'A'); --для першого та другого групування залишаємо як було, для інших -
+      else
+        sps.SEL015(11, k.group_sps, k.sps, 'A');
+      end if;
+      ----
+
         --оплата кожної стрічки розрахунків
         for p in (select * from TSEL015 where us_id = sys_context('bars_global','user_id') )
           loop
-
-              p.TT:= case when p.MFOA=p.MFOB  then 'PSG'
+        p.TT := case
+                  when p.MFOA = p.MFOB then 'PSG'
                           when p.MFOA<>p.MFOB then 'PS5'
                           else p.TT
                      end;
+
               --оплата
               begin
-               SPS.PAY_PEREKR (p.TT,p.VOB,p.ID,SYSDATE,SYSDATE,p.DK,p.KVA,p.SUMA,p.KVB,p.SUMA,NULL,p.MFOA,p.NMS,p.NLSA,p.NMKB,p.NLSB,p.MFOB,p.NAZN,p.OKPOA,p.OKPOB,NULL,NULL,1,NULL,NULL,p.KOEF);
+          SPS.PAY_PEREKR(
+            p.TT, p.VOB, p.ID, SYSDATE, SYSDATE, p.DK, p.KVA, p.SUMA, p.KVB,
+            p.SUMA, NULL, p.MFOA, p.NMS, p.NLSA, p.NMKB, p.NLSB, p.MFOB, p.NAZN,
+            p.OKPOA, p.OKPOB, NULL, NULL, 1, NULL, NULL, p.KOEF);
+
                 if sqlcode = 0 then
-                         insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps||' - OK!');
+            insert into SPS_GR_PROTOCOL(RU, GROUP_SPS, MESSAGE)
+                 values (c.ru, k.group_sps, 'SPS: Розрахунок для RU: '||c.ru||' та GROUP_RU: '||k.group_sps||' - OK!');
                 end if;
-               exception when others then
+        exception
+          when others then
                 l_err:=sqlerrm;
                 insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: '||l_err); --log
+
                 l_err:='SPS: NLSA: '||p.NLSA||' MFOA: '||p.MFOA||' KVA: '||p.KVA||' SUMA: '||p.SUMA/100||' NLSB: '||p.NLSB||' MFOB: '||p.MFOB||' KVB: '||p.KVB;
                 insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps,l_err ); --log
               end;
           end loop; --цикл по платежах
        end loop; --цикл по групах рахунків
   end loop; --цикл по МФО
+
   bc.home; --вертаємся на "/"
+
   --видалення протоколів роботи функції старших 7 днів
   select max(trunc(time_sps)) into l_date from SPS_GR_PROTOCOL;
   delete SPS_GR_PROTOCOL where trunc(time_sps) < l_date -7;
@@ -1144,14 +1173,13 @@ begin
 end;
 
 end sps;
-/
 
+/
 show err;
  
 PROMPT *** Create  grants  SPS ***
-
-grant EXECUTE                                                                on SPS             to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on SPS             to START1;
+grant EXECUTE                                                                on SPS             to BARS_ACCESS_DEFROLE;
 
  
  

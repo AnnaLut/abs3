@@ -1,52 +1,141 @@
-
-
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TBIU_CURRATEKOMUPD.sql =========*** 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/tbiu_curratekomupd.sql =========*** 
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  trigger TBIU_CURRATEKOMUPD ***
+CREATE OR REPLACE TRIGGER tbiu_curratekomupd
+ BEFORE
+  INSERT OR UPDATE
+ ON cur_rates$base
+REFERENCING NEW AS NEW OLD AS OLD
+ FOR EACH ROW
+DECLARE
+    l_comm          cur_rate_kom_upd.comments%TYPE;
+    l_kol_com       NUMBER DEFAULT 0;
+    l_kol_off       NUMBER DEFAULT 0;
+    ---- настройка списка тобо тобо для занесения курсов в витрину
+    l_branch_main   cur_rates$base.branch%TYPE DEFAULT '/300465/';
+BEGIN
+    IF INSERTING
+    THEN
+        --- не предполагается в одном действии изменения оф и ком курсов
+        --- и установка новіх курсов в null
+        IF :new.rate_o IS NOT NULL
+        THEN
+            l_comm := 'Добавлен курс НБУ';
+            l_kol_off := l_kol_off + 1;
+        end if;    
+        
+        IF (:new.rate_b IS NOT NULL OR :new.rate_s IS NOT NULL)
+        THEN
+            l_comm := 'Добавлен коммерческий курс ';
+            l_kol_com := l_kol_com + 1;
+        END IF;
+    ELSE
+        l_comm := 'Изменен курс ';
 
-  CREATE OR REPLACE TRIGGER BARS.TBIU_CURRATEKOMUPD 
-before insert or update ON cur_rates$base for each row
-declare
-  l_comm cur_rate_kom_upd.comments%type;
-  l_kol  number;
-begin
+        IF :new.rate_b != NVL (:old.rate_b, 0)
+        THEN
+            l_comm := l_comm || 'покупки, ';
+            l_kol_com := l_kol_com + 1;
+        END IF;
 
-  l_kol:=0;
-  l_comm := 'Изменен/добавлен курс ';
+        IF :new.rate_s != NVL (:old.rate_s, 0)
+        THEN
+            l_comm := l_comm || 'продажи, ';
+            l_kol_com := l_kol_com + 1;
+        END IF;
 
-  If    :new.rate_b != :old.rate_b
-                    then l_comm := l_comm||'покупки, ';
-                         l_kol:=l_kol +1;
-  end if;
+        IF :new.rate_o != NVL (:old.rate_o, 0)
+        THEN
+            l_comm := l_comm || 'официальный, ';
+            l_kol_off := l_kol_off + 1;
+        END IF;
+    END IF;
 
-  if :new.rate_s != :old.rate_s
-                    then l_comm := l_comm||'продажи, ';
-                         l_kol:=l_kol +1;
-  end if;
+    IF (l_kol_off > 0 OR l_kol_com > 0)
+    THEN
+        INSERT INTO cur_rate_kom_upd (kv,
+                                      vdate,
+                                      bsum,
+                                      rate_b,
+                                      rate_s,
+                                      branch,
+                                      isp,
+                                      systime,
+                                      recid,
+                                      rate_o,
+                                      comments)
+        VALUES      (:new.kv,
+                     :new.vdate,
+                     :new.bsum,
+                     :new.rate_b,
+                     :new.rate_s,
+                     :new.branch,
+                     gl.auid,
+                     SYSDATE,
+                     s_curratekomupd.NEXTVAL,
+                     :new.rate_o,
+                     l_comm);
 
-  if :new.rate_o != :old.rate_o
-                    then l_comm := l_comm||'официальный, ';
-                         l_kol:=l_kol +1;
-  end if;
+        ----------------- порождено COBUMMFO-9345
+        -----заполняем витрину для ШД
+        BEGIN
+            INSERT ALL
+            ----в любом случае офф курс загружаем только для /
+            WHEN l_kol_off > 0 AND :new.branch = '/'
+            THEN
+                INTO   bars_intgr.cur_rate_official (arcdate,
+                                                     kv,
+                                                     kvcode,
+                                                     kvname,
+                                                     kvnominal,
+                                                     rate)
+                VALUES (:new.vdate,
+                        cukv,
+                        cunom,
+                        cuname,
+                        nominal,
+                        :new.rate_o)
+            ----? добавить возможность списка бранчей
+            WHEN (    l_kol_com > 0
+                  AND (:new.branch = l_branch_main OR l_branch_main IS NULL))
+            THEN
+                INTO   bars_intgr.cur_rate_commercial (arcdate,
+                                                       branch,
+                                                       kv,
+                                                       kvcode,
+                                                       kvname,
+                                                       kvnominal,
+                                                       rate_b,
+                                                       rate_s)
+                VALUES (:new.vdate,
+                        :new.branch,
+                        cukv,
+                        cunom,
+                        cuname,
+                        nominal,
+                        :new.rate_b,
+                        :new.rate_s)
+                SELECT cur.kv cukv, cur.lcv cunom, cur.name cuname,
+                       cur.nominal
+                FROM   tabval$global cur
+                WHERE  kv = :new.kv;
 
-  if l_kol> 0 then
-                  insert into CUR_RATE_KOM_UPD (KV,VDATE,BSUM,RATE_B,RATE_S,BRANCH,ISP,SYSTIME,recid, rate_o, comments)
-                                         select :new.KV, :new.VDATE, :new.BSUM, :new.RATE_B, :new.RATE_S,
-                                                :new.BRANCH,gl.aUid,sysdate,S_CURRATEKOMUPD.nextval, :new.rate_o, l_comm
-                                           from dual;
-  end if;
-
-end tbiu_CURRATEKOMUPD;
-
-
-
+            bars.bars_audit.info ('TBIU_CRRATEKOMUPD => OK ' || SQL%ROWCOUNT);
+        EXCEPTION
+            WHEN OTHERS
+            THEN
+                bars.bars_audit.error ('TBIU_CRRATEKOMUPD => ' || SQLERRM);
+                raise;
+        END;
+    END IF;                              ---< (l_kol_off > 0 OR l_kol_com > 0)
+END tbiu_curratekomupd;
 /
-ALTER TRIGGER BARS.TBIU_CURRATEKOMUPD ENABLE;
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TBIU_CURRATEKOMUPD.sql =========*** 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/tbiu_curratekomupd.sql =========*** 
 PROMPT ===================================================================================== 
+
+

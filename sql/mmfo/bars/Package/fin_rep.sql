@@ -243,7 +243,7 @@ END fin_rep;
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_REP 
 AS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.0.7 29.10.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.0.8 06.12.2018';
 
 /*
  2017-05-23 1.0.2  - COBUSUPMMFO-588 Если Клиент одновременно входит в группу под общим контролем
@@ -2601,11 +2601,14 @@ begin
 
 
 			l_rep.rv    := 1;             l_rep.sort := '1000'; 	l_rep.kod  := 'VNKRO'; 			l_rep.name := 'ВКР операції';
-			l_rep.s    := fin_obu.GET_VNKR(x.zdat, p_rnk, p_nd);
+			--l_rep.s    := fin_obu.GET_VNKR(x.zdat, p_rnk, p_nd);
 
-               if f_get_osbb_k110_type (p_rnk) = 1 and l_rep.s is null then
+               if f_get_osbb_k110_type (p_rnk, p_nd) = 1 then
                 l_rep.s    := CCK_APP.GET_ND_TXT( p_nd, 'VNCRR');
+               else 
+                l_rep.s    := fin_obu.GET_VNKR(x.zdat, p_rnk, p_nd);
                end if;
+               
 			PIPE ROW(l_rep);
 
 			l_rep.rv    := 2;            l_rep.sort := '2000';   	l_rep.kod  := 'VNCRP';  		l_rep.name := 'Попередній ВКР контрагента';
@@ -2637,6 +2640,9 @@ begin
 			l_rep.rv    := 3; 			 l_rep.sort := '3000';		l_rep.kod  := 'VNCRR';			l_rep.name := 'Поточний ВКР контрагента';
 			l_rep.s    := null; --fin_obu.GET_VNKR(x.zdat, p_rnk, p_nd);
 
+            if f_get_osbb_k110_type (p_rnk, p_nd) = 1   then
+                l_rep.s := CCK_APP.GET_ND_TXT( p_nd, 'VNCRR');
+            else
 			Begin
 			   Select txt
 			    into l_rep.s
@@ -2652,11 +2658,10 @@ begin
                   AND (dazs IS NULL OR dazs > x.zdat)  				  )
 				Where num = 1;
             exception when no_data_found then
-              l_rep.s := null;
-              if f_get_osbb_k110_type (p_rnk) = 1 and l_rep.s is null   then
               l_rep.s := CCK_APP.GET_ND_TXT( p_nd, 'VNCRR');
+                 end;
               end if;
-             end;
+            
 			PIPE ROW(l_rep);
 
 

@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FIN_REZ.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FIN_REZ ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_fin_rez.sql =========*** Run ***
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.P_FIN_REZ 
 (kor_  int , -- =10 - кол-во дней корр.пров.
  DAT1_ date, -- дата "С"
@@ -58,7 +55,7 @@ begin
               and o.fdat <= (DAT2_+ kor_)
                )
   loop
-
+   begin --2018.10.17 MDom для тестування звіту про доходи та витрати (БР+Вiддiлення), т.я. не вдавалося згенерувати
      select branch , vdat , vob , mfoa , mfob ,
             decode(nlsb,k.nls, nlsa, nlsb),
             decode(nlsb,k.nls, kv  , kv2 )
@@ -114,7 +111,12 @@ begin
      end if;
 
      <<NextRec>> NULL;
-
+   --2018.10.17 MDom для тестування звіту про доходи та витрати (БР+Вiддiлення), т.я. не вдавалося згенерувати
+   exception
+     when no_data_found then
+       null; --якщо не знаходить ref в oper, наступна ітерація
+   end;
+   ----
   end loop;
   ----------------------
   <<KIN>> null;
@@ -122,15 +124,16 @@ begin
 
 end p_FIN_REZ;
 /
-show err;
-
+ show err;
+ 
 PROMPT *** Create  grants  P_FIN_REZ ***
-grant EXECUTE                                                                on P_FIN_REZ       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_FIN_REZ       to RPBN001;
 grant EXECUTE                                                                on P_FIN_REZ       to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on P_FIN_REZ       to RPBN001;
+grant EXECUTE                                                                on P_FIN_REZ       to BARS_ACCESS_DEFROLE;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FIN_REZ.sql =========*** End ***
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_fin_rez.sql =========*** End ***
+ PROMPT ===================================================================================== 
+ 

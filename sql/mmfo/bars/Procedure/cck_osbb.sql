@@ -369,11 +369,17 @@ end if;
     if sd1.ostb > 0 then
        cck_dop.open_account(p_nd => dd2.nd,  p_tip => 'SDI') ;
     end if;
+	
     -----сохраняем данные об обеспечении
+	begin
     insert into cc_accp(ACC,  ACCS,     ND )
       select distinct z.acc, s.acc, dd2.nd
       from (select * from cc_accp where nd = dd1.nd) z,
            (select a.acc from accounts a, nd_acc n where n.nd= dd2.nd and n.acc = a.acc and a.tip='SS ') s ;
+	exception when others then 
+    if sqlcode = -1 then null; else raise;  --COBUMMFO-8054
+    end if; 
+    end;
     ------добавить 2600
     insert into nd_acc(nd,acc)
     select dd2.nd, a.acc  from nd_acc n, accounts a

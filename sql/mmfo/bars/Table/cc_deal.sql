@@ -214,6 +214,8 @@ exception when others then
  end;
 /
 
+
+
 declare
   e_idx_exists           exception;
   pragma exception_init( e_idx_exists,      -00955 );
@@ -311,6 +313,25 @@ exception when others then
  end;
 /
 
+
+begin
+    execute immediate 'create index IDX_CCDEAL_VIDD on CC_DEAL (VIDD)
+  tablespace BRSDYNI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 PROMPT *** Create  grants  CC_DEAL ***

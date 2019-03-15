@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/REF_QUE.sql =========*** Run *** =====
 PROMPT ===================================================================================== 
@@ -82,7 +80,7 @@ begin
   CREATE UNIQUE INDEX BARS.PK_REFQUE ON BARS.REF_QUE (KF, REF) 
 LOCAL COMPUTE STATISTICS';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode in (-955,-14016)  then null; else raise; end if;
  end;
 /
 

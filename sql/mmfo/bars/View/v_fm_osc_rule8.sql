@@ -19,7 +19,7 @@ PROMPT *** Create  view V_FM_OSC_RULE8 ***
           AND c.custtype = 2
           AND a.nbs IN ('2650', '2655')
           AND (   NVL (TRIM (c.ved), '00000') IN ('66010', '66020', '66030')
-               OR regexp_like(upper(o.nazn), '(^| )(ÑÒÐÀÕ|ÏÅÐÅÑÒÐÀÕ)')
+               OR regexp_like(upper(o.nazn), '(^|.)(ÑÒÐÀÕ|ÏÅÐÅÑÒÐÀÕ)')
     )
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=
                  15000000

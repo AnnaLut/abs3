@@ -9,10 +9,16 @@
                 <div class="panel panel-default" style="display: inline-flex;width:100%">
                     <div class="panel-body">
                         <div class="form-group">
-                            <label><b>Початкова, Одноразова</b></label>
+                            <label><b>Разова комісія за надання кредиту</b></label>
                             <label class="lbl-top">+ Дисконт (ПЛЮС), - Премія (МІНУС)</label>
                             <label>Сума:</label>  
                             <input kendo-numeric-text-box k-ng-model="credit.discontSumValue" data-decimals="2"   style="width: 100px" ng-disabled="isSaveFunc()"/>
+                        </div>
+                        <div class="form-group" ng-show="custtype==3">
+                            <label><b>Комісія за обслуговування кредиту</b></label>
+                            <label class="lbl-top"><b>(сплачується перед видачею кредиту)</b></label>
+                            <label>Сума:</label>
+                            <input kendo-numeric-text-box k-ng-model="credit.commissionObsl" data-decimals="2" style="width: 100px" ng-disabled="isSave" />
                         </div>
                     </div>
                 </div>
@@ -39,8 +45,15 @@
         </tr>
         <tr>
             <td>
-                <label class="lbl-top">Вал. комісійного рахунку</label>
-                <select kendo-drop-down-list name="ddlCurComAcc" id="ddlCurComAcc" style="width: 300px" k-ng-model="credit.curComAccValue" k-options="ddlCurComAccOptions" k-ng-disabled="isSave"></select>  
+                <div class="panel panel-default" style="display: inline-flex;width:100%">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="lbl-top"><b>Вал. комісійного рахунку</b></label>
+                            <select kendo-drop-down-list name="ddlCurComAcc" id="ddlCurComAcc" style="width: 300px" k-ng-model="credit.curComAccValue" k-options="ddlCurComAccOptions" k-ng-disabled="isSave"></select>
+                            <label>%</label>
+                        </div>
+                    </div>
+                </div>
             </td>
             <td>
                 <div class="panel panel-default" style="display: inline-flex;width:100%">
@@ -67,7 +80,7 @@
                                 </div>
                                 <br />
                                 <div>
-                                    <input kendo-numeric-text-box k-ng-model="credit.metrRateValue" style="width: 100px" k-min="0" ng-disabled="isSaveFunc()"/>  <label>% або сума в залежності від метода</label>
+                                    <input kendo-numeric-text-box k-ng-model="credit.metrRateValue" style="width: 100px" k-min="0" ng-disabled="isSaveFunc()" k-decimals="3" k-format="'{0:n3}'"/>  <label>% або сума в залежності від метода</label>
                                 </div>
                             </div>
                         </div>

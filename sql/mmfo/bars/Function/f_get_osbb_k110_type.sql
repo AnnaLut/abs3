@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION f_get_osbb_k110_type (P_RNK NUMBER)
+CREATE OR REPLACE FUNCTION f_get_osbb_k110_type (P_RNK NUMBER, P_nd NUMBER)
    RETURN NUMBER
 IS
    /*
@@ -6,8 +6,8 @@ IS
    0 - неявляется
    1- является
    */
-   l_res         NUMBER;
-   l_borg_nd     NUMBER;
+   l_res         NUMBER :=0;
+/*   l_borg_nd     NUMBER;
    l_borg_all    NUMBER := 0;
    l_sum_osbb    NUMBER := 250000; -- Загальна сума заборгованості з врахуванням всіх кредитів ОСББ/ЖБК > 250 тис. грн.;
    l_days_osbb   NUMBER := 30; -- кількість днів прострочення за будь якою активною операцією ОСББ/ЖБК >=30 днів.
@@ -36,7 +36,7 @@ IS
       END IF;
 
       RETURN x_event_date;
-   END;
+   END;*/
 BEGIN
    BEGIN                                     -- контрагенты страховых компаний
       SELECT 1
@@ -49,8 +49,24 @@ BEGIN
       THEN
          NULL;
    END;
+   
+   
+   BEGIN                                     -- ОСББ
+      SELECT 1
+        INTO l_res
+        FROM cc_deal
+       WHERE nd = p_nd AND SUBSTR (prod, 1, 6) IN ('206309',
+                                                   '206310',
+                                                   '206325',
+                                                   '206326');
+       return l_res;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         NULL;
+   END;
 
-   BEGIN
+  /* BEGIN
       FOR c IN (SELECT *
                   FROM cc_deal
                  WHERE     rnk = p_rnk
@@ -102,7 +118,7 @@ BEGIN
       l_res := 1;
    ELSE
       l_res := 0;
-   END IF;
+   END IF;*/
 
    RETURN l_res;
 END;

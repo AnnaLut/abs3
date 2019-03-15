@@ -7,9 +7,9 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FM_INTDOCCHECK ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_FM_INTDOCCHECK (p_ref number)
+CREATE OR REPLACE PROCEDURE BARS.P_FM_INTDOCCHECK (p_ref number default null)
 --
--- Version 1.3 12/06/2018
+-- Version 1.5 09/10/2018
 --
 -- проверка начальных (исход€щих) документов
 --   мультимфо
@@ -34,10 +34,12 @@ is
      l_tt    oper.tt%type;
      l_flag  number;
      l_otm   number := 0;
+     l_id_a  oper.id_a%type;
+     l_id_b  oper.id_b%type;
   begin
      begin
-        select o.tt, o.nazn, o.nam_a, o.nam_b
-          into l_tt, l_nazn, l_nama, l_namb
+        select o.tt, o.nazn, o.nam_a, o.nam_b, o.id_a , o.id_b
+          into l_tt, l_nazn, l_nama, l_namb, l_id_a , l_id_b          
           from oper o
          where o.ref = p_ref
            for update of o.sos nowait;
@@ -82,6 +84,69 @@ is
         end loop;
      end if;
 
+    /*
+      COBUSUPABS-9160
+    */
+    -------------------------------
+    -- якщо в l_id_a , l_id_b Ї ќ ѕќ в терористах
+    if l_otm = 0 then
+       begin
+            select fin_r.c1 into l_otm
+              from bars.FINMON_REFT fin_r
+             where fin_r.c25 is not null
+               and regexp_like(fin_r.c25, '^([[:digit:]]{8}|[[:digit:]]{10})$')
+               and fin_r.c25 in (l_id_a , l_id_b)
+               and rownum = 1;
+       exception
+         when no_data_found then l_otm := 0;
+       end;
+    end if;
+    -- якщо в l_nazn Ї ќ ѕќ в терористах
+    if l_otm = 0 then
+       begin 
+        with tab_okpo as
+         (SELECT regexp_replace(res_okpo, '[^0-9]') res_okpo
+            FROM (SELECT REGEXP_SUBSTR(str, '[^ ]+', 1, LEVEL) AS res_okpo
+                    FROM (SELECT l_nazn AS str
+                            FROM DUAL)
+                  CONNECT BY LEVEL <= LENGTH(REGEXP_REPLACE(str, '[^ ]+')) + 1)
+           WHERE REGEXP_LIKE(res_okpo, '(^|\D)(\d{8}|\d{10})(\D|$)'))
+        select fin_r.c1 into l_otm
+          from bars.FINMON_REFT fin_r, tab_okpo
+         where fin_r.c25 = tab_okpo.res_okpo
+           and fin_r.c25 is not null
+           and regexp_like(fin_r.c25, '^([[:digit:]]{8}|[[:digit:]]{10})$')
+           and rownum = 1;
+           exception
+         when no_data_found then l_otm := 0;
+       end;
+    end if;
+    -- якщо в TAG =>FIO э слова ч/3 або через то треба перев≥рити стандартним методом
+    if l_otm = 0 then
+       begin
+        for check_str in ( 
+                           select level as element,
+                                  regexp_substr(str, '(.*?)( (через)|(ч/з)|$)', 1, level, null, 1) as element_value
+                             from (select value str
+                                     from operw
+                                    where ref = p_ref
+                                      and tag = 'FIO'
+                                      and rownum =1 
+                                  ) 
+                             where regexp_like(str,'ч/з|через') 
+                             connect by level <= regexp_count(str, 'через') + regexp_count(str, 'ч/з')+ 1
+                          )
+        loop
+           l_otm := f_istr (check_str.element_value);
+           if l_otm > 0 then
+              exit;
+           end if;
+        end loop;
+       exception
+         when no_data_found then l_otm := 0;  
+       end;
+    end if;
+    ------------------------------
 
      /*COBUSUPABS-5202
      ѕо операц≥€м з кодами CVO, IBO, CVS додатково перев≥р€ти на на€вн≥сть терорист≥в у ѕерел≥ку додатковий рекв≥зит операц≥њ "59" ЂSWT.59 Beneficiare Customerї
@@ -148,7 +213,6 @@ is
            -- запись уже есть
            when dup_val_on_index then null;
         end;
-
         if c_grp is not null then
            insert into oper_visa (ref, dat, userid, groupid, status)
            values (p_ref, sysdate, user_id, c_grp, 1);
@@ -157,7 +221,6 @@ is
 
   end fm_check;
 begin
-
   if p_ref is not null then
      -- проверка одного документа
      for r in (select ref from ref_que where nvl(fmcheck, 0) = 0 and ref = p_ref )
@@ -165,7 +228,6 @@ begin
         fm_check(r.ref);
      end loop;
   else
-
      for b in ( select kf from mv_kf )
      loop
         -- представл€емс€ чужим ћ‘ќ

@@ -67,5 +67,6 @@ namespace BarsWeb.Areas.CreditUi.Models
         public decimal? LIM { get; set; }
         public int? INSPECTOR_ID { get; set; }
         public CustomerInfo CUST_DATA { get; set; }
+        public decimal? S_S36 { get; set; }
     }
 }
