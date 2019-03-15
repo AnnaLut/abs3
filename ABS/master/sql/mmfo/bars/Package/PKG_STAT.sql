@@ -8,7 +8,7 @@ CREATE OR REPLACE PACKAGE "PKG_STAT" is
   -------------------------------------------------------------------------------
   --возвращает последнюю подпись
   procedure get_last_sign(p_file_id  in  STAT_FILE_SIGNS.FILE_ID%TYPE,
-                          p_sign     out STAT_FILE_SIGNS.SIGN%TYPE);    
+                          p_sign     out STAT_FILE_SIGNS.envelope%TYPE);    
   -------------------------------------------------------------------------------
  --возвращает список типов файлов доступных для загрузки
   procedure get_type_list_p(res out BARS.VARCHAR2_LIST);
@@ -30,6 +30,7 @@ CREATE OR REPLACE PACKAGE "PKG_STAT" is
   procedure set_file_operation(p_file_id      in stat_files.id%type,
                                p_oper_id      in stat_operations.id%type,
                                p_sign         in STAT_FILE_SIGNS.sign%type:=null,
+                               p_envelope     in STAT_FILE_SIGNS.ENVELOPE%type:=null,
                                p_reverse      in int := 0);
   --------------------------------------------------------------------------------
   -- добавляет файл
@@ -70,9 +71,9 @@ CREATE OR REPLACE PACKAGE BODY "PKG_STAT" is
 
   --возвращает последнюю подпись
   procedure get_last_sign(p_file_id  in  STAT_FILE_SIGNS.FILE_ID%TYPE,
-                          p_sign     out STAT_FILE_SIGNS.SIGN%TYPE) is
+                          p_sign     out STAT_FILE_SIGNS.envelope%TYPE) is
   begin
-    select s.sign
+    select s.envelope
     into   p_sign 
     from STAT_FILE_SIGNS s , stat_file_operations_hist h
     where s.file_id  = p_file_id
@@ -199,6 +200,7 @@ end get_file_data_by_storage;
   procedure set_file_operation(p_file_id      in stat_files.id%type,
                                p_oper_id      in stat_operations.id%type,
                                p_sign         in STAT_FILE_SIGNS.sign%type:=null,
+                               p_envelope     in STAT_FILE_SIGNS.ENVELOPE%type:=null,
                                p_reverse      in int := 0) is
     l_th constant varchar2(100) := g_dbgcode || 'set_file_operation';
     l_oper         v_stat_workflow_operations_all%rowtype;
@@ -231,7 +233,7 @@ end get_file_data_by_storage;
       raise_application_error(-20001,'Увага!! Файл було змінено в процессі підписання усіма учасниками!!');
     end;
 
-    if p_sign is not null then
+    if p_sign is not null or p_envelope is not null then
       l_signer_id:=gl.USR_ID;
       l_sign_date:=sysdate;
     end if;
@@ -364,13 +366,14 @@ end get_file_data_by_storage;
        1 )
      returning id into l_id;
 
-      if p_sign is not null then
+      if p_sign is not null or p_envelope is not null then
       insert into STAT_FILE_SIGNS
         (sign_id,
          file_id,
          sign_date,
          user_id,
          sign,
+         envelope,
          oper_hist,
          END_OPER
          )
@@ -380,6 +383,7 @@ end get_file_data_by_storage;
           l_sign_date,
           l_signer_id,
           p_sign,
+          p_envelope,
           l_id,
           l_oper.END_OPER);
       end if;

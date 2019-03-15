@@ -41,6 +41,13 @@ tablespace BRSDYND
 end;
 / 
 
+begin 
+   execute immediate('alter table STAT_FILE_SIGNS add ENVELOPE BLOB ');
+exception when others then 
+   null; 
+end;
+/
+
 -- Add comments to the table 
 comment on table STAT_FILE_SIGNS
   is ' Підписи на файлі ';
@@ -59,6 +66,9 @@ comment on column STAT_FILE_SIGNS.oper_hist
   is 'ID історіії операцій';
 comment on column STAT_FILE_SIGNS.end_oper
   is 'останній підпис';
+comment on column STAT_FILE_SIGNS.end_oper
+  is 'Підписаний конверт';
+
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin
