@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" ReportInfo.Created="11/22/2018 16:25:05" ReportInfo.Modified="11/23/2018 11:21:39" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHzPfbhMU3HSoU5H4mPft3vzCUEmkS+zwMT4EWhjIwAV8w=="/>
+    <Parameter Name="p_okpo" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_nmkk" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_resid" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_mfo" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_odate" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_nls" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_kv" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_otype" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_dat_in_dpa" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_id_dpa" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_id_dps" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_dat_acc_dpa" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_id_pr" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_date_r" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_fn_r" DataType="System.String" Description="ID из очереди"/>
+    <Parameter Name="p_id_rec" DataType="System.String" Description="ID из очереди"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="141.75">
+      <TableObject Name="Table1" Left="47.25" Top="9.45" Width="642.63" Height="56.7">
+        <TableColumn Name="Column1" Width="203.23"/>
+        <TableColumn Name="Column2" Width="439.4"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1"/>
+          <TableCell Name="Cell2" Text="Форма № П5" HorzAlign="Right"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Text="[Date]" Format="Date" Format.Format="d" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell7"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Border.Lines="Top" Text="число, місяць, рік" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell12"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Left="9.45" Top="75.6" Width="699.3" Height="47.25" Text="Копія електронного файла-відповіді &#13;&#10;щодо взяття на облік/зняття з обліку рахунку Платника податків&#13;&#10;в органі державної податкової служби&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="145.45" Width="718.2" Height="396.9" CanGrow="true" CanShrink="true">
+      <TextObject Name="Text2" Left="9.45" Width="689.85" Height="387.45" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="1.  Податковий номер або серія та номер паспорта (для фізичної особи, яка через свої &#13;&#10;     релігійні переконання відмовилась від прийняття реєстраційного номера облікової &#13;&#10;     картки платника податків та повідомила про це відповідний орган ДПС і має відмітку у &#13;&#10;     паспорті) клієнта [p_okpo]&#13;&#10;2.  Скорочене найменування (прізвище, ім'я, по батькові) Платника податків згідно з &#13;&#10;     Повідомленням [p_nmkk]&#13;&#10;3.  Резидентність Платника податків [p_resid]&#13;&#10;4.  Код фінансової установи, у якій відкрито рахунок [p_mfo]&#13;&#10;5.  Дата операції [p_odate]&#13;&#10;6.  Номер рахунка [p_nls]&#13;&#10;7.  Валюта рахунка [p_kv]&#13;&#10;8.  Тип операції [p_otype]&#13;&#10;9.  Дата надання Повідомлення до ДПС України [p_dat_in_dpa]&#13;&#10;10. Орган ДПС регіонального рівня, який зазначено в Повідомленні як місце обліку   &#13;&#10;      Платника податків [p_id_dpa]&#13;&#10;11. Орган ДПС районного рівня, який зазначено в Повідомленні як місце обліку   &#13;&#10;      Платника податків [p_id_dps]&#13;&#10;12. Дата взяття на облік рахунка в органі ДПС [p_dat_acc_dpa]&#13;&#10;13. Причина відмови в узятті на облік рахунка [p_id_pr]&#13;&#10;14. Дата формування Файла-відповіді [p_date_r]&#13;&#10;15. Найменування Файла-відповіді [p_fn_r]&#13;&#10;16. Ідентифікатор запису в Повідомленні–відповіді [p_id_rec]&#13;&#10;17. &lt;b&gt;Дозволяю розпочати операції на рахунку номер рахунка [p_nls]&lt;/b&gt;&#13;&#10;" HtmlTags="true"/>
+    </DataBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="04/03/2018 15:18:43" ReportInfo.Modified="01/14/2019 15:52:25" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void ReportTitle1_BeforePrint(object sender, EventArgs e)
+    {
+      /*    Report.SetParameterValue(&quot;dk_txt&quot;, 
+        Switch(
+        ((Int32)Report.GetParameterValue(&quot;dk&quot;)==1),&quot;Покупка&quot;,
+        ((Int32)Report.GetParameterValue(&quot;dk&quot;)==2),&quot;Продаж&quot;,
+        ((Int32)Report.GetParameterValue(&quot;dk&quot;)==3),&quot;Конверсія купівлі&quot;,      
+        ((Int32)Report.GetParameterValue(&quot;dk&quot;)==4),&quot;Конверсія продажу&quot;
+        )      
+      );      */
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcJ5DXO9mdI+DtiG+5TWuleQ==">
+      <TableDataSource Name="Table" Alias="qryData" DataType="System.Int32" Enabled="true" SelectCommand="SELECT CHAR00     DK,&#13;&#10;       CHAR01     MFO,&#13;&#10;       CHAR02     BRANCH_NAME,&#13;&#10;       NUM00      RNK,&#13;&#10;       CHAR03     NMK,&#13;&#10;       NUM01      KV2,&#13;&#10;       NUM02      KURS_F,&#13;&#10;       NUM03      S2,&#13;&#10;       NUM04      S_EQ,&#13;&#10;       NUM05      KV_CONV,&#13;&#10;       NUM06      S_CONV&#13;&#10;  FROM rs_tmp_report_data&#13;&#10; WHERE session_id = :SESSION_ID">
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="KURS_F" DataType="System.Decimal"/>
+        <Column Name="KV2" DataType="System.Decimal"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="KV_CONV" DataType="System.Int16"/>
+        <Column Name="DK" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="S2" DataType="System.Decimal"/>
+        <Column Name="S_EQ" DataType="System.Decimal"/>
+        <Column Name="S_CONV" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.String"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime" Expression="[Date]"/>
+    <Total Name="lcv_s2s" Expression="[qryData.S2]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="lcv_sq" Expression="[qryData.S_EQ]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="kurs_f_s2s" Expression="[qryData.S2]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="kurs_f_sq" Expression="[qryData.S_EQ]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="330" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1171.8" Height="47.25" BeforePrintEvent="ReportTitle1_BeforePrint">
+      <TableObject Name="Table1" Width="1149.33" Height="47.25">
+        <TableColumn Name="Column19" Width="96.6"/>
+        <TableColumn Name="Column20" Width="96.6"/>
+        <TableColumn Name="Column21" Width="172.2"/>
+        <TableColumn Name="Column22" Width="127.05"/>
+        <TableColumn Name="Column23" MaxWidth="567" Width="210"/>
+        <TableColumn Name="Column24" Width="81.48"/>
+        <TableColumn Name="Column25" Width="81.48"/>
+        <TableColumn Name="Column26" Width="134.4"/>
+        <TableColumn Name="Column27" Width="149.52"/>
+        <TableRow Name="Row3" Height="47.25">
+          <TableCell Name="Cell51" Text="Біржові заявки акцептовані дилером за [sFdat1] року" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="9"/>
+          <TableCell Name="Cell52" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell53" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell54" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell55" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell56" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell57" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell58" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell59" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="50.64" Width="1171.8" Height="47.25">
+      <TableObject Name="Table1" Width="1149.33" Height="47.25" Border.Lines="All" Border.Width="0.25">
+        <TableColumn Name="Column10" Width="75.6"/>
+        <TableColumn Name="Column11" Width="75.6"/>
+        <TableColumn Name="Column12" Width="151.2"/>
+        <TableColumn Name="Column13" Width="106.05"/>
+        <TableColumn Name="Column14" MaxWidth="567" Width="189"/>
+        <TableColumn Name="Column15" Width="60.48"/>
+        <TableColumn Name="Column16" Width="60.48"/>
+        <TableColumn Name="Column17" Width="113.4"/>
+        <TableColumn Name="Column18" Width="128.52"/>
+        <TableColumn Name="Column28" Width="75.6"/>
+        <TableColumn Name="Column29" Width="113.4"/>
+        <TableRow Name="Row2" Height="47.25">
+          <TableCell Name="Cell42" Border.Lines="All" Border.Width="0.25" Text="Тип заявки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell43" Border.Lines="All" Border.Width="0.25" Text="МФО" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell44" Border.Lines="All" Border.Width="0.25" Text="Відділення" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell45" Border.Lines="All" Border.Width="0.25" Text="РНК" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell46" Border.Lines="All" Border.Width="0.25" Text="Найменування клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell47" Border.Lines="All" Border.Width="0.25" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell48" Border.Lines="All" Border.Width="0.25" Text="Курс дилера" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell49" Border.Lines="All" Border.Width="0.25" Text="Сума в валюті" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell50" Border.Lines="All" Border.Width="0.25" Text="Сума в еквіваленті" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell60" Border.Lines="All" Border.Width="0.25" Text="Валюта конверсії" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell61" Border.Lines="All" Border.Width="0.25" Text="Сума конверсії" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader3" Top="101.28" Width="1171.8" Condition="[qryData.DK]">
+      <GroupHeaderBand Name="GroupHeader1" Top="104.67" Width="1171.8" Condition="[qryData.KV2]">
+        <GroupHeaderBand Name="GroupHeader2" Top="108.06" Width="1171.8" Condition="[qryData.KURS_F]">
+          <DataBand Name="Data1" Top="111.45" Width="1171.8" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true">
+            <TableObject Name="Table1" Width="1149.33" Height="18.9" Border.Lines="All" Border.Width="0.25" GrowToBottom="true" CanBreak="false" RepeatHeaders="false">
+              <TableColumn Name="Column1" Width="75.6"/>
+              <TableColumn Name="Column2" Width="75.6"/>
+              <TableColumn Name="Column3" Width="151.2"/>
+              <TableColumn Name="Column4" Width="106.05"/>
+              <TableColumn Name="Column5" MaxWidth="529.2" Width="189"/>
+              <TableColumn Name="Column6" Width="60.48"/>
+              <TableColumn Name="Column7" Width="60.48"/>
+              <TableColumn Name="Column8" Width="113.4"/>
+              <TableColumn Name="Column9" Width="128.52"/>
+              <TableColumn Name="Column30" Width="75.6"/>
+              <TableColumn Name="Column31" Width="113.4"/>
+              <TableRow Name="Row1">
+                <TableCell Name="Cell1" Border.Lines="All" Border.Width="0.25" Text="[qryData.DK]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell2" Border.Lines="All" Border.Width="0.25" Text="[qryData.MFO]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell3" Border.Lines="All" Border.Width="0.25" Text="[qryData.BRANCH_NAME]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell4" Border.Lines="All" Border.Width="0.25" Text="[qryData.RNK]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell5" Border.Lines="All" Border.Width="0.25" Text="[qryData.NMK]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell26" Border.Lines="All" Border.Width="0.25" Text="[qryData.KV2]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell31" Border.Lines="All" Border.Width="0.25" Text="[qryData.KURS_F]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell36" Border.Lines="All" Border.Width="0.25" Text="[qryData.S2]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell41" Border.Lines="All" Border.Width="0.25" Text="[qryData.S_EQ]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell62" Border.Lines="All" Border.Width="0.25" Text="[qryData.KV_CONV]" HorzAlign="Center" VertAlign="Center"/>
+                <TableCell Name="Cell63" Border.Lines="All" Border.Width="0.25" Text="[qryData.S_CONV]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+              </TableRow>
+            </TableObject>
+          </DataBand>
+          <GroupFooterBand Name="GroupFooter2" Top="133.74" Width="1171.8" Height="22.68" CanGrow="true" CanShrink="true">
+            <TextObject Name="Text25" Left="718.2" Width="113.4" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="[kurs_f_s2s]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TextObject Name="Text26" Left="831.6" Width="128.9" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="[kurs_f_sq]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TextObject Name="Text27" Width="718.2" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="[qryData.KV2] по курсу [qryData.KURS_F]" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TextObject Name="Text33" Left="960.12" Width="75.6" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TextObject Name="Text35" Left="1036.5" Width="113.02" Height="22.68" Border.Lines="Right, Top, Bottom" Border.Width="0.25" Fill.Color="WhiteSmoke" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </GroupFooterBand>
+        </GroupHeaderBand>
+        <GroupFooterBand Name="GroupFooter1" Top="159.81" Width="1171.8" Height="22.68" CanGrow="true" CanShrink="true">
+          <TextObject Name="Text30" Left="-0.1" Width="718.2" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Всього по [qryData.KV2]" HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TextObject Name="Text31" Left="718.2" Width="113.4" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="[lcv_s2s]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TextObject Name="Text32" Left="831.6" Width="128.9" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="[lcv_sq]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TextObject Name="Text34" Left="959.9" Width="75.6" Height="22.68" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TextObject Name="Text36" Left="1036.5" Width="113.02" Height="22.68" Border.Lines="Right, Top, Bottom" Border.Width="0.25" Fill.Color="WhiteSmoke" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter3" Top="185.88" Width="1171.8" Height="37.8" CanShrink="true" CanBreak="true"/>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="227.07" Width="1171.8" Height="18.9"/>
+  </ReportPage>
+</Report>

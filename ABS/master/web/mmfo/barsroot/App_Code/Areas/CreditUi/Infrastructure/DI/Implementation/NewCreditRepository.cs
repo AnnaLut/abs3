@@ -900,7 +900,9 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     new { Tag = "SN8_R", Value = param.sn8 != null? param.sn8.ToString() :  null},
                     new { Tag = "I_CR9", Value = param.icr9 != null? param.icr9.ToString() : null},
                     new { Tag = "R_CR9", Value = param.cr9 != null?  param.cr9.ToString() : null},
-                    new { Tag = "DAYSN", Value = param.daysn }, new { Tag = "DATSN", Value = param.datsn }, new { Tag = "DAYNP", Value = param.daynp } };
+                    new { Tag = "DAYSN", Value = param.daysn }, new { Tag = "DATSN", Value = param.datsn }, new { Tag = "DAYNP", Value = param.daynp },
+                    new { Tag = "S_S36", Value = param.s_s36 != null? ((decimal)param.s_s36).ToString("F").Replace(",", ".") : null}
+                };
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.CommandText = @"bars.cck_app.set_nd_txt";
@@ -1074,7 +1076,8 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                            (select nb from banks where mfo = cc.mfokred) as bank_name, --54
                                             cck_app.Get_ND_TXT(cc.nd, 'FLAGS') as FLAGS,--55
                                             cc.limit, --56
-                                            cc.id --57
+                                            cc.id, --57
+                                            cck_app.Get_ND_TXT(cc.nd, 'S_S36') as s_s36 --58
                                       from cc_v cc, customer c, sb_ob22 cp, cc_aim ca, int_accn ia
                                      where cc.rnk = c.rnk
                                        and cc.prod = cp.r020||cp.ob22
@@ -1145,6 +1148,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                         credit.FLAGS = String.IsNullOrEmpty(reader.GetValue(55).ToString()) ? String.Empty : reader.GetString(55);
                         credit.LIM = String.IsNullOrEmpty(reader.GetValue(56).ToString()) ? (decimal?)null : reader.GetDecimal(56);
                         credit.INSPECTOR_ID = String.IsNullOrEmpty(reader.GetValue(57).ToString()) ? (int?)null : reader.GetInt32(57);
+                        credit.S_S36 = String.IsNullOrEmpty(reader.GetValue(58).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(58).Replace(".", ","));
                     }
                 }
                 credit.CUST_DATA = GetCustomerInfo(credit.nRNK, connection);

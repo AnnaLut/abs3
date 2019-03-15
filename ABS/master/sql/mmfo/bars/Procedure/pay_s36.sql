@@ -190,21 +190,23 @@ begin
     select i.* into r_isdi from int_accn i where i.acc = r_sdi.acc and i.acrb is not null and rownum = 1;
 
     -- доделать % карточку 3600 для лин.амортизации
-    update int_accn set id    = 1,
-                        metr  = 4,
-                        basem = 0,
-                        basey = 0,
-                        freq  = 1,
-                        acr_dat = (gl.bdate-1) ,
-                        tt    = '%%1',
-                        acra  = r_s36.acc,
-                        acrb  = r_isdi.acrb,
-                        s     = 0,
-                        io    = 0
-            where acc = r_s36.acc;
-    if SQL%rowcount = 0 then
-       insert into int_accn (ACC,   ID,METR,BASEM,BASEY,FREq,ACR_DAT,      tt  ,ACRA  , ACRB   , S, IO )
-                   values   (r_s36.acc, 1,   4,    0,    0, 1, (gl.bdate-1), '%%1',r_s36.acc, r_isdi.acrb, 0, 0 );
+    if nvl(cck_app.Get_ND_TXT(r_dd.nd,'S_S36'),0) = 0 then
+      update int_accn set id    = 1,
+                          metr  = 4,
+                          basem = 0,
+                          basey = 0,
+                          freq  = 1,
+                          acr_dat = (gl.bdate-1) ,
+                          tt    = '%%1',
+                          acra  = r_s36.acc,
+                          acrb  = r_isdi.acrb,
+                          s     = 0,
+                          io    = 0
+              where acc = r_s36.acc;
+      if SQL%rowcount = 0 then
+         insert into int_accn (ACC,   ID,METR,BASEM,BASEY,FREq,ACR_DAT,      tt  ,ACRA  , ACRB   , S, IO )
+                     values   (r_s36.acc, 1,   4,    0,    0, 1, (gl.bdate-1), '%%1',r_s36.acc, r_isdi.acrb, 0, 0 );
+      end if;
     end if;
 
   exception when NO_DATA_FOUND then RETURN;

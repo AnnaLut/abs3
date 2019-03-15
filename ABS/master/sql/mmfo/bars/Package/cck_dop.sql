@@ -182,8 +182,15 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
   -- Авторизация КД
   procedure cc_autor(p_nd   in number,
                      p_saim in varchar2 default null,
+                     p_urov in varchar2 default null,
+                     p_txt  out varchar2
+                     );
+
+  procedure cc_autor(p_nd   in number,
+                     p_saim in varchar2 default null,
                      p_urov in varchar2 default null
                      );
+
 
 -- редагування довідника "Торговці-партнери"
 procedure edit_partner (p_id       in wcs_partners_all.id%type
@@ -243,10 +250,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
   G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.09 11/10/2018';
 
    /*
+ 29/08/2018 VPogoda проверки заполнения параметров контрагента по физлицам перенесены в процедуру открытия договора
  13/07/2018 COBUMMFO-8410 Проверки и наследование обеспечения при авторизации
  27.11.2017 Sta+Вика Семенова : При авторизации кред.линий (Ген.договора - VIDD=2,3) при типе авторизации 1 (полная авторизация)
               автоматически открывать суб.договор (или несколько суб.договоров) и счета на нем (SS и SN) c параметрами Ген.договора (валюта, % ставка, база начисления)
 
+   /*
+   22/06/2018 COBUMMFO-8206 - добавлена логика для расщепления операции КК1 при перечислении средств на карточный счет
+   13/05/2018 COBUMMFO-7118 - добавлена процедура для редактирования справочника партнеров
+   03/05/2018 COBUMMFO-7118 - логика по авторизации договоров с "партнерами"
+   25/04/2018 COBUMMFO-7467 - доработки по одноразовой комиссии
+   23/02/2018 COBUSUPABS-6353, для "определенных" продуктов для начисленных комиссий по методу "% от остатка" открываются счета 22_8 вместо 3578 и 3579
   28/03/2017 Приведение дисконта в формат NNNNNN.NN
   02/03/2017 вызов стандартной процедуры авторизации перенесен после открытия счетов
   15/02/2017 COBUSUPABS-5326
@@ -342,7 +356,7 @@ BEGIN
 
 
     -- проверки по гендоговорам
-    
+
     if prod_ is null then
        ERR_Message := 'Не знайдений код продукту. Вийдіть з функцiї й увiйдiть у неї ще раз';    ERR_Code    := 1;
        raise STOP_PRC;
@@ -379,7 +393,7 @@ BEGIN
       else
         Vid_ := 1;
       end if;
-    else                                 
+    else
       Vid_ := 11;
     end if;
 
@@ -423,7 +437,7 @@ BEGIN
 
     -- ежемесячная комиссия
     if metr is not null and metr_r is not null then
-      insert into int_accn (acc,id,metr,basem,basey,freq,tt) values (Acc8_, 2, trunc(METR), 0, BASEY, 5, '%%1');
+      insert into int_accn (acc,id,metr,basem,basey,freq,tt,acr_dat) values (Acc8_, 2, trunc(METR), 0, BASEY, 5, '%%1', gl.bDATE-1);
       insert into int_ratn (acc,id,bdat,ir)                  values (Acc8_, 2, SDATE_, METR_R);
     end if;
 
@@ -750,17 +764,19 @@ end builder_gpk;
     l_tt        int_accn.tt%type;
 
   begin
-return; -- cobuprvnix-161 
+return; -- cobuprvnix-161
     logger.info('CCK_DOP.CALC_SDI run  nd=' || to_char(ND_) || ' sum_sdi=' ||
                 to_char(sum_sdi));
 
     -- построить потоки. расчитать Єф ставки
     FOR k in (select (case
                        when nvl(acrn.FPROCN(a.acc, 0), 0) = 0 then
-                        (select ir
+                        (select first_value(ir) over (partition by acc order by bdat) as ir
                            from int_ratn
                           where id = 0
-                            and acc = a.acc)
+                            and acc = a.acc
+                            and rownum =1
+                         )
                        else
                         acrn.FPROCN(a.acc, 0)
                      end) / 36500 ir,
@@ -1597,7 +1613,8 @@ return; -- cobuprvnix-161
       procedure cc_autor_ex
         (p_nd   in number,
                    p_saim in varchar2 default null,
-                   p_urov in varchar2 default null
+                   p_urov in varchar2 default null,
+                   p_txt  out varchar2
                    ) is
   l_deal_source number;
   l_cd_row      cc_deal%rowtype;
@@ -1663,23 +1680,23 @@ begin
 
            --ES001    Вартість товару (держ.програма)
            l_ES001 := CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'ES001') ;
-           If l_ES001 is null then 
-             v_err_text := 'НЕ заповнено параметр «Вартість товару (держ.програма)»';  
+           If l_ES001 is null then
+             v_err_text := 'НЕ заповнено параметр «Вартість товару (держ.програма)»';
            end if;
 
            ---«Енергоефективний захід» (одного із - ES104 or ES110 or ES116 or …)
-           begin 
-             select 1 
-               into l_RomStal 
+           begin
+             select 1
+               into l_RomStal
                from nd_txt
-                 where nd =  l_cd_row.ND 
-                   and rownum = 1  
+                 where nd =  l_cd_row.ND
+                   and rownum = 1
                    and tag in (select tag from cc_tag where tag like 'ES1%' AND TABLE_NAME = 'VW_ESCR_EVENTS_CENTURA' );
-           EXCEPTION 
-             WHEN NO_DATA_FOUND THEN 
+           EXCEPTION
+             WHEN NO_DATA_FOUND THEN
                v_err_text:= v_err_text||' НЕ заповнено жодний параметр «Енергоефективний захід»' ;
            end;
-          
+
           if v_err_text is not null then
             raise_application_error(-20203,v_err_text);
           end if;
@@ -1695,6 +1712,8 @@ begin
         EXCEPTION WHEN NO_DATA_FOUND THEN  l_RomStal  := 0;
         end ;
      end if ;
+
+    v_7467_flag := cck_app.Get_ND_TXT(l_cd_row.nd, 'S_S36') * 100;
   end if ;  -- COBUSUPABS-4863
 
 
@@ -1818,8 +1837,90 @@ COBUMMFO-7118
         if cur.force_open in ('0', '1') then     l_force_open := to_number(cur.force_open);
         else                                     doc_strans(l_stmt_pattern || cur.force_open, l_force_open, p_nd);
         end if;
+
+        -- COBUSUPABS-6353
+        if cur.tip = 'SK0' and  cck_ui.check_product_6353(l_cd_row.prod) = 1 then
+          select count(1) into l_force_open
+            from int_ratn ir,
+                 nd_acc n
+            where n.nd = p_nd
+              and ir.acc = n.acc
+              and ir.id = 2;
+          if l_force_open != 0 then
+            l_force_open := 1;
+          end if;
+        end if;
+        -- COBUSUPABS-6457
+        if nvl(v_7467_flag,0) >0 and cur.tip = 'S36' then
+          l_force_open := 1;
+        end if;
+
         -- открываем или нет счет в замисимости от параметра
-        if l_force_open = 1 then   cck_dop.open_account(p_nd, cur.tip);    end if;
+        if l_force_open = 1 then
+          cck_dop.open_account(p_nd, cur.tip);
+
+          if nvl(v_7467_flag,0) >0 and cur.tip = 'S36' then
+            declare
+              v_rec oper%rowtype;
+              v_acrb number;
+              v_tt   char(3) := '%%1';
+            begin
+            for r in (select a.acc, /*c.sour, */a.kv, a.tobo
+                        from nd_acc n, accounts a--, cc_add c
+                        where n.nd = l_cd_row.nd
+                          and n.acc = a.acc
+                          and a.tip = 'S36'
+--                          and n.nd = c.nd
+                   )
+            loop
+              v_rec.kv := r.kv;
+
+              begin
+                select acc
+                  into v_acrb
+                  from accounts a,
+                       cck_ob22 c
+                  where a.nbs = '6511'
+                    and c.nbs = substr(l_cd_row.prod,1,4)
+                    and c.ob22 = substr(l_cd_row.prod,5,2)
+                    and  (  a.tobo =r.tobo or a.tobo = substr(r.tobo,1,length(r.tobo)-7)
+                         or a.tobo = substr(r.tobo,1,length(r.tobo)-7)||'000000/')
+                    and a.ob22 = nvl(c.sd_sk0,'-')
+                    and a.dazs is null
+                    and rownum = 1;
+               exception
+                 when no_data_found then
+                   v_acrb := null;
+               end;
+               if v_acrb is null then
+                 update int_accn
+                   set acrb = v_acrb
+                   where acc = r.acc;
+                 raise_application_error(-20210,'Не вдалось знайти рахунок доходів 6511 для процентної картки рахунка комісії!');
+               end if;
+
+              update int_accn i
+                set i.metr = 4,
+                    i.basey = 0,
+                    i.acra = r.acc,
+                    i.acrb = v_acrb
+                where acc = r.acc;
+              if sql%rowcount = 0 then
+                INSERT INTO int_accn
+                  (acc, id, metr, basem, basey, freq, acra, acrb, tt, acr_dat)
+                VALUES
+                  (r.acc, 1, 4, 0, 0, 1, r.acc, v_acrb, v_tt, gl.bdate - 1);
+              end if;
+     end loop;
+  end;
+          end if;
+          if nvl(v_7467_flag,0) >0 and cur.tip = 'S36' then
+            paym_comission(l_cd_row.nd,v_7467_flag,l_cd_row.cc_id, l_cd_row.sdate, p_txt);
+          elsif l_cd_row.vidd = 5 and cur.tip = 'CR9' then
+            paym_limit(l_cd_row.nd, l_cd_row.limit*100,p_txt);
+          end if;
+        end if;
+
      end loop;
   end;
 
@@ -1938,11 +2039,9 @@ COBUMMFO-7118
                    cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'U') ZAYU,
                    cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'V') ZAYV,
                    (select name from cc_tag where tag = n.tag and n.tag like 'ZAY_P') NAMEP
-              FROM nd_txt n, cc_pawn c, cc_deal cd
+              FROM nd_txt n, cc_pawn c
              WHERE n.nd = p_nd AND tag LIKE 'ZAY_P'
                and n.txt = to_char(c.pawn(+))
-               and n.nd  = cd.nd
-               and nvl(cd.ndg,cd.nd) = cd.nd
          )
 
      LOOP
@@ -2023,7 +2122,7 @@ COBUMMFO-7118
 
        end if;
 
-       
+
        Accreg.setAccountSParam( l_new_acc, 'OB22', l_ob22 );
        -- cobummfo-7618
        Accreg.setAccountSParam( l_new_acc, 'R013', k.r013 );
@@ -2100,18 +2199,38 @@ COBUMMFO-7118
 
   end; --- -- вызов стандартной процедуры авторизации
 
+
+
+--  p_txt := 'Договір '||l_cd_row.cc_id||' від '||to_char(l_cd_row.sdate,'dd.mm.yyyy')||' успішно авторизований';
+  if p_txt is null then
+    p_txt := 'В процесі авторизації проведення не створювались';
+  end if;
 end cc_autor_ex;
 ----- Авторизация КД-------------------------
 procedure cc_autor(p_nd   in number,  p_saim in varchar2 default null,    p_urov in varchar2 default null) is
-
-
+  v_txt varchar2(4000);
 begin
-    CCK_DOP.cc_autor_ex (p_nd ,  p_saim,  p_urov );
+    CCK_DOP.cc_autor_ex (p_nd ,  p_saim,  p_urov, v_txt );
     for dd in (select nd from cc_deal where nd <> ndg and ndg =p_nd)
     loop update cc_deal set sos =0 where nd = dd.nd;
-         CCK_DOP.cc_autor_ex (dd.nd ,  p_saim,  p_urov );
+         CCK_DOP.cc_autor_ex (dd.nd ,  p_saim,  p_urov, v_txt);
     end loop ;
 end cc_autor ;
+
+procedure cc_autor(p_nd   in number,  
+                   p_saim in varchar2 default null,    
+                   p_urov in varchar2 default null,
+                   p_txt  out varchar2) is
+  v_txt varchar2(4000);
+begin
+    CCK_DOP.cc_autor_ex (p_nd ,  p_saim,  p_urov, p_txt );
+    for dd in (select nd from cc_deal where nd <> ndg and ndg =p_nd)
+    loop update cc_deal set sos =0 where nd = dd.nd;
+         CCK_DOP.cc_autor_ex (dd.nd ,  p_saim,  p_urov, v_txt );
+         p_txt := substr(p_txt||'<br/>'||v_txt,1,4000);
+    end loop ;
+end cc_autor ;
+
 
 
 procedure edit_partner (p_id       in wcs_partners_all.id%type

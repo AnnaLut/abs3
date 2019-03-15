@@ -541,12 +541,12 @@ begin
   delete from tts_vob where tt='CNB';
   begin
     insert into tts_vob(vob, tt, ord)
-    values (402, 'CNB', null);
+    values (401, 'CNB', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 402, ''CNB'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 401, ''CNB'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

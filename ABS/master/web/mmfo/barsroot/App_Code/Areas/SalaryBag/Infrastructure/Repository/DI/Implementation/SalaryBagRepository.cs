@@ -64,6 +64,7 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                 p.Add("p_acc", model.Account, DbType.Decimal, ParameterDirection.Input);
                 p.Add("p_fs", model.Fs, DbType.Decimal, ParameterDirection.Input);
                 p.Add("p_branch", model.Branch, DbType.String, ParameterDirection.Input);
+                p.Add("p_id", null, DbType.Decimal, ParameterDirection.Output);
 
                 connection.Execute("zp.create_deal", p, commandType: CommandType.StoredProcedure);
             }

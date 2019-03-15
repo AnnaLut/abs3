@@ -17,7 +17,7 @@ PROMPT *** Create  view V_FM_OSC_RULE9 ***
   AND SUBSTR (o.nlsa, 1, 4) IN ('2600', '2620', '2625', '2902') -- Ê 2650, 2655, 3739
   AND SUBSTR (o.nlsb, 1, 4) IN ('2650', '2655', '3739'))
   AND (
-		regexp_like(upper(o.nazn), '(^| )(ÑÒÐÀÕ|ÏÅÐÅÑÒÐÀÕ)')
+		regexp_like(upper(o.nazn), '(^|.)(ÑÒÐÀÕ|ÏÅÐÅÑÒÐÀÕ)')
 		)
   AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=  15000000
   ;

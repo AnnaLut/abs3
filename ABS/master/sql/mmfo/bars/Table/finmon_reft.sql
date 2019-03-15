@@ -181,6 +181,17 @@ exception when others then
 /
 
 
+PROMPT *** Create  index I_FINMON_REFT_NAME_Ñ25 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I_FINMON_REFT_NAME_Ñ25 ON BARS.FINMON_REFT REGEXP_LIKE( c25, ''^([[:digit:]]{8}|[[:digit:]]{10})$'')
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 PROMPT *** Create  grants  FINMON_REFT ***
 grant SELECT                                                                 on FINMON_REFT     to BARSREADER_ROLE;

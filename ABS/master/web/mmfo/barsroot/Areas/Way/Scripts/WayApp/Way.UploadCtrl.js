@@ -724,6 +724,7 @@
                         { field: "ID", width: 50, hidden: true },
                         { field: "URL", width: 125, template: "<i class='pf-icon pf-16 pf-document_header_footer-ok2'><span style='margin-left:20px;'>#=URL#</span></i>" },
                         { field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
+                        { field: "Doc_DRN", title: "DRN", width: 75},
                         { field: "NLSA", title: "Рахунок відправника", width: 150 },
                         { field: "Sgrn", title: "Сума", width: 75},
                         { field: "KV", title: "Код<br/>валюти", width: 75 },

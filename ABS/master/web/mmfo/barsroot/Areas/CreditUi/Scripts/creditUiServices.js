@@ -29,7 +29,8 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 datsn: save.diffDaysValue ? kendo.toString(kendo.parseDate(save.firstPayDiffValue), 'dd.MM.yyyy') : null,
                 daynp: save.daynp.Key,
                 vidd: save.viddValue.VIDD,
-                inspector_id: save.inspector_id
+                inspector_id: save.inspector_id,
+                s_s36: save.commissionObsl
             };
         },
         multiExtInt: function (nd, save){
@@ -166,7 +167,8 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 firstPayDiffValue: null,
                 daynp: { Key: -2 },
                 lim: null,
-                inspector_id: null
+                inspector_id: null,
+                commissionObsl: null
             };
         },
         getDeal: function (save, resp) {
@@ -219,6 +221,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.diffDaysValue = save.dayPayDiffValue ? true : false;
             save.lim = resp.LIM;
             save.inspector_id = resp.INSPECTOR_ID;
+            save.commissionObsl = resp.S_S36;
         },
         CUST_INFO: function () {
             return {

@@ -102,14 +102,22 @@ type tbl_tip_ndg is table of row_tip_ndg;
    ,p_fk  VARCHAR2
   ) RETURN VARCHAR2;
 
-  ----Авторизация КД ---------------------------------------------------------------------
+
   PROCEDURE autor
   (
     p_nd   NUMBER
    ,p_mode NUMBER
    ,p_x1   VARCHAR2
    ,p_x2   VARCHAR2
+   ,p_txt out varchar2
   ); -- авторизация
+
+  ----Авторизация КД ---------------------------------------------------------------------
+  PROCEDURE autor  (p_nd   in NUMBER, -- реф КД >0 = авторизовать, <0 = Де-авторизовать
+                    p_mode NUMBER, -- =1 с полным фаршем, =0 - без него
+                    p_x1   VARCHAR2, -- Основание
+                    p_x2   VARCHAR2 -- Инициатива
+                   );
 
   --График Погашения Кредита (ГПК)
   PROCEDURE gpk_upd
@@ -1227,6 +1235,7 @@ bars_audit.info('6353 Check product result : '||v_ret);
     RETURN l_sem;
   END dop_sem;
 
+
   ------Сухова -------------------------------------------------------------------
   PROCEDURE autor
   (
@@ -1237,6 +1246,7 @@ bars_audit.info('6353 Check product result : '||v_ret);
     p_x1   VARCHAR2
    , -- Основание
     p_x2   VARCHAR2 -- Инициатива
+   ,p_txt out varchar2
   ) IS
     -- авторизация
     l_nd  NUMBER;
@@ -1248,6 +1258,10 @@ bars_audit.info('6353 Check product result : '||v_ret);
     stmp_ VARCHAR2(50);
     ntmp_ NUMBER;
     l_x1  VARCHAR2(50);
+
+    v_7467_flag number;
+    v_num       integer;
+    v_sal       number;
   BEGIN
     l_nd := abs(p_nd);
 
@@ -1277,6 +1291,36 @@ bars_audit.info('6353 Check product result : '||v_ret);
                                ,g_errs || 'Не знайдено Договір ref=' || p_nd || ' ' ||
                                 stmp_);
     END;
+
+
+
+     -- COBUMMFO-7467
+     /*
+3.2 Забезпечити,  у випадку якщо по договору передбачається «Комісія за обслуговування кредиту (сплачується перед видачею кредиту)» (заповнено відповідні параметри) наступний контроль при виконанні процедури авторизації кредитного договору:
+?	до кредитного договору, відповідно якого виконується процедура авторизації, повинен бути підв’язаний рахунок 2620;
+?	на рахунку 2620 повинно бути достатньо коштів для погашення «Комісії за обслуговування кредиту (сплачується перед видачею кредиту)» вказаної в параметрах кредитного договору;
+У випадку якщо контроль не пройдено система повинна генерувати відповідні повідомлення:
+«До кредитного договору не підв’язано рахунок 2620. Авторизація не можлива.»
+або
+«На рахунку 2620 не достатньо коштів для сплати комісії за обслуговування кредиту (сплачується перед видачею кредиту). Авторизація не можлива.»
+     */
+    v_7467_flag := cck_app.Get_ND_TXT(dd.nd, 'S_S36')*100;
+    if v_7467_flag is not null then
+      select count(1), sum(a.ostc)
+        into v_num, v_sal
+        from nd_acc n,
+             accounts a
+        where n.nd = dd.nd
+          and n.acc = a.acc
+          and substr(a.nls,1,4) = '2620'
+          and a.dazs is null
+          and a.blkd = 0;
+      if v_num = 0 then
+        raise_application_error(-20203,'Умовами договору передбачено сплату одноразової комісії. До кредитного договору має бути прив"язаний рахунок 2620.  Авторизація неможлива');
+      elsif v_num > 0 and abs(v_sal) < to_number(v_7467_flag) then
+        raise_application_error(-20203,'На рахунку 2620 не достатньо коштів ['||abs(v_sal/100)||'] для сплати комісії за обслуговування кредиту (сплачується перед видачею кредиту) ['||v_7467_flag/100||']! Авторизація неможлива');
+      end if;
+    end if;
 
     --- Проверки по ДОГ.
     -- If p_X1 is null         then  raise_application_error(g_errn, g_errS||'Не указано підставу для  Договору ref='||l_nd )  ;    end if;
@@ -1339,10 +1383,29 @@ bars_audit.info('6353 Check product result : '||v_ret);
 
     ELSE
       -- з повним фаршем
-      cck_dop.cc_autor(p_nd, l_x1, nvl(p_x2, dd.branch));
+      cck_dop.cc_autor(p_nd   => p_nd,
+                       p_saim => l_x1,
+                       p_urov => nvl(p_x2, dd.branch),
+                       p_txt => p_txt);
     END IF;
 
   END autor;
+  
+PROCEDURE autor  (p_nd   in NUMBER, -- реф КД >0 = авторизовать, <0 = Де-авторизовать
+                    p_mode NUMBER, -- =1 с полным фаршем, =0 - без него
+                    p_x1   VARCHAR2, -- Основание
+                    p_x2   VARCHAR2 -- Инициатива
+                   )
+  is
+    v_txt varchar2(1000);
+  begin
+    cck_ui.autor(p_nd   => p_nd,
+                 p_mode => p_mode,
+                 p_x1   => p_x1,
+                 p_x2   => p_x2,
+                 p_txt  => v_txt);
+  end;
+
   ---------------------------------------------------------------------------
   PROCEDURE p_cc_lim_repair(p_id cc_lim_copy_header.id%TYPE
                             /*,p_nd cc_deal.nd%TYPE */) IS

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/19/2013 16:38:25" ReportInfo.Modified="11/01/2018 11:37:09" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/19/2013 16:38:25" ReportInfo.Modified="11/12/2018 12:51:01" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -226,7 +226,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="dev" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5Y3Neg7DvdR2Vu1DbZYHDJIJHEDEQst4kKpqTLmpSao9pdXXOP9sL/7e6gVjYFxF9Q==" CommandTimeout="120">
+    <OracleDataConnection Name="dev" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5Y3Neg7DvdR2Vu1DbZYHDJIJHEDEQst4kKpqTLmpSao9mm20TEEqz0SlBr7ljQUEEg==" CommandTimeout="120">
       <TableDataSource Name="Table" Alias="OFS" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT kod, name, &#13;&#10;              FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, add_months(trunc(dat_),-6)) as zn2, &#13;&#10;              FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, add_months(trunc(dat_),-3)) as zn1, &#13;&#10;              FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, dat_) as zn,&#13;&#10;              FIN_OBU.CALC_SCOR_BAL(kod, idf, add_months(trunc(dat_),-6), rnk_, nd_) as dat2 , &#13;&#10;              FIN_OBU.CALC_SCOR_BAL(kod, idf, add_months(trunc(dat_),-3), rnk_, nd_) as dat1 , &#13;&#10;              FIN_OBU.CALC_SCOR_BAL(kod, idf, dat_, rnk_, nd_) as dat, nd_, rnk_, dat_,  add_months(trunc(dat_),-3) as dat_1,  add_months (trunc(dat_),-6) as dat_2&#13;&#10;    FROM FIN_QUESTION f, (select :rnk as rnk_,:nd as nd_ ,  to_date(:dat_f,'dd.mm.yyyy') as dat_ from dual) d&#13;&#10;   WHERE idf IN (33)&#13;&#10;ORDER BY idf DESC, ord ASC">
         <Column Name="KOD" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
@@ -459,9 +459,10 @@ namespace FastReport
         <CommandParameter Name="DAT4" DataType="106" Expression="[datf2.DAT4]" DefaultValue="01-01-1900"/>
         <CommandParameter Name="DAT5" DataType="106" Expression="[datf2.DAT5]" DefaultValue="01-01-1900"/>
       </TableDataSource>
-      <TableDataSource Name="Table10" Alias="fin_110" DataType="System.Int32" Enabled="true" SelectCommand="select f_get_osbb_k110_type(:RNK) as RES from dual">
+      <TableDataSource Name="Table10" Alias="fin_110" DataType="System.Int32" Enabled="true" SelectCommand="select f_get_osbb_k110_type(:RNK, to_number(:ND)) as RES from dual">
         <Column Name="RES" DataType="System.Decimal"/>
         <CommandParameter Name="RNK" DataType="113" Expression="[rnk]" DefaultValue="1"/>
+        <CommandParameter Name="ND" DataType="104" Expression="[ND]"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="ND" DataType="System.String" Expression="&quot;134965626&quot;"/>

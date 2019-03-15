@@ -153,6 +153,7 @@ namespace Bars.EAD.Structs.Params
                                 res.UserLogin = Convert.ToString(rdr["user_login"]);
                                 res.UserFio = Convert.ToString(rdr["user_fio"]);
                                 res.BranchId = Convert.ToString(rdr["branch_id"]);
+                                res.ThirdPersons = new List<ThirdPersons>();
                             }
                         }
 

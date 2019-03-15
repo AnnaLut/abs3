@@ -2316,7 +2316,7 @@ from(
       --3) если ДБО оформлен, счет может быть открыт до ДБО, его считаем "старым"
       IF (    l_ndbo IS NOT NULL
           AND TRUNC (l_daos) >= TO_DATE (REPLACE (l_sdbo, '.', '/'), 'dd/mm/yyyy')
-          and l_agr_type not in ( 'acquiring_uo', 'salary_uo' ) ) -- Если на счете acquiring_uo, надо возвращать 0. (cdc_agr_u -> ead_pack.msg_create ('UAGR', cur.agr_type || ';' || TO_CHAR (cur.acc), cur.rnk, cur.kf);)
+          and l_agr_type not in ('encashment_uo', 'acquiring_uo', 'salary_uo' ) ) -- Если на счете acquiring_uo, надо возвращать 0. (cdc_agr_u -> ead_pack.msg_create ('UAGR', cur.agr_type || ';' || TO_CHAR (cur.acc), cur.rnk, cur.kf);)
       THEN
          l_result := 1;
       END IF;

@@ -66,13 +66,31 @@ BEGIN
             End if ; --4 Счет доходов для комиссии многоразовой  (вызывается при открытии счета с типом SK0),  в т.ч Для гарантий которые введены в Ощадбанке в КП
 
          end if;  -- 3   ОБЩИЙ Счет доходов по пене
-         select acc into ACC_ from accounts where nls = NBS_OB22_BRA ( A6.NBS, A6.OB22, a6.BRANCH );
-      exception when no_data_found then null;
+                     if  A6.ACC is null then
+							--begin
+								 select a.acc into ACC_
+									 from accounts a
+									 where a.nls = NBS_OB22_BRA ( A6.NBS, A6.OB22, a6.BRANCH );
+							--exception when no_data_found then null;end;
+					else
+							ACC_ := A6.ACC;   --COBUMMFO-8054
+					end if;
+	 --exception when no_data_found then null;
       end;  ---2
 
    end if;  -- 1    ---tip3_   ='SN '
 
    RETURN ACC_;
+   
+    exception
+	  when no_data_found then
+         bars_audit.error('<br/><b>cc_o_nls_ext. '||'Не вдалося знайти acc для nbs = '||A6.NBS||' ,ob22 ='||A6.OB22||' ,branch ='
+				 ||a6.BRANCH||' nbs = '||a2.nbs||', ob22 = '||a2.ob22||chr(10)||'</b><br/>'||sqlerrm||chr(10) || dbms_utility.format_error_stack());
+		RETURN ACC_;
+    when others then
+         bars_audit.error('<br/><b>cc_o_nls_ext. '||'Помилка в cc_o_nls_ext. nbs = '||A6.NBS||' ,ob22 ='||A6.OB22||' ,branch ='
+				 ||a6.BRANCH||' nbs = '||a2.nbs||', ob22 = '||a2.ob22||chr(10)||'</b><br/>'||sqlerrm||chr(10) || dbms_utility.format_error_stack());
+	    RETURN ACC_;
 
 END CC_O_NLS_EXT;
 /

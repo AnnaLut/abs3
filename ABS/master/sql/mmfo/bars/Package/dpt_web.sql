@@ -601,6 +601,7 @@ is
                    p_userid   in oper.userid%type, -- код исполнителя
                    p_type     in number, -- тип операции
                    p_mcode    in varchar2 default 'DPT', -- код модуля що викликає процедуру
+                   p_runid    in number default 0, -- ID джоба (сигнализирует, что процедура выполняется в рамках ВЗД)
                    p_ref      out number, -- референс документа
                    p_err_flag out boolean, -- флаг ошибки
                    p_err_msg  out varchar2); -- сообщение об ошибке
@@ -7417,6 +7418,7 @@ is
                    p_dk       => 1,
                    p_sk       => null,
                    p_type     => 4,
+                   p_runid    => p_runid, 
                    p_ref      => l_ref,
                    p_nazn     => l_payrec.nazn,
                    p_err_flag => l_errflg,
@@ -7818,6 +7820,7 @@ is
                    p_sk       => null,
                    p_userid   => null,
                    p_type     => 4,
+                   p_runid    => p_runid, 
                    p_ref      => l_ref_int,
                    p_err_flag => l_errflg,
                    p_err_msg  => l_errmsg);
@@ -7885,6 +7888,7 @@ is
                    p_sk       => null,
                    p_userid   => null,
                    p_type     => 2,
+                   p_runid    => p_runid, 
                    p_ref      => l_ref_dpt,
                    p_err_flag => l_errflg,
                    p_err_msg  => l_errmsg);
@@ -11533,6 +11537,7 @@ is
                    p_userid   in oper.userid%type,
                    p_type     in number,
                    p_mcode    in varchar2 default 'DPT', -- код модуля що викликає процедуру
+                   p_runid    in number default 0, -- ID джоба (сигнализирует, что процедура выполняется в рамках ВЗД)
                    p_ref      out number,
                    p_err_flag out boolean,
                    p_err_msg  out varchar2) is
@@ -11779,6 +11784,11 @@ is
             p_kvb,
             l_nlsb,
             p_sb);
+            
+      if p_runid > 0 and l_tt in ('DPI', 'DP2', 'DP5', 'DPL') then   -- для автоматического визирования в рамках ВЗД  --COBUMMFO-8613
+          gl.pay(2, p_ref, gl.bd);
+      end if;
+            
       bars_audit.trace('%s референс документа =  %s',
                        l_title,
                        to_char(p_ref));

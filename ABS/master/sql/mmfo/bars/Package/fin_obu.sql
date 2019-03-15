@@ -209,7 +209,7 @@ END fin_OBU;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_OBU IS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.2.4  03.03.2016';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.2.5  22.12.2018';
  --g_period number; --період 3-кварт, 6- піврічн, 12 річний
 
 --------------------------------------------
@@ -376,7 +376,9 @@ end ZN_rep;
 	exception when NO_DATA_FOUND
 	         THEN return null;
 	End;
-
+        if f_get_osbb_k110_type (RNK_, ND_) = 1 then
+               sTmp_:= CCK_APP.GET_ND_TXT( ND_, 'VNCRR');
+        end if;
 
 	return sTmp_;
 	END GET_VNKR;

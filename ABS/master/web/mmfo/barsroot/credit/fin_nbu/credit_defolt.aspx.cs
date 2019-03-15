@@ -70,7 +70,7 @@ public partial class credit_defolt : Bars.BarsPage
             //Tb_clas.Text = read_zn_p(Tb_okpo.Text, "CLAS", "6", TB_Dat.Text);
 
 
-            Set_Papams = read_osbb(RNK_.Value);
+            Set_Papams = read_osbb(RNK_.Value, ND_.Value);
 
             if (Set_Papams == 1)
             {
@@ -88,7 +88,7 @@ public partial class credit_defolt : Bars.BarsPage
 
     }
 
-    public static Decimal read_osbb(String rnk_)
+    public static Decimal read_osbb(String rnk_, String nd_)
     {
         Decimal res_type_; 
         {
@@ -97,7 +97,8 @@ public partial class credit_defolt : Bars.BarsPage
             try
             {
                 cmd.Parameters.Add("RNK", OracleDbType.Int64, Convert.ToInt64(rnk_), ParameterDirection.Input);
-                cmd.CommandText = ("select f_get_osbb_k110_type(:RNK) as RES from dual");
+                cmd.Parameters.Add("ND", OracleDbType.Int64, Convert.ToInt64(nd_), ParameterDirection.Input);
+                cmd.CommandText = ("select f_get_osbb_k110_type(:RNK, :ND) as RES from dual");
                 OracleDataReader rdr = cmd.ExecuteReader();
                 if (rdr.Read())
                 {
@@ -1407,6 +1408,8 @@ public partial class credit_defolt : Bars.BarsPage
                     {
                         InitOraConnection();
                         String l_sql_dat = "select to_char(dat,'dd/mm/yyyy') dat from (select  add_months(trunc(to_date('" + (String)rdr["ZP_DAT"] + "','dd/mm/yyyy'),'mm'),num-2) dat from conductor where 3 >= num) where dat >= to_date('" + (String)rdr["ZP_DAT"] + "','dd/mm/yyyy')-10 order by 1 ";
+
+                        // String l_sql_dat = "select to_char(dat,'dd/mm/yyyy') dat from (select  add_months(trunc(to_date('" + (String)rdr["ZP_DAT"] + "','dd/mm/yyyy'),'mm'),num-2) dat from conductor where 3 >= num) where dat >= to_date('" + (String)rdr["ZP_DAT"] + "','dd/mm/yyyy')-10 order by 1 ";
                         Dl_Zdat.DataSource = SQL_SELECT_dataset(l_sql_dat).Tables[0];
                         Dl_Zdat.DataTextField = "dat";
                         Dl_Zdat.DataValueField = "dat";

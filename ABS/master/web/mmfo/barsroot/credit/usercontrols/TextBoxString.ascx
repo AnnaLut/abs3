@@ -5,7 +5,7 @@
 <asp:TextBox ID="tb" runat="server" CssClass="cssTextBoxString"></asp:TextBox>
 
 <asp:RequiredFieldValidator ID="rfv" runat="server" ControlToValidate="tb" 
-    Display="None" Enabled="False" ErrorMessage='<%# MinMaxLengthErrorText %>'></asp:RequiredFieldValidator>
+    Display="None" Enabled="False" ErrorMessage='<%# MinMaxLengthErrorText %>' SetFocusOnError="true"></asp:RequiredFieldValidator>
 <asp:RegularExpressionValidator ID="rev" runat="server" ControlToValidate="tb" Display="None" ErrorMessage='<%# RequiredErrorText %>'></asp:RegularExpressionValidator>
 
 <act:ValidatorCalloutExtender ID="vceRFV" runat="server" 

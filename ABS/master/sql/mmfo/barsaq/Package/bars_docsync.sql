@@ -130,6 +130,19 @@
   --
   function get_bis_count(p_ref      in number) return number;
   
+  
+  -----------------------------------
+  -- GET_SIGN_FOR_VERIFIVCATION
+  --
+  -- Получить подпись от вертушки, которая обрабьатывает докуметнт от корп2 технологической подписью.
+  --
+  procedure get_extsign_for_verification(p_ext_ref      in    number, 
+                                         p_key          out   varchar2,
+                                         p_buff         out   varchar2,
+                                         p_sign         out   varchar2);
+  
+  
+  
 
 end bars_docsync;
 /
@@ -138,7 +151,7 @@ show err
 CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 
   -- global consts
-  G_BODY_VERSION constant varchar2(64)  := 'version 1.6 12/08/2018';
+  G_BODY_VERSION constant varchar2(64)  := 'version 1.7 24/11/2018';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := 'KF - схема с полем kf';
 
@@ -510,7 +523,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
     l_str   varchar2(40) := '';
     i       integer;
   begin
-    if substr(p_err_msg, 12, 1)='\' then
+    if substr(p_err_msg, 12, 1)= chr(92)  then  --'\' 
         l_str := ''; i := 1;
         while substr(p_err_msg, 12+i, 1) in ('0','1','2','3','4','5','6','7','8','9') loop
             l_str := l_str || substr(p_err_msg, 12+i, 1);
@@ -553,6 +566,51 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
     bars.bars_audit.error('Документ ext_ref='||p_extref||' заблокирован другим пользователем');
     return false;
   end lock_document4pay;
+
+
+  -----------------------------------
+  -- GET_SIGN_FOR_VERIFIVCATION
+  --
+  -- Получить подпись от вертушки, которая обрабьатывает докуметнт от корп2 технологической подписью.
+  --
+  procedure get_extsign_for_verification(p_ext_ref      in    number, 
+                                         p_key          out   varchar2,
+                                         p_buff         out   varchar2,
+                                         p_sign         out   varchar2 ) is
+     l_doc doc_import%rowtype;
+     l_trace         varchar2(1000) := G_TRACE||'get_extsign_for_verification: ';
+     l_hexbuff       varchar2(1000);
+     l_asciibuff     varchar2(1000);
+  begin
+     l_doc := read_corp_doc(p_ext_ref);  
+	 l_asciibuff := case when  bars.gl.amfo='300465' then 
+							  nvl(rpad(l_doc.nd,10),rpad(' ',10))||nvl(to_char(l_doc.datd,'YYMMDD'),rpad(' ',6))
+							||nvl(lpad(to_char(l_doc.dk),1),' ')
+							||nvl(lpad(l_doc.mfo_a,9),rpad(' ',9))||nvl(lpad(l_doc.nls_a,14),rpad(' ',14))
+							||nvl(lpad(to_char(l_doc.kv),3),rpad(' ',3))||nvl(lpad(to_char(l_doc.s),16),rpad(' ',16))
+							||nvl(lpad(l_doc.mfo_b,9),rpad(' ',9))||nvl(lpad(l_doc.nls_b,14),rpad(' ',14))
+							||nvl(lpad(to_char(nvl(l_doc.kv2,l_doc.kv)),3),rpad(' ',3))||nvl(lpad(to_char(nvl(l_doc.s2,l_doc.s)),16),rpad(' ',16))
+			else				
+							  nvl(rpad(l_doc.nd,10),rpad(' ',10))||nvl(to_char(l_doc.datd,'YYMMDD'),rpad(' ',6))
+							||nvl(lpad(to_char(l_doc.dk),1),' ')
+							||nvl(lpad(l_doc.mfo_a,9),rpad(' ',9))||nvl(lpad(l_doc.nls_a,14),rpad(' ',14))
+							||nvl(lpad(to_char(l_doc.kv),3),rpad(' ',3))||nvl(lpad(to_char(l_doc.s),16),rpad(' ',16))
+							||nvl(rpad(l_doc.nam_a,38),rpad(' ',38))||lpad(nvl(l_doc.id_a,' '), 14)
+							||nvl(lpad(l_doc.mfo_b,9),rpad(' ',9))||nvl(lpad(l_doc.nls_b,14),rpad(' ',14))
+							||nvl(lpad(to_char(nvl(l_doc.kv2,l_doc.kv)),3),rpad(' ',3))||nvl(lpad(to_char(nvl(l_doc.s2,l_doc.s)),16),rpad(' ',16))
+							||nvl(rpad(l_doc.nam_b,38),rpad(' ',38))||lpad(nvl(l_doc.id_b,' '), 14)
+							||nvl(rpad(l_doc.nazn,160),rpad(' ',160))
+                       end;
+
+     l_hexbuff := rawtohex(utl_raw.cast_to_raw(l_asciibuff));
+     p_buff := l_hexbuff;
+     p_key  := l_doc.id_o;
+     p_sign := l_doc.sign;
+
+     bars.bars_audit.info(l_trace||'extref = '||p_ext_ref||', buffer = '||l_asciibuff ||' hex buff='||l_hexbuff||', sign='||p_sign);
+             
+  end;  
+									  
 
 
   -----------------------------------

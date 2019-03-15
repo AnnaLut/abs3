@@ -12,6 +12,12 @@ using System.Web.UI.HtmlControls;
 using ibank.core.Exceptions;
 using ibank.objlayer;
 using ibank.core;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Xml.Linq;
+using System.Linq;
 
 namespace barsroot.core
 {
@@ -206,6 +212,86 @@ namespace barsroot.core
         public static void SaveExceptionInSession(Exception ex)
         {
             HttpContext.Current.Session["AppError"] = ex;
+        }
+
+        /// <summary>
+        /// Превращение объекта из БД в xml для soap-запроса
+        /// </summary>
+        /// <param name="Т">тип объекта</param>
+        /// <param name="objToSerialize">экземпляр объекта</param>
+        public static XmlDocument SerializeObject<T>(T objToSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            XmlSerializerNamespaces names = new XmlSerializerNamespaces();
+            names.Add("", "");
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlDocument xmlResult = new XmlDocument();
+            using (MemoryStream mStream = new MemoryStream())
+            {
+                using (XmlWriter writer = XmlWriter.Create(mStream))
+                {
+                    xmlSerializer.Serialize(writer, objToSerialize, names);
+                }
+                mStream.Flush();
+                mStream.Seek(0, SeekOrigin.Begin);
+                using (StreamReader sReader = new StreamReader(mStream))
+                {
+                    xmlDoc.Load(sReader);
+                }
+            }
+
+            return xmlDoc;
+        }
+
+        /// <summary>
+        /// Добавление к запросу сертификата, если кроме ssl-соединения требуется еще один уровень аутентификации
+        /// </summary>
+        /// <param name="request">экземпляр запроса</param>
+        /// <param name="certName">имя сертификата для поиска в хранилище сертификатов</param>
+        public static void ManageSSlCertification(HttpWebRequest request, string certName)
+        {
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
+            ServicePointManager.ServerCertificateValidationCallback += new System.Net.Security.RemoteCertificateValidationCallback((s, ce, ch, ssl) => true);
+
+            //Looking for proper certificate in Local store of sertificates:
+            X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadOnly);
+            var certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, certName, false);
+            X509Certificate cert = null;
+            try
+            {
+                cert = certCollection[0];
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Сертифікат для запитів до сервісу не знайдено (пошук по імені [" + certName + "]). Текст помилки: " + ex.Message);
+            }
+
+            request.ClientCertificates.Add(cert);
+        }
+
+        public static String ParseResponseWithGeneralWebServiceError(String xml)
+        {
+            String result = "No message";
+            if (String.IsNullOrEmpty(xml))
+                return result;
+            try
+            {
+                XDocument document = XDocument.Parse(xml);
+                XNode node = document.LastNode;
+                XElement status = document.Descendants("faultcode").FirstOrDefault();
+                XElement message = document.Descendants("faultstring").FirstOrDefault();
+                if (status != null && message != null)
+                {
+                    return String.Format("Status: {0}, Message: {1}", status.Value, message.Value);
+                }
+                return result;
+            }
+            catch (System.Exception e)
+            {
+                return "No message";
+            }
+
         }
     }
 }

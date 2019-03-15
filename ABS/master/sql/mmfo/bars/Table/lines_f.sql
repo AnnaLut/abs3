@@ -68,6 +68,7 @@ end;
 PROMPT *** ALTER_POLICIES to LINES_F ***
  exec bpa.alter_policies('LINES_F');
 
+COMMENT ON TABLE BARS.LINES_F IS 'Детальні рядки файла @F';
 
 COMMENT ON TABLE BARS.LINES_F IS '';
 COMMENT ON COLUMN BARS.LINES_F.KF IS '';
@@ -77,9 +78,9 @@ COMMENT ON COLUMN BARS.LINES_F.DAT IS '';
 COMMENT ON COLUMN BARS.LINES_F.N IS '';
 COMMENT ON COLUMN BARS.LINES_F.MFO IS '';
 COMMENT ON COLUMN BARS.LINES_F.OKPO IS '';
-COMMENT ON COLUMN BARS.LINES_F.RTYPE IS '';
-COMMENT ON COLUMN BARS.LINES_F.OTYPE IS '';
-COMMENT ON COLUMN BARS.LINES_F.ODATE IS '';
+COMMENT ON COLUMN BARS.LINES_F.RTYPE IS 'Реєстр, якому належить податковий номер: 0 - податковий номер не належить жодному реєстру, 1 - ЄДРПОУ, 2 - ДРФО, 3 - податковий номер, наданий контролюючим органом, 4 - серія та номер паспорта (для фізичної особи, яка має відмітку у паспорті про право здійснювати будь-які платежі за серією та номером паспорта)';
+COMMENT ON COLUMN BARS.LINES_F.OTYPE IS 'Тип операції: 1 - відкрито рахунок, 3 - закрито рахунок, 5 - зміна рахунка (закрито рахунок не за ініціативою клієнта), 6 - зміна рахунка (відкрито рахунок не за ініціативою клієнта)';
+COMMENT ON COLUMN BARS.LINES_F.ODATE IS 'Дата операції';
 COMMENT ON COLUMN BARS.LINES_F.NLS IS '';
 COMMENT ON COLUMN BARS.LINES_F.NLSM IS '';
 COMMENT ON COLUMN BARS.LINES_F.KV IS '';
@@ -140,6 +141,60 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table BARS.LINES_F add dpa_ead_que_id number(38)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+COMMENT ON COLUMN BARS.LINES_F.DPA_EAD_QUE_ID IS 'ID запису в черзі на відправку документа в ЕА';
+
+PROMPT *** Create  index i_lines_f_dpa_ead_que_id ***
+begin
+  execute immediate '
+    create index i_lines_f_dpa_ead_que_id on BARS.LINES_F(dpa_ead_que_id)
+      tablespace BRSMDLI
+      pctfree 10
+      initrans 2
+      maxtrans 255
+      storage
+      (
+        initial 64K
+        next 1M
+        minextents 1
+        maxextents unlimited
+      )
+  ';
+exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
+
+
+PROMPT *** Create  index i_lines_f_nlsotype ***
+begin
+  execute immediate '
+    create index i_lines_f_nlsotype on BARS.LINES_F(mfo,nls,kv,otype)
+      tablespace BRSMDLI
+      pctfree 10
+      initrans 2
+      maxtrans 255
+      storage
+      (
+        initial 64K
+        next 1M
+        minextents 1
+        maxextents unlimited
+      )
+  ';
+exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
 
 
 PROMPT *** Create  grants  LINES_F ***

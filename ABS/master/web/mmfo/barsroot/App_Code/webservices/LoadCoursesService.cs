@@ -13,6 +13,7 @@ using BarsWeb.Areas.Way.Models;
 using Oracle.DataAccess.Client;
 using System.Data;
 using System.Text;
+using BarsWeb.Core.Logger;
 
 namespace Bars.WebServices
 {
@@ -31,13 +32,55 @@ namespace Bars.WebServices
             public string StackTrace { get; set; }
         }
 
+        private void WriteLogMessage(string msg)
+        {
+            DbLoggerConstruct.NewDbLogger().Info(msg, "LoadCoursesService");
+        }
+        private void CheckFiles(IEnumerable<string> files, string path)
+        {
+            path += path[path.Length - 1] == '/' ? "" : "/";
+            WriteLogMessage(string.Format("Selected Files :: [{0}]", string.Join(" , ", files.ToArray())));
+            foreach (string file in files)
+            {
+                CheckFileExistence(path + file);
+                CheckFileRead(path + file);
+            }
+        }
+        private void CheckFileExistence(string _fullPath)
+        {
+            try
+            {
+                if (!File.Exists(_fullPath))
+                    WriteLogMessage(string.Format("File [{0}] doesnt exists or there is no acces to it", _fullPath));
+            }
+            catch (System.Exception ex)
+            {
+                WriteLogMessage(string.Format("Error while chacking file existence, file [{0}], msg = [{1}]", _fullPath, ex.Message));
+            }
+        }
+        private void CheckFileRead(string _fullPath)
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader(File.Open(_fullPath, FileMode.Open), Encoding.GetEncoding(1251)))
+                {
+                    string tmp = sr.ReadToEnd();  //2.Проверить кодировку кириллици
+                    if (string.IsNullOrWhiteSpace(tmp)) throw new System.Exception("Empty data");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                WriteLogMessage(string.Format("Error while reading file [{0}], msg = [{1}]", _fullPath, ex.Message));
+            }
+        }
+
         [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
         [WebMethod(EnableSession = true)]
         public ResultResponse LoadAllCourses(string UserName, string Password, string PathFrom, string PathTo)
         {
-            var result = new ResultResponse { status = "OK", message = "",  StackTrace=""};
+            var result = new ResultResponse { status = "OK", message = "", StackTrace = "" };
             StringBuilder sb = new StringBuilder();
-            
+
             try
             {
                 bool isAuthenticated = CustomAuthentication.AuthenticateUser(UserName, Password, true);
@@ -51,6 +94,8 @@ namespace Bars.WebServices
 
                 if (fileNames.Count() > 0)
                 {
+                    CheckFiles(fileNames, PathFrom);
+
                     OracleConnection con = OraConnector.Handler.UserConnection;
                     try
                     {
@@ -79,7 +124,7 @@ namespace Bars.WebServices
                 result.message = ex.Message;
                 result.StackTrace = ex.StackTrace;
             }
-            
+
             result.message = sb.ToString();
             return result;
         }
@@ -121,7 +166,7 @@ namespace Bars.WebServices
                 cmd.ExecuteNonQuery();
 
                 Result = Convert.ToString(cmd.Parameters["P_RETURN"].Value);
-            }                
+            }
 
             return Result;
         }
@@ -135,7 +180,7 @@ namespace Bars.WebServices
                 files.Add(dir.Replace(path, "").Replace("\\", ""));
             }
             return files.AsEnumerable();
-        }        
+        }
 
         private void LoginUserInt(String userName)
         {

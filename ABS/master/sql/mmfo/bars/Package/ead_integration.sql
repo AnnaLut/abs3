@@ -3,7 +3,7 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql ====
 PROMPT ===================================================================================== 
 
 CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-49 3.3 08.10.2018 MMFO';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-49 3.4 25.02.2019 MMFO';
    g_type_id  object_type.id%type;
    g_state_id number;
 
@@ -55,7 +55,7 @@ function ead_nbs_check_param  (p_nbs      varchar2, -- можно передавать как nbs 
       doc_pages_count       ead_docs.page_count%TYPE,
       doc_binary_data       ead_docs.scan_data%TYPE,
       doc_request_number    CUST_REQUESTS.REQ_ID%TYPE,
-      agr_code              ead_docs.agr_id%TYPE,
+      agr_code              varchar2(500),--ead_docs.agr_id%TYPE,
       agr_type              ead_nbs.agr_type%type,
       account_type          varchar2(50), -- размерность 50 - от себя
       account_number        accounts.nls%TYPE,
@@ -78,6 +78,8 @@ function ead_nbs_check_param  (p_nbs      varchar2, -- можно передавать как nbs 
   FUNCTION get_DocAll_Instance(p_doc_id ead_docs.id%TYPE) RETURN Doc_Instance_Set PIPELINED;
   -- (Доп метод)Сканкопии по зарплатным проектам
   FUNCTION get_DocSalary_Instance(p_doc_id ead_docs.id%TYPE) RETURN Doc_Instance_Set PIPELINED;
+  -- (Доп метод)Сканкопии по DPA
+  FUNCTION get_DocDPA_Instance(p_doc_id ead_docs.id%TYPE) RETURN Doc_Instance_Set PIPELINED;
 
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Client.GetInstance
@@ -450,6 +452,11 @@ function ead_nbs_check_param  (p_nbs      varchar2, -- можно передавать как nbs 
    -- EADService.cs         Structs.Params.GercClient.GetInstance!!!
    -----------------------------------------------------------------------
 
+   -----------------------------------------------------------------------
+   -- EADService.cs         Structs.Params.GercClient.GetInstance!!!
+   -----------------------------------------------------------------------
+  FUNCTION SPLIT_KEY(p_key in string, p_kf in string default null) return string;
+
 END ead_integration;
 /
 SHOW ERRORS;
@@ -457,7 +464,7 @@ SHOW ERRORS;
 
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
-   g_body_version constant varchar2(64) := 'version 3.3 08.10.2018 MMFO';
+   g_body_version constant varchar2(64) := 'version 3.4 25.02.2019 MMFO';
 
    type TAccAgrParam is record
    (
@@ -763,6 +770,7 @@ end  ead_nbs_check_param;
         l_rnk      customer.rnk%type;
         l_nbs      accounts.nbs%type;
         l_acc_2625 accounts.acc%type;
+        l_wb_dpt   dpt_deposit.wb%type;
    begin
      rAccAgrParam := null;
       begin
@@ -817,8 +825,9 @@ end  ead_nbs_check_param;
 
        -- Если приезжает счет онлайн-депозита - определяем 2625 счет включенный в ДКБО
        select max(deposit_id) keep(dense_rank last order by idupd),
-              max(acc_d) keep(dense_rank last order by idupd)
-         into rAccAgrParam.agr_code, l_acc_2625
+              max(acc_d) keep(dense_rank last order by idupd),
+              max(wb) keep(dense_rank last order by idupd)
+         into rAccAgrParam.agr_code, l_acc_2625, l_wb_dpt
          from dpt_deposit_clos
         where acc = p_acc and wb = 'Y';
 
@@ -827,7 +836,7 @@ end  ead_nbs_check_param;
        if (rAccAgrParam.agr_code is not null and l_acc_type is not null) then
         rAccAgrParam.agr_type := 'dkbo_fo';
 --        p_agr_code := l_id;
-       elsif (rAccAgrParam.agr_code is not null and l_acc_type is null and l_nbs in ('2630','2635')) then
+       elsif (rAccAgrParam.agr_code is not null and l_acc_type is null and l_nbs in ('2630','2635')) or (nvl(l_wb_dpt,'N')='Y') then
 --         p_parent_agr_code := l_id;
         rAccAgrParam.parent_agr_type := 'dkbo_fo';
         rAccAgrParam.agr_type := 'dep_online_fo';
@@ -963,10 +972,17 @@ end  ead_nbs_check_param;
   function get_Doc_Instance(p_doc_id ead_docs.id%type) return Doc_Instance_Set pipelined is
     l_Doc_Instance_Rec Doc_Instance_Rec;
     l_ea_struct_id ead_docs.ea_struct_id%type;
+    l_is_dpa simple_integer := 0;
   begin
     select ea_struct_id into l_ea_struct_id from ead_docs where id = p_doc_id;
 
-    if l_ea_struct_id like ('001%') then
+    -- перевірка чи є код в довіднику кодів ДПА
+    select coalesce(max(1),0) into l_is_dpa from dpa_ead_nbs where struct_code = l_ea_struct_id;
+
+    if l_is_dpa = 1 then
+      -- DPA
+      select * into l_Doc_Instance_Rec from table(get_DocDPA_Instance(p_doc_id));      
+    elsif l_ea_struct_id like ('001%') then
       -- Зарплата (ЮрЛица, первые сканы...)
       select * into l_Doc_Instance_Rec from table(get_DocSalary_Instance(p_doc_id));
     else
@@ -1001,7 +1017,7 @@ end  ead_nbs_check_param;
                        ELSE
                         null
                      END) as doc_request_number,
-                     agr_id as agr_code,
+                     to_char(agr_id) as agr_code,
                      get_agr_type(agr_id) as agr_type,
                      get_acc_type(agr_id, acc) as account_type,
                      nls as account_number,
@@ -1076,7 +1092,7 @@ end  ead_nbs_check_param;
                      NVL(d.page_count, 1) as doc_pages_count,
                      d.scan_data as doc_binary_data,
                      null as doc_request_number,
-                     d.agr_id as agr_code,
+                     to_char(d.agr_id) as agr_code,
                      'salary_uo' as agr_type,
                      null as account_type,
                      null as account_number,
@@ -1111,6 +1127,74 @@ end  ead_nbs_check_param;
       PIPE ROW(l_Doc_Instance_Rec);
     end loop;
   END get_DocSalary_Instance;
+
+  -- Сканкопии по DPA
+FUNCTION get_DocDPA_Instance(p_doc_id ead_docs.id%TYPE) RETURN Doc_Instance_Set PIPELINED IS
+    l_Doc_Instance_Rec Doc_Instance_Rec;
+  BEGIN
+    bc.go('/');
+
+    FOR i IN (select d.kf,
+                     d.rnk,
+                     d.ea_struct_id as doc_type,
+                     d.id as doc_id,
+                     NVL(d.page_count, 1) as doc_pages_count,
+                     d.scan_data as doc_binary_data,
+                     null as doc_request_number,
+                     --
+                     case n.agr_type
+                       when 'dep_uo' then
+                         (select to_char(max(dpu_id)) from dpu_deal where acc = a.acc)
+                       when 'pr_uo' then
+                         (select max(nkd) from specparam sp where acc = a.acc)
+                       when 'kpk_uo' then
+                         (select max(nkd) from specparam sp where acc = a.acc)
+                       when 'dbo_uo' then
+                         (select max(w.value) from customerw w where w.rnk = a.rnk and trim(w.tag) = 'NDBO')
+                       else null end as agr_code,
+                     --
+                     n.agr_type,
+                     n.acc_type account_type,
+                     a.nls as account_number,
+                     a.kv as account_currency,
+                     d.crt_date as created,
+                     d.crt_date as changed,
+                     sb.logname as user_login,
+                     sb.fio as user_fio,
+                     d.crt_branch as branch_id,
+                     d.rnk as linkedrnk,
+                     d.ticket_id,
+                     d.doc_print_number
+                from ead_docs d
+                     left join staff$base sb on d.crt_staff_id = sb.id
+                     inner join dpa_ead_que q on q.ead_doc_id = d.id
+                     inner join dpa_ead_nbs n on n.id = q.dpa_ead_nbs_id
+                     inner join accounts a on a.acc = d.acc
+               where d.id = p_doc_id) loop
+
+      l_Doc_Instance_Rec.rnk                := ead_integration.split_key(i.rnk, i.kf);
+      l_Doc_Instance_Rec.doc_type           := i.doc_type;
+      l_Doc_Instance_Rec.doc_id             := i.doc_id;
+      l_Doc_Instance_Rec.doc_pages_count    := i.doc_pages_count;
+      l_Doc_Instance_Rec.doc_binary_data    := i.doc_binary_data;
+      l_Doc_Instance_Rec.doc_request_number := i.doc_request_number;
+      l_Doc_Instance_Rec.agr_code           := case when i.agr_type = 'dep_uo' then ead_integration.split_key(i.agr_code, i.kf) else i.agr_code end;
+      l_Doc_Instance_Rec.agr_type           := i.agr_type;
+      l_Doc_Instance_Rec.account_type       := i.account_type;
+      l_Doc_Instance_Rec.account_number     := i.account_number;
+      l_Doc_Instance_Rec.account_currency   := i.account_currency;
+      l_Doc_Instance_Rec.created            := i.created;
+      l_Doc_Instance_Rec.changed            := i.changed;
+      l_Doc_Instance_Rec.user_login         := i.user_login;
+      l_Doc_Instance_Rec.user_fio           := i.user_fio;
+      l_Doc_Instance_Rec.branch_id          := i.branch_id;
+      l_Doc_Instance_Rec.linkedrnk          := ead_integration.split_key(i.linkedrnk, i.kf);
+      l_Doc_Instance_Rec.ticket_id          := i.ticket_id;
+      l_Doc_Instance_Rec.doc_print_number   := i.doc_print_number;
+
+      PIPE ROW(l_Doc_Instance_Rec);
+    end loop;
+  END get_DocDPA_Instance;
 
  -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Client.GetInstance      BMS.Method = SetClientData

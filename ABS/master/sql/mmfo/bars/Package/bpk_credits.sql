@@ -43,6 +43,7 @@ is
   , p_adjustment     in     pls_integer default 0
   );
 
+  procedure set_accw_DATEOFKK;
 
 end BPK_CREDITS;
 /
@@ -86,7 +87,135 @@ is
   begin
     return 'Package DPU_AGR body ' || g_body_version || '.';
   end body_version;
+  ------------------------------------------------------------------------------
+  --COBUMMFO-8742
+  --встановлення параметру DATEOFKK «Дата визнання кредиту проблемним на КК» 
+  --на карковий рахунок  
+  --визначається кількість днів прострочення % та тіла по кредиту за БПК
+  --при кількості >90 - виставляється параметр DATEOFKK
+   procedure set_accw_DATEOFKK
+    as  
+/* -------ver. 1   
+   l_deltaDay integer:=90;     
+   l_tagToSet varchar(10):='DATEOFKK';
+   l_ob22_2207 varchar(10):='87';
+   l_ob22_2209 varchar(10):='I3';
+  begin    
+   for rec in (  
+     select  w.acc_pk
+      from w4_acc w 
+      inner join 
+             --2203 Прострочена заборгованість за кредитами------ 
+            (select   
+              wa.acc_pk,a_2207.nls,a_2207.ostc
+--              ,(select  max(fdat) from saldoa where acc =wa.acc_2207   and ostf = 0 ) date_ost
+              ,dat_spz(wa.acc_2207,bankdate,1)date_ost
+             from w4_acc wa
+                  inner join accounts a_2207 on a_2207.acc=wa.acc_2207 and a_2207.ostc<>0 and a_2207.ob22=l_ob22_2207 
+             where wa.acc_2207 is not null )  t_2203 
+             ----------------------------------------------------
+      on t_2203.acc_pk=w.acc_pk
+      inner join 
+             --2208 Прострочені нараховані доходи за кредитами--- 
+            (select   
+              wa.acc_pk,a_2209.nls,a_2209.ostc
+--              ,(select  max(fdat) from saldoa where acc =wa.acc_2209   and ostf = 0 ) date_ost
+              ,dat_spz(wa.acc_2209,bankdate,1)date_ost
+             from w4_acc wa
+                  inner join accounts a_2209 on a_2209.acc=wa.acc_2209 and a_2209.ostc<>0 and a_2209.ob22=l_ob22_2209 
+             where wa.acc_2209 is not null ) t_2208 
+             ----------------------------------------------------
+      on t_2208.acc_pk=w.acc_pk
+    where    ( bankdate-t_2203.date_ost >l_deltaDay  or bankdate-t_2208.date_ost >l_deltaDay)
+              and not  exists (select 1 from accountsw where acc=w.acc_pk and tag=l_tagToSet )
+                ) 
+   loop --встановлення параметру
+      accreg.setAccountwParam(rec.acc_pk,l_tagToSet,bankdate );
+   end loop;*/
+   -------ver. 2 
+ l_mfo_cnt  integer;
+ l_try number;
+ l_status number;
+ v_taskname varchar2(15):='SET_DATEOFKK';
+     
+ 
+-- v_ob22_2207 varchar(10):='87';
+-- v_ob22_2209 varchar(10):='I3';
+ v_chunk_stmt varchar2(128) := 'select kf as START_ID, kf as END_ID from bars.mv_kf ';
+ v_task_statement varchar2(4000) := q'[
+begin 
 
+ bars.bc.go(:START_ID);
+ logger.info('SET_DATEOFKK run for '||:END_ID);
+
+ for rec in 
+   (
+     select wa.acc_pk ,wa.kf
+     from w4_acc wa      
+             inner join accounts a_2207 on a_2207.acc=wa.acc_2207 and a_2207.ostc<>0 and a_2207.ob22='87' 
+             inner join accounts a_2209 on a_2209.acc=wa.acc_2209 and a_2209.ostc<>0 and a_2209.ob22='I3'            
+     where       
+      ( 
+        bankdate-(dat_spz(wa.acc_2207,bankdate,1)) >90
+        or 
+        bankdate-(dat_spz(wa.acc_2209,bankdate,1)) >90
+      ) 
+      and not  exists (select 1 from accountsw where acc=wa.acc_pk and tag='DATEOFKK' )      
+   )
+ loop
+    --встановлення параметру
+    accreg.setAccountwParam(rec.acc_pk,'DATEOFKK',bankdate);
+    logger.info ('SET_DATEOFKK:'||rec.kf||':'|| rec.acc_pk);               
+ end loop;  
+            
+  commit;
+  bc.home;     
+exception 
+  when others then 
+        logger.info('SET_DATEOFKK Error:'||sqlerrm);
+end;
+]';
+
+ task_doesnt_exist exception;
+ pragma exception_init(task_doesnt_exist, -29498);
+
+begin
+    begin
+        DBMS_PARALLEL_EXECUTE.DROP_TASK (v_taskname);
+    exception
+        when task_doesnt_exist then null;
+    end;
+  
+    select count(*) into l_mfo_cnt from mv_kf;
+  
+    dbms_parallel_execute.create_task(v_taskname);
+  
+    dbms_parallel_execute.create_chunks_by_sql(task_name => v_taskname,
+                                             sql_stmt  => v_chunk_stmt,
+                                             by_rowid  => false);
+                                             
+  -- запуск задачи по всем МФО
+    dbms_parallel_execute.run_task(task_name      => v_taskname,
+                                 sql_stmt       => v_task_statement,
+                                 language_flag  => dbms_sql.native,
+                                 parallel_level => l_mfo_cnt);    
+  --== проверка окончания работы таски
+    l_try    := 0;
+    l_status := dbms_parallel_execute.task_status(v_taskname);
+    while (l_try < 2 and l_status != dbms_parallel_execute.finished) loop
+        l_try := l_try + 1;
+        dbms_parallel_execute.resume_task(v_taskname);
+        l_status := dbms_parallel_execute.task_status(v_taskname);
+    end loop;                                         
+    commit;
+
+    exception
+        when others then
+             bars_audit.error(' error during execution procedure set_accw_DATEOFKK: ' ||
+                         dbms_utility.format_error_stack() || chr(10) ||
+                         dbms_utility.format_error_backtrace());                                                                          
+
+end set_accw_DATEOFKK;
   ------------------------------------------------------------------------------
   -- fill_bpk_credit_deal  -- (до)наповнення портфеля договорів
   --

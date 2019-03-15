@@ -6,8 +6,18 @@
  
   CREATE OR REPLACE PACKAGE BARS.BARS_DPA is
 
-g_head_version constant varchar2(64)  := 'Version 1.33 28/01/2019';
+g_head_version constant varchar2(64)  := 'Version 1.33 25/02/2019';
 g_head_defs    constant varchar2(512) := '';
+
+type t_rec_lines is record (
+  ead_que_id dpa_ead_que.id%type,
+  fn         lines_f.fn%type,
+  dat        lines_f.dat%type,
+  fn_r       lines_f.fn_r%type,
+  nls        lines_f.nls%type,
+  kv         accounts.kv%type,
+  kf         accounts.kf%type);
+type t_lines is table of t_rec_lines;
 
 /** header_version - возвращает версию заголовка пакета */
 function header_version return varchar2;
@@ -101,11 +111,30 @@ procedure ins_r0(p_filename varchar2, p_filedata clob, p_tickname OUT varchar2);
                         );
   FUNCTION dpa_nbs(p_nbs  varchar2
                  ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER;
+
+  function decode_base64(p_clob_in in clob) return blob;
+
+  -----------------------------------------------------------------------------------------
+  --  send_pdf2ea
+  --
+  --    Формування файлу pdf та відправка в EA
+  --
+  procedure send_pdf2ea;
+
+  -------------------------------------------------------------------------------
+  -- check_is_ead
+  -- Перевірка чи потрібно відправляти в звіт електронний архів. return 1 - потрібно / 0 - не потрібно
+  --
+  function check_is_ead(p_nls   in accounts.nls%type,
+                        p_otype in lines_f.otype%type,
+                        p_tip   in accounts.tip%type,
+                        p_rnk   in customer.rnk%type,
+                        p_daos  in accounts.daos%type) return number;
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.33 28/01/2019';
+g_body_version constant varchar2(64)  := 'Version 1.35 01/03/2019';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -221,10 +250,11 @@ begin
 
 
   if p_filetype = 'CV' or p_filetype = 'CA' then
-       select substr(sab,2,3) into l_sab from banks$base where mfo = gl.amfo;
-	   l_filename := p_filetype||'*'||l_sab||
-	                 f_chr36(extract(month from sysdate)) ||
-		             f_chr36(extract(day from sysdate))||'.'|| lpadchr(l_filenum, '0',3);
+       -- select substr(sab,2,3) into l_sab from banks$base where mfo = gl.amfo; --sys_context('bars_context','glb_mfo');
+       select n_isep into l_sab from rcukru where mfo = gl.amfo;
+     l_filename := p_filetype||'O'||l_sab||
+                   f_chr36(extract(month from sysdate)) ||
+                 f_chr36(extract(day from sysdate))||'.'|| lpad(f_conv36(l_filenum),3,'0');
 
   else
          l_filename := upper('@' || p_filetype || '0' ||
@@ -831,6 +861,55 @@ begin
 end form_ticket;
 
 -------------------------------------------------------------------------------
+-- check_is_ddbo
+-- Перевірка ознаки ДБО по rnk. return 1 - так / 0 - ні
+--
+function check_is_ddbo(p_nbs  in accounts.nbs%type,
+                       p_rnk  in customer.rnk%type,
+                       p_daos in accounts.daos%type) return number
+is
+  l_is_ddbo number(1) := 0;
+begin
+  select coalesce(max(1),0)
+  into l_is_ddbo 
+  from dpa_ead_nbs 
+  where is_ddbo = 1 and nbs = p_nbs
+       and to_date(kl.get_customerw(p_rnk, 'DDBO'),'dd.mm.yyyy') <= p_daos;
+
+  return l_is_ddbo;
+end check_is_ddbo;
+
+-------------------------------------------------------------------------------
+-- check_is_ead
+-- Перевірка чи потрібно відправляти в звіт електронний архів. return 1 - потрібно / 0 - не потрібно
+--
+function check_is_ead(p_nls   in accounts.nls%type,
+                      p_otype in lines_f.otype%type,
+                      p_tip   in accounts.tip%type,
+                      p_rnk   in customer.rnk%type,
+                      p_daos  in accounts.daos%type) return number
+is
+  l_is_ead  number(1) := 0;
+  l_is_ddbo number(1) := 0;
+  l_nbs     accounts.nbs%type;
+begin
+  l_nbs := substr(p_nls,1,4);
+  l_is_ddbo := check_is_ddbo(l_nbs, p_rnk, p_daos);
+
+  -- якщо знайдено в довіднику dpa_ead_nbs запис відповідно до параметрів перевірки повертаємо 1 інакше 0
+  select coalesce(max(1),0)
+  into l_is_ead
+  from dpa_ead_nbs n 
+  where n.custtype = 2 -- тільки юр особи
+        and n.nbs = substr(p_nls,1,4)
+        and n.oper_type = case when p_otype in (1,6) then 1 when p_otype in (3,5) then 2 end -- p_otype in (1,6) - відкриття рахунка, p_otype in (3,5) - закриття рахунка
+        and n.is_ddbo = l_is_ddbo
+        and regexp_like(substr(p_tip,1,2),n.tip);
+
+  return l_is_ead;
+end check_is_ead;
+
+-------------------------------------------------------------------------------
 -- iparse_ticket
 -- процедура разбора квитанции
 --
@@ -880,7 +959,12 @@ is
 
   l_tip    accounts.tip%type; -- COBUMMFO-7501
   l_nlsalt accounts.nlsalt%type; -- COBUMMFO-7501
-  l_daos   accounts.daos%type; -- COBUMMFO-7501
+
+  l_is_ea          simple_integer := 0;
+  l_dpa_ead_que_id dpa_ead_que.id%type;
+  l_otype          lines_f.otype%type;
+  l_rnk            accounts.rnk%type;
+  l_daos           accounts.daos%type;
 begin
 
   bars_audit.info(p || 'Start. p_filename - ' || p_filename);
@@ -973,15 +1057,15 @@ begin
         begin
            -- 2124 - имя файла @F для данного счета
            if substr(p_filename,1,2) = '@R' then
-              select n into l_tmpn
-                from lines_f
-               where fn  = l_f_name
-                 and dat > sysdate-30
-                 and nls = l_account
-                 and kv  = l_currency
-                 and otype in (1,6)
-                 and n = l_f_rec;
-
+              select f.n, f.otype, a.tip, a.rnk, a.daos
+                into l_tmpn, l_otype, l_tip, l_rnk, l_daos
+                from lines_f f
+                     left join accounts a on a.nls = f.nls and a.kf = f.kf and a.kv = f.kv
+               where f.fn  = l_f_name
+                 and f.dat > sysdate-30
+                 and f.nls = l_account
+                 and f.kv  = l_currency
+                 and f.otype in (1,6);
            else
               select n into l_tmpn
                 from lines_p
@@ -1016,18 +1100,38 @@ begin
 
      -- квитовка строк
      if substr(p_filename,1,2) = '@R' then
+        -- пошук по nbs, чи потрібно відправляти звіт в ЕА
+        l_is_ea := check_is_ead(p_nls   => l_account,
+                                p_otype => l_otype,
+                                p_tip   => l_tip,
+                                p_rnk   => l_rnk,
+                                p_daos  => l_daos);
+
+        -- спочатку обнуляю змінну бо ми в циклі
+        l_dpa_ead_que_id := null;
+
+        -- COBUMMFO-7056 - Автоматична передача Повідомленнь від ДПС
+        -- якщо потрібно то добавляєм в чергу на відправку в ЕА звіт
+        -- que_date   - Дата очікування формування та відправки файлу: (не пусто) - ознака, очікує формування та відправки PDF файлу в ЕА
+        -- ead_doc_id - після відправки в ЕА цьому полю буде проставлено id документа електронного архіва, а que_date стане null
+        if l_is_ea > 0 then
+          insert into dpa_ead_que (id, que_date, ead_doc_id)
+          values (dpa_ead_que_seq.nextval, sysdate, null)
+          returning id into l_dpa_ead_que_id;
+        end if;
 
         update lines_f
-           set dat_in_dpa  = l_receive_date,
-               dat_acc_dpa = l_sts_date,
-               id_pr       = l_reason,
-               id_dpa      = l_sts_reg,
-               id_dps      = l_sts_rai,
-               id_rec      = l_rec_id,
-               fn_r        = p_filename,
-               date_r      = l_tick_date,
-               n_r         = l_tick_n,
-               err         = l_err
+           set dat_in_dpa     = l_receive_date,
+               dat_acc_dpa    = l_sts_date,
+               id_pr          = l_reason,
+               id_dpa         = l_sts_reg,
+               id_dps         = l_sts_rai,
+               id_rec         = l_rec_id,
+               fn_r           = p_filename,
+               date_r         = l_tick_date,
+               n_r            = l_tick_n,
+               err            = l_err,
+               dpa_ead_que_id = l_dpa_ead_que_id
          where fn  = l_f_name
            and dat > sysdate-30
            and nls = l_account
@@ -1235,6 +1339,12 @@ is
 
   p varchar2(100) := 'bars_dpa.iparse_ticket2. ';
 
+  l_is_ea          simple_integer := 0;
+  l_dpa_ead_que_id dpa_ead_que.id%type;
+  l_otype          lines_f.otype%type;
+  l_rnk            accounts.rnk%type;
+  l_daos           accounts.daos%type;
+  l_lines          t_lines;
 begin
 
   bars_audit.info(p || 'Start.');
@@ -1336,7 +1446,7 @@ begin
 
   end if;
 
-  -- если есть строки с ошибками (они уже сквитованы выше),
+  -- если есть строки с ошибками (они уже сквитованы выше - fn_r вже = '@F2%'),
   --   для остальных строк ставим квитовку 0000
   if l_tick_rec > 0 then
      l_f_rowerr := '0000';
@@ -1345,15 +1455,62 @@ begin
      l_f_rowerr := l_err_code;
   end if;
 
-  -- квитовка остальных строк
+  -- квитовка остальных строк (відбираємо ті що залишились із назвою f.fn_r like '@F1%' - інші вже сквитовано вище як помилкові і мають іншу назву)
   if substr(p_filename,1,2) = '@F' then
+     -- наповнення колекції lines_f
+     select -- перевірка якщо потрібно передавати в еа тоді формуєм dpa_ead_que_id
+            case when
+              f.otype in (3,5) and -- передаєм тільки закриті рахунки
+              check_is_ead(f.nls,       -- p_nls   => l_account,
+                           f.otype,     -- p_otype => l_otype,
+                           a.tip,       -- p_tip   => l_tip,
+                           a.rnk,       -- p_rnk   => l_rnk,
+                           a.daos) = 1  -- p_daos  => l_daos
+              then dpa_ead_que_seq.nextval else null end as ead_que_id,
+            f.fn,
+            f.dat,
+            f.fn_r,
+            f.nls,
+            f.kv,
+            f.kf
+     bulk collect into l_lines
+     from lines_f f
+     left join accounts a on a.nls = f.nls and a.kv = f.kv and a.kf = f.kf
+     where f.fn = l_f_name
+           and f.dat > sysdate-30
+           and f.fn_r like '@F1%';
+
+     -- COBUMMFO-7056 - Автоматична передача Повідомленнь від ДПС
+     -- якщо потрібно то добавляєм в чергу на відправку в ЕА звіт
+     -- que_date   - Дата очікування формування та відправки файлу: (не пусто) - ознака, очікує формування та відправки PDF файлу в ЕА
+     -- ead_doc_id - після відправки в ЕА цьому полю буде проставлено id документа електронного архіва, а que_date стане null
+     forall i in l_lines.first..l_lines.last
+     insert into dpa_ead_que (id, que_date, ead_doc_id)
+     select l_lines(i).ead_que_id, sysdate, null
+     from dual
+     where l_lines(i).ead_que_id is not null;
+    
+     -- квитовка строк
+     forall i in l_lines.first..l_lines.last
      update lines_f
+        set err    = l_f_rowerr,
+            fn_r   = p_filename,
+            date_r = l_tick_date,
+            dpa_ead_que_id = l_lines(i).ead_que_id
+      where fn   = l_lines(i).fn
+        and dat  = l_lines(i).dat
+        and fn_r = l_lines(i).fn_r
+        and nls  = l_lines(i).nls
+        and kv   = l_lines(i).kv
+        and kf   = l_lines(i).kf;
+
+     /*update lines_f
         set err    = l_f_rowerr,
             fn_r   = p_filename,
             date_r = l_tick_date
       where fn = l_f_name
         and dat > sysdate-30
-        and fn_r like '@F1%';
+        and fn_r like '@F1%';*/
   elsif substr(p_filename,1,2) = '@P' then
      update lines_p
         set err    = l_f_rowerr,
@@ -1649,6 +1806,7 @@ is
    l_lines_count number;
    l_trace       varchar2(1000) := 'form_cvk_file';
    l_iban        varchar2(29) := lpad(' ',29);
+   l_kf          varchar2(6) :=sys_context('bars_context','user_mfo');
 begin
    bars_audit.info(l_trace||'старт формирования файлов');
 
@@ -1666,6 +1824,7 @@ begin
                             MFO,   NB,   NLS,   DAOS,   VID,   TVO,   NAME_BLOK as name_block,   FIO_BLOK as fio_block,
                             FIO_ISP,   INF_ISP,   ADDR,   OKPO, INF_ISP2
                       from  v_cvk_ca
+                      where daos = p_filedate
                    ) loop
 
           --првая запись
@@ -1681,18 +1840,18 @@ begin
              dbms_lob.append(l_clob, l_system_info||l_header_info);
           end if;
 
-          l_file_line := rpad (c.nb, 38)||
-                         lpad (c.mfo, 9)||
-                         rpad (c.addr, 250)||
-                         rpad (c.vid, 1)||
-                         lpad (c.nls, 14)||
-                         lpad (c.tvo, 3)||
-                         to_char(c.daos, 'yymmdd')||
-                         rpad (c.name_block, 38)||
-                         lpad (c.okpo, 10)||
-                         rpad (c.fio_block, 76)||
-                         rpad (c.inf_isp, 38)||
-                         rpad (c.inf_isp2, 38)||l_nl;
+          l_file_line := rpad (coalesce(c.nb,' '), 38)||
+                         lpad (coalesce(c.mfo,' '), 9)||
+                         rpad (coalesce(c.addr,' '), 250)||
+                         rpad (coalesce(c.vid,' '), 1)||
+                         lpad (coalesce(c.nls,' '), 14)||
+                         lpad (coalesce(c.tvo,' '), 3)||
+                         rpad(coalesce(to_char(c.daos, 'yymmdd'),' '),6)||
+                         rpad (coalesce(c.name_block,' '), 38)||
+                         lpad (coalesce(c.okpo,' '), 10)||
+                         rpad (coalesce(c.fio_block,' '), 76)||
+                         rpad (coalesce(c.inf_isp,' '), 38)||
+                         rpad (coalesce(c.inf_isp2,' '), 38)||l_nl;
 
            dbms_lob.append(l_clob, l_file_line);
            bars_audit.info(l_trace||'строка:'||l_file_line);
@@ -1700,28 +1859,33 @@ begin
 
         p_ids.extend;
 
-        insert into dpa_lob (file_data, file_name, userid) 
+        insert into dpa_lob (file_data, file_name, userid)
         values (l_clob, l_file_name, user_id)
         returning id into p_ids(p_ids.last);
+
+        update dpa_file_counters
+           set taxca_date = trunc(sysdate), --trunc(p_filedate),
+               taxca_seq  = l_file_num
+         where kf = l_kf;
+
         bars_audit.trace(l_trace||'вставлен файл размером :'||dbms_lob.getlength(l_clob));
         p_file_count := 1;
 
    else
 
       for c in (
-                 select count(v.nls) over (partition by decode(vid, 13, '1', 14, '2', '3') ) cnt_vid,
-                        row_number() over (partition by decode(vid, 13, '1', 14, '2', '3') order by v.nls ) vid_rank,
+                 select --count(v.nls) over (partition by decode(vid, 13, '1', 14, '2', '3') ) cnt_vid,
+                        --row_number() over (partition by decode(vid, 13, '1', 14, '2', '3') order by v.nls ) vid_rank,
+                        -- відключив розбивку по типам рахунків. хз чого було так
+                        count(v.nls) over () cnt_vid,
+                        row_number() over (order by v.nls) vid_rank,
                         v.nls, decode(vid, 13, '1', 14, '2', '3') vid, fdat, mfo_d as mfoa, nls_d as nlsa, mfo_k as mfob, nls_k as nlsb,
                         dk, s, vob, nd,
                         v.kv, datd, datp, nam_a, nam_b, nazn, d_rec, naznk, nazns, id_d as id_a, id_k as id_b, v.ref, dat_a, dat_b
                    from v_dpa_cv v
-                         --,
-                         --( select ref from dpa_acc_userid d where userid = user_id) d
-                  where
-                  --d.ref = v.opldok_ref
-                     --and
-                     v.fdat = p_filedate
-                  order     by vid, nls
+                  where v.fdat = p_filedate
+                  order by 2
+                  --order     by vid, nls
                ) loop
 
 
@@ -1736,11 +1900,6 @@ begin
              -- вставка записи в заголовок
              insert into zag_tb(fn, dat, n) values(l_file_name, sysdate,c.cnt_vid );
 
-             -- если клоб наполнен предыдущим файлом
-             --    if dbms_lob.isopen(l_clob) = 1 and dbms_lob.getlength(l_clob) > 0 then
-             --       dbms_lob.close(l_clob);
-             --    end if;
-
              -- кол-во файлов
              i := i+1;
 
@@ -1748,26 +1907,26 @@ begin
              dbms_lob.append(l_clob, l_system_info||l_header_info);
           end if;
 
-          l_file_line :=  lpad(c.mfoa, 9) || lpad(c.nlsa,14) || l_iban ||
-                          lpad(c.mfob, 9) || lpad(c.nlsb,14) || l_iban ||
+          l_file_line :=  lpad(coalesce(c.mfoa,' '), 9) || lpad(coalesce(c.nlsa,' '),14) || lpad(coalesce(l_iban,' '),29) ||
+                          lpad(coalesce(c.mfob,' '), 9) || lpad(coalesce(c.nlsb,' '),14) || lpad(coalesce(l_iban,' '),29) ||
                           to_char(c.dk)||
-                          lpad(c.s,16) ||
-                          lpad(c.vob, 2)||
-                          rpad(c.nd,10) ||
-                          lpad(c.kv, 3) ||
-                          to_char(c.datd, 'yyMMdd') ||
-                          to_char(c.datp, 'yyMMdd') ||
-                          rpad(c.nam_a,38) ||
-                          rpad(c.nam_b,38) ||
-                          rpad(c.nazn,160)||
-                          rpad(c.d_rec,60) ||
-                          rpad(c.naznk,3) ||
-                          rpad(c.nazns,2) ||
-                          rpad(c.id_a,14)||
-                          rpad(c.id_b,14)||
-                          substr(lpad(c.ref,9),-9) ||
-                          to_char(c.dat_a, 'yyMMdd') ||
-                          to_char(c.dat_b, 'yyMMdd') || l_nl;
+                          lpad(coalesce(c.s,' '),16) ||
+                          lpad(coalesce(c.vob,' '), 2)||
+                          rpad(coalesce(c.nd,' '),10) ||
+                          lpad(coalesce(c.kv,' '), 3) ||
+                          rpad(coalesce(to_char(c.datd, 'yyMMdd'),' '),6) ||
+                          rpad(coalesce(to_char(c.datp, 'yyMMdd'),' '),6) ||
+                          rpad(coalesce(c.nam_a,' '),38) ||
+                          rpad(coalesce(c.nam_b,' '),38) ||
+                          rpad(coalesce(c.nazn,' '),160)||
+                          rpad(coalesce(c.d_rec,' '),60) ||
+                          rpad(coalesce(c.naznk,' '),3) ||
+                          rpad(coalesce(c.nazns,' '),2) ||
+                          rpad(coalesce(c.id_a,' '),14)||
+                          rpad(coalesce(c.id_b,' '),14)||
+                          substr(lpad(coalesce(c.ref,' '),9),-9) ||
+                          rpad(coalesce(to_char(c.dat_a, 'yyMMdd'),' '),6) ||
+                          rpad(coalesce(to_char(c.dat_b, 'yyMMdd'),' '),6) || l_nl;
                       l_lines_count := l_lines_count + 1;
            dbms_lob.append(l_clob, l_file_line);
 
@@ -1775,17 +1934,52 @@ begin
           --прочитали последню строку для данного вида счета
           if c.vid_rank = c.cnt_vid then
             p_ids.extend;
-            
-            insert into dpa_lob(file_data, file_name, userid) 
+
+            insert into dpa_lob(file_data, file_name, userid)
             values(l_clob, l_file_name, user_id)
             returning id into p_ids(p_ids.last);
-             
-             l_lines_count := 0;
+
+            update dpa_file_counters
+               set taxcv_date = trunc(sysdate), --trunc(p_filedate),
+                   taxcv_seq  = l_file_num
+             where kf = l_kf;
+
+            l_lines_count := 0;
           end if;
 
          end loop;
 
          --if dbms_lob.isopen(l_clob) = 1 then dbms_lob.close(l_clob); end if;
+
+         -- навіть якщо нема руху то формуєм порожній файл
+         -- (інформація від цвк)
+         if i = 0 then
+             l_file_name   := get_file_name(p_filetype, l_file_num);
+             l_system_info  := lpad(' ', 100) || l_nl;
+             l_header_info :=  substr(l_file_name,1,12)||to_char(sysdate,'yymmddhhmi')||lpadchr(/*c.cnt_vid*/0, '0', 6)||lpadchr('',' ', 166)||l_nl;
+
+             dbms_lob.createtemporary(l_clob,FALSE);
+             dbms_lob.append(l_clob, l_system_info||l_header_info);
+
+             bars_audit.info(l_trace||'зформовано ім`я порожнього файла '||l_file_name);
+             -- вставка записи в заголовок
+             insert into zag_tb(fn, dat, n) values(l_file_name, sysdate,0);
+
+             p_ids.extend;
+
+             insert into dpa_lob(file_data, file_name, userid)
+             values(l_clob, l_file_name, user_id)
+             returning id into p_ids(p_ids.last);
+
+             update dpa_file_counters
+                set taxcv_date = trunc(sysdate), --trunc(p_filedate),
+                    taxcv_seq  = l_file_num
+              where kf = l_kf;
+
+             l_lines_count := 0;
+
+             i := i+1;
+         end if;
 
          p_file_count := i;
          bars_audit.info(l_trace||'на выходе процедуры возвращаем кол-во файлов::'||p_file_count);
@@ -1793,8 +1987,7 @@ begin
 
     end if;
 
-end;
-
+end form_cvk_file;
 -------------------------------------------------------------------------------
 -- get_cvk_file
 -- Получить количество сформированных файлов ЦВК по типу файла
@@ -1803,15 +1996,15 @@ is
    l_clob clob;
    l_filename varchar2(4000);
 begin
-   select file_data, file_name 
-   into l_clob,  l_filename 
-   from dpa_lob 
+   select file_data, file_name
+   into l_clob,  l_filename
+   from dpa_lob
    where id = p_file_number and userid = user_id;
 
    p_filename := l_filename;
 
    return l_clob;
-end;
+end get_cvk_file;
 
 procedure del_f_row(p_idrow varchar2)
 is
@@ -2082,6 +2275,230 @@ end;
     END IF;
     RETURN l_dpa;
   END dpa_nbs;
+
+  --decode_base64------------------------------------------------------------------------------
+  function decode_base64(p_clob_in in clob) return blob is
+     l_blob           blob;
+     l_result         blob;
+     l_offset         integer;
+     l_buffer_size    binary_integer := 29568;
+     l_buffer_varchar varchar2(32736);
+     l_buffer_raw     raw(32736);
+  begin
+     if p_clob_in is null then
+         return null;
+     end if;
+
+     dbms_lob.createtemporary(l_blob, false);
+     l_offset := 1;
+
+     for i in 1 .. ceil(dbms_lob.getlength(p_clob_in) / l_buffer_size) loop
+         dbms_lob.read(p_clob_in,
+                       l_buffer_size,
+                       l_offset,
+                       l_buffer_varchar);
+         l_buffer_raw := utl_raw.cast_to_raw(l_buffer_varchar);
+         l_buffer_raw := utl_encode.base64_decode(l_buffer_raw);
+         dbms_lob.writeappend(l_blob,
+                              utl_raw.length(l_buffer_raw),
+                              l_buffer_raw);
+         l_offset := l_offset + l_buffer_size;
+     end loop;
+
+     l_result := l_blob;
+     dbms_lob.freetemporary(l_blob);
+
+     return l_result;
+  end;
+
+  -----------------------------------------------------------------------------------------
+  --  send_pdf2ea
+  --
+  --    Формування файлу pdf та відправка в EA (для джоба)
+  --
+  procedure send_pdf2ea
+  is
+    l_ead_doc_id  ead_docs.id%type;
+    l_url         varchar2(1024) := getglobaloption('LINK_FOR_ABSBARS_WEBAPISERVICES')||'fastreport/fastreport/getFileInBase64';
+    l_wallet_path varchar2(256) := getglobaloption('PATH_FOR_ABSBARS_WALLET');
+    l_wallet_pwd  varchar2(256) := getglobaloption('PASS_FOR_ABSBARS_WALLET');
+    l_response    wsm_mgr.t_response;
+    l_buff        blob;
+    l_act         varchar2(256) := '.SEND_PDF2EA ';
+  begin
+
+    for r in (select kf from mv_kf)
+    loop
+      bc.go(r.kf);
+      for i in
+        (select t.*,
+                n.id as dpa_ead_nbs_id,
+                n.struct_code,
+                --
+                xmlroot( XmlElement("ROOT",
+                        Xmlelement("FileName", 'EAD_DPS.frx'),
+                        Xmlelement("ResponseFileType", '7'),
+                        Xmlelement("Parameters",
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_okpo'),
+                                              Xmlelement("Value", okpo),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_nmkk'),
+                                              Xmlelement("Value", nmkk),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_resid'),
+                                              Xmlelement("Value", res_name),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_mfo'),
+                                              Xmlelement("Value", mfo),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_odate'),
+                                              Xmlelement("Value", odate),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_nls'),
+                                              Xmlelement("Value", nls),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_kv'),
+                                              Xmlelement("Value", kv),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_otype'),
+                                              Xmlelement("Value", otype_name),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_dat_in_dpa'),
+                                              Xmlelement("Value", dat_in_dpa),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_id_dpa'),
+                                              Xmlelement("Value", name_reg), -- lines_f.id_dpa -- spr_obl - Області України
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_id_dps'),
+                                              Xmlelement("Value", name_sti),   -- lines_f.id_dps -- spr_reg - Довідник податкових інспекцій
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_dat_acc_dpa'),
+                                              Xmlelement("Value", dat_acc_dpa),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_id_pr'),
+                                              Xmlelement("Value", id_pr),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_date_r'),
+                                              Xmlelement("Value", date_r),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_fn_r'),
+                                              Xmlelement("Value", fn_r),
+                                              Xmlelement("Type", '18')),
+                                   XmlElement("FrxParameter",
+                                              Xmlelement("Name", 'p_id_rec'),
+                                              Xmlelement("Value", id_rec),
+                                              Xmlelement("Type", '18'))
+                                  )), version '1.0" encoding="windows-1251') as xml_buff
+         from    (select q.id,
+                         a.acc,
+                         a.rnk,
+                         f.okpo,
+                         f.nmkk,
+                         f.resid,
+                         case f.resid when 1 then 'резидент'
+                                      when 2 then 'нерезидент'
+                                      else to_char(f.resid) 
+                           end res_name,
+                         f.mfo,
+                         to_char(f.odate,'dd.mm.yyyy') as odate,
+                         f.nls,
+                         f.kv,
+                         f.otype,
+                         case f.otype when 1 then 'Відкрито рахунок'
+                                      when 3 then 'Закрито рахунок'
+                                      when 5 then 'Зміна рахунка (закрито рахунок не за ініціативою клієнта)'
+                                      when 6 then 'Зміна рахунка (відкрито рахунок не за ініціативою клієнта)'
+                                      else to_char(f.otype) 
+                           end otype_name,
+                         case when f.otype in (1,6) then to_char(f.dat_in_dpa,'dd.mm.yyyy') -- якщо відкриття рахунку то беремо дату надання повідомлення
+                              when f.otype in (3,5) then to_char(f.dat,'dd.mm.yyyy')        -- якщо закриття рахунку то беремо дату відправки F0
+                           end dat_in_dpa,
+                         case when f.otype in (1,6) then f.id_dpa
+                              when f.otype in (3,5) then c.c_reg
+                           end id_dpa,
+                         coalesce(o.name_reg,to_char(f.id_dpa),to_char(c.c_reg)) name_reg,
+                         coalesce(f.id_dps, c.c_dst) id_dps,
+                         coalesce(r.name_sti,to_char(f.id_dps),to_char(c.c_dst)) name_sti,
+                         case when f.otype in (1,6) then to_char(f.dat_acc_dpa,'dd.mm.yyyy') 
+                              when f.otype in (3,5) then (select to_char(f0.dat_acc_dpa,'dd.mm.yyyy') -- якщо закриття рахунку то беремо дату взяття на облік по F0
+                                                          from lines_f f0
+                                                          where f0.otype in (1,6)
+                                                                and f0.mfo = f.mfo
+                                                                and f0.nls = f.nls
+                                                                and f0.kv = f.kv
+                                                                and f0.dat = (select max(dat) from lines_f where mfo = f0.mfo and nls=f0.nls and kv=f0.kv and otype in (1,6)))
+                           end dat_acc_dpa, 
+                         f.id_pr,
+                         to_char(f.date_r,'dd.mm.yyyy') as date_r,
+                         f.fn_r,
+                         f.id_rec,
+                         case when substr(a.nls,1,4) in (select nbs from dpa_ead_nbs where is_ddbo = 1)
+                                   and to_date(kl.get_customerw(a.rnk, 'DDBO'),'dd.mm.yyyy') <= a.daos then 1 else 0 end is_ddbo,
+                         a.tip
+                  from dpa_ead_que q
+                         inner join lines_f f on f.dpa_ead_que_id = q.id
+                         inner join accounts a on a.nls = f.nls and a.kv = f.kv and a.kf = f.mfo
+                         left join customer c on c.rnk = a.rnk -- інформація по дпа потрібна тільки для закриття рахунків
+                         left join spr_obl o on o.c_reg = coalesce(f.id_dpa, c.c_reg)
+                         left join spr_reg r on r.c_reg = coalesce(f.id_dpa, c.c_reg) and r.c_dst = coalesce(f.id_dps, c.c_dst)
+                  where q.que_date > sysdate - 30
+                  ) t inner join dpa_ead_nbs n on n.custtype = 2
+                                              and n.nbs = substr(t.nls,1,4)
+                                              and n.oper_type = case when t.otype in (1,6) then 1 when t.otype in (3,5) then 2 end
+                                              and n.is_ddbo = t.is_ddbo
+                                              and regexp_like(substr(t.tip,1,2),n.tip)
+        )
+      loop
+        wsm_mgr.prepare_request(p_url         => l_url,
+                                p_action      => null,
+                                p_http_method => wsm_mgr.g_http_post,
+                                p_wallet_path => l_wallet_path,
+                                p_wallet_pwd  => l_wallet_pwd,
+                                p_body        => i.xml_buff.getclobval());
+        -- позвать метод веб-сервиса
+        wsm_mgr.execute_api(l_response);
+
+        -- decode from base64
+        l_buff := bars_dpa.decode_base64(l_response.cdoc);
+
+        -- запис в ЕА
+        l_ead_doc_id := ead_pack.doc_create(p_type_id      => 'SCAN',
+                                            p_template_id  => null, --'EAD_DPS',
+                                            p_scan_data    => l_buff,
+                                            p_ea_struct_id => i.struct_code,
+                                            p_rnk          => i.rnk,
+                                            p_agr_id       => null,
+                                            p_acc          => i.acc);
+        -- оновлення черги
+        update dpa_ead_que
+           set que_date   = null, -- запис оброблено, удаляєм з індекса
+               ead_doc_id = l_ead_doc_id, -- id документа ЕА
+               dpa_ead_nbs_id = i.dpa_ead_nbs_id -- id запису із довідника dpa_ead_nbs
+        where id = i.id;
+      end loop;
+    commit; -- commit по кожному mfo
+    end loop;
+  exception
+    when others then
+      bars_audit.info (g_modcode || l_act || 'error: ' || substr (dbms_utility.format_error_backtrace || ' ' || sqlerrm, 1, 2000));
+      rollback;
+      raise;
+  end send_pdf2ea;
 
 end bars_dpa;
 /

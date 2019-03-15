@@ -368,17 +368,33 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
                     Logger.Info(string.Format("GetExcel (api/reporting/nbu/getexcel) file path: {0} was created", fPath), "api/reporting/nbu/getexcel");
                     return Request.CreateResponse(HttpStatusCode.OK, new { FileName = fPath });
                 }
-                var exel = new ExcelHelpers<List<Dictionary<string, object>>>(res.ToList(), title, ti, null);
+                if (fileCodeBase64=="QDEy")  //для звітів "@12" (для цих звітів додаються пілдсумкові строки "баланс", які містять суму всіх попередніх значень)
+                {
+                    var exel = new ExcelHelpers<List<Dictionary<string, object>>>(res.ToList(), title, ti, null, true);
+
+                    using (var ms = exel.ExportToMemoryStream())
+                    {
+                        fPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                        File.WriteAllBytes(fPath, ms.ToArray());
+                    }
+                }
+                else //для всіх звітів, окрім звітів "@12"
+                {
+                    var exel = new ExcelHelpers<List<Dictionary<string, object>>>(res.ToList(), title, ti, null);
+
+                    using (var ms = exel.ExportToMemoryStream())
+                    {
+                        fPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                        File.WriteAllBytes(fPath, ms.ToArray());
+                    }
+                }
+                
 
                 // todo: add filters and sorts
                 //List<DetailedReport> res = _repository.GetDetailedReportList(Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode);
                 //var exel = new ExcelHelpers<DetailedReport>(res, true);
 
-                using(var ms = exel.ExportToMemoryStream())
-                {
-                    fPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                    File.WriteAllBytes(fPath, ms.ToArray());
-                }
+                
 
                 return Request.CreateResponse(HttpStatusCode.OK, new { FileName = fPath });
             }

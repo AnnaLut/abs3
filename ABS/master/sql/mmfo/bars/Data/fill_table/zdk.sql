@@ -1,5 +1,7 @@
 PROMPT *** Filling table ZDK ***
 
+truncate table zdk;
+
 begin 
   execute immediate 'insert into ZDK select 1 dk, ''Купівля'' z_type from dual
     	                             union all

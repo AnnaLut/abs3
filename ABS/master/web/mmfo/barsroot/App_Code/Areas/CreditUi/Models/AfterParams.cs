@@ -30,5 +30,6 @@ namespace BarsWeb.Areas.CreditUi.Models
         public string daynp { get; set; }
         public byte vidd { get; set; }
         public int? inspector_id { get; set; }
+        public decimal? s_s36 { get; set; }
     }
 }

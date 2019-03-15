@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/01/2018 15:51:33" ReportInfo.Modified="10/03/2018 15:10:44" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+      int n;
+    private void Data1_BeforePrint(object sender, EventArgs e)
+    {      
+        n=n+1;
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIQVe61V6nMEnia3wHoUo28=">
+      <TableDataSource Name="Table" Alias="Table1" DataType="System.Int32" Enabled="true" SelectCommand="select * from v_oper_sep_comp ">
+        <Column Name="REF_IN" DataType="System.Decimal"/>
+        <Column Name="NAZN_IN" DataType="System.String"/>
+        <Column Name="S_IN" DataType="System.Decimal"/>
+        <Column Name="ND_OUT" DataType="System.String"/>
+        <Column Name="REF_OUT" DataType="System.Decimal"/>
+        <Column Name="DRN" DataType="System.String"/>
+        <Column Name="NAZN_OUT" DataType="System.String"/>
+        <Column Name="S_OUT" DataType="System.Decimal"/>
+        <Column Name="PDAT_OUT" DataType="System.DateTime"/>
+        <Column Name="STATUS" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="400" PaperHeight="210">
+    <ReportTitleBand Name="ReportTitle1" Width="1436.4" Height="45.36">
+      <TextObject Name="Text23" Left="22.68" Width="415.8" Height="22.68" Text="СЕП - Повернені документи" VertAlign="Center" Font="Arial, 14pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="49.8" Width="1436.4" Height="105.84">
+      <TextObject Name="Text2" Left="75.6" Width="98.28" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Референс вхідного документу (Ref2i)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text4" Left="173.88" Width="264.6" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Призначення платежу вхідного документу (NAZ2i)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text6" Left="438.48" Width="98.28" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Сума вхідного документу (S2i)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text8" Left="536.76" Width="98.28" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Номер вихідного документу (ND1i)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text10" Left="635.04" Width="113.4" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Референс вихідного документу (Ref1i)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text12" Left="748.44" Width="128.52" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Референс док. Way4  (DOC_DRN_ND1i) &#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text14" Left="876.96" Width="189" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Призначення платежу вихідного документу (NAZ1i)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text16" Left="1065.96" Width="90.72" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Сумма вихідного документу (S1i)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text22" Left="22.68" Width="52.92" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="№ п.п" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text20" Left="1247.4" Width="181.44" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Статус відповідності" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text18" Left="1156.68" Width="90.72" Height="90.72" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата вихідного документу (DD1i)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text24" Left="75.6" Top="90.72" Width="98.28" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="2" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt, style=Italic" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text25" Left="173.88" Top="90.72" Width="264.6" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+      <TextObject Name="Text26" Left="438.48" Top="90.72" Width="98.28" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="4" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt, style=Italic" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text27" Left="536.76" Top="90.72" Width="98.28" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+      <TextObject Name="Text28" Left="635.04" Top="90.72" Width="113.4" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="6" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt, style=Italic" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text29" Left="748.44" Top="90.72" Width="128.52" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+      <TextObject Name="Text30" Left="876.96" Top="90.72" Width="189" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+      <TextObject Name="Text31" Left="1065.96" Top="90.72" Width="90.72" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="9" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 8pt, style=Italic" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text32" Left="22.68" Top="90.72" Width="52.92" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+      <TextObject Name="Text33" Left="1156.68" Top="90.72" Width="90.72" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="10" HideZeros="true" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+      <TextObject Name="Text34" Left="1247.4" Top="90.72" Width="181.44" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="11" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="160.09" Width="1436.4" Height="18.9" CanGrow="true" BeforePrintEvent="Data1_BeforePrint" DataSource="Table" KeepDetail="true">
+      <TextObject Name="Text1" Left="75.6" Width="98.28" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.REF_IN]" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text3" Left="173.88" Width="264.6" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.NAZN_IN]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text5" Left="438.48" Width="98.28" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.S_IN]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text7" Left="536.76" Width="98.28" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.ND_OUT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text9" Left="635.04" Width="113.4" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.REF_OUT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text11" Left="748.44" Width="128.52" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.DRN]" HideZeros="true" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text13" Left="876.96" Width="189" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="[Table1.NAZN_OUT]" HideZeros="true" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text15" Left="1065.96" Width="90.72" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.S_OUT]" HideZeros="true" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text21" Left="22.68" Width="52.92" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[n]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text17" Left="1156.68" Width="90.72" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.PDAT_OUT]" HideZeros="true" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text19" Left="1247.4" Width="181.44" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table1.STATUS]" HideZeros="true" VertAlign="Center" Font="Arial, 9pt">
+        <Highlight>
+          <Condition Expression="Value != &quot;Успішно&quot;" Font="Arial, 9.75pt" ApplyFont="true"/>
+        </Highlight>
+      </TextObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="183.43" Width="1436.4" Height="34.02"/>
+  </ReportPage>
+</Report>

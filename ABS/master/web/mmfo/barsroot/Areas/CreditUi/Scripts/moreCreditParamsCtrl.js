@@ -20,7 +20,8 @@
         { tag: "DAYNP", tab: $scope.ArrayTabs[1], fields: "Тип урегулювання дня погашення" }, { tag: "DAYSN", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу  -> День" },
         { tag: "INIC", tab: $scope.ArrayTabs[0], fields: "Ініціатива" }, { tag: "CCRNG", tab: $scope.ArrayTabs[1], fields: "Шаблон погашення рахунку \"SG\" " },
         { tag: "I_CR9", tab: $scope.ArrayTabs[0], fields: "Вид" }, { tag: "R_CR9", tab: $scope.ArrayTabs[2], fields: "Комісія за невикористаний ліміт" },
-        { tag: "FREQ", tab: $scope.ArrayTabs[1], fields: "Погашення основного боргу -> Періодичність" }, { tag: "FREQP", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу -> Періодичність" }];
+        { tag: "FREQ", tab: $scope.ArrayTabs[1], fields: "Погашення основного боргу -> Періодичність" }, { tag: "FREQP", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу -> Періодичність" },
+        { tag: "S_S36", tab: $scope.ArrayTabs[2], fields: "Комісія за обслуговування кредиту (сплачується перед видачею кредиту)" }];
 
     $scope.GetMessage = function (tag) {
         if (!$rootScope.isTagOnly) {
@@ -120,6 +121,12 @@
                     text: "Редагування на вкладці <b>" + message[0] + "</b>, <br> поле: <b>\"" + message[1] + "\"</b>"
                 });
             }
+
+            if (e.model.TAG === "S_S36" && $rootScope.isTagOnly) {
+                this.cancelRow();
+                bars.ui.error({ text: "Заборонено редагувати параметр <b>" + e.model.TAG + "</b> у авторизованому кредиті" });
+            }
+                
         },
         save: function (e) {
             if ((e.model.TYPE == "D") && (e.model.TXT != null)) {

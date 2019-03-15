@@ -1153,6 +1153,11 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
             l_rec_commision.doc_rrn := l_str;
 
           end if;
+          if l_str_if='DRN' --7226
+           then
+            dbms_xslprocessor.valueof(l_parm_ref, 'Value/text()', l_str);
+            l_rec.doc_drn:=l_str;                       
+          end if;               
         end loop;
 
         l_str := null;
@@ -1279,7 +1284,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
           l_rec.doc_descr           := null;
         end if;
 
-        if l_doc_pay = 8 and l_rec.postingstatus = 'Posted' then
+        if l_doc_pay >= 7 and l_rec.postingstatus = 'Posted' then
           insert into ow_oic_documents_data values l_rec;
           if l_fee_doc = 1 and l_rec_commision.postingstatus = 'Posted' then
             insert into ow_oic_documents_data values l_rec_commision;

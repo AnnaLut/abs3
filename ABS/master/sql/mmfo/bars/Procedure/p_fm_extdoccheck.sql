@@ -7,9 +7,9 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FM_EXTDOCCHECK ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_FM_EXTDOCCHECK (p_rec number)
+  CREATE OR REPLACE PROCEDURE BARS.P_FM_EXTDOCCHECK (p_rec number default null)
 --
--- Version 1.5 01/02/2016
+-- Version 1.6 06/09/2016
 --
 -- проверка ответных (входящих) документов
 --   мультимфо
@@ -30,10 +30,12 @@ is
      l_mfoa          arc_rrp.mfoa%type;
      l_mfob          arc_rrp.mfob%type;
      l_otm           number;
+     l_id_a          arc_rrp.id_a%type;
+     l_id_b          arc_rrp.id_b%type;
   begin
      begin
-        select a.nazn, a.nam_a, a.nam_b, a.mfoa, a.mfob
-          into l_nazn, l_nama, l_namb, l_mfoa, l_mfob
+        select a.nazn, a.nam_a, a.nam_b, a.mfoa, a.mfob , a.id_a , a.id_b
+          into l_nazn, l_nama, l_namb, l_mfoa, l_mfob , l_id_a, l_id_b
           from arc_rrp a
          where a.rec = p_rec
            for update of a.blk nowait;
@@ -60,6 +62,73 @@ is
         l_otm := 0;
      end if;
 
+	 
+	    /*
+      COBUSUPABS-9160
+    */
+    -------------------------------
+    -- Якщо в l_id_a , l_id_b є ОКПО в терористах
+    if l_otm = 0 then
+       begin
+            select fin_r.c1 into l_otm
+              from bars.FINMON_REFT fin_r
+             where fin_r.c25 is not null
+               and regexp_like(fin_r.c25, '^([[:digit:]]{8}|[[:digit:]]{10})$')
+               and fin_r.c25 in (l_id_a , l_id_b)
+               and rownum = 1;
+       exception
+         when no_data_found then l_otm := 0;
+       end;
+    end if;
+    -- Якщо в l_nazn є ОКПО в терористах
+    if l_otm = 0 then
+       begin 
+        with tab_okpo as
+         (SELECT regexp_replace(res_okpo, '[^0-9]') res_okpo
+            FROM (SELECT REGEXP_SUBSTR(str, '[^ ]+', 1, LEVEL) AS res_okpo
+                    FROM (SELECT l_nazn AS str
+                            FROM DUAL)
+                  CONNECT BY LEVEL <= LENGTH(REGEXP_REPLACE(str, '[^ ]+')) + 1)
+           WHERE REGEXP_LIKE(res_okpo, '(^|\D)(\d{8}|\d{10})(\D|$)'))
+        select fin_r.c1 into l_otm
+          from bars.FINMON_REFT fin_r, tab_okpo
+         where fin_r.c25 = tab_okpo.res_okpo
+           and fin_r.c25 is not null
+           and regexp_like(fin_r.c25, '^([[:digit:]]{8}|[[:digit:]]{10})$')
+           and rownum = 1;
+           exception
+         when no_data_found then l_otm := 0;
+       end;
+    end if;
+	
+	-- Якщо в TAG =>FIO э слова ч/3 або через то треба перевірити стандартним методом
+    if l_otm = 0 then
+       begin
+        for check_str in ( 
+                           select level as element,
+                                  regexp_substr(str, '(.*?)( (через)|(ч/з)|$)', 1, level, null, 1) as element_value
+                             from (select value str
+                                     from operw
+                                    where ref = p_rec
+                                      and tag = 'FIO'
+                                      and rownum =1 
+                                  ) 
+                             where regexp_like(str,'ч/з|через') 
+                             connect by level <= regexp_count(str, 'через') + regexp_count(str, 'ч/з')+ 1
+                          )
+        loop
+           l_otm := f_istr (check_str.element_value);
+           if l_otm > 0 then
+              exit;
+           end if;
+        end loop;
+       exception
+         when no_data_found then l_otm := 0;  
+       end;
+    end if;
+    ------------------------------
+	 
+	 
      -- ставим признак "проверено" для документа
      update rec_que set fmcheck = 1 where rec = p_rec;
     -- доп проверка ) виключення з правил. Загальне правило, якщо є збіг по ПІБ - операція блокується.

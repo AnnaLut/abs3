@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/17/2018 14:42:53" ReportInfo.Modified="12/05/2018 10:50:52" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void GroupFooter1_BeforePrint(object sender, EventArgs e)
+    {
+      if((string)Report.GetColumnValue(&quot;Table.NBS&quot;) == (string)Report.GetColumnValue(&quot;Table.NB2&quot;))
+      {
+        GroupFooter1.Visible = false;
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQK99fuZRKzEzGbD+yUHvAxs=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 PRN, CHAR00 BRANCH, CHAR01 NAME, CHAR02 NB2, CHAR03 NAME_NB2, CHAR04 NBS, CHAR05 NAME_NBS, NUM01 N1, NUM02 N2, CHAR06 OUR_MFO, CHAR07 OUR_BANK_NAME, CHAR08 SFDAT1, CHAR09 SFDAT2 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="PRN" DataType="System.Decimal"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="NB2" DataType="System.Decimal"/>
+        <Column Name="NAME_NB2" DataType="System.String"/>
+        <Column Name="NBS" DataType="System.Decimal"/>
+        <Column Name="NAME_NBS" DataType="System.String"/>
+        <Column Name="N1" DataType="System.Decimal"/>
+        <Column Name="N2" DataType="System.Decimal"/>
+        <Column Name="OUR_MFO" DataType="System.String"/>
+        <Column Name="OUR_BANK_NAME" DataType="System.String"/>
+        <Column Name="SFDAT1" DataType="System.String"/>
+        <Column Name="SFDAT2" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Total Name="NN1" Expression="[Table.N1]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="NN2" Expression="[Table.N2]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="TN1" Expression="[Table.N1]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="TN2" Expression="[Table.N2]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="AN1" Expression="[Table.N1]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="AN2" Expression="[Table.N2]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Top="20" Width="1047.06" Height="94.5">
+      <TextObject Name="Text23" Left="18.9" Top="18.9" Width="103.95" Height="18.9" Text="[Table.OUR_MFO]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text24" Left="122.85" Top="18.9" Width="907.2" Height="18.9" Text="[Table.OUR_BANK_NAME]" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text25" Left="18.9" Top="37.8" Width="1011.15" Height="18.9" Text="Звiт про доходи та витрати (БР+Вiддiлення)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text26" Left="18.9" Top="56.7" Width="1011.15" Height="18.9" Text="з [Table.SFDAT1] по [Table.SFDAT2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+    </ReportTitleBand>
+    <ColumnHeaderBand Name="ColumnHeader1" Top="134.5" Width="1047.06" Height="18.9">
+      <TextObject Name="Text16" Left="652.05" Width="132.3" Height="18.9" Text="Прибуток (Крд-Деб)" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text18" Left="916.65" Width="132.3" Height="18.9" Text="Дохід (Кредит)" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text17" Left="784.35" Width="132.3" Height="18.9" Text="Витрати (Дебет)" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+    </ColumnHeaderBand>
+    <GroupHeaderBand Name="GroupHeader2" Top="173.4" Width="1047.06" Condition="[Table.NB2]">
+      <GroupHeaderBand Name="GroupHeader1" Top="193.4" Width="1047.06" Condition="[Table.NBS]">
+        <DataBand Name="Data1" Top="213.4" Width="1047.06" Height="18.9" DataSource="Table">
+          <TextObject Name="Text3" Width="170.1" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Table.BRANCH]" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text4" Left="170.1" Width="481.95" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Table.NAME]" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text5" Left="652.05" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[[Table.N2]-[Table.N1]]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text6" Left="784.35" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Table.N1]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text7" Left="916.65" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Table.N2]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter1" Top="252.3" Width="1047.06" Height="18.9" BeforePrintEvent="GroupFooter1_BeforePrint">
+          <TextObject Name="Text1" Width="170.1" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Gainsboro" Text="[[Table.NBS]]" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text8" Left="170.1" Width="481.95" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Gainsboro" Text="[Table.NAME_NBS]" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text9" Left="652.05" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Gainsboro" Text="[[NN2]-[NN1]]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text10" Left="784.35" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Gainsboro" Text="[NN1]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TextObject Name="Text11" Left="916.65" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Gainsboro" Text="[NN2]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter2" Top="291.2" Width="1047.06" Height="37.8">
+        <TextObject Name="Text2" Width="170.1" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Silver" Text="[[Table.NB2]]" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text12" Left="170.1" Width="481.95" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Silver" Text="[Table.NAME_NB2]" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text13" Left="652.05" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Silver" Text="[[TN2]-[TN1]]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text14" Left="784.35" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Silver" Text="[TN1]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+        <TextObject Name="Text15" Left="916.65" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="0.5" Fill.Color="Silver" Text="[TN2]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="349" Width="1047.06" Height="18.9">
+      <TextObject Name="Text22" Left="170.1" Width="481.95" Height="18.9" Text="Разом по МФО:" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text19" Left="652.05" Width="132.3" Height="18.9" Text="[[AN2]-[AN1]]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text20" Left="784.35" Width="132.3" Height="18.9" Text="[AN1]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text21" Left="916.65" Width="132.3" Height="18.9" Text="[AN2]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

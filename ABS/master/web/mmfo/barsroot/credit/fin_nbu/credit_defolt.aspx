@@ -169,7 +169,7 @@
                             <tr>
                                 <td colspan="4">
                                     <asp:Label ID="Lb_vncr" runat="server" Text="Внутрішній кредитний рейтинг  "></asp:Label>
-                                    <asp:DropDownList ID="tb_vncr" runat="server" Width="90px" DataSource='<%# SQL_SELECT_dataset(@"select code as id, code as name from CCK_RATING where code not in ("+ ((char)39).ToString() + "Д" +((char)39).ToString() + ")" ) %>'
+                                    <asp:DropDownList ID="tb_vncr" runat="server" Width="90px" DataSource='<%# SQL_SELECT_dataset(@"select code as id, code as name from  CCK_RATING where code not in ("+ ((char)39).ToString() + "Д" +((char)39).ToString() + ")" ) %>'
                                         DataTextField="NAME" DataValueField="ID" Enabled="true"></asp:DropDownList>
                                     <Bars:Separator ID="Sp2" runat="server" Visible="False" BorderWidth="1px" />
                                     <Bars:ImageTextButton ID="Ib_save_vncrr" runat="server" ButtonStyle="Image" ImageUrl="/Common/Images/default/16/document_edit.png"
