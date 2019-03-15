@@ -43,7 +43,10 @@ SELECT id
       ,req_type
       ,sq S2_EQV
 FROM   v_zay
-WHERE
+WHERE  
  s2 > 0
  AND trunc(nvl(fdat, bankdate)) <= bankdate
- AND fdat >= (sysdate - 30);
+ AND fdat >= (sysdate - 30)
+;
+
+grant SELECT                                                          on V_ZAY42      to BARS_ACCESS_DEFROLE;
