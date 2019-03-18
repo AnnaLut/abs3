@@ -2379,8 +2379,8 @@ begin
                 prty_   => 0,
                 uid_    => l_userid
             );
-
-            select bars.bars_swift.StrToSwift(ca.locality,'TRANS'),
+            
+            select bars.bars_swift.StrToSwift(ca.locality,'TRANS'), 
                    bars.bars_swift.StrToSwift(ca.address,'TRANS')
             into l_ccodea, l_adr from bars.customer_address ca, bars.accounts acc where ca.rnk = acc.rnk and acc.nls = p_nlsa and acc.kv = p_kv and acc.dazs is null and ca.type_id = 1;
 
@@ -2401,11 +2401,10 @@ begin
                                     when p_kv = 978 then '50F'
                                     else '50K' end,
                 '/'||p_nlsa||'$nl$1/'
-                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end,1,32)||'$nl$'  --||'$nl$2/'  расширение наименования в рамках заявки COBUBB-2087
-                   ||case when length(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end)>32 then '2/'||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end,33,32)||'$nl$2/' else '2/' end
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end,1,32)||'$nl$2/'
                    ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(l_adr,'TRANS') else l_adr end,1,32)||'$nl$3/'
-                   ||'UA/'||l_ccodea
-                   ||case when length(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end)<33 then '$nl$6/UA/'||p_okpoa else '' end,
+                   ||'UA/'||l_ccodea||'$nl$6/'
+                   ||'UA/'||p_okpoa,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             add_dop_req(l_ref, '52A', trim(l_biccode),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
@@ -2432,16 +2431,16 @@ begin
             trim(substr(p_nazn,1,34)||case when substr(p_nazn,35,34) is not null then '$nl$' else '' end  ||substr(p_nazn,35,34)||
             case when substr(p_nazn,69,34) is not null then  '$nl$' else '' end ||substr(p_nazn,69,34)||
             case when substr(p_nazn,102,34) is not null then '$nl$' else '' end||substr(p_nazn,102,34))
-            else
+            else 
             trim(substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),1,34)||case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),35,34) is not null then '$nl$' else '' end  ||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),35,34)||
             case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),69,34) is not null then  '$nl$' else '' end ||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),69,34)||
-            case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34) is not null then '$nl$' else '' end||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34))
+            case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34) is not null then '$nl$' else '' end||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34)) 
             end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-
+                
             add_dop_req(l_ref, '71A', substr(p_sw71a,1,34),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-
+                
             /*add_dop_req(l_ref, '72', substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_dopreq,'TRANS') else p_dopreq end,1,32),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             */
@@ -2589,7 +2588,6 @@ end mbm_payments;
  
 PROMPT *** Create  grants  MBM_PAYMENTS ***
 grant EXECUTE                                                                on MBM_PAYMENTS    to BARS_ACCESS_DEFROLE;
-
  
  
  PROMPT ===================================================================================== 
