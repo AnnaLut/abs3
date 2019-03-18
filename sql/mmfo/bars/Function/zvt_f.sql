@@ -505,7 +505,7 @@ BEGIN
          AND mfoa_ = mfob_
    THEN
       t_ := 14;                                                   --   ÏÖ WEY4
-   ELSIF (tt_ LIKE 'PK_' OR tt_ = 'R03') AND tt_ NOT IN ('PKK')
+   ELSIF (tt_ LIKE 'PK_' OR tt_ = 'R03' OR tt_ = 'PXS') AND tt_ NOT IN ('PKK')
    THEN
       IF nbsd_ = '7452' AND nbsk_ IN ('3550', '2924')
       THEN
@@ -525,7 +525,8 @@ BEGIN
                 'PKE',
                 'PKU',
                 'PKY',
-                'PKZ')
+                'PKZ',
+                'PXS')--COBUMMFO-11126 13.03.2019 Ñåðá³í
       THEN
          t_ := 86;                                                          --
       ELSE
