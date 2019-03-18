@@ -1,4 +1,10 @@
-create or replace procedure DDRAPS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/ddraps.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PROCEDURE BARS.DDRAPS 
 ( dat_    in      DATE
 , mode_   in      SMALLINT DEFAULT 0
 ) IS
@@ -14,7 +20,7 @@ create or replace procedure DDRAPS
    p_dat in date,
    p_kf  in varchar2
   )
-  is 
+  is
    SELECT /*+ LEADING(vp b0) FULL(vp) INDEX(b1 UK_SNAP_BALANCES_EXCHANGE) */
           vp.acc3800, (SELECT nls||'/'||LPAD(kv,3,'0') FROM accounts WHERE acc=acc3800) nls3800,
           vp.acc3801, (SELECT RPAD(nls,14)||nms        FROM accounts WHERE acc=acc3801) nls3801,
@@ -30,14 +36,14 @@ create or replace procedure DDRAPS
        on ( b1.FDAT = b0.FDAT and b1.KF = b0.KF and b1.ACC = vp.ACC3801 )
     WHERE vp.KF = p_kf
       AND b0.ostq + NVL(b1.ostq,0) <> 0;
-  
+
   type t_vp_list is table of cur_vp_list%rowtype index by pls_integer;
   v    t_vp_list;
-  
+
   type t_oper is table of oper%rowtype index by pls_integer;
   oper_tab t_oper;
-  
-  
+
+
   c_limit           constant pls_integer := 10e3;
   l_errmsg          varchar2(500);
 
@@ -59,7 +65,7 @@ create or replace procedure DDRAPS
   l_allowed_dt      DATE; -- Дата раніше якої заборонено формування
   l_kf              snap_balances.kf%type;
   l_condition       varchar2(200);
-             
+
   x                 SYS_REFCURSOR;
   l_cur_scn         NUMBER;
   -- тип для вичитки вхідних даних
@@ -73,17 +79,17 @@ create or replace procedure DDRAPS
                         , ostf  NUMBER(24)
                         , dos   NUMBER(24)
                         , kos   NUMBER(24) );
-  
+
   type imp_rec_tab is table of imp_rec index by pls_integer;
   c imp_rec_tab;
 
   -- тип для накопления вставки простых счетов
   type snap_balance_tab is table of snap_balances_intr_tbl%rowtype index by pls_integer;
-  
+
   l_snap_balance snap_balance_tab;
   -- счетчик для накопления вставки простых счетов
   l_sb pls_integer := 0; -- counter for l_snap_balance
-  
+
   -- типы для накопления вешалок в Нових драпсах
   TYPE ves_rec IS RECORD( kf   char(6),
                           acc  NUMBER,     rnk  NUMBER,
@@ -102,7 +108,7 @@ create or replace procedure DDRAPS
                         , rat2 NUMBER );
   TYPE rat_tab IS TABLE OF rat_rec INDEX BY BINARY_INTEGER;
   q    rat_tab;
-  
+
   -- Ініціалізація курсів по даті
   PROCEDURE get_rat(dat_ DATE)
   IS
@@ -147,16 +153,16 @@ create or replace procedure DDRAPS
     s := ROUND(q(kv_).rat2*s_*POWER(10,2-q(kv_).dig));
     RETURN CASE s WHEN 0 THEN SIGN(s_) ELSE s END;
   END;
-  
+
   procedure p_exception
   (
    ip_text in varchar2
   )
   as
   begin
-    raise_application_error( -20666, ip_text ); 
+    raise_application_error( -20666, ip_text );
   end p_exception;
-  
+
   procedure p_oper_tab_add
   (
    p_ix in pls_integer
@@ -189,7 +195,7 @@ create or replace procedure DDRAPS
     oper_tab(p_ix).TOBO   := null;
     oper_tab(p_ix).KF     := v(p_ix).KF;
   end p_oper_tab_add;
-  
+
   procedure p_oper_tab_insert
   as
   begin
@@ -222,7 +228,7 @@ create or replace procedure DDRAPS
        ,TOBO
        ,KF )
     VALUES
-       ( oper_tab(idx).REF   
+       ( oper_tab(idx).REF
         ,oper_tab(idx).TT
         ,oper_tab(idx).VOB
         ,oper_tab(idx).ND
@@ -246,33 +252,33 @@ create or replace procedure DDRAPS
         ,oper_tab(idx).NAZN
         ,oper_tab(idx).BRANCH
         ,oper_tab(idx).TOBO
-        ,oper_tab(idx).KF );         
+        ,oper_tab(idx).KF );
    end p_oper_tab_insert;
-   
+
    procedure p_snap_balance_insert
    as
    begin
      forall idx in 1..l_snap_balance.count
-      insert 
+      insert
       into SNAP_BALANCES_INTR_TBL
          ( FDAT, KF, ACC, RNK, OST, DOS, KOS, OSTQ, DOSQ, KOSQ )
       values
          (
           l_snap_balance(idx).FDAT
-         ,l_snap_balance(idx).KF  
-         ,l_snap_balance(idx).ACC 
-         ,l_snap_balance(idx).RNK 
-         ,l_snap_balance(idx).OST 
-         ,l_snap_balance(idx).DOS 
-         ,l_snap_balance(idx).KOS 
+         ,l_snap_balance(idx).KF
+         ,l_snap_balance(idx).ACC
+         ,l_snap_balance(idx).RNK
+         ,l_snap_balance(idx).OST
+         ,l_snap_balance(idx).DOS
+         ,l_snap_balance(idx).KOS
          ,l_snap_balance(idx).OSTQ
          ,l_snap_balance(idx).DOSQ
          ,l_snap_balance(idx).KOSQ
         );
-      l_sb := 0;  
-      l_snap_balance.delete;   
+      l_sb := 0;
+      l_snap_balance.delete;
    end p_snap_balance_insert;
-   
+
    procedure p_snap_balance_add
     (
      p_idx in pls_integer,
@@ -283,7 +289,7 @@ create or replace procedure DDRAPS
     begin
       l_sb := l_sb + 1;
       l_snap_balance(l_sb).FDAT := dat_;
-      l_snap_balance(l_sb).KF   := v(p_idx).KF;  
+      l_snap_balance(l_sb).KF   := v(p_idx).KF;
       l_snap_balance(l_sb).ACC  := p_acc;
       l_snap_balance(l_sb).RNK  := v(p_idx).rnk;
       l_snap_balance(l_sb).OST  := CASE WHEN p_vdk = 1 THEN 0-v(p_idx).s ELSE v(p_idx).s END;
@@ -293,7 +299,7 @@ create or replace procedure DDRAPS
       l_snap_balance(l_sb).DOSQ := CASE WHEN p_vdk = 1 THEN v(p_idx).s   ELSE 0          END;
       l_snap_balance(l_sb).KOSQ := CASE WHEN p_vdk = 1 THEN 0            ELSE v(p_idx).s END;
     end p_snap_balance_add;
-  
+
 BEGIN
 
   BARS_AUDIT.INFO( $$PLSQL_UNIT||': Start running with (dat_='||to_char(dat_,'dd.mm.yyyy')||', mode_='||to_char(mode_)||').' );
@@ -533,11 +539,11 @@ BEGIN
       l_snap_balance(l_sb).DOSQ := dosq_                                 ;
       l_snap_balance(l_sb).KOSQ := kosq_                                 ;
     END IF;
-   
+
    end loop;
     -- вставка простых счетов
     p_snap_balance_insert;
-    
+
   END LOOP; -- fetch
 
   -- Теперь повесить ошибки округления на вешалки4
@@ -569,12 +575,12 @@ BEGIN
     END IF;
     i := ves.NEXT(i);
   END LOOP;
-  
+
   -- cleanup collection
   ves.delete;
   -- вставка вешалок
   p_snap_balance_insert;
- 
+
    --
   -- переоцінка валютних позицій (коригуючі проводки + корекція даних в AGG_MONBALS_EXCHANGE)
   -- BARS_SNAPSHOT.DAILY_CURRENCY_REVALUATION;
@@ -599,19 +605,19 @@ BEGIN
   end if;
 
   gl.aUID := l_pvp_uid;
- 
+
   open cur_vp_list(dat_,l_kf);
-  
+
   LOOP
     fetch cur_vp_list bulk collect into v limit c_limit;
     exit when  v.count = 0;
-    
-    
+
+
    -- init
    l_sb := 0;
-     
+
     for idx in 1..v.count
-    loop 
+    loop
       bars_audit.trace( $$PLSQL_UNIT||': ВП '||v(idx).nls3800||', DK='||v(idx).DK||', S='||v(idx).s );
       GL.REF( l_ref );
       GL.PAYV( 1, l_ref, dat_, 'PVP', v(idx).dk
@@ -622,42 +628,42 @@ BEGIN
       -- заполнение коллекции для SNAP_BALANCES_INTR_TBL
       p_snap_balance_add(idx, v(idx).dk,   v(idx).acc3801);
       p_snap_balance_add(idx, 1-v(idx).dk, v(idx).acc6204);
- 
+
     end loop;
-    
+
     p_oper_tab_insert;
     -- cleanup collection after insert
-    oper_tab.delete;  
-    
+    oper_tab.delete;
+
     -- merge SNAP_BALANCES_INTR_TBL
     forall idx in indices of l_snap_balance
     merge
     into SNAP_BALANCES_INTR_TBL m
     using (
            select l_snap_balance(idx).FDAT as FDAT
-                 ,l_snap_balance(idx).KF   as KF  
-                 ,l_snap_balance(idx).ACC  as ACC 
+                 ,l_snap_balance(idx).KF   as KF
+                 ,l_snap_balance(idx).ACC  as ACC
                  ,l_snap_balance(idx).RNK  as RNK
-                 ,l_snap_balance(idx).OST  as OST 
+                 ,l_snap_balance(idx).OST  as OST
                  ,l_snap_balance(idx).OSTQ as OSTQ
-                 ,l_snap_balance(idx).DOS  as DOS 
+                 ,l_snap_balance(idx).DOS  as DOS
                  ,l_snap_balance(idx).DOSQ as DOSQ
-                 ,l_snap_balance(idx).KOS  as KOS 
+                 ,l_snap_balance(idx).KOS  as KOS
                  ,l_snap_balance(idx).KOSQ as KOSQ
            from dual
           ) s
-    on ( m.FDAT = s.FDAT 
+    on ( m.FDAT = s.FDAT
          and m.KF   = s.KF
          and m.ACC  = s.ACC)
-    when matched then 
-      update 
-         set m.OST  = s.OST 
-            ,m.OSTQ = s.OSTQ
-            ,m.DOS  = s.DOS 
-            ,m.DOSQ = s.DOSQ
-            ,m.KOS  = s.KOS 
-            ,m.KOSQ = s.KOSQ
-     when not matched then 
+    when matched then
+      update
+         set m.OST  = m.OST   + s.OST
+            ,m.OSTQ = m.OSTQ  + s.OSTQ
+            ,m.DOS  = m.DOS   + s.DOS
+            ,m.DOSQ = m.DOSQ  + s.DOSQ
+            ,m.KOS  = m.KOS   + s.KOS
+            ,m.KOSQ = m.KOSQ  + s.KOSQ
+     when not matched then
        insert
          ( FDAT, KF, ACC, RNK, OST, DOS, KOS, OSTQ, DOSQ, KOSQ )
        values
@@ -672,16 +678,16 @@ BEGIN
   gl.aUID  := uid#;
 
   q.delete;
-  
+
   if ( dat_ = DAT_NEXT_U( GL.GBD(), -1 ) )
   then -- Доплата проводок переоцінки породжених при формуванні знімків балансу
     GL.OVERPAY_PVP;
   end if;
 
   COMMIT;
-  
+
   -- Фіксуємо SCN , що був до формування знімку балансу для можливого відкату
-  l_cur_scn := BARS_UTL_SNAPSHOT.GET_SNP_SCN(p_table => 'SALDOA', p_date  => dat_); 
+  l_cur_scn := BARS_UTL_SNAPSHOT.GET_SNP_SCN(p_table => 'SALDOA', p_date  => dat_);
   -- Фіксуємо SCN на якому формуємо знімок балансу по табл. SALDOA
   BARS_UTL_SNAPSHOT.SET_TABLE_SCN( p_table => 'SALDOA'
                                  , p_date  => dat_
@@ -722,17 +728,17 @@ BEGIN
   BARS_AUDIT.INFO( $$PLSQL_UNIT||': Exit.' );
 
 EXCEPTION
-  WHEN OTHERS THEN    
+  WHEN OTHERS THEN
     -- Back to
     if l_cur_scn is not null then
         -- відкочуємо зміни по збереженим SCN
         BARS_UTL_SNAPSHOT.SET_TABLE_SCN( p_table => 'SALDOA'
                                      , p_date  => dat_
                                      , p_kf    => l_kf
-                                     , p_scn   => l_cur_scn );    
+                                     , p_scn   => l_cur_scn );
         commit;
     end if;
-    
+
     GL.PL_DAT( l_bank_dt );
     gl.aUID  := uid#;
     BARS_UTL_SNAPSHOT.PURGE_RUNNING_FLAG();
@@ -740,6 +746,18 @@ EXCEPTION
                                   chr(10) || dbms_utility.format_error_backtrace() );
     raise;
 END DDRAPS;
-/
 
-show errors;
+/
+ show err;
+ 
+PROMPT *** Create  grants  DDRAPS ***
+grant EXECUTE                                                                on DDRAPS          to BARSUPL;
+grant EXECUTE                                                                on DDRAPS          to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on DDRAPS          to UPLD;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/ddraps.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 
