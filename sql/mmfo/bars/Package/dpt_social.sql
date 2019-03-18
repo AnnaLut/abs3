@@ -1775,11 +1775,13 @@ begin
                p_err_msg    => l_errmsg);
     end if;
 
-         insert into operw (ref,tag,value) values (l_ref, 'SK_ZB', l_skzb);
          if l_errflg then
             bars_error.raise_nerror(g_modcode, 'PAYDOC_FAILED', l_accA.num, l_accB.num,
                                                to_char(filedata.sum), l_errmsg);
          end if;
+         
+         insert into operw (ref,tag,value) values (l_ref, 'SK_ZB', l_skzb);
+         
       end if;
       bars_audit.trace('%s референс %s: %s -> %s на %s', title, to_char(l_ref),
                        l_accA.num, l_accB.num, to_char(filedata.sum));
