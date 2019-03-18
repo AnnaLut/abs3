@@ -12,6 +12,7 @@ using Areas.NbuIntegration.Models;
 using System.Globalization;
 using System.Collections;
 using System.Collections.Generic;
+using BarsWeb.Core.Logger;
 
 namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
 {
@@ -20,7 +21,12 @@ namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
     {
         readonly ISagoRepository _repo;
         INbuServiceRepository _nbuRepo;
-        public SagoController(ISagoRepository repo, INbuServiceRepository nbuRepo) { _repo = repo; _nbuRepo = nbuRepo; }
+        IDbLogger _logger;
+        public SagoController(ISagoRepository repo, INbuServiceRepository nbuRepo, IDbLogger logger)
+        {
+            _repo = repo; _nbuRepo = nbuRepo;
+            _logger = logger;
+        }
 
         private CultureInfo _ci;
         public CultureInfo Ci
@@ -51,6 +57,7 @@ namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.Error(ex.Message + Environment.NewLine + ex.StackTrace, "SAGO");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -68,6 +75,7 @@ namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.Error(ex.Message + Environment.NewLine + ex.StackTrace, "SAGO");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -84,6 +92,7 @@ namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.Error(ex.Message + Environment.NewLine + ex.StackTrace, "SAGO");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -100,6 +109,7 @@ namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.Error(ex.Message + Environment.NewLine + ex.StackTrace, "SAGO");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }

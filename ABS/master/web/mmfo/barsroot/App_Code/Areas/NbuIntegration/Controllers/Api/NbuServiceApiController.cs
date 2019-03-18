@@ -7,13 +7,19 @@ using Areas.NbuIntegration.Models;
 using Oracle.DataAccess.Client;
 using Bars.Classes;
 using AttributeRouting.Web.Http;
+using BarsWeb.Core.Logger;
 
 namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
 {
     public class NbuServiceController : BarsApiController
     {
         readonly INbuServiceRepository _repo;
-        public NbuServiceController(INbuServiceRepository repo) { _repo = repo; }
+        readonly IDbLogger _logger;
+        public NbuServiceController(INbuServiceRepository repo, IDbLogger logger)
+        {
+            _repo = repo;
+            _logger = logger;
+        }
 
         [HttpGet]
         //[GET("/api/nbuintegration/nbuservice/GetDataFromNbu/{date}/{userName?}")]
@@ -33,6 +39,7 @@ namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.Error(ex.Message + Environment.NewLine + ex.StackTrace, "SAGO");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
