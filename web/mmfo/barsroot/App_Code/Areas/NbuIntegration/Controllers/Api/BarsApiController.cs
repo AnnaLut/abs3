@@ -69,7 +69,7 @@ namespace BarsWeb.Areas.NbuIntegration.Controllers.Api
             }
         }
 
-        private void WriteMsgToAudit(OracleConnection con, string msg)
+        protected void WriteMsgToAudit(OracleConnection con, string msg)
         {
             using (OracleCommand cmd = con.CreateCommand())
             {
