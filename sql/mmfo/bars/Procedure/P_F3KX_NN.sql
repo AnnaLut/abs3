@@ -13,12 +13,12 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.19.004          28.02.2019
+% VERSION     :   v.19.008          18.03.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-    ver_           varchar2(30)        := ' v.19.004    28.02.2019';
+    ver_           varchar2(30)        := ' v.19.008    18.03.2019';
 /*
    Структура показателя    DDDD NNN
 
@@ -27,6 +27,7 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+14.03.2019  -добавлены операции ч-з транзитный счет 2924          [11063]
 09.11.2018  -mfo 336503, добавлено дт2900-кт26035306015772        [9664]
             -forex                                                [9924]
 29.10.2018  q006 заполняется только из доп.реквизитов сделок
@@ -38,20 +39,6 @@ IS
               zayavka.DT =3, kv_conv !=null (ранее удалялись только для 300465)
 30.08.2018  для продажи валюты добавлен отбор проводок Дт 2542 Кт 3739
 07.08.2018  новая корреспонденция дт2600-кт3800, операция OW1,OW2
-25.07.2018  покупка: zayavka.f092 может выбираться по параметрам проводки
-22.06.2018  операции forex: анализ доп.параметра FOREX
-13.06.2018  дополнительная обработка операций 2900-3739 для RNK ="наш банк"
-11.06.2018  исключение операций по маске "прoдаж не [здійснювався]"
-30.05.2018  расширение условий при определении K021=G
-27.04.2018  ревизия алгоритма определения параметра K021 для клиента
-13.04.2018  -исключена корреспонденция дт2630-кт3800
-10.04.2018  -новые корреспонденции дт2530/2531-кт2900
-30.03.2018  zayavka.f092 может выбираться и по параметрам проводки (дата,сумма,валюта)
-27.03.2018  -новые корреспонденции дт2900-кт2531, дт2545-кт2900
-            -отдельная обработка rnk=93073101 (банк как юр.лицо)
-12.03.2018  уточнениe по консолидации операций по 3739
-03.03.2018  в протокол для консолидир.данных не заносятся параметры сделок/клиентов
-15.02.2018  по процедуре p_f70_nn  от  20.11.2017  для РУ
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    userid_      number;
@@ -78,6 +65,7 @@ IS
    nmk_a      varchar2(70);
    k021_a     varchar2(1);
    k030_a     varchar2(1);
+   ob22_      varchar2(2);
    op_spot_   number;
 
    sql_z      varchar2(200);
@@ -521,7 +509,16 @@ BEGIN
                (ko, rnk, REF, acck, nlsk, kv, accd, nlsd, nazn, s_nom, s_eqv)
       SELECT *
         FROM ( 		--купівля валюти  (1)
-               SELECT  '1' ko, o.rnkk, o.REF, o.acck, o.nlsk,
+               SELECT  '1' ko, 
+                       (case
+                           when  o.nlsk like '2924%'
+                             then    nvl( (select q.rnkk  from provodki_otc q
+                                            where o.ref = q.ref
+                                              and o.kv = q.kv
+                                              and o.nlsk = q.nlsd), o.rnkk)
+                             else    o.rnkk
+                         end)   rnkk,
+                       o.REF, o.acck, o.nlsk,
                        o.kv, o.accd, o.nlsd, o.nazn,
                        SUM (o.s * 100) s_nom,
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
@@ -532,7 +529,7 @@ BEGIN
                             AND SUBSTR (o.nlsk, 1,4) IN
                                      ('1600', '1602', '2520', '2530', '2531',
                                       '2541', '2542', '2544', '2545',
-                                      '2600', '2602', '2620', '2650')
+                                      '2600', '2602', '2620', '2650','2924')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
                             AND LOWER (TRIM (o.nazn)) not like '%за рахунок _ншо_%' )
@@ -1039,6 +1036,14 @@ BEGIN
 
                end if;
 
+               ob22_ := '00';
+               begin
+                    select ob22  into ob22_
+                      from accounts where acc = acc_;
+               exception
+                  when others  then  ob22_ :='00';
+               end;
+
                   -- ОКПО клiєнта
                   IF rez_ = 0 and trim(okpo_) is NULL -- для нерезидентiв
                   THEN
@@ -1067,7 +1072,7 @@ BEGIN
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
                p_ins (nnnn_, 'F089', f089_);
-               p_ins (nnnn_, 'F092', '216');
+               p_ins (nnnn_, 'F092', '215');
 
                f089_ :='2';
 
@@ -1089,7 +1094,7 @@ BEGIN
 
                f089_ :='2';
 
-         elsif ko_='2' and nlsk_ like '3739%' and d1#3K_='216' and sum1_< kons_sum_ 
+         elsif ko_='2' and nlsk_ like '3739%' and d1#3K_ in ('215','216') and sum1_< kons_sum_ 
          then
                f089_ :='1';
                p_ins (nnnn_, 'F091', '4');
@@ -1102,8 +1107,11 @@ BEGIN
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
                p_ins (nnnn_, 'F089', f089_);
-               p_ins (nnnn_, 'F092', '216');
-
+               if nls_ like '2900%'  and ob22_ ='05'  then
+                  p_ins (nnnn_, 'F092', '215');
+               else
+                  p_ins (nnnn_, 'F092', d1#3K_);
+               end if;
                f089_ :='2';
 
          else
@@ -1310,7 +1318,7 @@ BEGIN
 
    CLOSE c_main;
 
-   logger.info ('P_F3KX etap 1 after c_main');
+--   logger.info ('P_F3KX etap 1 after c_main');
 ------------------------------------------------------------
 --                                    зеркальные операции для 2620, 2625, 2630
    if mfou_ =300465  then             --and mfo_ !=300465  then
@@ -1334,11 +1342,11 @@ BEGIN
           p_ins (nnnn_, 'D100', '01');
           p_ins (nnnn_, 'S180', '#');
           p_ins (nnnn_, 'F089', '1');
-          p_ins (nnnn_, 'F092', '164');
+          p_ins (nnnn_, 'F092', '130');         --164
      end loop;
 
    end if;
-   logger.info ('P_F3KX etap 2');
+--   logger.info ('P_F3KX etap 2');
 ------------------------------------------------------------
    delete from nbur_agg_protocols
          where kf =mfo_
@@ -1434,7 +1442,7 @@ BEGIN
                                       ) );
                                     
    end loop;
-   logger.info ('P_F3KX etap 3 after consolidation 1');
+--   logger.info ('P_F3KX etap 3 after consolidation 1');
    nbuc_ := nbuc1_;
    f089_ :='2';
 
@@ -1536,7 +1544,7 @@ BEGIN
     END LOOP;
     CLOSE rfc1_;
 
-   logger.info ('P_F3KX etap 4 after FOREX');
+--   logger.info ('P_F3KX etap 4 after FOREX');
 --    банковские операции FXE
     for u in ( SELECT  '3' ko, o.rnkk rnk, o.REF, o.acck, o.nlsk,
                        o.kv, o.accd, o.nlsd, o.nazn,
@@ -1593,19 +1601,19 @@ BEGIN
 	 p_ins (nnnn_, 'K020', '0000000006');
 	 p_ins (nnnn_, 'K021', '3');
 	 p_ins (nnnn_, 'K030', '1');
-         p_ins (nnnn_, 'Q001', 'АТ Ощадбанк');
+         p_ins (nnnn_, 'Q001', 'АТ "ОЩАДБАНК"');
          p_ins (nnnn_, 'Q024', '1');
          p_ins (nnnn_, 'D100', '01');
          p_ins (nnnn_, 'S180', '#');
          p_ins (nnnn_, 'F089', f089_);
          if f091_ ='3'  then
-            p_ins (nnnn_, 'F092', '164');
+            p_ins (nnnn_, 'F092', '130');             --164
          else
             p_ins (nnnn_, 'F092', '215');
          end if;
     end loop;
 
-   logger.info ('P_F3KX etap 5 after FXE');
+--   logger.info ('P_F3KX etap 5 after FXE');
 ---------------------------------------------------
    insert into nbur_agg_protocols
             ( kf, report_date, report_code, nbuc, field_code, field_value )
@@ -1633,7 +1641,7 @@ BEGIN
                               )   
                         where  f091 ='4' and f092 in ('215','216') and f089 ='1') );
 ----------------------------------------
-   logger.info ('P_F3KX etap 6 after consolidation 2');
+--   logger.info ('P_F3KX etap 6 after consolidation 2');
 
 DELETE FROM OTCN_TRACE_70
          WHERE kodf = kodf_ and datf= dat_ ;
