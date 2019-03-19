@@ -1,7 +1,7 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pkg_ddl.sql =========*** Run *** ===
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pkg_ddl.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.PKG_DDL is

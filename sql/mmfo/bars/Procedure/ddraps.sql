@@ -1,7 +1,7 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/ddraps.sql =========*** Run *** ==
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/ddraps.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PROCEDURE BARS.DDRAPS 
