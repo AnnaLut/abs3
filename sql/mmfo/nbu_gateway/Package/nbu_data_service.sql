@@ -469,7 +469,7 @@ create or replace package body nbu_data_service as
                                         r.data_type_id = l_data_type_id);
 
          insert into tmp_pledge
-         select coalesce(c.company_code, p.person_code),  -- customer_code varchar2(4000 byte),
+           select distinct coalesce(c.company_code, p.person_code),  -- customer_code varchar2(4000 byte),
                 t.numberpledge,                           -- pledge_number varchar2(4000 byte),
                 t.pledgeday,                              -- pledge_date date,
                 t.request_id,                             -- request_id number(38),
@@ -490,7 +490,7 @@ create or replace package body nbu_data_service as
 
        --при добавлении типа и порядкового номера мердж нам не нужен
          merge into tmp_pledge a
-         using (select t.core_pledge_kf, t.core_pledge_id,
+           using (select t.core_pledge_kf, t.core_pledge_id,t.pledge_date,
                        coalesce(min(case when t.core_pledge_kf = l.core_pledge_kf and t.core_pledge_id = l.core_pledge_id then
                                               t.core_pledge_kf
                                          else null
@@ -509,7 +509,8 @@ create or replace package body nbu_data_service as
                 left join nbu_reported_customer c on c.customer_code = t.customer_code
                 left join nbu_reported_pledge l on l.customer_object_id = c.id and l.pledge_number = t.pledge_number and l.pledge_date = t.pledge_date) s
          on (a.core_pledge_kf = s.core_pledge_kf and
-             a.core_pledge_id = s.core_pledge_id)
+               a.core_pledge_id = s.core_pledge_id and
+ 			  a.pledge_date=s.pledge_date)
          when matched then update
               set a.default_core_pledge_kf = s.default_core_pledge_kf,
                   a.default_core_pledge_id = s.default_core_pledge_id;
