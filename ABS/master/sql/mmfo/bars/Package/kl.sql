@@ -1667,11 +1667,11 @@ BEGIN
   if p_flag_visa = 0
   or p_flag_visa = 1 and not is_customer_visa(Rnk_) 
   then
-     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_, case passp_ 
+     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_, Pdate_/*case passp_ 
                                                      when 1 then Pdate_ 
 						     when 7 then Pdate_ --якщо новий паспорт 9385
                                                      else null 
-                                                    end
+                                                    end*/
 						  ,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
 $if KL_PARAMS.CLV $then
   else
