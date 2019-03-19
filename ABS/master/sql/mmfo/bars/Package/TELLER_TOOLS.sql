@@ -451,8 +451,8 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
                end,
                cur_code,
                0,
-               non_atm_amount,
-               atm_amount,
+               0,
+               atm_amount+non_atm_amount,
                0
           from teller_cash_opers t
           where doc_ref = p_doc_ref 
