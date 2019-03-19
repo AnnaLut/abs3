@@ -382,7 +382,7 @@ function utf8todeflang(p_clob in    clob) return clob is
           bc.subst_branch(l_branch);
           
           if l_sybsidy_list(i).paytype = 1 then
-            if substr(l_sybsidy_list(i).receiveraccnum, 1, 4) = '2603' then
+            if substr(l_sybsidy_list(i).receiveraccnum, 1, 4) = '2603' and substr(l_mfo,1,6) != l_sybsidy_list(i).receiverbankcode then
               l_tt := 'SM3';
             elsif substr(l_mfo,1,6) != l_sybsidy_list(i).receiverbankcode then
               l_tt := 'RSM';
