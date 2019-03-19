@@ -868,7 +868,7 @@ logger.info('Teller. v_req_id = '||v_req_id||', v_session_id = '||v_session_id);
       end if;
     end if;
 
-
+    v_req_id := OccupyOperation;
 /*
     select xmlelement("Option",xmlattributes(0 as "gsr:type"))
       into v_req_body
@@ -963,7 +963,7 @@ logger.info('v_curcode = '||v_curcode||', r.cur_code = '||r.cur_code);
       if teller_utils.get_cur_code(v_curcode) != r.cur_code then  -- надо вытолкнуть другую валюту
         v_tmp_req := CashOutOperation(p_curcode => r.cur_code, p_amount => r.amn);
 logger.info('Sendback cur = '||r.cur_code||', amn = '||r.amn);
-        if v_sendback is not null then 
+        if v_sendback is not null then
           v_sendback := v_sendback || '<br/>';
         end if;
         v_sendback := r.cur_code||': '||r.amn;
@@ -1281,7 +1281,7 @@ logger.info('Good cashin cur = '||r.cur_code||', amn = '||r.amn);
       v_session_id := get_session_id;
 logger.info('Teller. v_cnt = '||v_cnt||', v_session_id = '||v_session_id);
       exit when v_session_id is not null or v_cnt>2;
-      
+
       if v_session_id is null then
         v_req_id := OpenOperation;
       end if;
@@ -1729,7 +1729,7 @@ logger.info('Teller. v_cnt = '||v_cnt||', v_session_id = '||v_session_id);
 --  pragma autonomous_transaction;
     v_amount number;
   begin
-      
+
       update teller_atm_status
         set amount = nvl(p_amount,amount)
            ,last_user = g_hostname
@@ -2253,7 +2253,7 @@ bars_audit.info('Teller: p_errtxt = '||p_errtxt);
       insert into teller_opers (oper_ref,state, amount,cur_code)
         values ('TOX','OC',q.amn,teller_utils.get_r030(q.cur_code))
         returning id into v_oper_id;
- 
+
       insert into teller_cash_opers (doc_ref,
                                      op_type,
                                      cur_code,
@@ -2583,8 +2583,6 @@ begin
     g_local_url := 'http://10.10.17.42:8080/barsroot/webservices/Glory.asmx';
   end if;
 */
---g_local_url := 'http://10.10.10.75:3/barsroot/webservices/Glory.asmx';
-bars_audit.info(g_hostname||' - '||g_local_url);
 
 end teller_soap_api;
 /
