@@ -60,7 +60,7 @@ end fm_utl;
 /
 create or replace package body fm_utl
 is
-g_body_version constant varchar2(64)  := 'version 1.4   21.11.2018';
+g_body_version constant varchar2(64)  := 'version 1.5   19.03.2019';
 g_trace constant varchar2(16) := 'FM_UTL';
 
 -------------------------------------------------------------------------------------------------
@@ -349,6 +349,7 @@ end recalc_risk;
 procedure run_deferred_task(p_procname        varchar2,
                             p_success_message varchar2)
 is
+l_trace constant varchar2(150) := 'run_deferred_task';
 l_jobname varchar2(64) := 'FM_'||substr(upper(p_procname), instr(p_procname, '.')+1)||'_'||f_ourmfo;
 l_error_message varchar2(256) := 'Відкладена процедура виконалась з помилками. Зверніться до департаменту ІТ';
 l_action varchar2(2000) :=
@@ -364,6 +365,7 @@ l_action varchar2(2000) :=
      p_expiration      => 0);
  exception
      when others then
+             bars_audit.fatal(g_trace||''.''||l_trace||'':''||dbms_utility.format_error_stack||chr(10)||dbms_utility.format_error_backtrace);
              bms.send_message(p_receiver_id     => '||user_id||',
              p_message_type_id => 1,
              p_message_text    => '''||l_error_message||''',
