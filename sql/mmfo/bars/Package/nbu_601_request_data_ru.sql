@@ -1607,14 +1607,18 @@ for over in (select distinct over_deal.rnk,
                                        group by a.nd) sum_lim on sum_lim.nd=over_deal.nd
 
                      --Прострочена заборгованість за основним боргом
-                     left join (select d.nd, a.acc , a.nls, a.ob22, fdos(a.acc, add_months(trunc(sysdate,'mm'),-1), trunc(sysdate,'mm')-1) sumarbase, a.tip
-                                      from accounts a, cc_deal d, nd_acc n
-                                      where  a.tip ='SN ' and  a.acc= n.acc and n.nd = d.nd and d.vidd = 10) arrearBase on arrearbase.nd=over_deal.nd
+                     left join (select nd,kv, sum (sp) sumarbase  from (
+                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,trunc(sysdate,'mm')) sp
+                                        from  bars.nd_acc n,  bars.accounts a2
+                                        where  n.acc = a2.acc and a2.tip='SP')
+                                       group by nd,kv)  arrearBase  on arrearBase.nd=over_deal.nd 
 
                      --Прострочена заборгованість  за процентами
-                     left join (select d.nd, a.acc , a.nls, a.ob22,NVL(( select sum(S) from opldok where fdat >=add_months(trunc(sysdate,'mm'),-1) and fdat <= trunc(sysdate,'mm')-1 and acc = a.acc and dk = 0 and tt ='%%1'),0) sumarproc, a.tip
-                                from accounts a, cc_deal d, nd_acc n
-                                where  a.tip ='SPN' and  a.acc= n.acc and n.nd = d.nd and d.vidd = 10) arrearproc  on arrearproc.nd=over_deal.nd
+                     left join (select nd,kv, sum (spn) sumarproc  from (
+                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,trunc(sysdate,'mm')) spn
+                                        from  bars.nd_acc n,  bars.accounts a2
+                                        where  n.acc = a2.acc and a2.tip='SPN')
+                                       group by nd,kv) arrearproc  on arrearproc.nd=over_deal.nd
 
                      --номінальна процентна ставка
                      left join (select t4.nd,t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
