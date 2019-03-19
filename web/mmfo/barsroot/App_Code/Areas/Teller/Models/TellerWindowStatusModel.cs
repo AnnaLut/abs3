@@ -17,5 +17,6 @@ namespace BarsWeb.Areas.Teller.Model
         public String Ref { get; set; }
         public String Message { get; set; }
         public String StatusText { get; set; }
+        public Int32 RejectFlag { get; set; }
     }
 }

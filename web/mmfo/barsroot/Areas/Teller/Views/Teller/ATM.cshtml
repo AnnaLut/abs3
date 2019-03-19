@@ -17,8 +17,15 @@
             </div>
             
             <div class="atm-block1" style="float: right; height: 40px; display: inline-block; position:relative;">
-                <div class="atm-block2" >
-                    <a class="atm-button atm-color-red" onclick="CancelOperation()">Відмінити</a>
+                <div class="atm-block2">
+                    @if (Model.RejectFlag != 1)
+                    {
+                        <a class="atm-button atm-color-red" onclick="CancelOperation()">Відмінити</a>
+                    }
+                    else
+                    {
+                        <a class="atm-button atm-color-red" style="cursor: default" disabled="disabled">Відмінити</a>
+                    }
                 </div>
             </div>
         </div>
