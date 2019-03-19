@@ -23,11 +23,12 @@ namespace BarsWeb.Areas.Teller.Patterns.TellerWindowStatus
                 Model.isSWI = "0";
             Decimal Ref = Convert.ToDecimal(Model.Ref);
             List.AddRange(ResultDocref(Ref));
-            List.Add(new OracleParameter("p_warning",    OracleDbType.Decimal,   Convert.ToDecimal(Model.isSWI),                 ParameterDirection.Input));
-            List.Add(new OracleParameter("p_amount",     OracleDbType.Decimal,                                                   ParameterDirection.Output));
-            List.Add(new OracleParameter("p_atm",        OracleDbType.Varchar2,  4000, null,                                     ParameterDirection.Output));
-            List.Add(new OracleParameter("p_currency",   OracleDbType.Varchar2,  4000, null,                                     ParameterDirection.Output));
-            List.Add(new OracleParameter("p_oper_desc",  OracleDbType.Varchar2,  4000, null,                                     ParameterDirection.Output));
+            List.Add(new OracleParameter("p_warning",     OracleDbType.Decimal,   Convert.ToDecimal(Model.isSWI),                 ParameterDirection.Input));
+            List.Add(new OracleParameter("p_amount",      OracleDbType.Decimal,                                                   ParameterDirection.Output));
+            List.Add(new OracleParameter("p_atm",         OracleDbType.Varchar2,  4000, null,                                     ParameterDirection.Output));
+            List.Add(new OracleParameter("p_currency",    OracleDbType.Varchar2,  4000, null,                                     ParameterDirection.Output));
+            List.Add(new OracleParameter("p_oper_desc",   OracleDbType.Varchar2,  4000, null,                                     ParameterDirection.Output));
+            List.Add(new OracleParameter("p_reject_flag", OracleDbType.Int32,                                                     ParameterDirection.Output));
             return List;
         }
     }
