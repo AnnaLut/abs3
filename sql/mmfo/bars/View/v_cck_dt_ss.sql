@@ -27,21 +27,23 @@ PROMPT *** Create  view V_CCK_DT_SS ***
            o.nazn,
            o.sos
       FROM oper o,
+           opldok op,
            customer c,
            cc_deal d,
            nd_acc na,
            accounts a
-     WHERE     o.dk = 1
-           AND SUBSTR (o.nlsa, 1, 2) IN ('20', '22')
+     WHERE      SUBSTR (a.nls, 1, 2) IN ('20', '22')
+           AND op.acc = a.acc
+           AND a.tip = 'SS '
+           AND op.dk = 0
+           AND op.fdat >= bankdate - 10
+           AND op.sos >= 0
+           and op.ref = o.ref
            AND o.nlsa = a.nls
-           AND o.kv = a.kv
-           AND o.vdat >= bankdate - 10
            AND a.rnk = c.rnk
            AND a.acc = na.acc
            AND na.nd = d.nd
-           AND a.tip = 'SS '
-           AND o.sos >= 0
-    UNION ALL
+  /*  UNION ALL
     SELECT o.REF,
            o.tt,
            o.vdat,
@@ -61,20 +63,22 @@ PROMPT *** Create  view V_CCK_DT_SS ***
            o.nazn,
            o.sos
       FROM oper o,
+           opldok op,
            customer c,
            cc_deal d,
            nd_acc na,
            accounts a
-     WHERE     o.dk = 0
-           AND SUBSTR (o.nlsb, 1, 2) IN ('20', '22')
+     WHERE     SUBSTR (a.nls, 1, 2) IN ('20', '22')
+           AND a.tip = 'SS '
+           AND op.acc = a.acc
+           and op.dk = 1
+           AND op.fdat >= bankdate - 10
+           AND op.sos >= 0
+           and op.ref = o.ref
            AND o.nlsb = a.nls
-           AND o.kv2 = a.kv
-           AND o.vdat >= bankdate - 5
            AND a.rnk = c.rnk
            AND a.acc = na.acc
-           AND na.nd = d.nd
-           AND a.tip = 'SS '
-           AND o.sos >= 0);
+           AND na.nd = d.nd*/);
 
 PROMPT *** Create  grants  V_CCK_DT_SS ***
 grant SELECT                                                                 on V_CCK_DT_SS     to BARSREADER_ROLE;
