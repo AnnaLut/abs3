@@ -139,8 +139,18 @@ begin
    l_ob22 := Substr( p_NBS_ob22,5,2) ;
 
    for ss in (select f.ACC_SP , a.*
-              from (select x.* from accounts     x where x.ostc < 0 and NVL(p_Rnk,x.RNK) =x.RNK  and x.ostc = x.ostb and x.nls like l_NBS and NVL(l_ob22, x.ob22) = x.ob22 ) a,
-                   (select y.* from PRVN_FIN_DEB y where p_mode is null or exists (select 1 from FIN_DEBT z where p_mode = z.MOD_ABS ) ) F
+              from (select x.* 
+                    from accounts x, FIN_DEBT z 
+                    where NVL(p_mode,z.MOD_ABS) = z.MOD_ABS 
+                      and NVL(p_Rnk ,x.RNK    ) = x.RNK  
+                      and NVL(l_ob22, x.ob22  ) = x.ob22 and x.nls like l_NBS
+                      and x.ostc < 0 and x.ostc = x.ostb  
+                      and x.nbs||x.ob22 = z.NBS_N/*Tarasenko =>*/
+                      and z.nbs_p is not null
+                      and z.nbs_n <> z.nbs_p
+                      and z.term_day is not null
+                   ) a,
+                   PRVN_FIN_DEB f
               where a.ACC = f.acc_ss
              )
    loop
