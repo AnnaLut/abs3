@@ -47,7 +47,7 @@ for i in  (select b.id,b.kf,a.reporting_date,a.data_type_id
 
                 join (select * from bars.customer where custtype=2) cust on cust.rnk=c.rnk
                 where c.custtype=2 and fdat=trunc(sysdate,'mm')
-                      and tipa<>15 and tip in ('SS ','SP ','SN ','SPN','SNO','SRR') and coalesce(sumzagalcred.sum_zagal,sumzagal_over.sum_zagal, sumzagal_bpk.sum_zagal)>=5000000
+                      and tipa<>15 and tip in ('SS ','SP ','SN ','SPN','SNO','SRR','SK0','SK9') and coalesce(sumzagalcred.sum_zagal,sumzagal_over.sum_zagal, sumzagal_bpk.sum_zagal)>=5000000
                 group by cust.okpo,c.rnk,c.nd,c.kv,c.kf;
 
         commit;
@@ -75,6 +75,7 @@ for i in  1..result_check.count loop
                        result_check(i).kf);
    commit;
    update result_comparison_601_rez r set r.sum_all_601=(SELECT t.sum_all FROM credit_nbu_601 t where r.nd=t.nd);
+   commit;
    update result_comparison_601_rez r set r.difference=r.sum_all_cr-r.sum_all_601;
    --dbms_output.put_line (result_check(i).rnk ||'/'||result_check(i).nd);
   commit;
