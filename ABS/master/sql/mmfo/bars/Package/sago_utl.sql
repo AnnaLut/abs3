@@ -13,7 +13,7 @@ create or replace package sago_utl is
                         P_DOC_COUNT    sago_requests.doc_count%type,
                         P_REQ_ID   out sago_requests.id%type,
                         P_ERR_MESS out varchar2);
-                        
+
   procedure ins_document(p_ref_sago     sago_documents.ref_sago%type,
                          p_act          sago_documents.act%type,
                          p_act_type     sago_documents.act_type%type,
@@ -29,15 +29,15 @@ create or replace package sago_utl is
                          p_request_id   sago_documents.request_id%type,
                          p_is_ins   out number,
                          P_ERR_MESS out varchar2);
-  
+
   procedure set_request_state(p_req_id    sago_requests.id%type,
                               p_state     sago_requests.state%type,
                               p_comm      sago_requests.comm%type);
-                              
+
   procedure create_payment(p_req_id sago_requests.id%type);
-  
+
   procedure pay_req_paym;
-  
+
   function get_count_doc(p_req_id sago_requests.id%type) return integer;
 
 end sago_utl;
@@ -56,12 +56,12 @@ create or replace package body sago_utl is
     insert into sago_requests(id, create_date, data, state, comm, user_id, doc_count)
     values(sago_requests_seq.nextval, p_create_date, p_data, p_state, p_comm, p_user_id, p_doc_count)
     returning id into P_REQ_ID;
-  exception 
+  exception
     when others then
       p_err_mess := SUBSTR(SQLERRM,1,4000);
       null;
   end;
-  
+
   procedure ins_document(p_ref_sago     sago_documents.ref_sago%type,
                          p_act          sago_documents.act%type,
                          p_act_type     sago_documents.act_type%type,
@@ -79,27 +79,27 @@ create or replace package body sago_utl is
                          P_ERR_MESS out varchar2) is
   begin
     insert into sago_documents(id, ref_sago, act, act_type, act_date, total_amount, reg_id, f_state, n_doc, d_doc, user_id, fio_reg, sign, request_id)
-    values(sago_documents_seq.nextval, p_ref_sago, p_act, p_act_type, p_act_date, p_total_amount, p_reg_id, p_f_state, p_n_doc, p_d_doc, p_user_id, p_fio_reg, p_sign, 
+    values(sago_documents_seq.nextval, p_ref_sago, p_act, p_act_type, p_act_date, p_total_amount, p_reg_id, p_f_state, p_n_doc, p_d_doc, p_user_id, p_fio_reg, p_sign,
            p_request_id);
    p_is_ins := 1;
-  exception 
+  exception
     when others then
        p_err_mess := SUBSTR(SQLERRM,1,4000);
        p_is_ins := 0;
   end;
-  
+
   function get_acc_for_sago(p_nbs varchar2, p_kf varchar2) return varchar2 is
    l_nls accounts.nls%type;
   begin
     select sa.nls
-      into l_nls 
+      into l_nls
       from sago_accounts sa
      where sa.nbs = p_nbs
        and sa.kf = p_kf;
     return l_nls;
   end;
-  
-  procedure create_payment(p_req_id sago_requests.id%type) is 
+
+  procedure create_payment(p_req_id sago_requests.id%type) is
     l_ref oper.ref%type;
     l_nlsa     accounts.nls%type;
     l_nlsb     accounts.nls%type;
@@ -120,8 +120,8 @@ create or replace package body sago_utl is
                 where sot.id_sago_oper = sd.act
                   and sd.request_id = p_req_id
                   and sd.f_state = 9999) loop
-      begin 
-        
+      begin
+
          ---  ????????доделать подсчет количества оплаченных в запросе
           gl.ref(l_ref);
           l_bankdate :=  gl.bd;
@@ -131,7 +131,7 @@ create or replace package body sago_utl is
             l_cashsymb := 33;
             l_nlsa := get_acc_for_sago('1001', l_kf);
             l_nlsb := get_acc_for_sago('1811', l_kf);
-            l_ida  := f_ourokpo; 
+            l_ida  := f_ourokpo;
             l_idb  := f_ourokpo;
             l_nazn := 'Зменшення запасів готівки для підкріплення операційної каси';
             select substr(acc.nms,1,38)
@@ -151,7 +151,7 @@ create or replace package body sago_utl is
             l_cashsymb := 67;
             l_nlsa := get_acc_for_sago('1811', l_kf);
             l_nlsb := get_acc_for_sago('1001', l_kf);
-            l_ida  := f_ourokpo; 
+            l_ida  := f_ourokpo;
             l_idb  := f_ourokpo;
             l_nazn := 'Збільшення запасів готівки за рахунок операційної каси';
             select substr(acc.nms,1,38)
@@ -171,7 +171,7 @@ create or replace package body sago_utl is
           --  l_cashsymb := 33;
             l_nlsa := get_acc_for_sago('9817', l_kf);
             l_nlsb := get_acc_for_sago('9910', l_kf);
-            l_ida  := f_ourokpo; 
+            l_ida  := f_ourokpo;
             l_idb  := f_ourokpo;
             l_nazn := 'Підкріплення запасів готівки НБУ в уповноваженому банку';
             select substr(acc.nms,1,38)
@@ -191,7 +191,7 @@ create or replace package body sago_utl is
          --   l_cashsymb := 33;
             l_nlsa := get_acc_for_sago('9910', l_kf);
             l_nlsb := get_acc_for_sago('9817', l_kf);
-            l_ida  := f_ourokpo; 
+            l_ida  := f_ourokpo;
             l_idb  := f_ourokpo;
             l_nazn := 'Вивезення запасів готівки в уповноваженому банку до НБУ';
             select substr(acc.nms,1,38)
@@ -221,6 +221,7 @@ create or replace package body sago_utl is
             l_mfob := '300001';
             l_ida  := f_ourokpo;
             l_idb  := '00032106';
+            l_nazn := 'Перерахування коштів для підкріплення готів., ювіл. та інвест.моне';
 
           end if;
 
@@ -265,7 +266,7 @@ create or replace package body sago_utl is
                       980,
                       get_proc_nls('T00',980) ,
                       c0.total_amount);
-           else 
+           else
                   paytt(0,
                         l_ref,
                         l_bankdate,
@@ -278,14 +279,14 @@ create or replace package body sago_utl is
                         l_nlsb,
                         c0.total_amount);
           end if;
-                     
+
            update sago_documents sd
               set sd.ref_our = case c0.rn when 1 then to_char(l_ref)
                                           when 2 then to_char(sd.ref_our)||','||to_char(l_ref) end,
                   sd.f_state = 2
             where sd.id = c0.id;
-        
-       exception 
+
+       exception
          when others then
            dbms_output.put_line(sqlerrm);
            logger.error('SAGO ERORR:'||sqlerrm);
@@ -294,11 +295,11 @@ create or replace package body sago_utl is
             where sd.id = c0.id;
        end;
     end loop;
-    update sago_requests sr 
+    update sago_requests sr
        set sr.state = 4
      where sr.id = p_req_id;
   end;
-  
+
   procedure pay_req_paym is
   begin
     for c0 in (select *
@@ -307,7 +308,7 @@ create or replace package body sago_utl is
        create_payment(c0.id);
     end loop;
   end;
-  
+
   procedure set_request_state(p_req_id    sago_requests.id%type,
                               p_state     sago_requests.state%type,
                               p_comm      sago_requests.comm%type) is
@@ -317,7 +318,7 @@ create or replace package body sago_utl is
            sr.comm = p_comm
      where sr.id = p_req_id;
   end;
-  
+
   function get_count_doc(p_req_id sago_requests.id%type) return integer is
     l_cnt integer := 0;
   begin
