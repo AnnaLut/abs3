@@ -28,7 +28,7 @@
   function teller_arms (p_armcode in varchar2)
     return integer;
 
-  function get_active_tt 
+  function get_active_tt
     return varchar;
 
   function get_active_oper
@@ -85,7 +85,7 @@
   function check_open_opers (p_oper_type in varchar2)
     return number;
 
-  function get_tox_flag 
+  function get_tox_flag
     return integer;
 
 
@@ -262,7 +262,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_UTILS is
                   and a.kv = t.kv
                 group by t.lcv,t.NAME)
 */
-    select cur_code, (nvl(atm_amount,0)+nvl(non_atm_amount,0)), rowid
+    select cur_code, nvl(tco.oper_amount,0), rowid
       into p_currency, v_ret, v_rowid
       from teller_cash_opers tco
       where tco.doc_ref = p_doc_ref
@@ -307,7 +307,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_UTILS is
       return r.s/100;
     end loop;
     return 0;*/
-    select cur_code, (nvl(atm_amount,0)+non_atm_amount), rowid
+    select cur_code, nvl(tco.oper_amount,0), rowid
       into p_currency, v_ret, v_rowid
       from teller_cash_opers tco
       where tco.doc_ref = p_doc_ref

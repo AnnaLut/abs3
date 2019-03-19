@@ -12,7 +12,7 @@
   -- Purpose : Пакет для обслуговування операцій з теллерами
 
   g_package_name    constant varchar2(20)  := 'Teller_Tools';
-  g_header_version  constant varchar2(64)  := 'version 3.0 26/10/2018';
+  g_header_version  constant varchar2(64)  := 'version 3.4 19/03/2018';
 
   g_user_id      constant  number        := user_id;
   g_bars_dt      constant  date          := gl.bd;
@@ -186,7 +186,8 @@
                              ,p_amount    out number
                              ,p_currency  out varchar2
                              ,p_oper_desc out varchar2
-                             ,p_atm       out varchar2)
+                             ,p_atm       out varchar2
+                             ,p_reject_flag out integer)
     return varchar2;
 
 
@@ -305,7 +306,7 @@ end teller_tools;
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
 
   g_min_banknote constant  number := 10;
-  g_body_version constant  varchar2(64)  := 'version 3.7 29/01/2019';
+  g_body_version constant  varchar2(64)  := 'version 3.4 19/03/2019';
   g_ws_name      varchar2(100) := sys_context('bars_global', 'host_name');
   g_eq_url       constant  varchar2(100) := case get_teller
                                               when 0 then null
@@ -338,6 +339,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
                            ,p_cur_code in varchar2
                            ,p_atm_amn  in number
                            ,p_non_atm  in number
+                           ,p_oper_amn in number
                            ,p_final    in integer default 0)
     is
     v_doc_ref number;
@@ -345,7 +347,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
     v_oper_type teller_cash_opers.op_type%type;
     v_oper_tt   teller_opers.oper_ref%type;
     v_final     integer := p_final;
+    v_oper_st   teller_opers.state%type;
   begin
+    
+if p_oper_amn <= 2 then
+  logger.info('teller   : '||dbms_utility.format_call_stack);
+--  raise;
+end if;
 /*
     merge into teller_cash_opers tco
       using (select p_doc_ref  doc_ref,
@@ -382,6 +390,7 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
       update teller_cash_opers
         set atm_amount    = nvl(p_atm_amn,0)
            ,non_atm_amount= nvl(p_non_atm,0)
+           ,oper_amount   = p_oper_amn
            ,last_dt       = sysdate
            ,last_user     = g_ws_name
            ,op_type       = v_oper_type
@@ -393,10 +402,23 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
           and op_type = p_op_type
           and cur_code= teller_utils.get_r030(p_cur_code);
       if sql%rowcount = 0 then
-        insert into teller_cash_opers (doc_ref, op_type, cur_code, atm_amount, non_atm_amount, last_dt, last_user,atm_status)
-                               values (v_doc_ref, v_oper_type, teller_utils.get_r030(p_cur_code), nvl(p_atm_amn,0), nvl(p_non_atm,0), sysdate, g_ws_name,decode(v_final,1,2,0));
+        insert into teller_cash_opers (doc_ref, op_type, cur_code, atm_amount, non_atm_amount, oper_amount, last_dt, last_user,atm_status)
+                               values (v_doc_ref, v_oper_type, teller_utils.get_r030(p_cur_code), nvl(p_atm_amn,0), nvl(p_non_atm,0), p_oper_amn, sysdate, g_ws_name,decode(v_final,1,2,0));
       end if;
     end if;
+  
+  v_oper_st := case v_oper_type
+                 when 'IN' then 'IN'
+                 when 'OUT' then 'O0'
+                 when 'RIN' then 'RI'
+                 when 'ROUT' then'RO'
+               end;
+  update teller_opers 
+    set state = nvl(v_oper_st,state)
+    where id = v_doc_ref
+      and state != nvl(v_oper_st,state)
+      and oper_ref != 'TOX';
+    
   exception
     when others then
       bars_audit.info('save_cash_opers: '||dbms_utility.format_call_stack);
@@ -407,7 +429,38 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
                            ,p_atm     in number default null)
     is
     v_cnt integer := 0;
+    v_op_state teller_opers.state%type;
   begin
+    select state into v_op_state
+      from teller_opers 
+      where id = p_doc_ref;
+    if v_op_state like 'R%' then
+      -- отмена операции. Выполняем исключительно операции АТМ
+      insert into teller_cash_opers (doc_ref,
+                                     op_type,
+                                     cur_code,
+                                     atm_amount,
+                                     non_atm_amount,
+                                     oper_amount,
+                                     atm_status)
+        select p_doc_ref,
+               case op_type 
+                 when 'IN' then 'ROUT'
+                 when 'OUT' then 'RIN'
+                 else 'NONE'
+               end,
+               cur_code,
+               0,
+               non_atm_amount,
+               atm_amount,
+               0
+          from teller_cash_opers t
+          where doc_ref = p_doc_ref 
+            and not op_type like 'R%'
+            and atm_status >0
+            and not exists (select 1 from teller_cash_opers o where o.doc_ref = p_doc_ref and op_type = case t.op_type when 'IN' then 'ROUT' when 'OUT' then 'RIN' else 'NONE' end and atm_status>0);
+      return;
+    end if;
 --    delete from teller_cash_opers where doc_ref = p_doc_ref;
     for r in (select doc_type, kv, sum(s) s
                 from (select case d.dk
@@ -426,12 +479,12 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
                order by doc_type, kv
               )
     loop
-      save_cash_oper(p_doc_ref, r.doc_type,r.kv,nvl(p_atm,0),nvl(p_nonatm,r.s/100));
-      if v_cnt = 0 then
+      save_cash_oper(p_doc_ref, r.doc_type,r.kv,nvl(p_atm,0),nvl(p_nonatm,0),r.s/100);
+/*      if v_cnt = 0 then
         update teller_opers set state = decode(r.doc_type,'IN','IN','OUT','O0','RIN','RI','ROUT','RO',state)
           where id = p_doc_ref;
         v_cnt :=1 ;
-      end if;
+      end if;*/
     end loop;
   end ins_cash_opers;
 
@@ -1337,7 +1390,7 @@ logger.info('Teller.write_oper. p_op_code = '||p_op_code||', v_op_type = '||v_op
                         and d.acc = a.acc
                         and a.nls like '100%')
           loop
-            save_cash_oper(p_doc_ref, r.doc_type,p_op_curr,0,r.sq/100);
+            save_cash_oper(p_doc_ref, r.doc_type,p_op_curr,0,r.sq/100,r.sq/100);
           end loop;
         else
           v_rec.status   := 'IN';
@@ -1363,7 +1416,7 @@ logger.info('Teller.write_oper. p_op_code = '||p_op_code||', v_op_type = '||v_op
               v_num)
       returning id into v_ret;
       if get_type_operation(v_rec.tt) != 'NONE' then
-        ins_cash_opers(v_ret);
+        ins_cash_opers(v_ret,case g_eq_type when 'M' then v_rec.sum_cur else 0 end,0);
 --        save_cash_oper(v_ret, get_type_operation(p_doc_ref), v_rec.cur, 0, v_rec.sum_cur);
 
       end if;
@@ -1908,9 +1961,10 @@ logger.info('teller step1. v_in_flag= '||v_in_flag||', v_out_flag = '||v_out_fla
                                    cur_code,
                                    atm_amount,
                                    non_atm_amount,
+                                   oper_amount,
                                    last_dt,
                                    last_user)
-      values(v_ret,'IN',980,0,p_op_amount,sysdate,g_user_id);
+      values(v_ret,'IN',980,0,0,p_op_amount,sysdate,g_user_id);
     update teller_opers
       set doc_ref = 0-v_ret
          ,state = 'S0'
@@ -2052,13 +2106,13 @@ logger.info('End_request: p_doc_ref = '||p_docref||', p_atm = '||p_atm_amount||'
 
     case
       when v_state in ('ID','I0','II','IN') then  -- заканчиваем "штатный" приём налички
-        save_cash_oper(v_oper_id, 'IN',v_cur,p_atm_amount,p_non_atm_amount,1);
+        save_cash_oper(v_oper_id, 'IN',v_cur,p_atm_amount,p_non_atm_amount,p_atm_amount+p_non_atm_amount,1);
       when v_state like 'O%'      then  -- заканчиваем "штатную" выдачу наличных
-        save_cash_oper(v_oper_id, 'OUT',v_cur,p_atm_amount,p_non_atm_amount,1);
+        save_cash_oper(v_oper_id, 'OUT',v_cur,p_atm_amount,p_non_atm_amount,p_atm_amount+p_non_atm_amount,1);
       when v_state in ('RI','R2','RD','RIN')         then  -- приём наличных при возврате
-        save_cash_oper(v_oper_id, 'RIN',v_cur,p_atm_amount,p_non_atm_amount,1);
+        save_cash_oper(v_oper_id, 'RIN',v_cur,p_atm_amount,p_non_atm_amount, p_atm_amount+p_non_atm_amount,1);
       when v_state in ('RX','RO','R0')          then -- выдача наличных при возврате
-        save_cash_oper(v_oper_id, 'ROUT',v_cur,p_atm_amount,p_non_atm_amount,1);
+        save_cash_oper(v_oper_id, 'ROUT',v_cur,p_atm_amount,p_non_atm_amount,p_atm_amount+p_non_atm_amount,1);
       else
         null;
     end case;
@@ -2268,7 +2322,7 @@ logger.info('End_request: p_doc_ref = '||p_docref||', p_atm = '||p_atm_amount||'
       from teller_cash_opers
       where doc_ref = (select id from teller_opers where doc_ref = p_docref)
         and op_type in ('IN','RIN')
-        and atm_status = 2;
+        and atm_status >= 1;
 /*    select count(1)
       into v_in_done
       from teller_oper_history toh
@@ -2280,7 +2334,7 @@ logger.info('End_request: p_doc_ref = '||p_docref||', p_atm = '||p_atm_amount||'
       from teller_cash_opers
       where doc_ref = (select id from teller_opers where doc_ref = p_docref)
         and op_type in ('OUT','ROUT')
-        and atm_status = 2;
+        and atm_status >= 1;
 /*    select count(1)
       into v_out_done
       from teller_oper_history toh
@@ -2520,7 +2574,8 @@ logger.info('Teller.change_request p_docref = '||p_docref||', p_curcode = '||p_c
                              ,p_amount    out number
                              ,p_currency  out varchar2
                              ,p_oper_desc out varchar2
-                             ,p_atm       out varchar2)
+                             ,p_atm       out varchar2
+                             ,p_reject_flag out integer)
     return varchar2
     is
     v_ret varchar2(10) := '??';
@@ -2528,6 +2583,7 @@ logger.info('Teller.change_request p_docref = '||p_docref||', p_curcode = '||p_c
     v_oper_code varchar2(3);
     v_docref number := nvl(p_doc_ref,0);
   begin
+    p_reject_flag := 0;
     if p_doc_ref = -1 then
       p_oper_desc := 'Операцію СБОН+ оброблено успішно';
       return 'OK';
@@ -2622,13 +2678,14 @@ logger.info('Teller.change_request p_docref = '||p_docref||', p_curcode = '||p_c
                     end,
                     p_warning)
             returning id, state into v_num, v_ret;
-          ins_cash_opers(v_num);
+          ins_cash_opers(v_num,0,0);
 --          save_cash_oper(v_num, v_ret, r.kv, 0, r.s/100);
         end loop;
     end;
 
     if v_ret like 'R%' and v_ret != 'RJ' and v_ret != 'RX' then
-      ins_cash_opers(v_num);
+      p_reject_flag := 1;
+      ins_cash_opers(v_num,0,0);
     end if;
     teller_utils.set_active_oper(v_num);
     if v_ret is null then
@@ -2754,9 +2811,11 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
     v_optype := get_type_operation(v_doc_ref);
     for r in (select * from teller_opers where doc_ref = v_doc_ref) loop
       v_state := r.state;
-      if v_state in ('IN') then
-        if v_optype in ('IN','ALL') then
+      if v_state in ('IN','II','RD','ID') then
+        if v_optype in ('IN','ALL') and v_state like 'I%' then
           v_state := 'I0';
+        elsif v_optype in ('OUT') and v_state like 'RD' then
+          v_state := 'RI';
         elsif v_optype = 'OUT' then
           v_state := 'O0';
         end if;
@@ -2890,7 +2949,8 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
                           when -1 then teller_utils.get_active_oper()
                           else p_docref
                         end;
-
+    v_oper_ref number;
+    v_curr_oper varchar2(10);
   begin
 /*    if nvl(p_docref,0) = 0 then -- операція СБОН+
       update teller_opers
@@ -2902,17 +2962,25 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
 */  --bars_audit.info('Teller.Confirm_request');
 
     v_req_id := teller_soap_api.StatusOperation;
-logger.info('step1');
     if teller_soap_api.get_current_dev_status() not in (1000,1500,9200,2003) then
       p_errtxt := 'АТМ працює. Поточний статус: '||teller_soap_api.get_current_dev_status_desc();
       return 0;
     end if;
 
-    select op.state, op.oper_ref
-      into v_state, v_op_tt
+    select op.state, op.oper_ref, id, case
+                                        when v_state like 'I%' then
+                                          'IN'
+                                        when v_state in ('RI','RD') then
+                                          'RIN'
+                                        when v_state like 'O%' and v_state != 'OK' then
+                                          'OUT'
+                                        when v_state = 'RO' then
+                                          'ROUT'
+                                      end case
+      into v_state, v_op_tt, v_oper_ref, v_curr_oper
       from teller_opers op
       where op.doc_ref = v_doc_ref or (op.id = v_doc_ref and op.oper_ref = 'SBN');
-logger.info('step2');
+
     if v_op_tt = 'SBN' then
       if v_state like 'I%' or v_state = 'RI' then
         v_op_type := 'IN';
@@ -2926,7 +2994,6 @@ logger.info('step2');
       end if;
     end if;
 --    get_type_operation(v_op_tt);
-logger.info('step3, v_op_type = '||v_op_type);
     for r in (select *
                     from (select * from teller_ws_define where op_type = v_op_type) wd
                     connect by prior oper_end_state = oper_start_state
@@ -2950,8 +3017,13 @@ logger.info('step3, v_op_type = '||v_op_type);
         exit;
       end if;
     end loop;
-logger.info('step4');
     p_atm_amount := get_atm_amount(p_errtxt);
+logger.info('tell v_oper_ref = '||v_oper_ref||', v_op_type = '||v_op_type||', p_atm_amount = '||p_atm_amount);
+    update teller_cash_opers
+      set atm_amount = p_atm_amount/*,
+          non_atm_amount = nvl(non_atm_amount,0) - p_atm_amount*/
+      where doc_ref = v_oper_ref
+        and op_type like '%'||v_curr_oper;
 logger.info('step5, atm_amount = '||p_atm_amount||', errtxt = '||p_errtxt);
 --    bars_audit.info('TELLER returning p_errtxt = '||p_errtxt);
 --    v_res := teller_soap_api.InventoryOperation(0);
@@ -2994,11 +3066,12 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
                      where tr.oper_ref = r.id
                        and tr.req_type = r.rq_name
                        and tr.oper_currency in (r.active_cur,teller_utils.get_cur_code(r.active_cur))
+                       and trim(tr.status) = '0'
                      order by tr.req_id desc)
       loop
-        v_ret := rq.oper_amount;
-        p_amount_txt := nvl(rq.oper_amount_txt, rq.response);
-        exit;
+        v_ret := v_ret + rq.oper_amount;
+        p_amount_txt := p_amount_txt||'<br/>'||nvl(rq.oper_amount_txt, rq.response);
+--        exit;
       end loop;
     end loop;
     return v_ret;
@@ -3248,7 +3321,10 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
                end),
            sum(case
                  when tco.op_type in ('IN','RIN') then
-                   round(decode(tv.kv,980,1,rato(tv.kv, v_dt)) * (tco.atm_amount+tco.non_atm_amount),2)
+                   round(decode(tv.kv,980,1,rato(tv.kv, v_dt)) * (tco.atm_amount+ tco.non_atm_amount/*case op.user_ref
+                                                                                   when to_char(user_id) then tco.non_atm_amount
+                                                                                   else              0
+                                                                                 end*/),2)
                  else 0
                end),
            sum(case
@@ -3258,7 +3334,10 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
                end),
            sum(case
                  when tco.op_type in ('OUT','ROUT') then
-                   round(decode(tv.kv,980,1,rato(tv.kv, v_dt)) * (tco.atm_amount+tco.non_atm_amount),2)
+                   round(decode(tv.kv,980,1,rato(tv.kv, v_dt)) * (tco.atm_amount+tco.non_atm_amount/*case op.user_ref
+                                                                                   when to_char(user_id) then tco.non_atm_amount
+                                                                                   else              0
+                                                                                 end*/),2)
                  else 0
                end)
       into p_cnt_in,
@@ -3561,7 +3640,7 @@ logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curco
         returning id
         into v_oper_id;
 
-      save_cash_oper(v_oper_id,'IN',p_curcode,0,p_non_atm_amount,2);
+      save_cash_oper(v_oper_id,'IN',p_curcode,0,p_non_atm_amount,p_non_atm_amount,2);
       teller_utils.set_active_oper(v_oper_id);
     end if;
 
@@ -3636,18 +3715,20 @@ logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curco
             and oper_ref = 'TOX'
             and cur_code = q.cur_code;
 */
-          insert into teller_opers (oper_ref,
-                                      amount,
-                                      state,
-                                      cur_code,
-                                      active_cur
-                                      )
-            values ('TOX',q.amount,'IA',teller_utils.get_r030(p_curcode),teller_utils.get_r030(p_curcode))
-            returning id
-            into v_oper_id;
-
-          save_cash_oper(v_oper_id,'IN',v_cur_code,q.amount,0);
-          teller_utils.set_active_oper(v_oper_id);
+          if q.amount != 0 then
+            insert into teller_opers (oper_ref,
+                                        amount,
+                                        state,
+                                        cur_code,
+                                        active_cur
+                                        )
+              values ('TOX',q.amount,'IA',teller_utils.get_r030(p_curcode),teller_utils.get_r030(p_curcode))
+              returning id
+              into v_oper_id;
+        
+           save_cash_oper(v_oper_id,'IN',v_cur_code,q.amount,0,q.amount,2);
+           teller_utils.set_active_oper(v_oper_id);
+          end if;
         end loop;
         v_ret := teller_soap_api.InventoryOperation;
 
@@ -3708,7 +3789,7 @@ logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curco
 
         teller_utils.set_active_oper(v_ret);
 
-        save_cash_oper(v_ret,'OUT',v_cur_code,0,p_non_atm_amount,2);
+        save_cash_oper(v_ret,'OUT',v_cur_code,0,p_non_atm_amount,p_non_atm_amount,2);
         p_errtxt := teller_utils.create_cashout_message;
         teller_utils.set_active_oper(null);
         return 1;
@@ -3763,7 +3844,7 @@ bars_audit.info('Teller: cash_oper after end cashout (3) request');
 /*      insert into teller_cash_opers (doc_ref, op_type, cur_code,atm_amount, non_atm_amount,last_dt,last_user)
         values (v_curr_oper,'OUT',v_cur_code,0,p_non_atm_amount,sysdate,g_ws_name);*/
       teller_utils.set_active_oper(v_curr_oper);
-      save_cash_oper(v_curr_oper,'OUT',v_cur_code,0,p_non_atm_amount,2);
+      save_cash_oper(v_curr_oper,'OUT',v_cur_code,0,p_non_atm_amount,p_non_atm_amount,2);
     end if;
       p_errtxt := teller_utils.create_cashout_message;
       teller_utils.set_active_oper(null);
@@ -3805,7 +3886,7 @@ bars_audit.info('Teller: cash_oper after end cashout (3) request');
       insert into teller_opers (oper_ref,state, amount,cur_code,req_ref)
         values ('TOX','OT',r.non_atm_amount,teller_utils.get_r030(r.cur_code),-1)
         returning id into v_oper_id;
-      save_cash_oper(v_oper_id,'OUT',teller_utils.get_r030(r.cur_code),0,r.non_atm_amount,2);
+      save_cash_oper(v_oper_id,'OUT',teller_utils.get_r030(r.cur_code),0,r.non_atm_amount,r.non_atm_amount,2);
 
 /*      insert into teller_cash_opers (doc_ref,
                                      op_type,
@@ -4031,7 +4112,7 @@ bars_audit.info('Teller: cash_oper after end cashout (3) request');
                   and exists (select 1 from opldok where ref = op.doc_ref)
               )
     loop
-      teller_tools.ins_cash_opers(p_doc_ref => r.id);
+      teller_tools.ins_cash_opers(p_doc_ref => r.id,p_nonatm => 0,p_atm => 0);
     end loop;
 
 
@@ -4277,10 +4358,11 @@ dbms_output.put_line(v_sw_flag);
                                        cur_code,
                                        atm_amount,
                                        non_atm_amount,
+                                       oper_amount,
                                        atm_status,
                                        last_dt,
                                        last_user)
-          select doc_ref, decode(op_type,'IN','ROUT','OUT','RIN'),cur_code,0,non_atm_amount,2,sysdate,g_ws_name
+          select doc_ref, decode(op_type,'IN','ROUT','OUT','RIN'),cur_code,0,0,non_atm_amount,2,sysdate,g_ws_name
             from teller_cash_opers
             where doc_ref = r.id;
       end if;
@@ -4321,12 +4403,12 @@ dbms_output.put_line(v_sw_flag);
                   group by tco.cur_code)
     loop
       if cur.diff != 0 then
-         p_errtxt := p_errtxt ||case 
+        p_errtxt := p_errtxt ||case 
                                  when length(p_errtxt)> 0 then '<br/>'
                                  else ''
                                end||
           'Залишок коштів Теллера в валюті '||cur.cur_code||' не нульовий: '||to_char(cur.diff)||'. Необхідно зробити повне вилучення!';
-     end if;
+      end if;
     end loop;
 
     if p_errtxt is not null then
@@ -4341,8 +4423,8 @@ end teller_tools;
  show err;
  
 PROMPT *** Create  grants  TELLER_TOOLS ***
-grant EXECUTE                                                                on TELLER_TOOLS    to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on TELLER_TOOLS    to BARS_CONNECT;
+grant EXECUTE                                                                on TELLER_TOOLS    to BARS_ACCESS_DEFROLE;
 
  
  

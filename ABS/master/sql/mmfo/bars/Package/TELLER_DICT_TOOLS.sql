@@ -1,4 +1,5 @@
 
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/teller_dict_tools.sql =========*** R
  PROMPT ===================================================================================== 
@@ -87,6 +88,7 @@ end teller_dict_tools;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_DICT_TOOLS is
 
+  g_body_version constant  varchar2(20) := '2.1'; -- 13.03.2019
 
   function get_tt_id (p_op_code in varchar2)
     return number;
@@ -117,19 +119,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_DICT_TOOLS is
     v_out_flag integer := 0;
     v_int      integer := 0;
   begin
-    for r in (select nvl(nlsm,nlsa) nlsa, nvl(nlsk,nlsb) nlsb, tt
+    for r in (select nvl(nlsm,nlsa) nlsa, nvl(nlsk,nlsb) nlsb, tt, dk
                 from tts
                 where tt = p_op_code
               union
-              select nvl(tts.nlsm,tts.nlsa) nlsa, nvl(tts.nlsk,tts.nlsb) nlsb, tts.tt
+              select nvl(tts.nlsm,tts.nlsa) nlsa, nvl(tts.nlsk,tts.nlsb) nlsb, tts.tt, tts.dk
                 from ttsap, tts
                 where ttsap.tt = p_op_code
                   and ttsap.ttap = tts.tt)
     loop
-      if nvl(r.nlsa,'-') like '%CASH%' then
+      if (nvl(r.nlsa,'-') like '%CASH%' and r.dk = 1) or (nvl(r.nlsb,'-') like '%CASH%' and r.dk = 0) then
         v_in_flag := 1;
       end if;
-      if nvl(r.nlsb,'-') like '%CASH%' then
+      if (nvl(r.nlsb,'-') like '%CASH%' and r.dk = 1) or (nvl(r.nlsa,'-') like '%CASH%' and r.dk = 0) then
         v_out_flag := 1;
       end if;
       if v_in_flag = 1 and v_out_flag = 1 then
@@ -245,10 +247,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_DICT_TOOLS is
                                   p_param1 =>  'Обладнання '||get_equip_name(p_equip_code)||'з адресою '||p_equip_ip||'  вже має дві підключені робочі станції');
           --raise_application_error(-20001, v_progname||': Обладнання '||get_equip_name(p_equip_code)||'з адресою '||p_equip_ip||'  вже має дві підключені робочі станції');
         end if;
-        
-        if r.equip_position = 'R' then 
+
+        if r.equip_position = 'R' then
           v_pos := 'L';
-        elsif r.equip_position = 'L' then 
+        elsif r.equip_position = 'L' then
           v_pos := 'R';
         end if;
       end loop;
@@ -292,9 +294,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_DICT_TOOLS is
           bars_error.raise_nerror(p_errmod => 'TEL',p_errname => 'TELL_DICT2',p_param1 => v_err);
         end if;
 
-        if r.equip_position = 'R' then 
+        if r.equip_position = 'R' then
           v_pos := 'L';
-        elsif r.equip_position = 'L' then 
+        elsif r.equip_position = 'L' then
           v_pos := 'R';
         end if;
       end loop;
@@ -335,7 +337,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_DICT_TOOLS is
     end loop;
 
     if v_sw_flag is null then
-      v_sw_flag := case 
+      v_sw_flag := case
                      when p_op_code in ('CN1','CN2','CUV','CNU','CN3','CN4') then 1
                      else 0
                    end;
@@ -610,12 +612,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_DICT_TOOLS is
     merge into teller_boss_roles br
       using (select p_userrole userrole, p_priority priority from dual) parm
       on (br.userrole = parm.userrole)
-      when matched then update 
+      when matched then update
         set priority  = parm.priority
       when not matched then insert (userrole, priority)
         values (parm.userrole, parm.priority);
   end upd_boss;
-  
+
   procedure del_boss (p_userrole in varchar2)
     is
   begin
@@ -626,8 +628,8 @@ end teller_dict_tools;
  show err;
  
 PROMPT *** Create  grants  TELLER_DICT_TOOLS ***
-grant EXECUTE                                                                on TELLER_DICT_TOOLS to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on TELLER_DICT_TOOLS to BARS_ACCESS_USER;
+grant EXECUTE                                                                on TELLER_DICT_TOOLS to BARS_ACCESS_DEFROLE;
 
  
  
