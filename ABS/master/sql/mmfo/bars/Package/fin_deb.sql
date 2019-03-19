@@ -75,7 +75,7 @@ END FIN_DEB;
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_DEB IS  G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.2.1  30.10.2018';
 
 /*     ФИНАНСОВCOВАЯ ДЕБИТОРКА
-
+07.12.2018 SP Обмеження винесення на прострочку рахунків NBS_P IS NULL: NBS_N=NBS_P.
 30.10.2018 Sta Функція побудови платіжного дня DAT_PL по № дня в поточному місяці, в тому числі від`ємне число.
 31.07.2018 Sta - На базе заявки COBUMMFO-7564 Перенесення не сплачених нарахованих доходів за послуги інкасації на прострочені доходи
                  погодивши з Демкович МС,
@@ -148,7 +148,6 @@ begin
                       and x.nbs||x.ob22 = z.NBS_N/*Tarasenko =>*/
                       and z.nbs_p is not null
                       and z.nbs_n <> z.nbs_p
-                      and z.term_day is not null
                    ) a,
                    PRVN_FIN_DEB f
               where a.ACC = f.acc_ss
