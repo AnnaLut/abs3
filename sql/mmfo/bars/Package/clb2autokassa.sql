@@ -52,7 +52,7 @@ end CLB2AutoKassa;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CLB2AUTOKASSA is
 
-  G_BODY_VERSION constant varchar2(64) := 'version 1.5 27/09/2018';
+  G_BODY_VERSION constant varchar2(64) := 'version 1.6 20/03/2019';
   g_dl_interval  constant integer := 60; -- минимальное время между циклами обработки для документов, по которым были ошибки
 
   ----
@@ -333,6 +333,9 @@ procedure SendRequest (p_doc_ref in number)
   v_req_body    clob;
   v_err         varchar2(2000);
   v_step        varchar2(2000);
+  v_http        varchar2(20);
+  v_w_path      varchar2(100) := parameter_utl.get_value_from_config(p_param_code => 'SMPP.Wallet_dir');
+  v_w_pass      varchar2(100) := parameter_utl.get_value_from_config(p_param_code => 'SMPP.Wallet_pass');
 begin
   v_err := v_progname ||'. Виклик WS для відправки даних в модуль "Автокаса". Адреса WS - '||v_url;
   bars_audit.info(v_err);
@@ -345,16 +348,16 @@ begin
     bars_audit.info('Виклик процедури '||v_progname||' для документу, що знаходиться в статусі '||v_sta);
    return;
   end if;
-
+  v_req_body := v_req_body||'<url>'||getglobaloption('WS_EXT_AUTOKASSA')||'</url>';
 --bars_audit.info(v_url);
-  UTL_HTTP.set_detailed_excp_support(true);
+--  UTL_HTTP.set_detailed_excp_support(true);
   wsm_mgr.prepare_request(p_url         => v_url,
                           p_action      => '',
                           p_http_method => wsm_mgr.g_http_post,
-                          p_wallet_path => parameter_utl.get_value_from_config(p_param_code => 'SMPP.Wallet_dir'),
-                          p_wallet_pwd  =>  parameter_utl.get_value_from_config(p_param_code => 'SMPP.Wallet_pass'),
+                          p_wallet_path => v_w_path,
+                          p_wallet_pwd  =>  v_w_pass,
                           p_content_type => wsm_mgr.g_ct_xml,
-                          p_body        => v_req_body||'<url>'||getglobaloption('WS_EXT_AUTOKASSA')||'</url>'
+                          p_body        => v_req_body
                           ,p_soap_method => 'SaveClientOutcashEnquiry'
                           ,p_namespace => 'http://tempuri.org/'
                           );
