@@ -17,3 +17,4 @@ begin
     execute immediate 'drop table tmp_sago';
     commit;
 end;
+/
