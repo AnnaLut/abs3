@@ -567,7 +567,9 @@ function utf8todeflang(p_clob in    clob) return clob is
                      l_ttkp := 'SM5';
                   end if;
                   
-                  begin                    
+                  begin  
+                          commit;
+                  
                           gl.ref(l_refkp);
                         
                           gl.in_doc3(ref_   => l_refkp,
@@ -613,7 +615,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                               l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);
 
                   exception when others then 
-                    commit;
+                    logger.info('SUBSIDY: Помилка при створенні документу на оплату комісіі для рахунку :' ||l_sybsidy_list(i).receiveraccnum);
                   end;               
                 
                  /* gl.payv(flg_  => 0,
@@ -726,8 +728,11 @@ function utf8todeflang(p_clob in    clob) return clob is
       from subsidy_data t
       left join oper o
         on t.ref = o.ref
+      left join operw ow
+        on ow.ref = o.ref
+       and ow.tag = 'REF92'
       left join oper o2
-        on o2.refl = t.ref
+        on o2.ref = ow.value
      where t.extreqid = p_id;
 
     if l_ticket_list.count > 0 then
