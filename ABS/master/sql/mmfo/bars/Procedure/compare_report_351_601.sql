@@ -29,26 +29,28 @@ for i in  (select b.id,b.kf,a.reporting_date,a.data_type_id
 ------------------------
         execute immediate 'truncate table rez_cr_601';
         insert into rez_cr_601
-        select cust.okpo,c.rnk,c.nd,c.kv, abs(sum(bv)) * 100 as s,c.kf 
-                from bars.rez_cr c
-                left join --загальна сума (ліміт кредитної лінії)
-                            (select distinct cd.nd, (cd.sdog*100) as sum_zagal
-                                             from bars.cc_deal cd) sumzagalcred on sumzagalcred.nd=c.nd
-                left join --овердрафт
-                (select na.nd,a.acc, min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal
-                                  from bars.saldoa a, bars.accounts a1, bars.nd_acc na
-                                  where a1.acc=na.acc and a.acc=a1.acc and a1.nbs=9129
-                                  group by na.nd,a.acc)  sumzagal_over on sumzagal_over.nd=c.nd
-                left join --БПК
-                          (select w4.nd,a.acc,min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal
-                                  from bars.saldoa a, bars.accounts a1, bars.w4_acc w4
-                                  where a.acc=a1.acc and w4.acc_9129=a1.acc
-                                  group by  w4.nd,a.acc) sumzagal_bpk on sumzagal_bpk.nd=c.nd
-
-                join (select * from bars.customer where custtype=2) cust on cust.rnk=c.rnk
-                where c.custtype=2 and fdat=trunc(sysdate,'mm')
-                      and tipa<>15 and tip in ('SS ','SP ','SN ','SPN','SNO','SRR','SK0','SK9') and coalesce(sumzagalcred.sum_zagal,sumzagal_over.sum_zagal, sumzagal_bpk.sum_zagal)>=5000000
-                group by cust.okpo,c.rnk,c.nd,c.kv,c.kf;
+        select n.okpo,n.rnk,n.nd,n.kv,(n.s+com.s1) as ss ,n.kf
+               from (select cust.okpo,c.rnk,c.nd,c.kv, abs(sum(bv)) * 100 as s,c.kf 
+                              from bars.rez_cr c
+                              left join --загальна сума (ліміт кредитної лінії)
+                                          (select distinct cd.nd, (cd.sdog*100) as sum_zagal
+                                                           from bars.cc_deal cd) sumzagalcred on sumzagalcred.nd=c.nd
+                              left join --овердрафт
+                              (select na.nd,a.acc, min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal
+                                                from bars.saldoa a, bars.accounts a1, bars.nd_acc na
+                                                where a1.acc=na.acc and a.acc=a1.acc and a1.nbs=9129
+                                                group by na.nd,a.acc)  sumzagal_over on sumzagal_over.nd=c.nd
+                              left join --БПК
+                                        (select w4.nd,a.acc,min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal
+                                                from bars.saldoa a, bars.accounts a1, bars.w4_acc w4
+                                                where a.acc=a1.acc and w4.acc_9129=a1.acc
+                                                group by  w4.nd,a.acc) sumzagal_bpk on sumzagal_bpk.nd=c.nd
+                              join (select * from bars.customer where custtype=2) cust on cust.rnk=c.rnk
+                              where c.custtype=2 and fdat=trunc(sysdate,'mm') and tipa<>15 and tip in ('SS ','SP ','SN ','SPN','SNO','SRR') 
+                                    and coalesce(sumzagalcred.sum_zagal,sumzagal_over.sum_zagal, sumzagal_bpk.sum_zagal)>=5000000 
+                              group by cust.okpo,c.rnk,c.nd,c.kv,c.kf
+                    )n
+                 left join (select (c1.bv*100) as s1,n.nd from nd_acc n, accounts a, rez_cr c1 where n.acc=a.acc and a.nbs=3578 and a.acc=c1.acc and c1.fdat=trunc(sysdate,'mm')) com on com.nd=n.nd;
 
         commit;
 ------------------------
