@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.006  01/03/2019 (27/02/2019)
+% VERSION     :  v.19.008 18/03/2019 (11/03/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -32,6 +32,8 @@ IS
 12     VVV        R030 код валюты
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 11/03/2019 для рахунк?в SNA добавив зм?нив 
+            znap_ := to_char(round(gl.p_icurval(k.kv, k.proc_SNA, dat_)*k.koef)); 
  16/01/2019 для дочерних счетов по ЦБ будет формироваться код остатка 
             родительского счета и значение показателя с противоположным 
             знаком если типы остатков не совпадают
@@ -54,52 +56,6 @@ IS
  02.03.2018 для pmode_=2 переменная  Datn_ определяется как и для pmode_=0
             (включались балансовые счета у которых D_CLOSE='31/12/2017')
  10.01.2018 измененный алгоритм расчета S190
- 29.12.2017 изменение структуры показателей с отчета за 26.12.2017
- 24.11.2017 пом_нялась назва поля в dpu_vidd
- 11.09.2017 для счетов 2701,3660 проверяется их наличие в МБДК
- 28.07.2017 отдельное определение r012 для счетов 1592
- 15.05.2017 определение s240 для счетов 2924 по ob22 (для 322669)
- 25.04.2017 для формирования остатка по счетам убрал годовые корректирующие
-            (dos99_, kos99_, dosq99_, kosq99_)
- 21.03.2017 для 9129: при отсутствии активного овердрафта срок к погашению
-                      определяется по договору овердрафта
- 24.02.2017 для проводок по списанию со счетов резерва снят комментарий для
-            корреспонденции счетов 7 класса (строка 3836 или 38..)
- 23.01.2017 datp_ не увеличивается на 1 день
-            (возможны ситуации расчета резерва и списания резерва в один день)
- 11.01.2017 ГОУ:замена s240 для SNA без остатков на основных счетах (новый блок)
- 09.12.2016 договора открытые после расчета резервов включаются в OTCN_FA7_REZ1
-            для использования при уточнении параметров связанных счетов
- 22.09.2016 otcn_fa7_rez1 дополняется счетами 1__9,3119,3219
-             с резервом и дисконтом =0  (2-й блок расшифровки резервов)
- 16.09.2016 -включен блок установки ограничений s240 для "отзывных"
-                депозитов открытых после 06.06.2015
- 30.08.2016 -вьюшка v_tmp_rez_risk_c5_new дополнительно содержит договора, открытые
-             в отчетном периоде и без расчета резервов -необходимо для корректной
-             расшифровки дисконтов/премий привязанных к новым договорам
- 04.08.2016 - перераспределение R013 при превышении резерва над текущим
-               остатком для проц.счетов ЦБ
- 21/07/2016 - для счетов резерва параметр R013 будет определяться по
-               R013 активов (счета начисленных процентов до 30, больше 30)
- 02/07/2016 - для таблиц OPLDOK добавил условие o.fdat = z.fdat
-              для уменьшения времени формирования
-              для валюты 974 (белоруские рубли) из V_TMP_REZ_RISK_C5
-              изменяем на значение 933
- 14/06/2016 - для счетов резервов под непросроченные проценты будет
-              разбивка по параметру  R012 на 'A' и "B'
- 10/06/2016 - на 11.06.2016 в файл будут включаться счета резерва 1890, 2890,
-              3590, 3599 и поэтому при обработке VIEW V_TMP_REZ_RISK_C5_NEW
-              не исключаем группы бал.счетов 181, 280, 351, 354, 355, 357
- 14/07/2015 - для внутреннего файла @77 не будем выполняться сохранение в табл.
-              RNBU_TRACE_ARCH
- 13/07/2015 - для внутреннего файла @77 дату расчета резерва выбираем 1 число
-              месяца за отчетным
- 02/07/2015 - для внутреннего файла @77 не наполнялась таблица TMP_IREP
- 28/05/2015 - для счетов дисконта и премии при разбивке остатка заполняем поле
-              TOBO в RNBU_TRACE  (нужно для выгрузки детального протокола)
- 25/05/2015 - для pmode_ = 2 будем формировать файл с учетом месячных
-              корректирующих проводок (формирование файла @77 для СБ)
-              вместо VIEW sal будем использовать таблицу OTCN_SALDO
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_           VARCHAR2 (2)           := 'A7';
    sheme_          Varchar2(1) := 'G';
@@ -107,7 +63,7 @@ IS
    ret_            NUMBER;
    add_            NUMBER;
    acc_            NUMBER;
-   acc_proc_sna NUMBER := 0;
+   acc_proc_sna    NUMBER := 0;
    nbs_            VARCHAR2 (4);
    nbs1_           VARCHAR2 (4);
    nls_            VARCHAR2 (15);
@@ -429,16 +385,6 @@ IS
             s242_ := '1';
          END IF;
       END IF;
-
-      -- 11/07/2012 Притуп + 20/06/2013 УПБ Корецька
---      if substr(nls_, 1, 4) in ('1410', '1420', '1430', '1435', '1436', '1437', '1440', '1446', '1447', '3040') or
---         substr(nls_, 1, 4) in ('1415', '1416', '1417', '1426', '1427') and
---         r013_ in ('2', '4', '5', '6', '7')     до 26.12.2017
---         r011_ in ('2', 'D')
---      THEN
---         x_ := '1';
---         s242_ := '1';
---      END IF;
 
       -- для Одеського СБЕРа 21/08/2012
       IF mfo_ = 328845
@@ -2977,7 +2923,6 @@ BEGIN
                        group by acc, mdate, kodp, substr(kodp, 9, 1), substr(kodp, 6, 1), substr(kodp, 7, 1)) s,
                        accounts a, customer c
                   where t.dat = datr_ and
-                      t.id not like 'NLO%' and
                       t.acc = s.acc and
                       t.acc = a.acc and
                       nvl(a.nbs, substr(a.nls, 1,4)) in (select r020
@@ -2989,7 +2934,7 @@ BEGIN
                       (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
                        mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
                         )
-            where szq <> 0 or discont <> 0 or prem <> 0 or suma <> 0
+            where szq <> 0 or discont <> 0 or prem <> 0 or suma <> 0 or proc_SNA <> 0 and tip = 'SNA'
             order by tobo, acc, s240, rnum)
    loop
       IF typ_ > 0 THEN
@@ -3257,8 +3202,8 @@ BEGIN
             r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
             r011_ := substr(k.kodp,6,1);
 
-            kodp_ := '2'||substr(k.nls,1,3)||'6'||r011_||r013_||substr(k.kodp,8);
-            znap_ := to_char(round(gl.p_icurval(k.kv, k.discont_SDF, dat_)*k.koef));
+            kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
+            znap_ := to_char(round(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_)*k.koef));
 
             comm_ := SUBSTR(' дисконт SDF c1', 1,100);
 
@@ -3276,7 +3221,7 @@ BEGIN
           -- нарах. відсотки (тип рахунку SNA)
           if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
              kodp_ := '2' || nbs_ || substr(k.kodp,6,1) || r013_ || substr(k.kodp,8);
-             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
+             znap_ := to_char(round(gl.p_icurval(k.kv, k.proc_SNA, dat_)*k.koef));
              
              comm_ := SUBSTR(' нарах. відсотки SNA c1', 1,100);
              
@@ -3295,8 +3240,8 @@ BEGIN
             r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
             r011_ := substr(k.kodp,6,1);
 
-            kodp_ := '2'||substr(k.nls,1,3)||'6'||r011_||r013_||substr(k.kodp,8);
-            znap_ := to_char(round(gl.p_icurval(k.kv, k.discont_SDF, dat_)*k.koef));
+            kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
+            znap_ := to_char(round(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_)*k.koef));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c1', 1,100);
 
@@ -3314,8 +3259,8 @@ BEGIN
         -- нарах. в_дсотки (тип рахунку SNA)
          if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
             kodp_ := '2' || nbs_ || substr(k.kodp,6,1) || (case when TP_SND then k.r013 else '4' end) || substr(k.kodp,8);
-            znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
-             
+            znap_ := to_char(round(gl.p_icurval(k.kv, k.proc_SNA, dat_)*k.koef));
+
             comm_ := SUBSTR(' нарах. відсотки SNA for rez=0 c1', 1,100);
              
             insert into rnbu_trace
@@ -3377,7 +3322,7 @@ BEGIN
                      nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                      nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                      T.ND,T.ID,a.ob22, t.zpr discont_SDF, c.custtype,
-                     t.accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA
+                     t.accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA, t.sz
                 FROM V_TMP_REZ_RISK_C5_NEW T,
                      ACCOUNTS A,
                      SPECPARAM S,
@@ -3389,7 +3334,6 @@ BEGIN
                                                                              '11419','11429','11519','11529','12039',
                                                                              '12069','12089','12109','12119','12129',
                                                                              '12139','12209','12239') )
-                     and T.ID not LIKE 'NLO%'
                      AND T.ACC = A.ACC
                      AND T.ACC = S.ACC(+)
                      AND A.KV = TO_NUMBER (L.R030)
@@ -3419,7 +3363,7 @@ BEGIN
                      nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                      nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                      T.ND, T.ID, a.ob22, t.zpr discont_SDF, c.custtype,
-                     t.accr_30 accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA
+                     t.accr_30 accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA, t.sz
                 FROM V_TMP_REZ_RISK_C5_NEW T,
                      ACCOUNTS A,
                      SPECPARAM S,
@@ -3431,7 +3375,6 @@ BEGIN
                                                                              '11419','11429','11519','11529','12039',
                                                                              '12069','12089','12109','12119','12129',
                                                                              '12139','12209','12239') )
-                     and T.ID not LIKE 'NLO%'
                      AND T.ACC = A.ACC
                      AND T.ACCR_30 = S.ACC(+)
                      AND A.KV = TO_NUMBER (L.R030)
@@ -3442,47 +3385,9 @@ BEGIN
                           mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
                      and t.nbs not like '204%'
                      and t.nbs not like '239%'
-          union
-                SELECT
-                    T.ACC,
-                     T.NLS,
-                     DECODE(T.KV, 974, 933, T.KV) KV,
-                     T.RNK,
-                     T.S080,
-                     GL.P_ICURVAL (T.KV, T.SZ, dat_) SZQ,
-                     A.ISP,
-                     A.MDATE,
-                     A.TOBO,
-                     nvl(a.nbs, substr(a.nls, 1,4)) NBS,
-                     NVL (S.S240, '0') S240,
-                     NVL (S.S180, '0') S180,
-                     L.R031,
-                     DECODE(LPAD (L.R030, 3, '0'), '974', '933', LPAD (L.R030, 3, '0')) R030,
-                     NVL (S.R011, '0') R011, NVL (S.R013, '0') R013,
-                     NVL (DECODE (C.COUNTRY, 804, '1', '2'), '1') REZ,
-                     nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
-                     nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
-                     T.ND, T.ID, a.ob22, t.zpr discont_SDF, c.custtype,
-                     t.accr, a.tip, nvl(s.s190, '0') s190, t.pv as proc_SNA
-                FROM V_TMP_REZ_RISK_C5_NEW T,
-                     ACCOUNTS A,
-                     SPECPARAM S,
-                     CUSTOMER C,
-                     KL_R030 L
-               WHERE T.DAT = datr_
-                     and (T.ID LIKE 'NLO%')
-                     AND T.ACC = A.ACC
-                     AND T.ACC = S.ACC(+)
-                     AND A.KV = TO_NUMBER (L.R030)
-                     AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
-                     AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('204','239','410','420')
-                     AND A.RNK = C.RNK
-                     and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
-                          mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
-                     and t.nbs not like '204%'
-                     and t.nbs not like '239%'
                             )
-                where szq <> 0 or discont <> 0 or prem <> 0
+                where sz <> 0 and szq <> 0 or 
+                      sz = 0 and (discont <> 0 or prem <> 0 or proc_SNA <> 0 and tip = 'SNA')
                 order by tobo, acc, s240)
    loop
       IF typ_ > 0 THEN
@@ -3537,10 +3442,17 @@ BEGIN
       srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
       srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
 
-      nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
+      if k.accr is not null then
+         nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
 
-      nbs_ := substr(nbs_r013_, 1, 4);
-      r013_ := substr(nbs_r013_, 5, 1);
+         nbs_ := substr(nbs_r013_, 1, 4);
+         r013_ := substr(nbs_r013_, 5, 1);
+      else
+         nbs_ := substr(k.nbs, 1, 3) || '9';
+         r013_ := k.r013; 
+         
+         nbs_r013_ := nbs_ || r013_;
+      end if;      
 
       -- тимчасово, поки НБУ не зніме контроль на 3590
       if nbs_ = '3590' and k.nbs not in ('3510', '3511', '3519') then
@@ -3659,12 +3571,13 @@ BEGIN
       if k.szq <> 0 then
           if TP_SND then
              -- прострочені відсотки
-             if k.tip in ('SK9','SP ','SPN','XPN','OFR','KSP','KK9','KPN', 'SNA') then
+             if k.tip in ('SK9','SP ','SPN','XPN','OFR','KSP','KK9','KPN', 'SNA') or
+                sakt_ = 0
+             then
                 s240_ := 'Z';
              end if;
 
              if sakt_ = 0 then
-                s240_ := 'Z';
                 comm_ := SUBSTR (k.tobo || ' резерв під погашені відсотки (залишок = 0) ', 1, 200);
              else
                 comm_ := SUBSTR (k.tobo || ' резерв під  '||(case when k.tip in ('SPN', 'XPN') then 'прострочені ' else '' end)||'відсотки ', 1, 200);
@@ -3763,8 +3676,8 @@ BEGIN
          end if;
 
          if k.discont_SDF <> 0 then
-             kodp_ := '2'||substr(k.nls,1,3)||'6'||'6'||r013_||substr(kodp_,8);
-             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
+             kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3)||'6'||'6'||r013_||substr(kodp_,8);
+             znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
 
              comm_ := SUBSTR(' дисконт SDF c2', 1,100);
 
@@ -3781,7 +3694,7 @@ BEGIN
 
          -- нарах. відсотки (тип рахунку SNA)
          if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
-             kodp_ := '2' || nbs_ || r011_ || r013_ || substr(kodp_,8);
+             kodp_ := '2' || nbs_ || r011_ || (case when TP_SND then '3' else '4' end) || substr(kodp_,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
              
              comm_ := SUBSTR(' нарах. відсотки SNA c2', 1,100);
@@ -3823,8 +3736,8 @@ BEGIN
          end if;
 
          if k.discont_SDF <> 0 then
-            kodp_ := '2'||substr(k.nls,1,3)||'6'||'6'||(case when TP_SND then k.r013 else '4' end)||s181_||'Z'||k.rez||s190_||k.r030;
-            znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
+            kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3)||'6'||'6'||(case when TP_SND then k.r013 else '4' end)||s181_||'Z'||k.rez||s190_||k.r030;
+            znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c2', 1,100);
 
@@ -3841,7 +3754,7 @@ BEGIN
          
          -- нарах. в_дсотки (тип рахунку SNA)
          if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
-            kodp_ := '2'||nbs_||r011_||(case when TP_SND then k.r013 else '4' end)||s181_||'Z'||k.rez||s190_||k.r030;
+            kodp_ := '2'||nbs_||r011_||(case when TP_SND then '3' else '4' end)||s181_||'Z'||k.rez||s190_||k.r030;
             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
              
             comm_ := SUBSTR(' нарах. відсотки SNA for rez=0 c2', 1,100);
@@ -4809,3 +4722,12 @@ BEGIN
    logger.info ('P_FA7_NN: END ');
 END;
 /
+
+CREATE OR REPLACE PUBLIC SYNONYM P_FA7_NN FOR BARS.P_FA7_NN;
+
+
+GRANT EXECUTE ON BARS.P_FA7_NN TO BARS_ACCESS_DEFROLE;
+
+GRANT EXECUTE ON BARS.P_FA7_NN TO RPBN002;
+
+GRANT EXECUTE ON BARS.P_FA7_NN TO WR_ALL_RIGHTS;

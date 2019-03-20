@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.005   27/02/2019 (26/02/2019)
+% VERSION : v.19.007  18/03/2019 ( 07/03/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -1304,7 +1304,7 @@ BEGIN
                       (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
                        mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
                         )
-            where szq <> 0 or discont <> 0 or prem <> 0
+            where szq <> 0 or discont <> 0 or prem <> 0 or proc_SNA <> 0 and tip = 'SNA'
             order by acc, rnum)
    loop
       IF typ_ > 0 THEN
@@ -1319,7 +1319,7 @@ BEGIN
 
       -- новая функция для определения кода R013=1 до 30-и дней, 2 - более 30
       r013_30 := f_ret_type_r013 (dat_, k.nbs, k.r013 );
-
+      
       if k.accr = k.accr_30 or r013_30 = 1
       then
          nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
@@ -1466,11 +1466,11 @@ BEGIN
           end if;
 
           if k.discont_SDF <> 0 then
-               r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
-               r011_ := substr(k.kodp,6,1);
+             r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
+             r011_ := substr(k.kodp,6,1);
 
-              kodp_ := '2'||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
-             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
+             kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
+             znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
 
              comm_ := SUBSTR(' дисконт SDF c1', 1,100);
 
@@ -1507,8 +1507,8 @@ BEGIN
             r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
             r011_ := substr(k.kodp,6,1);
 
-            kodp_ := '2'||substr(k.nls,1,3)||'6'||r011_||r013_||substr(k.kodp,8);
-            znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
+            kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
+            znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c1', 1,100);
 
@@ -1560,7 +1560,7 @@ BEGIN
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                              t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr,
-                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF, t.pv proc_SNA
+                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF, t.pv proc_SNA, t.sz
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
                        where t.dat = datr_
@@ -1591,7 +1591,7 @@ BEGIN
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                              t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr_30 accr,
-                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF, t.pv proc_SNA
+                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF, t.pv proc_SNA, t.sz
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
                        where t.dat = datr_
@@ -1615,7 +1615,8 @@ BEGIN
                               or
                                 mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
                         )
-            where szq <> 0 or discont <> 0 or prem <> 0
+                where sz <> 0 and szq <> 0 or 
+                      sz = 0 and (discont <> 0 or prem <> 0 or proc_SNA <> 0 and tip = 'SNA')
             order by acc )
    loop
       IF typ_ > 0 THEN
@@ -1651,11 +1652,18 @@ BEGIN
 
       srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
       srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
+      
+      if k.accr is not null then
+          nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
 
-      nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
-
-      nbs_ := substr(nbs_r013_, 1, 4);
-      r013_ := substr(nbs_r013_, 5, 1);
+          nbs_ := substr(nbs_r013_, 1, 4);
+          r013_ := substr(nbs_r013_, 5, 1);
+      else
+          nbs_ := substr(k.nbs, 1, 3) || '9';
+          r013_ := k.r013; 
+          
+          nbs_r013_ := nbs_ || r013_;
+      end if;
 
       select nvl(min(s245), '1')
       into s245_
@@ -1828,8 +1836,8 @@ BEGIN
           end if;
 
           if k.discont_SDF <> 0 then
-             kodp_ := '2'||substr(k.nls,1,3)||'6'||'6'||r013_||substr(kodp_,8);
-             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
+             kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3)||'6'||'6'||r013_||substr(kodp_,8);
+             znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
 
              comm_ := SUBSTR(' дисконт SDF c2', 1,100);
 
@@ -1846,7 +1854,7 @@ BEGIN
 
           -- нарах. в_дсотки (тип рахунку SNA)
           if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
-             kodp_ := '2'||nbs_||r011_||r013_||substr(kodp_,8);
+             kodp_ := '2'||nbs_||r011_||(case when TP_SND then '3' else '4' end)||substr(kodp_,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
              
              comm_ := SUBSTR(' нарах. в_дсотки SNA c2', 1,100);
@@ -1864,8 +1872,9 @@ BEGIN
           end if;
       else
          if k.discont_SDF <> 0 then
-            kodp_ := '2'||substr(k.nls,1,3)||'6'||'6'||(case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
-            znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
+            kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3)||'6'||'6'||
+                     (case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
+            znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c2', 1,100);
 
@@ -1882,7 +1891,7 @@ BEGIN
 
          -- нарах. в_дсотки (тип рахунку SNA)
          if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
-            kodp_ := '2'||nbs_||r011_||(case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
+            kodp_ := '2'||nbs_||r011_||(case when TP_SND then '3' else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
              
             comm_ := SUBSTR(' нарах. в_дсотки SNA for rez=0 c2', 1,100);
@@ -2013,30 +2022,31 @@ BEGIN
    -- вир_внювання з А7 по рахунках резерву на декадну дату
    if dat_ = dat_end_ then
         -- по резервах
-       merge into rnbu_trace a
-       using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
-              from (
-                select acc_id acc, s245, nbs, ost
-                from nbur_tmp_a7_s245
-                where report_date = dat_ and
-                      nbs like '___9') a
-                    join
-                (select acc, substr(kodp, 16, 1) s245,
-                        substr(kodp, 2, 4) nbs, sum(znap) ost
-                from rnbu_trace
-                where kodp like '____9%'
-                group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
-                on (a.acc = b.acc and
-                    a.s245 = b.s245 and
-                    a.nbs=b.nbs)
-                where nvl(a.ost,0)<>nvl(b.ost,0)
-                order by nvl(a.nbs, b.nbs)) b
-       on (a.acc = b.acc and
-           a.kodp like '_'||b.nbs||'__________'||b.s245||'%')
-       WHEN MATCHED THEN
-            update set a.znap = a.znap + b.rizn,
-                   comm = comm || ' *=' || to_char(b.rizn)
-       WHERE b.acc is not null;
+       for k in (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
+                 from (
+                    select acc_id acc, s245, nbs, ost
+                    from nbur_tmp_a7_s245
+                    where report_date = dat_ and
+                          nbs like '___9') a
+                        join
+                    (select acc, substr(kodp, 16, 1) s245,
+                            substr(kodp, 2, 4) nbs, sum(znap) ost
+                    from rnbu_trace
+                    where kodp like '____9%'
+                    group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
+                    on (a.acc = b.acc and
+                        a.s245 = b.s245 and
+                        a.nbs = b.nbs)
+                    where nvl(a.ost,0)<>nvl(b.ost,0)
+                    order by nvl(a.nbs, b.nbs))
+       loop
+           update rnbu_trace 
+           set znap = znap + k.rizn,
+               comm = comm || ' *=' || to_char(k.rizn)
+           where acc = k.acc and 
+                 kodp like '_'||k.nbs||'__________'||k.s245||'%' and
+                 rownum = 1;
+       end loop;
 
        -- по дсиконтах
        merge into rnbu_trace a
@@ -2063,7 +2073,7 @@ BEGIN
        where b.acc is not null;
    end if;
 
-------------------------------------------------
+------------------------------------------------------
    declare
       recid_    number;
       granica_  number := 1000;
@@ -2607,3 +2617,5 @@ BEGIN
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
+
+CREATE OR REPLACE PUBLIC SYNONYM P_FC5 FOR BARS.P_FC5;

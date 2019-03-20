@@ -1,4 +1,4 @@
-/* Formatted on 27/06/2018 20:36:57 (QP5 v5.227.12220.39724) */
+PROMPT View V_TMP_REZ_RISK_C5;
 CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5
 (
    DAT,
@@ -24,7 +24,7 @@ CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5
    ACCR_30,
    DAT_MI,
    ZPR,
-   PV, 
+   PV,
    NBS
 )
 AS
@@ -54,14 +54,20 @@ AS
             dat_mi,
             SUM (
                (CASE
-                   WHEN nbs NOT LIKE '204%' THEN 0
+                   WHEN nbs NOT LIKE '204%' AND nbs NOT LIKE '239%' THEN 0
                    ELSE NVL (zpr, 0) * 100
                 END))
                zpr,
-            SUM ( NVL (pv, 0) * 100 ) pv,
+            SUM (NVL (pv, 0) * 100) pv,
             nbs
        FROM nbu23_rez a
-      WHERE rez <> 0 OR diskont <> 0
+      WHERE    rez <> 0
+            OR diskont <> 0
+            OR tip = 'SNA' AND pv <> 0
+            OR     rez = 0
+               AND diskont = 0
+               AND tip = 'SS'
+               AND sdate > ADD_MONTHS (fdat, -1) + 1
    GROUP BY fdat,
             acc,
             nls,
@@ -74,6 +80,8 @@ AS
             dat_mi;
 
 
+Prompt Privs on VIEW V_TMP_REZ_RISK_C5 TO BARSREADER_ROLE to BARSREADER_ROLE;
 GRANT SELECT ON BARS.V_TMP_REZ_RISK_C5 TO BARSREADER_ROLE;
 
+Prompt Privs on VIEW V_TMP_REZ_RISK_C5 TO UPLD to UPLD;
 GRANT SELECT ON BARS.V_TMP_REZ_RISK_C5 TO UPLD;
