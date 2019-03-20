@@ -2,7 +2,7 @@
 var showHide = {};
 var intervalObj = {};
 var SbonFlag = '1';
-var tellerStatusText = { 0: 'Зачекайте, виконується операція', 1: 'Будь ласка, заберіть гроші', 2: 'Будь ласка, заберіть не прийняті гроші' };
+var tellerStatusText = { 0: 'Зачекайте, виконується операція', 1: 'Будь ласка, заберіть видані кошти', 2: 'Будь ласка, заберіть повернуті кошти' };
 var onConfirmClickSwitchValue = 0;
 var colorGray = 'atm-color-gray', colorBlue = 'atm-color-blue', colorGreen = 'atm-color-green', colorRed = 'atm-color-red';
 var OK = 0, ERROR = 1;
@@ -51,7 +51,8 @@ function GetStatus() {
                 $('#text-oper').text(tellerStatusText[result.status.TellerStatusCode]);
         },
         error: function (result) {
-            intervalObj.Stop();
+            if (intervalObj.isRuning())
+                intervalObj.Stop();
         }
     });
 }
@@ -472,10 +473,18 @@ function CancelOperation() {
 
 /// Проведение отмены операции
 function BeginCancelOperation() {
+    intervalObj.Run(GetStatus, 500);
     showHide.showPreloaderItems_HideConfirm();
     var ref = GetRef();
+    //Implement({
+    //    url: '/barsroot/api/teller/teller/atmrequest',
+    //    data: { Ref: ref, SbonFlag: 0, Method: 'CancelAtmWindowOperation' },
+    //    error: DefaultError,
+    //    success: BeginCancelOperationOnSuccess
+    //});
+
     Implement({
-        url: '/barsroot/api/teller/teller/atmrequest',
+        url: '/barsroot/teller/tellerATM/CancelATMWindowOperation',
         data: { Ref: ref, SbonFlag: 0, Method: 'CancelAtmWindowOperation' },
         error: DefaultError,
         success: BeginCancelOperationOnSuccess
@@ -484,9 +493,9 @@ function BeginCancelOperation() {
 
 /// Функция для обраь=ботки результете проведения отмены операции
 function BeginCancelOperationOnSuccess(result) {
-    var prevStatus = $('#atm-window-status').val();
+    //var prevStatus = $('#atm-window-status').val();
     showHide.hidePreloaderItems();
-    if (result.Status) {
+    if (result.statusCode) {
         $('#atm-p-err-text').html(result.Message);
         if (result.Status === "Done") {
             $('#atm-window-container').empty();
@@ -511,6 +520,8 @@ function BeginCancelOperationOnSuccess(result) {
     showHide.showHideElements(['#atm-confirm'], 'block');
     if (result.StatusText)
         $('#atm-info').html(result.StatusText);
+    if (intervalObj.isRuning())
+        intervalObj.Stop();
 }
 
 /// Подтверждение закрытия окна

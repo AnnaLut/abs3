@@ -72,6 +72,34 @@ namespace BarsWeb.Areas.Teller.Controllers
             }
         }
 
+        /// <summary>
+        /// Виконання операцій з вікном теллера
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult CancelATMWindowOperation(ATMModel data)
+        {
+            TellerWindowStatusModel model = _repo.ExecuteGetStatus(data);
+            model = InitializeStatusModel(model, data);
+            return Json(new { statusCode = System.Net.HttpStatusCode.OK, model });
+        }
+
+        /// <summary>
+        /// Отримання статусу після проведення операції
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private TellerWindowStatusModel InitializeStatusModel(TellerWindowStatusModel model, ATMModel data)
+        {
+            data.RJ = true;
+            data.Method = "getwindowstatus";
+            TellerWindowStatusModel tmpModel = _repo.ExecuteGetStatus(data);
+            model.Status = tmpModel.Status;
+            return model;
+        }
+
         private JsonResult OnExceptionJsonResult(String exceptionMessage)
         {
             return Json(new { statusCode = System.Net.HttpStatusCode.InternalServerError, p_errtxt = exceptionMessage });
