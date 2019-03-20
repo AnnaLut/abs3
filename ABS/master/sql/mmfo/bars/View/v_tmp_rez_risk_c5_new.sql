@@ -1,4 +1,3 @@
-/* Formatted on 27/06/2018 20:39:22 (QP5 v5.227.12220.39724) */
 CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5_NEW
 (
    DAT,
@@ -54,7 +53,7 @@ AS
             dat_mi,
             SUM (
                (CASE
-                   WHEN nbs NOT LIKE '204%' THEN 0
+                   WHEN nbs NOT LIKE '204%' and nbs NOT LIKE '239%' THEN 0
                    ELSE NVL (zpr, 0) * 100
                 END))
                zpr,
@@ -67,6 +66,7 @@ AS
                AND diskont = 0
                AND tip = 'SS'
                AND sdate > ADD_MONTHS (fdat, -1) + 1
+             or tip = 'SNA' and pv <> 0
    GROUP BY fdat,
             acc,
             nls,
