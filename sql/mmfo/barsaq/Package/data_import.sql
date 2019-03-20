@@ -5,7 +5,7 @@
 CREATE OR REPLACE PACKAGE BARSAQ.data_import is
 
   -- global consts
-  G_HEADER_VERSION constant varchar2(64)  := 'version 1.32 15/07/2015';
+  G_HEADER_VERSION constant varchar2(64)  := 'version 1.42 20/03/2019';
 
   G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := ''
 	||'KF - схема с полем ''kf''' || chr(10)
@@ -229,8 +229,8 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure sync_account_stmt2(
     p_acc       in number default null,
     p_startdate in date default trunc(sysdate-1));
-    
-    
+
+
   ----
   -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
   -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -526,7 +526,7 @@ end data_import;
 CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
 
   -- global consts
-  G_BODY_VERSION constant varchar2(64)  := 'version 1.98 07/06/2018';
+  G_BODY_VERSION constant varchar2(64)  := 'version 2.05 20/03/2019';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
     ||'KF - схема с полем ''kf''' || chr(10)
@@ -2063,7 +2063,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_turnovers2;
-  
+
    ----
   -- sync_acc_turnovers2_kf - синхронизиреут историю остатков и оборотов в АБС для передачи в систему
   --
@@ -2684,7 +2684,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_transactions2;
-  
+
   ----
   -- sync_acc_transactions2_kf - синхронизиреут проводки в АБС для передачи в систему
   --
@@ -4029,7 +4029,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_ACC_TRANSACTIONS, JOB_STATUS_FAILED, l_acc_msg, SQLCODE, get_error_msg());
     --
   end sync_account_stmt2;
-  
+
   ----
   -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
   -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -4097,8 +4097,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         replace_tags(l_local_tag, l_remote_tag);
         --
         -- инстанцируем таблицы схемы BARSAQ базы АБС БАРС в базе IBANK
-        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_ACC_TURNOVERS, g_global_name, l_scn);
-        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_ACC_TRANSACTIONS, g_global_name, l_scn);
+       /* rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_ACC_TURNOVERS, g_global_name, l_scn);
+        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_ACC_TRANSACTIONS, g_global_name, l_scn);*/
         --
         -- устанавливаем(передвигаем) точку синхронизации для удаленных таблиц на текущий момент
         -- чтобы потоки на IBANK не применяли лишних данных
@@ -4170,7 +4170,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             dbms_apply_adm.set_table_instantiation_scn(SRCTAB_OPLDOK, g_global_name, l_scn);
         end if;*/
         --
-        restore_tags(l_local_tag, l_remote_tag);
+       -- restore_tags(l_local_tag, l_remote_tag);
         --
         bars.bars_audit.info('Виконано синхронізацію виписок починаючи з дати '
             ||to_char(p_startdate,'DD.MM.YYYY')||' '||l_acc_msg);
@@ -4183,7 +4183,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_tx := false;
         end if;*/
         --
-        restore_tags(l_local_tag, l_remote_tag);
+      --  restore_tags(l_local_tag, l_remote_tag);
         --
         raise_application_error(-20000, get_error_msg());
     end;
