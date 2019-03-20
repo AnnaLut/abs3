@@ -13,7 +13,7 @@
   ---------------------------------------------------------------------
 
   g_header_version   constant varchar2(64) := 'version 1.03 18/03/2014';
-  g_transfer_timeout number := 180;
+  g_transfer_timeout number := 1800;
 
   ----
   -- ¬озвращает версию заголовка пакета
