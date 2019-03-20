@@ -1,7 +1,7 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/ddraps.sql =========*** Run *** 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/ddraps.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PROCEDURE BARS.DDRAPS 
@@ -620,9 +620,6 @@ BEGIN
     loop
       bars_audit.trace( $$PLSQL_UNIT||': ВП '||v(idx).nls3800||', DK='||v(idx).DK||', S='||v(idx).s );
       GL.REF( l_ref );
-      GL.PAYV( 1, l_ref, dat_, 'PVP', v(idx).dk
-           , 980, TRIM(SUBSTR(v(idx).nls3801,1,14)), v(idx).s
-           , 980, TRIM(SUBSTR(v(idx).nls6204,1,14)), v(idx).s );
       -- заполнение коллекции для oper;
       p_oper_tab_add(idx);
       -- заполнение коллекции для SNAP_BALANCES_INTR_TBL
@@ -632,7 +629,14 @@ BEGIN
     end loop;
 
     p_oper_tab_insert;
-    -- cleanup collection after insert
+    -- оплата
+    for iop in 1..oper_tab.count
+     loop
+          GL.PAYV( 1, oper_tab(iop).ref, dat_, 'PVP', oper_tab(iop).dk
+                  , 980, oper_tab(iop).nlsa, oper_tab(iop).s
+                  , 980, oper_tab(iop).nlsb, oper_tab(iop).s );
+      end loop;
+    -- cleanup collection after insert into oper and GL.PAYV
     oper_tab.delete;
 
     -- merge SNAP_BALANCES_INTR_TBL
