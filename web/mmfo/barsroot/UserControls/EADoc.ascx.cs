@@ -809,6 +809,8 @@ namespace Bars.UserControls
                 EadPack ep = new EadPack(new BbConnection());
                 _dbLogger.Info("FrxDocLocal:  TemplateID = " + TemplateID, "deposit");
 
+                _dbLogger.Info("Сканування на сторінці:" + HttpContext.Current.Request.Url.AbsoluteUri);
+
                 if (EAStructID.HasValue)
                     this._DocID = ep.DOC_CREATE("DOC", TemplateID, null, EAStructID, RNK, AgrID,null);
 
