@@ -236,7 +236,7 @@ FUNCTION body_version   RETURN VARCHAR2; -- body_version   - возвращает версию т
 
 END Z23;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
+CREATE OR REPLACE PACKAGE BODY Z23 IS
 
   G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 24.3 05-03-2019'; 
 
@@ -244,7 +244,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 121) 20-02-2019(24.3) - (COBUMMFO-10053) - сума лізингу в справедливу вартість LIZSUM - 
 120) 10-02-2019(24.2) - (COBUMMFO-10322) - Дата формування архіву по фін. та хоз. дебіторці 
 119) 18-01-2019(24.1) - (COBUMMFO-10630) - Распределение ('SDI','SDA','SDM','SDF','SNA','SRR')     
-118) 23-10-2018(24.0) - (COBUMMFO-7488)  - Добавлены процедура и функция 
+118) 23-10-2018(24.0) - (COBUMMFO-7488) - Добавлены процедура и функция
                          procedure Set_OK_18   ( p_Dat01 date, p_KF varchar2, p_NPP int ); 
                          function  Get_REZ_LOG ( p_KF char, p_dat date, p_txt varchar2) return varchar2 ;  
 117) 24-09-2018(23.9) - Перестраивать архив пока не выгрузят T0
@@ -5917,7 +5917,7 @@ BEGIN
  -------------------------------
  delete from NBU23_REZ where id like 'CACP%' and fdat = dat01_;
  -- пересчитать переоценку в связи с изменением невизнанних доходів
- -- update cp_pereoc_v set fl_alg23=fl_alg23 where fl_alg23<>0;
+-- update cp_pereoc_v set fl_alg23=fl_alg23 where fl_alg23<>0;
 
 /*
  -- Новая переоценка пока не стоит

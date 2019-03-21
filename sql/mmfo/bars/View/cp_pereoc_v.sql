@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view CP_PEREOC_V ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.CP_PEREOC_V ("SOS", "ND", "DATD", "SUMB", "DAZS", "DATP_A", "FL_REPO", "TIP", "REF", "ID", "NAME", "CP_ID", "MDATE", "CENA", "IR", "ERAT", "RYN", "VIDD", "KV", "KOL", "KOL_CP", "N", "N1", "D", "D1", "P", "P1", "R", "R1", "R2", "S", "BAL_VAR", "UNREC1", "R21", "R31", "EXPR1", "EXPN1", "KOLK", "BAL_VAR1", "NKD1", "RATE_B", "K20", "K21", "K22", "OSTR", "OSTR_F", "OSTAF", "OSTS_P", "EMI", "DOX", "RNK", "PF", "PFNAME", "DAT_ZV", "DAPP", "DATP", "QUOT_SIGN", "FL_ALG", "DATREZ23", "REZ23", "PEREOC23", "FL_ALG23", "OPCION", "NLS", "S2", "S2_P") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.CP_PEREOC_V ("SOS", "ND", "DATD", "SUMB", "DAZS", "DATP_A", "FL_REPO", "TIP", "REF", "ID", "NAME", "CP_ID", "MDATE", "CENA", "IR", "ERAT", "RYN", "VIDD", "KV", "KOL", "KOL_CP", "N", "N1", "D", "D1", "P", "P1", "R", "R1", "R2", "S", "BAL_VAR", "UNREC1", "R21", "R31", "EXPR1", "EXPN1", "KOLK", "BAL_VAR1", "NKD1", "RATE_B", "K20", "K21", "K22", "OSTR", "OSTR_F", "OSTAF", "OSTS_P", "EMI", "DOX", "RNK", "PF", "PFNAME", "DAT_ZV", "DAPP", "DATP", "QUOT_SIGN", "FL_ALG", "DATREZ23", "OPCION", "NLS", "S2", "S2_P", "OSTSDM") AS 
 SELECT SOS,
           ND,
           DATD,
@@ -42,9 +42,9 @@ SELECT SOS,
           CASE
              WHEN kv = 980
              THEN
-                (N + D + P + (R + UNREC) + R2 + R3 + expR + expN + S) * (-1)
+                (N + D + P + (R + UNREC) + R2 + R3 + expR + expN + ostsdm + S) * (-1)
              ELSE
-                (N + D + P + (R + UNREC) + R2 + R3 + expR + expN) * (-1)
+                (N + D + P + (R + UNREC) + R2 + R3 + expR + expN + ostsdm) * (-1)
           END
              bal_var,
           UNREC1,
@@ -57,11 +57,11 @@ SELECT SOS,
              WHEN kv = 980
              THEN
                 ABS (
-                   (N + D + P + (R + UNREC) + R2 + R3 + expR + expN + s)
+                   (N + D + P + (R + UNREC) + R2 + R3 + expR + expN + ostsdm + s)
                    / (N / CENA))
              ELSE
                 ABS (
-                   (N + D + P + (R + UNREC) + R2 + R3 + expR + expN)
+                   (N + D + P + (R + UNREC) + R2 + R3 + expR + expN + ostsdm)
                    / (N / CENA))
           END,6)
              bal_var1,
@@ -86,6 +86,7 @@ SELECT SOS,
                           + R3
                           + expR
                           + expN
+                          + ostsdm   
                           + (CASE WHEN kv = 980 THEN S ELSE 0 END))
                          / ABS (NVL (N / CENA, 1)),
                          2))),
@@ -100,6 +101,7 @@ SELECT SOS,
                          + R3
                          + expR
                          + expN
+                         + ostsdm
                          + (CASE WHEN kv = 980 THEN S ELSE 0 END))
                         / ABS (NVL (N / CENA, 1)),
                         2)),
@@ -117,6 +119,7 @@ SELECT SOS,
                        + R3
                        + expR
                        + expN
+                       + ostsdm
                        + (CASE WHEN kv = 980 THEN S ELSE 0 END))
                       / ABS (NVL (N / CENA, 1))))
                 * kol1,
@@ -130,6 +133,7 @@ SELECT SOS,
                        + R3
                        + expR
                        + expN
+                       + ostsdm
                        + (CASE WHEN kv = 980 THEN S ELSE 0 END))
                       / ABS (NVL (N / CENA, 1))))
                 * kol1,
@@ -150,27 +154,12 @@ SELECT SOS,
           quot_sign,
           fl_alg,
           ROUND (gl.bd, 'MM') DATREZ23,
-          REZ23,
-          f_cp_pereoc23 (p_fl_alg23   => fl_alg23,
-                         p_rez23      => t.rez23,
-                         p_n1         => N1,
-                         p_d1         => D1,
-                         p_p1         => p1,
-                         p_r1         => r1,
-                         p_unrec1     => unrec1,
-                         p_r21        => r21,
-                         p_r31        => r31,
-                         p_expr1      => expr1,
-                         p_expn1      => expn1,
-                         p_cena       => cena,
-                         p_kolk       => kolk)
-             PEREOC23,
-          fl_alg23,
 --          round(DECODE (fl_alg, 3, (rate_b - abs(s2))*kol1, 0),6) OPCION,--переоцінку будемо робити не нарізницю, а з розформуванням попередньої
           round(DECODE (fl_alg, 3, rate_b*kol1, 0),6) OPCION,   
           NLS,
           S2,
-          S2_P
+          S2_P,
+	  ostsdm
      FROM (SELECT o.sos,
                   o.nd,
                   o.datd,
@@ -286,11 +275,10 @@ SELECT SOS,
                   o.datp,
                   NVL (c.quot_sign, 0) quot_sign,
                   NVL (c.fl_alg, 0) FL_ALG,
-                  f_cp_pereoc (e.REF, ROUND (gl.bd, 'MM'), 1) FL_ALG23,
-                  f_cp_pereoc (e.REF, ROUND (gl.bd, 'MM'), 2) REZ23,
                   a.nls,
                   NVL (s2.ostc, 0) / 100 S2,
-                  NVL (s2.ostb, 0) / 100 S2_P
+                  NVL (s2.ostb, 0) / 100 S2_P,
+                 (select NVL ( SUM (fost (cp_acc, gl.bd)), 0) / 100  from cp_accounts where cp_acctype = 'SDM' and cp_ref = e.ref ) ostsdm
              FROM cp_kod k,
                   cp_deal e,
                   accounts a,
