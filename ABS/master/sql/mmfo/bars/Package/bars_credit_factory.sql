@@ -218,13 +218,15 @@ FUNCTION get_crd_response_new (p_okpo     IN bars.customer.okpo%TYPE,
           WHERE c.rnk = p.rnk
             and c.date_off is null
             and c.okpo = p_okpo
+            and c.k050 != '910'
             and p.numdoc = p_numdoc
             and p.passp =  v_doctype
             and trunc(p.bday) = TO_DATE (p_bday, g_date_format);
       EXCEPTION
          WHEN NO_DATA_FOUND THEN
            RETURN '<Client>No list</Client>';
-      END;
+         when TOO_MANY_ROWS then
+           RETURN '<Client>для МФО '||gl.aMFO||' є декілька записів по вказаним параметрам пошуку. Необхідно виконати об"єднання клієнтів!</Client>';
 
       select xmlelement("Client",
                xmlelement("FIO",c.nmk),
