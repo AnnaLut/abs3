@@ -13,10 +13,13 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6IX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 6IX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.005  15.02.2019
+ VERSION     :    v.18.007  15.03.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+15.03.2019      COBUMMFO-11153 Якщо для A6I014 S031=90, для A6I015, A6I015 проставимо S031=90
+			       Якщо для A6I014 S031=90, по цьому K020, Q003_2 не має бути показників A6I014 з S031='#'
+12.03.2019	COBUMMFO-9739 Виправлено помилку (у додаванні показників 'A6I014', 'A6I015', 'A6I016' не враховувалася версія файлу)
 15.02.2019	COBUMMFO-9739 додаємо "нульові" (T070=0) показники 'A6I014', 'A6I015', 'A6I016',
                               якщо відсутнє забезпечення (в розрізі кожного Q003_2)
 11.02.2019	COBUMMFO-9739 додаємо "нульовий"(T070=0) показник A6I014, якщо відсутнє забезпечення (немає в #D8 seg_01 = 081,084,083)
@@ -157,6 +160,25 @@ begin
             and v.seg_01 in (121,126,131,123,127,134,132,122,124,125,118,119,133,081,084,083)
        );
 
+  --Видаляємо "зайві" показники A6I014. Якщо для A6I014 S031=90, по цьому K020, Q003_2 не має бути показників A6I014 з S031='#'
+  delete 
+    from NBUR_log_f6ix v1
+   where report_date = p_report_date
+     and kf = p_kod_filii
+     and version_id = l_version_id
+     and EKP = 'A6I014'
+     and S031 = '#'
+     and exists (select 1 
+                   from NBUR_log_f6ix v2
+                  where v2.report_date = p_report_date
+                    and v2.kf = p_kod_filii
+                    and v2.version_id = l_version_id
+                    and v2.EKP = 'A6I014'
+                    and v2.S031 = '90'
+                    and v1.Q003_2 = v2.Q003_2
+                    and v1.k020 = v2.k020
+                );
+
   -- додаємо "нульові" (T070=0) показники 'A6I014', 'A6I015', 'A6I016', якщо відсутнє забезпечення (немає в #D8 seg_01 in 081,084,083)
   declare
     type t_ekp_mass is varray(3) of varchar(6);
@@ -174,6 +196,9 @@ begin
                                                 where n1.K020=n2.K020 
                                                   and n2.EKP = ekp_mass(indx)
                                                   and n2.Q003_2 = n1.Q003_2
+                                                  and n2.report_date = p_report_date
+                                                  and n2.kf = p_kod_filii
+                                                  and n2.version_id = n1.version_id
                                                )
                             )
                    loop
@@ -191,6 +216,35 @@ begin
                           end;
                    end loop;
      end loop;
+  end;
+
+
+--зробимо заміну. Якщо для A6I014 S031=90, для A6I015, A6I015 проставимо S031=90
+  declare 
+    type k020_t is table of Nbur_Log_F6ix.K020%TYPE;
+    type Q003_2_t is table of Nbur_Log_F6ix.Q003_2%TYPE;
+    k020 k020_t;
+    Q003_2 Q003_2_t;
+  begin
+        select distinct K020, Q003_2 
+               bulk collect into K020, Q003_2
+         from Nbur_Log_F6ix n1
+        where report_date = p_report_date
+          and kf = p_kod_filii
+          and version_id = l_version_id
+          and EKP = 'A6I014'
+          and S031 = '90';
+    
+      forall indx in K020.first..K020.last
+          update Nbur_Log_F6ix
+             set S031 = '90'
+           where report_date = p_report_date
+             and kf = p_kod_filii
+             and version_id = l_version_id
+             and K020 = K020(indx)
+             and Q003_2 = Q003_2(indx)
+             and EKP IN ('A6I015', 'A6I016');
+           
   end;
 
   commit;
