@@ -2254,7 +2254,7 @@ is
             -- сума відсотків розраховується в валюті основного рахунку, її необхідно привести до валюти рахунку відсотків
             -- (вона може відрізнятися від валюти основного рахунку, наприклад валюта угоди - золото (959), а рахунок відсотків в доларах США (840))
             -- також, оригінальна сума розрахованих відсотків конвертується в валюту рахунку доходів/витрат в другій частині проводки
-            if (l_int_accn_row.id = interest_utl.INTEREST_KIND_FEES and l_int_accn_row.metr > 90) then
+            if (l_int_accn_row.id = interest_utl.INTEREST_KIND_FEES and l_int_accn_row.metr > 90 and l_interest_account_row.kv = l_income_account_row.kv) then
                 l_interest_amount := abs(p_int_reckoning_row.interest_amount);
                 l_income_amount := abs(p_int_reckoning_row.interest_amount);
             else
