@@ -341,7 +341,7 @@ function initReceivedDocsGrid() {
                     TotalSum: { type: 'number' },
                     OperationType: { type: 'number' },
                     RegionId: { type: 'number' },
-                    Ref: { type: 'number' },
+                    Ref: { type: 'string' },
                     RefSago: { type: 'number' },
                     RequestId: { type: 'number' },
                     Id: { type: 'number' },
