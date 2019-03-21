@@ -29,7 +29,7 @@ for i in  (select b.id,b.kf,a.reporting_date,a.data_type_id
 ------------------------
         execute immediate 'truncate table rez_cr_601';
         insert into rez_cr_601
-        select n.okpo,n.rnk,n.nd,n.kv,(n.s+com.s1) as ss ,n.kf
+        select n.okpo,n.rnk,n.nd,n.kv,(n.s+nvl(com.s1,0)) as ss,n.kf
                from (select cust.okpo,c.rnk,c.nd,c.kv, abs(sum(bv)) * 100 as s,c.kf 
                               from bars.rez_cr c
                               left join --загальна сума (ліміт кредитної лінії)
@@ -50,7 +50,8 @@ for i in  (select b.id,b.kf,a.reporting_date,a.data_type_id
                                     and coalesce(sumzagalcred.sum_zagal,sumzagal_over.sum_zagal, sumzagal_bpk.sum_zagal)>=5000000 
                               group by cust.okpo,c.rnk,c.nd,c.kv,c.kf
                     )n
-                 left join (select (c1.bv*100) as s1,n.nd from nd_acc n, accounts a, rez_cr c1 where n.acc=a.acc and a.nbs=3578 and a.acc=c1.acc and c1.fdat=trunc(sysdate,'mm')) com on com.nd=n.nd;
+                  left join (select sum(c1.bv)*100 as s1,n.nd from nd_acc n, accounts a, rez_cr c1 where n.acc=a.acc and a.nbs=3578 and a.acc=c1.acc and c1.fdat=trunc(sysdate,'mm')
+                                                              group by n.nd) com on com.nd=n.nd;
 
         commit;
 ------------------------
