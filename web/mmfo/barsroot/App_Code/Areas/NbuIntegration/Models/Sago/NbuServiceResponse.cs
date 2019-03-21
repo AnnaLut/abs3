@@ -36,7 +36,7 @@ namespace Areas.NbuIntegration.Models
         /// <summary>
         /// REF_OUR
         /// </summary>
-        public decimal? Ref { get; set; }
+        public string Ref { get; set; }
         /// <summary>
         /// ACT_DATE
         /// </summary>
