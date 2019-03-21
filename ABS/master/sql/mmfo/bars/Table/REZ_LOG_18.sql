@@ -1,5 +1,5 @@
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========= Scripts /Sql/BARS/Table/REZ_LOG_18.sql ========*** Run *** ======
+PROMPT *** Run *** ========= Scripts /Sql/BARS/Table/REZ_LOG_18.sql ========*** Run *** ====
 PROMPT ===================================================================================== 
 
 exec bars.bpa.alter_policy_info( 'REZ_LOG_18', 'WHOLE' , null, null, null, null ); 

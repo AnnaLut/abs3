@@ -51,7 +51,7 @@ BEGIN
                    p_quot_sign,
                    p_fl_alg);
    END IF;
-
+/*”—“¿–≤ÀŒ
    IF    p_rez23 != cp_dealset.rez23
       OR p_fl_alg23 IS NOT NULL
       OR p_pereoc23 IS NOT NULL
@@ -74,6 +74,7 @@ BEGIN
                    p_fl_alg23);
       END IF;
    END IF;
+*/
 END;
 /
 show err;
