@@ -14112,8 +14112,17 @@ is
                                       p_amount + p_commiss);
 
       -- конечная дата предыдущего начисления
-      l_accturn(i).intdat1 := l_accturn(i).prevdat;
+      
+      l_accturn(i).intdat1 := case when l_accturn(i).prevdat = l_accturn(i).currdat then  --COBUMMFO-10082 *
+                               l_accturn(i).prevdat - 1 
+                              else
+                               l_accturn(i).prevdat
+                              end;
+      -- * COBUMMFO-10082 
+      -- при пролонгации депозита с капитализацией и зачислении средств на след.день после начисления процентов
+      -- этот день не учитывается входящий остаток при начислении %%, поэтому делаем -1 день
 
+                             
       -- конечная дата текущего начисления по ставке част.снятия ( max() = текущая - 1)
       l_accturn(i).intdat2 := case
                                 when l_accturn(i).currdat < p_date then
