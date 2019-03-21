@@ -818,8 +818,8 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             
             List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
                 if (isDtl)
-                    return GetOracleConnector.ReadDataLazy(query.SqlText, listParams.ToArray());
-            using (OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection)
+                    return GetOracleConnector.ReadDataLazy(query.SqlText, query.SqlParams);
+                using (OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = connection.CreateCommand())
             {
                 cmd.Parameters.AddRange(query.SqlParams);
