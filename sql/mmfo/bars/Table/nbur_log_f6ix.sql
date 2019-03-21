@@ -4,10 +4,12 @@ PROMPT *** Run *** ======= Scripts /Sql/BARS/Table/nbur_log_f6Ix.sql ======= ***
 PROMPT ===================================================================================== 
 
 SET FEEDBACK     OFF
+-- 15.03.2019 Змінено права на таблицю. Було BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F6IX', 'FILIAL',  'M', NULL,  'E',  'E' )
+--					Стало BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F6IX', 'FILIAL',  'M', NULL,  NULL,  NULL )
 
 begin
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F6IX', 'WHOLE' , NULL, NULL, NULL, NULL );
-  BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F6IX', 'FILIAL',  'M', NULL,  'E',  'E' );
+  BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F6IX', 'FILIAL',  'M', NULL,  NULL,  NULL );
 end;
 /
 
