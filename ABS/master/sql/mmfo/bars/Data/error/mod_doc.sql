@@ -1,9 +1,3 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Err/mod_DOC.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create/replace ERR модуль DOC ***
 declare
   l_mod  varchar2(3) := 'DOC';
   l_rus  varchar2(3) := 'RUS';
@@ -81,8 +75,8 @@ begin
     bars_error.add_message(l_mod, 20, l_exc, l_rus, 'Модификация реквизита NAZN (Назначение платежа) запрещена системой. Документ подписан.', '', 1, 'GUARD_NAZN');
     bars_error.add_message(l_mod, 20, l_exc, l_ukr, 'Модифікацію реквізиту NAZN (Призначення платежу) заборонено системою. Документ підписано.', '', 1, 'GUARD_NAZN');
 
-    bars_error.add_message(l_mod, 21, l_exc, l_rus, 'ФИНАНСОВЫЙ МОНИТОРИНГ: оплата документа $(REF) приостановлена!', '', 1, 'FM_STOPVISA');
-    bars_error.add_message(l_mod, 21, l_exc, l_ukr, 'ФІНАНСОВИЙ МОНІТОРИНГ: оплата документа $(REF) припинена!', '', 1, 'FM_STOPVISA');
+    bars_error.add_message(l_mod, 21, l_exc, l_rus, 'ФИНАНСОВЫЙ МОНИТОРИНГ: оплата документа %s) приостановлена!', '', 1, 'FM_STOPVISA');
+    bars_error.add_message(l_mod, 21, l_exc, l_ukr, 'ФІНАНСОВИЙ МОНІТОРИНГ: оплата документа %s припинена!', '', 1, 'FM_STOPVISA');
 
     bars_error.add_message(l_mod, 22, l_exc, l_rus, 'EVAL_OP_FIELD: Доп. реквизит %s в операции %s отсутствует!', '', 1, 'OP_RULES_NOT_FOUND');
     bars_error.add_message(l_mod, 22, l_exc, l_ukr, 'EVAL_OP_FIELD: Дод. реквізит %s в операції %s відсутній!', '', 1, 'OP_RULES_NOT_FOUND');
@@ -219,7 +213,41 @@ begin
     bars_error.add_message(l_mod, 61, l_exc, l_rus, 'Документ EXT_REF=%s, REF=%s не сплачено по факту', '', 1, 'FAILED_TO_PAY_BY_FACT');
     bars_error.add_message(l_mod, 61, l_exc, l_ukr, 'Документ EXT_REF=%s, REF=%s не оплатено по факту', '', 1, 'FAILED_TO_PAY_BY_FACT');
 
+    bars_error.add_message(l_mod, 63, l_exc, l_rus, 'Документ REF=%s вже було сторновано', '', 1, 'HAS_BEEN_BACKED_YET');
+    bars_error.add_message(l_mod, 63, l_exc, l_ukr, 'Документ REF=%s вже було сторновано', '', 1, 'HAS_BEEN_BACKED_YET');
 
+    bars_error.add_message(l_mod, 64, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати у закритій банківській даті %s', '', 1, 'BAK_IN_CLOSED_DAY');
+    bars_error.add_message(l_mod, 64, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати у закритій банківській даті %s', '', 1, 'BAK_IN_CLOSED_DAY');
+
+    bars_error.add_message(l_mod, 65, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати у минулій банківській даті %s', '', 1, 'BAK_IN_PAST');
+    bars_error.add_message(l_mod, 65, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати у минулій банківській даті %s', '', 1, 'BAK_IN_PAST');
+
+    bars_error.add_message(l_mod, 66, l_exc, l_rus, 'Документ СЕП/ВПС REF=%s не можливо сторнувати, відправлено у файлі %s', '', 1, 'BAK_SEP_IN_FILE');
+    bars_error.add_message(l_mod, 66, l_exc, l_ukr, 'Документ СЕП/ВПС REF=%s не можливо сторнувати, відправлено у файлі %s', '', 1, 'BAK_SEP_IN_FILE');
+
+    bars_error.add_message(l_mod, 67, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, знаходиться в системі нерухомих платежів', '', 1, 'BAK_IMMOBILE_DOC');
+    bars_error.add_message(l_mod, 67, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, знаходиться в системі нерухомих платежів', '', 1, 'BAK_IMMOBILE_DOC');
+
+    bars_error.add_message(l_mod, 68, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, було відправлено до процесінгу у файлі %s', '', 1, 'BAK_PC_DOC');
+    bars_error.add_message(l_mod, 68, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, було відправлено до процесінгу у файлі %s', '', 1, 'BAK_PC_DOC');
+
+    bars_error.add_message(l_mod, 69, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, було відправлено до депозитарію НБУ у файлі %s', '', 1, 'BAK_NBU_DCP_DOC');
+    bars_error.add_message(l_mod, 69, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, було відправлено до депозитарію НБУ у файлі %s', '', 1, 'BAK_NBU_DCP_DOC');
+
+    bars_error.add_message(l_mod, 70, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, документ є дочірнім до доек-ту реф = %s', '', 1, 'BAK_CHILD_DOC');
+    bars_error.add_message(l_mod, 70, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, документ є дочірнім до доек-ту реф = %s', '', 1, 'BAK_CHILD_DOC');
+
+    bars_error.add_message(l_mod, 71, l_exc, l_rus, 'Документ ЦП REF=%s не можливо сторнувати, помилка виконання деактивації пакету %s', '', 1, 'BAK_CPDEACTIVATE_ERROR');
+    bars_error.add_message(l_mod, 71, l_exc, l_ukr, 'Документ ЦП REF=%s не можливо сторнувати, помилка виконання деактивації пакету = %s', '', 1, 'BAK_CPDEACTIVATE_ERROR');
+
+    bars_error.add_message(l_mod, 72, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, помилка виконання відкату інформації по нарахованих відсотках: %s', '', 1, 'BAK_INTRECONINGS_ERROR');
+    bars_error.add_message(l_mod, 72, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, помилка виконання відкату інформації по нарахованих відсотках: %s', '', 1, 'BAK_INTRECONINGS_ERROR');
+
+    bars_error.add_message(l_mod, 73, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, помилка виконання відкату інформації по нарахованих відсотках: %s', '', 1, 'BAK_ACRDOCS_ERROR');
+    bars_error.add_message(l_mod, 73, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, помилка виконання відкату інформації по нарахованих відсотках: %s', '', 1, 'BAK_ACRDOCS_ERROR');
+
+    bars_error.add_message(l_mod, 74, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, перевірте налаштування операції BAK (флаг 38 повинен стояти в занчення 0)', '', 1, 'BAK_CAN_MAKE_REDSALDO');
+    bars_error.add_message(l_mod, 74, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, перевірте налаштування операції BAK (флаг 38 повинен стояти в занчення 0)', '', 1, 'BAK_CAN_MAKE_REDSALDO');
 
   commit;
 end;
