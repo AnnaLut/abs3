@@ -4,75 +4,23 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_back_dok.sql =========*** Run **
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PROCEDURE BARS.P_BACK_DOK (
-    Ref_        IN  Number,
-    Lev_        IN  Number default 3,
-    ReasonId_   IN  Number,
-    Par2_       OUT Number,
-    Par3_       OUT Varchar2,
-    FullBack_       Number default 1)
---** Режимы: ************************************************************************
---*  PRAVEX   - для ПРАВЭКСа      (с проверкой на oper.otm и acc_doc_queue)
---*  KAZ      - для Казначейства  (без проверки на связанный документ)
---*  PET      - для Петрокоммерца (с проверкой на допустимость выполнения сторно)
---*  MVO      - для МВО-НБУ       (с восстановлением буфера проводок в САБО)
---*  SBER     - для Сбербанка (пишем ref_back)
---*  DCP      - запрет сторно документов ДЦП, отправленных в файле A
---*  ALK      - удаление из очереди ANELIK_OUT_QUEUE
---*  ACR_DAT  - сторно документов по начислению процентов
---*  STO      - сторно документов модуля "Регулярные платежи"
---*  CCK      - Обработка сторно "Погаш кредитов". Кредиты ЮЛ+ФЛ (для всех КБ)
---*  NRV      - Снятие оборотов по эквиваленту по непереоцениваемым счетам
---*  DPT      - восстановление инф-ции при сторнировании операции по взысканию штрафа
---*  ORD      - Сторно отдельным мемордером BAK
---*  FUL      - Разрешить полный БЕК
---*  BPK      - для Сбербанка - запрет сторно документов БПК, отправленных в ПЦ
---*  LOM      - для ММФО НБУ (по скупке)
---*  RU_IMM   - для нерухомих(Ощадбанк)
---*  NER      - для нерухомих(Ощадбанк) ЦБД
---*  FM       - с проверкой блокированных по ФМ документов
---*  BRANCH   - сторно по бранчу (пока для НБУ)
---** Банки: *************************************************************************
---*  СЭБ      - ALK+DCP
---*  УПБ      - DCP+CCK+NRV+FUL+DPT+ACR_DAT
---*  ОБ ГОУ   - SBER+DCP+CCK+NRV+FUL+BPK+FM
---*  ОБ РУ    - SBER+ACR_DAT+CCK+NRV+DPT+ORD+BPK+RU_IMM+FM
---*  ОБ ЦРНВ  - SBER+ACR_DAT+CCK+NRV+DPT+ORD+BPK+NER+FM
---*  Столица  - DCP+CCK+NRV+FUL
---*  Демарк   - DCP+CCK+FUL
---*  Петроком - PET+DCP+CCK+FUL
---*  НБУ      - DCP+FUL+BRANCH
---*  ПРАВЕКС  - PRAVEX+ACR_DAT+DPT+FUL
---*  НБУ-МВО  - MVO+ACR_DAT+STO+FUL
---*  Надра    - SBER+ACR_DAT+CCK+NRV+DPT+FUL
---*  НБУ ММФО - CCK+DCP+ACR_DAT+NRV+DPT+ORD+LOM+FUL+BRANCH
---***********************************************************************************
-IS
--- ************************************************************************* --
---                (C) BARS. Back Document
---                Version 2.38 15/05/2015
---                  (ErrCode 9250-9255)
--- ************************************************************************* --
--- CCK - Обработка сторно "Погаш кредитов". Кредиты ЮЛ+ФЛ (для всех КБ)
--- DCP - запрет сторно документов ДЦП, отправленных в файле A
--- BPK - для Сбербанка - запрет сторно документов БПК, отправленных в ПЦ
--- ACR_DAT - сторно документов по начислению процентов
--- NRV - Снятие оборотов по эквиваленту по непереоцениваемым счетам
--- DPT - восстановление инф-ции при сторнировании операции по взысканию штрафа
--- ORD - Сторно отдельным мемордером
--- SBER - для Сбербанка (пишем ref_back)
--- RU_IMM - для нерухомих(Ощадбанк)
--- FM - с проверкой блокированных по ФМ документов
--- ************************************************************************* --
-
-  err        EXCEPTION;
-  erm        VARCHAR2(30);
-  par1       VARCHAR2(2000);
+  create or replace procedure bars.p_back_dok (
+    ref_          in  number,
+    lev_          in  number default 3,
+    reasonid_     in  number,
+    par2_         out number,
+    par3_         out varchar2,
+    fullback_         number default 1) 
+is
+   -----------------------------------
+   -- Version 2.4 21/03/2019
+   -----------------------------------
 
   Rec_       number;
   l_sos      number;
   l_tt       varchar2(3);
   l_vdat     date;
+  l_fdat     date;
   l_otm      varchar2(1);
   l_stat     number;
   FN_B_      varchar2(12);
@@ -94,223 +42,206 @@ IS
   tt_        varchar2(3);
   i          number;
   l_count_ref number;
-  l_sql      varchar2(512);
-  l_name     varchar2(50);
+  l_fcode    varchar2(100); 
+  l_trace    varchar2(1000):= $$plsql_unit ||': ';
 
 BEGIN
+   
+   bars_audit.info(l_trace||'Старт сторно документа реф='||Ref_||', уровень='||Lev_||', причина='||ReasonId_||', fullback='||FullBack_||', par2='||Par2_||', par3='||Par3_);
+ 
+  begin
+     -- флаг операции, которая позволяет красное сальдо
+     
+     select value into l_fcode from tts_flags where tt = 'BAK' and fcode = 38;
+     
+     --select '-'||value||'-' from tts_flags where tt = 'BAK' and fcode = 38;
+     
+     if l_fcode = '1' then
+        bars_error.raise_nerror('DOC', 'BAK_CAN_MAKE_REDSALDO', Ref_);
+     end if;   
+   exception when no_data_found then null;
+   end;
+   
+   begin
+     select ref, sos, tt, vdat, refl
+       into rec_, l_sos, l_tt, l_vdat, refl_nos_
+       from oper where ref = ref_;
+	   
+   exception when no_data_found then
+      bars_error.raise_nerror('DOC', 'REF_NOT_FOUND', Ref_ );
+   end;
 
-  BEGIN
-     SELECT ref, sos, tt, vdat, refl
-       INTO Rec_, l_sos, l_tt, l_vdat, Refl_NOS_
-       FROM oper WHERE ref=Ref_
-       ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN
-     -- '9251 - Документ не найден: REF=#'||Ref_ ;
-     erm := 'REF_NOT_FOUND';
-     par1 := to_char(Ref_);
-     raise err;
-  END;
+   
+   -- Проверка повторной операции СТОРНО реф № ref_
+   begin
+      select count(*) into x from opldok where ref = ref_ and tt = 'BAK';
+      if x > 0 or l_sos < 0 or l_tt = 'BAK' then
+         bars_error.raise_nerror('DOC', 'HAS_BEEN_BACKED_YET', Ref_ );
+      end if;
+   enD;
 
-  NosTt_ := GetGlobalOption('NOSTT');
 
-  BEGIN
-     SELECT count(*) INTO x FROM opldok WHERE ref=ref_ AND tt='BAK';
-     IF x > 0 OR l_sos < 0 OR l_tt = 'BAK' THEN
-        -- Попытка повторной операции СТОРНО реф № ref_
-        erm := 'BACK_BACK';
-        par1 := TO_CHAR(ref_);
-        RAISE err;
-     END IF;
-  END;
+   -- Нельзя сторнировать документ в закрытом банковском дне
+   IF l_sos = 5 THEN
+      -- пользователь работает в текущем банковском дне
+      if bankdate() = bankdate_g() then
+         -- проверка на закрытый банковский день
+         IF nvl(branch_attribute_utl.get_value('/','RRPDAY') ,0) = 0 THEN
+            bars_error.raise_nerror('DOC', 'BAK_IN_CLOSED_DAY', Ref_, to_char(bankdate(), 'dd/mm/yyyy') );
+         END IF;
 
-  -- Нельзя сторнировать документ в закрытом банковском дне
-  IF l_sos = 5 THEN
-
-     -- пользователь работает в текущем банковском дне
-     IF Bankdate() = Bankdate_g() THEN
-
+      -- пользователь работает в прошлом банковском дне
+      else
         -- проверка на закрытый банковский день
-        IF nvl(GetGlobalOption('RRPDAY'),0) = 0 THEN
-           -- '9250 - День закрыт! Невозможно выполнить операцию!';
-           erm := 'DAY_IS_CLOSED';
-           raise err;
-        END IF;
-
-     -- пользователь работает в прошлом банковском дне
-     ELSE
-
-        -- проверка на закрытый банковский день
-        SELECT nvl(max(nvl(stat,0)),9) INTO l_stat FROM fdat WHERE fdat=Bankdate();
+        select nvl(max(nvl(stat,0)),9) into l_stat from fdat where fdat = bankdate();
         IF l_stat = 9 THEN
-           -- '9250 - День закрыт! Невозможно выполнить операцию!';
-           erm := 'DAY_IS_CLOSED';
-           raise err;
+           bars_error.raise_nerror('DOC', 'BAK_IN_CLOSED_DAY', Ref_,to_char(bankdate(), 'dd/mm/yyyy') );
         END IF;
 
         -- нельзя сторнировать оплаченный документ прошлой датой
         if Bankdate() < l_vdat then
-           -- Невозможно сторнировать документ прошлой банковской датой
-           erm := 'PAST_DAY';
-           raise err;
+           bars_error.raise_nerror('DOC', 'BAK_IN_PAST', Ref_, to_char(bankdate(), 'dd/mm/yyyy') );
         end if;
-        select count(*) into i from opldok where ref = Ref_ and fdat > gl.bd;
+
+		
+        select count(*), max(fdat) 
+		  into i, l_fdat 
+		  from opldok where ref = Ref_ and fdat > gl.bd;
         if i > 0 then
            -- Невозможно сторнировать документ прошлой банковской датой
-           erm := 'PAST_DAY';
-           raise err;
+           bars_error.raise_nerror('DOC', 'BAK_IN_PAST', Ref_, to_char(l_fdat, 'dd/mm/yyyy') );
         end if;
+      end if;
+   end if;
 
-     END IF;
 
-  END IF;
-  p_fm_intdoccheck(ref_);
-  -- проверка на блокированный по ФМ документ
-  if l_sos < 5 then
-     begin
-        select otm into i from fm_ref_que where ref = ref_;
-     exception when no_data_found then i := 0;
-     end;
-     if i > 0 then
-        -- ФИНАНСОВЫЙ МОНИТОРИНГ: оплата документа Ref_ приостановлена!;
-        bars_error.raise_nerror('DOC', 'FM_STOPVISA', '$REF', to_char(ref_));
-        raise err;
-     end if;
-  end if;
+    -- проверка на блокированный по ФМ документ
+    p_fm_intdoccheck(ref_);
 
-  IF FullBack_ = 1 THEN
-     FOR c IN (SELECT distinct fdat FROM opldok WHERE ref=Ref_ AND sos=5)
-     LOOP
-        SELECT nvl(max(nvl(stat,0)),9) INTO l_stat FROM fdat WHERE fdat=c.fdat;
-        IF l_stat = 9 THEN
-           -- '9253 - Документ за закрытую банковскую дату: DAT=#'||c.fdat ;
-           erm := 'DOC_CLOSED_DAY';
-           par1 := to_char(c.fdat, 'dd/MM/yyyy');
-           raise err;
-        END IF;
-     END LOOP;
-  END IF;
-
-  -- переписано с учетом БИСов
-  Rec_  := null;
-  FN_B_ := '';
-  FOR c IN ( SELECT a.rec, a.fn_b
-               FROM arc_rrp a, ( SELECT ref FROM oper
-                                  START WITH ref=Ref_ CONNECT BY PRIOR refl=ref) o
-              WHERE a.ref=o.ref
-                FOR UPDATE OF a.BLK NOWAIT )
-  LOOP
-     Rec_  := c.rec;
-     FN_B_ := c.fn_b;
-     IF FN_B_ is null THEN
-        UPDATE arc_rrp SET blk=-1 WHERE rec=Rec_ and fn_b is null;
-        DELETE FROM rec_que WHERE rec=Rec_;
-     ELSE
-        -- '9252 -  Нельзя ИЗЪЯТЬ документ: отправлен из банка в файле #' || FN_B_ ;
-        erm := 'BACK_FNB';
-        par1 := FN_B_;
-        raise err;
-     END IF;
-  END LOOP;
-    --Нерухомі
-  begin
-   select count(*) into l_count_ref from asvo_immobile where refout=Ref_;
-     if (l_count_ref>0) then
-        erm := 'BACK_IMM';
-        par1 := to_char(Ref_);
-        raise err;
-     end if;
-    end;
-  BEGIN
-     SELECT fna INTO FN_B_ FROM dcp_p WHERE ref=Ref_ ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN
-     FN_B_ := '' ;
-  END;
-  IF FN_B_ IS NOT NULL THEN
-     -- '9252 -  Нельзя ИЗЪЯТЬ документ: отправлен из банка в файле #' || FN_B_ ;
-     erm := 'BACK_FNB';
-     par1 := FN_B_;
-     raise err;
-  END IF;
-
-  -- БПК: операция для ПЦ
-  -- старый процессинг
-  begin
-    select f_n into l_pkk_fn from pkk_que where ref = Ref_ and sos = 1;
-    if l_pkk_fn is not null then
-       -- '9252 -  Нельзя ИЗЪЯТЬ документ: отправлен из банка в файле #' || l_pkk_fn ;
-       erm := 'BACK_FNB';
-       par1 := l_pkk_fn;
-       raise err;
+    if l_sos < 5 then
+       begin
+          select otm into i from fm_ref_que where ref = ref_;
+       exception when no_data_found then i := 0;
+       end;
+       if i > 0 then
+          bars_error.raise_nerror('DOC', 'FM_STOPVISA',  to_char(ref_));
+       end if;
     end if;
-  exception when no_data_found then null;
-  end;
-  -- новый процессинг Way4
-  begin
-    select f_n into l_pkk_fn from ow_pkk_que where ref = Ref_ and sos = 1;
-    if l_pkk_fn is not null then
-       -- '9252 -  Нельзя ИЗЪЯТЬ документ: отправлен из банка в файле #' || l_pkk_fn ;
-       erm := 'BACK_FNB';
-       par1 := l_pkk_fn;
-       raise err;
+
+    -- непонятный повторяющийся код
+    if fullback_ = 1 then
+       for c in (select distinct fdat from opldok where ref=ref_ and sos=5)
+       loop
+          select nvl(max(nvl(stat,0)),9) into l_stat from fdat where fdat=c.fdat;
+          if l_stat = 9 then
+             bars_error.raise_nerror('DOC', 'BAK_IN_CLOSED_DAY', Ref_,to_char(c.fdat, 'dd/mm/yyyy') );             
+          end if;
+       end loop;
     end if;
-  exception when no_data_found then null;
-  end;
 
-
-  -- восстановление инф-ции при сторнировании операции по взысканию штрафа
-  DPT.revoke_penalty(ref_, l_tt);
-
-  BEGIN
-     SELECT ref INTO nRef_ FROM oper WHERE refl=Ref_ AND refl is not null;
-  EXCEPTION WHEN NO_DATA_FOUND THEN
-     nRef_ := null;
-  END;
-  IF nRef_ IS NOT NULL AND l_tt <> NosTt_ THEN
-     -- '9254 -  Нельзя ИЗЪЯТЬ дочерний документ REF=#'||Ref_ ;
-     erm := 'BACK_REFL';
-     par1 := to_char(Ref_);
-     raise err;
-  END IF;
-
-  BEGIN
-     SELECT reason INTO Reason_ FROM bp_reason WHERE id=ReasonId_;
-  EXCEPTION WHEN NO_DATA_FOUND THEN
-     Reason_ := 'Сторно документа';
-  END;
-  UPDATE operw SET value=Reason_ WHERE ref=Ref_ AND tag='BACKR';
-  IF SQL%ROWCOUNT=0 THEN
-     INSERT INTO operw(ref, tag, value)
-     VALUES (Ref_, 'BACKR', Reason_);
-  END IF;
-
- -- Повернення статусу пакета ЦП
-  l_name:='CP_DEACTIVE';
-  begin
-    for r in (select object_name from sys.all_objects  where owner='BARS' and object_name = l_name)
+    
+	-- Нельзя сторнировать СЕП/ВПС документ, если он уже отобран в файл.
+    rec_  := null;
+    fn_b_ := '';
+    for c in ( select a.rec, a.fn_b
+               from arc_rrp a, ( select ref from oper
+                                  start with ref = ref_ connect by prior refl=ref) o
+              where a.ref=o.ref
+                for update of a.blk, a.fn_b nowait )
     loop
-    l_sql:='begin BARS.'||l_name||'(:ref,:tt); end;';
-      begin
-      EXECUTE IMMEDIATE l_sql USING ref_,l_tt;
-      --logger.info('P_BACK_DOK '||l_name||' executed ref='||ref_);
-      exception when others then NULL;
-      logger.info('P_BACK_DOK '||l_name||' not exists or ???');
-      END;
+       rec_  := c.rec;
+       fn_b_ := c.fn_b;
+       if fn_b_ is null then
+          update arc_rrp set blk=-1 where rec=rec_ and fn_b is null;
+          delete from rec_que where rec=rec_;
+       else
+          bars_error.raise_nerror('DOC', 'BAK_SEP_IN_FILE', Ref_, fn_b_);          
+       end if;
     end loop;
-  end;
 
-  -- вычисляем группу контроля для сторнирования
-  begin
-     select to_number(val) into BackVisa_
-       from params
-      where par='BACKVISA';
-  exception when no_data_found then
-     BackVisa_ := 0;
-  end;
-  chk.PUT_NOS(Ref_,BackVisa_);
 
--- Откат начисленных %%
-  interest_utl.on_interest_document_revert(ref_);
-  begin
+    --Невозможно сторнировать нерухомі
+    begin
+       select count(*) into l_count_ref from asvo_immobile where refout=Ref_;
+       if (l_count_ref > 0) then
+          bars_error.raise_nerror('DOC', 'BAK_IMMOBILE_DOC', Ref_);         
+       end if;
+    end;
+
+	-- невозможно сторнировать документ, который уже ушел в депозитарий НБУ
+	begin
+       select fna into fn_b_ from dcp_p where ref=ref_ ;
+    exception when no_data_found then
+       fn_b_ := '' ;
+    end;
+    if fn_b_ is not null then
+       bars_error.raise_nerror('DOC', 'BAK_NBU_DCP_DOC', Ref_, fn_b_ );             
+    END IF;
+
+    
+    -- новый процессинг Way4
+    begin
+       select f_n into l_pkk_fn from ow_pkk_que where ref = Ref_ and sos = 1;
+       if l_pkk_fn is not null then
+          bars_error.raise_nerror('DOC', 'BAK_PC_DOC', Ref_, l_pkk_fn );          
+       end if;
+    exception when no_data_found then null;
+    end;
+
+
+    -- восстановление инф-ции при сторнировании операции по взысканию штрафа
+    DPT.revoke_penalty(ref_, l_tt);
+
+  
+    -- Проверка на изъятие дочерноего документа
+    begin
+       select ref into nref_ from oper where refl=ref_ and refl is not null;
+    exception when no_data_found then
+       nref_ := null;
+    end;
+    NosTt_ := branch_attribute_utl.get_value('/','NOSTT');
+    if nref_ is not null and l_tt <> nostt_ then
+       bars_error.raise_nerror('DOC', 'BAK_CHILD_DOC', Ref_, nref_ );
+    end if;
+
+
+	begin
+       select reason into reason_ from bp_reason where id=reasonid_;
+    exception when no_data_found then
+       Reason_ := 'Сторно документа';
+    end;
+
+    update operw set value = reason_ where ref = ref_ and tag='BACKR';
+    if sql%rowcount=0 then
+       insert into operw(ref, tag, value) values (Ref_, 'BACKR', Reason_);
+    end if;
+
+    -- Повернення статусу пакета ЦП
+	begin 
+	    bars.cp_deactive(ref_,l_tt); 
+	exception when others then 
+       bars_error.raise_nerror('DOC', 'BAK_CPDEACTIVATE_ERROR', Ref_,  dbms_utility.format_error_stack()||chr(13)||chr(10)||dbms_utility.format_error_backtrace() );       
+	end;   
+
+ 
+
+    -- вычисляем группу контроля для сторнирования
+    BackVisa_ := nvl(to_number(branch_attribute_utl.get_value('/','BACKVISA')),0);
+  
+    chk.PUT_NOS(Ref_,BackVisa_);
+
+
+    -- Откат начисленных %% (int_reconings)
+    begin 
+	   interest_utl.on_interest_document_revert(ref_);
+	exception when others then
+	   bars_error.raise_nerror('DOC', 'BAK_INTRECONINGS_ERROR', Ref_,  dbms_utility.format_error_stack()||chr(13)||chr(10)||dbms_utility.format_error_backtrace());
+	end;
+	
+	   
+    
+	-- Откат начисленных %% (acr_docs)
+	begin
       select acc, id, int_date
         into l_acc, l_id, l_intdate
         from acr_docs
@@ -318,73 +249,72 @@ BEGIN
       begin
          bars.acrn.acr_back(l_acc, l_id, l_intdate);
       exception when others then
-         erm := 'BACK_INT';
-         par1 := to_char(Ref_);
-         bars_audit.info('BCK '||Ref_||' '||chr(13)||chr(10)||dbms_utility.format_error_stack()||chr(13)||chr(10)||dbms_utility.format_error_backtrace());
-         raise err;
+         bars_error.raise_nerror('DOC', 'BAK_ACRDOCS_ERROR', Ref_,  dbms_utility.format_error_stack()||chr(13)||chr(10)||dbms_utility.format_error_backtrace());         
       end;
-      RETURN;
-  exception
-      when NO_DATA_FOUND then null;
-  end;
+      return;
+    exception
+       when no_data_found then null;
+    end;
 
-  -- Сторно операции NOS
-  IF l_tt = NosTt_ THEN
-     -- для плановых операций CVV (CVV-дочерняя, NOS-главная, у NOS refl=Ref_CVV)
-     if Refl_NOS_ is not null then
-        if l_sos <> 5 Then
-           -- у дочернего CVV надо убрать связку, доп. рекв. и вернуть на подбор КС
-           update oper set refl=null where ref=Ref_;
-           update operw set value='0' where tag='NOS_A' and ref=Refl_NOS_;
-           delete from operw where tag='NOS_B' and ref=Refl_NOS_;
-           UPDATE oper SET chk=substr(chk, 1, length(rtrim(chk))-6) WHERE ref=Refl_NOS_;
-           DELETE FROM oper_visa WHERE sqnc = (SELECT max(sqnc) FROM oper_visa WHERE ref=Refl_NOS_);
-        end if;
-     else
-        begin
-           -- для фактич. CVV (CVV-главная, у CVV refl=Ref_NOS_)
-           select ref into Refl_NOS_ from oper where refl=Ref_;
-           update oper set refl=null where ref=Refl_NOS_;
-           update operw set value='0' where tag='NOS_A' and ref=Refl_NOS_;
-           delete from operw where tag='NOS_B' and ref=Refl_NOS_;
-        exception when no_data_found then null;
-        end;
-     end if;
-  END IF;
+    -- Сторно операции NOS
+    if l_tt = nostt_ then
+       -- для плановых операций CVV (CVV-дочерняя, NOS-главная, у NOS refl=Ref_CVV)
+       if Refl_NOS_ is not null then
+          if l_sos <> 5 Then
+             -- у дочернего CVV надо убрать связку, доп. рекв. и вернуть на подбор КС
+             update oper set refl=null where ref=Ref_;
+             update operw set value='0' where tag='NOS_A' and ref=Refl_NOS_;
+             delete from operw where tag='NOS_B' and ref=Refl_NOS_;
+             update oper set chk=substr(chk, 1, length(rtrim(chk))-6) where ref=refl_nos_;
+             delete from oper_visa where sqnc = (select max(sqnc) from oper_visa where ref=refl_nos_);
+           end if;
+       else
+          begin
+             -- для фактич. CVV (CVV-главная, у CVV refl=Ref_NOS_)
+             select ref into Refl_NOS_ from oper where refl=Ref_;
+             update oper set refl=null where ref=Refl_NOS_;
+             update operw set value='0' where tag='NOS_A' and ref=Refl_NOS_;
+             delete from operw where tag='NOS_B' and ref=Refl_NOS_;
+          exception when no_data_found then null;
+          end;
+       end if;
+    end if;
 
-  RefH_  := Ref_;
+    
+	
+	RefH_  := Ref_;
+    
+	-- Выполнение цыкла сторно для докумнета и его связанных
+	loop
+       begin
+          select refl into refl_ from oper where ref = refh_;
+       exception when no_data_found then
+          refl_ := null;
+       end;
 
-  LOOP
-     BEGIN
-        SELECT refl INTO RefL_ FROM oper WHERE ref=RefH_;
-     EXCEPTION WHEN NO_DATA_FOUND THEN
-        RefL_ := null;
-     END;
+       -- Обработка сторно "Погаш кредитов"
+       if lev_>= 5 then
+          p_back_cck(refh_,lev_);  -- уст сч.8999*lim pap=3
+       end if;
 
-     -- Обработка сторно "Погаш кредитов"
-     IF lev_>=5 THEN
-        p_back_CCK(refH_,lev_);  -- уст сч.8999*LIM pap=3
-     END IF;
+       
 
-   -- Конец обработки сторно "Погаш кредитов"
+       -- Снятие оборотов по эквиваленту по непереоцениваемым счетам
+       if lev_ >= 5 then
+          for x in (select a.acc,o.fdat,o.sq from accounts a,opldok o where o.ref=refh_ and a.pos=2 and o.acc=a.acc and o.sos=5)
+          loop
+             update saldob set dos=dos-x.sq,kos=kos-x.sq where acc=x.acc and fdat=x.fdat;
+          end loop;
+       end if;  
 
-     -- Снятие оборотов по эквиваленту по непереоцениваемым счетам
-     IF lev_>=5 THEN
-        FOR x IN (SELECT a.acc,o.fdat,o.sq FROM accounts a,opldok o WHERE o.ref=refH_ AND a.pos=2 AND o.acc=a.acc AND o.sos=5)
-        LOOP
-           UPDATE saldob SET dos=dos-x.sq,kos=kos-x.sq WHERE acc=x.acc AND fdat=x.fdat;
-        END LOOP;
-     END IF;
+       -- выполнение сторно проводки
+	   gl.bck(RefH_, Lev_);
 
 
--- ************************************************************************* --
-     gl.bck(RefH_, Lev_);
--- ************************************************************************* --
+       delete from ref_que where ref=refh_ ;
 
-     DELETE FROM ref_que WHERE ref=RefH_ ;
-
-     BEGIN
-        SELECT count(*) INTO l_sos FROM opldok WHERE ref = refH_ AND tt='BAK';
+       begin
+        select count(*) into l_sos from opldok where ref = refh_ and tt = 'BAK';
 
         IF l_sos > 0 THEN
            -- Окремий сторно ордер
@@ -439,9 +369,6 @@ BEGIN
         n.ref2_state= null
     where n.ref2 = ref_;
 
---EXCEPTION
- -- WHEN err THEN
-   -- bars_error.raise_nerror('DOC', erm, par1);
 END p_back_dok;
 /
  show err;
