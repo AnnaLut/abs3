@@ -249,6 +249,11 @@ begin
     bars_error.add_message(l_mod, 74, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, перевірте налаштування операції BAK (флаг 38 повинен стояти в занчення 0)', '', 1, 'BAK_CAN_MAKE_REDSALDO');
     bars_error.add_message(l_mod, 74, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, перевірте налаштування операції BAK (флаг 38 повинен стояти в занчення 0)', '', 1, 'BAK_CAN_MAKE_REDSALDO');
 
+    bars_error.add_message(l_mod, 75, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, недостатньо коштів на рахунку %s', '', 1, 'BAK_BROKEN_LIMIT');
+    bars_error.add_message(l_mod, 75, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, недостатньо коштів на рахунку %s', '', 1, 'BAK_BROKEN_LIMIT');
+
+
+
   commit;
 end;
 /

@@ -308,7 +308,15 @@ BEGIN
        end if;  
 
        -- выполнение сторно проводки
-	   gl.bck(RefH_, Lev_);
+       begin 
+          gl.bck(RefH_, Lev_);
+       exception when others then 
+          if sqlerrm like '%\9301 - Broken limit on account%' then 
+             bars_error.raise_nerror('DOC', 'BAK_BROKEN_LIMIT', Ref_,  substr(sqlerrm,instr(sqlerrm,'#'), 20) );         
+          else raise;
+          end if;    
+       end;
+
 
 
        delete from ref_que where ref=refh_ ;
