@@ -134,7 +134,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.35 01/03/2019';
+g_body_version constant varchar2(64)  := 'Version 1.36 22/03/2019';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -2435,7 +2435,7 @@ end;
                          coalesce(f.id_dps, c.c_dst) id_dps,
                          coalesce(r.name_sti,to_char(f.id_dps),to_char(c.c_dst)) name_sti,
                          case when f.otype in (1,6) then to_char(f.dat_acc_dpa,'dd.mm.yyyy') 
-                              when f.otype in (3,5) then (select to_char(f0.dat_acc_dpa,'dd.mm.yyyy') -- якщо закриття рахунку то беремо дату взяття на облік по F0
+                              when f.otype in (3,5) then (select to_char(min(f0.dat_acc_dpa),'dd.mm.yyyy') -- якщо закриття рахунку то беремо дату взяття на облік по F0
                                                           from lines_f f0
                                                           where f0.otype in (1,6)
                                                                 and f0.mfo = f.mfo
