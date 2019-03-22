@@ -526,7 +526,7 @@ end data_import;
 CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
 
   -- global consts
-  G_BODY_VERSION constant varchar2(64)  := 'version 2.05 20/03/2019';
+  G_BODY_VERSION constant varchar2(64)  := 'version 2.06 22/03/2019';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
     ||'KF - схема с полем ''kf''' || chr(10)
@@ -6716,7 +6716,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                              and z.id = zt.id
                              and z.kf = p_kf
                              and zt.change_time >= p_startdate
-                         ) as of scn l_scn
+                         ) --as of scn l_scn
                 )
         loop
                 -- блокируем строку в doc_export
