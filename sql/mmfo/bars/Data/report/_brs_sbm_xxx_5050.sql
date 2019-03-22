@@ -46,12 +46,12 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'K-файл (Показники діяльності)';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:okpo=''ЄДРПОУ'',:nbs=''Б/Р(всi-%)'',:kod_analyt=''Код аналітичного обліку(всi-%)'',:SRT=''Сортування(ЕДРПОУ/Код установи)'',:in_trkk=''В розрізі тркк''';
+    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:corporation_id=''№ корпорації'',:okpo=''ЄДРПОУ'',:nbs=''Б/Р(всi-%)'',:kod_analyt=''Код аналітичного обліку(всi-%)'',:SRT=''Сортування(ЕДРПОУ/Код установи)'',:in_trkk=''В розрізі тркк''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5050.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := ':okpo=''%'',:nbs=''%'',:kod_analyt=''%'',:SRT=''ЕДРПОУ'',:in_trkk=''Так''';
-    l_zpr.bind_sql     := '';
+    l_zpr.bind_sql     := ':corporation_id=''V_ROOT_CORPORATION|EXTERNAL_ID|CORPORATION_NAME|ORDER BY ID''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select 1 from dual';
     l_zpr.xsl_data     := '';

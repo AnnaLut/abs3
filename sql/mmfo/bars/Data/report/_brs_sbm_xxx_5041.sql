@@ -46,12 +46,12 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'К-файл (Таблиця 20)';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:corporation_id=''Корпорація(всi-%)'',:nbs=''Б/Р(всi-%)''';
+    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:corporation_id=''Корпорація(ПФУ-%)'',:nbs=''Б/Р(всi-%)''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5041.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := ':corporation_id=''%'',:nbs=''%''';
-    l_zpr.bind_sql     := '';
+    l_zpr.bind_sql     := ':corporation_id=''V_ROOT_CORPORATION|EXTERNAL_ID|CORPORATION_NAME''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select 1 from dual';
     l_zpr.xsl_data     := '';
@@ -129,10 +129,10 @@ commit;
 
 exec umu.add_report2arm(5041,'$RM_WCRC');
 exec umu.add_report2arm(5041,'$RM_CRPC');
+exec umu.add_report2arm(5041,'$RM_DRU1');
 commit;
 
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBM_***_5041.sql =========*** End 
 PROMPT ===================================================================================== 
-

@@ -46,12 +46,12 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'К-файл (Таблиця 18)';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:sFdat2=''''';
+    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:kod_ustan=''Код установи''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5032.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := '';
-    l_zpr.bind_sql     := '';
+    l_zpr.bind_sql     := ':kod_ustan=''V_ORG_CORPORATIONS|EXTERNAL_ID|CORPORATION_NAME|WHERE base_id = 8''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select 1 from dual';
     l_zpr.xsl_data     := '';
@@ -86,7 +86,7 @@ begin
     l_rep.name        :='Empty';
     l_rep.description :='К-файл (Таблиця 18)';
     l_rep.form        :='frm_FastReport';
-    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",FALSE,FALSE';
+    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
@@ -126,6 +126,10 @@ end;
 /                                           
                                             
 commit;                                     
+
+exec umu.add_report2arm(5032,'$RM_CRPC');
+exec umu.add_report2arm(5032,'$RM_WCRC');
+commit;                                
 
 
 

@@ -194,10 +194,10 @@ begin
   end loop;
 
 --опис зв'€зкe м≥ж таблиц€ми  
-bars_metabase.add_extrnval(l_tabid,12,bars_metabase.get_tabid('TYPNLS_CORP'),2,null,null,'select KOD as id, TXT as name from TYPNLS_CORP v where v.CORP_ID = :CORP_KOD');
-bars_metabase.add_extrnval(l_tabid,13,bars_metabase.get_tabid('V_ORG_CORPORATIONS'),3,'ORG',null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :CORP_KOD');
+bars_metabase.add_extrnval(l_tabid,12,null,null,null,null,'select KOD as id, TXT as name from TYPNLS_CORP v where v.CORP_ID = :CORP_KOD');
+bars_metabase.add_extrnval(l_tabid,13,null,null,null,null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :CORP_KOD');
 bars_metabase.add_extrnval(l_tabid,14,bars_metabase.get_tabid('V_ROOT_CORPORATION'),1,'ROOT'); 
-bars_metabase.add_extrnval(l_tabid,15,bars_metabase.get_tabid('V_ORG_CORPORATIONS'),3,'ORG1',null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :ALT_CORP_COD');
+bars_metabase.add_extrnval(l_tabid,15,null,null,null,null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :ALT_CORP_COD');
 
 end;
 /
