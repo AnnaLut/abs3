@@ -139,8 +139,6 @@ COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.NAZN IS 'Призначення платежу';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.TT IS 'Код операции';
 
 
-
-
 PROMPT *** Create  index PK_OB_CORP_DATA_DOC ***
 begin   
  execute immediate '

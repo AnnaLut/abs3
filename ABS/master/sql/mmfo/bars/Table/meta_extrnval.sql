@@ -102,31 +102,6 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint CC_METAEXTRNVAL_SRCTABID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL MODIFY (SRCTABID CONSTRAINT CC_METAEXTRNVAL_SRCTABID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METAEXTRNVAL_SRCCOLID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL MODIFY (SRCCOLID CONSTRAINT CC_METAEXTRNVAL_SRCCOLID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_METAEXTRNVAL_BRANCH_NN ***
 begin   
  execute immediate '

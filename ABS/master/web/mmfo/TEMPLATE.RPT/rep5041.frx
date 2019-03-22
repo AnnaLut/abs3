@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/25/2017 17:03:55" ReportInfo.Modified="11/13/2018 14:09:41" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/25/2017 17:03:55" ReportInfo.Modified="01/08/2019 14:10:52" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,59 +18,50 @@ namespace FastReport
 {
   public class ReportScript
   {
-    private int d_beg = 0;
-    private int d_end = 0; 
-    private float m_zn = 0;
-    private float all_w = 1770;
-    private float st_w = 133;
-    private float c1_mw = 133;
-    private int st_cell = 6;
-    private float c1_w = 0;
-    private float c2_w = 0;
-    private float c3_w = 0;
-    private float c4_w = 0;
-    private float c5_w = 0;
-    private float c6_w = 0;
-    private float left_w = 0; 
-    private float wid = 0;
-
+    private float m_zn = 1175; //ширина гріда даних на день
+    private float all_w = 1770;  //загальна ширина
+    private float st_w = 133; //максимальна ширина колонки гріда даних на день 
+    private float c1_mw = 133; // максимальна ширина першої колонки
+    private int st_cell = 6; //кількість статичних колонок
+    private float c1_w = 95; //Ширина 1 колонки
+    private float c2_w = 76; // Ширина 2 колонки
+    private float c3_w = 189; // Ширина 3 колонки
+    private float c4_w = 67;  // Ширина 4 колонки
+    private float c5_w = 92;  // Ширина 5 колонки
+    private float c6_w = 76;  // Ширина 6 колонки    
+    private float left_w = 0; //ширина яка залишилась на статичні колонки
+    private float wid = 0; //ширина колонки гріда даних на день
+                  
     
-    
-    private void wide()
+    private void wide(TableObject tab)
     {
       int cou = 0;
-      string d_beg_st;
-      string d_end_st;
-      c1_w = 95;
-      c2_w = 76;
-      c3_w = 189;
-      c4_w = 67;
-      c5_w = 92;
-      c6_w = 76;
-      m_zn = all_w - c1_w - c2_w - c3_w - c4_w - c5_w - c6_w;
-      d_beg_st = Report.GetColumnValue(&quot;Table.DT1&quot;).ToString();
-      d_end_st = Report.GetColumnValue(&quot;Table.DT2&quot;).ToString();
-      if ( string.IsNullOrEmpty(d_beg_st))
+      int rc = st_cell;
+      string num_row = String.Empty;
+      string d_beg_st = Report.GetColumnValue(&quot;Table.DT1&quot;).ToString(); //Початкова дата
+      string d_end_st = Report.GetColumnValue(&quot;Table.DT2&quot;).ToString(); //Кінцева дата
+       
+      int d_beg = string.IsNullOrEmpty(d_beg_st) ? 0 : Int32.Parse(d_beg_st.Substring(0,2));  //Початковий день
+      int d_end = string.IsNullOrEmpty(d_end_st) ? 0 : Int32.Parse(d_end_st.Substring(0,2));  //Кінцевий день
+       
+      int m_beg = string.IsNullOrEmpty(d_beg_st) ? 0 : Int32.Parse(d_beg_st.Substring(3,2));  //Початковий місяць
+      int m_end = string.IsNullOrEmpty(d_end_st) ? 0 : Int32.Parse(d_end_st.Substring(3,2));  //Кінцевий місяць
+      
+      int y_beg = string.IsNullOrEmpty(d_beg_st) ? 0 : Int32.Parse(d_beg_st.Substring(6,4));  //Початковий рік
+      int y_end = string.IsNullOrEmpty(d_end_st) ? 0 : Int32.Parse(d_end_st.Substring(6,4));  //Кінцевий рік
+      
+      if (m_beg == m_end)
       {
-        d_beg = 0;
+        for ( int i = d_beg-1; i&lt; d_end; i++)
+        {
+          cou++; //кількість днів
+        } 
+        wid = m_zn/cou;
       }
       else 
       {
-        d_beg = Int32.Parse(d_beg_st.Substring(0,2));  
+        wid = m_zn;
       }
-      if ( string.IsNullOrEmpty(d_end_st))
-      {
-        d_end = 0;
-      }
-      else 
-      {
-        d_end = Int32.Parse(d_end_st.Substring(0,2));  
-      }
-      for ( int i = d_beg-1; i&lt; d_end; i++)
-      {
-        cou++;
-      } 
-      wid = m_zn/cou;
       if (wid&gt;st_w) {
         wid=st_w;  
         left_w = all_w-cou*st_w;
@@ -82,155 +73,84 @@ namespace FastReport
           else {
             c1_w = c1_mw;
           }
+          c2_w = st_w;
           c3_w = st_w;
-          c4_w = st_w;  
+          c4_w = st_w;
+          c5_w = st_w;
+          c6_w = st_w;
         }
         else {
+          c2_w = left_w/2;
           c3_w = left_w/2;
           c4_w = left_w/2;
+          c5_w = left_w/2;
+          c6_w = left_w/2;
         }
-      }  
-    }
-    
-    private void Table1_ManualBuild(object sender, EventArgs e)
-    {
-          
-      int d_beg = 0;
-      int d_end = 0;
-      string d_beg_st;
-      string d_end_st;
-      int rc = st_cell;
-      string temp = &quot;&quot;;
-      wide();
-      TableObject tab  = sender as TableObject;
-      d_beg_st = Report.GetColumnValue(&quot;Table.DT1&quot;).ToString();
-      d_end_st = Report.GetColumnValue(&quot;Table.DT2&quot;).ToString();
-      if ( string.IsNullOrEmpty(d_beg_st))
-      {
-        d_beg = 0;
       }
-      else 
-      {
-        d_beg = Int32.Parse(d_beg_st.Substring(0,2));  
-      }
-      if ( string.IsNullOrEmpty(d_end_st))
-      {
-        d_end = 0;
-      }
-      else 
-      {
-        d_end = Int32.Parse(d_end_st.Substring(0,2));  
-      }
-      tab.PrintRow(0);
+     
       tab.Columns[0].Width = c1_w;
       tab.Columns[1].Width = c2_w;
       tab.Columns[2].Width = c3_w;
       tab.Columns[3].Width = c4_w;
       tab.Columns[4].Width = c5_w;
       tab.Columns[5].Width = c6_w;
-      if (d_beg != 0 || d_end != 0){
-        for ( int i = 0; i&lt; st_cell; i++) 
-        { 
-          tab.PrintColumn(i);
-        } 
-            
-        for ( int i = d_beg-1; i&lt; d_end; i++)
-        { 
-          tab.Columns[i+st_cell].Width = wid;
-          tab.PrintColumn(i+st_cell);
-            
-        }
-        tab.PrintRow(1);
-        if (d_beg != 0 || d_end != 0){
-          for ( int i = 0; i&lt; st_cell; i++) 
-          { 
-            tab.PrintColumn(i);
-          } 
-            
-          for ( int i = d_beg-1; i&lt; d_end; i++)
-          { 
-            rc++;  
-            temp = rc.ToString(); 
-            tab[i+st_cell,1].Text = temp;
-             
-            tab.Columns[i+st_cell].Width = wid;
-            tab.PrintColumn(i+st_cell);
-            
-          }
-        } 
-      }  
-    }
-    
-    private void Table2_ManualBuild(object sender, EventArgs e)
-    {
-          
-      int d_beg = 0;
-      int d_end = 0;
-      string d_beg_st;
-      string d_end_st;
-      string temp = &quot;&quot;;
-      wide();
-      TableObject tab  = sender as TableObject;
-      d_beg_st = Report.GetColumnValue(&quot;Table.DT1&quot;).ToString();
-      d_end_st = Report.GetColumnValue(&quot;Table.DT2&quot;).ToString();
-      Dictionary&lt;decimal, decimal&gt; days = new Dictionary&lt;decimal, decimal&gt;();
-      if ( string.IsNullOrEmpty(d_beg_st))
-      {
-        d_beg = 0;
-      }
-      else 
-      {
-        d_beg = Int32.Parse(d_beg_st.Substring(0,2));  
-      }
-      if ( string.IsNullOrEmpty(d_end_st))
-      {
-        d_end = 0;
-      }
-      else 
-      {
-        d_end = Int32.Parse(d_end_st.Substring(0,2));  
-      }
-      DataSourceBase rowData = Report.GetDataSource(&quot;dat&quot;);
-      rowData.Init();
-      while( rowData.HasMoreRows)
-      {
-        days.Add((decimal)Report.GetColumnValue(&quot;dat.day_n&quot;),(decimal)Report.GetColumnValue(&quot;dat.kilk&quot;));
-        rowData.Next();
-      }
-      tab.PrintRow(0);
-      tab.Columns[0].Width = c1_w;
-      tab.Columns[1].Width = c2_w;
-      tab.Columns[2].Width = c3_w;
-      tab.Columns[3].Width = c4_w;
-      tab.Columns[4].Width = c5_w;
-      tab.Columns[5].Width = c6_w;
-      for ( int i = 0; i&lt; st_cell; i++) 
-      { 
-        tab.PrintColumn(i);
-      }
-      if (d_beg != 0 || d_end != 0){
-        for ( int i = d_end; i&gt;= d_beg; i--){
-          if (days.ContainsKey(i) &amp;&amp; d_beg != 0 &amp;&amp; d_end != 0) {
-            temp = tab[i+st_cell-1,0].Text; 
-          }
-        
-          tab[i+st_cell-1,0].Text = temp;
-        }
       
+      if (d_beg != 0 &amp;&amp; d_end != 0 &amp;&amp; m_beg == m_end &amp;&amp; y_beg == y_end)
+      {
+        for ( int i = st_cell; i &lt; d_beg+st_cell; i++)
+        { 
+          tab.Columns[i].Width = 0;   
+        }           
+       // cou=st_cell;
         for ( int i = d_beg-1; i&lt; d_end; i++)
         { 
+          rc++;
+          num_row = rc.ToString(); 
+          Table1[i+st_cell,1].Text = num_row;
           tab.Columns[i+st_cell].Width = wid;
-          tab.PrintColumn(i+st_cell);
-            
+
+        }       
+        for ( int i = d_end+st_cell; i &lt; tab.ColumnCount; i++)
+        { 
+          tab.Columns[i].Width = 0;            
+        }         
+      }
+      else
+      {
+        for ( int i = st_cell; i &lt; tab.ColumnCount; i++)
+        { 
+          tab.Columns[i].Width = 0;            
         }
       }
-    }      
+    }
+    
+    private void Table1_BeforePrint(object sender, EventArgs e)
+    {
+      TableObject tab  = sender as TableObject;
+      wide(tab);
+    }
+
+    private void Table2_BeforePrint(object sender, EventArgs e)
+    {
+      TableObject tab  = sender as TableObject;
+      wide(tab);
+    }
+    private void Table5_BeforePrint(object sender, EventArgs e)
+    {
+      TableObject tab  = sender as TableObject;
+      wide(tab);
+    } 
+    private void Table6_BeforePrint(object sender, EventArgs e)
+    {
+      TableObject tab  = sender as TableObject;
+      wide(tab);
+    }     
   }
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQErsjkfKiAbBINbOZDcWtxM=">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select case when nbs is not null then '' else corp_name end as corp_name,&#13;&#10;     case when nbs is not null then '' else name end as name, &#13;&#10;     case when nbs is not null then '' else okpo end as okpo,&#13;&#10;     case when nbs is not null then '' else coalesce(namk, 'Разом:') end as namk, &#13;&#10;     case when nbs is null then 'Всього:' else nbs end as nbs,&#13;&#10;round(sum(ost)/count(distinct dd)/100, 2) as sred,&#13;&#10;sum(ost)/100 as ost,&#13;&#10;sum(case when mont = 1 and dd = 1 then ost else 0 end)/100 as d_1,&#13;&#10;sum(case when mont = 1 and dd = 2 then ost else 0 end)/100 as d_2, &#13;&#10;sum(case when mont = 1 and dd = 3 then ost else 0 end)/100 as d_3, &#13;&#10;sum(case when mont = 1 and dd = 4 then ost else 0 end)/100 as d_4, &#13;&#10;sum(case when mont = 1 and dd = 5 then ost else 0 end)/100 as d_5, &#13;&#10;sum(case when mont = 1 and dd = 6 then ost else 0 end)/100 as d_6, &#13;&#10;sum(case when mont = 1 and dd = 7 then ost else 0 end)/100 as d_7, &#13;&#10;sum(case when mont = 1 and dd = 8 then ost else 0 end)/100 as d_8, &#13;&#10;sum(case when mont = 1 and dd = 9 then ost else 0 end)/100 as d_9, &#13;&#10;sum(case when mont = 1 and dd = 10 then ost else 0 end)/100 as d_10, &#13;&#10;sum(case when mont = 1 and dd = 11 then ost else 0 end)/100 as d_11, &#13;&#10;sum(case when mont = 1 and dd = 12 then ost else 0 end)/100 as d_12, &#13;&#10;sum(case when mont = 1 and dd = 13 then ost else 0 end)/100 as d_13, &#13;&#10;sum(case when mont = 1 and dd = 14 then ost else 0 end)/100 as d_14, &#13;&#10;sum(case when mont = 1 and dd = 15 then ost else 0 end)/100 as d_15, &#13;&#10;sum(case when mont = 1 and dd = 16 then ost else 0 end)/100 as d_16, &#13;&#10;sum(case when mont = 1 and dd = 17 then ost else 0 end)/100 as d_17, &#13;&#10;sum(case when mont = 1 and dd = 18 then ost else 0 end)/100 as d_18, &#13;&#10;sum(case when mont = 1 and dd = 19 then ost else 0 end)/100 as d_19, &#13;&#10;sum(case when mont = 1 and dd = 20 then ost else 0 end)/100 as d_20, &#13;&#10;sum(case when mont = 1 and dd = 21 then ost else 0 end)/100 as d_21, &#13;&#10;sum(case when mont = 1 and dd = 22 then ost else 0 end)/100 as d_22, &#13;&#10;sum(case when mont = 1 and dd = 23 then ost else 0 end)/100 as d_23, &#13;&#10;sum(case when mont = 1 and dd = 24 then ost else 0 end)/100 as d_24, &#13;&#10;sum(case when mont = 1 and dd = 25 then ost else 0 end)/100 as d_25, &#13;&#10;sum(case when mont = 1 and dd = 26 then ost else 0 end)/100 as d_26, &#13;&#10;sum(case when mont = 1 and dd = 27 then ost else 0 end)/100 as d_27, &#13;&#10;sum(case when mont = 1 and dd = 28 then ost else 0 end)/100 as d_28, &#13;&#10;sum(case when mont = 1 and dd = 29 then ost else 0 end)/100 as d_29, &#13;&#10;sum(case when mont = 1 and dd = 30 then ost else 0 end)/100 as d_30, &#13;&#10;sum(case when mont = 1 and dd = 31 then ost else 0 end)/100 as d_31,&#13;&#10;to_char(:sFdat1, 'dd.mm.yyyy') as dt1,&#13;&#10;to_char(:sFdat2, 'dd.mm.yyyy') as dt2&#13;&#10;from&#13;&#10;   (select case when :corporation_id='%' then 'Теплоенергетики та Енергогенеруючі компанії' else  r.corporation_name end corp_name,&#13;&#10;      m.name, &#13;&#10;      a.okpo,&#13;&#10;      a.namk, &#13;&#10;      substr (a.nls, 1, 4) nbs,&#13;&#10;      case when trunc(:sFdat1,'MM')=trunc(:sFdat2,'MM') then 1 else 0 end as mont,&#13;&#10;      ostq + obdbq - obkrq as ost,    &#13;&#10;      to_number(to_char(postdat,'DD')) as dd&#13;&#10;from ob_corp_data_acc a&#13;&#10;     join v_ob_corp_rep_nbs q on q.rep_id = 5041 and q.nbs = substr(a.nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;left join clim_mfo m on a.kf = m.mfo&#13;&#10;left join v_root_corporation r on a.corp_id=r.external_id&#13;&#10;   where a.corp_id in (6, 11)&#13;&#10;   and a.is_last = 1&#13;&#10;   and a.fdat between :sFdat1 and :sFdat2&#13;&#10;   and decode(:corporation_id,'%',1,:corporation_id) = decode(:corporation_id,'%',1,to_char(a.corp_id))&#13;&#10;   and instr(decode(:nbs,'%',substr(a.nls, 1, 4),:nbs),substr(a.nls, 1, 4))&gt;0) q&#13;&#10;  group by grouping sets((corp_name, name,okpo, namk, nbs),(corp_name,name,okpo,namk), (nbs), ())&#13;&#10;  order by q.name, q.corp_name, q.okpo ,q.nbs nulls first">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQCJYmh5S4Q+evzoxZ2DQIA8=" CommandTimeout="1000">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="with dates as&#13;&#10;(select holiday as date_f, dat_next_u(holiday, 0) as date_d from holiday where kv = 980&#13;&#10;union all&#13;&#10;select fdat, fdat from fdat)&#13;&#10;select  corp_name,&#13;&#10;      name, &#13;&#10;      okpo,&#13;&#10;      namk, &#13;&#10;      nbs,&#13;&#10;round(sum(ost)/count(distinct dd)/100, 2) as sred,&#13;&#10;sum(ost)/100 as ost,&#13;&#10;sum(case when mont = 1 and dd = 1 then ost else 0 end)/100 as d_1,&#13;&#10;sum(case when mont = 1 and dd = 2 then ost else 0 end)/100 as d_2, &#13;&#10;sum(case when mont = 1 and dd = 3 then ost else 0 end)/100 as d_3, &#13;&#10;sum(case when mont = 1 and dd = 4 then ost else 0 end)/100 as d_4, &#13;&#10;sum(case when mont = 1 and dd = 5 then ost else 0 end)/100 as d_5, &#13;&#10;sum(case when mont = 1 and dd = 6 then ost else 0 end)/100 as d_6, &#13;&#10;sum(case when mont = 1 and dd = 7 then ost else 0 end)/100 as d_7, &#13;&#10;sum(case when mont = 1 and dd = 8 then ost else 0 end)/100 as d_8, &#13;&#10;sum(case when mont = 1 and dd = 9 then ost else 0 end)/100 as d_9, &#13;&#10;sum(case when mont = 1 and dd = 10 then ost else 0 end)/100 as d_10, &#13;&#10;sum(case when mont = 1 and dd = 11 then ost else 0 end)/100 as d_11, &#13;&#10;sum(case when mont = 1 and dd = 12 then ost else 0 end)/100 as d_12, &#13;&#10;sum(case when mont = 1 and dd = 13 then ost else 0 end)/100 as d_13, &#13;&#10;sum(case when mont = 1 and dd = 14 then ost else 0 end)/100 as d_14, &#13;&#10;sum(case when mont = 1 and dd = 15 then ost else 0 end)/100 as d_15, &#13;&#10;sum(case when mont = 1 and dd = 16 then ost else 0 end)/100 as d_16, &#13;&#10;sum(case when mont = 1 and dd = 17 then ost else 0 end)/100 as d_17, &#13;&#10;sum(case when mont = 1 and dd = 18 then ost else 0 end)/100 as d_18, &#13;&#10;sum(case when mont = 1 and dd = 19 then ost else 0 end)/100 as d_19, &#13;&#10;sum(case when mont = 1 and dd = 20 then ost else 0 end)/100 as d_20, &#13;&#10;sum(case when mont = 1 and dd = 21 then ost else 0 end)/100 as d_21, &#13;&#10;sum(case when mont = 1 and dd = 22 then ost else 0 end)/100 as d_22, &#13;&#10;sum(case when mont = 1 and dd = 23 then ost else 0 end)/100 as d_23, &#13;&#10;sum(case when mont = 1 and dd = 24 then ost else 0 end)/100 as d_24, &#13;&#10;sum(case when mont = 1 and dd = 25 then ost else 0 end)/100 as d_25, &#13;&#10;sum(case when mont = 1 and dd = 26 then ost else 0 end)/100 as d_26, &#13;&#10;sum(case when mont = 1 and dd = 27 then ost else 0 end)/100 as d_27, &#13;&#10;sum(case when mont = 1 and dd = 28 then ost else 0 end)/100 as d_28, &#13;&#10;sum(case when mont = 1 and dd = 29 then ost else 0 end)/100 as d_29, &#13;&#10;sum(case when mont = 1 and dd = 30 then ost else 0 end)/100 as d_30, &#13;&#10;sum(case when mont = 1 and dd = 31 then ost else 0 end)/100 as d_31,&#13;&#10;to_char(:sFdat1, 'dd.mm.yyyy') as dt1,&#13;&#10;to_char(:sFdat2, 'dd.mm.yyyy') as dt2&#13;&#10;from&#13;&#10;   (select r.CORPORATION_NAME as corp_name,&#13;&#10;      m.name, &#13;&#10;      a.okpo,&#13;&#10;      a.namk, &#13;&#10;      a.nbs nbs,&#13;&#10;      case when trunc(:sFdat1,'MM')=trunc(:sFdat2,'MM') then 1 else 0 end as mont,&#13;&#10;      ostq + obdbq - obkrq as ost,    &#13;&#10;      to_number(to_char(postdat,'DD')) as dd&#13;&#10;from ob_corp_data_acc a&#13;&#10;     join dates d on d.date_d = a.fdat&#13;&#10;     join v_ob_corp_rep_nbs q on q.rep_id = 5041 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;left join clim_mfo m on a.kf = m.mfo&#13;&#10;left join v_root_corporation r on a.corp_id=r.external_id&#13;&#10;   where a.corp_id = decode(:corporation_id,'%',1,:corporation_id)&#13;&#10;   and a.is_last = 1&#13;&#10;   and a.fdat between :sFdat1 and :sFdat2&#13;&#10;   and decode(:corporation_id,'%',1,:corporation_id) = decode(:corporation_id,'%',1,to_char(a.corp_id))&#13;&#10;   and instr(decode(:nbs,'%',a.nbs,:nbs),a.nbs)&gt;0&#13;&#10; ) q&#13;&#10;  group by (corp_name, name,okpo, namk, nbs)&#13;&#10;  order by q.name, q.corp_name, q.okpo ,q.nbs nulls first">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
         <Column Name="NAMK" DataType="System.String"/>
@@ -282,19 +202,125 @@ namespace FastReport
         <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
         <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
       </TableDataSource>
+      <TableDataSource Name="Table4" DataType="System.Int32" Enabled="true" SelectCommand="with dates as&#13;&#10;(select holiday as date_f, dat_next_u(holiday, 0) as date_d from holiday where kv = 980&#13;&#10;union all&#13;&#10;select fdat, fdat from fdat)&#13;&#10;select  corp_name,&#13;&#10;      name, &#13;&#10;      okpo,&#13;&#10;      namk, &#13;&#10;      nbs,&#13;&#10;round(sum(ost)/count(distinct dd)/100, 2) as sred,&#13;&#10;sum(ost)/100 as ost,&#13;&#10;sum(case when mont = 1 and dd = 1 then ost else 0 end)/100 as d_1,&#13;&#10;sum(case when mont = 1 and dd = 2 then ost else 0 end)/100 as d_2, &#13;&#10;sum(case when mont = 1 and dd = 3 then ost else 0 end)/100 as d_3, &#13;&#10;sum(case when mont = 1 and dd = 4 then ost else 0 end)/100 as d_4, &#13;&#10;sum(case when mont = 1 and dd = 5 then ost else 0 end)/100 as d_5, &#13;&#10;sum(case when mont = 1 and dd = 6 then ost else 0 end)/100 as d_6, &#13;&#10;sum(case when mont = 1 and dd = 7 then ost else 0 end)/100 as d_7, &#13;&#10;sum(case when mont = 1 and dd = 8 then ost else 0 end)/100 as d_8, &#13;&#10;sum(case when mont = 1 and dd = 9 then ost else 0 end)/100 as d_9, &#13;&#10;sum(case when mont = 1 and dd = 10 then ost else 0 end)/100 as d_10, &#13;&#10;sum(case when mont = 1 and dd = 11 then ost else 0 end)/100 as d_11, &#13;&#10;sum(case when mont = 1 and dd = 12 then ost else 0 end)/100 as d_12, &#13;&#10;sum(case when mont = 1 and dd = 13 then ost else 0 end)/100 as d_13, &#13;&#10;sum(case when mont = 1 and dd = 14 then ost else 0 end)/100 as d_14, &#13;&#10;sum(case when mont = 1 and dd = 15 then ost else 0 end)/100 as d_15, &#13;&#10;sum(case when mont = 1 and dd = 16 then ost else 0 end)/100 as d_16, &#13;&#10;sum(case when mont = 1 and dd = 17 then ost else 0 end)/100 as d_17, &#13;&#10;sum(case when mont = 1 and dd = 18 then ost else 0 end)/100 as d_18, &#13;&#10;sum(case when mont = 1 and dd = 19 then ost else 0 end)/100 as d_19, &#13;&#10;sum(case when mont = 1 and dd = 20 then ost else 0 end)/100 as d_20, &#13;&#10;sum(case when mont = 1 and dd = 21 then ost else 0 end)/100 as d_21, &#13;&#10;sum(case when mont = 1 and dd = 22 then ost else 0 end)/100 as d_22, &#13;&#10;sum(case when mont = 1 and dd = 23 then ost else 0 end)/100 as d_23, &#13;&#10;sum(case when mont = 1 and dd = 24 then ost else 0 end)/100 as d_24, &#13;&#10;sum(case when mont = 1 and dd = 25 then ost else 0 end)/100 as d_25, &#13;&#10;sum(case when mont = 1 and dd = 26 then ost else 0 end)/100 as d_26, &#13;&#10;sum(case when mont = 1 and dd = 27 then ost else 0 end)/100 as d_27, &#13;&#10;sum(case when mont = 1 and dd = 28 then ost else 0 end)/100 as d_28, &#13;&#10;sum(case when mont = 1 and dd = 29 then ost else 0 end)/100 as d_29, &#13;&#10;sum(case when mont = 1 and dd = 30 then ost else 0 end)/100 as d_30, &#13;&#10;sum(case when mont = 1 and dd = 31 then ost else 0 end)/100 as d_31,&#13;&#10;to_char(to_date ('01.04.2018', 'dd.mm.yyyy'), 'dd.mm.yyyy') as dt1,&#13;&#10;to_char(to_date('20.04.2018', 'dd.mm.yyyy'), 'dd.mm.yyyy') as dt2&#13;&#10;from&#13;&#10;   (select r.CORPORATION_NAME as corp_name,&#13;&#10;      m.name, &#13;&#10;      a.okpo,&#13;&#10;      a.namk, &#13;&#10;      a.nbs nbs,&#13;&#10;      case when trunc(to_date ('01.04.2018', 'dd.mm.yyyy'),'MM')=trunc(to_date('20.04.2018', 'dd.mm.yyyy'),'MM') then 1 else 0 end as mont,&#13;&#10;      ostq + obdbq - obkrq as ost,    &#13;&#10;      to_number(to_char(postdat,'DD')) as dd&#13;&#10;from ob_corp_data_acc a&#13;&#10;     join dates d on d.date_d = a.fdat&#13;&#10;     join v_ob_corp_rep_nbs q on q.rep_id = 5041 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;left join clim_mfo m on a.kf = m.mfo&#13;&#10;left join v_root_corporation r on a.corp_id=r.external_id&#13;&#10;   where a.corp_id = 6&#13;&#10;   and a.is_last = 1&#13;&#10;   and a.fdat between to_date ('01.04.2018', 'dd.mm.yyyy') and to_date('20.04.2018', 'dd.mm.yyyy') &#13;&#10; ) q&#13;&#10;  group by (corp_name, name,okpo, namk, nbs)&#13;&#10;  order by q.name, q.corp_name, q.okpo ,q.nbs nulls first">
+        <Column Name="CORP_NAME" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NAMK" DataType="System.String"/>
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="SRED" DataType="System.Decimal"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="D_1" DataType="System.Decimal"/>
+        <Column Name="D_2" DataType="System.Decimal"/>
+        <Column Name="D_3" DataType="System.Decimal"/>
+        <Column Name="D_4" DataType="System.Decimal"/>
+        <Column Name="D_5" DataType="System.Decimal"/>
+        <Column Name="D_6" DataType="System.Decimal"/>
+        <Column Name="D_7" DataType="System.Decimal"/>
+        <Column Name="D_8" DataType="System.Decimal"/>
+        <Column Name="D_9" DataType="System.Decimal"/>
+        <Column Name="D_10" DataType="System.Decimal"/>
+        <Column Name="D_11" DataType="System.Decimal"/>
+        <Column Name="D_12" DataType="System.Decimal"/>
+        <Column Name="D_13" DataType="System.Decimal"/>
+        <Column Name="D_14" DataType="System.Decimal"/>
+        <Column Name="D_15" DataType="System.Decimal"/>
+        <Column Name="D_16" DataType="System.Decimal"/>
+        <Column Name="D_17" DataType="System.Decimal"/>
+        <Column Name="D_18" DataType="System.Decimal"/>
+        <Column Name="D_19" DataType="System.Decimal"/>
+        <Column Name="D_20" DataType="System.Decimal"/>
+        <Column Name="D_21" DataType="System.Decimal"/>
+        <Column Name="D_22" DataType="System.Decimal"/>
+        <Column Name="D_23" DataType="System.Decimal"/>
+        <Column Name="D_24" DataType="System.Decimal"/>
+        <Column Name="D_25" DataType="System.Decimal"/>
+        <Column Name="D_26" DataType="System.Decimal"/>
+        <Column Name="D_27" DataType="System.Decimal"/>
+        <Column Name="D_28" DataType="System.Decimal"/>
+        <Column Name="D_29" DataType="System.Decimal"/>
+        <Column Name="D_30" DataType="System.Decimal"/>
+        <Column Name="D_31" DataType="System.Decimal"/>
+        <Column Name="DT1" DataType="System.String"/>
+        <Column Name="DT2" DataType="System.String"/>
+      </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="sFdat1" DataType="System.DateTime"/>
     <Parameter Name="sFdat2" DataType="System.DateTime"/>
     <Parameter Name="corporation_id" DataType="System.String"/>
     <Parameter Name="nbs" DataType="System.String"/>
+    <Total Name="TotalACSer" Expression="[Table.SRED]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalALL" Expression="[Table.SRED]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalACALL" Expression="[Table.OST]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAllALL" Expression="[Table.OST]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalAC1" Expression="[Table.D_1]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC2" Expression="[Table.D_2]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC3" Expression="[Table.D_3]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC4" Expression="[Table.D_4]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC5" Expression="[Table.D_5]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC6" Expression="[Table.D_6]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC7" Expression="[Table.D_7]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC8" Expression="[Table.D_8]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC9" Expression="[Table.D_9]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC10" Expression="[Table.D_10]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC11" Expression="[Table.D_11]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC12" Expression="[Table.D_12]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC13" Expression="[Table.D_13]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC14" Expression="[Table.D_14]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC15" Expression="[Table.D_15]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC16" Expression="[Table.D_16]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC17" Expression="[Table.D_17]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC18" Expression="[Table.D_18]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC19" Expression="[Table.D_19]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC20" Expression="[Table.D_20]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC21" Expression="[Table.D_21]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC22" Expression="[Table.D_22]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC23" Expression="[Table.D_23]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC24" Expression="[Table.D_24]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC25" Expression="[Table.D_25]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC26" Expression="[Table.D_26]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC27" Expression="[Table.D_27]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC28" Expression="[Table.D_28]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC29" Expression="[Table.D_29]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC30" Expression="[Table.D_30]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalAC31" Expression="[Table.D_31]" Evaluator="Data2" PrintOn="GroupFooter2"/>
+    <Total Name="TotalALL1" Expression="[Table.D_1]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL2" Expression="[Table.D_2]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL3" Expression="[Table.D_3]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL4" Expression="[Table.D_4]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL5" Expression="[Table.D_5]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL6" Expression="[Table.D_6]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL7" Expression="[Table.D_7]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL8" Expression="[Table.D_8]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL9" Expression="[Table.D_9]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL10" Expression="[Table.D_10]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL11" Expression="[Table.D_11]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL12" Expression="[Table.D_12]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL13" Expression="[Table.D_13]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL14" Expression="[Table.D_14]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL15" Expression="[Table.D_15]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalAll16" Expression="[Table.D_16]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL17" Expression="[Table.D_17]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL18" Expression="[Table.D_18]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL19" Expression="[Table.D_19]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL20" Expression="[Table.D_20]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL21" Expression="[Table.D_21]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL22" Expression="[Table.D_22]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL23" Expression="[Table.D_23]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL24" Expression="[Table.D_24]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL25" Expression="[Table.D_25]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL26" Expression="[Table.D_26]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL27" Expression="[Table.D_27]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL28" Expression="[Table.D_28]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL29" Expression="[Table.D_29]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL30" Expression="[Table.D_30]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="TotalALL31" Expression="[Table.D_31]" Evaluator="Data1" PrintOn="ReportSummary1"/>
   </Dictionary>
-  <ReportPage Name="Page1" PaperWidth="490">
-    <ReportTitleBand Name="ReportTitle1" Width="1776.6" Height="47.25">
+  <ReportPage Name="Page1" PaperWidth="490" Guides="292.95,359.1,557.55,595.35,633.15,670.95,708.75,746.55,784.35,822.15,859.95,897.75,935.55,973.35,1011.15,1048.95,1086.75,1124.55,1162.35,1200.15,1237.95,1275.75,1313.55,1351.35,1389.15,1426.95,1464.75,1502.55,1540.35,1578.15,1615.95,1653.75,1701,1738.8">
+    <ReportTitleBand Name="ReportTitle1" Width="1776.6" Height="95.5" Guides="75.6,94.5">
       <TextObject Name="Text2" Left="-9450" Top="-9450" Width="481.95" Height="66.15" Text="                      Інформація щодо перерахування коштів з &#13;&#10;Оптового ринку електричної енергії України НАЕК &quot;Енергоатом&quot;, &#13;&#10;тепловим енергогенеруючим компаніям та іншим виробникам &#13;&#10;	електричної енергії з [sFdat1] по [sFdat2] " Font="Arial, 9pt"/>
-      <TextObject Name="Text3" Left="56.7" Top="9.45" Width="888.3" Height="37.8" Text="Інформація щодо залишків коштів по рахунках корпоративного клієнта  [Table.CORP_NAME]   за [Table.DT1] по [Table.DT2]&#13;&#10;                                                                                                                	     " Font="Arial, 9pt"/>
-    </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="51.25" Width="1776.6" Height="57.7">
-      <TableObject Name="Table1" Width="1738.8" Height="57.7" Border.Lines="All" ManualBuildEvent="Table1_ManualBuild">
+      <TextObject Name="Text3" Width="1738.8" Height="37.8" Text="Інформація щодо залишків коштів по рахунках корпоративного клієнта  [Table.CORP_NAME]   за [Table.DT1] по [Table.DT2]&#13;&#10;                                                                                                                	     " HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TableObject Name="Table1" Top="37.8" Width="1738.8" Height="57.7" Border.Lines="All" BeforePrintEvent="Table1_BeforePrint">
         <TableColumn Name="Column1" Width="94.5"/>
         <TableColumn Name="Column2" Width="94.5"/>
         <TableColumn Name="Column3" Width="103.95"/>
@@ -332,11 +358,11 @@ namespace FastReport
         <TableColumn Name="Column35" Width="37.8"/>
         <TableColumn Name="Column36" Width="47.25"/>
         <TableColumn Name="Column37" Width="37.8"/>
-        <TableRow Name="Row1" Height="37.8">
+        <TableRow Name="Row1" Height="37.8" AutoSize="true">
           <TableCell Name="Cell1" Border.Lines="All" Fill.Color="Silver" Text="Регіон" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell2" Border.Lines="All" Fill.Color="Silver" Text="ЄДРПОУ клієнта" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell3" Border.Lines="All" Fill.Color="Silver" Text="Назва клієнта" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell122" Fill.Color="Silver" Text="Б/р" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell122" Border.Lines="All" Fill.Color="Silver" Text="Б/р" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell123" Border.Lines="All" Fill.Color="Aqua" Text="Середньоденні залишки" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell124" Border.Lines="All" Fill.Color="Aquamarine" Text="Всього за період" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
           <TableCell Name="Cell91" Border.Lines="All" Fill.Color="Silver" Text="1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
@@ -371,49 +397,49 @@ namespace FastReport
           <TableCell Name="Cell120" Border.Lines="All" Fill.Color="Silver" Text="30" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell121" Border.Lines="All" Fill.Color="Silver" Text="31" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
-        <TableRow Name="Row2" Height="19.9">
-          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="Silver" Text="1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+        <TableRow Name="Row2" Height="19.9" AutoSize="true">
+          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="Silver" Text="1" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell7" Border.Lines="All" Fill.Color="Silver" Text="2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell8" Border.Lines="All" Fill.Color="Silver" Text="3" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell9" Border.Lines="All" Fill.Color="Silver" Text="4" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Aqua" Text="5" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell57" Border.Lines="All" Fill.Color="Aquamarine" Text="6" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="Silver" Text="7" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="Silver" Text="8" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell60" Border.Lines="All" Fill.Color="Silver" Text="9" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="Silver" Text="10" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="Silver" Text="11" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="Silver" Text="12" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="Silver" Text="13" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="Silver" Text="14" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell66" Border.Lines="All" Fill.Color="Silver" Text="15" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell67" Border.Lines="All" Fill.Color="Silver" Text="16" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="Silver" Text="17" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell69" Border.Lines="All" Fill.Color="Silver" Text="18" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell70" Border.Lines="All" Fill.Color="Silver" Text="19" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell71" Border.Lines="All" Fill.Color="Silver" Text="20" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell72" Border.Lines="All" Fill.Color="Silver" Text="21" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell73" Border.Lines="All" Fill.Color="Silver" Text="22" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell74" Border.Lines="All" Fill.Color="Silver" Text="23" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell75" Border.Lines="All" Fill.Color="Silver" Text="24" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell76" Border.Lines="All" Fill.Color="Silver" Text="25" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell77" Border.Lines="All" Fill.Color="Silver" Text="26" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell78" Border.Lines="All" Fill.Color="Silver" Text="27" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell79" Border.Lines="All" Fill.Color="Silver" Text="28" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell80" Border.Lines="All" Fill.Color="Silver" Text="29" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell81" Border.Lines="All" Fill.Color="Silver" Text="30" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell82" Border.Lines="All" Fill.Color="Silver" Text="31" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell83" Border.Lines="All" Fill.Color="Silver" Text="32" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell84" Border.Lines="All" Fill.Color="Silver" Text="33" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell85" Border.Lines="All" Fill.Color="Silver" Text="34" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell86" Border.Lines="All" Fill.Color="Silver" Text="35" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell87" Border.Lines="All" Fill.Color="Silver" Text="36" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell89" Border.Lines="All" Fill.Color="Silver" Text="37" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Aqua" Text="5" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell57" Border.Lines="All" Fill.Color="Aquamarine" Text="6" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell60" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell66" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell67" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell69" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell70" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell71" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell72" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell73" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell74" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell75" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell76" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell77" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell78" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell79" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell80" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell81" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell82" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell83" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell84" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell85" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell86" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell87" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell89" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
       </TableObject>
-    </PageHeaderBand>
-    <DataBand Name="Data1" Top="112.95" Width="1776.6" Height="37.8" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true">
-      <TableObject Name="Table2" Width="1738.8" Height="37.8" Border.Lines="All" ManualBuildEvent="Table2_ManualBuild">
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="99.5" Width="1776.6" Height="37.8" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true">
+      <TableObject Name="Table2" Width="1738.8" Height="37.8" Border.Lines="All" BeforePrintEvent="Table2_BeforePrint">
         <TableColumn Name="Column38" Width="94.5"/>
         <TableColumn Name="Column39" Width="94.5"/>
         <TableColumn Name="Column40" Width="103.95"/>
@@ -451,47 +477,211 @@ namespace FastReport
         <TableColumn Name="Column72" Width="37.8"/>
         <TableColumn Name="Column73" Width="47.25"/>
         <TableColumn Name="Column74" Width="37.8"/>
-        <TableRow Name="Row3" Height="37.8">
+        <TableRow Name="Row3" Height="37.8" AutoSize="true">
           <TableCell Name="Cell125" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell126" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell127" Border.Lines="All" Text="[Table.NAMK]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell128" Text="[Table.NBS]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell129" Border.Lines="All" Fill.Color="Aqua" Text="[Table.SRED]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell130" Border.Lines="All" Fill.Color="Aquamarine" Text="[Table.OST]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell131" Border.Lines="All" Text="[Table.D_1]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell132" Border.Lines="All" Text="[Table.D_2]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell133" Border.Lines="All" Text="[Table.D_3]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell134" Border.Lines="All" Text="[Table.D_4]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell135" Border.Lines="All" Text="[Table.D_5]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell136" Border.Lines="All" Text="[Table.D_6]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell137" Border.Lines="All" Text="[Table.D_7]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell138" Border.Lines="All" Text="[Table.D_8]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell139" Border.Lines="All" Text="[Table.D_9]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell140" Border.Lines="All" Text="[Table.D_10]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell141" Border.Lines="All" Text="[Table.D_11]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell142" Border.Lines="All" Text="[Table.D_12]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell143" Border.Lines="All" Text="[Table.D_13]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell144" Border.Lines="All" Text="[Table.D_14]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell145" Border.Lines="All" Text="[Table.D_15]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell146" Border.Lines="All" Text="[Table.D_16]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell147" Border.Lines="All" Text="[Table.D_17]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell148" Border.Lines="All" Text="[Table.D_18]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell149" Border.Lines="All" Text="[Table.D_19]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell150" Border.Lines="All" Text="[Table.D_20]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell151" Border.Lines="All" Text="[Table.D_21]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell152" Border.Lines="All" Text="[Table.D_22]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell153" Border.Lines="All" Text="[Table.D_23]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell154" Border.Lines="All" Text="[Table.D_24]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell155" Border.Lines="All" Text="[Table.D_25]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell156" Border.Lines="All" Text="[Table.D_26]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell157" Border.Lines="All" Text="[Table.D_27]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell158" Border.Lines="All" Text="[Table.D_28]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell159" Border.Lines="All" Text="[Table.D_29]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell160" Border.Lines="All" Text="[Table.D_30]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell161" Border.Lines="All" Text="[Table.D_31]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell128" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell129" Border.Lines="All" Fill.Color="Aqua" Text="[Table.SRED]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell130" Border.Lines="All" Fill.Color="Aquamarine" Text="[Table.OST]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell131" Border.Lines="All" Text="[Table.D_1]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell132" Border.Lines="All" Text="[Table.D_2]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell133" Border.Lines="All" Text="[Table.D_3]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell134" Border.Lines="All" Text="[Table.D_4]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell135" Border.Lines="All" Text="[Table.D_5]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell136" Border.Lines="All" Text="[Table.D_6]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell137" Border.Lines="All" Text="[Table.D_7]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell138" Border.Lines="All" Text="[Table.D_8]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell139" Border.Lines="All" Text="[Table.D_9]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell140" Border.Lines="All" Text="[Table.D_10]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell141" Border.Lines="All" Text="[Table.D_11]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell142" Border.Lines="All" Text="[Table.D_12]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell143" Border.Lines="All" Text="[Table.D_13]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell144" Border.Lines="All" Text="[Table.D_14]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell145" Border.Lines="All" Text="[Table.D_15]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell146" Border.Lines="All" Text="[Table.D_16]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell147" Border.Lines="All" Text="[Table.D_17]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell148" Border.Lines="All" Text="[Table.D_18]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell149" Border.Lines="All" Text="[Table.D_19]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell150" Border.Lines="All" Text="[Table.D_20]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell151" Border.Lines="All" Text="[Table.D_21]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell152" Border.Lines="All" Text="[Table.D_22]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell153" Border.Lines="All" Text="[Table.D_23]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell154" Border.Lines="All" Text="[Table.D_24]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell155" Border.Lines="All" Text="[Table.D_25]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell156" Border.Lines="All" Text="[Table.D_26]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell157" Border.Lines="All" Text="[Table.D_27]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell158" Border.Lines="All" Text="[Table.D_28]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell159" Border.Lines="All" Text="[Table.D_29]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell160" Border.Lines="All" Text="[Table.D_30]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell161" Border.Lines="All" Text="[Table.D_31]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="154.75" Width="1776.6" Height="18.9"/>
+    <GroupHeaderBand Name="GroupHeader2" Top="145.3" Width="1776.6" Guides="0" Condition="[Table.NBS]">
+      <DataHeaderBand Name="DataHeader1" Top="141.3" Width="1776.6"/>
+      <DataBand Name="Data2" Top="149.3" Width="1776.6" DataSource="Table"/>
+      <GroupFooterBand Name="GroupFooter2" Top="153.3" Width="1776.6" Height="18.9">
+        <TableObject Name="Table5" Width="1738.8" Height="18.9" BeforePrintEvent="Table5_BeforePrint">
+          <TableColumn Name="Column75" Width="94.5"/>
+          <TableColumn Name="Column76" Width="94.5"/>
+          <TableColumn Name="Column77" Width="103.95"/>
+          <TableColumn Name="Column78"/>
+          <TableColumn Name="Column79" Width="122.85"/>
+          <TableColumn Name="Column80" Width="75.6"/>
+          <TableColumn Name="Column81" Width="37.8"/>
+          <TableColumn Name="Column82" Width="37.8"/>
+          <TableColumn Name="Column83" Width="37.8"/>
+          <TableColumn Name="Column84" Width="37.8"/>
+          <TableColumn Name="Column85" Width="37.8"/>
+          <TableColumn Name="Column86" Width="37.8"/>
+          <TableColumn Name="Column87" Width="37.8"/>
+          <TableColumn Name="Column88" Width="37.8"/>
+          <TableColumn Name="Column89" Width="37.8"/>
+          <TableColumn Name="Column90" Width="37.8"/>
+          <TableColumn Name="Column91" Width="37.8"/>
+          <TableColumn Name="Column92" Width="37.8"/>
+          <TableColumn Name="Column93" Width="37.8"/>
+          <TableColumn Name="Column94" Width="37.8"/>
+          <TableColumn Name="Column95" Width="37.8"/>
+          <TableColumn Name="Column96" Width="37.8"/>
+          <TableColumn Name="Column97" Width="37.8"/>
+          <TableColumn Name="Column98" Width="37.8"/>
+          <TableColumn Name="Column99" Width="37.8"/>
+          <TableColumn Name="Column100" Width="37.8"/>
+          <TableColumn Name="Column101" Width="37.8"/>
+          <TableColumn Name="Column102" Width="37.8"/>
+          <TableColumn Name="Column103" Width="37.8"/>
+          <TableColumn Name="Column104" Width="37.8"/>
+          <TableColumn Name="Column105" Width="37.8"/>
+          <TableColumn Name="Column106" Width="37.8"/>
+          <TableColumn Name="Column107" Width="37.8"/>
+          <TableColumn Name="Column108" Width="37.8"/>
+          <TableColumn Name="Column109" Width="37.8"/>
+          <TableColumn Name="Column110" Width="47.25"/>
+          <TableColumn Name="Column111" Width="37.8"/>
+          <TableRow Name="Row4">
+            <TableCell Name="Cell162" Fill.Color="White" HorzAlign="Right"/>
+            <TableCell Name="Cell163" Fill.Color="White"/>
+            <TableCell Name="Cell164" Border.Lines="Right" Fill.Color="White"/>
+            <TableCell Name="Cell165" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Center"/>
+            <TableCell Name="Cell166" Border.Lines="All" Fill.Color="Aqua" Text="[TotalACSer]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell187" Border.Lines="All" Fill.Color="Aquamarine" Text="[TotalACALL]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell188" Border.Lines="All" Text="[TotalAC1]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell189" Border.Lines="All" Text="[TotalAC2]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell190" Border.Lines="All" Text="[TotalAC3]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell191" Border.Lines="All" Text="[TotalAC4]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell192" Border.Lines="All" Text="[TotalAC5]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell193" Border.Lines="All" Text="[TotalAC6]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell194" Border.Lines="All" Text="[TotalAC7]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell195" Border.Lines="All" Text="[TotalAC8]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell196" Border.Lines="All" Text="[TotalAC9]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell197" Border.Lines="All" Text="[TotalAC10]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell198" Border.Lines="All" Text="[TotalAC11]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell199" Border.Lines="All" Text="[TotalAC12]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell200" Border.Lines="All" Text="[TotalAC13]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell201" Border.Lines="All" Text="[TotalAC14]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell202" Border.Lines="All" Text="[TotalAC15]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell203" Border.Lines="All" Text="[TotalAC16]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell204" Border.Lines="All" Text="[TotalAC17]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell205" Border.Lines="All" Text="[TotalAC18]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell206" Border.Lines="All" Text="[TotalAC19]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell207" Border.Lines="All" Text="[TotalAC20]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell208" Border.Lines="All" Text="[TotalAC21]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell209" Border.Lines="All" Text="[TotalAC22]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell210" Border.Lines="All" Text="[TotalAC23]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell211" Border.Lines="All" Text="[TotalAC24]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell212" Border.Lines="All" Text="[TotalAC25]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell213" Border.Lines="All" Text="[TotalAC26]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell214" Border.Lines="All" Text="[TotalAC27]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell215" Border.Lines="All" Text="[TotalAC28]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell216" Border.Lines="All" Text="[TotalAC29]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell217" Border.Lines="All" Text="[TotalAC30]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            <TableCell Name="Cell218" Border.Lines="All" Text="[TotalAC31]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="176.2" Width="1776.6" Height="18.9">
+      <TableObject Name="Table6" Width="1738.8" Height="18.9" Border.Lines="All" Fill.Color="192, 255, 192" BeforePrintEvent="Table6_BeforePrint">
+        <TableColumn Name="Column112" Width="94.5"/>
+        <TableColumn Name="Column113" Width="94.5"/>
+        <TableColumn Name="Column114" Width="103.95"/>
+        <TableColumn Name="Column115"/>
+        <TableColumn Name="Column116" Width="122.85"/>
+        <TableColumn Name="Column117" Width="75.6"/>
+        <TableColumn Name="Column118" Width="37.8"/>
+        <TableColumn Name="Column119" Width="37.8"/>
+        <TableColumn Name="Column120" Width="37.8"/>
+        <TableColumn Name="Column121" Width="37.8"/>
+        <TableColumn Name="Column122" Width="37.8"/>
+        <TableColumn Name="Column123" Width="37.8"/>
+        <TableColumn Name="Column124" Width="37.8"/>
+        <TableColumn Name="Column125" Width="37.8"/>
+        <TableColumn Name="Column126" Width="37.8"/>
+        <TableColumn Name="Column127" Width="37.8"/>
+        <TableColumn Name="Column128" Width="37.8"/>
+        <TableColumn Name="Column129" Width="37.8"/>
+        <TableColumn Name="Column130" Width="37.8"/>
+        <TableColumn Name="Column131" Width="37.8"/>
+        <TableColumn Name="Column132" Width="37.8"/>
+        <TableColumn Name="Column133" Width="37.8"/>
+        <TableColumn Name="Column134" Width="37.8"/>
+        <TableColumn Name="Column135" Width="37.8"/>
+        <TableColumn Name="Column136" Width="37.8"/>
+        <TableColumn Name="Column137" Width="37.8"/>
+        <TableColumn Name="Column138" Width="37.8"/>
+        <TableColumn Name="Column139" Width="37.8"/>
+        <TableColumn Name="Column140" Width="37.8"/>
+        <TableColumn Name="Column141" Width="37.8"/>
+        <TableColumn Name="Column142" Width="37.8"/>
+        <TableColumn Name="Column143" Width="37.8"/>
+        <TableColumn Name="Column144" Width="37.8"/>
+        <TableColumn Name="Column145" Width="37.8"/>
+        <TableColumn Name="Column146" Width="37.8"/>
+        <TableColumn Name="Column147" Width="47.25"/>
+        <TableColumn Name="Column148" Width="37.8"/>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell219" Border.Lines="All" Text="Загалом:" ColSpan="4"/>
+          <TableCell Name="Cell220" Border.Lines="All"/>
+          <TableCell Name="Cell221" Border.Lines="All"/>
+          <TableCell Name="Cell222" Border.Lines="All"/>
+          <TableCell Name="Cell223" Border.Lines="All" Fill.Color="Aqua" Text="[TotalALL]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell244" Border.Lines="All" Fill.Color="Aquamarine" Text="[TotalAllALL]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell245" Border.Lines="All" Text="[TotalALL1]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell246" Border.Lines="All" Text="[TotalALL2]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell247" Border.Lines="All" Text="[TotalALL3]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell248" Border.Lines="All" Text="[TotalALL4]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell249" Border.Lines="All" Text="[TotalALL5]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell250" Border.Lines="All" Text="[TotalALL6]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell251" Border.Lines="All" Text="[TotalALL7]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell252" Border.Lines="All" Text="[TotalALL8]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell253" Border.Lines="All" Text="[TotalALL9]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell254" Border.Lines="All" Text="[TotalALL10]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell255" Border.Lines="All" Text="[TotalALL11]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell256" Border.Lines="All" Text="[TotalALL12]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell257" Border.Lines="All" Text="[TotalALL13]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell258" Border.Lines="All" Text="[TotalALL14]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell259" Border.Lines="All" Text="[TotalALL15]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell260" Border.Lines="All" Text="[TotalAll16]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell261" Border.Lines="All" Text="[TotalALL17]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell262" Border.Lines="All" Text="[TotalALL18]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell263" Border.Lines="All" Text="[TotalALL19]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell264" Border.Lines="All" Text="[TotalALL20]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell265" Border.Lines="All" Text="[TotalALL21]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell266" Border.Lines="All" Text="[TotalALL22]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell267" Border.Lines="All" Text="[TotalALL23]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell268" Border.Lines="All" Text="[TotalALL24]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell269" Border.Lines="All" Text="[TotalALL25]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell270" Border.Lines="All" Text="[TotalALL26]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell271" Border.Lines="All" Text="[TotalALL27]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell272" Border.Lines="All" Text="[TotalALL28]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell273" Border.Lines="All" Text="[TotalALL29]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell274" Border.Lines="All" Text="[TotalALL30]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell275" Border.Lines="All" Text="[TotalALL31]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="199.1" Width="1776.6"/>
   </ReportPage>
 </Report>

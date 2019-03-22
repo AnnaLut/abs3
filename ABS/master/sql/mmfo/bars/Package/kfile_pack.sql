@@ -104,6 +104,8 @@ CREATE OR REPLACE PACKAGE BARS.KFILE_PACK IS
     
     procedure call_web_serv(p_sess_id in number,
                             p_corp_id in number default null);
+							
+    function dat_prev_u(datb_ date, prev_ int) return date;							
 
 END KFILE_PACK;
 /
@@ -1708,7 +1710,46 @@ is
     logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
     raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm); 
  end;
-
+ 
+function dat_prev_u(datb_ date, prev_ int) return date is
+  dat_  date;
+  dat1_ date;
+  kol_  int;
+  i_    int;
+  ern constant positive := 208;
+  err exception;
+  erm varchar2(80);
+begin
+  dat_ := datb_ - prev_;
+  select count(*)
+    into kol_
+    from holiday
+   where kv = 980
+     and holiday >= dat_
+     and holiday <= datb_;
+  if kol_ = 0 then
+    return(dat_);
+  end if;
+  for i_ in 1 .. 10 loop
+    begin
+      dat_ := dat_ - 1;
+      select holiday
+        into dat1_
+        from holiday
+       where kv = 980
+         and holiday = dat_;
+      kol_ := kol_ + 1;
+    exception
+      when no_data_found then
+        begin
+          --DAT_=5
+          if datb_ - dat_ = prev_ + kol_ then
+            return(dat_);
+          end if;
+        end;
+    end;
+  end loop;
+end dat_prev_u;
 
 BEGIN
    -- Initialization
