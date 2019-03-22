@@ -1572,7 +1572,7 @@ for over in (select distinct over_deal.rnk,
                                          nd_acc n,
                                          accounts a2
                                   where ag.fdat = add_months(trunc(sysdate,'mm'),-1)
-                                        and a2.tip in ('OVN','SN')
+                                        and a2.tip in ('SS ','SP ', 'SN ','SPN','SNO','SRR')
                                         and n.acc = a2.acc
                                         and n.acc = ag.acc)
                             group by nd) sumarrears on sumarrears.nd=over_deal.nd
