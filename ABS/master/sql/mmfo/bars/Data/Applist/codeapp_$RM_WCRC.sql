@@ -98,7 +98,7 @@ begin
 												  p_funcname  =>     '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=V_CORP_ACCOUNTS_WEB[EDIT_MODE=>MULTI_EDIT][NSIFUNCTION][showDialogWindow=>false]',     
 												  p_rolename => '' ,
                                                   p_frontend  =>      l_application_type_id ); 
-
+												  
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
@@ -106,7 +106,7 @@ begin
 													p_funcname  =>  '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=V_OB_CORP_L1[CONDITIONS=>V_OB_CORP_L1.PARENT_ID IS NULL][NSIFUNCTION][showDialogWindow=>false]',     
 													p_rolename => '' ,
                                                     p_frontend  =>   l_application_type_id );
-													
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_WCRC) - АРМ Корпоративні клієнти(ЦБД)  ');
     l := l_function_ids.first;
@@ -129,6 +129,10 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+umu.add_reference2arm_bytabname('OB_CORP_REP_NBS', '$RM_WCRC', 2, 1);
+umu.add_reference2arm_bytabname('OB_CORP_DICT_NBS', '$RM_WCRC', 2, 1);
+umu.add_reference2arm_bytabname('OB_CORP_DICT_REP', '$RM_WCRC', 2, 1);
+umu.add_reference2arm_bytabname('TYPNLS_CORP', '$RM_WCRC', 2, 1);
 umu.add_reference2arm_bytabname('OB_CORP_DICT_OKPO', '$RM_WCRC', 2, 1);
 umu.add_reference2arm_bytabname('OB_CORP_REP_NBS', '$RM_WCRC', 2, 1);
 umu.add_reference2arm_bytabname('OB_CORP_DICT_NBS', '$RM_WCRC', 2, 1);

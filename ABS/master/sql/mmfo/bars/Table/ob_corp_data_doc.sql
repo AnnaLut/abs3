@@ -49,7 +49,9 @@ begin
     DOCKV NUMBER, 
     SQ NUMBER, 
     NAZN VARCHAR2(160), 
-    TT VARCHAR2(3)
+    TT VARCHAR2(3),
+	NBSA VARCHAR2(4),
+	NBSB VARCHAR2(4)
    ) PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
   TABLESPACE BRSBIGD COMPRESS
   PARTITION BY RANGE (SESS_ID)
@@ -103,6 +105,22 @@ exception when others then
 end; 
 /
 
+begin
+    execute immediate 'alter table OB_CORP_DATA_DOC add nbsa varchar2(4)';                          
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
+begin  
+    execute immediate 'alter table OB_CORP_DATA_DOC add nbsb varchar2(4)';                          
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+
 
 
 
@@ -137,6 +155,8 @@ COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.DOCKV IS 'Валюта платежу';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.SQ IS 'Сума платежу (еквівалент в національній валюті)';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.NAZN IS 'Призначення платежу';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.TT IS 'Код операции';
+COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.NBSA IS 'Балансовий рахунок платника';
+COMMENT ON COLUMN BARS.OB_CORP_DATA_DOC.NBSB IS 'Балансовий рахунок отримувача';
 
 
 PROMPT *** Create  index PK_OB_CORP_DATA_DOC ***

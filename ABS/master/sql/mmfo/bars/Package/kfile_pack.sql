@@ -61,24 +61,6 @@ CREATE OR REPLACE PACKAGE BARS.KFILE_PACK IS
 
     PROCEDURE CLOSE_CORP_ITEM(P_UNIT_ID OB_CORPORATION.ID%TYPE);
 
-    function kf_ost_sum(p_corp_id    in number,
-                        p_nbs        in varchar2,
-                        p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
-                        p_kod_analyt in varchar2,
-                        p_date_start in date,
-                        p_date_end   in date,
-                        p_rep_id     in number) return measure_table
-        pipelined;
-
-    function kf_ost_sum_ustan(p_corp_id    in number,
-                              p_nbs        in varchar2,
-                              p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
-                              p_kod_analyt in varchar2,
-                              p_date_start in date,
-                              p_date_end   in date,
-                              p_rep_id     in number) return measure_table_2
-        pipelined;
-
     function get_possible_units(p_id_unit ob_corporation.id%type) return t_units pipelined;
     --процедура обновления счетов корпоративных клиентов(обновляет включение в выписку, код ТРКК, код подразделения, дату открытия и альтернат. корпорацию)
     procedure update_acc_corp(p_acc      number,
@@ -423,15 +405,22 @@ IS
                  p_expiration      => 0);
                  bars_login.logout_user;
      end;';
+     l_holiday number;
     begin
+    
     if SYS_CONTEXT ('bars_context', 'user_mfo') is null then
     raise_application_error(-20000, 'Формування К-файлів на рівні "/" заборонено!!');
     end if;
     if p_date > trunc(sysdate) then 
     raise_application_error(-20000, 'Формування К-файлів за майбутню дату: '||to_char(p_date, 'dd.mm.yyyy')||' заборонено!!');
     end if;
-    if p_date < trunc(add_months(sysdate, -1)) then 
+    /*if p_date < trunc(add_months(sysdate, -1)) then 
     raise_application_error(-20000, 'Формування К-файлів за дату меншу ніж : '||to_char(add_months(sysdate, -1), 'dd.mm.yyyy')||' заборонено!!');
+    end if;*/
+    
+    select count(*) into l_holiday from holiday where kv = 980 and holiday = p_date;
+    if l_holiday > 0 then
+    raise_application_error(-20000, 'Формування К-файлів за вихідний день : '||to_char(p_date, 'dd.mm.yyyy')||' заборонено!!');
     end if;
 
     dbms_scheduler.create_job(job_name => l_jobname,
@@ -690,6 +679,7 @@ begin
                l_whoiam := 0;
                         l_data_doc(l_data_doc.last).mfoa  := l_mfo_d;
                         l_data_doc(l_data_doc.last).nlsa  := l_nls_d;
+                        l_data_doc(l_data_doc.last).nbsa  := substr(l_nls_d, 1, 4);
                         l_data_doc(l_data_doc.last).kva   := l_kv_d;
                         l_data_doc(l_data_doc.last).nama  := replace(l_nam_d, '|',' ');
                         l_data_doc(l_data_doc.last).okpoa := l_okpo_d;
@@ -698,6 +688,7 @@ begin
                l_whoiam := 1;
                         l_data_doc(l_data_doc.last).mfob  := l_mfo_d;
                         l_data_doc(l_data_doc.last).nlsb  := l_nls_d;
+                        l_data_doc(l_data_doc.last).nbsb  := substr(l_nls_d, 1, 4);
                         l_data_doc(l_data_doc.last).kvb   := l_kv_d;
                         l_data_doc(l_data_doc.last).namb  := replace(l_nam_d, '|',' ');
                         l_data_doc(l_data_doc.last).okpob := l_okpo_d;
@@ -718,12 +709,14 @@ begin
                   if l_whoiam = 0 then
                             l_data_doc(l_data_doc.last).mfob  := l_mfo_d;
                             l_data_doc(l_data_doc.last).nlsb  := l_nls_d;
+                            l_data_doc(l_data_doc.last).nbsb  := substr(l_nls_d, 1, 4);
                             l_data_doc(l_data_doc.last).kvb   := l_kv_d;
                             l_data_doc(l_data_doc.last).namb  := replace(l_nam_d, '|',' ');
                             l_data_doc(l_data_doc.last).okpob := l_okpo_d;
                   else
                             l_data_doc(l_data_doc.last).mfoa  := l_mfo_d;
                             l_data_doc(l_data_doc.last).nlsa  := l_nls_d;
+                            l_data_doc(l_data_doc.last).nbsa  := substr(l_nls_d, 1, 4);
                             l_data_doc(l_data_doc.last).kva   := l_kv_d;
                             l_data_doc(l_data_doc.last).nama  := replace(l_nam_d, '|',' ');
                             l_data_doc(l_data_doc.last).okpoa := l_okpo_d;
@@ -734,12 +727,14 @@ begin
                     if c2.dk = 1 then
                         l_data_doc(l_data_doc.last).mfob  := c2.mfob;
                         l_data_doc(l_data_doc.last).nlsb  := c2.nlsb;
+                        l_data_doc(l_data_doc.last).nbsb  := substr(c2.nlsb, 1, 4);
                         l_data_doc(l_data_doc.last).kvb   := c2.kv2;
                         l_data_doc(l_data_doc.last).namb  := replace(c2.nam_b, '|',' ');
                         l_data_doc(l_data_doc.last).okpob := c2.id_b;
                     else
                         l_data_doc(l_data_doc.last).mfob  := c2.mfoa;
                         l_data_doc(l_data_doc.last).nlsb  := c2.nlsa;
+                        l_data_doc(l_data_doc.last).nbsb  := substr(c2.nlsa, 1, 4);
                         l_data_doc(l_data_doc.last).kvb   := c2.kv;
                         l_data_doc(l_data_doc.last).namb  := replace(c2.nam_a, '|',' ');
                         l_data_doc(l_data_doc.last).okpob := c2.id_a;
@@ -749,12 +744,14 @@ begin
                     if c2.dk = 1 then
                         l_data_doc(l_data_doc.last).mfoa  := c2.mfoa;
                         l_data_doc(l_data_doc.last).nlsa  := c2.nlsa;
+                        l_data_doc(l_data_doc.last).nbsa  := substr(c2.nlsa, 1, 4);
                         l_data_doc(l_data_doc.last).kva   := c2.kv;
                         l_data_doc(l_data_doc.last).nama  := replace(c2.nam_a, '|',' ');
                         l_data_doc(l_data_doc.last).okpoa := c2.id_a;
                     else
                         l_data_doc(l_data_doc.last).mfoa  := c2.mfob;
                         l_data_doc(l_data_doc.last).nlsa  := c2.nlsb;
+                        l_data_doc(l_data_doc.last).nbsa  := substr(c2.nlsb, 1, 4);
                         l_data_doc(l_data_doc.last).kva   := c2.kv2;
                         l_data_doc(l_data_doc.last).nama  := replace(c2.nam_b, '|',' ');
                         l_data_doc(l_data_doc.last).okpoa := c2.id_b;
@@ -798,7 +795,9 @@ begin
                l_data_doc(l_data_doc.last).stmt:= 0;
             if (l_psum > 0 ) then
                l_data_doc(l_data_doc.last).nlsa := '3801';
+               l_data_doc(l_data_doc.last).nbsa := '3801';
                l_data_doc(l_data_doc.last).nlsb := c0.nls;
+               l_data_doc(l_data_doc.last).nbsb := substr(c0.nls, 1, 4);
                l_data_doc(l_data_doc.last).nama := l_nb;
                l_data_doc(l_data_doc.last).namb := c0.nmk;
                l_data_doc(l_data_doc.last).okpoa:= gl.aokpo;
@@ -806,7 +805,9 @@ begin
                l_sumkrq := l_sumkrq + l_psum;
             else
                l_data_doc(l_data_doc.last).nlsb := '3801';
+               l_data_doc(l_data_doc.last).nbsb := '3801';
                l_data_doc(l_data_doc.last).nlsa := c0.nls;
+               l_data_doc(l_data_doc.last).nbsa := substr(c0.nls, 1, 4);
                l_data_doc(l_data_doc.last).namb := l_nb;
                l_data_doc(l_data_doc.last).nama := c0.nmk;
                l_data_doc(l_data_doc.last).okpob:= gl.aokpo;
@@ -866,6 +867,7 @@ begin
                 l_data_acc(l_data_acc.last).namk      :=replace(c0.nmk,'|',' ');
                 l_data_acc(l_data_acc.last).nms       :=replace(c0.nms,'|',' ');
                 l_data_acc(l_data_acc.last).is_last   :=1;
+                l_data_acc(l_data_acc.last).nbs       :=substr(c0.nls, 1, 4);
 
 
     if l_data_doc.last >= 1000 then
@@ -1466,215 +1468,6 @@ END lic26_kfile;
     logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
     raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm); 
  end update_acc_corp;
------------------------------------------------------------------------------
-
-   -- возвращает общую сумму остатков за период по календарным днџм (учитываџ первую и последнюю даты)
-   -- (используетсџ в дальнейшем к примеру длџ расчета средневзвешенного остатка период)
- function kf_ost_sum(p_corp_id    in number,
-                     p_nbs        in varchar2,
-                     p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
-                     p_kod_analyt in varchar2,
-                     p_date_start in date,
-                     p_date_end   in date,
-                     p_rep_id     in number) return measure_table
-     pipelined is
-     rec        measure_record;
-     l_sum      ob_corp_data_acc.ostq%type := 0;
-     l_kf       ob_corp_data_acc.kf%type;
-     l_dat      ob_corp_data_acc.fdat%type;
-     l_last_zn  ob_corp_data_acc.ostq%type := 0;
-     l_dat_loop ob_corp_data_acc.fdat%type;
-     l_d_sql    clob;
-     l_ref_cur  sys_refcursor;
-     type l_my_tab is table of number index by varchar2(255);
-     l_rec     l_my_tab;
-     date_diff decimal;
- begin
-     --  менџем первую дату периода (если перваџ дата в ob_corporation_data больше, чем перваџ дата периода)
-     -- устанавливаем предельную дату длџ суммированиџ = второй дате периода
-     -- не имеет значениџ есть ли такаџ дата в ob_corporation_data, если еще не наступила,
-     -- то будет прогнозный расчет cо значением остатка=текущему
-     -- суммируем в выбранном периоде остатки
-     l_d_sql := 'SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.kf, cd.fdat
-                       FROM ob_corp_data_acc cd
-                       join v_ob_corp_rep_nbs q on q.nbs = substr(cd.nls,1,4) and Q.CORP_ID = cd.corp_id 
-                      WHERE cd.is_last = 1 
-                        AND q.rep_id = :P_REP_ID 
-                        AND CD.CORP_ID = :P_CORP_ID
-                        AND substr(CD.NLS,1,4) = :P_NBS' || case
-                    when p_kv_flag = 1 then
-                     ' AND CD.KV = 980 '
-                    when p_kv_flag = 2 then
-                     ' AND CD.KV <> 980 '
-                    else
-                     ' '
-                end || case
-                    when p_kod_analyt <> '%' then
-                     ' AND :P_KOD_ANALYT = CD.KOD_ANALYT '
-                    else
-                     ' '
-                end ||
-                'AND cd.fdat >= :P_DATE_START
-                        AND cd.fdat <= :P_DATE_END +10
-                        group by cd.kf, cd.fdat
-                        order by CD.kf asc, cd.fdat desc';
-     if p_kod_analyt <> '%' then
-         open l_ref_cur for l_d_sql
-             using p_rep_id, p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
-     else
-         open l_ref_cur for l_d_sql
-             using p_rep_id, p_corp_id, p_nbs, p_date_start, p_date_end;
-     end if;
-     loop
-         fetch l_ref_cur
-             into l_sum, l_kf, l_dat;
-         if l_kf is not null and l_dat is not null then
-             l_rec(l_kf || to_char(l_dat, 'ddmmyyyy')) := l_sum;
-         end if;
-         exit when l_ref_cur%notfound;
-     end loop;
-     close l_ref_cur;
- 
-     for l_kf_k in (select kf from clim_mfo) loop
-         l_dat_loop := p_date_end + 10;
-         l_last_zn  := 0;
-         l_sum      := 0;
-         date_diff  := 0;
-         while l_dat_loop >= p_date_start loop
-             if l_rec.exists(l_kf_k.kf || to_char(l_dat_loop, 'ddmmyyyy')) then
-                 l_last_zn := l_rec(l_kf_k.kf ||
-                                    to_char(l_dat_loop, 'ddmmyyyy'));
-             end if;
-             if l_dat_loop <= p_date_end then
-                 l_sum     := l_sum + l_last_zn;
-                 date_diff := date_diff + 1;
-             end if;
-             l_dat_loop := l_dat_loop - 1;
-         end loop;
-         begin
-             rec.kf      := l_kf_k.kf;
-             rec.ost_sum := trunc(l_sum / 100 / date_diff, 2); -- /100 - в гривны; /date_diff - среднее за период;
-             pipe row(rec);
-         exception
-             when zero_divide then
-                 raise_application_error(-20001,
-                                         'Відсутні данні за вказаний період');
-         end;
-     end loop;
-     return;
- exception when no_data_needed then null;
-           when others then
-         close l_ref_cur;
-         logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
-         raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
- end kf_ost_sum;
-
-------------------------------------------------------------------------------------------------------------
-   -- возвращает общую сумму остатков за период по календарным днџм (учитываџ первую и последнюю даты)
-   -- (используетсџ в дальнейшем к примеру длџ расчета средневзвешенного остатка период)
- function kf_ost_sum_ustan(p_corp_id    in number,
-                           p_nbs        in varchar2,
-                           p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
-                           p_kod_analyt in varchar2,
-                           p_date_start in date,
-                           p_date_end   in date,
-                           p_rep_id     in number) return measure_table_2
-    pipelined is
-    rec        measure_record_2;
-    l_sum      ob_corp_data_acc.ostq%type := 0;
-    l_k_ust    ob_corp_data_acc.kod_ustan%type;
-    l_dat      ob_corp_data_acc.fdat%type;
-    l_last_zn  ob_corp_data_acc.ostq%type := 0;
-    l_dat_loop ob_corp_data_acc.fdat%type;
-    l_d_sql    clob;
-    l_ref_cur  sys_refcursor;
-    type l_my_tab is table of number index by varchar2(255);
-    l_rec     l_my_tab;
-    date_diff decimal;
- begin
-    --  менџем первую дату периода (если перваџ дата в ob_corporation_data больше, чем перваџ дата периода)
-    -- устанавливаем предельную дату длџ суммированиџ = второй дате периода
-    -- не имеет значениџ есть ли такаџ дата в ob_corporation_data, если еще не наступила,
-    -- то будет прогнозный расчет cо значением остатка=текущему
-    -- суммируем в выбранном периоде остатки
-    l_d_sql := 'SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.KOD_USTAN, cd.fdat
-                     FROM ob_corp_data_acc cd  
-                     join v_ob_corp_rep_nbs q on q.nbs = substr(cd.nls,1,4) and Q.CORP_ID = cd.corp_id                    
-                    WHERE cd.is_last = 1 
-                      AND q.rep_id = :p_rep_id 
-                      AND CD.CORP_ID = :P_CORP_ID
-                      AND substr(CD.NLS,1,4) = :P_NBS ' || case
-                   when p_kv_flag = 1 then
-                    'AND CD.KV = 980 '
-                   when p_kv_flag = 2 then
-                    'AND CD.KV <> 980 '
-                   else
-                    ' '
-               end || case
-                   when p_kod_analyt <> '%' then
-                    'AND :P_KOD_ANALYT = CD.KOD_ANALYT '
-                   else
-                    ' '
-               end || ' 
-                      AND cd.fdat >= :P_DATE_START
-                      AND cd.fdat <= :P_DATE_END +10
-                    group by cd.KOD_USTAN, cd.fdat
-                    order by CD.KOD_USTAN asc, cd.fdat desc';
-
-    if p_kod_analyt <> '%' then
-        open l_ref_cur for l_d_sql
-            using p_rep_id, p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
-    else
-        open l_ref_cur for l_d_sql
-            using p_rep_id, p_corp_id, p_nbs, p_date_start, p_date_end;
-    end if;
-    loop
-        fetch l_ref_cur
-            into l_sum, l_k_ust, l_dat;
-        if l_k_ust is not null and l_dat is not null then
-            l_rec(l_k_ust || to_char(l_dat, 'ddmmyyyy')) := l_sum;
-        end if;
-        exit when l_ref_cur%notfound;
-    end loop;
-    close l_ref_cur;
-
-    for k_ust_c in (select c.external_id
-                      from ob_corporation c
-                     where c.parent_id = p_corp_id) loop
-        l_dat_loop := p_date_end + 10;
-        l_last_zn  := 0;
-        l_sum      := 0;
-        date_diff  := 0;
-        while l_dat_loop >= p_date_start loop
-            if l_rec.exists(k_ust_c.external_id ||
-                            to_char(l_dat_loop, 'ddmmyyyy')) then
-                l_last_zn := l_rec(k_ust_c.external_id ||
-                                   to_char(l_dat_loop, 'ddmmyyyy'));
-            end if;
-            if l_dat_loop <= p_date_end then
-                l_sum     := l_sum + l_last_zn;
-                date_diff := date_diff + 1;
-            end if;
-            l_dat_loop := l_dat_loop - 1;
-        end loop;
-        begin
-            rec.kod_ustan := k_ust_c.external_id;
-            rec.ost_sum   := trunc(l_sum / 100 / date_diff, 2); -- /100 - в гривны; /date_diff - среднее за период;
-            pipe row(rec);
-        exception
-            when zero_divide then
-                raise_application_error(-20001,
-                                        'Відсутні данні за вказаний період');
-        end;
-    end loop;
-
-    return;
-exception when no_data_needed then null;
-           when others then
-    close l_ref_cur;
-    logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
-    raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
- end kf_ost_sum_ustan;
 
 -------------------------------------------------вставка в customerw
 procedure ins_customerw (p_rnk customerw.rnk%type,p_external_id varchar2, p_org_id varchar2)

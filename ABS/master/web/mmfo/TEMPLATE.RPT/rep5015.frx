@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="11/03/2015 17:18:22" ReportInfo.Modified="10/22/2018 10:12:44" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="11/03/2015 17:18:22" ReportInfo.Modified="12/11/2018 10:47:52" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,8 +29,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQKIiF87dsMCEP3MerY6lxQM=">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT  t1.name, t1.ord, t2.kf ourmfo, &#13;&#10;nvl(t2.count_2560_2565,0) count_2560_2565, &#13;&#10;nvl(t2.count_2560,0) count_2560, &#13;&#10;nvl(t2.count_2565,0)count_2565,&#13;&#10;nvl(t2.count_2560_10,0)count_2560_10, &#13;&#10;nvl(t2.count_2560_20,0)count_2560_20, &#13;&#10;nvl(t2.count_2560_30,0)count_2560_30, &#13;&#10;nvl(t2.count_2560_40,0) count_2560_40, &#13;&#10;nvl(t2.count_2560_other,0) count_2560_other,&#13;&#10;nvl(t2.count_okpo,0) count_okpo,&#13;&#10;nvl(t2.count_id,0) count_id,t1.kod_s&#13;&#10;    FROM clim_mfo t1&#13;&#10;             LEFT JOIN&#13;&#10;           (SELECT a.kf,&#13;&#10;                   COUNT (DISTINCT a.okpo) count_okpo, &#13;&#10;                   COUNT (DISTINCT a.kod_ustan) count_id,&#13;&#10;                   SUM (case when substr(a.nls,1,4) in ('2560','2565') then 1 else 0 end) count_2560_2565,&#13;&#10;                   SUM (case when substr(a.nls,1,4) = '2560' then 1 else 0 end) count_2560,&#13;&#10;                   SUM (case when substr(a.nls,1,4) = '2565' then 1 else 0 end) count_2565,                   &#13;&#10;                   SUM (case when a.kod_analyt = '10' AND substr(a.nls,1,4) = '2560' then 1 else 0 end) count_2560_10,&#13;&#10;                   SUM (case when a.kod_analyt = '20' AND substr(a.nls,1,4) = '2560' then 1 else 0 end) count_2560_20,&#13;&#10;                   SUM (case when a.kod_analyt = '30' AND substr(a.nls,1,4) = '2560' then 1 else 0 end) count_2560_30,&#13;&#10;                   SUM (case when a.kod_analyt = '40' AND substr(a.nls,1,4) = '2560' then 1 else 0 end) count_2560_40,&#13;&#10;                   SUM (case when (a.kod_analyt not in ('10', '20', '30', '40') or a.kod_analyt is null) AND substr(a.nls,1,4) = '2560' then 1 else 0 end) count_2560_other&#13;&#10;              FROM ob_corp_data_acc a&#13;&#10;              join v_ob_corp_rep_nbs q on q.rep_id = 5015 and q.nbs = substr(nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;              WHERE a.corp_id = 1 &#13;&#10;                AND a.is_last = 1&#13;&#10;                AND a.fdat = TRUNC(:sFdat1)&#13;&#10;          GROUP BY a.kf) t2&#13;&#10;        ON t1.mfo = t2.kf&#13;&#10;ORDER BY t1.ord">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQARi1RaTwAwMt38fq/tvXwo=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT  t1.name, t1.ord, t2.kf ourmfo, &#13;&#10;nvl(t2.count_2560_2565,0) count_2560_2565, &#13;&#10;nvl(t2.count_2560,0) count_2560, &#13;&#10;nvl(t2.count_2565,0)count_2565,&#13;&#10;nvl(t2.count_2560_10,0)count_2560_10, &#13;&#10;nvl(t2.count_2560_20,0)count_2560_20, &#13;&#10;nvl(t2.count_2560_30,0)count_2560_30, &#13;&#10;nvl(t2.count_2560_40,0) count_2560_40, &#13;&#10;nvl(t2.count_2560_other,0) count_2560_other,&#13;&#10;nvl(t2.count_okpo,0) count_okpo,&#13;&#10;nvl(t2.count_id,0) count_id,t1.kod_s&#13;&#10;    FROM clim_mfo t1&#13;&#10;             LEFT JOIN&#13;&#10;           (SELECT a.kf,&#13;&#10;                   COUNT (DISTINCT a.okpo) count_okpo, &#13;&#10;                   COUNT (DISTINCT a.kod_ustan) count_id,&#13;&#10;                   SUM (case when a.nbs in ('2560','2565') then 1 else 0 end) count_2560_2565,&#13;&#10;                   SUM (case when a.nbs = '2560' then 1 else 0 end) count_2560,&#13;&#10;                   SUM (case when a.nbs = '2565' then 1 else 0 end) count_2565,                   &#13;&#10;                   SUM (case when a.kod_analyt = '10' AND a.nbs = '2560' then 1 else 0 end) count_2560_10,&#13;&#10;                   SUM (case when a.kod_analyt = '20' AND a.nbs = '2560' then 1 else 0 end) count_2560_20,&#13;&#10;                   SUM (case when a.kod_analyt = '30' AND a.nbs = '2560' then 1 else 0 end) count_2560_30,&#13;&#10;                   SUM (case when a.kod_analyt = '40' AND a.nbs = '2560' then 1 else 0 end) count_2560_40,&#13;&#10;                   SUM (case when (a.kod_analyt not in ('10', '20', '30', '40') or a.kod_analyt is null) AND a.nbs = '2560' then 1 else 0 end) count_2560_other&#13;&#10;              FROM ob_corp_data_acc a&#13;&#10;              join v_ob_corp_rep_nbs q on q.rep_id = 5015 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;              WHERE a.corp_id = 1 &#13;&#10;                AND a.is_last = 1&#13;&#10;                AND a.fdat = TRUNC(:sFdat1)&#13;&#10;          GROUP BY a.kf) t2&#13;&#10;        ON t1.mfo = t2.kf&#13;&#10;ORDER BY t1.ord">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="ORD" DataType="System.Int16"/>
         <Column Name="OURMFO" DataType="System.String"/>
@@ -66,10 +66,10 @@ namespace FastReport
   </Dictionary>
   <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="20" TopMargin="12" RightMargin="15" BottomMargin="12" FirstPageSource="1" OtherPagesSource="1">
     <ReportTitleBand Name="ReportTitle1" Width="990.36" Height="236.25">
-      <TableObject Name="Table4" Top="75.6" Width="982.8" Height="160.65">
+      <TableObject Name="Table4" Top="75.6" Width="992.25" Height="160.65">
         <TableColumn Name="Column6" Width="28.35"/>
         <TableColumn Name="Column7" Width="37.8"/>
-        <TableColumn Name="Column8" Width="170.1"/>
+        <TableColumn Name="Column8" Width="179.55"/>
         <TableColumn Name="Column9" Width="85.05"/>
         <TableColumn Name="Column10"/>
         <TableColumn Name="Column11"/>
@@ -130,14 +130,14 @@ namespace FastReport
           <TableCell Name="Cell49" Border.Lines="All" Fill.Color="Silver" Text="14" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
         </TableRow>
       </TableObject>
-      <TextObject Name="Text1" Width="982.8" Height="18.9" Text="ІНФОРМАЦІЯ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-      <TextObject Name="Text2" Top="18.9" Width="982.8" Height="37.8" Text="щодо кількості рахунків установ ПФУ&#13;&#10;станом на [sFdat1] р." Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text1" Width="992.25" Height="18.9" Text="ІНФОРМАЦІЯ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Top="18.9" Width="992.25" Height="37.8" Text="щодо кількості рахунків установ ПФУ&#13;&#10;станом на [sFdat1] р." Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
     </ReportTitleBand>
     <DataBand Name="Data1" Top="240.25" Width="990.36" Height="18.9" DataSource="Table">
-      <TableObject Name="Table3" Width="982.8" Height="18.9">
+      <TableObject Name="Table3" Width="992.25" Height="18.9">
         <TableColumn Name="Column1" Width="28.35"/>
         <TableColumn Name="Column2" Width="37.8"/>
-        <TableColumn Name="Column3" Width="170.1"/>
+        <TableColumn Name="Column3" Width="179.55"/>
         <TableColumn Name="Column4" Width="85.05"/>
         <TableColumn Name="Column5"/>
         <TableColumn Name="Column21"/>
@@ -168,10 +168,10 @@ namespace FastReport
       </TableObject>
     </DataBand>
     <ReportSummaryBand Name="ReportSummary1" Top="263.15" Width="990.36" Height="18.9">
-      <TableObject Name="Table5" Width="982.8" Height="18.9">
+      <TableObject Name="Table5" Width="992.25" Height="18.9">
         <TableColumn Name="Column31" Width="28.35"/>
         <TableColumn Name="Column32" Width="37.8"/>
-        <TableColumn Name="Column33" Width="170.1"/>
+        <TableColumn Name="Column33" Width="179.55"/>
         <TableColumn Name="Column34" Width="85.05"/>
         <TableColumn Name="Column35"/>
         <TableColumn Name="Column36"/>

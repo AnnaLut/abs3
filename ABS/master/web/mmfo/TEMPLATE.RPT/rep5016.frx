@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/11/2016 15:43:43" ReportInfo.Modified="10/22/2018 10:16:16" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/11/2016 15:43:43" ReportInfo.Modified="12/11/2018 10:50:15" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,8 +29,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIZnkbhY7hZAWFexk7OhbjY=">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT t1.name, t1.ord, t2.kf ourmfo, nvl(t2.sum_post,0)sum_post, nvl(t2.sum_gu_pf,0)sum_gu_pf,t1.kod_s&#13;&#10;    FROM clim_mfo t1&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT a.kf, SUM (case when substr(d.nlsa,1,4) = '2560' AND substr(d.nlsb,1,4) = '2604' then d.sq else 0 end) / 100 sum_post,&#13;&#10;                          SUM (case when okpob in (select corporation_code from ob_corporation where parent_id=1)&#13;&#10;                                      and nlsb in (select nls from ob_corp_data_acc q where a.kf=q.kf and q.fdat = a.fdat and q.kod_analyt=40 and q.corp_id = 1 and q.is_last = 1)            &#13;&#10;                                                   then d.sq else 0 end) / 100 sum_gu_pf&#13;&#10;              FROM ob_corp_data_acc a&#13;&#10;              join ob_corp_data_doc d on A.ACC = d.acc and A.SESS_ID = d.sess_id and a.kf = d.kf&#13;&#10;              join v_ob_corp_rep_nbs q on q.rep_id = 5016 and q.nbs = substr(a.nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;              WHERE a.corp_id = 1&#13;&#10;              and a.is_last = 1&#13;&#10;              AND a.fdat = :sFdat1&#13;&#10;          GROUP BY a.kf) t2&#13;&#10;            ON t1.mfo = t2.kf&#13;&#10;ORDER BY t1.ord  ">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQKlLUxArXqGf/yyeE0WklIs=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT t1.name,&#13;&#10;       t1.ord,&#13;&#10;       t2.kf ourmfo,&#13;&#10;       nvl(t2.sum_post, 0) sum_post,&#13;&#10;       nvl(t2.sum_gu_pf, 0) sum_gu_pf,&#13;&#10;       t1.kod_s&#13;&#10;  FROM clim_mfo t1&#13;&#10;  LEFT JOIN (SELECT a.kf,&#13;&#10;                    SUM(case&#13;&#10;                          when d.nbsa = '2560' AND d.nbsb = '2604' then d.sq else 0&#13;&#10;                        end) / 100 sum_post,&#13;&#10;                    SUM(case when okpob in (select w.corporation_code&#13;&#10;                                              from ob_corporation w&#13;&#10;                                              join ob_corporation e on w.parent_id = e.id&#13;&#10;                                             where e.external_id = a.corp_id) and (nlsb, kvb) in (select nls, kv &#13;&#10;                                                                                                    from ob_corp_data_acc q&#13;&#10;                                                                                                   where a.kf = q.kf&#13;&#10;                                                                                                     and q.fdat = a.fdat&#13;&#10;                                                                                                     and q.kod_analyt = '40'&#13;&#10;                                                                                                     and q.corp_id = a.corp_id&#13;&#10;                                                                                                     and q.is_last = 1) &#13;&#10;                        then d.sq else 0 end) / 100 sum_gu_pf&#13;&#10;               FROM ob_corp_data_acc a&#13;&#10;               join ob_corp_data_doc d on A.ACC = d.acc and A.SESS_ID = d.sess_id&#13;&#10;               join v_ob_corp_rep_nbs q on q.rep_id = 5016 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;              WHERE a.corp_id = 1&#13;&#10;                and a.is_last = 1&#13;&#10;                AND a.fdat = :sFdat1&#13;&#10;              GROUP BY a.kf) t2 ON t1.mfo = t2.kf&#13;&#10; ORDER BY t1.ord">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="ORD" DataType="System.Int16"/>
         <Column Name="OURMFO" DataType="System.String"/>
@@ -46,11 +46,11 @@ namespace FastReport
   </Dictionary>
   <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="12" TopMargin="20" RightMargin="12" BottomMargin="15" FirstPageSource="15" OtherPagesSource="15">
     <ReportTitleBand Name="ReportTitle1" Width="703.08" Height="160.65">
-      <TextObject Name="Text1" Top="9.45" Width="699.3" Height="18.9" Text="Інформація" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
-      <TextObject Name="Text2" Top="28.35" Width="699.3" Height="37.8" Text="щодо фінансування пенсійних виплат&#13;&#10;за [sFdat1]" Format="Date" Format.Format="d" HorzAlign="Center"/>
-      <TableObject Name="Table1" Top="75.6" Width="699.3" Height="85.05" Border.Lines="All">
+      <TextObject Name="Text1" Top="9.45" Width="703.08" Height="18.9" Text="Інформація" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Top="28.35" Width="703.08" Height="37.8" Text="щодо фінансування пенсійних виплат&#13;&#10;за [sFdat1]" Format="Date" Format.Format="d" HorzAlign="Center"/>
+      <TableObject Name="Table1" Top="75.6" Width="703.08" Height="85.05" Border.Lines="All">
         <TableColumn Name="Column1" Width="56.7"/>
-        <TableColumn Name="Column2" Width="170.1"/>
+        <TableColumn Name="Column2" Width="173.88"/>
         <TableColumn Name="Column3" Width="85.05"/>
         <TableColumn Name="Column4" Width="94.5"/>
         <TableColumn Name="Column5" Width="151.2"/>
@@ -82,9 +82,9 @@ namespace FastReport
       </TableObject>
     </ReportTitleBand>
     <DataBand Name="Data1" Top="164.65" Width="703.08" Height="18.9" DataSource="Table">
-      <TableObject Name="Table2" Width="699.3" Height="18.9">
+      <TableObject Name="Table2" Width="703.08" Height="18.9">
         <TableColumn Name="Column7" Width="56.7"/>
-        <TableColumn Name="Column8" Width="170.1"/>
+        <TableColumn Name="Column8" Width="173.88"/>
         <TableColumn Name="Column9" Width="85.05"/>
         <TableColumn Name="Column10" Width="94.5"/>
         <TableColumn Name="Column11" Width="151.2"/>
@@ -100,9 +100,9 @@ namespace FastReport
       </TableObject>
     </DataBand>
     <ReportSummaryBand Name="ReportSummary1" Top="187.55" Width="703.08" Height="18.9">
-      <TableObject Name="Table3" Width="699.3" Height="18.9" Border.Lines="All">
+      <TableObject Name="Table3" Width="703.08" Height="18.9" Border.Lines="All">
         <TableColumn Name="Column13" Width="56.7"/>
-        <TableColumn Name="Column14" Width="170.1"/>
+        <TableColumn Name="Column14" Width="173.88"/>
         <TableColumn Name="Column15" Width="85.05"/>
         <TableColumn Name="Column16" Width="94.5"/>
         <TableColumn Name="Column17" Width="151.2"/>
