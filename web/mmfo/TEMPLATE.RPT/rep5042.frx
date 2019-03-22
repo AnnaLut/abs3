@@ -1,8 +1,45 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2017 16:12:27" ReportInfo.Modified="11/12/2018 11:18:24" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2017 16:12:27" ReportInfo.Modified="12/11/2018 12:19:30" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private decimal sumSdb;
+    private decimal sumSkr;
+    
+    private void Table2_BeforePrint(object sender, EventArgs e)
+    {
+      DataSourceBase rowData = Report.GetDataSource(&quot;Table&quot;);
+      rowData.Init();
+      while( rowData.HasMoreRows)
+      {
+        sumSdb += (decimal)Report.GetColumnValue(&quot;Table.SDB&quot;);
+        sumSkr += (decimal)Report.GetColumnValue(&quot;Table.SKR&quot;);
+        rowData.Next();
+      }
+      rowData.First();
+      
+    }
+  }
+}
+</ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIxTNay2JQgkcZrX0GB6uKM=">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select name_cli,&#13;&#10;       nls,&#13;&#10;       okpo,&#13;&#10;       name,&#13;&#10;       nvl(sum (nvl(sdb,0)),0) sdb,&#13;&#10;       nvl(sum (nvl(skr,0)),0) skr&#13;&#10; from (select case when d.dk = 1 then d.namb else d.nama end name_cli,&#13;&#10;              a.nls,&#13;&#10;              case when d.dk = 1 then d.okpoa else d.okpob end okpo,&#13;&#10;              case when d.dk = 1 then d.nama else d.namb end name,&#13;&#10;              case when d.dk = 0 then d.sq / 100 else 0 end sdb,&#13;&#10;              case when d.dk = 1 then d.sq / 100 else 0 end skr&#13;&#10;         from ob_corp_data_acc a&#13;&#10;         join ob_corp_data_doc d on a.sess_id = d.sess_id and a.acc = d.acc&#13;&#10;         join v_ob_corp_rep_nbs q on q.rep_id = 5042 and q.nbs = substr(a.nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;        where a.corp_id = 5&#13;&#10;          and a.fdat between :sFdat1 and :sFdat2&#13;&#10;          and case when d.dk = 1 then d.okpob else d.okpoa end = :okpo&#13;&#10;          and a.kf = :kf&#13;&#10;          and a.nls = :nls)&#13;&#10;     group by name_cli, nls, okpo, name">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJrNv91+CXQS5t+cl7ST7gM=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select name_cli,&#13;&#10;       nls,&#13;&#10;       okpo,&#13;&#10;       name,&#13;&#10;       nvl(sum (nvl(sdb,0)),0) sdb,&#13;&#10;       nvl(sum (nvl(skr,0)),0) skr&#13;&#10; from (select case when d.dk = 1 then d.namb else d.nama end name_cli,&#13;&#10;              a.nls,&#13;&#10;              case when d.dk = 1 then d.okpoa else d.okpob end okpo,&#13;&#10;              case when d.dk = 1 then d.nama else d.namb end name,&#13;&#10;              case when d.dk = 0 then d.sq / 100 else 0 end sdb,&#13;&#10;              case when d.dk = 1 then d.sq / 100 else 0 end skr&#13;&#10;         from ob_corp_data_acc a&#13;&#10;         join ob_corp_data_doc d on a.sess_id = d.sess_id and a.acc = d.acc&#13;&#10;         join v_ob_corp_rep_nbs q on q.rep_id = 5042 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;        where a.corp_id = 5&#13;&#10;          and a.fdat between :sFdat1 and :sFdat2&#13;&#10;          and case when d.dk = 1 then d.okpob else d.okpoa end = :okpo&#13;&#10;          and a.kf = :kf&#13;&#10;          and a.nls = :nls)&#13;&#10;     group by name_cli, nls, okpo, name">
         <Column Name="NAME_CLI" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
@@ -21,61 +58,64 @@
     <Parameter Name="nls" DataType="System.String"/>
     <Parameter Name="kf" DataType="System.String"/>
     <Parameter Name="okpo" DataType="System.String"/>
-    <Total Name="Total" Expression="[Table.SDB]" Evaluator="Data1"/>
-    <Total Name="Total1" Expression="[Table.SKR]" Evaluator="Data1"/>
   </Dictionary>
-  <ReportPage Name="Page1">
-    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="94.5">
-      <TextObject Name="Text1" Left="37.8" Top="9.45" Width="614.25" Height="66.15" Text="Рух коштів по поточних рахунках із спеціальним режимом використання&#13;&#10;[Table.NAME_CLI]&#13;&#10;[nls]&#13;&#10;з [sFdat1] по [sFdat2]&#13;&#10;">
+  <ReportPage Name="Page1" PaperWidth="180">
+    <ReportTitleBand Name="ReportTitle1" Width="604.8" Height="94.5">
+      <TextObject Name="Text1" Width="607.07" Height="75.6" Text="Рух коштів по поточних рахунках із спеціальним режимом використання&#13;&#10;[Table.NAME_CLI]&#13;&#10;[nls]&#13;&#10;з [sFdat1] по [sFdat2]&#13;&#10;" HorzAlign="Center">
         <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
           <DateFormat/>
-          <GeneralFormat/>
-          <GeneralFormat/>
-          <GeneralFormat/>
+          <DateFormat/>
         </Formats>
       </TextObject>
-      <TextObject Name="Text3" Left="548.1" Top="75.6" Width="56.7" Height="18.9" Text="грн." HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text3" Left="455.87" Top="75.6" Width="151.2" Height="18.9" Text="грн." HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="98.5" Width="718.2" Height="47.25">
-      <TableObject Name="Table1" Width="604.81" Height="47.25" Border.Lines="All" Border.Width="2">
-        <TableColumn Name="Column1" Width="139.39"/>
-        <TableColumn Name="Column2" Width="177.19"/>
-        <TableColumn Name="Column3" Width="139.39"/>
-        <TableColumn Name="Column4" Width="148.84"/>
-        <TableRow Name="Row1" Height="28.35">
-          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="DarkGray" Text="Код ЄДРПОУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="DarkGray" Text="Найменування клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="DarkGray" Text="Перераховано коштів з рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell4" Border.Lines="All" Fill.Color="DarkGray" Text="Надійшло коштів на рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-        </TableRow>
-        <TableRow Name="Row2">
-          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="DarkGray" Text="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="DarkGray" Text="2" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="DarkGray" Text="3" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="DarkGray" Text="4" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    <DataBand Name="Data1" Top="168.65" Width="604.8" Height="18.9" DataSource="Table">
+      <TableObject Name="Table3" Width="604.81" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column9" Width="139.39"/>
+        <TableColumn Name="Column10" Width="177.19"/>
+        <TableColumn Name="Column11" Width="139.39"/>
+        <TableColumn Name="Column12" Width="148.84"/>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell23" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell24" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell25" Border.Lines="All" Text="[Table.SDB]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="[Table.SKR]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
       </TableObject>
-    </PageHeaderBand>
-    <DataBand Name="Data1" Top="149.75" Width="718.2" Height="94.5" DataSource="Table">
-      <TableObject Name="Table2" Width="604.81" Height="37.8" Border.Lines="All" Border.Width="2">
-        <TableColumn Name="Column5" Width="139.39"/>
-        <TableColumn Name="Column6" Width="177.19"/>
-        <TableColumn Name="Column7" Width="139.39"/>
-        <TableColumn Name="Column8" Width="148.84"/>
-        <TableRow Name="Row3">
-          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="PaleTurquoise" Text="Всього" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="PaleTurquoise" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="PaleTurquoise" Text="[Total]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="PaleTurquoise" Text="[Total1]" HorzAlign="Center" VertAlign="Center"/>
-        </TableRow>
-        <TableRow Name="Row4">
-          <TableCell Name="Cell15" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell16" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell17" Border.Lines="All" Text="[Table.SDB]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell18" Border.Lines="All" Text="[Table.SKR]" HorzAlign="Center" VertAlign="Center"/>
-        </TableRow>
-      </TableObject>
+      <DataHeaderBand Name="DataHeader3" Top="98.5" Width="604.8" Height="66.15">
+        <TableObject Name="Table1" Width="604.81" Height="47.25" Border.Lines="All" Border.Width="2">
+          <TableColumn Name="Column1" Width="139.39"/>
+          <TableColumn Name="Column2" Width="177.19"/>
+          <TableColumn Name="Column3" Width="139.39"/>
+          <TableColumn Name="Column4" Width="148.84"/>
+          <TableRow Name="Row1" Height="28.35">
+            <TableCell Name="Cell1" Border.Lines="All" Fill.Color="DarkGray" Text="Код ЄДРПОУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell2" Border.Lines="All" Fill.Color="DarkGray" Text="Найменування клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell3" Border.Lines="All" Fill.Color="DarkGray" Text="Перераховано коштів з рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell4" Border.Lines="All" Fill.Color="DarkGray" Text="Надійшло коштів на рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </TableRow>
+          <TableRow Name="Row2">
+            <TableCell Name="Cell6" Border.Lines="All" Fill.Color="DarkGray" Text="1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell7" Border.Lines="All" Fill.Color="DarkGray" Text="2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell8" Border.Lines="All" Fill.Color="DarkGray" Text="3" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell9" Border.Lines="All" Fill.Color="DarkGray" Text="4" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+        <TableObject Name="Table2" Top="47.25" Width="604.81" Height="18.9" Border.Lines="All" Border.Width="2" BeforePrintEvent="Table2_BeforePrint">
+          <TableColumn Name="Column13" Width="139.39"/>
+          <TableColumn Name="Column14" Width="177.19"/>
+          <TableColumn Name="Column15" Width="139.39"/>
+          <TableColumn Name="Column16" Width="148.84"/>
+          <TableRow Name="Row7">
+            <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Aquamarine" Text="Всього" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Aquamarine" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell29" Border.Lines="All" Fill.Color="Aquamarine" Text="[sumSdb]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell30" Border.Lines="All" Fill.Color="Aquamarine" Text="[sumSkr]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="248.25" Width="718.2" Height="18.9"/>
   </ReportPage>
 </Report>

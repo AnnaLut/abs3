@@ -44,7 +44,8 @@ begin
     POSTDAT DATE, 
     NAMK VARCHAR2(70), 
     NMS VARCHAR2(70), 
-    IS_LAST NUMBER(1,0)
+    IS_LAST NUMBER(1,0),
+	NBS VARCHAR2(4)
    ) PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
   TABLESPACE BRSBIGD COMPRESS 
   partition by range (FDAT)
@@ -74,7 +75,13 @@ exception when others then
 end; 
 /
 
-
+begin
+    execute immediate 'alter table OB_CORP_DATA_ACC add nbs VARCHAR2(4)';          
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to OB_CORP_DATA_ACC ***
@@ -103,18 +110,17 @@ COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.POSTDAT IS 'Дата проведення в ОДБ (дата 
 COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.NAMK IS 'Найменування клієнта';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.NMS IS 'Найменування рахунку';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.IS_LAST IS 'Актуальність даних';
+COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.NBS IS 'Балансовий рахунок';
 
 
-
-
-PROMPT *** Create  constraint PK_OB_CORP_DATA_ACC ***
+PROMPT *** Create  index IND_OB_CORP_DATA_ACC_CORP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORP_DATA_ACC ADD CONSTRAINT PK_OB_CORP_DATA_ACC PRIMARY KEY (SESS_ID, ACC)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  CREATE INDEX BARS.IND_OB_CORP_DATA_ACC_CORP ON BARS.OB_CORP_DATA_ACC (FDAT, IS_LAST, CORP_ID, KF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  TABLESPACE BRSBIGI  LOCAL ';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 
@@ -128,8 +134,6 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
-
 
 PROMPT *** Create  grants  OB_CORP_DATA_ACC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OB_CORP_DATA_ACC to BARS_ACCESS_DEFROLE;
