@@ -11,17 +11,22 @@ CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #08 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :28/12/2018 (07/12/2018)
+% VERSION     :14/03/2019 (06/03/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-28.12.2018 изменения для групп бал.счетов 612, 630 
+14.03.2019 для бал.счетов 2805,3510,3519,3550,3551,3552,3559,3578 
+           и S183='0' изменяем S183_ на '1'
+           для всіх бал.рахунків параметр S183 змінюємо з "0" на "1"
+06.03.2019 добавлено блок для заміни параметру K072 для від'ємних значень 
+           показника для бал.рахунків 6 і 7 класів
+28.12.2018 изменения для групп бал.счетов 612, 630
 07.12.2019 для бал.рах. 3500,3600 параметр R011 будемо формувати нульовим
-30.11.2018 включено для обробки два бал.рахунки 3500 _ 3600 як_ будуть 
-           включатися в файл #08X _ не будуть включатися в файл #08.  
-09.10.2018 при розбитт_ залишку для групи бал.рах. 704 параметр R011 
-           формуємо _з значенням "0" 
+30.11.2018 включено для обробки два бал.рахунки 3500 _ 3600 як_ будуть
+           включатися в файл #08X _ не будуть включатися в файл #08.
+09.10.2018 при розбитт_ залишку для групи бал.рах. 704 параметр R011
+           формуємо _з значенням "0"
 07.08.2018 для 3521,3522,3621,3622 зм_нено формування параметру K072
 08.05.2018 для бал.счета 3648 параметр R011 будем формировать равным нулю
 09.02.2018 для 3653, 3658 зм_нено формування параметру K072
@@ -29,10 +34,10 @@ CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
 06.02.2018 для группы 290 и бал.счетов 2920, 2924 R011='0'
 22.01.2018 изменено формирование параметра K072 для ФЛ и для некотр_х
            бал.счетов
-18.01.2018 для таблицы KL_K070 изменео условие p.D_CLOSE is null на 
-           p.D_CLOSE(+) is null (возникала ошибка) 
+18.01.2018 для таблицы KL_K070 изменео условие p.D_CLOSE is null на
+           p.D_CLOSE(+) is null (возникала ошибка)
 11.01.2018 новая структура показателя добавлено 3-х значный код страны
-20.03.2017 объеденнены некоторые блоки для присвоения переменной S_  
+20.03.2017 объеденнены некоторые блоки для присвоения переменной S_
            значения 'I'
 07.06.2016 для групп бал.счетов 602,604,605 и Кт оборотов в кореспонденции
            со счетами дискрнта формируем показатель со знаком плюс
@@ -155,9 +160,9 @@ CURSOR Saldo IS
               NVL(lpad (trim(cc.k072), 2, 'X'),'XX') k072,
               s.ost, s.ostq, s.dos96, s.kos96, s.dosq96, s.kosq96,
               s.dos99, s.kos99, s.dosq99, s.kosq99,
-              s.doszg, s.koszg, a.isp, a.tobo, a.nms, a.tip, 
+              s.doszg, s.koszg, a.isp, a.tobo, a.nms, a.tip,
               NVL(cc.s130,'90') S130, lpad (to_char(c.country), 3, '0'), nvl(a.ob22, '00')
-       FROM  otcn_saldo s, specparam cc, otcn_acc a, customer c 
+       FROM  otcn_saldo s, specparam cc, otcn_acc a, customer c
        WHERE (s.ost-s.dos96+s.kos96+s.doszg-s.koszg <> 0 OR
               s.ostq-s.dosq96+s.kosq96 <> 0)
          and s.acc = a.acc
@@ -183,7 +188,7 @@ procedure p_ins(p_dat_ date, p_tp_ varchar2, p_rnk_ number, p_nls_ varchar2,
                 p_nbs_ varchar2, p_kv_ smallint, p_r011_ varchar2,
                 p_r013_ varchar2, p_k072_ varchar2,
                 p_s183_ varchar2, p_s130_ varchar2,
-                p_country_ varchar2, 
+                p_country_ varchar2,
                 p_znap_ varchar2, p_isp_ number, p_nbuc_ varchar2) IS
 
 kod_ varchar2(18);
@@ -221,8 +226,8 @@ begin
       s_:= '22';
    end if;
 
-   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_=2 and 
-      s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+   if substr(p_nbs_,1,3) in ('601','608','701','708') and r_=2 and
+      s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8')
    then
       s_:= 'N2';
    end if;
@@ -239,23 +244,23 @@ begin
       s_:='30';
    end if;
 
-   if (p_nbs_ in ('3653','3658') or 
-      substr(p_nbs_,1,3) in ('355','605','606','610','611','704')) and 
-      r_=1 and s_ not in ('42','43') 
+   if (p_nbs_ in ('3653','3658') or
+      substr(p_nbs_,1,3) in ('355','605','606','610','611','704')) and
+      r_=1 and s_ not in ('42','43')
    then
       s_:= '42';
    end if;
 
-   if (p_nbs_ in ('3653','3658') or 
-      substr(p_nbs_,1,3) in ('355','605','606','610','611','704')) and 
-      r_=2 and s_ not in ('N8') 
+   if (p_nbs_ in ('3653','3658') or
+      substr(p_nbs_,1,3) in ('355','605','606','610','611','704')) and
+      r_=2 and s_ not in ('N8')
    then
       s_:= 'N8';
    end if;
 
-   if p_nbs_ in ('6140') or 
-      substr(p_nbs_,1,3) in ('601','613','701','713') and 
-      r_=2 and s_ not in ('N3') 
+   if p_nbs_ in ('6140') or
+      substr(p_nbs_,1,3) in ('601','613','701','713') and
+      r_=2 and s_ not in ('N3')
    then
       s_:= 'N3';
    end if;
@@ -280,12 +285,12 @@ begin
       s_ := 'N6';
    end if;
 
-   if custtype_ = 2 and codcagent_ = 3 and s_ = '00' 
+   if custtype_ = 2 and codcagent_ = 3 and s_ = '00'
    then
       s_ := '12';
    end if;
 
-   if custtype_ = 2 and codcagent_ = 4 and s_ = '00' 
+   if custtype_ = 2 and codcagent_ = 4 and s_ = '00'
    then
       s_ := 'N6';
    end if;
@@ -299,24 +304,24 @@ begin
    then
       s_ := 'N8';
    end if;
-   
+
    if p_nbs_ = '7030' and r_=1 and s_ not in ('30', '31', '32', '33')
    then
-      s_:= (case  
+      s_:= (case
                 when ob22_ in ('01', '06', '07', '08','51') then '30'
                 when ob22_ in ('47', '48') then '31'
                 else '30'
             end);
-   end if;   
+   end if;
 
    if p_nbs_ in ('1919') and s_ = '2D' then
       s_:='21';
    end if;
-   
+
     if substr(p_nbs_,1,3) = '602' and s_ = '21' then
        s_ := '2B';
-    end if;   
-    
+    end if;
+
    Ostn_:= to_number(p_znap_);
 
    if substr(p_nbs_,1,3) in ('602','605','609','612','630') then
@@ -351,7 +356,7 @@ begin
             s2_:=s_ ;
          end if;
 
-         if s2_ <> '00' then  
+         if s2_ <> '00' then
             s1_ := s2_;
          end if;
 
@@ -369,24 +374,24 @@ begin
             else
                s1_ := 'N2';
             end if;
-            
+
             r1_ := '2';
          end if;
 
         -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
          if substr(p_nbs_,1,3) = '605' and s1_ <> 'N8' and r1_ = '2' then
             s1_:='N8';
-         end if;   
+         end if;
 
          if substr(p_nbs_,1,3) = '605' and s1_ not in ('42', '43') and r1_ = '1' then
             s1_:='42';
-         end if;   
-         
-         if dat_ < dat_Izm1 
+         end if;
+
+         if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') ||
                    '1' || p_s130_ || p_country_;
          end if;
 
@@ -462,7 +467,7 @@ begin
                s1_ := 'N2';
                s_  := 'N2';
             end if;
-            
+
             r_ := '2';
             r1_ := '2';
          end if;
@@ -470,21 +475,21 @@ begin
         -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
          if substr(p_nbs_,1,3) = '605' and s1_ <> 'N8' and r1_ = '2' then
             s1_:='N8';
-         end if;   
+         end if;
 
          if substr(p_nbs_,1,3) = '605' and s1_ not in ('42', '43') and r1_ = '1' then
             s1_:='42';
-         end if;   
+         end if;
 
          if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') ||
                    '1' || p_s130_ || p_country_;
          end if;
 
-         if se_ <> 0 and k.nlsk not like '6%'  
+         if se_ <> 0 and k.nlsk not like '6%'
          then
             comm1_ := '';
             comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
@@ -495,13 +500,13 @@ begin
             Ostn_:= Ostn_ - se_;
          end if;
 
-         if se_ <> 0 and k.nlsk like '6%'  
+         if se_ <> 0 and k.nlsk like '6%'
          then
             if dat_ < dat_Izm1
             then
                kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
-            else 
-               kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') || 
+            else
+               kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') ||
                       '1' || p_s130_ || p_country_;
             end if;
 
@@ -516,9 +521,9 @@ begin
    end if;
 
    if ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_<>300465) OR
-      ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_=300465 and 
-         p_k072_ in ('XX','21') 
-      ) 
+      ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_=300465 and
+         p_k072_ in ('XX','21')
+      )
    then
       for k in (select accd, nlsd, kv, decode(kv,980,sum(s*100),sum(sq*100)) s,
                        acck, nlsk
@@ -573,7 +578,7 @@ begin
 
          se_:= 0;  -- 09.06.2013 ниже есть блок для обратных проводок
 
-         if s2_ <> '00' then  
+         if s2_ <> '00' then
             s1_ := s2_;
          end if;
 
@@ -589,24 +594,24 @@ begin
             s1_ := 'N2';
             r1_ := '2';
          end if;
-         
+
         -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
          if substr(p_nbs_,1,3) in ('702') and s1_='N2' and r1_ = '2' then
             s1_:='N6';
-         end if;   
+         end if;
 
          if substr(p_nbs_,1,3) = '702' and s1_='42' and r1_ = '1' then
             s1_:='41';
-         end if;         
+         end if;
 
          if substr(p_nbs_,1,3) = '702' and s1_='21' and r1_ = '1' then
             s1_:='2D';
-         end if;  
+         end if;
                   if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
-         else 
-            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+         else
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') ||
                    '1' || p_s130_ || p_country_;
          end if;
 
@@ -672,7 +677,7 @@ begin
          else
             s1_:='X';
             r1_:='1';
-            s2_:=s_ ;  
+            s2_:=s_ ;
          end if;
 
          if s2_ <> '00' then
@@ -693,25 +698,25 @@ begin
             s1_ := 'N2';
             r1_ := '2';
          end if;
-         
+
         -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
          if substr(p_nbs_,1,3) in ('702') and s1_='N2' and r1_ = '2' then
             s1_:='N6';
-         end if;   
+         end if;
 
          if substr(p_nbs_,1,3) = '702' and s1_='42' and r1_ = '1' then
             s1_:='41';
-         end if;         
+         end if;
 
          if substr(p_nbs_,1,3) = '702' and s1_='21' and r1_ = '1' then
             s1_:='2D';
-         end if;          
+         end if;
 
          if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') ||
                    '1' || p_s130_ || p_country_;
          end if;
 
@@ -729,10 +734,10 @@ begin
             then
                kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
             else
-               kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') || 
-                      '1' || p_s130_ || p_country_; 
+               kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') ||
+                      '1' || p_s130_ || p_country_;
             end if;
-  
+
             INSERT INTO rnbu_trace
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsk, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm_);
@@ -784,7 +789,7 @@ begin
             s1_:=s2_;
          end if;
 
-         if s1_ in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+         if s1_ in ('N1','N2','N3','N4','N5','N6','N7','N8')
          then
             r1_:='2';
          end if;
@@ -801,26 +806,26 @@ begin
             s1_ := 'N2';
             r1_ := '2';
          end if;
-         
+
          if custtype_ = 3 and codcagent_ = 5 and s1_ not in ('42','43')
          then
             s1_ := '42';
          end if;
-         
+
          if (custtype_ = 3 and codcagent_ = 6 or r1_ = '2') and s1_ not in ('N8')
          then
             s1_ := 'N8';
-         end if;         
+         end if;
 
          if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') ||
                    '1' || p_s130_ || p_country_;
          end if;
 
-         if se_ <> 0 then  
+         if se_ <> 0 then
             INSERT INTO rnbu_trace
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsk, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm1_);
@@ -857,7 +862,7 @@ begin
             where ca.acc=k.accd and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
-                  c.ise = p.k070(+) and 
+                  c.ise = p.k070(+) and
                   p.d_close(+) is null;
 
             comm1_ := '';
@@ -872,7 +877,7 @@ begin
             s1_:=s2_;
          end if;
 
-         if s1_ in ('N1','N2','N3','N4','N5','N6','N7','N8') 
+         if s1_ in ('N1','N2','N3','N4','N5','N6','N7','N8')
          then
             r1_:='2';
          end if;
@@ -896,21 +901,21 @@ begin
          then
             s1_ := '42';
          end if;
-         
+
          if (custtype_ = 3 and codcagent_ = 6 or r1_ = '2') and s1_ not in ('N8')
          then
             s1_ := 'N8';
-         end if;         
-         
+         end if;
+
          if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else
-            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') || 
+            kod_:= p_tp_ || p_nbs_ || '0' || s1_ || r1_ || lpad(p_kv_,3,'0') ||
                    '1' || p_s130_ || p_country_;
          end if;
 
-         if se_ <> 0 then   
+         if se_ <> 0 then
             INSERT INTO rnbu_trace
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsk, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm1_);
@@ -934,11 +939,11 @@ begin
       else
          if substr(p_nbs_,1,3) in ('605','704') OR p_nbs_ in ('3500','3600')
          then
-            kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;         
+            kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') ||
+                   p_s183_ || p_s130_ || p_country_;
          else
-            kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
-                   p_s183_ || p_s130_ || p_country_;         
+            kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') ||
+                   p_s183_ || p_s130_ || p_country_;
          end if;
       end if;
 
@@ -986,7 +991,7 @@ p_proc_set(kodf_,sheme_,nbuc1_,typ_);
 sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''08'' union select ''3500'' from dual union select ''3600'' from dual ';
 
    if mfou_ <> 300465 and to_char(Dat_,'MM')='12' then
-      ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);   
+      ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
    else
       if to_char(Dat_,'MM') in ('01','02','03','04','05','06') then
          ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
@@ -1170,11 +1175,11 @@ LOOP
    FETCH SALDO INTO rnk_, acc_, nls_, kv_, data_, nbs1_, r011_, r013_, k072_,
                     Ostn_, Ostq_, Dos96_, Kos96_, Dosq96_, Kosq96_,
                     Dos99_, Kos99_, Dosq99_, Kosq99_,
-                    Doszg_, Koszg_, isp_, tobo_, nms_, tip_, s130_, country_, ob22_, 
+                    Doszg_, Koszg_, isp_, tobo_, nms_, tip_, s130_, country_, ob22_,
                     nd_, freq_;
    EXIT WHEN SALDO%NOTFOUND;
 
-   if substr(nbs1_,1,3) = '290' OR nbs1_ in ('2920', '2924', '3648') 
+   if substr(nbs1_,1,3) = '290' OR nbs1_ in ('2920', '2924', '3648')
    then
       r011_ := '0';
    end if;
@@ -1266,7 +1271,7 @@ LOOP
    end if;
 
    IF se_<>0 THEN
-      if typ_ > 0 then  
+      if typ_ > 0 then
          nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
       else
          nbuc_ := nbuc1_;
@@ -1310,7 +1315,7 @@ LOOP
          s183_:='B';
       end if;
 
-      if nbs1_ in ('2809','2924','3570')  and s183_ = '0' 
+      if nbs1_ in ('2805','2809','2924','2510','3519','3550','3551','3552','3559','3570','3578')  and s183_ = '0'
       then
          s183_:='1';
       end if;
@@ -1327,7 +1332,7 @@ LOOP
       END;
 
       -- счета начисленных процентов
-      IF dat_ < dat_Izm1 and fa7p_ > 0 and se_ < 0 
+      IF dat_ < dat_Izm1 and fa7p_ > 0 and se_ < 0
       THEN
 
          freq_:= NULL;
@@ -1436,8 +1441,11 @@ LOOP
 END LOOP;
 CLOSE SALDO;
 
+update rnbu_trace set kodp = substr(kodp,1,12) || '1' || substr(kodp,14)
+where substr(kodp,13,1)='0';
+
 update rnbu_trace set kodp = substr(kodp,1,6) || '42' || substr(kodp,9,10)
-where substr(kodp,2,4) in ('3653','3658') 
+where substr(kodp,2,4) in ('3653','3658')
 and substr(kodp,7,2)='00'
 and substr(kodp,9,1)='1';
 
@@ -1445,6 +1453,46 @@ update rnbu_trace set kodp = substr(kodp,1,6) || '42' || substr(kodp,9,10)
 where substr(kodp,2,3) in ('355','605','606','610','611','704')
 and substr(kodp,7,2)='00'
 and substr(kodp,9,1)='1';
+
+-- блок для заміни параметру K072 для від'ємних значень показника
+
+for z in ( select kodp, sum(znap) 
+           from bars.rnbu_trace
+           where substr(kodp,2,1) in ('6','7')  
+           group by kodp
+           having sum(znap) < 0
+         )
+     loop
+ 
+        for k in ( select r1.* 
+                   from rnbu_trace r1
+                   where r1.kodp = z.kodp 
+                 )
+            loop
+
+               begin
+                  select kodp 
+                     into kodp_
+                  from rnbu_trace 
+                  where znap = ( select max(znap) 
+                                 from rnbu_trace 
+                                 where kodp like substr(z.kodp,1,6)||'__'||substr(z.kodp,9)||'%' 
+                                   and substr(kodp,7,2) <> substr(z.kodp,7,2)
+                               )
+                    and rownum =1;
+               
+                  if k.znap < 0 
+                  then
+                     update rnbu_trace r set r.kodp = substr(z.kodp,1,6) || substr(kodp_,7,2) || substr(z.kodp,9),
+                                             r.comm = substr(k.comm || 'заміна K072 з ' || substr(z.kodp,7,2) || ' на ' || substr(kodp_,7,2), 1,200)
+                     where r.recid = k.recid;
+                  end if;
+               exception when no_data_found then
+                  null;
+               end;
+
+        end loop;
+end loop; 
 ---------------------------------------------------
 DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
 ---------------------------------------------------
@@ -1452,7 +1500,7 @@ DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
 INSERT INTO tmp_nbu(kodf, datf, kodp, znap, nbuc)
 SELECT kodf_, Dat_, kodp, SUM (znap), nbuc
 FROM rnbu_trace
-WHERE substr(kodp,2,4) not in ('3500','3600') 
+WHERE substr(kodp,2,4) not in ('3500','3600')
 GROUP BY kodf_, Dat_, kodp, nbuc;
 
 logger.info ('P_F08_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
