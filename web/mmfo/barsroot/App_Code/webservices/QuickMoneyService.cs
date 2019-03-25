@@ -35,6 +35,7 @@ namespace Bars.WebServices.QuickMoney
         public string TransactionShortReport(string Parameters, string ServiceMethod)
         {
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
             try
             {
                 SoapHttpClient client = new SoapHttpClient(TypeClient.ServiceName.QUICK_MONEY);
