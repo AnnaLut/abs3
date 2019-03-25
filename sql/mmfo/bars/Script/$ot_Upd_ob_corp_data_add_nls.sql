@@ -9,6 +9,8 @@ dbms_output.put_line('KF :'||i.kf||' Updated: '||sql%rowcount);
 commit;
 end loop;
 bc.go('/');
+dbms_stats.gather_table_stats ('BARS','OB_CORP_DATA_ACC', estimate_percent => 5, cascade => true);
+dbms_stats.gather_table_stats ('BARS','OB_CORP_DATA_DOC', estimate_percent => 5, cascade => true);
 exception when others then
 bc.go('/');
 raise;

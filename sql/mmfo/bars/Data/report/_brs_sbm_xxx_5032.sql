@@ -50,7 +50,7 @@ begin
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5032.frx';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := '';
+    l_zpr.default_vars := ':kod_ustan=''%''';
     l_zpr.bind_sql     := ':kod_ustan=''V_ORG_CORPORATIONS|EXTERNAL_ID|CORPORATION_NAME|WHERE base_id = 8''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select 1 from dual';
