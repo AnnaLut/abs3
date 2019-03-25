@@ -28,7 +28,8 @@ begin
 	CORPORATION_NAME VARCHAR2(300 CHAR), 
 	PARENT_ID NUMBER(5,0), 
 	STATE_ID NUMBER(5,0), 
-	EXTERNAL_ID VARCHAR2(30 CHAR)
+	EXTERNAL_ID VARCHAR2(30 CHAR),
+	BASE_CORP number
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -38,6 +39,12 @@ exception when others then
 end; 
 /
 
+begin
+execute immediate 'alter table ob_corporation add BASE_CORP number';
+exception when others then
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
 
 
 
@@ -120,18 +127,16 @@ exception when others then
 
 
 
-PROMPT *** Create  index IND_OB_CORP_EXT ***
+PROMPT *** Create  index UK_OB_CORPORATION ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.IND_OB_CORP_EXT ON BARS.OB_CORPORATION (EXTERNAL_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
+CREATE INDEX BARS.UK_OB_CORPORATION ON BARS.OB_CORPORATION (EXTERNAL_ID, BASE_CORP)
+LOGGING
+TABLESPACE BRSSMLI compress 1';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
-
 
 
 PROMPT *** Create  index IND_OB_CORP_PER_ID ***
