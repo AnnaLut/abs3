@@ -10,14 +10,16 @@ using System.Web.Services;
 using Bars.WebServices.OutsideServices;
 using System.Xml;
 using Microsoft.CSharp.RuntimeBinder;
+using System.Text;
 
 namespace Bars.WebServices.OutsideServices
 {
     public static class TypeClient
     {
-        public enum ServiceName{ SINGLE_WINDOW, QUICK_MONEY }
+        public enum ServiceName { SINGLE_WINDOW, QUICK_MONEY }
 
-        public static string GetStringType(ServiceName name) {
+        public static string GetStringType(ServiceName name)
+        {
             switch (name)
             {
                 case ServiceName.QUICK_MONEY:
@@ -56,7 +58,7 @@ namespace Bars.WebServices.OutsideServices
                     return new SWWS();
 
                 case TypeClient.ServiceName.QUICK_MONEY:
-                    return new SWSvc();
+                    return new SWSvc { Timeout = 1000 * 60 * 60 };
                 default:
                     throw new ApplicationException("Ошибка создания клиента для сервиса " + serviceName);
             }
@@ -73,22 +75,22 @@ namespace Bars.WebServices.OutsideServices
 
             string certName = Bars.Configuration.ConfigurationSettings.AppSettings[sn + ".CertSearch"];
             if (!string.IsNullOrEmpty(certName))
+            {
+                X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                store.Open(OpenFlags.ReadOnly);
+                var certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, certName, false);
+                X509Certificate cert = null;
+                try
                 {
-                    X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-                    store.Open(OpenFlags.ReadOnly);
-                    var certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, certName, false);
-                    X509Certificate cert = null;
-                    try
-                    {
-                        cert = certCollection[0];
-                    }
-                    catch (System.Exception ex)
-                    {
-                        throw new System.Exception("Сертифікат для запитів до сервісу " + serviceName + " не знайдено (пошук по [" + certName + "])");
-                    }
-
-                    proxy.ClientCertificates.Add(cert);
+                    cert = certCollection[0];
                 }
+                catch (System.Exception ex)
+                {
+                    throw new System.Exception("Сертифікат для запитів до сервісу " + serviceName + " не знайдено (пошук по [" + certName + "])");
+                }
+
+                proxy.ClientCertificates.Add(cert);
+            }
         }
 
         public ProxyModel LoadParams()
@@ -107,11 +109,12 @@ namespace Bars.WebServices.OutsideServices
 
         public string GiveResponse(object[][] response)
         {
-            string result = "";
+            StringBuilder result = new StringBuilder();
+            //string result = "";
             XmlDocument xmlDoc = new XmlDocument();
             dynamic records = response;
 
-            if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW || 
+            if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW ||
                 (serviceName == TypeClient.ServiceName.QUICK_MONEY && response[0].Length == 1)) //old version for single_window & quick_money.TransactionShortReport
             {
 
@@ -123,7 +126,7 @@ namespace Bars.WebServices.OutsideServices
                         XmlNode root = xmlDoc.FirstChild;
                         XmlNodeList list = root["Data"].ChildNodes;
                         foreach (XmlNode node in list)
-                            result += node.OuterXml;
+                            result.Append(node.OuterXml);
                     }
                 }
             }
@@ -134,10 +137,10 @@ namespace Bars.WebServices.OutsideServices
                 XmlNode root = xmlDoc.FirstChild;
                 XmlNodeList list = root["NBUSTATREPORT"].ChildNodes;
                 foreach (XmlNode node in list)
-                    result += node.OuterXml;
+                    result.Append(node.OuterXml);
             }
 
-            return result;
+            return result.ToString();
         }
     }
 }
