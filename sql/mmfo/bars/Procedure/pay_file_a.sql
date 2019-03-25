@@ -51,7 +51,6 @@ PROMPT *** Create  procedure PAY_FILE_A ***
   l_tmp varchar2(32767);
   l_str varchar2(32767);
 
-
     function get_kv(p_lcv tabval.lcv%type) return tabval.kv%type
         is
         l_kv tabval.kv%type;
@@ -185,6 +184,15 @@ PROMPT *** Create  procedure PAY_FILE_A ***
         bars_audit.trace('%s: pay_extern_doc done, l_errcode=%s, l_errmsg=%s',
            l_th, to_char(l_errcode), l_errmsg);
 
+        if p_errcode = 0 and p_errmsg is null then
+          begin
+            insert into CHECK_PAY_FILE_A(ND,S, NLSA, NLSB, MFOA, MFOB, LCV, PDAT, VDAT, KF)
+            values(p_nd, p_s, p_nlsa, p_nlsb, p_mfoa, p_mfob, p_kv, p_date, gl.bdate, sys_context('bars_context','user_mfo'));
+          exception when dup_val_on_index then
+            raise_application_error(-20000, 'Документ з номером '||p_nd||' вже створено!');
+            rollback to savepoint sp_paystart; 
+          end;
+        end if; 
        -- возврат контекста
        bc.set_context;
 
