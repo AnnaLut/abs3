@@ -6681,7 +6681,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
 
-            commit;
+       --     commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
         for c in (select *
