@@ -221,7 +221,7 @@ function initMainGrid() {
             {
                 field: 'Rules',
                 title: 'Правила',
-                width: 100,
+                width: 120,
                 template: '#= singleRowRulesViewTemplate(Rules, Ref) #'
             },
             {
@@ -436,7 +436,7 @@ function initMainGrid() {
     };
 
     $(formCfg.mainGridSelector).kendoGrid(gridOptions);
-    changeGridMaxHeight(0.77, formCfg.mainGridSelector);
+    changeGridMaxHeight(0.87, formCfg.mainGridSelector);
 
     $('#showBlockedOnly').on('change', function () {
         filter.filteringData.showBlockedOnly = this.checked;
@@ -481,7 +481,7 @@ function singleRowRulesViewTemplate(rules, ref) {
 
     var onclick = "showRulesInfoDict('" + rules.trim() + "' , '" + ref + "');";
     var title = 'title="Перегляд правил фінансового моніторингу для документу реф. ' + ref + '"';
-    return '<a style="min-width: auto; border: none;background: transparent;" class="k-button" ' + title + ' onclick="' + onclick + '"><i class="pf-icon pf-16 pf-book"></i></a>';
+    return '<a style="min-width: auto; border: none;background: transparent;" class="k-button" ' + title + ' onclick="' + onclick + '">' + rules + ' <i class="pf-icon pf-16 pf-book" style="margin-left:5px;"></i></a>';
 }
 
 function getStatusTemplate(status) {
