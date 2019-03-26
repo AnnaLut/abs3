@@ -1312,19 +1312,19 @@ IS
         end;
 
         begin
-         select case when SIGN_DATE is not null then id
-                          else -id
-                     end
-                  into l_res
-               from
-               (select ed.sign_date, ed.id, ed.crt_date, max(ed.crt_date) over (partition by template_id order by crt_date desc) max_crt_date
-                from ead_docs ed
-               where ed.AGR_ID = p_id
-                 and ED.EA_STRUCT_ID = p_struct_code
-                 and ED.RNK = p_rnk
-				 and ed.acc = p_acc
-                 and ed.template_id = p_template)
-               where crt_date = max_crt_date;
+         select case when SIGN_DATE is not null 
+                     then  id
+                     else -id
+                end
+           into l_res
+           from
+               (select ed.sign_date, ed.id, ed.crt_date, max(ed.id) over (partition by template_id order by id desc) max_id
+                  from ead_docs ed
+                 where ed.AGR_ID = p_id and 
+                       ED.EA_STRUCT_ID = p_struct_code and 
+                       ED.RNK = p_rnk and 
+                       ed.template_id = p_template)
+          where id = max_id;
         exception
           when NO_DATA_FOUND then
             bars_audit.error('EBP.GET_ARCHIVE_DKBO_DOCID : не знайдено жодного друку документу для РНК = '|| to_char(p_rnk) || ' угоди ДКБО = ' || to_char(p_id) || ' з кодом ЕА = ' || p_struct_code || ' і шаблоном ' || p_template);
