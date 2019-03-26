@@ -7,13 +7,8 @@
   CREATE OR REPLACE PACKAGE BARS.CHK IS
 -- ****************************************************************
 -- *            Financial cheks functions package                 *
--- *                Unity-Bars (c) 2000-2009                          *
+-- *                Unity-Bars (c) 2000-2019                      *
 -- ****************************************************************
-/*
-    -- OSC+VISASIGN+WEB                 Ощадный банк(ГРЦ)
-    -- OSC+VISASIGN+WEB+KF              Ощадный банк(мульти-мфо)
-    -- VISASIGN                         Демарк (уточнить, нужен ли макрос FM)
-*/
 
 G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 3.66 16/10/2016';
 
@@ -333,7 +328,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CHK IS
 
 -- ****************************************************************
 -- *            Financial cheks functions package                 *
--- *               Unity-Bars (c) 2000-2006                       *
+-- *               Unity-Bars (c) 2000-2019                       *
 -- *                                                              *
 -- ****************************************************************
 
@@ -342,7 +337,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CHK IS
    -- VISASIGN                         Демарк (уточнить, нужен ли макрос FM)
 */
 
-G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 3.58 2018-07-10';
+G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '3.6 24-03-2019';
 
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 
@@ -959,23 +954,22 @@ begin
   end if;
 end mode_visa_sign;
 
+------------------------------------------------
+-- Наложение визы с подписью типа VEGA1
+------------------------------------------------
 PROCEDURE put_visa_out (ref_ NUMBER, tt_ CHAR, grp_ NUMBER, status_ NUMBER,
-                keyid_ VARCHAR2, sign1_ VARCHAR2,sign2_ VARCHAR2, sqnc_ out number) IS
-hex_   VARCHAR2(6);
-fch_   NUMBER;
-l_otm     number := 0;
-l_fmcheck number := 0;
-respid_   SMALLINT;
-refl_     NUMBER;
-err       EXCEPTION;
-ers       varchar2(30);
-
-v_teller_flag number;
-v_status      number := status_;
-
-hasIntSign  binary_integer;
-hasExtSign  binary_integer;
-hasRespond  binary_integer;
+                       keyid_ VARCHAR2, sign1_ VARCHAR2,sign2_ VARCHAR2, sqnc_ out number) IS
+   hex_      VARCHAR2(6);
+   fch_      NUMBER;
+   l_otm     number := 0;
+   l_fmcheck number := 0;
+   respid_   SMALLINT;
+   refl_     NUMBER;
+   v_teller_flag number;
+   v_status      number := status_;
+   hasIntSign  binary_integer;
+   hasExtSign  binary_integer;
+   hasRespond  binary_integer;
 
 BEGIN
    logger.trace('put_visa():start');
@@ -993,7 +987,6 @@ BEGIN
      v_errtxt varchar2(2000);
      v_num number;
    begin
-     dbms_output.put_line('branch start put_visa_out ='|| sys_context('bars_context','user_branch') );
      begin
      execute immediate 'begin :1 := teller_tools.validate_visa(p_visa   => '||status_||',
                                                                p_docref => '||ref_||',
@@ -1011,15 +1004,12 @@ BEGIN
      if v_teller_flag = 1 then
        v_status := 2;
      end if;
-/*     bars_audit.info('Teller_chk: ref = '||ref_||', visa = '||status_||', v_num = '||v_num||', v_teller_flag = '||v_teller_flag||', errtxt = '||v_errtxt);
-     bars_audit.info('status_ = '||status_);
-*/     if v_teller_flag = 1 and v_num = -1 then  -- нельзя визировать!
+     if v_teller_flag = 1 and v_num = -1 then  -- нельзя визировать!
          bars_error.raise_nerror('TEL','TELL_DOC2',v_errtxt);
---       raise_application_error(-20100,v_errtxt);
      end if;
    end;
 
-   dbms_output.put_line('branch before FM ='|| sys_context('bars_context','user_branch') );
+   
    -- проверка ФМ
 
    -- status=0 - ввод
@@ -1101,13 +1091,11 @@ BEGIN
      -- всевозможные проверки
      IF keyid_ IS NOT NULL THEN
        IF hasIntSign<>0 and sign1_ is null THEN
-          -- отсутствует внутренняя ЭЦП
-          ers := 'INT_SIGN_EMPTY';
-          raise err;
+          -- отсутствует внутренняя ЭЦП          
+          bars_error.raise_nerror(MODCODE, 'INT_SIGN_EMPTY');
        ELSIF hasExtSign<>0 and sign2_ is null and status_<>3 THEN
-          -- отсутствует внешняя ЭЦП(кроме случая сторнирования)
-          ers := 'EXT_SIGN_EMPTY';
-          raise err;
+          -- отсутствует внешняя ЭЦП(кроме случая сторнирования)          
+          bars_error.raise_nerror(MODCODE, 'EXT_SIGN_EMPTY');          
        END IF;
      END IF;
      IF grp_ IS NOT NULL and status_<>3 THEN -- для сторно(status=3) update oper.chk выполняет p_back_doc
@@ -1147,8 +1135,10 @@ BEGIN
    --
    logger.trace('Наложена виза на док. ref='||ref_||', groupid='||grp_||', status='||status_);
    --
-EXCEPTION WHEN err THEN
-   bars_error.raise_nerror(MODCODE, ers);
+exception  when others then
+    bars_audit.error('chk.put_visa_out: Ошибка наложения визы для реф='||ref_||': '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(13)||chr(10)||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
+    raise;
 END put_visa_out;
 
 PROCEDURE put_visa (ref_ NUMBER, tt_ CHAR, grp_ NUMBER, status_ NUMBER,
@@ -1161,7 +1151,7 @@ BEGIN
      v_errtxt varchar2(2000);
      v_num number;
    begin
-     dbms_output.put_line('branch start chk.put_visa ='|| sys_context('bars_context','user_branch') );
+
      execute immediate 'begin :1 := teller_tools.validate_visa(p_visa   => '||status_||',
                                                                p_docref => '||ref_||',
                                           p_errtxt => :2);
@@ -1176,16 +1166,21 @@ BEGIN
          null;
     end;
 
---bars_audit.info('v_teller_flag = '||v_teller_flag);
+
   if v_teller_flag = 1 then
     v_status := 2;
   else
     v_status := status_;
   end if;
   
-  dbms_output.put_line('branch before chk.put_visa_out ='|| sys_context('bars_context','user_branch') );
+--  dbms_output.put_line('branch before chk.put_visa_out ='|| sys_context('bars_context','user_branch') );
   put_visa_out(ref_, tt_, grp_, v_status, keyid_, sign1_, sign2_, l_sqnc);
-  dbms_output.put_line('branch after chk.put_visa_out ='|| sys_context('bars_context','user_branch') );
+--  dbms_output.put_line('branch after chk.put_visa_out ='|| sys_context('bars_context','user_branch') );
+exception  when others then
+    bars_audit.error('chk.put_visa: '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(10) ||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
+    raise;
+
 END put_visa;
 
 -- Отримання буфферу для накладання внутрішної ЕЦП
@@ -1299,7 +1294,9 @@ begin
 
 end get_int_ecp;
 
+-----------------------------------------------------
 -- Отримання переліку накладених внутрішніх підписів
+-----------------------------------------------------
 function get_int_ecps(p_ref in oper_visa.ref%type, p_lev in number)
   return tt_ecp_array is
   l_ecp_array tt_ecp_array;
@@ -1342,7 +1339,9 @@ begin
   return l_ecp_array;
 end get_int_ecps;
 
+-----------------------------------------------------
 -- Отримання зовнішнього підпису (у вигляді об'єкту)
+-----------------------------------------------------
 function get_ext_ecp_obj(p_ref in oper_visa.ref%type) return tt_ecp_obj is
   l_ecp_obj  tt_ecp_obj;
   l_sign_id  sgn_data.id%type;
@@ -1374,7 +1373,9 @@ begin
   return l_ecp_obj;
 end get_ext_ecp_obj;
 
+-----------------------------------------------------
 -- Отримання зовнішнього підпису
+-----------------------------------------------------
 procedure get_ext_ecp(p_ref        in oper_visa.ref%type,
                       p_sign_type  out varchar2,
                       p_buffer_hex out varchar2,
@@ -1670,7 +1671,9 @@ EXCEPTION
    bars_error.raise_nerror(MODCODE, 'UNHANDLED_NO_DATA_FOUND', '$PROC', 'lock_doc');
 END lock_doc;
 
+-----------------------------------------------------
 -- возвращает буфер документа для внутр. ЭЦП
+-----------------------------------------------------
 procedure make_int_docbuf(pref in number, buf out varchar2) is
   err  EXCEPTION;
   ers  varchar2(30);
@@ -1709,7 +1712,9 @@ exception when err then
   bars_error.raise_nerror(MODCODE, ers, '$REF', to_char(pref));
 end;
 
+-----------------------------------------------------
 -- возвращает буфер документа для внутр. ЭЦП и его размер
+-----------------------------------------------------
 procedure make_int_docbuf2(pref in number, buf out varchar2, buf_len out number) is
 begin
   make_int_docbuf(pref, buf);
@@ -1895,6 +1900,10 @@ begin
     end if;
     p_visa_array(i) := visa_obj;
   end loop;
+exception  when others then
+    bars_audit.error('chk.put_visa: '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(10) ||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
+    raise;
 end;
 
 /**
@@ -2004,6 +2013,11 @@ begin
     end if;
     p_visa_array(i) := visa_obj;
   end loop;
+
+exception  when others then
+    bars_audit.error('chk.put_visa: '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(10) ||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
+    raise;
 end;
 
 /**
@@ -2162,7 +2176,11 @@ end;
 
     bars_audit.trace(g_pack_name || l_proc_name || 'Finish. outDataXml=%s',
                      dbms_lob.substr(outDataXml, 3000, 1));
-  end make_data4visa_xml;
+exception  when others then
+    bars_audit.error('chk.put_visa: '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(10) ||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
+    raise;
+end make_data4visa_xml;
 
 /**
  * Разширение make_data4visa_xml для работы с новой криптографией
@@ -2374,6 +2392,11 @@ begin
   dbms_lob.createtemporary(outdataxml, true);
   dbms_xmldom.writetoclob(l_xmldoc, outdataxml);
   dbms_xmldom.freedocument(l_xmldoc);
+
+exception  when others then
+    bars_audit.error('chk.put_visa: '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(10) ||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
+    raise;
 end make_data4visa_ext_xml;
 
 /**
@@ -2436,7 +2459,8 @@ end make_data4visa_ext_xml;
     err_doc_storno_exception exception;
     pragma exception_init(err_doc_storno_exception, -20101);
   begin
-    /* Структура входящего XML inDataClob:
+     bars_audit.info('chk.put_visas_xml: start exec');
+     /* Структура входящего XML inDataClob:
     <?xml version="1.0" encoding="utf-8" ?>
     <docs4visa grpid="grpId" par="par">
       <doc ref="ref" key="ECP[3]">
@@ -2999,8 +3023,17 @@ end make_data4visa_ext_xml;
     dbms_lob.createtemporary(outDataXml, true);
     dbms_xmldom.writeToClob(l_xmlDoc, outDataXml);
     dbms_xmldom.freeDocument(l_xmlDoc);
+   exception  when others then
+    bars_audit.error('chk.put_visas_xml: '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(10) ||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
+    raise;
   end put_visas_xml;
 
+  
+  ----------------------------------------------------------
+  --
+  ---------------------------------------------------------
+  
   procedure put_visas_xml_ext(inDataClob in clob, outDataXml out clob, enableCommit in number default 0) is
     l_proc_name varchar2(100) := 'put_visas_xml_ext. ';
 
@@ -3770,9 +3803,9 @@ end make_data4visa_ext_xml;
     dbms_lob.createtemporary(outDataXml, true);
     dbms_xmldom.writeToClob(l_xmlDoc, outDataXml);
     dbms_xmldom.freeDocument(l_xmlDoc);
-exception
-  when others then
-    logger.info('chk.put_visas_xml_ext: '||sqlerrm||' '||dbms_utility.format_call_stack);
+  exception  when others then
+      bars_audit.error('chk.put_visa_out: '||sqlerrm||': '||dbms_utility.format_error_stack() || chr(10) ||
+                 dbms_utility.format_error_backtrace()||', :'||dbms_utility.format_call_stack);
     raise;
   end put_visas_xml_ext;
 
