@@ -30,6 +30,7 @@ END Dat_Prev_U ;
 /
  show err;
  
+grant execute on BARS.DAT_PREV_U to BARS_ACCESS_DEFROLE;
  
  
  PROMPT ===================================================================================== 
