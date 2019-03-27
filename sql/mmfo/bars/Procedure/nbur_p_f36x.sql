@@ -18,7 +18,7 @@ is
 %
 % VERSION     :  v.18.002    07/12/2018 (24/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_      char(30)  := 'v.19.005   07/03/2019';
+  ver_      char(30)  := 'v.19.006   26/03/2019';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -116,11 +116,12 @@ BEGIN
             p16 as Q007_1, p21 as Q007_2, p23 as Q007_3, p24 as Q007_4,
             to_date(doc_date, 'ddmmyyyy') as Q007_5, lpad(p09, 3, '0') as K040, p01 as D070, p18 as F008, 
             substr(p02,1,1) as K112, nvl(p20, '9') as F019, p19 as F020,
-            lpad(p14, 3, '0') as R030, l_b040_8 || b041 as Q023, p27 as Q006, p13 as T070, p15 as T071, '#' as f105,
+            lpad(p14, 3, '0') as R030, case when date_closed is not null then  b040 else null end as Q023, p27 as Q006, p13 as T070, p15 as T071, '#' as f105,
             null as ACC_ID, null as ACC_NUM, p14 as KV, rnk as CUST_ID, BRANCH
-    from (select f.*, l_b040_8 || b041 as b040,
+    from (select f.*, l_b040_8 || b041 as b040, b.date_closed, 
                  to_char(row_number() over (order by f.k020, f.p17, f.p16, to_date(f.doc_date, 'ddmmyyyy')))  as Q003_2
           from cim_f36 f
+          join branch b on b.branch = f.branch
           where f.create_date = l_date_z_end
             and f.branch like '/'||p_kod_filii||'/'
             and f.b041 > '0'
