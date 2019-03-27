@@ -13859,6 +13859,8 @@ procedure icheck_project (
   p_flag_kk in     number default 0)
 is
   l_msg        varchar2(254) := null;
+  l_paspissuer_c number;
+
   procedure append_msg ( p_txt varchar2 )
   is
   begin
@@ -13945,11 +13947,10 @@ begin
   end if;
   --COBUMMFO-9385{
   if (nvl(p_project.type_doc,0)) = 7 then
-   begin 
-    select 'x' into p_project.str_err from V_DICT_DMSU_DEPTS where code = p_project.paspissuer;
-   exception when no_data_found then 
-     append_msg('Невірно вказано орган видачі ID картки');          
-   end;  
+    select count(1) into l_paspissuer_c from V_DICT_DMSU_DEPTS where code = p_project.paspissuer and is_active=1 ;
+    if l_paspissuer_c=0 then 
+      append_msg('Невірно вказано орган видачі ID картки');          
+    end if;
   end if;--}
 
   if p_project.email is not null and not check_email(upper(p_project.email)) then
