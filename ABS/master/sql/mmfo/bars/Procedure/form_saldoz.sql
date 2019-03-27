@@ -11,13 +11,14 @@ CREATE OR REPLACE PROCEDURE BARS.FORM_SALDOZ
   %param p_korr  - виправл€ти, €кщо нев≥рна дата валютуванн€ дл€ м≥с€чних коригуючих
   %param p_incl_ZG  - не включаЇмо обороти ZG
 
-  %version 3.3  09/02/2019 (01/02/2019)
+  %version 3.4  20/03/2019 (09/02/2019)
   %usage   перенакопиченн€ м≥с€чних виправних оборот≥в.
   */
-  l_dat    DATE := trunc( z_dat31, 'MM' ); -- 1e число зв≥тного м≥с€ц€
--- ≤нтервал накопиченн€:
+  l_dat    DATE := trunc( z_dat31, 'MM' ); -- 1e число зв≥тного м≥с€ц€-- ≤нтервал накопиченн€:
   l_dat0   DATE := add_months( l_dat, 1 );
   l_dat1   DATE := last_day(l_dat0);
+  
+  l_dat_yyyy    DATE := DAT_NEXT_U(trunc(z_dat31, 'yyyy'), -1); --банк≥вська дата к≥нц€ року
 BEGIN
 
   bars_audit.info( $$PLSQL_UNIT||': Start '  ||to_char(l_dat, 'dd/mm/yyyy')||' по '||to_char(z_dat31,'dd/mm/yyyy') );
@@ -65,7 +66,7 @@ BEGIN
             on ( d.KF = o.KF and d.REF = o.REF )
          where o.FDAT between l_dat0 AND l_dat1
            and o.SOS  = 5
-           and d.VDAT = z_dat31
+           and d.VDAT = any (z_dat31, l_dat_yyyy)
            and d.VOB  = any ( 96, 99 )
            and d.tt not like 'ZG%'
          group BY o.KF, o.ACC;
@@ -87,10 +88,11 @@ BEGIN
             on ( d.KF = o.KF and d.REF = o.REF )
          where o.FDAT between l_dat0 AND l_dat1
            and o.SOS  = 5
-           and d.VDAT = z_dat31
+           and d.VDAT = any (z_dat31, l_dat_yyyy)
            and d.VOB  = any ( 96, 99 )
          group BY o.KF, o.ACC;    
     end if;
+    commit;
     
     insert
       into SALDOZ
@@ -144,11 +146,11 @@ BEGIN
      where o.FDAT between l_dat0 AND l_dat1
        and o.SOS  = 5
        and o.ACC  = p_acc
-       and d.VDAT = z_dat31
+       and d.VDAT = any (z_dat31, l_dat_yyyy)
        and d.VOB  = any ( 96, 99 )
        and d.tt not like 'ZG%'
      group BY o.KF, o.ACC;
-
+     commit;
   end if;
 
   bars_audit.info( $$PLSQL_UNIT||': Finish (сформовано '||to_char(sql%rowcount)||' запис≥в).' );

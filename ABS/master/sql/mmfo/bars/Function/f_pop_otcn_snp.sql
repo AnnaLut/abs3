@@ -10,7 +10,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Функция наполнения таблиц для формирования отчетности
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :   08/11/2018 (12/04/2018)
+% VERSION     :   21/03/2019 (08/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые Кт обороты
              Исправлено.
@@ -143,15 +143,18 @@ commit;
 
 if add_KP_ >= 1 then
    IF TO_CHAR(Dat_,'MM') in ('12') THEN
-      sql_doda_ := ' AND tt NOT LIKE ''ZG%'' AND '||
-             'not (((nlsa LIKE ''6%'' OR nlsa LIKE ''7%'') '||
-             'and (nlsb LIKE ''5040%'' OR nlsb LIKE ''5041%'')) or ' ||
-             '((nlsa LIKE ''5040%'' OR nlsa LIKE ''5041%'') and '||
-             '(nlsb LIKE ''6%'' OR nlsb LIKE ''7%'')) or ' ||
-             '((nlsa LIKE ''3902%'' OR nlsa LIKE ''3903%'') '||
-             'and (nlsb LIKE ''5040%'' OR nlsb LIKE ''5041%'')) or ' ||
-             '((nlsa LIKE ''5040%'' OR nlsa LIKE ''5041%'') and '||
-             '(nlsb LIKE ''3902%'' OR nlsb LIKE ''3903%'')))';
+      sql_doda_ := ' AND tt NOT LIKE ''ZG%'' '||
+                   ' AND not (((nlsa LIKE ''6%'' OR nlsa LIKE ''7%'') and '||
+                             ' (nlsb LIKE ''5040%'' OR nlsb LIKE ''5041%''))    or ' ||
+                             '((nlsa LIKE ''5040%'' OR nlsa LIKE ''5041%'') and '||
+                             ' (nlsb LIKE ''6%'' OR nlsb LIKE ''7%''))          or ' ||
+                             '((nlsa LIKE ''3902%'' OR nlsa LIKE ''3903%'') and '||
+                             ' (nlsb LIKE ''5040%'' OR nlsb LIKE ''5041%''))    or ' ||
+                             '((nlsa LIKE ''5040%'' OR nlsa LIKE ''5041%'') and '||
+                             ' (nlsb LIKE ''3902%'' OR nlsb LIKE ''3903%''))    or '||
+                             '(nlsa LIKE ''5040%'' AND nlsb LIKE ''5041%'')     or '||
+                             '(nlsa LIKE ''5041%'' AND nlsb LIKE ''5040%'')  '||
+                            ')';
 
       type_kor_ := (case when add_KP_ = 1
                          then 1
@@ -277,7 +280,7 @@ if add_KP_ >= 1 then
        AND a.acc=s.acc
        AND s.acc not in (select acc from otcn_saldo);
 
-   commit;
+    commit;
 
     INSERT /*+APPEND */
       INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
@@ -299,7 +302,7 @@ if add_KP_ >= 1 then
      AND a.acc=s.acc
      AND s.acc not in (select acc from otcn_saldo);
 
-commit;
+     commit;
 
     INSERT /*+APPEND */
       INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, OB22, RNK,
@@ -321,7 +324,6 @@ commit;
      AND a.FDAT BETWEEN Dat1_ AND Dat2_
      AND a.acc=s.acc
      AND s.acc not in (select acc from otcn_saldo);
---   and fost(s.acc, glb_bankdate()) <> 0;
 
    commit;
 
