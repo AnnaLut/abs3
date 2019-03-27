@@ -40,15 +40,7 @@ IS
                              p_dclass    VARCHAR2,
                              p_dvkr      VARCHAR2,
                              p_dsum      NUMBER,
-                             p_ddate         in DATE,
-                             p_education     in varchar2,
-                             p_marriage      in varchar2,
-                             p_dependents    in number,
-                             p_codedrpou     in varchar2,
-                             p_workplace     in varchar2,
-                             p_worktype      in varchar2,
-                             p_conf_income   in number,
-                             p_unconf_income in number
+                             p_ddate         in DATE
                              );
 END bars_credit_factory;
 
@@ -599,15 +591,7 @@ FUNCTION get_crd_response_new (p_okpo     IN bars.customer.okpo%TYPE,
                              p_dclass        in VARCHAR2,
                              p_dvkr          in VARCHAR2,
                              p_dsum          in NUMBER,
-                             p_ddate         in DATE,
-                             p_education     in varchar2,
-                             p_marriage      in varchar2,
-                             p_dependents    in number,
-                             p_codedrpou     in varchar2,
-                             p_workplace     in varchar2,
-                             p_worktype      in varchar2,
-                             p_conf_income   in number,
-                             p_unconf_income in number
+                             p_ddate         in DATE
                              )
    AS
       l_branch            bars.BRANCH.BRANCH%TYPE;
@@ -665,52 +649,6 @@ FUNCTION get_crd_response_new (p_okpo     IN bars.customer.okpo%TYPE,
       WHEN NO_DATA_FOUND THEN
         raise_application_error(-20001,'No data for ACC ('|| TO_CHAR(p_nls) || ') AND kv ('||TO_CHAR(p_kv) || ') in MFO '|| substr(p_branch,2,6)  );
        end;
-
- -- сохранение параметров клиента
-      if p_education is not null then
-        save_cust_param(l_rnk,'EDUCA',case lower(p_education)
-                                        when 'початкова освіта' then 1
-                                        when 'базова загальна середня освіта' then 2
-                                        when 'повна загальна середня освіта' then 3
-                                        when 'професійно-технічна освіта' then 4
-                                        when 'вища освіта' then 5
-                                      end);
-      end if;
-
-      if p_marriage is not null then
-        save_cust_param(l_rnk,'STAT',case lower(p_marriage)
-                                       when 'одружений /заміжня' then 2 
-                                       when 'неодружений /незаміжня' then 1
-                                     end);
-      end if;
-
-      if p_dependents is not null then
-        save_cust_param(l_rnk,'MEMB',p_dependents);
-      end if;
-
-      if p_codedrpou is not null then
-        save_cust_param(l_rnk,'EDRPO',p_codedrpou);
-      end if;
-
-      if p_workplace is not null then
-        save_cust_param(l_rnk,'NAMEW',p_workplace);
-      end if;
-
-      if p_worktype is not null then
-        save_cust_param(l_rnk,'CIGPO',case lower(p_worktype)
-                                        when 'юридична особа'	then 1
-                                        when 'фізична особа – суб’єкт підприємницької діяльності' then 2
-                                      end);
-      end if;
-
-      if p_conf_income is not null then
-        save_cust_param(l_rnk,'REMO',p_conf_income);
-      end if;
-
-      if p_unconf_income is not null then
-        save_cust_param(l_rnk,'NREMO',p_unconf_income);
-      end if;
- --
 
      --знаходимо договір w4_acc
      begin
