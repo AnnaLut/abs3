@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F81_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #81 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :   10/04/2018 (27/03/2018)
+% VERSION     :    27/03/2019 (10/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -108,6 +108,7 @@ korr504_ number := 0;
 add_     number := 0;
 d_sum_   number;
 k_sum_   number;
+l_tp       char(1);
 -------------------------------------------------------------------------------
 CURSOR Saldo IS
    SELECT a.rnk, a.acc, a.nls, a.kv, s.fdat, a.nbs, s.ost, s.ostq,
@@ -117,28 +118,28 @@ CURSOR Saldo IS
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg, s.dos99zg, s.kos99zg,
           a.tip, nvl(l.k041,'1'),
-          lag(s.acc, 1) over (partition by substr(s.nls,1,4),s.kv order by s.acc) pacc
+          lag(s.acc, 1) over (partition by substr(s.nls,1,4),s.kv order by s.acc) pacc, 
+          '1' as tp
    FROM  otcn_saldo s, otcn_acc a, customer cc, kl_k040 l
    WHERE a.acc=s.acc    and
          a.rnk=cc.rnk   and
          NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)
-   UNION
-   SELECT s.rnk, s.acc, s.nls, s.kv, s.daos, s.nbs, 0, 0,
+   UNION ALL
+   SELECT s.rnk, s.acc, s.nls, s.kv, s.daos, nvl(s.nbs, substr(s.nls, 1, 4)), 0, 0,
           0, 0, 0, 0,
           0, 0, 0, 0,
           0, 0, 0, 0,
           0, 0, 0, 0,
           0, 0, 0, 0, 0, 0,
           s.tip, nvl(l.k041,'1'),
-          lag(s.acc, 1) over (partition by substr(s.nls,1,4),s.kv order by s.acc) pacc
+          lag(s.acc, 1) over (partition by substr(s.nls,1,4), s.kv order by s.acc) pacc, '2' as tp
    FROM   accounts s, customer cc, kl_k040 l, kod_r020 k
-   WHERE  s.nbs=k.r020
+   WHERE  nvl(s.nbs, substr(s.nls, 1, 4)) = k.r020
      and  trim(k.prem)='КБ'
      and  k.a010 = '02'
-     and  s.acc not in (select c.acc
-                       from saldoa c
-                       where c.fdat <= Dat_ )
-     and  s.acc in (select acc from kor_prov)
+     and  k.d_close is null
+     and  s.acc in (select acc from kor_prov where vob in (99, 199))
+     and  not exists (select 1 from otcn_saldo o where o.acc = nvl(s.accc, s.acc))
      and  s.rnk = cc.rnk
      and  NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+);
 ---------------------------------------------------------------------------
@@ -173,6 +174,7 @@ begin
 end;
 -------------------------------------------------------------------------------
 BEGIN
+logger.info ('P_F81_NN: Begin ');
 -------------------------------------------------------------------
 userid_ := user_id;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
@@ -200,7 +202,8 @@ END;
 --- их остатков (номиналы+эквиваленты)+обороты+корректирующие обороты
 --- все эти действия выполняются в функции F_POP_OTCN
 
-sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''02''';
+sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''02'' and d_close is null ';
+
 ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
 ----------------------------------------------------------------------------
 OPEN Saldo;
@@ -211,7 +214,7 @@ OPEN Saldo;
                     Dos96_, Dosq96_, Kos96_, Kosq96_,
                     Dos99_, Dosq99_, Kos99_, Kosq99_,
                     Doszg_, Koszg_, Dos96zg_, Kos96zg_,
-                    Dos99zg_, Kos99zg_, tips_, k041_, pacc_;
+                    Dos99zg_, Kos99zg_, tips_, k041_, pacc_, l_tp;
    EXIT WHEN Saldo%NOTFOUND;
 
    if typ_ > 0 then  
@@ -219,7 +222,7 @@ OPEN Saldo;
    else
       nbuc_ := nbuc1_;
    end if;
-
+   
    --- после перехода на новые DRAPSы
    --- обороты по перекрытию 6,7 классов на 5040,5041
    IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
@@ -227,34 +230,69 @@ OPEN Saldo;
          Dos96_ := 0;
          Kos96_ := 0; 
       else
-         SELECT NVL(SUM(decode(o.dk,0,1,0)*o.s),0),
-                    NVL(SUM(decode(o.dk,1,1,0)*o.s),0)
-           INTO d_sum_, k_sum_
-           FROM opldok o, oper p
-          WHERE o.fdat = any(select fdat from fdat where fdat between Dat_  AND  Dat_+31)
-            AND o.acc  = acc_
-            AND (o.tt like 'ZG8%'  or o.tt like 'ZG9%')
-            and o.ref = p.ref
-            and p.sos = 5
-            and p.vob = 96;
-        
-         if Dos96_ >0 then
-            Dos96_ := Dos96_ - d_sum_;
-         end if;
-
-         if Kos96_ >0 then
-            Kos96_ := Kos96_ - k_sum_;
-         end if;
+         null;
       end if;
-   END IF;
+   end if;   
 
+   if l_tp = '1' then
+      if Dos99_ + Kos99_ = 0 then
+         -- по дочірнім рахунках шукаємо річні проводки
+         select NVL(SUM((case when vob = 99 and o.dk = 0 then 1 else 0 end)*o.s),0),
+                NVL(SUM((case when vob = 99 and o.dk = 0 and kv_ <> 980 then 1 else 0 end)*o.sq),0),
+                NVL(SUM((case when vob = 99 and o.dk = 1 then 1 else 0 end)*o.s),0),
+                NVL(SUM((case when vob = 99 and o.dk = 1 and kv_ <> 980 then 1 else 0 end)*o.sq),0)
+         INTO Dos99_, Dosq99_, Kos99_, Kosq99_
+         from kor_prov o, accounts a
+         where o.acc = a.acc and
+               a.accc is not null and
+               a.accc = acc_  and
+               o.vdat = dat_ and
+               o.vob = 99;   
+      end if;
+         
+      if Dos99zg_ + Kos99zg_ = 0 then
+         -- по дочірнім рахунках шукаємо обороти згортання річних проводок
+         select NVL(SUM((case when vob = 199 and o.dk = 0 then 1 else 0 end)*o.s),0),
+                NVL(SUM((case when vob = 199 and o.dk = 1 then 1 else 0 end)*o.s),0)
+         INTO Dos99zg_, Kos99zg_
+         from kor_prov o, accounts a
+         where o.acc = a.acc and
+               a.accc is not null and
+               a.accc = acc_  and
+               o.vdat = dat_ and
+               o.vob = 199;   
+      end if;
+   else
+     -- річні коригуючі проводки
+      select NVL(SUM((case when vob = 99 and o.dk = 0 then 1 else 0 end)*o.s),0),
+             NVL(SUM((case when vob = 99 and o.dk = 0 and kv_ <> 980 then 1 else 0 end)*o.sq),0),
+             NVL(SUM((case when vob = 99 and o.dk = 1 then 1 else 0 end)*o.s),0),
+             NVL(SUM((case when vob = 99 and o.dk = 1 and kv_ <> 980 then 1 else 0 end)*o.sq),0)
+      INTO Dos99_, Dosq99_, Kos99_, Kosq99_
+      from kor_prov o
+      where acc = acc_  and
+            vdat = dat_ and
+            vob = 99;       
+   
+      -- обороти по згортанню річних коригуючих  
+      select NVL(SUM((case when vob = 199 and o.dk = 0 then 1 else 0 end)*o.s),0),
+             NVL(SUM((case when vob = 199 and o.dk = 1 then 1 else 0 end)*o.s),0)
+      INTO Dos99zg_, Kos99zg_
+      from kor_prov o
+      where acc = acc_  and
+            vdat = dat_ and
+            vob = 199;       
+   end if;
+   
+   comm_ := 'Type '||l_tp;
+   
    --- корректирующие обороты за год по перекрытию 6,7 классов на 5040,5041
    IF Dos99zg_ > 0 THEN
-      p_ins(data_, '9', nls_, nbs_, kv_, k041_, TO_CHAR(Dos99zg_));
+      p_ins(data_, '9', nls_, nbs_, kv_, k041_, TO_CHAR(Dos99zg_), comm_);
    END IF;
 
    IF Kos99zg_ > 0 THEN
-      p_ins(data_, '0', nls_, nbs_, kv_, k041_, TO_CHAR(Kos99zg_));
+      p_ins(data_, '0', nls_, nbs_, kv_, k041_, TO_CHAR(Kos99zg_), comm_);
    END IF;
 
    if nbs_ not in ('3902','3903','5040','5041') and nbs_ not like '6%' and nbs_ not like '7%' then
@@ -286,7 +324,7 @@ OPEN Saldo;
 
    IF Ostn_ <> 0 THEN
       dk_ := IIF_N(Ostn_,0,'1','2','2');
-      p_ins(data_, dk_, nls_, nbs_, kv_, k041_, TO_CHAR(ABS(Ostn_)));
+      p_ins(data_, dk_, nls_, nbs_, kv_, k041_, TO_CHAR(ABS(Ostn_)), comm_);
    END IF;
 
    Ostq_:=Ostq_-Dosq96_+Kosq96_-Dosq99_+Kosq99_;
@@ -328,6 +366,8 @@ LOOP
       (kodf_, Dat_, kodp_, b_, nbuc_);
 END LOOP;
 CLOSE BaseL;
+
+logger.info ('P_F81_NN: End ');
 ------------------------------------------------------------------
 END p_f81_NN;
 /
