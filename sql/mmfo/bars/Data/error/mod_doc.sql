@@ -252,6 +252,11 @@ begin
     bars_error.add_message(l_mod, 75, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, недостатньо коштів на рахунку %s', '', 1, 'BAK_BROKEN_LIMIT');
     bars_error.add_message(l_mod, 75, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, недостатньо коштів на рахунку %s', '', 1, 'BAK_BROKEN_LIMIT');
 
+    bars_error.add_message(l_mod, 75, l_exc, l_rus, 'Документ REF=%s не можливо сторнувати, недостатньо коштів на рахунку %s', '', 1, 'BAK_BROKEN_LIMIT');
+    bars_error.add_message(l_mod, 75, l_exc, l_ukr, 'Документ REF=%s не можливо сторнувати, недостатньо коштів на рахунку %s', '', 1, 'BAK_BROKEN_LIMIT');
+
+    bars_error.add_message(l_mod, 76, l_exc, l_rus, 'Документ REF=%s не можливо сплатити, дата документу %s менша за банківську дату %s більш ніж на 30 днів', '', 1, 'DATD_MORE_THAN_30');
+    bars_error.add_message(l_mod, 76, l_exc, l_ukr, 'Документ REF=%s не можливо сплатити, дата документу %s менша за банківську дату %s більш ніж на 30 днів', '', 1, 'DATD_MORE_THAN_30');
 
 
   commit;
