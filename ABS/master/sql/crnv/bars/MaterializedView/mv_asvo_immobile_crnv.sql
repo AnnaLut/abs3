@@ -14,7 +14,7 @@ begin
 create materialized view MV_ASVO_IMMOBILE_CRNV
 partition by hash(mfo)
 partitions 26
-build immediate
+build deferred
 refresh fast on demand
 with rowid
 as
@@ -22,8 +22,11 @@ select m.ND, m.BRANCH, m.DEPVIDNAME, m.NLS, m.KV, m.SOURCE, m.IDCODE, m.FIO, m.O
        m.FL,
        m.KOD_OTD, m.MARK, ID,
        substr(m.BRANCH,2,6)                         as mfo,   
-       decode(m.ACC_CARD,'ï¿½01','ä01',m.ACC_CARD)  as norm_acc_card,
-       replace(replace(replace(m.NLS,'.'),'-'),' ') as norm_nls
+       m.ACC_CARD                                   as acc_card,
+       replace(replace(replace(m.NLS,'.'),'-'),' ') as norm_nls,
+       m.DZAGR,
+       m.BATCH_ID,
+       substr(m.branch,1,15)                        as norm_branch
 from asvo_immobile m}';
 exception
     when others then

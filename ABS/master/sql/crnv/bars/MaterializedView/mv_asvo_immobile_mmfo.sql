@@ -54,7 +54,10 @@ select m.ND, m.BRANCH, m.DEPVIDNAME, m.NLS, m.KV, m.SOURCE, m.IDCODE, m.FIO, m.O
                                   end
              then coalesce(substr(m.id,1,length(m.id)-2),' ')
              else  m.id
-        end                                          as norm_id
+        end                                          as norm_id,
+        m.DZAGR,
+        m.BATCH_ID,
+        substr(m.branch,1,15)                        as norm_branch   
 from MMFO_ASVO_IMMOBILE m}';
 exception
     when others then
