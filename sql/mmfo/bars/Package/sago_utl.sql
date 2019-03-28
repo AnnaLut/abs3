@@ -78,10 +78,15 @@ create or replace package body sago_utl is
                          p_is_ins   out number,
                          P_ERR_MESS out varchar2) is
   begin
-    insert into sago_documents(id, ref_sago, act, act_type, act_date, total_amount, reg_id, f_state, n_doc, d_doc, user_id, fio_reg, sign, request_id)
-    values(sago_documents_seq.nextval, p_ref_sago, p_act, p_act_type, p_act_date, p_total_amount, p_reg_id, p_f_state, p_n_doc, p_d_doc, p_user_id, p_fio_reg, p_sign,
-           p_request_id);
-   p_is_ins := 1;
+    if p_f_state = '9999' then
+        insert into sago_documents(id, ref_sago, act, act_type, act_date, total_amount, reg_id, f_state, n_doc, d_doc, user_id, fio_reg, sign, request_id)
+        values(sago_documents_seq.nextval, p_ref_sago, p_act, p_act_type, p_act_date, p_total_amount, p_reg_id, p_f_state, p_n_doc, p_d_doc, p_user_id, p_fio_reg, p_sign, 
+               p_request_id);
+        p_is_ins := 1;
+    else 
+        p_is_ins := 0;
+        p_err_mess := 'Статус документа не 9999!';
+    end if;
   exception
     when others then
        p_err_mess := SUBSTR(SQLERRM,1,4000);
@@ -193,7 +198,7 @@ create or replace package body sago_utl is
             l_nlsb := get_acc_for_sago('9817', l_kf);
             l_ida  := f_ourokpo;
             l_idb  := f_ourokpo;
-            l_nazn := 'Вивезення запасів готівки в уповноваженому банку до НБУ';
+            l_nazn := 'Зменшення запасів готівки в уповноваженому банку';
             select substr(acc.nms,1,38)
               into l_nmsa
               from accounts acc
@@ -221,7 +226,7 @@ create or replace package body sago_utl is
             l_mfob := '300001';
             l_ida  := f_ourokpo;
             l_idb  := '00032106';
-            l_nazn := 'Перерахування коштів для підкріплення готів., ювіл. та інвест.моне';
+            l_nazn := 'Перерахування коштів за зменшення запасів готівки УБ АТ "Ощадбанк"';
 
           end if;
 
