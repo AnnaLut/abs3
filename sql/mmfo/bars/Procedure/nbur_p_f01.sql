@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #01 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.003  22.11.2016
+% VERSION     :  v.16.004  18/01/2018 (22.11.2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.003  22.11.2016';
+  ver_          char(30)  := 'v.16.004  18/01/2018';
 /*
    Структура показника    DD BBBB VVV Y
 
@@ -165,7 +165,10 @@ BEGIN
                         field_code);
 
     logger.info ('NBUR_P_F01 end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
-
+    
+    -- підготовка даних для формування 42 консолідованого файлу
+    nbur_p_prepare_f42k(p_kod_filii, p_report_date);
+    
 END NBUR_P_F01;
 /
 show err;

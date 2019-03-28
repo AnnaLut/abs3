@@ -14,23 +14,29 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 17/01/2019 (27/11/2018)
+% VERSION     : 28/03/2019 (21/03/2019)
 %------------------------------------------------------------------------
+% 28/03/2019 - замість функції RKAPITAL будемо використовувати функцію
+%              RKAPITAL_F42
+% 21/03/2019 - змінено умову для формування показника B400000 
+%              25% від суми для Н9 (раніше було 25% від РК)
+%              добавлено формування показників B50000000, B60000000,
+%              B70000000, B80000000, B90000000      
 % 17/01/2019 - із показників 01, 02, 04 видаляємо банки нерезиденти
 %              у яких ALT_BIC=('8260000013', '8400000053', '8400000054')
 %              і у яких рейтинг 'BBB', 'BBB+','BBB-','Baa1','Baa2','Baa3'
-%              або починається на 'A', 'T', 'F' 
+%              або починається на 'A', 'T', 'F'
 %              і для яких включилися указані бал.рахунки
 %              добавлено формування показника B400000
-% 27/11/2018 - изменено формирование части кода показателя "NNNN" для 
+% 27/11/2018 - изменено формирование части кода показателя "NNNN" для
 %              показателя 05
-% 16/11/2018 - изменено формирование части кода показателя "NNNN" для 
+% 16/11/2018 - изменено формирование части кода показателя "NNNN" для
                показателя 05
-% 23/10/2018 - показгник A10000000 буде формуватися в блоц_ де формується 
-%              показник 02NNNN000     
-%              показгник A20000000 буде формуватися в блоц_ де формується 
-%              показник 04NNNN000     
-% 03/08/2018 - c 03.08.2018 будет формироваться новый показатель 
+% 23/10/2018 - показгник A10000000 буде формуватися в блоц_ де формується
+%              показник 02NNNN000
+%              показгник A20000000 буде формуватися в блоц_ де формується
+%              показник 04NNNN000
+% 03/08/2018 - c 03.08.2018 будет формироваться новый показатель
 %              'A90000000'
 % 02/03/2017 - для МФО=380388 (Платинум банк) изменил признак PR_BANK
 %              со значения "T" (временнаяй адм.) на "Л" (ликвидация)
@@ -68,7 +74,7 @@ IS
    dat_Zm6_   DATE := TO_DATE('12112015','ddmmyyyy'); -- формуються нов_ показники
                                                       -- A00000000, A10000000, A20000000
    dat_Zm7_   DATE := TO_DATE('02082018','ddmmyyyy'); -- формується новий показник
-                                                      -- A90000000 
+                                                      -- A90000000
 
    datz_      date := Dat_Next_U(dat_, 1);
    pr_bank    VARCHAR2 (1);
@@ -91,7 +97,7 @@ IS
    ddd_       VARCHAR2 (3);
    r012_      VARCHAR2 (1);
    r013_      VARCHAR2 (1);
-   r011_      VARCHAR2 (1);   
+   r011_      VARCHAR2 (1);
    r050_      VARCHAR2 (2);
    kv_        SMALLINT;
    kvp_       SMALLINT;
@@ -115,6 +121,8 @@ IS
    sum_k_     DECIMAL (24); -- сума регулятивного капiталу
    sum_k_19   DECIMAL (24); -- сума регулятивного капiталу до 19.07.2010
    sum_SK_    DECIMAL (24); -- сума статутного капiталу
+   sum_H9_    DECIMAL (24); -- сума для Н9 (ОК+ДК-В1) із SUM_H9 табл. REGCAPITAL
+   sum_3680_  NUMBER; 
 
    kodp_      VARCHAR2 (10);
    kodp1_      VARCHAR2 (10);
@@ -481,7 +489,11 @@ BEGIN
 --- якщо сума рег.капiталу < 0 , то береться сума=1000000000 (10 млн.)
 --- формувати файл #42 тiльки пiсля формування файлу #01
 
-   rgk_ := Rkapital (dat_next_u(dat_, 1), kodf_, userid_, 1); -- зм_на 27.12.2005 - при розрахунку норматив_в використовується нев_дкоригований кап_тал
+   --rgk_ := Rkapital (dat_next_u(dat_, 1), kodf_, userid_, 1); -- зм_на 27.12.2005 - при розрахунку норматив_в використовується нев_дкоригований кап_тал
+
+   -- новий варіант функціі де вибирається сума регулятивного капіталу і сума для Н9 (ОК+ДК-И1)
+   ret_ := Rkapital_f42 (dat_next_u(dat_, 1), kodf_, userid_, 1, sum_k_, sum_H9_); 
+   rgk_ := sum_k_;
 
    if rgk_ <= 0 then
       sum_k_ := 100;
@@ -553,7 +565,21 @@ BEGIN
       INTO pdat_
    FROM FDAT
    WHERE FDAT <= dat_;
+ 
+   sum_3680_ := 0;
 
+   IF dat_ >= to_date('01032019','ddmmyyyy') THEN    -- з 21.12.2005
+      -- сума показника бал.рахунку 3680 і R011=1 із #C5
+      BEGIN
+         SELECT SUM(field_value)
+            INTO   sum_3680_
+         FROM   V_NBUR_#C5
+         WHERE  report_date = Dat_ AND
+                seg_02 = '3680' and seg_03 = '1';
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         sum_3680_:=0 ;
+      END ;
+   END IF;
 ---------------------------------------------------------------------------
    if pmode_ = 0 and s_prizn_ = 0 then
        sql_acc_ := 'SELECT r020 FROM KL_F3_29 WHERE kf = ''42'' AND ddd IN (''047'', ''051'') ';
@@ -1101,7 +1127,7 @@ BEGIN
 
                   IF dat_ >= dat_Zm6_ and s_zal_ <> 0 THEN
                      kodp_ := 'A1' || '0000' || '000';
-                      
+
                         INSERT INTO RNBU_TRACE
                                  (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm)
                           VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), null, rnk_, link_code_, comm_);
@@ -1197,7 +1223,7 @@ BEGIN
 
                    IF dat_ >= dat_Zm6_ and s_zal_ <> 0 THEN
                       kodp_ := 'A2' || '0000' || '000';
-                      
+
                          INSERT INTO RNBU_TRACE
                                   (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm)
                            VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), null, rnk_, link_code_, comm_);
@@ -1839,7 +1865,7 @@ BEGIN
                                                  '1430','1435','1436','1437',
                                                  '1440','1446','1447')) or
                            (substr(k.nls,1,4) in ('1415','1416','1417','1426','1427') and r013_ not in ('3','9'))
-                         ) 
+                         )
                           and s240_ <= '5'
                           and k.kodp is null
                       then
@@ -1885,7 +1911,7 @@ BEGIN
       end if;
 -----------------------------------------------------------------------------
       -- формирование нового кода A90000000 з 03.08.2018
-      if dat_ >= dat_Zm7_   
+      if dat_ >= dat_Zm7_
       then
 
          insert /*+ append */
@@ -1908,24 +1934,24 @@ BEGIN
          ret_ := BARS.F_POP_OTCN( dat_, 1, sql_acc_, null, 0, 1);
 
          for k in ( SELECT /*+ PARALLEL(8) */
-                       a.acc, NVL(a.nbs, substr(a.nls,1,4)), a.nls, a.kv, 
-                       a.FDAT, NVL(p.r011, '0') r011, 
-                       c.rnk rnk, c.mdate, 
+                       a.acc, NVL(a.nbs, substr(a.nls,1,4)), a.nls, a.kv,
+                       a.FDAT, NVL(p.r011, '0') r011,
+                       c.rnk rnk, c.mdate,
                        sum(decode(a.kv, 980, a.ost, a.ostq)) ost
                     FROM OTCN_SALDO a, otcn_acc c, SPECPARAM p
                     WHERE a.ost <> 0
                       and a.acc=c.acc
                       and a.acc = p.acc(+)
-                      and a.nbs is null 
+                      and a.nbs is null
                       and substr(a.nls,4,1) <> '8'
                       and NVL (p.r011, '0') in ('C','D')
-                    GROUP BY a.acc, NVL(a.nbs, substr(a.nls,1,4)), a.nls, a.kv, 
+                    GROUP BY a.acc, NVL(a.nbs, substr(a.nls,1,4)), a.nls, a.kv,
                              a.FDAT, NVL(p.r011, '0'),
-                             c.rnk, c.mdate 
+                             c.rnk, c.mdate
                   )
             loop
 
-               if k.mdate - Dat_ < 183 
+               if k.mdate - Dat_ < 183
                then
                   kodp_ := 'A90000000';
                   znap_ := -k.ost;
@@ -1945,25 +1971,25 @@ BEGIN
     where (kodp like '01%' or kodp like '02%' or kodp like '61%')
       and rnk = 90092301;
 
-    -- блок для удаления банков нерезидентов с необходимыми значениями ALT_BIG 
+    -- блок для удаления банков нерезидентов с необходимыми значениями ALT_BIG
     -- и с необходимыми рейтингами и с указанными бал.счета
     delete from rnbu_trace
     where (kodp like '01%' or kodp like '02%' or kodp like '04%')
-      and rnk in ( select rnk from customer 
-                   where codcagent = 2  
-                     and rnk in ( select rnk from custbank 
+      and rnk in ( select rnk from customer
+                   where codcagent = 2
+                     and rnk in ( select rnk from custbank
                                   where alt_bic in ('8260000013', '8400000053', '8400000054')
                                     and ( trim(rating) in ('BBB', 'BBB+','BBB-','Baa1','Baa2','Baa3')  or
                                           substr(trim(rating),1,1) in ('A', 'T', 'F') )
                                 )
-                 ) 
-      and rnk in ( select rnk from accounts where nbs in ('1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
-                                                          '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
-                                                          '1532', '1533', '1535', '1536', '1538', 
-                                                          '1542', '1543', '1545', '1546', '1548', '1549', 
+                 )
+      and rnk in ( select rnk from accounts where nbs in ('1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519',
+                                                          '1520', '1521', '1522', '1524', '1526', '1528', '1529',
+                                                          '1532', '1533', '1535', '1536', '1538',
+                                                          '1542', '1543', '1545', '1546', '1548', '1549',
                                                           '1600', '1607', '1609')
                  ) ;
-    
+
     nnnn01_ := 0;
     rnk_ := 0;
     ddd_ := '00';
@@ -2059,13 +2085,97 @@ BEGIN
     IF dat_ >= to_date('18012019','ddmmyyyy') THEN
        select sum(znap)
           into s04_
-       from rnbu_trace 
+       from rnbu_trace
        where kodp like '04%';
 
-       if s04_ > ROUND (sum_k_ * k1_, 0) then
+       if s04_ > ROUND (sum_H9_ * k1_, 0) then   -- s04_ > ROUND (sum_k_ * k1_, 0)
           insert into rnbu_trace(nls, odate, kodp, znap )
           VALUES ('показник B4', dat_, 'B400000', to_char(s04_ - ROUND (sum_k_ * k1_, 0)));
-       end if; 
+       end if;
+    END IF;
+
+    -- з 01/03/2019 формуються нові показники B5, B6, B7, B8, B9 
+    -- якщо сума показника бал.рахунку 3680 і R011=1 із #C5 не нульова
+    IF dat_ >= to_date('01032019','ddmmyyyy') AND sum_3680_ <> 0 
+    THEN 
+      
+       for k in ( select * from V_NBUR_#26_dtl
+                  where report_date <= dat_
+                    and (seg_04 like '15%' OR seg_04 like '16%')
+                    and (seg_11 in ('1', '3', '4') OR (seg_11 = '5' and seg_10  in ('1', '2'))) 
+                    and seg_01 = '10' 
+                    and report_date = any ( select max(v1.report_date) 
+                                         from V_NBUR_#26_dtl v1
+                                         where v1.report_date <= dat_
+                                       )
+                ) 
+ 
+      loop
+         --1500, 1502, 1508, 1509, 1510, 1513, 1516, 1518, 1519, 1520, 1521, 1522, 1524, 1526, 1528, 1529, 1532, 1533, 1535, 1536, 1538, 1542, 1543, 1545, 1546, 1548, 1549, 1600, 1607, 1609
+         -- S580='1'
+         if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
+                          '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
+                          '1532', '1533', '1535', '1536', '1538',  
+                          '1542', '1543', '1545', '1546', '1548', '1549', 
+                          '1600', '1607', '1609'
+                        ) and k.seg_11 = '1'  
+         then
+            insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+               VALUES (k.acc_num, k.kv, dat_, 'B50000000', k.field_value, k.acc_id);
+         end if;
+
+         --1500, 1502, 1508, 1509, 1510, 1513, 1516, 1518, 1519, 1520, 1521, 1522, 1524, 1526, 1528, 1529, 1532, 1533, 1535, 1536, 1538, 1542, 1543, 1545, 1546, 1548, 1549, 1600, 1607, 1609
+         -- S580='3'
+         if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
+                          '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
+                          '1532', '1533', '1535', '1536', '1538',  
+                          '1542', '1543', '1545', '1546', '1548', '1549', 
+                          '1600', '1607', '1609'
+                        ) and k.seg_11 = '3'  
+         then
+            insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+               VALUES (k.acc_num, k.kv, dat_, 'B60000000', k.field_value, k.acc_id);
+         end if;
+
+         --1500, 1502, 1508, 1509, 1510, 1516, 1518, 1519, 1526, 1528, 1529
+         -- S580='4'
+         if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1516', '1518', '1519', 
+                          '1526', '1528', '1529' 
+                        ) and k.seg_11 = '4'  
+         then
+            insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+               VALUES (k.acc_num, k.kv, dat_, 'B70000000', k.field_value, k.acc_id);
+         end if;
+
+         -- 1502, 1508, 1509, 1510, 1513, 1516, 1518, 1519, 1520, 1522, 1524, 1526, 1528, 1529, 1532, 1533, 1535, 1536, 1538, 1542, 1543, 1545, 1546, 1548, 1549, 1600, 1607, 1609
+         -- S580='5', S245='1'
+         if k.seg_04 in ( '1502', '1508', '1509', '1513', '1516', '1518', '1519', 
+                          '1520', '1522', '1524', '1526', '1528', '1529', 
+                          '1532', '1533', '1535', '1536', '1538',  
+                          '1542', '1543', '1545', '1546', '1548', '1549', 
+                          '1600', '1607', '1609'
+                        ) and k.seg_11 = '5' 
+                          and k.seg_10 = '1' 
+         then
+            insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+               VALUES (k.acc_num, k.kv, dat_, 'B80000000', k.field_value, k.acc_id);
+         end if;
+
+         -- '1500', 1502, 1508, 1509, 1510, 1513, 1516, 1518, 1519, 1520, 1521, 1522, 1524, 1526, 1528, 1529, 1532, 1533, 1535, 1536, 1538, 1542, 1543, 1545, 1546, 1548, 1549, 1600, 1607, 1609
+         -- S580='5', S245='2'
+         if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
+                          '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
+                          '1532', '1533', '1535', '1536', '1538',  
+                          '1542', '1543', '1545', '1546', '1548', '1549', 
+                          '1600', '1607', '1609'
+                        ) and k.seg_11 = '5' 
+                          and k.seg_10 = '2' 
+         then
+            insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+               VALUES (k.acc_num, k.kv, dat_, 'B90000000', k.field_value, k.acc_id);
+         end if;
+
+       end loop;
     END IF;
 
     IF type_ = 0
