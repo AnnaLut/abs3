@@ -6620,7 +6620,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     --
     begin
         -- точка отката
-        savepoint sp;
+       -- savepoint sp;
         -- точка отсчета
 /*      l_scn := dbms_flashback.get_system_change_number();
         --
@@ -6681,8 +6681,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
 
-       --     commit;
+            commit;
         end loop;
+		savepoint sp;
         -- идем по заявкам на покупку/продажу валюты
         for c in (select *
                     from (select d.doc_id,
