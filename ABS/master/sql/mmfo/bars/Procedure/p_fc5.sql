@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.007  18/03/2019 ( 07/03/2019)
+% VERSION : v.19.008   27/03/2019 (18/03/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -2612,6 +2612,24 @@ BEGIN
                      and o1.nd = o.nd
                      and o1.znap <> 0
                  );
+    commit;
+	
+    merge into otc_c5_proc o
+    using (select c.rnk,
+                  d.link_group,
+                  NVL(d.link_code, '000') link_code,
+                  NVL(d.groupname, c.nmk) link_name,
+                  DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1) prins
+           from customer c
+           left outer join d8_cust_link_groups d
+            on (trim(c.okpo) = trim(d.okpo))) p
+        on (p.rnk = o.rnk) 
+    WHEN MATCHED THEN
+        UPDATE SET o.LINK_GROUP = p.LINK_GROUP, 
+                   o.LINK_CODE = p.LINK_CODE, 
+                   o.LINK_NAME = p.LINK_NAME, 
+                   o.FL_PRINS = p.PRINS     
+    where o.datf = dat_;
     commit;
 
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
