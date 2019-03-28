@@ -48,7 +48,7 @@ begin
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select ND, BRANCH, DEPVIDNAME, NLS, KV, SOURCE, IDCODE,  FIO, OST'||nlchr||
+    l_zpr.txt          := 'select ND, BRANCH, DEPVIDNAME, NLS, KV, SOURCE, IDCODE,  FIO, OST, FL, DZAGR, BATCH_ID'||nlchr||
                            ' from v_asvo_in_mmfo_not_crnv';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
