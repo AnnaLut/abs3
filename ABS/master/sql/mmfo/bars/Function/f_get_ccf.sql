@@ -13,7 +13,13 @@
 begin
    begin
       select ccf into l_ccf from nbs_ob22_ccf  where nbs = p_nbs and ob22 = p_ob22 and srok = p_srok;
-   exception when NO_DATA_FOUND THEN l_CCF := 100;
+   exception when NO_DATA_FOUND THEN 
+      if p_nbs in ('9129','9100') THEN
+         begin
+            select ccf into l_ccf from nbs_ob22_ccf  where nbs = p_nbs and srok = p_srok;
+         exception when NO_DATA_FOUND THEN l_CCF := 100;
+         end;
+      end if;
    end;
    return l_ccf;
 end;

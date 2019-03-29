@@ -25,11 +25,11 @@ begin
    END;
    delete from deb_fin;
    insert into deb_fin (nbs,kv,kat,rez,rezq,bv,bvq,rezf,rezqf)
-   select nbs,kv,kat,sum(rez) rez,sum(rezq) rezq ,sum(bv) bv,sum(bvq) bvq,
+   select nbs,kv,fin,sum(rez) rez,sum(rezq) rezq ,sum(bv) bv,sum(bvq) bvq,
           sum(rez) rezf,sum(rezq) rezqf
    from nbu23_rez where fdat=dat01_ and id like 'DEBF%' and dat_mi is null
-   group by nbs,kv,kat
-   order by nbs,kv,kat;
+   group by nbs,kv,fin
+   order by nbs,kv,fin;
 end;
 /
 show err;

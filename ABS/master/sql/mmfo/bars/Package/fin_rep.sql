@@ -1580,6 +1580,7 @@ end;
 	l_kv number;
 	l_custtype number;
 	l_nbs varchar2(4); l_fin number; l_tipa number; l_idf number; l_pd_0 number;
+        l_tip_fin  rez_cr.tip_fin%type;
 	l_25  varchar2(1);
 	l_24  varchar2(3);
 	l_mod varchar2(32) := 'LOAD_ND';
@@ -1589,8 +1590,8 @@ end;
 
 	 n_rnk := load_rnk (p_rnk);
      
-     Select RZ, kol, kv, custtype, nbs, fin , tipa, idf, pd_0
-		 into l_rz, l_kol , l_kv, l_custtype, l_nbs, l_fin, l_tipa, l_idf, l_pd_0
+     Select RZ, kol, kv, custtype, nbs, fin , tipa, idf, pd_0, tip_fin
+		 into l_rz, l_kol , l_kv, l_custtype, l_nbs, l_fin, l_tipa, l_idf, l_pd_0, l_tip_fin
 		 from rez_cr
 		where ROWID = P_RW;
 
@@ -1821,10 +1822,22 @@ end;
 		end if;
 	*/
 
-		If    l_kol between 31 and 60  then   t_deal.rnk(n_rnk).nd(n_nd).kol27 := '591';   l_.p161_3 := 1;
-		elsIf l_kol between 61 and 90  then   t_deal.rnk(n_rnk).nd(n_nd).kol27 := '592';   l_.p161_3 := 0; l_.p162_2 := 1;
-		elsIf l_kol >= 91              then   t_deal.rnk(n_rnk).nd(n_nd).kol27 := '593';   l_.p161_3 := 0; l_.p162_2 := 0; l_.p164_1:= 1; l_.p165_14 := 1;
-		else                                  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '000';   l_.p162_2 := 0; l_.p161_3 := 0;
+		If    l_kol between 31 and 60  THEN  l_.p161_3 := 1; 
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#'; 
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '591';   
+                   end if;
+		elsIf l_kol between 61 and 90  THEN  l_.p161_3 := 0; l_.p162_2 := 1; 
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#'; 
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '592';   
+                   end if;  
+		elsIf l_kol >= 91              THEN  l_.p161_3 := 0; l_.p162_2 := 0; l_.p164_1:= 1; l_.p165_14 := 1; 
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#'; 
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '593';   
+                   end if;
+		else                                 l_.p162_2 := 0; l_.p161_3 := 0;
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#';
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '000';   
+                   end if;
 		end if;
 
 		if not regexp_like(l_nbs,'^20[23]')
@@ -1923,7 +1936,9 @@ end;
 				  ||f_conct('164216608',l_.p166_8)
 				  ||f_conct('164216609',l_.p166_9)
 		          ;
-		 t_deal.rnk(n_rnk).nd(n_nd).kol26 :=  nvl(substr(l_tmp,2),'000000000');
+                 if l_tip_fin = 0 THEN t_deal.rnk(n_rnk).nd(n_nd).kol26 := NULL;
+                 else                  t_deal.rnk(n_rnk).nd(n_nd).kol26 :=  nvl(substr(l_tmp,2),'000000000');
+                 end if; 
 
 
 		--  27 Код щодо своєчас-ності сплати боргу
@@ -1978,13 +1993,29 @@ end;
 	  exception when no_data_found then
 	   null;
 	   l_tmp := null;
-	   	If    l_kol between 31 and 60   then   t_deal.rnk(n_rnk).nd(n_nd).kol27 := '591';
-		elsIf l_kol between 61 and 90   then   t_deal.rnk(n_rnk).nd(n_nd).kol27 := '592';
-		elsIf l_kol >= 91               then   t_deal.rnk(n_rnk).nd(n_nd).kol27 := '593';
-		else                                   t_deal.rnk(n_rnk).nd(n_nd).kol27 := '000';
+
+		If    l_kol between 31 and 60  THEN  
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#'; 
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '591';   
+                   end if;
+		elsIf l_kol between 61 and 90  THEN  
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#'; 
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '592';   
+                   end if;  
+		elsIf l_kol >= 91              THEN  
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#'; 
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '593';   
+                   end if;
+		else                                 
+                   if l_tip_fin in (0)         THEN  t_deal.rnk(n_rnk).nd(n_nd).kol27 := '#';
+                   else                              t_deal.rnk(n_rnk).nd(n_nd).kol27 := '000';   
+                   end if;
 		end if;
+
 	   t_deal.rnk(n_rnk).nd(n_nd).kol25 :=  nvl(substr(l_tmp,2),'0000');
-	   t_deal.rnk(n_rnk).nd(n_nd).kol26 :=  nvl(substr(l_tmp,2),'000000000');
+           if l_tip_fin = 0 THEN t_deal.rnk(n_rnk).nd(n_nd).kol26 := NULL;
+           else                  t_deal.rnk(n_rnk).nd(n_nd).kol26 :=  nvl(substr(l_tmp,2),'000000000');
+           end if;
 	                                l_tmp:=  f_conct('01',case when regexp_like(t_deal.rnk(n_rnk).nd(n_nd).kol24,'[1234567896]')  then '1' else '0' end)
 		                                   ||f_conct('02',case when regexp_like(t_deal.rnk(n_rnk).nd(n_nd).kol25,'[1234567896]')  then '1' else '0' end)
 										   ||f_conct('03',case when regexp_like(t_deal.rnk(n_rnk).nd(n_nd).kol26,'[1234567896]')  then '1' else '0' end)

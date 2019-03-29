@@ -1,13 +1,13 @@
 CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-/* Версия 15.3   20-02-2019  19-11-2018  23-10-2018  10-09-2018  12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017 
+/* Версия 15.3   20-02-2019  19-11-2018  23-10-2018  10-09-2018  12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017
    Розрахунок кредитного ризику по кредитах + БПК
 
    ----------------------------------------------
 34) 20-02-2019(15.3) - (COBUSUPABS-7264) - Застава по непрацюючих кредитах+KVED
 33) 19-11-2018(15.2) - Кредити+БПК+ОВЕР+МБДК+Коррахунки
 32) 23-10-2018(15.1) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
-31) 10-09-2018(15.0) - ОВЕР - 2600 добавлен 
+31) 10-09-2018(15.0) - ОВЕР - 2600 добавлен
 30) 12-07-2018(14.9) - Новые счета - ('SDI','SDA','SDM','SDF','SRR') по ОВЕРАМ выборка , как по кредитам
 29) 20-04-2018(14.8) - По Крыму FIN = max, PD = 1 (COBUSUPABS-5846 (Крым), лист 18-04-2018 20:36, будет в COBUMMFO-7561)
 28) 10-04-2018(14.7) - по оверам исключить залоги - a.tip <> 'ZAL' + по БПК исключить 3570,3578 -  b.tip not in ('SK9','ODB','OFR')
@@ -46,7 +46,7 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
        3 - кредиты
        4 - бюджет
        5 - МБДК
-       6 - коррсчета 
+       6 - коррсчета
        9 - фінансові зобов`язання - кредиты (9129)
       10 - ОВЕРДРАФТЫ
       41 - старый процессинг (карточки)
@@ -67,13 +67,13 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
  l_grp    rez_cr.grp%type      ; l_poci  rez_cr.poci%type   ;
 
  l_kol         NUMBER; acc8_     NUMBER; l_idf      NUMBER; l_fin      NUMBER; l_tipa     NUMBER; l_fin23     NUMBER; l_f        NUMBER;
- l_fp          NUMBER; l_pd_0    NUMBER; l_tip_fin  NUMBER; l_kz       NUMBER; srok       NUMBER; l_pd        NUMBER; l_CRQ      NUMBER; 
- l_EAD         NUMBER; l_zal     NUMBER; l_EADQ     NUMBER; l_LGD      NUMBER; l_CR       NUMBER; l_RC        NUMBER; l_bv       NUMBER; 
- l_BVQ         NUMBER; l_bv02    NUMBER; l_BV02q    NUMBER; l_ccf      NUMBER; l_srok     NUMBER; L_RCQ       NUMBER; L_CR_LGD   NUMBER; 
- l_zalq        NUMBER; l_zal_BV  NUMBER; l_zal_BVq  NUMBER; l_dv       NUMBER; l_polis    NUMBER; l_zal_lgd   NUMBER; l_s        NUMBER; 
+ l_fp          NUMBER; l_pd_0    NUMBER; l_tip_fin  NUMBER; l_kz       NUMBER; srok       NUMBER; l_pd        NUMBER; l_CRQ      NUMBER;
+ l_EAD         NUMBER; l_zal     NUMBER; l_EADQ     NUMBER; l_LGD      NUMBER; l_CR       NUMBER; l_RC        NUMBER; l_bv       NUMBER;
+ l_BVQ         NUMBER; l_bv02    NUMBER; l_BV02q    NUMBER; l_ccf      NUMBER; l_srok     NUMBER; L_RCQ       NUMBER; L_CR_LGD   NUMBER;
+ l_zalq        NUMBER; l_zal_BV  NUMBER; l_zal_BVq  NUMBER; l_dv       NUMBER; l_polis    NUMBER; l_zal_lgd   NUMBER; l_s        NUMBER;
  l_EADR        NUMBER; l_RZ      NUMBER; l_tip_kv   NUMBER; l_fin_okpo NUMBER; l_lgd_51   NUMBER;
  l_kol_fin_max NUMBER; l_k       NUMBER; l_g_kved   NUMBER;
-        
+
  VKR_       varchar2(3);  l_txt  varchar2(1000);  l_vkr   varchar2(50)  ;  l_real  varchar2(3);  l_text  VARCHAR2(250) ; l_kf varchar2(6);
  l_poci_    varchar2(3);
  l_kved     varchar2(5);
@@ -100,19 +100,19 @@ begin
    --delete from REZ_CR where fdat=p_Dat01 and tipa in ( 3, 4, 5, 6, 9, 10, 41, 42, 90, 94);
    l_lgd_51 := GET_REZ_PAR( 'LGD' );
    for d in (
-             SELECT e.nd, e.cc_id, e.vidd, e.fin23, decode(e.vidd, 110, 10, 3) tipa, sdate, wdate, e.prod, e.rnk, e.pd, cck_app.get_nd_txt(e.nd, 'VNCRR') vkr, 
+             SELECT e.nd, e.cc_id, e.vidd, e.fin23, decode(e.vidd, 110, 10, 3) tipa, sdate, wdate, e.prod, e.rnk, e.pd, cck_app.get_nd_txt(e.nd, 'VNCRR') vkr,
                     decode(trim(c.sed),'91',3,c.custtype) custtype, trim(c.sed) sed, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo,
                     substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK
              FROM CC_DEAL e, nd_open n, customer c
              WHERE  e.VIDD IN (1,2,3,110,11,12,13)  AND e.SDATE  <  p_DAT01 and  p_nd in (0, e.nd) and e.rnk = c.rnk
                and  n.fdat = p_dat01 and e.nd = n.nd -- действующие
              union all
-             select distinct b.nd, null cc_id, 11, fin23, tip_kart tipa, null dat_begin, null dat_end, '2203' prod, b.RNK, null pd, vkr, 
+             select distinct b.nd, null cc_id, 11, fin23, tip_kart tipa, null dat_begin, null dat_end, '2203' prod, b.RNK, null pd, vkr,
                     decode(trim(c.sed),'91',3,c.custtype) custtype, trim(c.sed) sed, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo,
                     substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK
              from rez_w4_bpk b, customer c where b.nbs not in ('3570','3578') and b.rnk = c.rnk
              union all
-             SELECT d.nd, d.cc_id,  d.vidd, D.FIN23, 5 tipa, d.sdate, d.wdate, d.prod, d.rnk, PD, f_vkr_MBDK(d.rnk) VKR, decode(trim(c.sed),'91',3,c.custtype) custtype, 
+             SELECT d.nd, d.cc_id,  d.vidd, D.FIN23, 5 tipa, d.sdate, d.wdate, d.prod, d.rnk, PD, f_vkr_MBDK(d.rnk) VKR, decode(trim(c.sed),'91',3,c.custtype) custtype,
                     trim(c.sed) sed, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, F_RNK_gcif (c.okpo, c.rnk) okpo,substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK
              FROM (select * from accounts where  nbs >'1500' and nbs < '1600') a,
                   (select e.* from cc_deal e,nd_open n
@@ -135,7 +135,7 @@ begin
       if d.tipa in (41,42) THEN l_VKR   :='БПК ';
       elsif d.tipa in (10) THEN l_VKR   :='ОВЕР';
       elsif d.tipa in (5)  THEN l_VKR   :='МБДК';
-      elsif d.tipa in (6)  THEN l_VKR   :='Коррахунки'; 
+      elsif d.tipa in (6)  THEN l_VKR   :='Коррахунки';
       else                      l_VKR   :='Кредит';
                                 l_real  := substr(trim(cck_app.get_nd_txt(d.nd, 'REAL')),1,3);
                                 l_poci_ := substr(trim(cck_app.get_nd_txt(d.nd, 'POCI')),1,3);
@@ -148,9 +148,9 @@ begin
          p_error_351( P_dat01, d.nd, user_id, l_err_type, null, null, null, null, l_vkr || '-"' || vkr_ ||'"', d.rnk, null);
       end if;
 
-      If l_poci_ = 'Так' then l_poci := 1; 
+      If l_poci_ = 'Так' then l_poci := 1;
       else                    l_poci := 0;
-      end if; 
+      end if;
 
       if     d.tipa in (41,42,44,10) and d.custtype = 2 THEN d.vidd := 1 ;
       elsif  d.tipa in (41,42,44,10)                    THEN d.vidd := 11;
@@ -193,7 +193,7 @@ begin
                from   nd_acc n, accounts a
                where  n.nd = d.nd and n.acc = a.acc and nls not like '3%' and nls not like '8%' and a.nbs not in ('2620','9611','9601')
                  and  ((a.tip in  ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0','CR9','SNA','SDI','SDA','SDM','SDF','SRR') or a.nbs like '15%')
-                 and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 or a.nbs='2600' and ost_korr(a.acc,l_dat31,null,a.nbs) <0)  
+                 and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 or a.nbs='2600' and ost_korr(a.acc,l_dat31,null,a.nbs) <0)
                order by a.tip desc;
          else
             OPEN c0 FOR
@@ -209,7 +209,7 @@ begin
             if  l_grp <>0 THEN  l_s250 := '8';
             else                l_s250 := null; l_grp := null;
             end if;
-      
+
             l_fin      := f_rnk_maxfin(p_dat01, d.okpo, l_tip_fin, d.nd, 1);
             l_fin_okpo := f_get_fin_okpo (d.rnk);
             if l_fin_okpo is not null THEN l_fin := least(l_fin,l_fin_okpo); end if;
@@ -238,10 +238,10 @@ begin
             else l_tipa := d.tipa;
             end if;
 
-            if l_tip_fin = 2 and l_fin = 10 or l_tip_fin = 1 and l_fin = 5 THEN 
+            if l_tip_fin = 2 and l_fin = 10 or l_tip_fin = 1 and l_fin = 5 THEN
                l_dat_fin_max := F_FIN_MAX (p_dat01, d.nd, l_fin, l_tipa);
                l_kol_fin_max := p_dat01 - l_dat_fin_max;
-            else 
+            else
                l_dat_fin_max := null;
                l_kol_fin_max := 0;
             end if;
@@ -289,8 +289,27 @@ begin
                       )
             LOOP
 
-               l_pd_0 := 0; l_text := NULL; 
- 
+               l_pd_0 := 0; l_text := NULL; l_ccf := 100;
+               
+               if s.nbs like '9%' THEN
+               if d.tipa = 10 THEN l_tipa := 90;
+               else                l_tipa :=  9;
+               end if;
+               if s.nbs in ('9000','9001','9122') and f_zal_ccf(p_dat01, d.nd) = 1 THEN l_CCF := 0;   -- COBUMMFO-7561
+               else
+                  if d.wdate is not null and d.sdate is not null THEN
+                     l_srok := d.wdate-d.sdate;
+                     if    l_srok <  365 THEN srok := 1;
+                     elsif l_srok < 1095 THEN srok := 2;
+                     else                     srok := 3;
+                     end if;
+                  else                        srok := 3;
+                  end if;
+                  l_CCF := F_GET_CCF (s.nbs, s.ob22, srok);
+               end if;
+            else l_tipa := d.tipa;
+            end if;
+
                if    d.vidd in ( 1, 2, 3) and d.prod like '21%'                THEN l_idf := 70; l_f := 76; l_fp := 48;
                elsif d.vidd in ( 1, 2, 3)                                      THEN l_idf := 50; l_f := 56;
                elsif d.vidd in (11,12,13) and z.kv  = 980 and nvl(z.tip,0) = 0 THEN l_idf := 62; l_f := 60; l_fp := 42;
@@ -304,10 +323,10 @@ begin
                end if;
 
 
-               l_k := F_K_ZAL (s.rnk, d.nd, z.kod_351, l_kol_fin_max); 
+               l_k := F_K_ZAL (s.rnk, d.nd, z.kod_351, l_kol_fin_max);
                --logger.info('ZAL_351 1 : nd = ' || ' l_k :=' || l_k || ' kod_351 = ' || z.kod_351 || ' kol_max = ' ||l_kol_fin_max ) ;
                l_text := l_text || ' l_k :=' || l_k || ' kod_351 = ' || z.kod_351 || ' kol_max = ' ||l_kol_fin_max;
-               --if l_k = 0 THEN 
+               --if l_k = 0 THEN
                --   z.zal_lgd:=0;
                --end if;
                l_zal  := (nvl(z.sall,0) * nvl(z.kl_351,0) * nvl(l_k,1))/100; l_zal_lgd := z.zal_lgd/100;
@@ -413,13 +432,13 @@ begin
                INSERT INTO REZ_CR (fdat   , RNK   , NMK    , ND    , KV      , NLS    , ACC       , EAD     , EADQ    , FIN     , PD       ,
                                    CR     , CRQ   , bv     , bvq   , VKR     , IDF    , KOL       , FIN23   , TEXT    , tipa    , pawn     ,
                                    zal    , zalq  , kpz    , vidd  , tip_zal , LGD    , CUSTTYPE  , CR_LGD  , nbs     , zal_bv  , zal_bvq  ,
-                                   S250   , dv    , RC     , RCQ   , BV02    , tip    , bv02q     , KL_351  , sdate   , RZ      , s080     , 
+                                   S250   , dv    , RC     , RCQ   , BV02    , tip    , bv02q     , KL_351  , sdate   , RZ      , s080     ,
                                    ob22   , grp   , cc_id  , pd_0  , istval  , wdate  , CCF       , okpo    , poci    , ddd_6B  , tip_fin  , rpb,
                                    k_ZAL  , kved  , g_kved , dat_fin_max     , kol_fin_max     )
                            VALUES (p_dat01, s.RNK , d.NMK  , d.nd  , s.kv    , s.nls  , s.acc     , l_ead   , l_eadq  , l_fin   , l_pd     ,
                                    l_CR   , l_CRQ , l_bv   , l_bvq , VKR_    , l_idf  , l_kol     , d.fin23 , l_text  , l_tipa  , z.pawn   ,
                                    l_zal  , l_zalq, z.kpz  , d.vidd, z.tip   , l_LGD  , d.CUSTTYPE, l_CR_LGD, s.nbs   , l_zal_bv, l_zal_bvq,
-                                   l_S250 , l_dv  , l_RC   , l_RCQ , l_bv02  , s.tip  , l_bv02q   , z.kl_351, d.sdate , d.RZ    , l_s080   , 
+                                   l_S250 , l_dv  , l_RC   , l_RCQ , l_bv02  , s.tip  , l_bv02q   , z.kl_351, d.sdate , d.RZ    , l_s080   ,
                                    s.ob22 , l_grp , d.cc_id, l_pd_0, l_istval, d.wdate, l_ccf     , d.okpo  , l_poci  , l_ddd   , l_tip_fin, nvl(z.rpb,0),
                                    L_K    , l_kved, l_g_kved, l_dat_fin_max, l_kol_fin_max );
 
@@ -443,7 +462,7 @@ begin
                                              l_pd   , 0         , 0       , l_bv         , l_bvq , VKR_   , l_idf   , l_kol  , d.fin23, l_text, d.tipa,
                                              d.vidd , d.CUSTTYPE, s.nbs   , l_S250       , l_dv  , l_bv   , s.tip   , l_bvq  , d.sdate, d.RZ  , l_grp ,
                                              d.okpo , l_poci    , l_ddd   , l_tip_fin    , l_s080, d.cc_id, l_istval, d.wdate, 0      ,
-                                             L_K    , l_kved    , l_g_kved, l_dat_fin_max, l_kol_fin_max );      
+                                             L_K    , l_kved    , l_g_kved, l_dat_fin_max, l_kol_fin_max );
                       end if;
                    --end if;
                 --END LOOP;
@@ -455,6 +474,7 @@ begin
    --if not f_mmfo THEN over_351 (p_dat01,1); end if;
 end;
 /
+
 show err;
 
 grant EXECUTE   on CCK_351  to BARS_ACCESS_DEFROLE;
