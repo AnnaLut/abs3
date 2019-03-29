@@ -24,7 +24,7 @@ begin
   , p_unit_code        => r_file.UNIT_CODE
   , p_period_tp        => r_file.PERIOD_TYPE
   , p_location_code    => r_file.LOCATION_CODE
-  , p_file_code_alt    => '#42'
+  , p_file_code_alt    => null
   , p_cnsl_tp          => r_file.CONSOLIDATION_TYPE
   , p_val_tp_ind       => r_file.VALUE_TYPE_IND
   , p_view_nm          => 'V_NBUR_'||l_file_code
