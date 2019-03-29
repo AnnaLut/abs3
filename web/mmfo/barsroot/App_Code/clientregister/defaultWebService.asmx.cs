@@ -3357,9 +3357,11 @@ namespace clientregister
                 con.Close();
                 con.Dispose();
             }
-            if (PublicFlag != String.Empty) { PublicFlagMessage = String.Format("Увага! Виявлено збіг з переліком публічних діячів № в переліку ={0}, ({1}) Зверніться до підрозділу фінансового моніторингу!", PublicFlag, nmk); }
-            DbLoggerConstruct.NewDbLogger().Info(String.Format("GetPublicFlag PublicFlag ={0}, PublicFlagMessage={1}.", PublicFlag, PublicFlagMessage), "ClientRegister");
-
+            if (PublicFlag != String.Empty) 
+            { 
+                PublicFlagMessage = String.Format("Увага! Виявлено збіг з переліком публічних діячів № в переліку ={0}, ({1}) Зверніться до підрозділу фінансового моніторингу!", PublicFlag, nmk);
+                DbLoggerConstruct.NewDbLogger().Info(String.Format("GetPublicFlag PublicFlag ={0}, PublicFlagMessage={1}.", PublicFlag, PublicFlagMessage), "ClientRegister");
+            }
 
             return PublicFlagMessage;
         }
