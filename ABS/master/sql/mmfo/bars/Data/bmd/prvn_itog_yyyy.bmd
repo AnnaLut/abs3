@@ -171,7 +171,6 @@ begin
   bars_metabase.add_column(l_tabid, 54, 'SDFQ1', 'N', 'SDFQ(POCI+2396)-1~Дисконт~Екв', '', null, 90, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 55, 'SDFQD', 'N', 'SDFQ-d(POCI+2396)~Дисконт~Екв', '', null, 91, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
 
-
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BANKS_RU');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'MFO');
@@ -189,6 +188,9 @@ begin
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 1, '1) Переформувати звіт - Підсумки з початку року', '', '', 'ONCE', '', '', 'FunNSIEditF("PRVN_ITOG_YYYY", 0)', '', 'sPar=PRVN_ITOG_YYYY[PROC=>PRVN_ITOG_PROC][DESCR=>1) Переформувати звіт Підсумки з початку року][ACCESSCODE=>1]', null);
 
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 1, null, ':KV > 0  and TO_CHAR( :FDAT, ''DDMM'') = ''0101'' ', 2, 'COLOR_Gray');
@@ -258,5 +260,4 @@ begin
 
 end;
 /
-
 commit;
