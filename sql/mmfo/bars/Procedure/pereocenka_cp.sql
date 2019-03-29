@@ -9,9 +9,10 @@ CREATE OR REPLACE PROCEDURE BARS.pereocenka_cp (p_dat01 date, p_mode number)  is
 /*  pmode = 0 - рассформирование
             1 - формирование
     ----------------------------
-   Версия 1.0   11-02-2019
+   Версия 1.1   14-03-2019  11-02-2019
    Дооцінка ЦП на суму сформованого резерву
    -------------------------------------
+02) 14-03-2019(1.1) -  Список угод, за якими не формується дооцінка (rez_nd_cp)
 01) 11-02-2019(1.0) -  Операція - RXP
 */ 
 
@@ -65,8 +66,11 @@ begin
    if p_mode = 1 THEN 
 
       OPEN c0 FOR  select nd, kv, substr(nbs,1,3) nb, sum(rez)*100 ost, null acc, null nls from nbu23_rez 
-                   where fdat=p_dat01 and rez<>0 and nbs in ('1410','1411','1412','1413','1414','1415','1416','1418',
-                                                             '3110','3111','3112','3113','3114','3115','3116','3118') 
+                   where fdat = p_dat01 and 
+                         rez <> 0 and 
+                         nbs in ('1410','1411','1412','1413','1414','1415','1416','1418',
+                                 '3110','3111','3112','3113','3114','3115','3116','3118') and
+                         nd not in (select nd from rez_nd_cp)
                    group by nd, kv, substr(nbs,1,3); 
    else 
       OPEN c0 FOR  select null nd, kv, substr(nls,1,3) nb, nvl(ost_korr(a.acc,oo.vdat,null,'1415'),0) ost, acc, nls  from accounts a where tip ='SR';

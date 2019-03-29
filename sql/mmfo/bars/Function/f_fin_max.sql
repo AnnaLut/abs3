@@ -1,26 +1,36 @@
 CREATE OR REPLACE FUNCTION BARS.F_FIN_MAX (p_dat01 date, p_nd integer, p_fin integer, p_tipa integer) RETURN date is
 
-/* Версия 1.0   10-04-2018 
+/* Версия 1.1   14-03-2019  10-04-2018
    Дата возникновения максимального значения фин.класса
+14-03-2019(1.1) -дату определять с учетом ген.договора    
 */
 
-l_fdat    nbu23_rez.fdat%type; 
-l_start   date := to_date('03-01-2017','dd-mm-yyyy'); -- дата початку дії постанови 351  ( COBUSUPABS-7190 "Заявка загальні доопрацювання продовження.pdf п.5)
+l_fdat    nbu23_rez.fdat%type;
+-- дата початку дії постанови 351  ( COBUSUPABS-7190 "Заявка загальні доопрацювання продовження.pdf п.5)
+l_start   date := to_date('03-01-2017','dd-mm-yyyy'); 
 
 begin
-   for k in (select distinct fdat,nd,fin from rez_cr where fdat >=l_start and  fdat <= P_dat01 and nd = p_nd and pd_0<>1 and tipa = p_tipa order by fdat desc)
+   for k in (select distinct fdat,fin from rez_cr 
+             where  fdat >=l_start and  fdat <= P_dat01 
+               and  nd in (select nd   from cc_deal where nd = p_nd union all
+                           select ndg  from cc_deal where nd = p_nd union all
+                           select p_nd from dual)  
+               and  pd_0<>1 
+               and  tipa = p_tipa 
+             order  by fdat desc
+            )
    loop
       if k.fin = p_fin THEN   l_fdat := k.fdat;
-      else  
+      else
       return least(l_fdat,p_dat01);
-      end if;             
+      end if;
    end loop;
    return least(l_fdat,p_dat01);
 end;
 /
+
  show err;
  
 PROMPT *** Create  grants  F_FIN_MAX ***
 grant EXECUTE                        on F_FIN_MAX to BARS_ACCESS_DEFROLE;
 grant EXECUTE                        on F_FIN_MAX to START1;
-

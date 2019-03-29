@@ -9,9 +9,10 @@ PROMPT *** Create  procedure P_2401 ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_2401 (DAT01_ date ) IS
 
-/* Версия 2.9  11-10-2017 05-10-2017  02-10-2017  27-09-2017  11-09-2017 05-09-2017  06-03-2017  29-01-2017
+/* Версия 3.0  14-03-2019  11-10-2017 05-10-2017  02-10-2017  27-09-2017  11-09-2017 05-09-2017  06-03-2017  
    Визначення Портфельного метода + ОСББ
    -------------------------------------
+ 14) 14-03-2019(3.0) - (COBUMMFO-11049) k050 in ('855', '321') Уточнен список счетов задолженности
  13) 11-10-2017(2.9) - По Крыму нет портфельного метода
  12) 11-10-2017(2.8) - ('3578','3579','3570') через таблицу REZ_DEB
  11) 11-10-2017(2.7) - Деб.>3 мес. не вклюсать в группу +  поиск в БПК исключить сам счет деб.
@@ -62,7 +63,7 @@ begin
              union  all
              select d.nd,d.rnk,'OSBB' tip,4 grp, 0 restr, 0 sp_
              from   cc_deal d, nd_open o, tmp_nbs_2401 t, CUSTOMER C
-             where  d.nd = o.nd and o.fdat = dat01_ and substr(d.prod,1,6) = t.nbs||t.ob22 and t.grp = 4 and d.rnk = c.rnk and c.k050 in ('855', '320')
+             where  d.nd = o.nd and o.fdat = dat01_ and substr(d.prod,1,6) = t.nbs||t.ob22 and t.grp = 4 and d.rnk = c.rnk and c.k050 in ('855', '321')
              union  all
              select a.acc nd,a.rnk,'DEB' tip,6 grp, 0 restr, 0 sp_ from accounts a, rez_deb r
              where a.nbs=r.nbs and r.deb = 1 and a.nbs is not null and (a.dazs is null or a.dazs >= dat01_)
@@ -131,15 +132,15 @@ begin
             begin
                select rnk,sum(ost) into rnk_,ost_
                from (select r.rnk,sum(-p_icurval(a.kv,ost_korr(a.acc,dat31_,null,a.nbs),dat31_)) ost
-                     from   rez_w4_bpk r, accounts a where r.acc = a.acc and r.rnk = k.rnk and a.nbs not in ('3578','3579','3570') group  by r.rnk
+                     from   rez_w4_bpk r, accounts a where r.acc = a.acc and r.rnk = k.rnk and a.nbs not in ('3578','3579','3570','9129') group  by r.rnk
                      union all
                      select a.rnk,sum(-p_icurval(a.kv,ost_korr(a.acc,dat31_,null,a.nbs),dat31_))
                      from   accounts a, nd_acc n
-                     where  n.acc=a.acc and a.tip   in ('SS ','SP ','SN ','SNA','SNO','SL ','SPN','CR9','SDI','SPI')
+                     where  n.acc=a.acc and a.tip   in ('SS ','SP ','SN ','SNO','SL ','SPN')
                             and  (dazs is null or dazs>=dat01_) and a.rnk=k.rnk group by a.rnk
                      union all
                      select rnk,sum(-p_icurval(kv,ost_korr(acc,dat31_,null,nbs),dat31_))
-                     from accounts where nbs in (select nbs from rez_deb where grupa = 1 and deb=1 and ( d_close is null or d_close > dat01_ ) )
+                     from accounts where nbs in (select nbs from rez_deb where deb=1 and ( d_close is null or d_close > dat01_ ) )
                                          and (dazs is null or dazs>=dat01_)  and rnk = k.rnk  --('3578','3579','3570')
                      group by rnk) f
                where  rnk=k.rnk group by rnk; --f.ost<5000000
