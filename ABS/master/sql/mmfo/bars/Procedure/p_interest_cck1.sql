@@ -84,18 +84,18 @@
        SELECT d.nd, d.cc_id, d.sdate, d.wdate,ndg
          FROM cc_deal d, accounts a8, int_accn ia, nd_acc n, nd_txt tz
         WHERE p_type = 17
-          AND vidd IN (11, 12, 13)
+		  AND vidd IN (11, 12, 13)
 		  AND ia.acc = a8.acc
-		  and ia.stp_dat is null
+		  AND ia.stp_dat is null
 		  AND n.acc = a8.acc
 		  AND n.nd = d.nd
-		  and tz.nd = d.nd
+		  AND tz.nd = d.nd
 		  AND ia.id in (0, 1)
-		  and tz.tag = 'FLAGS'
-		  and ia.s = 25
+		  AND tz.tag = 'FLAGS'
+		  AND ia.s = 25
 		  --AND substr(tz.txt, 2, 1) = '0' COBUMMFO-7232
 		  and tz.txt = '00'
-		  and d.sos <> 15;
+		  AND d.sos <> 15;
   ELSIF p_type = -999 THEN
      -- ÍÀ ÂÈÌÎÃÓ- ïî 1 ÊÄ
      OPEN k1 FOR
@@ -115,7 +115,7 @@
         WHERE sos >= 10
           AND sos < 14
           AND (p_type = 1 AND vidd IN (1, 2, 3) OR
-              p_type = 11 AND vidd IN (11, 12, 13));
+              p_type in (11,111) AND vidd IN (11, 12, 13));
 
    ELSIF p_type IN (2, 12) THEN
      -- ÍÀ ÂÈÌÎÃÓ- ç çàëèøêàìè íà SG
@@ -269,7 +269,7 @@
                      AND d.ndg=dd.nd
                      AND a.acc = i.acc
                      AND (i.stp_dat IS NULL or i.stp_dat >= ddat2_)
-                     AND ((a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9', 'CR9') AND (i.id  = 0 or (i.id = 1 and p_type != 111)))
+                     AND ((a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9', 'CR9') AND (i.id  = 0 or (i.id = 2 and p_type != 111)))
                           OR (i.metr = 4 AND i.id = 1)
                          )
                      AND i.acra IS NOT NULL
