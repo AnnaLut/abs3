@@ -160,8 +160,10 @@ BEGIN
     -- Новый(insert) -- Открыть счет обеспечения с PAWN_ACC Дополнить его спец.параметрами (PAWN_ACC)
 
     BEGIN
-      SELECT substr(nmk || ' Забезпечення.', 1, 38)
-        INTO az.nms
+      SELECT substr(nmk || ' Забезпечення.', 1, 38),
+             okpo
+        INTO az.nms,
+             oo.id_a
         FROM customer
        WHERE rnk = az.rnk;
     EXCEPTION
@@ -275,6 +277,42 @@ BEGIN
              ,p_pawn);
     v_flag := 1;
   END LOOP;
+  if dd.vidd = 5 or (dd.sos = 0 and v_flag = 0) then
+    insert into cc_accp (acc,
+                         accs,
+                         nd,
+                         pr_12,
+                         idz)
+      select az.acc, a.acc, dd.nd, 1, p_cc_idz
+        from accounts a, nd_acc n
+        where n.nd = dd.nd
+          and n.acc = a.acc
+          and a.tip = 'LIM'
+          and not exists (select 1 from cc_accp where acc = az.acc and accs = a.acc and nd = dd.nd);
+  end if;
+  
+  if dd.nd = nvl(dd.ndg,-1) then -- привяжем открываемый залог к субдоговорам, если этого еще нет
+    for deal in (select nd from cc_deal where ndg= dd.nd and nd != dd.nd)
+    loop
+      
+      for zal in (select distinct acc, idz, mpawn, pawn, rnk from cc_accp where nd = dd.nd)
+      loop
+        for acc in (select n.acc from nd_acc n, accounts a where n.nd = deal.nd and n.acc = a.acc and a.tip in ('SS ','SP ','CR9','SN ','SPN'))
+        loop
+          insert into cc_accp (acc,
+                               accs,
+                               nd,
+                               pr_12,
+                               idz,
+                               mpawn,
+                               pawn,
+                               rnk)
+           select zal.acc, acc.acc, deal.nd, 1, zal.idz, zal.mpawn, zal.pawn, zal.rnk from dual
+             where not exists (select 1 from cc_accp where acc = zal.acc and accs = acc.acc);
+        end loop;
+      end loop;
+    end loop;
+  end if;
   -----------------------------
   IF nvl(p_del, 0) = 0 THEN
     RETURN;
@@ -295,11 +333,12 @@ BEGIN
   END;*/
 
 
-BEGIN
-SELECT t.nls,substr(t.nms ,1,38) INTO oo.nlsb, oo.nam_b
-      FROM accounts t
-     WHERE t.kv =az.kv
-      and t.nls = BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0);
+  BEGIN
+    SELECT t.nls,substr(t.nms ,1,38), c.okpo INTO oo.nlsb, oo.nam_b, oo.id_b
+      FROM accounts t, customer c
+      WHERE t.kv =az.kv
+       and t.nls = BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0)
+       and t.rnk = c.rnk;
   EXCEPTION
     WHEN no_data_found THEN
       raise_application_error(g_errn

@@ -245,11 +245,12 @@ function get_kkw_crd (p_ref in oper.ref%type)
 
 END CCK_DOP;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
+CREATE OR REPLACE PACKAGE BODY CCK_DOP IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.09 11/10/2018';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.15 15/03/2019';
 
    /*
+ 
  29/08/2018 VPogoda проверки заполнения параметров контрагента по физлицам перенесены в процедуру открытия договора
  13/07/2018 COBUMMFO-8410 Проверки и наследование обеспечения при авторизации
  27.11.2017 Sta+Вика Семенова : При авторизации кред.линий (Ген.договора - VIDD=2,3) при типе авторизации 1 (полная авторизация)
@@ -354,7 +355,6 @@ BEGIN
     WDATE_ :=  WDATE;
     SDATE_ :=  SDATE;
 
-
     -- проверки по гендоговорам
 
     if prod_ is null then
@@ -374,6 +374,10 @@ BEGIN
     else
      select nvl(min(AIM),62) into aim_ from cc_aim where substr(PROD_,1,4) in ( nvl(NBS,'2062'), nvl(NBS2,'2063'), nvl(NBSF,'2202'), nvl(NBSF2,'2203'));
     end if;
+    for r in (select 1 from all_views where owner = 'BARS' and view_name = 'CC_AIM_2') 
+    loop
+      select nvl(min(AIM),62) into aim_ from cc_aim_2 where nbs = substr(PROD_,1,4);
+    end loop;
     -- pасчитываем дату первого гашения
 
     -- отбраковываем несуществующий день
@@ -387,14 +391,14 @@ BEGIN
     end if;
 
     -- вид кредита
-    if substr(prod_, 2, 1) = 0 then
+    if substr(prod_, 2, 1) = 2 then
+      Vid_ := 11;
+    else
       if prod_ = '206309' then
         Vid_ := 2;
       else
         Vid_ := 1;
       end if;
-    else
-      Vid_ := 11;
     end if;
 
     logger.trace('CCK_DOP.CC_OPEN  Вызов процедуры cck.CC_OPEN');
@@ -435,6 +439,7 @@ BEGIN
        Insert into nd_txt (ND, TAG, TXT) Values (ND_,'R_CR9', to_char(METR_9));
     end if;
 
+
     -- ежемесячная комиссия
     if metr is not null and metr_r is not null then
       insert into int_accn (acc,id,metr,basem,basey,freq,tt,acr_dat) values (Acc8_, 2, trunc(METR), 0, BASEY, 5, '%%1', gl.bDATE-1);
@@ -443,7 +448,12 @@ BEGIN
 
     if wdate - sdate >30 then
       cck_ui.p_gpk_default(nd => nd_, GPK_TYPE => gpk,ROUND_TYPE => 2);
-
+/*      cck_new.cc_gpk(mode_  => null,
+                     nd_    => nd_,
+                     ds_pog => null,
+                     flag   => 0,
+                     sum_pl => null);
+*/
 --      cck.CC_GPK( GPK, ND_, ACC8_, SDATE_, DATN_, WDATE_, SDOG, nFREQ, fPROC, 2);
     logger.info('CCK_DOP.CC_OPEN  Создан ГПК');
     end if;
@@ -519,6 +529,7 @@ BEGIN
 --  INSERT INTO nd_txt (ND, TAG, TXT) values (ND_, 'FLAGS', '00'); -- каникулы есть и по посл день
 
     -- Определяем и сохраняем S260
+    if prod_ is not null then
     begin
       select s260 into s260_ from cck_ob22 c where c.nbs||c.ob22=substr(prod_,1,6);
 /*      if s260_ is null then
@@ -528,6 +539,7 @@ BEGIN
       when no_data_found then
         raise_application_error(-20101,'Не знайдено опис продукту в довіднику сс_potra!');
     end;
+    end if;
     cck_app.set_nd_txt (ND_,'S260' ,s260_);
 
 
@@ -884,7 +896,7 @@ return; -- cobuprvnix-161
       select XIRR(k.ir) * 100 into IrrE_ from dual;
 
       --узнаем счет доходов
-      ACRB_ := null;
+      --ACRB_ := null;
 
       --        begin
       if l_SUM_KOM >= 0 then
@@ -1160,9 +1172,7 @@ return; -- cobuprvnix-161
     l_DT_R  operw.value%type;
 
     l_err int;
-
-    /*
-     mfo  oper.mfob%type, -- МФО получателя
+/*     mfo  oper.mfob%type, -- МФО получателя
      nls  oper.nlsb%type, -- Номер счета получателя
      nam oper.nam_b%type, -- Наименование счета получателя
      okpo oper.id_b%type, -- ИПН получателя
@@ -1552,8 +1562,8 @@ return; -- cobuprvnix-161
       else
         l_nls := f_newnls(l_acc8, p_tip, l_nbs);
     end case;
-    if l_nls is null then
-      -- Полная авторизация недоступна, т.к. для даного продукта нет возможности автоматически определить счет типа %s.
+
+    if l_nls is null then   -- Полная авторизация недоступна, т.к. для даного продукта нет возможности автоматически определить счет типа %s.
       bars_error.raise_nerror('CCK', 'AUTH_ERROR_CANNT_OPEN_ACC', p_tip);
     end if;
 
@@ -1599,6 +1609,7 @@ return; -- cobuprvnix-161
         end;
     end case;
   end open_account;
+--------------------
 
   -- Множественное открытие счето КД
   procedure open_an_account(p_nd  in cc_deal.nd%type,
@@ -1609,9 +1620,8 @@ return; -- cobuprvnix-161
     end loop;
   end open_an_account;
 
------------------
-      procedure cc_autor_ex
-        (p_nd   in number,
+----- Авторизация КД-------------------------
+procedure cc_autor_ex(p_nd   in number,
                    p_saim in varchar2 default null,
                    p_urov in varchar2 default null,
                    p_txt  out varchar2
@@ -1622,7 +1632,7 @@ return; -- cobuprvnix-161
   l_acc  accounts.acc%type;
   tmp_   int;
   ref_   int;
-  t      date := sysdate;
+  --t      date := sysdate;
   l_acc8_old accounts.accc%type := null;
   l_acc8_new accounts.accc%type := null;
   RaxN_ char(1) ; --ПРИЗНАК НАСЛЕД ВСЕХ СЧ ПРИ РЕСТРУКТУР: '1' -да. Иначе -нет
@@ -1644,8 +1654,13 @@ begin
   select * into l_cd_row from cc_deal where nd = p_nd;
   if l_cd_row.sos > 5 then     RETURN;  end if;
   ----------------------------------------------
-  if cck_app.Get_ND_TXT(l_cd_row.nd,'S260') is null then
+  if l_cd_row.vidd != 5 and cck_app.Get_ND_TXT(l_cd_row.nd,'S260') is null then
     raise_application_error(-20201,'Параметр S260 має бути заповнений! ');
+  end if;
+
+  if l_cd_row.vidd<5 and l_cd_row.nd != nvl(l_cd_row.ndg, p_nd) then
+    -- портфель ЮО, субдоговор, надо проставить NOHOP из генерального
+    cck_app.Set_ND_TXT(p_nd,'NOHOP',null);
   end if;
 
   -- COBUSUPABS-4863
@@ -1787,43 +1802,6 @@ COBUMMFO-7118
 
   If l_cd_row.NDI is null then  GOTO NEW_ACC ;  end if;
   -----------------------------------------------------
-
-  -- РЕСТРУКТУРИЗАЦИИ  НАДРА -------
-  RaxN_ := nvl( substr(CCK_APP.Get_ND_TXT (p_ND,'OLD_A'),1,1),'0');
-
-  begin  select a.acc into l_acc8_new from accounts a, nd_acc n where n.nd=p_ND and n.acc=a.acc and a.tip='LIM' and a.nls like '8999%';
-  EXCEPTION WHEN NO_DATA_FOUND THEN  return;
-  end;
-
-  for k in (select a.acc, a.tip, a.accc from nd_acc n, accounts a where n.nd =l_cd_row.NDI and n.acc= a.acc  and a.dazs is null order by decode(a.tip,'LIM',1,2)  )
-  loop
-
-     if k.tip = 'LIM' and RaxN_ = '1' then   l_acc8_old := k.acc;
-        -- обнулить старый 8999
-        update accounts set dazs=gl.bdate+1,ostc=0,ostb=0,ostf=0 where acc=k.acc;
-     else
-        -- тело кредита подвязать под новый 8999, если задано НАСЛЕДОВАТЬ
-        If k.accc = l_acc8_old  AND RaxN_ = '1' then
-           update accounts set accc = l_acc8_new where acc= k.acc;
-        end if;
-        -- счет гашения наследовать всегда
-        -- другие счета наследовать только в случае , если задано НАСЛЕДОВАТЬ
-        If k.tip = 'SG '         OR RaxN_ = '1' then
-           -- все счета
-           delete from nd_acc where nd = l_cd_row.NDI  and acc= k.acc ;
-           insert into nd_acc ( nd,acc) values (p_ND, k.acc)  ;
-        end if;
-     end if;
-
-  end loop;
-
-  --задано НАСЛЕДОВАТЬ
-  If RaxN_ = '1' then      -- переформировать ост на новом 8999
-     CCK.cc_START(p_ND) ;  -- обеспечение автоматически наследуется вместе со счетами задолженности
-     RETURN;
-  end if;
-  -------------------------------------------------
-
   -- открытие кредитных счетов по  договору
   <<NEW_ACC >> null;
   ------------------
@@ -1958,6 +1936,9 @@ COBUMMFO-7118
      end ;
   end If ;  ---- COBUSUPABS-4863
 
+
+
+ ------------------------------------------
   -- ==== ОБЕСПЕЧЕНИЕ ====
   -- Выясним Источник создания КД ( 2 - заявка в WCS)
 
@@ -1975,9 +1956,7 @@ COBUMMFO-7118
      RETURN;
   end if;
 
-/*     if p_nd=5911154601 then
-      raise_application_error(-20005,'cck.AUTOR');
-    end if;*/
+
 -- вызов стандартной процедуры авторизации
   cck.cc_autor(p_nd, p_saim, p_urov);
   
@@ -2001,6 +1980,7 @@ COBUMMFO-7118
                 sys_context('bars_context','user_branch');
 
   begin
+
      -- параметры кредита
      select * into l_ccv from cc_v where nd = p_nd;
 
@@ -2135,7 +2115,8 @@ COBUMMFO-7118
        -- привязка счета к счетам договора
        insert into cc_accp    (acc, accs, nd)
        select l_new_acc, a.acc, n.nd  from accounts a, nd_acc n
-        where n.nd = p_nd and n.acc=a.acc and a.tip in ('SS ','SP ','SL ')
+        where n.nd = p_nd and n.acc=a.acc and (a.tip in ('SS ','SP ','SL ') or (l_cd_row.vidd = 5 and a.tip = 'LIM')
+              or (l_cd_row.vidd in (2,3) and l_cd_row.ndg = l_cd_row.nd and a.tip = 'LIM'))
           and not exists
            ( select 1 from cc_accp where acc=l_new_acc and accs = a.acc);
 
@@ -2197,11 +2178,33 @@ COBUMMFO-7118
 
      end if;  -- vidd in (2,3)
 
-  end; --- -- вызов стандартной процедуры авторизации
+  end;
 
 
 
---  p_txt := 'Договір '||l_cd_row.cc_id||' від '||to_char(l_cd_row.sdate,'dd.mm.yyyy')||' успішно авторизований';
+  -- то же самое для субдоговоров по мсфз
+  if l_cd_row.nd != nvl(l_cd_row.ndg,-1) then
+    for r in (select distinct acc, idz, mpawn, pawn, rnk from cc_accp where nd = l_cd_row.ndg)
+    loop
+      insert into cc_accp (acc,
+                           accs,
+                           nd,
+                           pr_12,
+                           idz,
+                           mpawn,
+                           pawn,
+                           rnk)
+       select r.acc, a.acc, l_cd_row.nd, 1, r.idz, r.mpawn, r.pawn, r.rnk
+         from nd_acc n,
+              accounts a
+         where n.nd = l_cd_row.nd
+           and n.acc = a.acc
+           and a.tip in ('SS ','SP ','CR9','SN ','SPN');
+    end loop;
+  end if;
+
+
+  p_txt := 'Договір '||l_cd_row.cc_id||' від '||to_char(l_cd_row.sdate,'dd.mm.yyyy')||' успішно авторизований';
   if p_txt is null then
     p_txt := 'В процесі авторизації проведення не створювались';
   end if;
@@ -2230,7 +2233,6 @@ begin
          p_txt := substr(p_txt||'<br/>'||v_txt,1,4000);
     end loop ;
 end cc_autor ;
-
 
 
 procedure edit_partner (p_id       in wcs_partners_all.id%type
@@ -2548,6 +2550,36 @@ begin
   return null;
 end get_kkw_crd;
 -----------------------------------
+/*
+функция валидации параметров договора
+*/
+function check_nd (p_nd     in cc_deal.nd%type  -- референс договора
+                  ,p_type   in integer          -- тип проверки (создание/сохранение (1) или авторизация (2))
+                  ,p_errtxt out varchar2)       -- сообщение о результате валидации
+  return integer                                -- -1 - ошибка валидации, 1 - нет ошибок, 0 - есть сообщения, но не ошибки
+  is
+  v_flag integer;
+begin
+/*  for r in (select * from cck_check c where nvl(c.check_type,0) = nvl(p_type,0) order by c.order_no)
+  loop
+
+    if cck_app.Get_ND_TXT(p_ND => p_nd, p_TAG => r.tag) is null then
+      p_errtxt := case
+                    when p_errtxt is null then ''
+                    else p_errtxt||' '||chr(10)
+                  end ||'Параметр '||r.tag||'('||r.rule_name||') не заповнений';
+       if r.mandatory = 1 then
+         v_flag := -1;
+       else
+         v_flag := least(v_flag,0);
+       end if;
+     end if;
+  end loop;*/
+  return nvl(v_flag,1);
+end;
+
+
+-----------------------------------
 
   function header_version return varchar2 is
   begin
@@ -2560,6 +2592,7 @@ end get_kkw_crd;
   end body_version;
 
 end cck_dop;
+
 /
  show err;
  
