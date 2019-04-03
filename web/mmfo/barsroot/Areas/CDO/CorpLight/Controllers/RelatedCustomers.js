@@ -391,7 +391,7 @@ angular.module(globalSettings.modulesAreas)
                 if (validate()) {
 
                     if (vm.currentUser.NoInn == 1) {
-                        vm.currentUser.TaxCode = vm.currentUser.DocSeries + vm.currentUser.DocNumber;
+                        vm.currentUser.TaxCode = '0000000000';// vm.currentUser.DocSeries + vm.currentUser.DocNumber;
                     }
 
                     var userForm = $('#userCart');
