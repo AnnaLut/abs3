@@ -137,7 +137,7 @@ order by branch,name';
     ------------------------    
                                 
 
-    l_rep.name        :='Empty';
+/*    l_rep.name        :='Empty';
     l_rep.description :='Звіт по символах касплану за період видатки (розгорнутий) ';
     l_rep.form        :='frm_UniReport';
     l_rep.param       :=l_zpr.kodz||',,sFdat,sFdat2,"",TRUE,TRUE';
@@ -190,7 +190,7 @@ order by branch,name';
         exception when dup_val_on_index then     
            bars_error.raise_error('REP',13,to_char(l_rep.id));
         end;                                     
-     end if;                                     
+     end if; */                                    
                                            
                                            
     bars_report.print_message(l_message);   
