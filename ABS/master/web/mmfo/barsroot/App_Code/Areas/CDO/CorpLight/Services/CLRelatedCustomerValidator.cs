@@ -62,9 +62,10 @@ namespace BarsWeb.Areas.CDO.CorpLight.Services
                         from 
                             MBM_REL_CUSTOMERS
                         where 
-                            tax_code = :p_tax_code 
+                            (tax_code = :p_tax_code  and tax_code != '0000000000')
                             or cell_phone = :p_cell_phone
-                            or email = :p_email";
+                            or email = :p_email
+                           ";
             var result = _entities.ExecuteStoreQuery<decimal>(sql, taxCode, phoneNumber, email).FirstOrDefault();
             if (result > 0)
             {
