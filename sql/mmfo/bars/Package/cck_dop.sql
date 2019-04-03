@@ -374,10 +374,6 @@ BEGIN
     else
      select nvl(min(AIM),62) into aim_ from cc_aim where substr(PROD_,1,4) in ( nvl(NBS,'2062'), nvl(NBS2,'2063'), nvl(NBSF,'2202'), nvl(NBSF2,'2203'));
     end if;
-    for r in (select 1 from all_views where owner = 'BARS' and view_name = 'CC_AIM_2') 
-    loop
-      select nvl(min(AIM),62) into aim_ from cc_aim_2 where nbs = substr(PROD_,1,4);
-    end loop;
     -- pасчитываем дату первого гашения
 
     -- отбраковываем несуществующий день
