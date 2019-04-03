@@ -11,6 +11,7 @@ using Bars.WebServices.OutsideServices;
 using System.Xml;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Text;
+using System.IO;
 
 namespace Bars.WebServices.OutsideServices
 {
@@ -109,38 +110,74 @@ namespace Bars.WebServices.OutsideServices
 
         public string GiveResponse(object[][] response)
         {
-            StringBuilder result = new StringBuilder();
-            //string result = "";
-            XmlDocument xmlDoc = new XmlDocument();
-            dynamic records = response;
+            string tempFile = Path.GetTempFileName();
 
-            if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW ||
-                (serviceName == TypeClient.ServiceName.QUICK_MONEY && response[0].Length == 1)) //old version for single_window & quick_money.TransactionShortReport
+            using (StreamWriter sw = File.AppendText(tempFile))
             {
+                XmlDocument xmlDoc = new XmlDocument();
+                dynamic records = response;
 
-                foreach (var record in records)
+                if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW ||
+                    (serviceName == TypeClient.ServiceName.QUICK_MONEY && response[0].Length == 1)) //old version for single_window & quick_money.TransactionShortReport
                 {
-                    foreach (var field in record)
+
+                    foreach (var record in records)
                     {
-                        xmlDoc.LoadXml(field.Value);
-                        XmlNode root = xmlDoc.FirstChild;
-                        XmlNodeList list = root["Data"].ChildNodes;
-                        foreach (XmlNode node in list)
-                            result.Append(node.OuterXml);
+                        foreach (var field in record)
+                        {
+                            xmlDoc.LoadXml(field.Value);
+                            XmlNode root = xmlDoc.FirstChild;
+                            XmlNodeList list = root["Data"].ChildNodes;
+                            foreach (XmlNode node in list)
+                                sw.Write(node.OuterXml);
+                        }
                     }
                 }
-            }
-            else
-            {
-                var recond = response[0][3];
-                xmlDoc.LoadXml((recond as QuickMoney.Field).Value);
-                XmlNode root = xmlDoc.FirstChild;
-                XmlNodeList list = root["NBUSTATREPORT"].ChildNodes;
-                foreach (XmlNode node in list)
-                    result.Append(node.OuterXml);
+                else
+                {
+                    var recond = response[0][3];
+                    xmlDoc.LoadXml((recond as QuickMoney.Field).Value);
+                    XmlNode root = xmlDoc.FirstChild;
+                    XmlNodeList list = root["NBUSTATREPORT"].ChildNodes;
+                    foreach (XmlNode node in list)
+                        sw.Write(node.OuterXml);
+                }
             }
 
-            return result.ToString();
+            return File.ReadAllText(tempFile);
+
+
+            //string result = "";
+            //XmlDocument xmlDoc = new XmlDocument();
+            //dynamic records = response;
+
+            //if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW ||
+            //    (serviceName == TypeClient.ServiceName.QUICK_MONEY && response[0].Length == 1)) //old version for single_window & quick_money.TransactionShortReport
+            //{
+
+            //    foreach (var record in records)
+            //    {
+            //        foreach (var field in record)
+            //        {
+            //            xmlDoc.LoadXml(field.Value);
+            //            XmlNode root = xmlDoc.FirstChild;
+            //            XmlNodeList list = root["Data"].ChildNodes;
+            //            foreach (XmlNode node in list)
+            //                result += node.OuterXml;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    var recond = response[0][3];
+            //    xmlDoc.LoadXml((recond as QuickMoney.Field).Value);
+            //    XmlNode root = xmlDoc.FirstChild;
+            //    XmlNodeList list = root["NBUSTATREPORT"].ChildNodes;
+            //    foreach (XmlNode node in list)
+            //        result += node.OuterXml;
+            //}
+
+            //return result;
         }
     }
 }
