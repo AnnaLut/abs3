@@ -1,9 +1,10 @@
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/package/tms_utl.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE BARS.TMS_UTL 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/tms_utl.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.TMS_UTL 
 is
     -------------------------------------------------------------------------------
     LT_TASK_GROUP                  constant varchar2(30 char) := 'BANKDATE_TASK_GROUP';
@@ -48,6 +49,8 @@ is
     TASK_RUN_STATE_DISABLED        constant integer := 6;
     TASK_RUN_STATE_SKIP            constant integer := 7;
     TASK_RUN_STATE_WAIT_LEADING    constant integer := 8;
+
+    CHECK_TYPE              constant varchar2(30 char) := 'TMS_CHECK';
 
     function read_task(
         p_task_id in integer,
@@ -182,7 +185,6 @@ is
     result_cache;
 
 	procedure p_clean_tmsaudit;
-	
 end TMS_UTL;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.TMS_UTL 
@@ -483,7 +485,6 @@ is
         l_task_run_id := s_tms_task_run.nextval;
 
         l_wrapper_job_name := 'TMS_JOB_WRAPPER_' || l_task_run_id;
-
         insert into tms_task_run
         values (l_task_run_id,
                 p_run_id,
@@ -633,11 +634,11 @@ is
         where  r.id = p_run_id;
     end;
 
-    
+
   --------------------------------------------------
   --  DEPLOY_RUN_TASKS
-  --  
-  --  СОздать очередб на віполнение заданий в разрезе филиалов и бранчей 
+  --
+  --  СОздать очередб на віполнение заданий в разрезе филиалов и бранчей
   --
   --
   procedure deploy_run_tasks(
@@ -646,10 +647,10 @@ is
     begin
         for i in (/*select t.id, case when k.kf is null then '/' else bars_context.make_branch(k.kf) end branch_code,
                          -- tms_utl.TASK_RUN_STATE_IDLE
-                   */      
-                   select t.id, branch_processing_mode, case when k.kf is null and r.branch is null then '/' else 
-                                         case when r.branch is not null then r.branch else  bars_context.make_branch(k.kf) end 
-                                     end branch_code,                                     
+                   */
+                   select t.id, branch_processing_mode, case when k.kf is null and r.branch is null then '/' else
+                                         case when r.branch is not null then r.branch else  bars_context.make_branch(k.kf) end
+                                     end branch_code,
                          -- для задач, що виконуються по кожному відділенню окремо, перевіряємо стадію, на якій знаходиться відділення
                          case when t.branch_processing_mode in (tms_utl.BRANCH_PROC_MODE_SEQUENTIAL, tms_utl.BRANCH_PROC_MODE_PARALLEL_1,  tms_utl.BRANCH_PROC_MODE_PARALLEL_2 ) then
                                    -- якщо відділення повідомило про готовність до завершення дня (b.stage_id = tms_utl.STAGE_ACTIVITY_ACCOMPLISHED),
@@ -663,18 +664,18 @@ is
                          end state_id
                   from   tms_task t
                   left join mv_kf k on t.branch_processing_mode in (tms_utl.BRANCH_PROC_MODE_SEQUENTIAL, tms_utl.BRANCH_PROC_MODE_PARALLEL_1) and
-                                                           not exists (select 1 from tms_task_exclusion ex 
+                                                           not exists (select 1 from tms_task_exclusion ex
                                                                         where ex.kf = k.kf and t.task_code = ex.task_code)
-                  left join branch r           on t.branch_processing_mode in  (tms_utl.BRANCH_PROC_MODE_PARALLEL_2)   and not exists (select 1 from tms_task_exclusion ex 
-                                                                                                      where ex.kf = branch_utl.get_kf_from_branch_code(r.branch) 
+                  left join branch r           on t.branch_processing_mode in  (tms_utl.BRANCH_PROC_MODE_PARALLEL_2)   and not exists (select 1 from tms_task_exclusion ex
+                                                                                                      where ex.kf = branch_utl.get_kf_from_branch_code(r.branch)
                                                                                                         and t.task_code = ex.task_code)
                                                                                                         and branch_utl.get_branch_level(r.branch) = 2
-                  left join tms_branch_stage b on b.branch = case when k.kf is null and r.branch is null then '/' 
-                                                                  else 
-                                                                      case when r.branch is null then bars_context.make_branch(k.kf) 
-                                                                           else bars_context.make_branch(branch_utl.get_kf_from_branch_code(r.branch)) 
+                  left join tms_branch_stage b on b.branch = case when k.kf is null and r.branch is null then '/'
+                                                                  else
+                                                                      case when r.branch is null then bars_context.make_branch(k.kf)
+                                                                           else bars_context.make_branch(branch_utl.get_kf_from_branch_code(r.branch))
                                                                       end
-                                                             end 
+                                                             end
                                       and b.run_id is null
                   where  t.state_id = tms_utl.TASK_STATE_ACTIVE) loop
             tools.hide_hint(create_task_run(p_run_id, i.id, i.branch_code, i.state_id));
@@ -934,7 +935,7 @@ is
        gl.param;
 
        log_message('tms_utl.start_task_run_wrapper1', 'p_task_run_id : ' || p_task_run_id ||chr(10)|| 'gl.auid :'||gl.auid || ', glbl_cntx.user_id='||sys_context('bars_global','user_id') );
-        
+
         -- встановлюється відділення, по якому працює регламентна процедура
         bars_context.go(l_task_run_row.branch);
 
@@ -973,11 +974,32 @@ is
              commit;
     end;
 
-    
+
     ------------------------------------------
     -- START_TASK_RUN
-    --   
     --
+    --
+    procedure set_job_attr (p_job in varchar2
+                           ,p_attr in varchar2
+                           ,p_val  in varchar2)
+      is
+    pragma autonomous_transaction;
+    begin
+      dbms_scheduler.set_job_argument_value(job_name       => p_job,
+                                            argument_name  => p_attr,
+                                            argument_value => p_val);
+      commit;
+    end set_job_attr;
+    
+    procedure run_job (p_job  in varchar2)
+    is
+    pragma autonomous_transaction;
+    begin
+      dbms_scheduler.run_job(job_name            => p_job, 
+                             use_current_session => false);   
+      commit;
+    end run_job;
+    
     procedure start_task_run(
         p_task_run_id in integer)
     is
@@ -999,25 +1021,31 @@ is
 
         l_job_was_created := true;
 
-        dbms_scheduler.set_job_argument_value(job_name       => l_task_run_row.wrapper_job_name,
+        set_job_attr(l_task_run_row.wrapper_job_name,
+                     'p_task_run_id',
+                     l_task_run_row.id);
+/*        dbms_scheduler.set_job_argument_value(job_name       => l_task_run_row.wrapper_job_name,
                                               argument_name  => 'p_task_run_id',
                                               argument_value => l_task_run_row.id);
-
+*/
         set_task_run_state(l_task_run_row.id, tms_utl.TASK_RUN_STATE_IN_PROGRESS, null);
 
         update tms_task_run t
         set    t.start_time = sysdate
         where  t.id = l_task_run_row.id;
 
+
         begin 
-           dbms_scheduler.run_job(job_name => l_task_run_row.wrapper_job_name, use_current_session => false);    
+          run_job(l_task_run_row.wrapper_job_name);
+--           dbms_scheduler.run_job(job_name => l_task_run_row.wrapper_job_name, use_current_session => false);    
         exception when others then 
            --  ORA-27478: job "BARS.TMS_JOB_WRAPPER_139607" is running. 
            --  данное может произойти, если два закончившихся проуесса взяли один и тот же следующий джоб и начинают его віполнять
-           if sqlcode = -27478 
+           if sqlcode = -27478  or sqlcode = -27477
                 then null; 
            end if;
         end;
+
 
         commit;
 
@@ -1045,8 +1073,8 @@ is
     -- START_TASK
     --  p_run_id - номер запуска ВЗД из tms_run.id
     --
-    --  Для каждой задачи из всего чписка tms_task, запустить джобы по всем бранчам (паралельно или последовательно) из запланированного списка к віполнеию из 
-    --  tms_task_run  
+    --  Для каждой задачи из всего чписка tms_task, запустить джобы по всем бранчам (паралельно или последовательно) из запланированного списка к віполнеию из
+    --  tms_task_run
     --
 
     procedure start_task(
@@ -1130,12 +1158,12 @@ is
     end;
 
     --------------------------------------------------
-    --  PROCEED_RUN 
+    --  PROCEED_RUN
     --  p_run_id - код запуска ВЗД, поле tms_run.id
     --
     --  Пройтись по заполненному списку tms_task_run задач на выполнение (уже в разрезе бранчей и филиалов)
     --
-    
+
     procedure proceed_run(
         p_run_id in integer)
     is
@@ -1151,12 +1179,13 @@ is
         l integer;
         l_performing_task_flag char(1 byte);
     begin
+
         l_run_row := read_run(p_run_id, p_lock => true);
 
         for i in (select * from tms_task t order by t.sequence_number) loop
             -- для всех заданий по всем бранчам из запланированого списка в tms_task_run для запуска ВЗД № p_run_id
             for j in (select * from tms_task_run t where t.task_id = i.id and t.run_id = l_run_row.id) loop
-               
+
 
                 if (j.state_id = tms_utl.TASK_RUN_STATE_IDLE and (l_global_stop_flag or l_branch_state_list.exists(j.branch))) then
                     set_task_run_state(j.id,
@@ -1373,7 +1402,7 @@ is
     ( p_kf    in     fdat_kf.kf%type
     ) is
       l_bnk_dt varchar2(10);
-      
+
       -- COBUMMFO-9690 Begin
       l_module        varchar2(64);
       l_action        varchar2(64);
@@ -1381,13 +1410,13 @@ is
     begin
 
       bars_audit.info( $$PLSQL_UNIT||'.CLOSES_ACCESS: ( kf='||p_kf||' ).' );
-      
+
       dbms_application_info.read_module(l_module, l_action); -- COBUMMFO-9690
-	  
-	  DBMS_APPLICATION_INFO.SET_ACTION( 'TMS_UTL.CLOSES_ACCESS' );
+
+      DBMS_APPLICATION_INFO.SET_ACTION( 'TMS_UTL.CLOSES_ACCESS' );
       -- set ban on logging in
       begin
-        insert
+         insert
           into FDAT_KF ( KF )
         values ( p_kf );
       exception
@@ -1399,7 +1428,7 @@ is
 
       -- close all user sessions that logged in with previous bank date
       CLOSE_USER_SESSIONS( p_kf, l_bnk_dt );
-	  DBMS_APPLICATION_INFO.set_action(l_action /*null -- COBUMMFO-9690*/);
+      DBMS_APPLICATION_INFO.set_action(l_action /*null -- COBUMMFO-9690*/);
       -- accumulate a balance snapshot
       -- BARS_CONTEXT.SUBST_MFO( p_kf );
       -- DDRAPS( DAT_NEXT_U( to_date(l_bnk_dt,'MM/DD/YYYY'), -1 ) );
@@ -1408,14 +1437,14 @@ is
     end CLOSES_ACCESS;
 
     procedure OPEN_ACCESS
-    ( p_kf    in     fdat_kf.kf%type
+    ( p_kf     in     fdat_kf.kf%type
     ) is
     begin
-      
+
       bars_audit.info( $$PLSQL_UNIT||'.OPEN_ACCESS: ( kf='||p_kf||' ).' );
       
       delete FDAT_KF
-       where KF = p_kf;
+        where KF = p_kf;
 
     end OPEN_ACCESS;
 
@@ -1428,9 +1457,9 @@ is
       then
         CLOSES_ACCESS( p_kf );
       else
-        OPEN_ACCESS( p_kf );
-      end if;
-
+           OPEN_ACCESS( p_kf );
+        end if;   
+          
     end SET_BANK_DATE_ACCESS;
 
     --
@@ -1451,11 +1480,11 @@ is
       else
         l_kf := p_kf;
       end if;
-	  
-	  if ( sys_context('USERENV','ACTION') = 'TMS_UTL.CLOSES_ACCESS' ) then
+
+      if ( sys_context('USERENV','ACTION') = 'TMS_UTL.CLOSES_ACCESS' ) then
         return 1;
       end if;
-	  
+
       begin
         select 0
           into l_access
@@ -1477,11 +1506,11 @@ is
     begin
 
       bars_audit.info( $$PLSQL_UNIT||'.SET_BANK_DATE_STATE: ( p_fdat='||to_char(p_fdat,'dd.mm.yyyy')||', p_stat='||to_char(p_stat)||' ).' );
-
-      update FDAT
-         set STAT    = case p_stat when 1 then 9 else 0 end
-           , CHGDATE = sysdate
-       where FDAT    = p_fdat;
+       
+       update FDAT
+          set STAT    = case p_stat when 1 then 9 else 0 end
+            , CHGDATE = sysdate
+       where FDAT    = p_fdat;       
 
     end SET_BANK_DATE_STATE;
 
@@ -1568,7 +1597,7 @@ is
                  bars_audit.log_error('tms_utl.switch_bank_date (exception)', sqlerrm || chr(10) || dbms_utility.format_error_backtrace());
         end;
 
- 
+
          log_message('tms_utl.switch_bank_date3',
                     'gl.auid           : ' || gl.auid || chr(10) ||
                     'sid               : ' || sys_context('userenv', 'sid') || chr(10) ||
@@ -1682,9 +1711,9 @@ LOOP
      DELETE FROM tms_audit t
         WHERE t.rec_date < add_months(SYSDATE, -6) 
 				AND  rownum <= i_commit;
-       
+
        i_rowcount := i_rowcount + SQL%ROWCOUNT;
-       
+
        IF SQL%ROWCOUNT = 0 THEN
          COMMIT; EXIT;
        END IF;       
@@ -1694,13 +1723,14 @@ end p_clean_tmsaudit;
 
 end TMS_UTL;
 /
-show err;
+ show err;
  
 PROMPT *** Create  grants  TMS_UTL ***
 grant EXECUTE                                                                on TMS_UTL         to BARS_ACCESS_DEFROLE;
 
  
  
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/package/tms_utl.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/tms_utl.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 
