@@ -602,7 +602,8 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                           for credit in (with w4 as (select ND, ACC_PK, ACC_FILD, ACC 
                                                        from ( select nd, ACC_PK, ACC_2207, ACC_2208, ACC_2209, ACC_OVR, ACC_9129
                                                                 from W4_ACC) 
-                                                             unpivot (ACC FOR ACC_FILD IN (ACC_2207, ACC_2208, ACC_2209, ACC_OVR, ACC_9129)))
+                                                             unpivot (ACC FOR ACC_FILD IN (ACC_2207, ACC_2208, ACC_2209, ACC_OVR, ACC_9129))
+															 where acc is not null)
                                         select a.kv,
                                                w4.nd,
                                                max(case when w4.ACC_FILD = 'ACC_9129' then a1.daos else null end) as daos,
@@ -621,7 +622,7 @@ procedure fill_data(p_req_id varchar2, p_id out number) is
                                                a.kf
                                           from accounts a
                                           join w4 on a.acc = w4.acc_pk
-                                          left join accounts a1 on a1.acc = w4.acc and (a1.dazs is null or a1.dazs >= cust.date_from)
+                                          join accounts a1 on a1.acc = w4.acc and (a1.dazs is null or a1.dazs >= cust.date_from)
                                           left join saldoa s on s.acc = w4.acc and s.fdat between cust.date_from and cust.date_to
                                          where a.rnk = cust.rnk 
                                            and substr(a.nls, 1, 4) in ('2625', '2620') 
