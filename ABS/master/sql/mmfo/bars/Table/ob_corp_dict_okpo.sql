@@ -78,7 +78,7 @@ exception when others then
 
 PROMPT *** Create  grants  OB_CORP_DICT_OKPO ***
 grant FLASHBACK,SELECT                                                       on OB_CORP_DICT_OKPO to WR_REFREAD;
-
+grant select, insert, update, delete on OB_CORP_DICT_OKPO to BARS_ACCESS_USER;
 
 
 PROMPT ===================================================================================== 
