@@ -286,6 +286,16 @@ function renewDecl() {
     else {
         var data = grid.dataItem(selected[0]);
 
+        if (!data.DECL_ID && data.STATE == 0) {
+            bars.ui.alert({
+                title: 'Неможливо переформувати декларацію',
+                text: 'Декларація знаходиться в процесі формування',
+                close: function (e) {
+                    $('.k-overlay').remove();
+                }
+            });
+            return;
+        }
         bars.ui.confirm({
             text: 'Бажаєте переформувати декларацію за номером ' + data.DECL_ID + '?<br>Попередню буде видалено!'
         }, function () {
@@ -303,12 +313,15 @@ function renewDecl() {
                     },
                     error: function (err) {
                         window.parent.$('.k-overlay').css('z-index', '10002');
-                        bars.ui.error({
-                            text: err.responseJSON,
-                            close: function (err) {
-                                $('.k-overlay').remove();
-                            }
-                        });
+                        if (err.responseJSON && err.responseJSON.Message) {
+                            bars.ui.error({
+                                title: err.responseJSON.Message,
+                                text: err.responseJSON.MessageDetail,
+                                close: function (err) {
+                                    $('.k-overlay').remove();
+                                }
+                            });
+                        }
                     }
                 });
             });
