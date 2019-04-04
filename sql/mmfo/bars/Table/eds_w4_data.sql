@@ -30,11 +30,11 @@ begin
     OPEN_IN VARCHAR2(100), 
     ACC_TYPE VARCHAR2(50), 
     END_BAL NUMBER(10,0), 
-    AMOUNT_PERIOD NUMBER(10,0), 
-    OTHER_ACCRUALS NUMBER(10,0), 
+    AMOUNT_PERIOD NUMBER(16,0), 
+    OTHER_ACCRUALS NUMBER(16,0), 
     KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
 	END_BALQ NUMBER(10),
-	AMOUNT_PERIODQ NUMBER(10)
+	AMOUNT_PERIODQ NUMBER(16)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -103,6 +103,11 @@ exception when others then
  end;
 /
 
+alter table eds_w4_data modify amount_period number(16);
+/
+alter table eds_w4_data modify amount_periodq number(16);
+/
+alter table eds_w4_data modify other_accruals number(16);
 
 
 PROMPT *** Create  grants  EDS_W4_DATA ***
