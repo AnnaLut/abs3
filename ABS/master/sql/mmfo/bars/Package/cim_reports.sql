@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.11 12/03/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.12 04/04/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -1262,7 +1262,9 @@ end  p_f531;
     for cur in (select t.*, b.b040
                 from cim_f36 t, branch b 
                 where t.branch = b.branch
-                  and t.manual_include = 1 and t.create_date = l_date_z_end)
+                  and t.manual_include = 1 and t.create_date = l_date_z_end
+                  and t.p01 = 1 --тільки єкспортні
+                  )
     loop
       l_nbur_36x.B040       := cur.b040;
       l_nbur_36x.K020       := lpad(cur.k020,10,'0');
