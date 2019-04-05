@@ -186,6 +186,7 @@ is
 
 	procedure p_clean_tmsaudit;
 end TMS_UTL;
+
 /
 CREATE OR REPLACE PACKAGE BODY BARS.TMS_UTL 
 is
@@ -871,6 +872,7 @@ is
         p_job_name in varchar2,
         p_description in varchar2)
     is
+    pragma autonomous_transaction;
         l_job_existance_flag integer;
     begin
         begin
@@ -890,6 +892,7 @@ is
         dbms_scheduler.set_attribute(name      => p_job_name,
                                      attribute => 'RAISE_EVENTS',
                                      value     => /*dbms_scheduler.JOB_SUCCEEDED + */dbms_scheduler.JOB_FAILED + dbms_scheduler.JOB_STOPPED);
+      commit;
     end;
 
     procedure finish_task_run(
@@ -1011,7 +1014,7 @@ is
 
         l_task_run_row := read_task_run(p_task_run_id, p_lock => true);
 
-        if (l_task_run_row.state_id = tms_utl.TASK_RUN_STATE_IN_PROGRESS) then
+        if (l_task_run_row.state_id not in (tms_utl.TASK_RUN_STATE_IDLE, tms_utl.TASK_RUN_STATE_TERMINATED)) then
             commit;
             return;
         end if;
@@ -1722,6 +1725,7 @@ END LOOP;
 end p_clean_tmsaudit;
 
 end TMS_UTL;
+
 /
  show err;
  
