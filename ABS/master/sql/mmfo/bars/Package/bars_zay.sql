@@ -725,6 +725,7 @@ is
   b_check boolean := false;
   l_char  varchar2(1);
 begin
+ if p_str is not null then    
   for i in 1..length(p_str)
   loop
      b_check := false;
@@ -741,6 +742,10 @@ begin
      end if;
   end loop;
   return b_check;
+  else 
+    return true;
+ end if; 
+
 end check_permitted_char;
 
 function check_digit (p_str varchar2) return boolean
