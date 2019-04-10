@@ -1019,8 +1019,16 @@ end  ead_nbs_check_param;
                         null
                      END) as doc_request_number,
                      to_char(agr_id) as agr_code,
-                     get_agr_type(agr_id) as agr_type,
-                     get_acc_type(agr_id, acc) as account_type,
+                     case when ea_struct_id like '51_' then ( select 'dkbo_fo' 
+                                                                from deal o 
+                                                               where o.deal_type_id = g_type_id 
+                                                                 and get_deal_state_id(p_deal_id => o.id) = g_state_id 
+                                                                 and o.id=agr_id )
+                          else get_agr_type(agr_id) 
+                     end as agr_type,
+                     case when ea_struct_id like '51_' then 'bpk_fo' 
+                          else get_acc_type(agr_id, acc) 
+                     end as account_type,
                      nls as account_number,
                      kv as account_currency,
                      crt_date as created,
@@ -1034,7 +1042,13 @@ end  ead_nbs_check_param;
                      doc_print_number
                 FROM (SELECT d.kf,
                              d.id,
-                             (select min(rnk) keep(dense_rank last order by idupd) from bars.dpt_deposit_clos dds where dds.deposit_id = d.agr_id) as rnk,
+                             (select min(rnk) keep(dense_rank last order by idupd) 
+                                from bars.dpt_deposit_clos dds 
+                               where dds.deposit_id = d.agr_id 
+                                 and case when d.ea_struct_id not like '51_' then 1
+                                          when d.ea_struct_id like '51_' and dds.rnk = d.rnk then 1
+                                          else 0 
+                                     end = 1 ) as rnk,
                              d.rnk AS linkedrnk,
                              d.agr_id,
                              sb.logname,
