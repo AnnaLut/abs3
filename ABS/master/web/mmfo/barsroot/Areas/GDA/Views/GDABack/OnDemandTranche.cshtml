@@ -1,0 +1,201 @@
+﻿@using Kendo.Mvc.UI
+@using Areas.GDA.Models
+
+@model SMBDepositOnDemand
+<script src="~/Areas/GDA/Scripts/GDABack/OnDemandTranche.js"></script>
+<script src="~/Areas/GDA/Scripts/GDABack/Index.js"></script>
+<link rel="stylesheet" href="~/Areas/GDA/Css/GDA/Main.css" />
+
+@Html.HiddenFor(x => x.ProcessId)
+@Html.HiddenFor(x => x.DebitAccount)
+@Html.HiddenFor(x => x.CustomerId)
+@Html.HiddenFor(x => x.CurrencyId)
+@Html.HiddenFor(x => x.ReturnAccount)
+@Html.HiddenFor(x => x.IsIndividualRate)
+@Html.HiddenFor(x => x.IndividualInterestRate)
+@Html.HiddenFor(x => x.FrequencyPayment)
+@Html.HiddenFor(x => x.CalculationType)
+@Html.Hidden("Type", (string)ViewBag.Type)
+
+<div>
+    @(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        if (ViewBag.StateCode == "DONE")
+        {
+            items.Add().Type(CommandType.Button).Text("Відхилити").Icon("pf-icon pf-16 pf-delete_button_error").Click("reject").Enable(false);
+            items.Add().Type(CommandType.Button).Text("Авторизувати").Icon("pf-icon pf-16 pf-user").Click("autorize").Enable(false);
+        }
+        else
+        {
+            items.Add().Type(CommandType.Button).Text("Відхилити").Icon("pf-icon pf-16 pf-delete_button_error").Click("reject").Enable(true);
+            items.Add().Type(CommandType.Button).Text("Авторизувати").Icon("pf-icon pf-16 pf-user").Click("autorize").Enable(true);
+        }
+        items.Add().Template("<a class='k-button clientBtn' onclick='showClientCard(" + @Model.CustomerId + ")'><span class='pf-icon pf-16 pf-book'></span>Відкрити картку клієнта</a>");
+    })
+    )
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="form-group">
+            <table border="0">
+                <tr>
+                    <td>
+                        <label>№ ДБО:</label>
+                        <input type="text" class="k-textbox" value="@ViewBag.Dbo"
+                               style="width: 168px;background-color:cornsilk" ng-disabled="true" />
+
+                        <label>Дата створення вкладу:</label>
+                        <input type="text" class="kendoDate form-control" style="width:140px" disabled value="@ViewBag.DboDate" />
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+
+                <tr>
+                    <td>
+                        <h2><label>Клієнт</label></h2>
+
+                        <label>РНК:</label>
+                        <input type="text" class="k-textbox" @*ng-model="depositDemand.clientRnk"*@ value="@ViewBag.Rnk"
+                               style="width: 140px;background-color:cornsilk" ng-disabled="true" />
+
+                        <label>ОКПО:</label>
+                        <input type="text" class="k-textbox" @*ng-model="depositDemand.clientOkpo"*@ value="@ViewBag.Okpo"
+                               style="width: 140px;background-color:cornsilk" ng-disabled="true" />
+
+                        <label>ПІБ/назва:</label>
+                        <input type="text" class="k-textbox" @*ng-model="depositDemand.clientName"*@ value="@ViewBag.Name"
+                               style="width: 250px;background-color:cornsilk" ng-disabled="true" />
+
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        @*<label>Поповнення в день оформлення:</label>
+                        <input type="checkbox" ng-model="depositDemand.replenishmentOnDayRegistration" ng-disabled="!isEditable('depositDemand')">
+
+                        <label>Сума:</label>
+                        <input type="text" class="k-textbox" ng-disabled="true" style="width: 80px;" value="@Model.AmountDeposit"/>*@
+
+                        <label>Валюта:</label>
+                        <input type="text" class="k-textbox" @*ng-model="depositDemand.currency"*@ ng-disabled="true" style="width: 80px;background-color:cornsilk" value="@Model.CurrencyId"/>
+                        @*<a class='k-button' ng-click="onHandBook('depositDemand','currency')" ng-disabled="!isEditable('depositDemand')">
+                            <i class='pf-icon pf-16 pf-book'></i>
+                        </a>*@
+
+                        <br><br>
+
+                        <label>Депозитний рахунок:</label>
+                        <input type="text" class="k-textbox" @*ng-model="depositDemand.acc"*@
+                               style="width: 250px;background-color:cornsilk" ng-disabled="true" value="@Model.PrimaryAccount"/>
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        @*<label>Рахунок для списання:</label>
+                        <select id="DebitAccDepositDemand"
+                                kendo-drop-down-list style="width: 30%" disabled></select>
+
+                        <label>Залишок на рахунку:</label>
+                        <input kendo-numeric-text-box k-min="0" style="width: 160px;background-color:cornsilk"
+                               k-max="999999999999999999999999999999" k-spinners="false" k-ng-disabled="true" id="DebitAccDepositDemandOstc"/>
+                        <br><br>*@
+
+                        <label>Рахунок для повернення:</label>
+                        <span style="color: red" ng-show="!isValueValid('depositDemand','accCreit')">*</span>
+                        <select id="DebitAccReturnDepositDemand"
+                                kendo-drop-down-list style="width: 30%" ,
+                                @*k-options="DebitAccDepositDemandOptions"
+                                ng-model="DepositDemand.accCreit"*@ disabled></select>
+
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Варіанти виплати %:</label>
+                        <input type="text" class="k-textbox" id="FrequencyPaymentSelect" ng-disabled="true"
+                               style="width: 140px;background-color:cornsilk" />
+                        @*<label>% ставка:</label>
+                        <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                               k-max="100" value="@Model.InterestRate" disabled/>*@
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+
+                        <label>Метод нарахування %:</label>
+                        <span style="color: red">*</span>
+                        <select id="editCalculationTypeDropDownList"
+                                kendo-drop-down-list style="width: 35%;background-color:cornsilk;" value="@Model.CalculationType"
+                                ng-disabled="true"></select>
+
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Індивідуальна % ставка:</label>
+                        <input type="checkbox" @(String.Equals(Model.IsIndividualRate, "1" ) ? "checked='checked'" : string.Empty) ng-disabled="true"/>
+                        <input kendo-numeric-text-box k-min="0" style="width: 80px" k-spinners="false"
+                               k-max="100" ng-disabled="true"
+                               value="@Model.IndividualInterestRate" disabled />
+
+                        <hr />
+
+                        <label>Коментар (максимум - 1000 символів):</label>
+                        @*<span style="color: red" ng-show="!isValueValid('depositDemand','comment')">*</span>*@
+                        <textarea rows="3" maxlength="1000" 
+                                  ng-disabled="true"
+                                  class="k-textbox">@Model.Comment</textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="well">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="form-group">
+                <label><b>Оператор:</b></label>
+                <input type="text" class="k-textbox" id="operator" style="width: 200px;background-color:cornsilk" disabled
+                       @*ng-model="replacementTranche.OperatorName" ng-disabled="true"*@ />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label><b>Дата:</b></label>
+                <input type="text" class="kendoDate form-control" id="operatorDate" style="width:110px" disabled />
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                <label><b>Контролер:</b></label>
+                <input type="text" class="k-textbox" id="controller" style="width: 200px;background-color:cornsilk" disabled
+                       @*ng-disabled="true" ng-model="replacementTranche.ControllerName"*@ />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label><b>Дата:</b></label>
+                <input type="text" class="kendoDate form-control" id="controllerDate" style="width:110px" disabled />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label><b>Статус:</b></label>
+                <input type="text" class="k-textbox" style="width: 120px;background-color:cornsilk" disabled value="@(ViewBag.StateName)"
+                       @*ng-disabled="true" ng-value="getStateTranche(replacementTranche.State)"*@ />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ConfirmPopup"></div>

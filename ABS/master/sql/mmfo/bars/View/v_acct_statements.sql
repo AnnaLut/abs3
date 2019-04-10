@@ -16,7 +16,7 @@ PROMPT *** Create  view V_ACCT_STATEMENTS ***
             DECODE (o.dk, 0, o.s / POWER (10, d.dig), 0) AS dos,
             DECODE (o.dk, 1, o.s / POWER (10, d.dig), 0) AS kos,
             p.nazn /*DECODE (o.tt, p.tt, p.nazn, t.name)*/ AS comm,
-            p.pdat AS pdat,
+            p.SOS_CHANGE_TIME AS pdat,
             p.mfoa,
             p.nlsa,
             p.id_a,

@@ -87,7 +87,6 @@ Ext.onReady(function () {
                         value = Ext.Date.format(field.Value, colDateFormat);
                         referenceGrid.metadata.tableInfo.SEMANTIC = referenceGrid.metadata.tableInfo.SEMANTIC.replace(par, value);
                     }
-
                 });
             referenceGrid.title = referenceGrid.metadata.tableInfo.SEMANTIC;
             var semantic = referenceGrid.metadata.tableInfo.SEMANTIC;
@@ -316,17 +315,8 @@ Ext.onReady(function () {
                         var AddEditRowsInform = metadata.AddEditRowsInform;
                         if (AddEditRowsInform && AddEditRowsInform.EditingRowsDataArray && AddEditRowsInform.EditingRowsDataArray.length > 0)
                             ExtApp.utils.RefBookUtils.setEditedRowsAfterReload(AddEditRowsInform, store, records);
-                        
-                        var savedHiddenColumns = referenceGrid.metadata.saveColumnsParam != '' ?
-                            ExtApp.utils.RefBookUtils.getHiddenColumnsFromLocalSrorage(referenceGrid.metadata.localStorageModel)
-                            : '';
-                        
-                        if (savedHiddenColumns && savedHiddenColumns.length != undefined && savedHiddenColumns.length)
-                            Ext.each(referenceGrid.columns, function (column) {
-                                if (Ext.Array.contains(savedHiddenColumns, column.dataIndex)) {
-                                    column.hide();
-                                }
-                            });
+                        if(metadata.saveColumnsParam)
+                        ExtApp.utils.RefBookUtils.syncHiddenColumnsFromLocalStorage(referenceGrid);
 
                     },
                     beforeload: function () {
@@ -514,7 +504,7 @@ Ext.onReady(function () {
             //         })
             //};
 
-
+            
             if (!referenceGrid.metadata.canUpdate()) {
                 toolbar.items.unshift(
                 {
@@ -580,15 +570,16 @@ Ext.onReady(function () {
 
             };
             
-            if (referenceGrid.metadata.saveColumnsParam != '' && referenceGrid.metadata.saveColumnsParam != undefined)
+            if (referenceGrid.metadata.saveColumnsParam)
             {
-                //if (referenceGrid.metadata.saveColumnsParam != 'POSSIBLY')
-                //toolbar.items.unshift({
-                //    itemId: 'saveColumnsButton',
-                //    tooltip: 'зберегти налаштування колонок',
-                //    iconCls: 'save',
-                //    disabled: false
-                //});
+                
+                if (referenceGrid.metadata.saveColumnsParam == 'POSSIBLY')
+                toolbar.items.unshift({
+                   id: 'saveColumnsButton',
+                   tooltip: 'зберегти налаштування колонок',
+                   iconCls: 'save',
+                   disabled: true
+                });
 
                 toolbar.items.unshift({
                     id: 'cleareColumnsButton',

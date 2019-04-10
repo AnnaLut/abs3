@@ -31,5 +31,11 @@ namespace BarsWeb.Areas.CreditUi.Models
         public byte vidd { get; set; }
         public int? inspector_id { get; set; }
         public decimal? s_s36 { get; set; }
+        public byte? IsGKD { get; set; }
+        public decimal? GKD_ND { get; set; }
+        public int? BUS_MOD { get; set; }
+        public string SPPI { get; set; }
+        public string IFRS { get; set; }
+        public string POCI { get; set; }
     }
 }

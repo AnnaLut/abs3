@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/11/2013 17:00:06" ReportInfo.Modified="12/07/2018 11:42:10" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoUS6qvaX0ql313TsNWhQ15kQpGy1B3eTKnyetDIsyiCiw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ID, CHAR00 DEPOSIT_NUMBER, CHAR01 ACCOUNT_NUMBER, CHAR02 LCV, CHAR03 CUSTOMER_NAME, CHAR04 OKPO, NUM01 REF_, NUM02 DOCUMENT_AMOUNT, CHAR05 COMMENT_TEXT, NUM03 CURRENCY_ID, CHAR06 BRANCH_ID, CHAR07 BRANCH_NAME from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="DEPOSIT_NUMBER" DataType="System.String"/>
+        <Column Name="ACCOUNT_NUMBER" DataType="System.String"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="CUSTOMER_NAME" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="REF_" DataType="System.Decimal"/>
+        <Column Name="DOCUMENT_AMOUNT" DataType="System.Decimal"/>
+        <Column Name="COMMENT_TEXT" DataType="System.String"/>
+        <Column Name="CURRENCY_ID" DataType="System.Decimal"/>
+        <Column Name="BRANCH_ID" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="Table2" DataType="System.Int32" Enabled="true" SelectCommand="select user_name, bankdate from dual">
+        <Column Name="USER_NAME" DataType="System.String"/>
+        <Column Name="BANKDATE" DataType="System.DateTime"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.String" Description="Дата з"/>
+    <Parameter Name="sFdat2" DataType="System.String" Description="Дата по"/>
+    <Parameter Name="session_id" DataType="System.String"/>
+    <Total Name="Total" TotalType="Count" Expression="[Table.BRANCH_ID]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="TotalErr" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter1" EvaluateCondition="Length([Table.COMMENT_TEXT])&gt;0"/>
+    <Total Name="TotalKV" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="TotalKVSum" Expression="[Table.DOCUMENT_AMOUNT]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="207.9" CanShrink="true">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="699.3" Height="18.9" CanShrink="true" Text="Надруковано [Date] [Table2.USER_NAME]"/>
+      <TableObject Name="Table1" Left="9.45" Top="141.75" Width="602.91" Height="66.15" Border.Lines="All">
+        <TableColumn Name="Column1" Width="54.81"/>
+        <TableColumn Name="Column4" Width="113.4"/>
+        <TableColumn Name="Column5" Width="94.5"/>
+        <TableColumn Name="Column8" Width="56.7"/>
+        <TableColumn Name="Column16" Width="85.05"/>
+        <TableColumn Name="Column17" Width="94.5"/>
+        <TableColumn Name="Column18" Width="103.95"/>
+        <TableRow Name="Row1" Height="47.25">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№ депозиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Ідентиф.код" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="Референс док." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="Сума документу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="Текст помилки (+ - ок)" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text2" Left="9.45" Top="37.8" Width="699.3" Height="37.8" CanBreak="false" Text="Протокол виконання автоматичної операції&#13;&#10;Нарахування відсотків по вкладам на вимогу ММСБ&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <LineObject Name="Line1" Left="9.45" Top="85.05" Width="699.3" Border.Style="Double" Border.Width="0.25"/>
+      <LineObject Name="Line2" Left="9.45" Top="132.3" Width="699.3" Border.Style="Double" Border.Width="0.25"/>
+      <TextObject Name="Text3" Left="9.45" Top="94.5" Width="699.3" Height="28.35" CanBreak="false" Text="Виконавець: &#13;&#10;Час: [sFdat1] - [sFdat2]     банк.дата: [Table2.BANKDATE]&#13;&#10;">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader2" Top="210.7" Width="718.2" Height="18.9" Condition="[Table.CURRENCY_ID]" SortOrder="None">
+      <TextObject Name="Text8" Left="9.45" Width="94.5" Height="18.9" Text="[Table.LCV]" AutoWidth="true"/>
+      <TextObject Name="Text9" Left="113.4" Width="94.5" Height="18.9" Text="[Table.CURRENCY_ID]" Format="Currency" Format.UseLocale="true" AutoWidth="true" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <GroupHeaderBand Name="GroupHeader1" Top="232.39" Width="718.2" Height="18.9" Condition="[Table.BRANCH_ID]">
+        <TextObject Name="Text4" Left="9.45" Width="699.3" Height="18.9" CanShrink="true" CanBreak="false" Text="Підрозділ: [Table.BRANCH_ID] [Table.BRANCH_NAME]">
+          <Formats>
+            <GeneralFormat/>
+            <GeneralFormat/>
+            <GeneralFormat/>
+            <DateFormat/>
+          </Formats>
+        </TextObject>
+        <DataBand Name="Data1" Top="254.09" Width="718.2" Height="18.9" CanGrow="true" DataSource="Table">
+          <TableObject Name="Table2" Left="9.45" Width="604.8" Height="18.9" Border.Lines="All" GrowToBottom="true">
+            <TableColumn Name="Column9" Width="54.97"/>
+            <TableColumn Name="Column12" Width="113.22"/>
+            <TableColumn Name="Column13" Width="95.72"/>
+            <TableColumn Name="Column15" Width="57.92"/>
+            <TableColumn Name="Column19" Width="82.78"/>
+            <TableColumn Name="Column20" Width="94.32"/>
+            <TableColumn Name="Column21" Width="105.87"/>
+            <TableRow Name="Row4">
+              <TableCell Name="Cell46" Border.Lines="All" Text="[Table.DEPOSIT_NUMBER]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+              <TableCell Name="Cell49" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+              <TableCell Name="Cell50" Border.Lines="All" Text="[Table.ACCOUNT_NUMBER]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+              <TableCell Name="Cell52" Border.Lines="All" Text="[Table.CURRENCY_ID]" VertAlign="Center" Font="Arial, 8pt"/>
+              <TableCell Name="Cell59" Border.Lines="All" Text="[Table.REF_]" VertAlign="Center" Font="Arial, 8pt"/>
+              <TableCell Name="Cell60" Border.Lines="All" Text="[Table.DOCUMENT_AMOUNT]" VertAlign="Center" Font="Arial, 8pt"/>
+              <TableCell Name="Cell61" Border.Lines="All" Text="[Table.COMMENT_TEXT]" VertAlign="Center" Font="Arial, 8pt"/>
+            </TableRow>
+          </TableObject>
+          <DataFooterBand Name="DataFooter1" Top="275.79" Width="718.2" Height="28.35">
+            <TextObject Name="Text6" Left="9.45" Width="699.3" Height="28.35" CanShrink="true" CanBreak="false" Text="===========================================================================&#13;&#10;Всього:                                   [Total]                 в т.ч. з помилками:            [TotalErr]">
+              <Formats>
+                <GeneralFormat/>
+                <GeneralFormat/>
+                <GeneralFormat/>
+                <DateFormat/>
+              </Formats>
+            </TextObject>
+          </DataFooterBand>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter1" Top="306.94" Width="718.2" Height="18.9">
+          <TextObject Name="Text5" Left="9.45" Width="699.3" Height="18.9" CanShrink="true" CanBreak="false" Text="Всього по підрозділу:            [Total]                 в т.ч. з помилками:            [TotalErr]">
+            <Formats>
+              <GeneralFormat/>
+              <GeneralFormat/>
+              <GeneralFormat/>
+              <DateFormat/>
+            </Formats>
+          </TextObject>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter2" Top="328.63" Width="718.2" Height="18.9">
+        <TextObject Name="Text7" Left="9.45" Width="699.3" Height="18.9" CanShrink="true" CanBreak="false" Text="Всього по валюті:            [TotalKV]     загал.сума:           [TotalKVSum]">
+          <Formats>
+            <GeneralFormat/>
+            <GeneralFormat/>
+            <GeneralFormat/>
+            <DateFormat/>
+          </Formats>
+        </TextObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

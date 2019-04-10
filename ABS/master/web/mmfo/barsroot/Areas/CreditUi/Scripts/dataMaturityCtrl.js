@@ -9,45 +9,22 @@
             transport: {
                 read: {
                     url: url + "getRang",
-                    data: { vidd: function () { return $rootScope.credit.viddValue.VIDD; } },
+                    data: { vidd: function () { return $rootScope.credit.viddValue.Key; } },
                     dataType: "json"
                 }
             }
         },
-        dataTextField: "NAME",
-        dataValueField: "RANG",
+        dataTextField: "Value",
+        dataValueField: "Key",
         dataBound: function (e) {
             if($rootScope.credit.rangValue == null)
             {
                 this.select(0);
-                $rootScope.credit.rangValue = { RANG: this.value() };
+                $rootScope.credit.rangValue = { Key: this.value() };
             }
         },
     };
-    $scope.ddlFreqOptions = {
-        dataSource: {
-            transport: {
-                read: {
-                    url: url + "getFreq",
-                    dataType: "json"
-                }
-            }
-        },
-        dataTextField: "NAME",
-        dataValueField: "FREQ"
-    };
-    $scope.ddlFreqIntOptions = {
-        dataSource: {
-            transport: {
-                read: {
-                    url: url + "getFreq",
-                    dataType: "json"
-                }
-            }
-        },
-        dataTextField: "NAME",
-        dataValueField: "FREQ"
-    };
+    
     $scope.ddlPreviousOptions = {
         dataSource: [
             { ID: "0", NAME: "День" },
@@ -72,18 +49,6 @@
         dataValueField: "ID"
     };
 
-    $scope.ddlDayNP = {
-        dataSource: {
-            transport: {
-                read: {
-                    url: url + "getDaynpList",
-                    dataType: "json"
-                }
-            }
-        },
-        dataTextField: "Value",
-        dataValueField: "Key"
-    };
 
     $rootScope.LoadRangs = function () {
         $scope.ddlRang.dataSource.read();

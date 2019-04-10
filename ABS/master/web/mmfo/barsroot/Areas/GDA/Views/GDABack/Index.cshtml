@@ -1,0 +1,126 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.GDA.Models
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="/barsroot/scripts/respond.min.js"></script>
+
+<script src="~/Scripts/jquery/jquery.iecors.js"></script>
+<script src="~/Areas/GDA/Scripts/GDABack/Index.js"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<link rel="stylesheet" href="~/Areas/GDA/Css/GDA/Main.css" />
+@*<meta http-equiv="X-UA-Compatible" content="IE=edge" />*@
+
+<div class="page-header">
+    <h1>Портфель депозитів ММСБ бек-офіс</h1>
+</div>
+
+@*Пошуковий блок*@
+<div class="well" style=" margin-bottom: 5px;">
+    <div class="row" style="margin-top: 5px;">
+        <div class="form-group" id="contract_number">
+            <label><b>№ ДБО:</b></label>
+            <input type="text" class="form-control" style="display: inline; width: 210px;margin-right:18px;" id="dbo" />
+        </div>
+        <div class="form-group" style="margin-top: 5px;">
+            <label><b>РНК:</b></label>
+            <input type="text" class="form-control" style="display: inline;width: 140px; margin-right:18px;" id="rnkNum" />
+        </div>
+        <div class="form-group" style="margin-top: 5px;">
+            <label><b>ЄДРПОУ:</b></label>
+            <input type="text" class="form-control" style="display: inline;width: 140px; margin-right:18px;" id="edrpouNum" />
+        </div>
+        <a class="k-button" onclick="opHistory();" id="btnHistoryOp"><i class="pf-icon pf-16 pf-document_header_footer-ok2"></i>Історія операцій</a>
+        <a class="k-button" onclick="searchOperation();" id="btnSearch"><i class="pf-icon pf-16 pf-find"></i>Пошук</a>
+    </div>
+</div>
+
+<div style="margin-bottom: 5px;">
+    <button type="button" class="btn btn-primary btn-xs btn-filter selected" id="OnAuthorization" onclick='ShowOnAuthorization();' disabled>На авторизації</button>
+    <button type="button" class="btn btn-default btn-xs btn-filter" id="Authorised" onclick='ShowAuthorised();'>Авторизовані</button>
+    <button type="button" class="btn btn-default btn-xs btn-filter" id="Blocked" onclick='ShowBlocked();'>Заблоковані</button>
+    <button type="button" class="btn btn-default btn-xs btn-filter" id="Failed" onclick='ShowFailed();'>Помилка</button>
+    <button type="button" class="btn btn-default btn-xs btn-filter" id="All" onclick='ShowAll();'>Всі</button>
+</div>
+
+<div>
+@(Html.Kendo().ToolBar()
+        .Name("ToolBar")
+        .Items(items =>
+        {
+            items.Add().Type(CommandType.Button).Text("Перегляд документів в ЕА").Icon("pf-icon pf-16 pf-book").Click("viewEA");
+            items.Add().Type(CommandType.Button).Text("Перегляд операції").Icon("pf-icon pf-16 pf-business_report").Click("viewOperation");
+            items.Add().Type(CommandType.Button).Id("block-btn").Text("Блокування траншу").Icon("pf-icon pf-16 pf-stop").Click("blockTranche");
+            items.Add().Type(CommandType.Button).Id("unblock-btn").Text("Розблокування траншу").Icon("pf-icon pf-16 pf-list-ok").Click("unblockTranche");
+            items.Add().Type(CommandType.Button).Text("Історія операцій по траншу").Icon("pf-icon pf-16 pf-book").Click("showHistory");
+        })
+)
+</div>
+<div id="gridBack"></div>
+
+@*<div style="margin-bottom: 50px;">
+    @(Html.Kendo().Grid<BackProcessTrancheInfo>
+        ()
+        .Name("grid")
+        .Columns(col =>
+        {
+            col.Bound(x => x.PROCESS_ID).Hidden(true);
+            col.Bound(x => x.PROCESS_CODE).Hidden(true);
+            col.Bound(x => x.DEPOSIT_ID).Hidden(true);
+            col.Bound(x => x.PROCESS_STATE_CODE).Hidden(true);
+            col.Bound(x => x.OBJECT_STATE_CODE).Hidden(true);
+            col.Bound(x => x.RNK).Title("РНК").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.CONTRACT_NUMBER).Title("ДБО").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.CUSTOMER_NAME).Title("Назва клієнта").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.OKPO).Title("ЄДРПОУ").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(108);
+            col.Bound(x => x.TRANSACTION_TYPE).Title("Тип операції").HeaderHtmlAttributes(new { style = "white-space: normal" }).Filterable(filterable =>
+                        filterable.Multi(true)
+            );
+            col.Bound(x => x.SYS_TIME).Title("Дата операції").ClientTemplate("#=formatDateOperationTemplate(data)#").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(100);
+            col.Bound(x => x.CUSTOMER_NAME).Hidden(true);
+            col.Bound(x => x.DEAL_NUMBER_NAME).Title("№ та валюта рахунку").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(280);
+            col.Bound(x => x.STATE_NAME).Title("Статус операції").HeaderHtmlAttributes(new { style = "white-space: normal" }).Filterable(filterable =>
+                        filterable.Multi(true)
+            );
+            col.Bound(x => x.FIO).Title("ПІБ Виконавця").HeaderHtmlAttributes(new { style = "white-space: normal" });
+        })
+        .Resizable(resizable => resizable.Columns(true))
+        .Reorderable(reorderable => reorderable.Columns(true))
+        .Scrollable()
+        .Selectable()
+        //.Events(ev => ev.Change("Selected").DataBound("DataBound"))
+        .HtmlAttributes(new { style = "min-height: 400px; height: 100%;" })
+        .ToolBar(toolbar =>
+        {
+        toolbar.Template(@<text>
+                <a class="k-button k-button-icontext k-grid-excel" href="#">
+                    <span class="k-icon k-i-excel"></span>Завантажити в Excel
+                </a>
+            </text>);
+        })
+        .Excel(excel => excel.FileName("Бек.xlsx").Filterable(false).AllPages(true).ProxyURL("/GDA/GDA/ConvertBase64ToFile/"))
+        .Sortable()
+        .Filterable()
+        .Pageable(page => page
+        .Refresh(true)
+        .PageSizes(new List<Int32>
+            { 5, 10, 20, 50 })
+            .ButtonCount(10))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("Get_Data", "GDABack"))
+            .PageSize(10)
+            )
+    )
+</div>*@
+<div id="windowContainer"></div>
+<div id="clientContainer"></div>
+
+<style>
+    .k-grid-content {
+        min-height: 294px;
+        height: 60%;
+    }
+</style>

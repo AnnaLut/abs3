@@ -109,7 +109,6 @@
             __doPostBack(sender, e);
         }
 
-
     </script>
 
     <style type="text/css">
@@ -187,6 +186,7 @@
         <asp:ScriptManager ID="sm" runat="server" EnablePartialRendering="true" EnableScriptGlobalization="True" EnableScriptLocalization="True">
         </asp:ScriptManager>
         <div class="pageTitle">
+            <asp:LinkButton ID="toplink" runat="server"></asp:LinkButton>
             <asp:Label ID="lbPageTitle" runat="server" Text="Розміщення заявки на кредит"></asp:Label>
         </div>
         <div style="text-align: left; padding: 10px 0px 10px 10px">
@@ -256,6 +256,8 @@
                 <tr>
                     <td>
                         <asp:Panel ID="attrMain" runat="server" GroupingText="Основні реквізити">
+                            <asp:UpdatePanel ID="InfoPanel" runat="server" UpdateMode="Conditional">
+                                <ContentTemplate>
                             <table border="0" cellpadding="3" cellspacing="0">
                                 <tr>
                                     <td>
@@ -288,6 +290,70 @@
                                     </td>
                                     <td>
                                         <bec:TextBoxDecimal ID="FPROC" runat="server" MaxValue="300" IsRequired="true" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <asp:CheckBox ID="cbFPROC2" runat="server" Checked="false" Text="Застосувати ставку №2"
+                                            OnCheckedChanged="cbFPROC2_CheckedChanged" AutoPostBack="true"/>
+                                    </td>
+                                    <td>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>   </td>
+                                    <td>
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <asp:Label ID="FPROC2Title" runat="server" Text="% ставка №2 : "></asp:Label>
+                                                </td>
+                                                <td>
+                                                    <bec:TextBoxDecimal ID="FPROC2" runat="server" MaxValue="100" Enabled="false" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <asp:Label ID="FPROC2_DATETitle" runat="server" Text="Дата вступу в дію % ставки №2 : "></asp:Label> 
+                                                </td>
+                                                <td>
+                                                    <bec:TextBoxDate ID="FPROC2_DATE" runat="server" Enabled="false"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <asp:CheckBox ID="cbFPROC3" runat="server" Checked="false" Text="Застосувати ставку №3"
+                                            AutoPostBack="true"  OnCheckedChanged="cbFPROC3_CheckedChanged"  Visible="false" />
+                                    </td>
+                                    <td>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>   </td>
+                                    <td>
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <asp:Label ID="FPROC3Title" runat="server" Text="% ставка №3 : " Visible="False"></asp:Label>
+                                                </td>
+                                                <td>
+                                                    <bec:TextBoxDecimal ID="FPROC3" runat="server" MaxValue="100" Enabled="false" Visible="False" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <asp:Label ID="FPROC3_DATETitle" runat="server" Text="Дата вступу в дію % ставки №3 : " Visible="False"></asp:Label> 
+                                                </td>
+                                                <td>
+                                                    <bec:TextBoxDate ID="FPROC3_DATE" runat="server" Enabled="false" Visible="False"/>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                                 <tr>
@@ -352,10 +418,50 @@
                                 </tr>
                                 <tr>
                                     <td>
+                                        <asp:Label ID="Label2" runat="server" Text="BUS_MOD : "></asp:Label>
+                                    </td>
+                                    <td>
+                                        <bec:DDLList ID="DDL_BUS_MOD" runat="server" IsRequired="true"  OnValueChanged="Bus_Mod_Changed" ></bec:DDLList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <asp:Label ID="Label3" runat="server" Text="SPPI : "></asp:Label>
+                                    </td>
+                                    <td>
+                                        <bec:DDLList ID="DDL_SPPI" runat="server" IsRequired="true" OnValueChanged="SPPI_Changed" ></bec:DDLList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <asp:Label ID="Label4" runat="server" Text="IFRS : "></asp:Label>
+                                    </td>
+                                    <td>
+                                        <bec:TextBoxString ID="IFRS" runat="server" MaxLength="20" IsRequired="true" Enabled="false" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <asp:Label ID="Label5" runat="server" Text="POCI : "></asp:Label>
+                                    </td>
+                                    <td>
+                                        <bec:DDLList ID="DDL_POCI" runat="server" IsRequired="false" Enabled="false" OnValueChanged="Poci_Changed"></bec:DDLList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <asp:Label ID="Label6" runat="server" Text="Ціль : "></asp:Label>
+                                    </td>
+                                    <td>
+                                        <bec:DDLList ID="DDL_AIM" runat="server" IsRequired="true" OnValueChanged="AIM_Changed"></bec:DDLList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         <asp:Label ID="PRODTitle" runat="server" Text="Продукт (ОВ22) : "></asp:Label>
                                     </td>
                                     <td>
-                                        <asp:Label ID="PROD" runat="server" Font-Italic="true" Width="400"></asp:Label>
+                                        <bec:DDLList ID="DDL_PROD" runat="server" IsRequired="true"></bec:DDLList>
                                     </td>
                                 </tr>
                                 <tr>
@@ -367,6 +473,8 @@
                                     </td>
                                 </tr>
                             </table>
+                                      </ContentTemplate>
+                            </asp:UpdatePanel>
                         </asp:Panel>
                     </td>
                 </tr>

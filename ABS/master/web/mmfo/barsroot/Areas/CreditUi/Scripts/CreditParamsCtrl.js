@@ -36,92 +36,26 @@
     $scope.isPruductBtnVisible = function () { return $rootScope.custtype == 3 || $rootScope.custtype == 2; };
     $scope.isPruductBtnEnabled = function () { return $rootScope.credit.aimValue != null; };
     $scope.isDdlAimEnabled = function () { return $rootScope.credit.custValue != null; };
+    $scope.isIFRSchosen = function () { return $rootScope.credit.ifrs != null || $rootScope.IsGKD(); };
 
-/*    angular.element(document).ready(function () {
+    $scope.checkRisk = function () {
 
-        if (!$rootScope.nd) {
-            var url = '/api/kernel/Params/GetParam/?id=MFO';
-            $http.get(bars.config.urlContent(url)).then(function (request) {
-                $rootScope.credit.mfoValue = request.data.Value;
-            });
-            url = '/api/kernel/Params/GetParam/?id=NAME';
-            $http.get(bars.config.urlContent(url)).then(function (request) {
-                $rootScope.credit.branchNameValue = request.data.Value;
-            });
+        if ($rootScope.credit.finValue.Key != null && $rootScope.credit.obsValue.Key != null && $rootScope.data_sources !== undefined) {
+            var obj = $.grep($rootScope.data_sources.Crisk, function (e) { return e.FIN == $rootScope.credit.finValue.Key && e.OBS == $rootScope.credit.obsValue.Key; });
+            if (obj.length > 0) {
+                $rootScope.credit.sIdValue = obj[0].CRISK;
+                $rootScope.credit.sCatValue = obj[0].NAME;
         }
-    });
-*/
-    var checkRisk = function () {
-        
-        if ($rootScope.credit.finValue != null && $rootScope.credit.obsValue != null) {
-            var url = '/creditui/newcredit/getCRisk/?fin=' + $rootScope.credit.finValue.FIN + "&obs=" + $rootScope.credit.obsValue.OBS;
-            $http.get(bars.config.urlContent(url)).then(function (request) {
-                if (request.data.length > 0) {
-                    $rootScope.credit.sIdValue = request.data[0].CRISK;
-                    $rootScope.credit.sCatValue = request.data[0].NAME;
-                }
-            });
+            else
+                $rootScope.credit.sIdValue = $rootScope.credit.sCatValue = null;
         }
-    }
-    $scope.ddlCurOptions = {
-        dataSource: {
-            cache: false,
-            transport: {
-                read: {
-                    url: url + "getCurrency",
-                    dataType: "json"
-                }
-            }
-        },
-        change: function(e) {
-            if($rootScope.credit.baseRateValue != null){
-                $rootScope.credit.baseRateValue = null;
-                $rootScope.credit.baseRateNameValue = null;
-                $scope.$apply();
-            }
-            if ($scope.isSave)
-                bars.ui.alert({ text: "Не забудьте змінити валюту рахунків" });
-        },
-        filter: "startswith",
-        dataTextField: "LCV",
-        dataValueField: "KV"
-    };
-    $scope.ddlFinOptions = {
-        dataSource: {
-            cache: false,
-            transport: {
-                read: {
-                    url: url + "getStanFin",
-                    dataType: "json"
-                }
-            }
-        },
-        dataTextField: "NAME",
-        dataValueField: "FIN",
-        change: checkRisk,
-        dataBound: checkRisk
-    };
-    $scope.ddlObsOptions = {
-        dataSource: {
-            cache: false,
-            transport: {
-                read: {
-                    url: url + "getStanObs",
-                    dataType: "json"
-                }
-            }
-        },
-        dataTextField: "NAME",
-        dataValueField: "OBS",
-        change: checkRisk,
-        dataBound: checkRisk
-    };
-
+        }
+   
     var LIST_UNSED = [{ id: "0", name: "Відновлюваний" }, { id: "1", name: "Невідновлюваний" }];
     var RENEWABLE_VIDDS = [2, 3, 12];       // (1,11)- невідновлювана
     var getUnsedValueByVidd = function (viddArr) {
         for(var i = 0; i < viddArr.length; i++){
-            if(RENEWABLE_VIDDS.indexOf(parseInt(viddArr[i].VIDD)) != -1){
+            if(RENEWABLE_VIDDS.indexOf(parseInt(viddArr[i].Key)) != -1){
                 return LIST_UNSED[0];
             }
         }
@@ -145,8 +79,10 @@
             var dd = this;
             var v = dd.value();
             if(($rootScope.sos == "0") || ($rootScope.sos == null)){
-                $rootScope.credit.listUnsedValue = getUnsedValueByVidd([{VIDD: v}]);
+                $rootScope.credit.listUnsedValue = getUnsedValueByVidd([{Key: v}]);
             }
+            
+            $scope.ChangeFields4GKD();
             $scope.$apply();
             $scope.ddlAim.dataSource.read();
             $rootScope.LoadRangs();
@@ -157,15 +93,17 @@
                 $rootScope.credit.listUnsedValue = getUnsedValueByVidd(dd.dataSource._data);
             }
             $rootScope.ShowCustInfo = false;
-            if (dd.dataSource && [11, 12, 13].indexOf(dd.dataSource._data[0].VIDD) !== -1) {
+            if (dd.dataSource && [11, 12, 13].indexOf(dd.dataSource._data[0].Key) !== -1) {
                 $scope.GetCustInfo($rootScope.credit.rnkValue);
                 $rootScope.ShowCustInfo = true;
             }
+            $scope.ChangeFields4GKD();
+
             $rootScope.$apply();
 
         },
-        dataTextField: "NAME",
-        dataValueField: "VIDD" //"METR"
+        dataTextField: "Value",
+        dataValueField: "Key" //"METR"
     };
 
     $scope.ddlListUnsedOptions = {
@@ -180,19 +118,22 @@
         dataValueField: "id"
     };
 
-    $scope.ddlSourOptions = {
-        dataSource: {
-            cache: false,
-            transport: {
-                read: {
-                    url: url + "getSour",
-                    dataType: "json"
-                }
+    $scope.ddlGPKOptions = {
+        dataSource: [{ id: "0", name: "Ні" }, { id: "1", name: "Так" }],
+        dataTextField: "name",
+        dataValueField: "id",
+        optionLabel: " ",
+        change: function () {
+            if ($rootScope.credit.belongtoGKD !== undefined && $rootScope.credit.belongtoGKD.id != 1 && $rootScope.credit.gkd_id !== null) {
+                $rootScope.credit.gkd_id = null;
+                $rootScope.GKD.limit = null;
+                $rootScope.GKD.wdate = null;
+                $scope.$apply();
             }
-        },
-        dataTextField: "NAME",
-        dataValueField: "SOUR"
+        }
     };
+
+
     $scope.ddlAimOptions = {
         dataSource: {
             cache: false,
@@ -201,7 +142,7 @@
                     url: url + "getAim",
                     data: {
                         vidd: function () {
-                            return $rootScope.credit.viddValue.VIDD;
+                            return $rootScope.credit.viddValue.Key;
                         },
                         dealDate: function () {
                             var date = kendo.toString(kendo.parseDate($rootScope.credit.startValue), 'dd.MM.yyyy');
@@ -221,70 +162,38 @@
                 $rootScope.credit.prodNameValue = null;
                 $scope.$apply();
             }
-            //
-
-            /*var dateStart = kendo.parseDate($rootScope.credit.startValue);
-            var dateEnd = kendo.parseDate($rootScope.credit.endValue);
-            var diff = dateDiff(dateStart, dateEnd);
-            var yearDiff = $rootScope.custtype == 3 ? ((diff[0] <= 3 && diff[1] <= 36 && diff[2] == 0) || (diff[0] <= 3 && diff[1] < 36 && diff[2] >= 0))
-                : ((diff[0] <= 1 && diff[1] <= 12 && diff[2] == 0) || (diff[0] <= 1 && diff[1] < 12 && diff[2] >= 0));
-            var urlui = url + 'getAimBal?rnk=' + $rootScope.credit.rnkValue + "&aim=" + e.sender._old + "&yearDiff=" + yearDiff;
-            //bars.ui.loader('body', true);
-            $http.get(urlui).then(function (request) {
-                if (request.data && request.data.NLS) {
-                    urlui = url + 'setMasIni';
-                    $http.post(urlui, { nbs: request.data.NLS }).then(function (request) {
-                        bars.ui.loader('body', false);
-                    });
-                }
-                else {
-                    bars.ui.loader('body', false);
-                }
-            });*/
         },
         autoBind: false,
-        dataTextField: "NAME",
-        dataValueField: "AIM"
+        dataTextField: "Value",
+        dataValueField: "Key"
     };
 
-    $scope.checkBal = function () {
-        var dateStart = kendo.parseDate($rootScope.credit.startValue);
-        var dateEnd = kendo.parseDate($rootScope.credit.endValue);
-        var diff = dateDiff(dateStart, dateEnd);
-        //var yearDiff = $rootScope.custtype == 3 ? ((diff[0] <= 3 && diff[1] <= 36 && diff[2] == 0) || (diff[0] <= 3 && diff[1] < 36 && diff[2] >= 0))
-          // : ((diff[0] <= 1 && diff[1] <= 12 && diff[2] == 0) || (diff[0] <= 1 && diff[1] < 12 && diff[2] >= 0));
-        //var yearDiff = ((diff[0] <= 3 && diff[1] <= 36 && diff[2] == 0) || (diff[0] <= 3 && diff[1] < 36 && diff[2] >= 0));
-        var yearDiff = ((diff[2] <= 365));
-        if (!$scope.credit.aimValue) return false;
-        var aim = $scope.credit.aimValue.AIM;
-        var urlui = url + 'getAimBal?vidd=' + $rootScope.credit.viddValue.VIDD + "&aim=" + /*e.sender._old*/aim + "&yearDiff=" + yearDiff;
-        $http.get(urlui).then(function (request) {
-            if (request.data && request.data.NLS) {
-                urlui = url + 'setMasIni';
-                $http.post(urlui, { nbs: request.data.NLS }).then(function (request) {
-                    bars.ui.loader('body', false);
-                });
-            }
-            else {
-                bars.ui.loader('body', false);
-            }
-        });
-        return true;
-    };
-
-    $scope.ddlBaseyOptions = {
+    $scope.ddlBusModOptions = {
+        autoBind: false,
         dataSource: {
             cache: false,
             transport: {
                 read: {
-                    url: url + "getBasey",
+                    url: url + "getBusMod",
+                    data: { rnk: function () { return $rootScope.credit.rnkValue; } },
                     dataType: "json"
                 }
             }
         },
-        dataTextField: "NAME",
-        dataValueField: "BASEY"
+        dataTextField: "Value",
+        dataValueField: "Key",
+        dataBound: function () {
+            this.select(0);
+            $rootScope.credit.bus_mod = { Key: this.value() };
+            $scope.GetSppi();
+        },
+        change: function (e) {
+            $rootScope.SetIFRS();
+            $rootScope.credit.prodValue = null;
+            $rootScope.credit.prodNameValue = null;
+        }
     };
+
     $scope.dpConslOptions = {
         format: "dd/MM/yyyy"
     };
@@ -398,7 +307,6 @@
             $rootScope.credit.rnkValue = data[0].RNK;
             $rootScope.credit.nmkValue = data[0].NMK;
             $scope.ddlVidd.dataSource.read();
-            //$scope.GetCustInfo(data[0].RNK);
             $rootScope.$apply();
         },
         {
@@ -407,19 +315,6 @@
             columns: $scope.columns
         });
     }
-
-    function dateDiff(date1, date2) {
-        var years = date2.getFullYear() - date1.getFullYear();
-        var months = years * 12 + date2.getMonth() - date1.getMonth();
-        //var days = date2.getDate() - date1.getDate();
-        var days = parseInt((date2 - date1) / (1000 * 60 * 60 * 24)); 
-        years -= date2.getMonth() < date1.getMonth();
-        months -= date2.getDate() < date1.getDate();
-        //days += days < 0 ? new Date(date2.getFullYear(), date2.getMonth() - 1, 0).getDate() + 1 : 0;
-
-        return [years, months, days];
-    }
-
 
     $scope.columnsPotra = [{
         field: "ID",
@@ -430,45 +325,22 @@
         width: 800
     }];
 
-    $scope.showReferProd = function (tabName, showFields) {
-        /*var dateStart = kendo.parseDate($rootScope.credit.startValue);
-        var dateEnd = kendo.parseDate($rootScope.credit.endValue);
-        var diff = dateDiff(dateStart, dateEnd);
-        var yearDiff = $rootScope.custtype == 3 ? ((diff[0] <= 3 && diff[1] <= 36 && diff[2] == 0) || (diff[0] <= 3 && diff[1] < 36 && diff[2] >= 0))
-            : ((diff[0] <= 1 && diff[1] <= 12 && diff[2] == 0) || (diff[0] <= 1 && diff[1] < 12 && diff[2] >= 0));
-        
-        var whereClause = "where (substr(id, 0, 4) in " +
-                          "      (select (case " +
-                          "                 when (select custtype from customer where rnk = " + $rootScope.credit.rnkValue + ") = 3 then " +
-                          "                  nbsf " +
-                          "        else " +
-                          "                  nbs " +
-                          "               end) " +
-                          "         from cc_aim " +
-                          "        where aim = " + $rootScope.credit.aimValue.AIM + ") " +
-                          "   or substr(id, 0, 4) in " +
-                          "      (select (case " +
-                          "                 when (select custtype from customer where rnk = " + $rootScope.credit.rnkValue + ") = 3 then " +
-                          "                  nbsf2" +
-                          "        else " +
-                          "                  nbs2 " +
-                          "               end) " +
-                          "        from cc_aim " +
-                          "       where aim = " + $rootScope.credit.aimValue.AIM + "))" + 
-                          "  and substr(id, 4, 1) = " + (yearDiff ? "'2'" : "'3'");*/
-        if ($scope.checkBal()) {
-            bars.ui.handBook(tabName, function (data) {
+    $scope.showReferProd = function () {
+        var poci = ($rootScope.credit.poci !== null && $rootScope.credit.poci.Key !== "") ? $rootScope.credit.poci.Key : 0;
+        var custtype = [11, 12, 13].indexOf($rootScope.credit.viddValue.Key) !== -1 ? 3 : 2;
+        var where_clause = "where IFRS = '" + $rootScope.credit.ifrs + "' and AIM = " + $rootScope.credit.aimValue.Key +
+            " and CUSTTYPE = " + custtype + " and POCI =  " + poci;
+            bars.ui.handBook('CC_POTR_2', function (data) {
                 $rootScope.credit.prodValue = data[0].ID;
                 $rootScope.credit.prodNameValue = data[0].NAME;
                 $scope.$apply();
             },
             {
                 multiSelect: false,
-                //clause: whereClause,
+                clause: where_clause,
                 columns: $scope.columnsPotra
             });
         }
-    }
     $scope.showReferBRate = function (tabName, showFields, whereClause) {
         var kv = $rootScope.credit.curValue.KV;
         if(kv == null || kv == undefined || kv == ""){kv = 980;}
@@ -548,5 +420,94 @@
             }
         });
       }
+
+    $scope.showGKD = function (tabName) {
+        bars.ui.handBook(tabName, function (data) {
+            $rootScope.credit.gkd_id = data[0].ND;
+            $rootScope.GKD.wdate = kendo.toString(kendo.parseDate(data[0].WDATE, 'yyyy-MM-dd'), 'dd/MM/yyyy');
+            $rootScope.SetActualLimit(data[0].ND);
+            $scope.$apply();
+        },
+        {
+            multiSelect: false,
+            clause: " SOS >= 10 and WDATE > gl.bd and VIDD = 5 and RNK = " + $rootScope.credit.rnkValue,
+            columns: [
+                {
+                    field: "ND",
+                    width: 100
+                },
+                {
+                    field: "CC_ID",
+                    width: 100
+                },
+            {
+                field: "WDATE",
+                width: 80,
+                template: "#= kendo.toString(kendo.parseDate(WDATE, 'yyyy-MM-dd'), 'dd/MM/yyyy') #"
+            }],
+            ResizedColumns: true
+        });
+    }
+
+   $rootScope.SetIFRS = function () {
+        if ($rootScope.credit.bus_mod.Key != null && $rootScope.credit.sppi.Key !== undefined) {
+            $http.get(bars.config.urlContent('/creditui/newcredit/GetIFRS/'), {
+                params: { bus_mod: $rootScope.credit.bus_mod.Key, sppi: $rootScope.credit.sppi.Key },
+                headers: { 'Accept': 'application/json' }
+            }).then(function (request) {
+                $rootScope.credit.ifrs = request.data.IFRS;
+                $rootScope.credit.poci = null;
+                //$scope.$apply();
+            });
+        }
+    }
+
+    $scope.GetSppi = function () {
+        $http.get(bars.config.urlContent('/creditui/newcredit/GetSPPI/'), {
+            params: { rnk: $rootScope.credit.rnkValue }
+        }).then(function (request) {
+            if (request.data.SPPI !== "") {
+                $rootScope.credit.sppi = { Key: kendo.parseInt(request.data.SPPI) };
+                $rootScope.SetIFRS();
+            }
+
+        });
+    }
+
+    $scope.ChangeFields4GKD = function () {
+        if ($rootScope.credit.viddValue && $rootScope.credit.viddValue.Key == 5) {
+            $rootScope.credit.gkd_id = null;
+            $rootScope.GKD.limit = null;
+            $rootScope.GKD.wdate = null;
+            $rootScope.credit.belongtoGKD = null;
+            if ($scope.ddlBusMod.dataSource) {
+                $scope.ddlBusMod.text("");
+                $scope.ddlBusMod.value("");
+                $scope.sppi_ddl.text("");
+                $scope.sppi_ddl.value("");
+                $scope.ddlPoci.text("");
+                $scope.ddlPoci.value("");
+                $rootScope.credit.bus_mod.Key = ""; 
+                $rootScope.credit.sppi.Key = "";
+                $rootScope.credit.poci = "";
+                $rootScope.credit.ifrs = null;
+            }
+
+        }
+        else
+            $scope.ddlBusMod.dataSource.read();
+    }
+
+    $rootScope.SetActualLimit = function (gkd_nd) {
+
+        _data = ($rootScope.nd !== null) ? { sub_nd: $rootScope.nd } : { gkd_nd: gkd_nd };
+        $http.get(bars.config.urlContent('/creditui/newcredit/GetActualLimit/'),
+        {
+            params: _data,
+            headers: { 'Accept': 'application/json' }
+        }).then(function (request) {
+            $rootScope.GKD.limit = kendo.toString(request.data.Limit, "n2");
+        });
+    };
 
 }]);

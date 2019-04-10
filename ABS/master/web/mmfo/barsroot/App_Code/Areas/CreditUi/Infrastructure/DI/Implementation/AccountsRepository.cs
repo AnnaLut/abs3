@@ -419,5 +419,16 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 connection.Close();
             }
         }
+
+        public bool IsNBShasOB22(string nbs)
+        {
+            using (OracleConnection conn = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = @"select ob22 from sb_ob22 where r020 = :nbs";
+                cmd.Parameters.Add("nbs", OracleDbType.Varchar2, nbs, ParameterDirection.Input);
+                return cmd.ExecuteScalar() != null;
+            }
+        }
     }
 }

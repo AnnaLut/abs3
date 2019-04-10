@@ -4,33 +4,39 @@
 
 angular.module("BarsWeb.Areas").factory('dataService', function(){
     return{
-        afterSaveDeal: function (nd, save) {
+        afterSaveDeal: function (nd, save, isGKD) {
             return {
                 nd: nd,
                 prod: save.prodValue,
-                fin: save.finValue.FIN,
+                fin: save.finValue.Key,
                 inic: save.branchValue,
                 flags: (save.holidayValue.ID) + (save.previousValue.ID),
-                rang: save.rangValue.RANG,
+                rang: save.rangValue.Key,
                 sdi: save.discontSumValue,
-                metr: save.metrValue ? save.metrValue.METR : null,
+                metr: save.metrValue ? save.metrValue.Key : null,
                 metr_r: save.metrRateValue ? save.metrRateValue : null,
                 sdate: kendo.toString(kendo.parseDate(save.conslValue), 'dd.MM.yyyy'),
-                basey: save.baseyValue.BASEY,
+                basey: save.baseyValue.Key,
                 sn8: save.isPenaltiesValue ? null : save.penaltiesRateValue,
                 sk4: save.earlyRateValue,
                 cr9: save.unusedLimitValue,
                 rnk: save.rnkValue,
-                isto: save.sourValue.SOUR,
-                kv: save.curComAccValue.KV,
+                isto: save.sourValue.Key,
+                kv: save.curComAccValue.Key,
                 dat3: kendo.parseDate(save.issueValue),
                 icr9: save.listUnsedValue.id,
                 daysn: save.diffDaysValue ? save.dayPayDiffValue : null,
                 datsn: save.diffDaysValue ? kendo.toString(kendo.parseDate(save.firstPayDiffValue), 'dd.MM.yyyy') : null,
                 daynp: save.daynp.Key,
-                vidd: save.viddValue.VIDD,
+                vidd: save.viddValue.Key,
                 inspector_id: save.inspector_id,
-                s_s36: save.commissionObsl
+                s_s36: save.commissionObsl,
+                //IsGKD: !isGKD ? save.belongtoGKD.id : null,
+                //GKD_ND: save.gkd_id,
+                BUS_MOD: save.bus_mod.Key,
+                SPPI: save.sppi.Key,
+                IFRS: save.ifrs,
+                POCI: save.poci? save.poci.Key : null
             };
         },
         multiExtInt: function (nd, save){
@@ -48,31 +54,31 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 PROC4: save.rateEValue
             };
         },
-        create: function (containerForSave, save) {
+        create: function (containerForSave, save, isGKD) {
             containerForSave.nRNK = save.rnkValue;
             containerForSave.CC_ID = save.numValue;
             containerForSave.Dat1 = kendo.parseDate(save.conslValue);
             containerForSave.Dat4 = kendo.parseDate(save.endValue);
             containerForSave.Dat2 = kendo.parseDate(save.startValue);
             containerForSave.Dat3 = kendo.parseDate(save.issueValue);
-            containerForSave.nKV = save.curValue.KV;
+            containerForSave.nKV = save.curValue.Key;
             containerForSave.nS = save.sumValue;
-            containerForSave.nVID = save.viddValue.VIDD;
-            containerForSave.nISTRO = save.sourValue.SOUR;
-            containerForSave.nCEL = save.aimValue.AIM;
+            containerForSave.nVID = save.viddValue.Key;
+            containerForSave.nISTRO = save.sourValue.Key;
+            containerForSave.nCEL = !isGKD? save.aimValue.Key: null;
             containerForSave.MS_NX = save.prodValue;
-            containerForSave.nFIN = save.finValue.FIN;
-            containerForSave.nOBS = save.obsValue.OBS;
-            containerForSave.sAIM = save.aimValue.NAME;
+            containerForSave.nFIN = save.finValue.Key;
+            containerForSave.nOBS = save.obsValue.Key;
+            containerForSave.sAIM = !isGKD? save.aimValue.Value: null;
             containerForSave.nKom = save.unusedLimitValue;
             containerForSave.NLS = save.nlsValue;
             containerForSave.nBANK = save.mfoValue;
-            containerForSave.nFREQ = save.freqValue.FREQ;
+            containerForSave.nFREQ = save.freqValue.Key;
             containerForSave.dfPROC = save.rateAValue;
-            containerForSave.nBasey = save.baseyValue.BASEY;
+            containerForSave.nBasey = save.baseyValue.Key;
             containerForSave.dfDen = kendo.parseInt(save.dayOfPayValue);
             containerForSave.DATNP = kendo.parseDate(save.firstPayDateValue);
-            containerForSave.nFREQP = save.freqIntValue.FREQ;
+            containerForSave.nFREQP = save.freqIntValue.Key;
         },
         clearMain: function () {
             return {
@@ -107,7 +113,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
         },
         clearCredit: function () {
             return {
-                curValue: { KV: "980", LCV: "" },
+                curValue: { Key: "980", Value: "" },
                 numValue: null,
                 branchValue: null,
                 sumValue: null,
@@ -118,10 +124,10 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 custValue: null,
                 rnkValue: null,
                 nmkValue: null,
-                finValue: { FIN: "1", NAME: "" },
-                obsValue: { OBS: "1", NAME: "" },
+                finValue: { Key: "1", Value: "" },
+                obsValue: { Key: "1", Value: "" },
                 viddValue: null,
-                sourValue: { SOUR: "4", NAME: "" },
+                sourValue: { Key: "4", Value: "" },
                 aimValue: null,
                 prodValue: null,
                 prodNameValue: null,
@@ -140,20 +146,20 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 rateEValue: null,
                 baseRateValue: null,
                 baseRateNameValue: null,
-                baseyValue: { BASEY: "0", NAME: "" },
+                baseyValue: { Key: "0", Value: "" },
                 nlsValue: null,
                 purposeValue: null,
                 guaranteeValue: null,
                 rangValue: null,
-                freqValue: { FREQ: "5", NAME: "" },
+                freqValue: { Key: "5", Value: "" },
                 dayOfPayValue: null,
                 firstPayDateValue: null,
                 holidayValue : { ID: 1 },
-                freqIntValue: { FREQ: "5", NAME: "" },
+                freqIntValue: { Key: "5", Value: "" },
                 diffDaysValue: false,
                 previousValue: { ID: "0" },
                 discontSumValue: null,
-                curComAccValue: { KV: "980", LCV: "" },
+                curComAccValue: { Key: "980", Value: "" },
                 metrValue: null,
                 metrRateValue: null,
                 unusedLimitValue: null,
@@ -168,7 +174,13 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 daynp: { Key: -2 },
                 lim: null,
                 inspector_id: null,
-                commissionObsl: null
+                commissionObsl: null,
+                belongtoGKD: { id: "", name: ""},
+                gkd_id: null,
+                bus_mod: { Key: "", Value: "" },
+                sppi: { Key: -1, Value: "" },
+                ifrs: null,
+                poci: null
             };
         },
         getDeal: function (save, resp) {
@@ -182,23 +194,23 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.endValue = resp.Dat4;
             save.startValue = resp.Dat2;
             save.issueValue = resp.Dat3;
-            save.curValue = { KV: resp.nKV, LCV: resp.nKVNAME };
+            save.curValue = { Key: resp.nKV, Value: resp.nKVNAME };
             save.sumValue = resp.nS;
-            save.viddValue = { VIDD: resp.nVID, NAME: resp.nVIDNAME };
-            save.sourValue = { SOUR: resp.nISTRO, NAME: resp.nISTRONAME };
-            save.aimValue = { AIM: resp.nCEL, NAME: resp.AIMNAME };
+            save.viddValue = { Key: resp.nVID, Value: resp.nVIDNAME };
+            save.sourValue = { Key: resp.nISTRO, Value: resp.nISTRONAME };
+            save.aimValue = { Key: resp.nCEL, Value: resp.AIMNAME };
             save.prodValue = resp.MS_NX;
-            save.finValue = { FIN: resp.nFIN, NAME: resp.nFINNAME };
-            save.obsValue = { OBS: resp.nOBS, NAME: resp.nOBSNAME };
+            save.finValue = { Key: resp.nFIN, Value: resp.nFINNAME };
+            save.obsValue = { Key: resp.nOBS, Value: resp.nOBSNAME };
             save.nlsValue = resp.NLS;
             save.mfoValue = resp.nBANK;
             save.branchNameValue = resp.nBANKNAME;
-            save.freqValue = { FREQ: resp.nFREQ, NAME: resp.nFREQNAME };
+            save.freqValue = { Key: resp.nFREQ, Value: resp.nFREQNAME };
             save.rateAValue = resp.dfPROC;
-            save.baseyValue = { BASEY: resp.nBasey, NAME: resp.nBaseyNAME };
+            save.baseyValue = { Key: resp.nBasey, Value: resp.nBaseyNAME };
             save.dayOfPayValue = resp.dfDen;
             save.firstPayDateValue = resp.DATNP;
-            save.freqIntValue = { FREQ: resp.nFREQP, NAME: resp.nFREQPNAME };
+            save.freqIntValue = { Key: resp.nFREQP, Value: resp.nFREQPNAME };
             save.unusedLimitValue = resp.nKom;
             save.branchValue = resp.INIC;
             save.custValue = resp.OKPO;
@@ -208,8 +220,8 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.acc8 = resp.ACC8;
             save.serviceValue = { id: resp.BASEM };
             save.discontSumValue = resp.S_SDI;
-            save.rangValue = { RANG: resp.RANG, NAME: resp.RANGNAME };
-            save.metrValue = { METR: resp.METR, NAME: resp.METRNAME };
+            save.rangValue = { Key: resp.RANG, Value: resp.RANGNAME };
+            save.metrValue = { Key: resp.METR, Value: resp.METRNAME };
             save.metrRateValue = resp.METR_R;
             save.penaltiesRateValue = resp.SN8;
             if (save.penaltiesRateValue) save.isPenaltiesValue = false;
@@ -222,6 +234,18 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.lim = resp.LIM;
             save.inspector_id = resp.INSPECTOR_ID;
             save.commissionObsl = resp.S_S36;
+            //save.belongtoGKD = { id: resp.IsGKD };
+            //save.gkd_id = resp.GKD_ND;
+            save.bus_mod = { Key: resp.BUS_MOD, Value: resp.BUS_MOD_NAME };
+            save.sppi = { Key: resp.SPPI };
+            save.ifrs = resp.IFRS;
+            save.poci = { Key: resp.POCI };
+        },
+        GKD: function () {
+            return {
+                wdate: null,
+                limit: null
+            }
         },
         CUST_INFO: function () {
             return {
@@ -235,7 +259,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 TYPEW: null,
                 REAL6INCOME: null,
                 NOREAL6INCOME: null
-        	}
+            }
         }
     };
 });

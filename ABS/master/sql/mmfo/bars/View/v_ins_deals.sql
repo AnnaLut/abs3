@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_INS_DEALS.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
@@ -79,7 +77,8 @@ PROMPT *** Create  view V_INS_DEALS ***
           d.renew_need,
           d.renew_newid,
           p.custtype AS custid,
-          ins_pack.get_deal_attr_s (d.id, 'EXT_SYSTEM') AS ext_system
+          to_char(d.ext_deal_id) as ext_system
+          --ins_pack.get_deal_attr_s (d.id, 'EXT_SYSTEM') AS ext_system
      FROM ins_deals d,
           branch b,
           staff$base s,

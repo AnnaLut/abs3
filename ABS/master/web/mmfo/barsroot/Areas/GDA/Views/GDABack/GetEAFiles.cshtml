@@ -1,0 +1,33 @@
+﻿@using Bars.EAD.Structs.Result;
+@using System.Collections.Generic;
+@model List<DocumentData>
+@{
+    //Page.Title = "Title goes here";
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml"; //"Your Layout Page goes here";
+}
+
+<div>
+    @(Html.Kendo().Grid<DocumentData>(Model)
+        .Name("gridDoc")
+        .Reorderable(x => x.Columns(true))
+        .Resizable(x => x.Columns(true))
+        .Columns(col => {
+            col.Bound(x => x.Struct_Name).Title("Назва");
+            col.Bound(x => x.DocLink).Title("Завантаження").ClientTemplate("<a class='k-button' href='#=data.DocLink#' target='_blank'>Завантажити</a>").Width(170);
+        })
+        .Filterable()
+        .Groupable()
+        .Selectable()
+        .Scrollable()
+        .Sortable()
+        .HtmlAttributes(new { style = "height: 420px;" })
+        .Pageable(page => page
+            .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+            .ButtonCount(10)
+        )
+        .DataSource(dataSource => {
+            dataSource.Ajax()
+            .ServerOperation(false);
+        })
+    )
+</div>

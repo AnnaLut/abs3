@@ -1,19 +1,13 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/attribute_utl.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.ATTRIBUTE_UTL is
+create or replace package attribute_utl is
 
     -- Author  : Artem Yurchenko
     -- Date    : 2015-04-20
     -- Purpose : Пакет для роботи з атрибутами об'єктів АБС
 
     OBJECT_TYPE_ATTRIBUTE          constant varchar2(30 char) := 'ATTRIBUTE';
-    ATTR_TYPE_FIXED                constant varchar2(30 char) := 'FIXED_ATTRIBUTE';
-    ATTR_TYPE_DYNAMIC              constant varchar2(30 char) := 'DYNAMIC_ATTRIBUTE';
-    ATTR_TYPE_CALCULATED           constant varchar2(30 char) := 'CALCULATED_ATTRIBUTE';
+    ATTR_TYPE_FIXED                constant integer := 1;
+    ATTR_TYPE_DYNAMIC              constant integer := 2;
+    ATTR_TYPE_CALCULATED           constant integer := 3;
 
     LT_ATTRIBUTE_STATE             constant varchar2(30 char) := 'ATTRIBUTE_STATE';
     ATTR_STATE_UNDER_CONSTRUCTION  constant integer := 1;
@@ -33,6 +27,7 @@
     ATTR_CODE_VALUE_TYPE           constant varchar2(30 char) := 'ATTR_VALUE_TYPE';
     ATTR_CODE_VALUE_TABLE_OWNER    constant varchar2(30 char) := 'ATTR_VALUE_TABLE_OWNER';
     ATTR_CODE_VALUE_TABLE_NAME     constant varchar2(30 char) := 'ATTR_VALUE_TABLE_NAME';
+    ATTR_CODE_ATTR_COLUMN_NAME     constant varchar2(30 char) := 'ATTR_ATTR_ID_COLUMN_NAME';
     ATTR_CODE_KEY_COLUMN_NAME      constant varchar2(30 char) := 'ATTR_KEY_COLUMN_NAME';
     ATTR_CODE_VALUE_COLUMN_NAME    constant varchar2(30 char) := 'ATTR_VALUE_COLUMN_NAME';
     ATTR_CODE_REGULAR_EXPRESSION   constant varchar2(30 char) := 'ATTR_REGULAR_EXPRESSION';
@@ -64,10 +59,12 @@
         p_value_type_id            in integer,
         p_value_table_owner        in varchar2 default null,
         p_value_table_name         in varchar2 default null,
+        p_attribute_column_name    in varchar2 default null,
         p_key_column_name          in varchar2 default null,
         p_value_column_name        in varchar2 default null,
         p_regular_expression       in varchar2 default null,
         p_list_type_code           in varchar2 default null,
+        p_value_by_date_flag       in char default 'N',
         p_multi_values_flag        in char default 'N',
         p_save_history_flag        in char default 'N',
         p_set_value_procedures     in string_list default null)
@@ -97,6 +94,7 @@
         p_small_value_flag         in char default 'N',
         p_value_by_date_flag       in char default 'N',
         p_multi_values_flag        in char default 'N',
+        p_save_history_flag        in char default 'N',
         p_get_value_function       in varchar2 default null,
         p_set_value_procedures     in string_list default null)
     return integer;
@@ -127,6 +125,10 @@
         p_attribute_code in varchar2)
     return varchar2;
 
+    function get_attribute_current_date(
+        p_attribute_id in integer)
+    return date;
+
     function get_number_value(
         p_object_id in integer,
         p_attribute_id in integer,
@@ -246,6 +248,20 @@
         p_attribute_code in varchar2,
         p_value_date in date default trunc(sysdate))
     return clob_list;
+
+    procedure create_history_utl(
+        p_object_id in integer,
+        p_attribute_id in integer,
+        p_valid_from in date,
+        p_valid_through in date,
+        p_number_value in number default null,
+        p_string_value in varchar2 default null,
+        p_date_value in date default null,
+        p_blob_value in blob default null,
+        p_clob_value in clob default null,
+        p_nested_table_id in integer default null,
+        p_state_code in char default attribute_utl.HISTORY_STATE_ACTIVE,
+        p_comment in varchar2 default null);
 
     procedure set_value(
         p_object_id in integer,
@@ -857,17 +873,38 @@
 
     procedure close_attribute(
         p_attribute_id in integer);
+
+    function pipe_values_for_date_range(
+        p_attribute_id in integer,
+        p_current_value_date in date,
+        p_expected_value_date in date)
+    return t_attribute_values
+    pipelined;
+
+    function pipe_value_for_date_range(
+        p_attribute_id in integer,
+        p_current_value_date in date,
+        p_expected_value_date in date)
+    return t_attribute_values
+    pipelined;
+
+    procedure set_current_values(
+        p_attribute_id in integer,
+        p_current_value_date in date,
+        p_expected_value_date in date);
+
+    procedure set_current_values;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
+create or replace package body attribute_utl as
 
     function map_value_type_to_oracle_type(
-        p_value_type_id in integer,
-        p_multi_values_flag in char)
+        p_value_type_id in integer/*,
+        p_multi_values_flag in char*/)
     return string_list
     is
     begin
-        if (p_multi_values_flag = 'N') then
+        -- if (p_multi_values_flag = 'N') then
             case when p_value_type_id in (attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST) then
                       return string_list('NUMBER');
                  when p_value_type_id = attribute_utl.VALUE_TYPE_STRING then
@@ -879,7 +916,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                  when p_value_type_id = attribute_utl.VALUE_TYPE_CLOB then
                       return string_list('CLOB');
             end case;
-        else
+/*        else
             case when p_value_type_id in (attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST) then
                       return string_list('NUMBER_LIST');
                  when p_value_type_id = attribute_utl.VALUE_TYPE_STRING then
@@ -891,14 +928,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                  when p_value_type_id = attribute_utl.VALUE_TYPE_CLOB then
                       return string_list('CLOB_LIST');
             end case;
-        end if;
+        end if;*/
     end;
 
     procedure check_attribute_uniqueness(p_attribute_code in varchar2)
     is
         l_attribute_row attribute_kind%rowtype;
     begin
-        l_attribute_row := read_attribute(upper(p_attribute_code), p_raise_ndf => false);
+        l_attribute_row := read_attribute(p_attribute_code, p_raise_ndf => false);
 
         if (l_attribute_row.id is not null) then
             raise_application_error(-20000, 'Атрибут з кодом {' || upper(p_attribute_code) || '} вже існує');
@@ -911,6 +948,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_value_type_id in integer,
         p_value_table_owner in varchar2,
         p_value_table_name in varchar2,
+        p_attribute_column_name in varchar2,
         p_key_column_name in varchar2,
         p_value_column_name in varchar2,
         p_multi_values_flag in char)
@@ -926,8 +964,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         if (l_value_table_name is null) then
             l_object_type_storage_row := object_utl.read_object_type_storage(p_object_type_id);
-            l_value_table_name := l_object_type_storage_row.table_name;
             l_value_table_owner := l_object_type_storage_row.table_owner;
+            l_value_table_name := l_object_type_storage_row.table_name;
             l_key_column_name := l_object_type_storage_row.key_column_name;
         end if;
 
@@ -941,16 +979,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         ddl_utl.check_if_table_exists(l_value_table_name, l_value_table_owner);
         ddl_utl.check_if_column_exists(l_value_table_name, l_key_column_name, l_value_table_owner);
+        ddl_utl.check_if_column_exists(l_value_table_name, l_key_column_name, l_value_table_owner);
         ddl_utl.check_if_column_exists(l_value_table_name, p_value_column_name, l_value_table_owner);
 
-        if (ddl_utl.get_column_data_type(p_value_table_name, p_value_column_name, p_value_table_owner) not member of map_value_type_to_oracle_type(p_value_type_id, p_multi_values_flag)) then
+        if (p_multi_values_flag = 'Y') then
+            ddl_utl.check_if_column_exists(l_value_table_name, p_attribute_column_name, l_value_table_owner);
+        end if;
+
+        if (ddl_utl.get_column_data_type(p_value_table_name, p_value_column_name, p_value_table_owner) not member of map_value_type_to_oracle_type(p_value_type_id/*, p_multi_values_flag*/)) then
             raise_application_error(-20000, 'Тип значень параметру {' || list_utl.get_item_name(attribute_utl.LT_ATTRIBUTE_VALUE_TYPE, p_value_type_id) ||
-                                            '} не відповідає типу поля {' || tools.words_to_string(map_value_type_to_oracle_type(p_value_type_id, p_multi_values_flag), ', ') || '}');
+                                            '} не відповідає типу поля {' || tools.words_to_string(map_value_type_to_oracle_type(p_value_type_id/*, p_multi_values_flag*/), ', ') || '}');
         end if;
     end;
 
     procedure check_attribute(
-        p_attribute_type_code in varchar2,
+        p_attribute_type_id in integer,
         p_attribute_name in varchar2,
         p_value_type_id in integer,
         p_regular_expression in varchar2,
@@ -960,8 +1003,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_list_type_row list_type%rowtype;
     begin
-        if (p_attribute_type_code not in (attribute_utl.ATTR_TYPE_FIXED, attribute_utl.ATTR_TYPE_DYNAMIC, attribute_utl.ATTR_TYPE_CALCULATED)) then
-            raise_application_error(-20000, 'Неочікуваний тип атрибуту {' || p_attribute_type_code || '}');
+        if (p_attribute_type_id not in (attribute_utl.ATTR_TYPE_FIXED, attribute_utl.ATTR_TYPE_DYNAMIC, attribute_utl.ATTR_TYPE_CALCULATED)) then
+            raise_application_error(-20000, 'Неочікуваний тип атрибуту {' || p_attribute_type_id || '}');
         end if;
 
         if (p_attribute_name is null) then
@@ -1018,6 +1061,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_value_type_id in integer,
         p_value_table_owner in varchar2,
         p_value_table_name in varchar2,
+        p_attribute_column_name in varchar2,
         p_key_column_name in varchar2,
         p_value_column_name in varchar2,
         p_regular_expression in varchar2,
@@ -1041,6 +1085,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                                       p_value_type_id,
                                       p_value_table_owner,
                                       p_value_table_name,
+                                      p_attribute_column_name,
                                       p_key_column_name,
                                       p_value_column_name,
                                       p_multi_values_flag);
@@ -1113,11 +1158,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure validate_attribute(
         p_attribute_row in attribute_kind%rowtype)
     is
-        l_attribute_type_code varchar2(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_attribute(l_attribute_type_code,
+        check_attribute(p_attribute_row.attribute_type_id,
                         p_attribute_row.attribute_name,
                         p_attribute_row.value_type_id,
                         p_attribute_row.regular_expression,
@@ -1125,24 +1167,25 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                         p_attribute_row.multi_values_flag,
                         p_attribute_row.save_history_flag);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
 
             check_attribute_value_storage(p_attribute_row.attribute_name,
                                           p_attribute_row.object_type_id,
                                           p_attribute_row.value_type_id,
                                           p_attribute_row.value_table_owner,
                                           p_attribute_row.value_table_name,
+                                          p_attribute_row.attribute_column_name,
                                           p_attribute_row.key_column_name,
                                           p_attribute_row.value_column_name,
                                           p_attribute_row.multi_values_flag);
 
-        elsif (l_attribute_type_code in (attribute_utl.ATTR_TYPE_DYNAMIC)) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
 
             if (p_attribute_row.value_by_date_flag is null or p_attribute_row.value_by_date_flag not in ('Y', 'N')) then
                 raise_application_error(-20000, 'Неочікуване значення флагу збереження значень атрибуту на дату {' || p_attribute_row.value_by_date_flag || '}');
             end if;
 
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
 
             if (p_attribute_row.value_by_date_flag is null or p_attribute_row.value_by_date_flag not in ('Y', 'N')) then
                 raise_application_error(-20000, 'Неочікуване значення флагу збереження значень атрибуту на дату {' || p_attribute_row.value_by_date_flag || '}');
@@ -1175,7 +1218,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     end;
 */
     function create_attribute(
-        p_attribute_type_code      in varchar2,
+        p_attribute_type_id        in integer,
         p_attribute_code           in varchar2,
         p_attribute_name           in varchar2,
         p_object_type_id           in integer,
@@ -1193,7 +1236,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     begin
         insert into attribute_kind(id, attribute_type_id, attribute_code, state_id)
         values (s_attribute_kind.nextval,
-                object_utl.get_object_type_id(p_attribute_type_code),
+                p_attribute_type_id,
                 upper(p_attribute_code),
                 attribute_utl.ATTR_STATE_UNDER_CONSTRUCTION)
         returning id into l_attribute_id;
@@ -1207,7 +1250,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_VALUE_BY_DATE_FLAG, p_value_by_date_flag);
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_MULTI_VALUES_FLAG, p_multi_values_flag);
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_SAVE_HISTORY_FLAG, p_save_history_flag);
-        set_value(l_attribute_id, attribute_utl.ATTR_CODE_SET_VALUE_PROCEDURES, p_set_value_procedures);
+        set_value(l_attribute_id, attribute_utl.ATTR_CODE_SET_VALUE_PROCEDURES, tools.words_to_string(p_set_value_procedures, p_splitting_symbol => ';'));
 
         return l_attribute_id;
     end;
@@ -1219,10 +1262,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_value_type_id            in integer,
         p_value_table_owner        in varchar2 default null,
         p_value_table_name         in varchar2 default null,
+        p_attribute_column_name    in varchar2 default null,
         p_key_column_name          in varchar2 default null,
         p_value_column_name        in varchar2 default null,
         p_regular_expression       in varchar2 default null,
         p_list_type_code           in varchar2 default null,
+        p_value_by_date_flag       in char default 'N',
         p_multi_values_flag        in char default 'N',
         p_save_history_flag        in char default 'N',
         p_set_value_procedures     in string_list default null)
@@ -1239,6 +1284,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                             p_value_type_id,
                             p_value_table_owner,
                             p_value_table_name,
+                            p_attribute_column_name,
                             p_key_column_name,
                             p_value_column_name,
                             p_regular_expression,
@@ -1253,7 +1299,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                                            p_value_type_id,
                                            p_regular_expression,
                                            p_list_type_code,
-                                           'N',
+                                           p_value_by_date_flag,
                                            'N',
                                            p_multi_values_flag,
                                            p_save_history_flag,
@@ -1261,6 +1307,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_VALUE_TABLE_OWNER, p_value_table_owner);
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_VALUE_TABLE_NAME, p_value_table_name);
+        set_value(l_attribute_id, attribute_utl.ATTR_CODE_ATTR_COLUMN_NAME, p_attribute_column_name);
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_KEY_COLUMN_NAME, p_key_column_name);
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_VALUE_COLUMN_NAME, p_value_column_name);
 
@@ -1334,6 +1381,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_small_value_flag         in char default 'N',
         p_value_by_date_flag       in char default 'N',
         p_multi_values_flag        in char default 'N',
+        p_save_history_flag        in char default 'N',
         p_get_value_function       in varchar2 default null,
         p_set_value_procedures     in string_list default null)
     return integer
@@ -1362,7 +1410,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                                            p_value_by_date_flag,
                                            p_small_value_flag,
                                            p_multi_values_flag,
-                                           'N',
+                                           p_save_history_flag,
                                            p_set_value_procedures);
 
         set_value(l_attribute_id, attribute_utl.ATTR_CODE_SMALL_VALUE_FLAG, p_small_value_flag);
@@ -1374,9 +1422,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         return l_attribute_id;
     end;
 
-    procedure lock_attribute(
+    function lock_attribute(
         p_attribute_id in integer,
         p_raise_ndf in boolean default true)
+    return attribute_kind%rowtype
     is
         l_attribute_row attribute_kind%rowtype;
     begin
@@ -1384,19 +1433,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         into   l_attribute_row
         from   attribute_kind oak
         where  oak.id = p_attribute_id
-        for update wait 60;
+        for update;
 
+        return l_attribute_row;
     exception
         when no_data_found then
              if (p_raise_ndf) then
                  raise_application_error(-20000, 'Вид атрибуту з ідентифікатором {' || p_attribute_id || '} не знайдений');
-             else null;
+             else return null;
              end if;
     end;
 
-    procedure lock_attribute(
+    function lock_attribute(
         p_attribute_code in varchar2,
         p_raise_ndf in boolean default true)
+    return attribute_kind%rowtype
     is
         l_attribute_row attribute_kind%rowtype;
     begin
@@ -1406,11 +1457,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         where  oak.attribute_code = upper(p_attribute_code)
         for update wait 60;
 
+        return l_attribute_row;
     exception
         when no_data_found then
              if (p_raise_ndf) then
                  raise_application_error(-20000, 'Вид атрибуту з кодом {' || p_attribute_code || '} не знайдений');
-             else null;
+             else return null;
              end if;
     end;
 
@@ -1519,8 +1571,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         select *
         into   l_attribute_current_date_row
         from   attribute_current_date t
-        where  t.attribute_kind_id = p_attribute_id
-        for update wait 900;
+        where  t.attribute_id = p_attribute_id
+        for update;
 
         return l_attribute_current_date_row;
     exception
@@ -1537,12 +1589,51 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         select current_value_date
         into   l_attribute_current_date
         from   attribute_current_date t
-        where  t.attribute_kind_id = p_attribute_id;
+        where  t.attribute_id = p_attribute_id;
 
         return l_attribute_current_date;
     exception
         when no_data_found then
              return null;
+    end;
+
+    procedure start_attribute_current_date(
+        p_attribute_id in integer,
+        p_attribute_current_date in date)
+    is
+    begin
+        insert into attribute_current_date_track
+        values (p_attribute_id, p_attribute_current_date, sysdate, null, null, null);
+    end;
+
+    procedure finish_attribute_current_date(
+        p_attribute_id in integer,
+        p_attribute_current_date in date,
+        p_comment_text in varchar2,
+        p_auxiliary_info in clob)
+    is
+    begin
+        update attribute_current_date_track t
+        set    t.finish_time = sysdate,
+               t.comment_text = p_comment_text,
+               t.stack_trace = p_auxiliary_info
+        where  t.attribute_kind_id = p_attribute_id and
+               t.value_date = p_attribute_current_date;
+    end;
+
+    procedure set_attribute_current_date(
+        p_attribute_id in integer,
+        p_attribute_current_date in date)
+    is
+    begin
+        update attribute_current_date t
+        set    t.current_value_date = p_attribute_current_date
+        where  t.attribute_id = p_attribute_id;
+
+        if (sql%rowcount = 0) then
+            insert into attribute_current_date
+            values (p_attribute_id, p_attribute_current_date);
+        end if;
     end;
 
     procedure validate_attribute_domain(
@@ -1611,6 +1702,59 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         return ' update ' || l_table_name ||
                ' set ' || p_attribute_row.value_column_name || ' = :value' ||
                ' where ' || l_key_column_name || ' = :object_id';
+    end;
+
+    function get_all_values_statement(
+        p_attribute_row in attribute_kind%rowtype)
+    return varchar2
+    is
+        l_table_name varchar2(100 char);
+    begin
+        l_table_name := case when p_attribute_row.value_table_owner is null then null
+                             else p_attribute_row.value_table_owner || '.'
+                        end || p_attribute_row.value_table_name;
+
+        return ' select ' || p_attribute_row.value_column_name ||
+               ' from '   || l_table_name ||
+               ' where '  || p_attribute_row.attribute_column_name || ' = :attribute_id and ' ||
+                             p_attribute_row.key_column_name || ' = :object_id';
+    end;
+
+    function delete_all_values_statement(
+        p_attribute_row in attribute_kind%rowtype)
+    return varchar2
+    is
+        l_table_name varchar2(100 char);
+    begin
+        l_table_name := case when p_attribute_row.value_table_owner is null then null
+                             else p_attribute_row.value_table_owner || '.'
+                        end || p_attribute_row.value_table_name;
+
+        return ' delete ' || l_table_name ||
+               ' where '  || p_attribute_row.attribute_column_name || ' = :attribute_id and ' ||
+                             p_attribute_row.key_column_name || ' = :object_id';
+    end;
+
+    function insert_all_values_statement(
+        p_attribute_row in attribute_kind%rowtype,
+        p_log_errors in boolean default false)
+    return varchar2
+    is
+        l_table_name varchar2(100 char);
+    begin
+        l_table_name := case when p_attribute_row.value_table_owner is null then null
+                             else p_attribute_row.value_table_owner || '.'
+                        end || p_attribute_row.value_table_name;
+
+        return ' insert into ' || l_table_name ||
+               ' (' || p_attribute_row.key_column_name || ', ' ||
+                       p_attribute_row.attribute_column_name || ', ' ||
+                       p_attribute_row.value_column_name ||
+               ' )' ||
+               ' select :object_id, :attribute_id, column_value from table(:value)' ||
+               case when p_log_errors then ' log errors into err$_' || l_table_name || ' (to_char(sysdate, ''yyyy-mm-dd hh24:mi:ss'')) reject limit unlimited'
+                    else null
+               end;
     end;
 
     function get_domain_data_statement(
@@ -1714,22 +1858,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure check_for_value(
         p_attribute_row attribute_kind%rowtype,
         p_valid_value_types in number_list,
-        p_attribute_type_code in varchar2)
+        p_attribute_type_id in integer)
     is
     begin
-        if (not tools.equals(p_attribute_row.state_id, attribute_utl.ATTR_STATE_ACTIVE)) then
+/*        if (not tools.equals(p_attribute_row.state_id, attribute_utl.ATTR_STATE_ACTIVE)) then
             raise_application_error(-20000, 'Атрибут {' || p_attribute_row.attribute_name ||
                                             '} знаходиться в стані {' || list_utl.get_item_name(attribute_utl.LT_ATTRIBUTE_STATE, p_attribute_row.state_id) ||
                                             '} - виконувати дії зі значеннями атрибуту не можливо');
         end if;
-
+*/
         if (p_attribute_row.value_type_id not member of p_valid_value_types) then
             raise_application_error(-20000, 'Неочікуване звернення до функції: атрибут {' || p_attribute_row.attribute_name ||
                                             '} має тип значення {' || list_utl.get_item_name(attribute_utl.LT_ATTRIBUTE_VALUE_TYPE, p_attribute_row.value_type_id) ||
                                             '} і для його отримання слід використовувати іншу функцію');
         end if;
 
-        if (p_attribute_type_code not in (attribute_utl.ATTR_TYPE_FIXED, attribute_utl.ATTR_TYPE_DYNAMIC, attribute_utl.ATTR_TYPE_CALCULATED)) then
+        if (p_attribute_type_id not in (attribute_utl.ATTR_TYPE_FIXED, attribute_utl.ATTR_TYPE_DYNAMIC, attribute_utl.ATTR_TYPE_CALCULATED)) then
             raise_application_error(-20000, 'Неочікуваний тип {' || p_attribute_row.attribute_type_id || '} атрибуту {' || p_attribute_row.attribute_name || '}');
         end if;
     end;
@@ -1737,17 +1881,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure check_for_single_value(
         p_attribute_row attribute_kind%rowtype,
         p_valid_value_types in number_list,
-        p_attribute_type_code in varchar2)
+        p_attribute_type_id in integer)
     is
     begin
-        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_code);
+        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_id);
 
         if (p_attribute_row.multi_values_flag = 'Y') then
             raise_application_error(-20000, 'Атрибут {' || p_attribute_row.attribute_name || '} передбачає збереження множини значень - ' ||
                                             'для отримання результату, необхідно використовувати функцію, що повертає колекцію значень, а не одне значення');
         end if;
 
-        if (p_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED and p_attribute_row.get_value_function is null) then
+        if (p_attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED and p_attribute_row.get_value_function is null) then
             raise_application_error(-20000, 'Функція отримання значення розрахункового атрибуту {' || p_attribute_row.attribute_name || '} не вказана');
         end if;
     end;
@@ -1755,16 +1899,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure check_for_multi_values(
         p_attribute_row attribute_kind%rowtype,
         p_valid_value_types in number_list,
-        p_attribute_type_code in varchar2)
+        p_attribute_type_id in integer)
     is
     begin
-        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_code);
+        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_id);
 
         if (p_attribute_row.multi_values_flag <> 'Y') then
             raise_application_error(-20000, 'Атрибут {' || p_attribute_row.attribute_name || '} не передбачає збереження множинних значень');
         end if;
 
-        if (p_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED and p_attribute_row.get_value_function is null) then
+        if (p_attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED and p_attribute_row.get_value_function is null) then
             raise_application_error(-20000, 'Функція отримання списку значень розрахункового атрибуту {' || p_attribute_row.attribute_name || '} не вказана');
         end if;
     end;
@@ -1772,12 +1916,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure check_before_single_value(
         p_attribute_row in attribute_kind%rowtype,
         p_valid_value_types in number_list,
-        p_attribute_type_code in varchar2)
+        p_attribute_type_id in integer)
     is
     begin
-        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_code);
+        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_id);
 
-        if (p_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED and (p_attribute_row.set_value_procedures is null or p_attribute_row.set_value_procedures is empty)) then
+        if (p_attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED and p_attribute_row.set_value_procedures is null) then
             raise_application_error(-20000, 'Процедура встановлення значення розрахункового атрибуту {' || p_attribute_row.attribute_name || '} не вказана');
         end if;
 
@@ -1790,12 +1934,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure check_before_multi_values(
         p_attribute_row attribute_kind%rowtype,
         p_valid_value_types in number_list,
-        p_attribute_type_code varchar2)
+        p_attribute_type_id in integer)
     is
     begin
-        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_code);
+        check_for_value(p_attribute_row, p_valid_value_types, p_attribute_type_id);
 
-        if (p_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED and (p_attribute_row.set_value_procedures is null or p_attribute_row.set_value_procedures is empty)) then
+        if (p_attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED and p_attribute_row.set_value_procedures is null) then
             raise_application_error(-20000, 'Процедура встановлення значення розрахункового атрибуту {' || p_attribute_row.attribute_name || '} не вказана');
         end if;
 
@@ -2434,18 +2578,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_value number;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar2(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST), p_attribute_row.attribute_type_id);
 
-        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_value, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
                 begin
                     execute immediate get_fixed_attribute_statement(p_attribute_row)
@@ -2457,7 +2598,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             else
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).number_value;
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).number_value;
             else
@@ -2500,32 +2641,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_values number_list;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
         check_for_multi_values(p_attribute_row,
                                number_list(attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST),
-                               l_attribute_type_code);
+                               p_attribute_row.attribute_type_id);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
-            l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id); end;';
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
+            l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
-            using out l_values, p_object_id, p_attribute_row.id;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+            using out l_values, p_object_id, p_attribute_row.id, p_value_date;
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
-                begin
-                    execute immediate get_fixed_attribute_statement(p_attribute_row)
-                    into l_values using p_object_id;
-                exception
-                    when no_data_found then
-                         l_values := null;
-                end;
+                execute immediate get_all_values_statement(p_attribute_row)
+                bulk collect into l_values using p_attribute_row.id, p_object_id;
             else
                 l_values := get_number_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_values := get_number_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             else
@@ -2568,18 +2701,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_value varchar2(4000 byte);
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), p_attribute_row.attribute_type_id);
 
-        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
-            l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id); end;';
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
+            l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
-            using out l_value, p_object_id, p_attribute_row.id;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+            using out l_value, p_object_id, p_attribute_row.id, p_value_date;
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
                 begin
                     execute immediate get_fixed_attribute_statement(p_attribute_row)
@@ -2591,7 +2721,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             else
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).string_value;
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).string_value;
             else
@@ -2634,30 +2764,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_values string_list;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), p_attribute_row.attribute_type_id);
 
-        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_values, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
-                begin
-                    execute immediate get_fixed_attribute_statement(p_attribute_row)
-                    into l_values using p_object_id;
-                exception
-                    when no_data_found then
-                         l_values := null;
-                end;
+                execute immediate get_all_values_statement(p_attribute_row)
+                bulk collect into l_values using p_attribute_row.id, p_object_id;
             else
                 l_values := get_string_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_values := get_string_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             else
@@ -2700,18 +2822,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_value date;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     BEGIN
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), p_attribute_row.attribute_type_id);
 
-        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_value, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
                 begin
                     execute immediate get_fixed_attribute_statement(p_attribute_row)
@@ -2723,7 +2842,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             else
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).date_value;
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).date_value;
             else
@@ -2756,7 +2875,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
     begin
         return get_date_value(p_object_id, read_attribute(p_attribute_code), p_value_date);
-
     end;
 
     function get_date_values(
@@ -2767,30 +2885,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_values date_list;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), p_attribute_row.attribute_type_id);
 
-        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_values, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
-                begin
-                    execute immediate get_fixed_attribute_statement(p_attribute_row)
-                    into l_values using p_object_id;
-                exception
-                    when no_data_found then
-                         l_values := null;
-                end;
+                execute immediate get_all_values_statement(p_attribute_row)
+                bulk collect into l_values using p_attribute_row.id, p_object_id;
             else
                 l_values := get_date_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_values := get_date_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             else
@@ -2834,18 +2944,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_value blob;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), p_attribute_row.attribute_type_id);
 
-        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_value, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
                 begin
                     execute immediate get_fixed_attribute_statement(p_attribute_row)
@@ -2857,7 +2964,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             else
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).blob_value;
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).blob_value;
             else
@@ -2900,30 +3007,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_values blob_list;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), p_attribute_row.attribute_type_id);
 
-        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_values, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
-                begin
-                    execute immediate get_fixed_attribute_statement(p_attribute_row)
-                    into l_values using p_object_id;
-                exception
-                    when no_data_found then
-                         l_values := null;
-                end;
+                execute immediate get_all_values_statement(p_attribute_row)
+                bulk collect into l_values using p_attribute_row.id, p_object_id;
             else
                 l_values := get_blob_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_values := get_blob_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             else
@@ -2966,18 +3065,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_value clob;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), p_attribute_row.attribute_type_id);
 
-        check_for_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_value, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
                 begin
                     execute immediate get_fixed_attribute_statement(p_attribute_row)
@@ -2989,7 +3085,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             else
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).clob_value;
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_value := get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).clob_value;
             else
@@ -3032,30 +3128,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_values clob_list;
         l_statement varchar2(32767 byte);
-        l_attribute_type_code varchar(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), p_attribute_row.attribute_type_id);
 
-        check_for_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), l_attribute_type_code);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             l_statement := 'begin :result := ' || p_attribute_row.get_value_function || '(:object_id, :attribute_id, :p_value_date); end;';
 
             execute immediate l_statement
             using out l_values, p_object_id, p_attribute_row.id, p_value_date;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'N' or get_attribute_current_date(p_attribute_row.id) = trunc(p_value_date)) then
-                begin
-                    execute immediate get_fixed_attribute_statement(p_attribute_row)
-                    into l_values using p_object_id;
-                exception
-                    when no_data_found then
-                         l_values := null;
-                end;
+                execute immediate get_all_values_statement(p_attribute_row)
+                bulk collect into l_values using p_attribute_row.id, p_object_id;
             else
                 l_values := get_clob_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 l_values := get_clob_values_utl(get_attr_value_for_date(p_object_id, p_attribute_row.id, p_value_date).nested_table_id);
             else
@@ -3155,18 +3243,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             link_history_to_operation(l_history_id, p_operation_id);
         end if;
 */
-    end create_history_utl;
+    end;
 
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in number)
+        p_value in number,
+        p_suppress_message in boolean default false)
     is
     begin
         execute immediate set_fixed_attribute_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
+        if (sql%rowcount = 0 and not p_suppress_message) then
             raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
                                             '} з ідентифікатором {' || p_object_id || '} не знайдений');
         end if;
@@ -3175,13 +3264,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in varchar2)
+        p_value in varchar2,
+        p_suppress_message in boolean default false)
     is
     begin
         execute immediate set_fixed_attribute_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
+        if (sql%rowcount = 0 and not p_suppress_message) then
             raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
                                             '} з ідентифікатором {' || p_object_id || '} не знайдений');
         end if;
@@ -3190,13 +3280,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in date)
+        p_value in date,
+        p_suppress_message in boolean default false)
     is
     begin
         execute immediate set_fixed_attribute_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
+        if (sql%rowcount = 0 and not p_suppress_message) then
             raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
                                             '} з ідентифікатором {' || p_object_id || '} не знайдений');
         end if;
@@ -3205,13 +3296,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in blob)
+        p_value in blob,
+        p_suppress_message in boolean default false)
     is
     begin
         execute immediate set_fixed_attribute_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
+        if (sql%rowcount = 0 and not p_suppress_message) then
             raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
                                             '} з ідентифікатором {' || p_object_id || '} не знайдений');
         end if;
@@ -3220,13 +3312,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in clob)
+        p_value in clob,
+        p_suppress_message in boolean default false)
     is
     begin
         execute immediate set_fixed_attribute_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
+        if (sql%rowcount = 0 and not p_suppress_message) then
             raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
                                             '} з ідентифікатором {' || p_object_id || '} не знайдений');
         end if;
@@ -3235,76 +3328,71 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in number_list)
+        p_value in number_list,
+        p_log_errors in boolean default false)
     is
     begin
-        execute immediate set_fixed_attribute_statement(p_attribute_row)
-        using p_value, p_object_id;
+        execute immediate delete_all_values_statement(p_attribute_row)
+        using p_attribute_row.id, p_object_id;
 
-        if (sql%rowcount = 0) then
-            raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
-                                            '} з ідентифікатором {' || p_object_id || '} не знайдений');
-        end if;
+        execute immediate insert_all_values_statement(p_attribute_row, p_log_errors)
+        using p_object_id, p_attribute_row.id, p_value;
     end;
 
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in string_list)
+        p_value in string_list,
+        p_log_errors in boolean default false)
     is
     begin
-        execute immediate set_fixed_attribute_statement(p_attribute_row)
+        execute immediate delete_all_values_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
-            raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
-                                            '} з ідентифікатором {' || p_object_id || '} не знайдений');
-        end if;
+        execute immediate insert_all_values_statement(p_attribute_row, p_log_errors)
+        using p_object_id, p_attribute_row.id, p_value;
     end;
 
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in date_list)
+        p_value in date_list,
+        p_log_errors in boolean default false)
     is
     begin
-        execute immediate set_fixed_attribute_statement(p_attribute_row)
+        execute immediate delete_all_values_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
-            raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
-                                            '} з ідентифікатором {' || p_object_id || '} не знайдений');
-        end if;
+        execute immediate insert_all_values_statement(p_attribute_row, p_log_errors)
+        using p_object_id, p_attribute_row.id, p_value;
     end;
 
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in blob_list)
+        p_value in blob_list,
+        p_log_errors in boolean default false)
     is
     begin
-        execute immediate set_fixed_attribute_statement(p_attribute_row)
+        execute immediate delete_all_values_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
-            raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
-                                            '} з ідентифікатором {' || p_object_id || '} не знайдений');
-        end if;
+        execute immediate insert_all_values_statement(p_attribute_row, p_log_errors)
+        using p_object_id, p_attribute_row.id, p_value;
     end;
 
     procedure set_fixed_attribute_value(
         p_object_id in integer,
         p_attribute_row in attribute_kind%rowtype,
-        p_value in clob_list)
+        p_value in clob_list,
+        p_log_errors in boolean default false)
     is
     begin
-        execute immediate set_fixed_attribute_statement(p_attribute_row)
+        execute immediate delete_all_values_statement(p_attribute_row)
         using p_value, p_object_id;
 
-        if (sql%rowcount = 0) then
-            raise_application_error(-20000, 'Об''єкт типу {' || object_utl.get_object_type_name(p_attribute_row.object_type_id) ||
-                                            '} з ідентифікатором {' || p_object_id || '} не знайдений');
-        end if;
+        execute immediate insert_all_values_statement(p_attribute_row, p_log_errors)
+        using p_object_id, p_attribute_row.id, p_value;
     end;
 
     procedure clear_attribute_values_utl(
@@ -3521,7 +3609,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         -- визначаємо елементи, що потрапляють в період дії нового значення
         -- такі значення додаємо до масиву значень, що видаляються з історії оскільки нове значення перекриває собою періоди їх дії.
@@ -3648,7 +3736,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         d pls_integer;
     begin
         -- повторюємо для масиву чисел той самий процес, що й для скалярного значення типу number
-        -- з особливостями перетворень між anydata та number_list
         select t.value_date, t.nested_table_id,
                (select cast(collect(number_values) as number_list)
                 from   attribute_values v
@@ -3657,7 +3744,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_original_data.first;
         while (l is not null) loop
@@ -3775,7 +3862,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_date_values.first;
         while (l is not null) loop
@@ -3895,7 +3982,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_original_data.first;
         while (l is not null) loop
@@ -4012,7 +4099,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_date_values.first;
         while (l is not null) loop
@@ -4131,7 +4218,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_original_data.first;
         while (l is not null) loop
@@ -4248,7 +4335,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_date_values.first;
         while (l is not null) loop
@@ -4367,7 +4454,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_original_data.first;
         while (l is not null) loop
@@ -4484,7 +4571,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_date_values.first;
         while (l is not null) loop
@@ -4603,7 +4690,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         from   attribute_value_by_date t
         where  t.attribute_id = p_attribute_id and
                t.object_id = p_object_id
-        for update wait 60;
+        for update;
 
         l := l_original_data.first;
         while (l is not null) loop
@@ -4697,16 +4784,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_value, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4719,16 +4808,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_values, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4741,16 +4832,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_value, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4763,16 +4856,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_values, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4785,16 +4880,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_value, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4807,16 +4904,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_values, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4829,16 +4928,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_value, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4851,16 +4952,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_values, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4873,16 +4976,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_value, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4895,16 +5000,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date)
     is
         l integer;
+        l_set_value_procedures string_list;
     begin
-        if (p_attribute_row.set_value_procedures is not null and p_attribute_row.set_value_procedures is not empty) then
-            l := p_attribute_row.set_value_procedures.first;
+        if (p_attribute_row.set_value_procedures is not null) then
+            l_set_value_procedures := tools.string_to_words(p_attribute_row.set_value_procedures, ';');
+            l := l_set_value_procedures.first;
             while (l is not null) loop
                 execute immediate 'begin ' ||
-                                   p_attribute_row.set_value_procedures(l) ||
+                                   l_set_value_procedures(l) ||
                                    '(:p_object_id, :p_attribute_id, :p_new_value, :p_valid_from, :p_valid_through); end;'
                 using p_object_id, p_attribute_row.id, p_values, p_valid_from, p_valid_through;
 
-                l := p_attribute_row.set_value_procedures.next(l);
+                l := l_set_value_procedures.next(l);
             end loop;
         end if;
     end;
@@ -4917,16 +5024,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
-        check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
-
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
         check_before_single_value(p_attribute_row,
                                   number_list(attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST),
-                                  l_attribute_type_code);
+                                  p_attribute_row.attribute_type_id);
 
         check_list_attribute(p_attribute_row, p_value);
 
@@ -4934,48 +5036,39 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         call_set_value_handler(p_attribute_row, p_object_id, p_value, p_valid_from, p_valid_through);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_number_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_number_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
             else
                 set_attribute_value_utl(p_object_id, p_attribute_row.id, p_attribute_row.small_value_flag, p_number_value => p_value);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             -- для розрахункових атрибутів може лише викликатися процедура попередньої обробки з l_attribute_row.set_value_procedure
-            -- (якщо вона вказана), додаткових дій не проводиться і зміна значення такого атрибуту не фіксується в історії
+            -- (якщо вона вказана), додаткових дій не проводиться
             null;
+        end if;
+
+        if (p_attribute_row.save_history_flag = 'Y') then
+          create_history_utl(p_object_id,
+                             p_attribute_row.id,
+                             p_valid_from,
+                             p_valid_through,
+                             p_number_value => p_value,
+                             p_comment => p_comment);
         end if;
     end;
 
@@ -4987,17 +5080,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
         l_nested_table_id integer;
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
         check_before_multi_values(p_attribute_row,
                                   number_list(attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST),
-                                  l_attribute_type_code);
+                                  p_attribute_row.attribute_type_id);
 
         check_list_attribute(p_attribute_row, p_values);
 
@@ -5007,21 +5097,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         l_nested_table_id := create_nested_table_item(p_values);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
             else
@@ -5051,60 +5141,48 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
         check_regular_expression(p_attribute_row, p_value);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), l_attribute_type_code);
+        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_value);
 
         call_set_value_handler(p_attribute_row, p_object_id, p_value, p_valid_from, p_valid_through);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_string_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_string_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
             else
                 set_attribute_value_utl(p_object_id, p_attribute_row.id, p_attribute_row.small_value_flag, p_string_value => p_value);
             end if;
         end if;
+
+        if (p_attribute_row.save_history_flag = 'Y') then
+          create_history_utl(p_object_id,
+                             p_attribute_row.id,
+                             p_valid_from,
+                             p_valid_through,
+                             p_string_value => p_value,
+                             p_comment => p_comment);
+        end if;
     end;
 
     procedure set_value_utl(
@@ -5115,17 +5193,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
         l_nested_table_id integer;
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
         check_regular_expression(p_attribute_row, p_values);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), l_attribute_type_code);
+        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_STRING), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_values);
 
@@ -5133,21 +5208,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         l_nested_table_id := create_nested_table_item(p_values);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
             else
@@ -5177,58 +5252,46 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), l_attribute_type_code);
+        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_value);
 
         call_set_value_handler(p_attribute_row, p_object_id, p_value, p_valid_from, p_valid_through);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_date_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_date_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
             else
                 set_attribute_value_utl(p_object_id, p_attribute_row.id, p_attribute_row.small_value_flag, p_date_value => p_value);
             end if;
         end if;
+
+        if (p_attribute_row.save_history_flag = 'Y') then
+          create_history_utl(p_object_id,
+                             p_attribute_row.id,
+                             p_valid_from,
+                             p_valid_through,
+                             p_date_value => p_value,
+                             p_comment => p_comment);
+        end if;
     end;
 
     procedure set_value_utl(
@@ -5239,15 +5302,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
         l_nested_table_id integer;
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), l_attribute_type_code);
+        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_DATE), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_values);
 
@@ -5255,21 +5315,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         l_nested_table_id := create_nested_table_item(p_values);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
             else
@@ -5299,58 +5359,47 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), l_attribute_type_code);
+        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_value);
 
         call_set_value_handler(p_attribute_row, p_object_id, p_value, p_valid_from, p_valid_through);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_blob_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_blob_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
             else
                 set_attribute_value_utl(p_object_id, p_attribute_row.id, p_attribute_row.small_value_flag, p_blob_value => p_value);
             end if;
         end if;
+
+        if (p_attribute_row.save_history_flag = 'Y') then
+          create_history_utl(p_object_id,
+                             p_attribute_row.id,
+                             p_valid_from,
+                             p_valid_through,
+                             p_blob_value => p_value,
+                             p_comment => p_comment);
+        end if;
+
     end;
 
     procedure set_value_utl(
@@ -5361,15 +5410,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
         l_nested_table_id integer;
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), l_attribute_type_code);
+        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_BLOB), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_values);
 
@@ -5377,21 +5423,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         l_nested_table_id := create_nested_table_item(p_values);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
             else
@@ -5421,57 +5467,45 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), l_attribute_type_code);
+        check_before_single_value(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_value);
 
         call_set_value_handler(p_attribute_row, p_object_id, p_value, p_valid_from, p_valid_through);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_clob_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_value);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
-            if (p_attribute_row.save_history_flag = 'Y') then
-              create_history_utl(p_object_id,
-                                 p_attribute_row.id,
-                                 p_valid_from,
-                                 p_valid_through,
-                                 p_clob_value => p_value,
-                                 p_comment => p_comment);
-            end if;
-
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_value);
             else
                 set_attribute_value_utl(p_object_id, p_attribute_row.id, p_attribute_row.small_value_flag, p_clob_value => p_value);
             end if;
+        end if;
+
+        if (p_attribute_row.save_history_flag = 'Y') then
+          create_history_utl(p_object_id,
+                             p_attribute_row.id,
+                             p_valid_from,
+                             p_valid_through,
+                             p_clob_value => p_value,
+                             p_comment => p_comment);
         end if;
     end;
 
@@ -5483,15 +5517,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_valid_through in date,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
         l_nested_table_id integer;
-        l_attribute_current_date date;
+        -- l_attribute_current_date date;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), l_attribute_type_code);
+        check_before_multi_values(p_attribute_row, number_list(attribute_utl.VALUE_TYPE_CLOB), p_attribute_row.attribute_type_id);
 
         check_domain_attribute(p_attribute_row, p_values);
 
@@ -5499,21 +5530,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 
         l_nested_table_id := create_nested_table_item(p_values);
 
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
 
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
 
-                l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
-                if (tools.compare_range_borders(trunc(p_valid_from), l_attribute_current_date) <= 0 and
-                    tools.compare_range_borders(l_attribute_current_date, trunc(p_valid_through)) <= 0) then
+                -- l_attribute_current_date := get_attribute_current_date(p_attribute_row.id);
+                if (tools.compare_range_borders(p_valid_from, trunc(sysdate)/*l_attribute_current_date*/) <= 0 and
+                    tools.compare_range_borders(trunc(sysdate)/*l_attribute_current_date*/, p_valid_through) <= 0) then
 
                     set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
                 end if;
             else
                 set_fixed_attribute_value(p_object_id, p_attribute_row, p_values);
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             if (p_attribute_row.value_by_date_flag = 'Y') then
                 set_value_for_date_utl(p_object_id, p_attribute_row.id, p_valid_from, p_valid_through, p_values, l_nested_table_id);
             else
@@ -5786,8 +5817,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_value,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -5806,7 +5837,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_value,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -5821,8 +5852,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_values,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -5841,7 +5872,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_values,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -5856,8 +5887,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_value,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -5876,7 +5907,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_value,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -5891,8 +5922,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_values,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -5911,7 +5942,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_values,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -5926,8 +5957,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_value,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -5946,7 +5977,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_value,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -5961,8 +5992,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_values,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -5981,7 +6012,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_values,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -5996,8 +6027,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_value,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -6016,7 +6047,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_value,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -6031,8 +6062,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_values,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -6051,7 +6082,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_values,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -6066,8 +6097,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_value,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -6086,7 +6117,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_value,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -6101,8 +6132,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         set_value(p_object_id,
                   p_attribute_id,
                   p_values,
-                  p_value_date,
-                  get_attr_value_after_date(p_object_id, p_attribute_id, p_value_date).value_date - 1,
+                  trunc(p_value_date),
+                  get_attr_value_after_date(p_object_id, p_attribute_id, trunc(p_value_date)).value_date - 1,
                   p_comment);
     end;
 
@@ -6121,7 +6152,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                       l_attribute_row,
                       p_values,
                       trunc(p_value_date),
-                      get_attr_value_after_date(p_object_id, get_attribute_id(p_attribute_code), trunc(p_value_date)).value_date - 1,
+                      get_attr_value_after_date(p_object_id, l_attribute_row.id, trunc(p_value_date)).value_date - 1,
                       p_comment);
     end;
 
@@ -6342,12 +6373,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_clob_values in clob_list,
         p_comment in varchar2)
     is
-        l_attribute_type_code varchar(30 char);
+        p_attribute_row.attribute_type_id varchar(30 char);
         l_all_value_types number_list;
     begin
         check_validity_period(p_attribute_row, p_valid_from, p_valid_through);
 
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
+        p_attribute_row.attribute_type_id := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
 
         l_all_value_types := number_list(attribute_utl.VALUE_TYPE_NUMBER,
                                          attribute_utl.VALUE_TYPE_STRING,
@@ -6357,7 +6388,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                                          attribute_utl.VALUE_TYPE_LIST);
 
         if (p_attribute_row.multi_values_flag = 'Y') then
-            check_before_multi_values(p_attribute_row, l_all_value_types, l_attribute_type_code);
+            check_before_multi_values(p_attribute_row, l_all_value_types, p_attribute_row.attribute_type_id);
 
             if (p_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_NUMBER) then
                 check_domain_attribute(p_attribute_row, p_number_values);
@@ -6374,7 +6405,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                 check_domain_attribute(p_attribute_row, p_number_values);
             end if;
         else
-            check_before_single_value(p_attribute_row, l_all_value_types, l_attribute_type_code);
+            check_before_single_value(p_attribute_row, l_all_value_types, p_attribute_row.attribute_type_id);
 
             if (p_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_NUMBER) then
                 check_domain_attribute(p_attribute_row, p_number_value);
@@ -6741,7 +6772,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_history_row attribute_history%rowtype;
         l_attribute_row attribute_kind%rowtype;
-        l_attribute_type_code varchar2(30 char);
+        p_attribute_row.attribute_type_id varchar2(30 char);
         l_history_id_for_date integer;
         l_history_row_after_date attribute_history%rowtype;
         l_previous_history_row attribute_history%rowtype;
@@ -6784,9 +6815,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                                             '} - виконувати дії зі значеннями атрибуту не можливо');
         end if;
 
-        l_attribute_type_code := object_utl.get_object_type_code(l_attribute_row.attribute_type_id);
+        p_attribute_row.attribute_type_id := object_utl.get_object_type_code(l_attribute_row.attribute_type_id);
 
-        if (l_attribute_type_code in (attribute_utl.ATTR_TYPE_FIXED, attribute_utl.ATTR_TYPE_DYNAMIC)) then
+        if (p_attribute_row.attribute_type_id in (attribute_utl.ATTR_TYPE_FIXED, attribute_utl.ATTR_TYPE_DYNAMIC)) then
 
             if (l_attribute_row.del_value_procedures is not null and l_attribute_row.del_value_procedures is not empty) then
                 l := l_attribute_row.set_value_procedures.first;
@@ -6821,52 +6852,52 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
                               l_number_values := l_previous_history_row.number_values;
                               check_list_attribute(l_attribute_row, l_number_values);
                               check_domain_attribute(l_attribute_row, l_number_values);
-                              set_number_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_number_values);
+                              set_number_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_number_values);
                           else
                               l_number_value := l_previous_history_row.number_value;
                               check_list_attribute(l_attribute_row, l_number_value);
                               check_domain_attribute(l_attribute_row, l_number_value);
-                              set_number_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_number_value);
+                              set_number_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_number_value);
                           end if;
                      when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_STRING then
                           if (l_attribute_row.multi_values_flag = 'Y') then
                               l_string_values := l_previous_history_row.string_values;
                               check_domain_attribute(l_attribute_row, l_string_values);
-                              set_string_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_string_values);
+                              set_string_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_string_values);
                           else
                               l_string_value := l_previous_history_row.string_value;
                               check_domain_attribute(l_attribute_row, l_string_value);
-                              set_string_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_string_value);
+                              set_string_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_string_value);
                           end if;
                      when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_DATE then
                           if (l_attribute_row.multi_values_flag = 'Y') then
                               l_date_values := l_previous_history_row.date_values;
                               check_domain_attribute(l_attribute_row, l_date_values);
-                              set_date_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_date_values);
+                              set_date_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_date_values);
                           else
                               l_date_value := l_previous_history_row.date_value;
                               check_domain_attribute(l_attribute_row, l_date_value);
-                              set_date_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_date_value);
+                              set_date_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_date_value);
                           end if;
                      when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_BLOB then
                           if (l_attribute_row.multi_values_flag = 'Y') then
                               l_blob_values := l_previous_history_row.blob_values;
                               check_domain_attribute(l_attribute_row, l_blob_values);
-                              set_blob_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_blob_values);
+                              set_blob_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_blob_values);
                           else
                               l_blob_value := l_previous_history_row.blob_value;
                               check_domain_attribute(l_attribute_row, l_blob_value);
-                              set_blob_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_blob_value);
+                              set_blob_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_blob_value);
                           end if;
                      when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_CLOB then
                           if (l_attribute_row.multi_values_flag = 'Y') then
                               l_clob_values := l_previous_history_row.clob_values;
                               check_domain_attribute(l_attribute_row, l_clob_values);
-                              set_clob_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_clob_values);
+                              set_clob_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_clob_values);
                           else
                               l_clob_value := l_previous_history_row.clob_value;
                               check_domain_attribute(l_attribute_row, l_clob_value);
-                              set_clob_value_utl(l_history_row.object_id, l_attribute_row, l_attribute_type_code, l_clob_value);
+                              set_clob_value_utl(l_history_row.object_id, l_attribute_row, p_attribute_row.attribute_type_id, l_clob_value);
                           end if;
                      else
                           raise_application_error(-20000, 'Неочікуваний тип значення атрибуту {' || l_attribute_row.value_type_id || '}');
@@ -6874,7 +6905,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             end if;
 
             delete_history_record(p_history_id, p_comment);
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             raise_application_error(-20000, 'Розрахунковий атрибут {' || l_attribute_row.attribute_name ||
                                             '} не веде історію зміни значень, отже видалення історії також не допускається');
         end if;
@@ -6882,15 +6913,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
 */
     function check_if_data_exists(
         p_attribute_row in attribute_kind%rowtype,
-        p_attribute_type_code in varchar2,
         p_include_deleted_values in char)
     return char
     is
         l_values_exists_flag char(1 byte);
     begin
-        if (p_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             return object_utl.check_if_any_objects_exists(p_attribute_row.object_type_id);
-        elsif (p_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             begin
                 if (p_include_deleted_values = 'Y') then
                     select /*+FIRST_ROW*/ 'Y'
@@ -6911,7 +6941,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             end;
 
             return l_values_exists_flag;
-        elsif (p_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             return object_utl.check_if_any_objects_exists(p_attribute_row.object_type_id);
         end if;
     end;
@@ -6923,13 +6953,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     return char
     is
         l_value_exists_flag char(1 byte);
-        l_attribute_type_code varchar2(30 char);
     begin
-        l_attribute_type_code := object_utl.get_object_type_code(p_attribute_row.attribute_type_id);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             return object_utl.check_if_any_objects_exists(p_attribute_row.object_type_id);
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
             begin
                 if (p_include_deleted_values = 'Y') then
                     select /*+FIRST_ROW*/ 'Y'
@@ -6951,7 +6978,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             end;
 
             return l_value_exists_flag;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        elsif (p_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             return object_utl.check_if_any_objects_exists(p_attribute_row.object_type_id);
         end if;
     end;
@@ -6989,7 +7016,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         l_table_owner varchar2(30 char);
         l_table_name varchar2(30 char);
         l_actual_field_data_type varchar2(30);
-        l_attribute_type_code varchar2(30 char);
     begin
         if (p_new_value_type_id not in (attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_STRING, attribute_utl.VALUE_TYPE_DATE,
                                         attribute_utl.VALUE_TYPE_CLOB, attribute_utl.VALUE_TYPE_BLOB, attribute_utl.VALUE_TYPE_LIST)) then
@@ -7002,9 +7028,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             raise_application_error(-20000, 'Для зміни налаштувань атрибуту, його необхідно перевести в режим редагування');
         end if;
 
-        l_attribute_type_code := object_utl.get_object_type_code(l_attribute_row.attribute_type_id);
-
-        if (l_attribute_type_code = attribute_utl.ATTR_TYPE_FIXED) then
+        if (l_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED) then
             if (l_attribute_row.value_table_name is null) then
                 l_object_type_storage_row := object_utl.read_object_type_storage(l_attribute_row.object_type_id);
                 l_table_owner := l_object_type_storage_row.table_owner;
@@ -7017,16 +7041,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
             -- TODO: set_deferred
             --
             l_actual_field_data_type := ddl_utl.get_column_data_type(l_table_name, l_attribute_row.value_column_name, l_table_owner);
-            if (l_actual_field_data_type is null or l_actual_field_data_type not member of map_value_type_to_oracle_type(p_new_value_type_id, l_attribute_row.multi_values_flag)) then
+            if (l_actual_field_data_type is null or l_actual_field_data_type not member of map_value_type_to_oracle_type(p_new_value_type_id/*, l_attribute_row.multi_values_flag*/)) then
                 raise_application_error(-20000, 'Тип значення атрибуту {' || list_utl.get_item_code(attribute_utl.LT_ATTRIBUTE_VALUE_TYPE, p_new_value_type_id) ||
                                                 '} не відповідає типу поля, що зберігатиме значення {' || l_actual_field_data_type || '}');
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_DYNAMIC) then
-            if (check_if_data_exists(l_attribute_row, l_attribute_type_code, 'Y') = 'Y') then
+        elsif (l_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_DYNAMIC) then
+            if (check_if_data_exists(l_attribute_row, 'Y') = 'Y') then
                 raise_application_error(-20000, 'З атрибутом {' || l_attribute_row.attribute_name ||
                                                 '} вже розпочата робота - існують значення атрибуту або історія їх зміни. Змінити тип значення атрибуту неможливо');
             end if;
-        elsif (l_attribute_type_code = attribute_utl.ATTR_TYPE_CALCULATED) then
+        elsif (l_attribute_row.attribute_type_id = attribute_utl.ATTR_TYPE_CALCULATED) then
             -- шо б там не було - просто змінюємо тип значення атрибуту, оскільки для розрахункових атрибутів ми не можемо перевірити
             -- тип значення, що повертається функцією
             null;
@@ -7042,9 +7066,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         l_attribute_row := read_attribute(p_attribute_id);
 
         if (l_attribute_row.state_id <> attribute_utl.ATTR_STATE_UNDER_CONSTRUCTION) then
-            lock_attribute(p_attribute_id);
+            l_attribute_row := lock_attribute(p_attribute_id);
 
-            set_value(p_attribute_id, attribute_utl.ATTR_CODE_STATE, attribute_utl.ATTR_STATE_UNDER_CONSTRUCTION);
+            set_value(l_attribute_row.id, attribute_utl.ATTR_CODE_STATE, attribute_utl.ATTR_STATE_UNDER_CONSTRUCTION);
         end if;
     end;
 
@@ -7053,9 +7077,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_attribute_row attribute_kind%rowtype;
     begin
-        l_attribute_row := read_attribute(p_attribute_id);
-
-        lock_attribute(p_attribute_id);
+        l_attribute_row := lock_attribute(p_attribute_id);
 
         if (l_attribute_row.state_id <> attribute_utl.ATTR_STATE_ACTIVE) then
             validate_attribute(l_attribute_row);
@@ -7069,67 +7091,409 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
     is
         l_attribute_row attribute_kind%rowtype;
     begin
-        l_attribute_row := read_attribute(p_attribute_id);
-
-        lock_attribute(p_attribute_id);
+        l_attribute_row := lock_attribute(p_attribute_id);
 
         if (l_attribute_row.state_id <> attribute_utl.ATTR_STATE_CLOSED) then
             set_value(p_attribute_id, attribute_utl.ATTR_CODE_STATE, attribute_utl.ATTR_STATE_CLOSED);
         end if;
     end;
-/*
+
+    function pipe_values_for_date_range(
+        p_attribute_id in integer,
+        p_current_value_date in date,
+        p_expected_value_date in date)
+    return t_attribute_values
+    pipelined
+    is
+        l_attribute_row attribute_kind%rowtype;
+        l_attribute_value t_attribute_value;
+    begin
+        l_attribute_row := read_attribute(p_attribute_id);
+
+        for i in (select d.object_id,
+                         d.active_nested_table_id,
+                         case when l_attribute_row.value_type_id in (attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST) then
+                                   cast(collect(v.number_values) as number_list)
+                              else null
+                         end number_values,
+                         case when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_STRING then
+                                   cast(collect(v.string_values) as string_list)
+                              else null
+                         end string_values,
+                         case when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_DATE then
+                                   cast(collect(v.date_values) as date_list)
+                              else null
+                         end date_values
+                  from  (select t.object_id,
+                                max(t.value_date) value_date,
+                                min(t.nested_table_id) keep (dense_rank last order by t.value_date nulls first) active_nested_table_id
+                         from   attribute_value_by_date t
+                         where  t.attribute_id = l_attribute_row.id and
+                                (p_current_value_date is null or p_current_value_date < t.value_date) and
+                                (t.value_date is null or t.value_date <= p_expected_value_date)
+                         group by t.object_id) d
+                  join  attribute_values v on v.nested_table_id = d.active_nested_table_id
+                  group by d.object_id, d.active_nested_table_id) loop
+
+            -- LOB-об'єкти не можна збирати в колекції на рівні SQL і використовувати в агрегатних функціях - для них потрібна окрема обробка
+            if (l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_CLOB) then
+                l_attribute_value := t_attribute_value(l_attribute_row.id,
+                                                       i.object_id,
+                                                       null, null, null, null, null,
+                                                       null, null, null, null, null);
+
+                select v.clob_values
+                bulk collect into l_attribute_value.clob_values
+                from   attribute_values v
+                where  v.nested_table_id = i.active_nested_table_id;
+            elsif (l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_BLOB) then
+                l_attribute_value := t_attribute_value(l_attribute_row.id,
+                                                       i.object_id,
+                                                       null, null, null, null, null,
+                                                       null, null, null, null, null);
+
+                select v.blob_values
+                bulk collect into l_attribute_value.blob_values
+                from   attribute_values v
+                where  v.nested_table_id = i.active_nested_table_id;
+            else
+                l_attribute_value := t_attribute_value(l_attribute_row.id,
+                                                       i.object_id,
+                                                       null, null, null, null, null,
+                                                       i.number_values,
+                                                       i.string_values,
+                                                       i.date_values,
+                                                       null,
+                                                       null);
+            end if;
+
+            pipe row(l_attribute_value);
+        end loop;
+    end;
+
+    function pipe_value_for_date_range(
+        p_attribute_id in integer,
+        p_current_value_date in date,
+        p_expected_value_date in date)
+    return t_attribute_values
+    pipelined
+    is
+        l_attribute_row attribute_kind%rowtype;
+        l_attribute_value t_attribute_value;
+    begin
+        l_attribute_row := read_attribute(p_attribute_id);
+
+        for i in (select t.object_id,
+                         max(t.value_date) value_date,
+                         case when l_attribute_row.value_type_id in (attribute_utl.VALUE_TYPE_NUMBER, attribute_utl.VALUE_TYPE_LIST) then
+                                   min(t.number_value) keep (dense_rank last order by t.value_date nulls first)
+                              else null
+                         end number_value,
+                         case when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_STRING then
+                                   min(t.string_value) keep (dense_rank last order by t.value_date nulls first)
+                              else null
+                         end string_value,
+                         case when l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_DATE then
+                                   min(t.date_value) keep (dense_rank last order by t.value_date nulls first)
+                              else null
+                         end date_value
+                  from   attribute_value_by_date t
+                  where  t.attribute_id = l_attribute_row.id and
+                         (p_current_value_date is null or p_current_value_date < t.value_date) and
+                         (t.value_date is null or t.value_date <= p_expected_value_date)
+                  group by t.object_id) loop
+
+            -- LOB-об'єкти не можна збирати в колекції на рівні SQL і використовувати в агрегатних функціях - для них потрібна окрема обробка
+            if (l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_CLOB) then
+                l_attribute_value := t_attribute_value(l_attribute_row.id,
+                                                       i.object_id,
+                                                       null, null, null, null, null,
+                                                       null, null, null, null, null);
+
+                select v.clob_value
+                into l_attribute_value.clob_value
+                from   attribute_value_by_date v
+                where  v.attribute_id = l_attribute_row.id and
+                       v.object_id = i.object_id and
+                       v.value_date = i.value_date;
+
+            elsif (l_attribute_row.value_type_id = attribute_utl.VALUE_TYPE_BLOB) then
+                l_attribute_value := t_attribute_value(l_attribute_row.id,
+                                                       i.object_id,
+                                                       null, null, null, null, null,
+                                                       null, null, null, null, null);
+
+                select v.clob_value
+                into l_attribute_value.clob_value
+                from   attribute_value_by_date v
+                where  v.attribute_id = l_attribute_row.id and
+                       v.object_id = i.object_id and
+                       v.value_date = i.value_date;
+            else
+                l_attribute_value := t_attribute_value(l_attribute_row.id,
+                                                       i.object_id,
+                                                       i.number_value,
+                                                       i.string_value,
+                                                       i.date_value,
+                                                       null, null, null, null,
+                                                       null, null, null);
+            end if;
+
+            pipe row(l_attribute_value);
+        end loop;
+    end;
+
     procedure set_current_values(
-        p_attribute_id in integer)
+        p_attribute_id in integer,
+        p_current_value_date in date,
+        p_expected_value_date in date)
     is
         pragma autonomous_transaction;
         l_attribute_row attribute_kind%rowtype;
         l_attribute_current_date_row attribute_current_date%rowtype;
-        l_objects number_list;
+        l_attribute_values t_attribute_values;
+        l_value_column_name varchar2(30 char);
+        l_locked_objects number_list;
         l_statement varchar2(32767 byte);
-        l_object_type_storage_row object_type_storage%rowtype;
-        l_table_name
+        l_start integer;
+        l_errlog_clause varchar2(32767 byte);
     begin
         l_attribute_row := lock_attribute(p_attribute_id);
         l_attribute_current_date_row := lock_attr_current_date(p_attribute_id);
 
-        l_objects := object_utl.lock_objects(l_attribute_row.object_type_id);
+        start_attribute_current_date(p_attribute_id, p_expected_value_date);
 
-        l_object_type_storage_row := object_utl.read_object_type_storage(l_attribute_row.object_type_id);
+        if (ddl_utl.check_if_table_exists('err$_' || l_attribute_row.value_table_name, l_attribute_row.value_table_owner) = 'Y') then
+            l_errlog_clause := ' log errors into ' || case when l_attribute_row.value_table_owner is null then null
+                                                           else l_attribute_row.value_table_owner || '.'
+                                                      end || 'err$_' || l_attribute_row.value_table_name ||
+                               ' (to_char(sysdate, ''yyyy-mm-dd hh24:mi:ss'')) reject limit unlimited';
+        end if;
 
-        l_statement := ' update ' || case when l_object_type_storage_row.table_owner is null then null
-                                          else l_object_type_storage_row.table_owner || '.' ||
-                                     end ||
-                                     l_object_type_storage_row.table_name ||
-                       ' set ' || l_attribute_row.value_column_name
+        if (l_attribute_row.multi_values_flag = 'Y') then
+
+            -- Hope that by collecting of all this data into one variable we will not exceed the limits of PGA.
+            -- In case of memory overflow we should divide our data set into portions with "bulk collect into ... limit N"
+            -- and perform partial updates for every portion. In case of partial processing we are unable to lock in advance all data rows that we need
+            -- and have to commit after every portion in order to avoid deadlocks with another sessions that also may have
+            -- an interest in objects that we've just updated
+            select value(t)
+            bulk collect into l_attribute_values
+            from   table(pipe_values_for_date_range(l_attribute_row.id, p_current_value_date, p_expected_value_date)) t;
+
+            if (l_attribute_values is not null and l_attribute_values is not empty) then
+                dbms_output.put_line('objects count : ' || l_attribute_values.count);
+
+                l_statement := ' select ' || l_attribute_row.key_column_name ||
+                               ' from   ' || case when l_attribute_row.value_table_owner is null then null
+                                                  else l_attribute_row.value_table_owner || '.'
+                                             end || l_attribute_row.value_table_name ||
+                               ' where  ' || l_attribute_row.attribute_column_name || ' = :attribute_id and' ||
+                               '        ' || l_attribute_row.key_column_name || ' in (select object_id from table(:attribute_values))' ||
+                               ' for update';
+
+                dbms_output.put_line(l_statement);
+                l_start := dbms_utility.get_time();
+
+                execute immediate l_statement
+                bulk collect into l_locked_objects
+                using l_attribute_row.id, l_attribute_values;
+
+                dbms_output.put_line('rows count   : ' || sql%rowcount || tools.crlf ||
+                                     'elapsed time : ' || (dbms_utility.get_time() - l_start) / 100);
+
+                l_statement := ' delete ' || case when l_attribute_row.value_table_owner is null then null
+                                                  else l_attribute_row.value_table_owner || '.'
+                                             end || l_attribute_row.value_table_name ||
+                               ' where  ' || l_attribute_row.attribute_column_name || ' = :attribute_id and' ||
+                               '        ' || l_attribute_row.key_column_name || ' in (select object_id from table(:attribute_values))';
+
+                dbms_output.put_line(l_statement);
+                l_start := dbms_utility.get_time();
+
+                execute immediate l_statement
+                using l_attribute_row.id, l_attribute_values;
+
+                dbms_output.put_line('rows count   : ' || sql%rowcount || tools.crlf ||
+                                     'elapsed time : ' || (dbms_utility.get_time() - l_start) / 100);
+
+                case (l_attribute_row.value_type_id)
+                when attribute_utl.VALUE_TYPE_NUMBER then
+                     l_value_column_name := 'number_values';
+                when attribute_utl.VALUE_TYPE_STRING then
+                     l_value_column_name := 'string_values';
+                when attribute_utl.VALUE_TYPE_DATE then
+                     l_value_column_name := 'date_values';
+                when attribute_utl.VALUE_TYPE_CLOB then
+                     l_value_column_name := 'clob_values';
+                when attribute_utl.VALUE_TYPE_BLOB then
+                     l_value_column_name := 'blob_values';
+                when attribute_utl.VALUE_TYPE_LIST then
+                     l_value_column_name := 'number_values';
+                else
+                    raise_application_error(-20000, 'Обробка значень атрибуту з типом {' || l_attribute_row.value_type_id || '} не передбачена');
+                end case;
+
+                l_statement := ' insert into ' || case when l_attribute_row.value_table_owner is null then null
+                                                       else l_attribute_row.value_table_owner || '.'
+                                                  end || l_attribute_row.value_table_name ||
+                               ' (' ||
+                                       l_attribute_row.key_column_name || ', ' ||
+                                       l_attribute_row.attribute_column_name || ', ' ||
+                                       l_attribute_row.value_column_name ||
+                               ' )' ||
+                               ' select a.object_id, a.attribute_id, v.column_value' ||
+                               ' from   table(:attribute_values) a' ||
+                               ' cross join table(a.' || l_value_column_name || ') v' ||
+                               l_errlog_clause;
+
+                dbms_output.put_line(l_statement);
+                l_start := dbms_utility.get_time();
+
+                execute immediate l_statement
+                using l_attribute_values;
+
+                dbms_output.put_line('rows count   : ' || sql%rowcount || tools.crlf ||
+                                     'elapsed time : ' || (dbms_utility.get_time() - l_start) / 100);
+            end if;
+/*
+            l_start := dbms_utility.get_time();
+            dbms_output.put_line('loop processing mode');
+            for i in (select * from table(pipe_values_for_date_range(l_attribute_row.id, p_current_value_date, p_expected_value_date))) loop
+                -- TODO : Lock objects before update
+                case (l_attribute_row.value_type_id)
+                when attribute_utl.VALUE_TYPE_NUMBER then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.number_values, true);
+                when attribute_utl.VALUE_TYPE_STRING then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.string_values, true);
+                when attribute_utl.VALUE_TYPE_DATE then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.date_values, true);
+                when attribute_utl.VALUE_TYPE_CLOB then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.clob_values, true);
+                when attribute_utl.VALUE_TYPE_BLOB then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.blob_values, true);
+                else
+                    raise_application_error(-20000, 'Обробка значеннь атрибуту з типом {' || l_attribute_row.value_type_id || '} не передбачена');
+                end case;
+            end loop;
+
+            dbms_output.put_line('elapsed time : ' || (dbms_utility.get_time() - l_start) / 100);
+*/
+        else
+            select value(t)
+            bulk collect into l_attribute_values
+            from   table(pipe_value_for_date_range(l_attribute_row.id, p_current_value_date, p_expected_value_date)) t;
+
+            dbms_output.put_line('objects count : ' || l_attribute_values.count);
+
+            l_statement := ' select ' || l_attribute_row.key_column_name ||
+                           ' from   ' || case when l_attribute_row.value_table_owner is null then null
+                                              else l_attribute_row.value_table_owner || '.'
+                                         end || l_attribute_row.value_table_name ||
+                           ' where  ' || l_attribute_row.key_column_name || ' in (select object_id from table(:attribute_values))' ||
+                           ' for update';
+
+            dbms_output.put_line(l_statement);
+            l_start := dbms_utility.get_time();
+
+            execute immediate l_statement
+            bulk collect into l_locked_objects
+            using l_attribute_values;
+
+            dbms_output.put_line('rows count   : ' || sql%rowcount || tools.crlf ||
+                                 'elapsed time : ' || (dbms_utility.get_time() - l_start) / 100);
+
+            case (l_attribute_row.value_type_id)
+            when attribute_utl.VALUE_TYPE_NUMBER then
+                 l_value_column_name := 'number_value';
+            when attribute_utl.VALUE_TYPE_STRING then
+                 l_value_column_name := 'string_value';
+            when attribute_utl.VALUE_TYPE_DATE then
+                 l_value_column_name := 'date_value';
+            when attribute_utl.VALUE_TYPE_CLOB then
+                 l_value_column_name := 'clob_value';
+            when attribute_utl.VALUE_TYPE_BLOB then
+                 l_value_column_name := 'blob_value';
+            when attribute_utl.VALUE_TYPE_LIST then
+                 l_value_column_name := 'number_value';
+            else
+                raise_application_error(-20000, 'Обробка значень атрибуту з типом {' || l_attribute_row.value_type_id || '} не передбачена');
+            end case;
+
+            l_statement := ' merge into ' || case when l_attribute_row.value_table_owner is null then null
+                                                  else l_attribute_row.value_table_owner || '.'
+                                             end || l_attribute_row.value_table_name || ' a ' ||
+                           ' using (select a.object_id, a.attribute_id, a.' || l_value_column_name || ' value from table(:attribute_values) a) s' ||
+                           ' on (a.' || l_attribute_row.key_column_name || ' = s.object_id)' ||
+                           ' when matched then update' ||
+                                ' set ' || l_attribute_row.value_column_name || ' = s.value' ||
+                           l_errlog_clause;
+
+            dbms_output.put_line(l_statement);
+            l_start := dbms_utility.get_time();
+
+            execute immediate l_statement
+            using l_attribute_values;
+
+            dbms_output.put_line('rows count   : ' || sql%rowcount || tools.crlf ||
+                                 'elapsed time : ' || (dbms_utility.get_time() - l_start) / 100);
+/*
+            l_start := dbms_utility.get_time();
+            dbms_output.put_line('loop processing mode');
+            for i in (select * from table(pipe_value_for_date_range(l_attribute_row.id, p_current_value_date, p_expected_value_date))) loop
+                -- TODO : Lock objects before update
+                case (l_attribute_row.value_type_id)
+                when attribute_utl.VALUE_TYPE_NUMBER then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.number_value, true);
+                when attribute_utl.VALUE_TYPE_STRING then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.string_value, true);
+                when attribute_utl.VALUE_TYPE_DATE then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.date_value, true);
+                when attribute_utl.VALUE_TYPE_CLOB then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.clob_value, true);
+                when attribute_utl.VALUE_TYPE_BLOB then
+                    set_fixed_attribute_value(i.object_id, l_attribute_row, i.blob_value, true);
+                else
+                    raise_application_error(-20000, 'Обробка значеннь атрибуту з типом {' || l_attribute_row.value_type_id || '} не передбачена');
+                end case;
+            end loop;
+
+            dbms_output.put_line('elapsed time : ' || (dbms_utility.get_time() - l_start) / 100);
+*/
+        end if;
+
+        finish_attribute_current_date(p_attribute_id, p_expected_value_date, null, null);
+        set_attribute_current_date(p_attribute_id, p_expected_value_date);
+
         commit;
+    exception
+        when others then
+             rollback;
+             dbms_output.put_line(sqlerrm || tools.crlf || dbms_utility.format_error_backtrace());
+             bars_audit.log_error('attribute_utl.set_current_values',
+                                  'attribute_id : ' || p_attribute_id || tools.crlf ||
+                                  sqlerrm || tools.crlf || dbms_utility.format_error_backtrace());
+
+             start_attribute_current_date(p_attribute_id, p_expected_value_date);
+             finish_attribute_current_date(p_attribute_id, p_expected_value_date, sqlerrm || tools.crlf || dbms_utility.format_error_backtrace(), null);
+
+             commit;
     end;
 
     procedure set_current_values
     is
+        l_expected_date date := trunc(sysdate);
     begin
-        for i in (select k.id
+        for i in (select k.id, d.current_value_date
                   from   attribute_kind k
-                  join   object_type o on o.id = k.attribute_type_id
-                  where  o.type_code = attribute_utl.ATTR_TYPE_FIXED and
-                         k.value_by_date_flag = 'Y' and
-                         exists (select 1
-                                 from   attribute_current_date d
-                                 where  d.attribute_id = k.id and
-                                        d.current_value_date <> trunc(sysdate))) loop
-            set_current_values(i.id);
+                  left join attribute_current_date d on d.attribute_id = k.id
+                  where  k.attribute_type_id = attribute_utl.ATTR_TYPE_FIXED and
+                         k.value_by_date_flag = 'Y') loop
+            if (not tools.equals(i.current_value_date, l_expected_date)) then
+                set_current_values(i.id, i.current_value_date, l_expected_date);
+            end if;
         end loop;
     end;
-*/
+
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  ATTRIBUTE_UTL ***
-grant EXECUTE                                                                on ATTRIBUTE_UTL   to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/attribute_utl.sql =========*** End *
- PROMPT ===================================================================================== 
- 

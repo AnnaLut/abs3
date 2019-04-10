@@ -18,7 +18,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
             // TODO: Add constructor logic here
             //
         }
-
+        /// <summary>
+        /// билдятся парметры, которые будут передаваться таблицам - наследникам, 
+        /// от таблиц - родителей(при проваливании и т.д.)
+        /// </summary>
+        /// <param name="baseNsiParams">параметры таблицы - родителя</param>
+        /// <param name="nsiParams">параметры таблицы - наследника</param>
         public static void BuildFromBaseOptions(FunNSIEditFParams baseNsiParams, FunNSIEditFParams nsiParams)
         {
             if (baseNsiParams.BaseOptionsNames == null || baseNsiParams.BaseOptionsNames.Count < 1)

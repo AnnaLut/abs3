@@ -17,6 +17,6 @@ namespace Bars.CommonModels
 
         public string ParameterName { get; set; }
         public string ParameterVlue { get; set; }
-        public string Discription { get; set; }
+        public string Description { get; set; }
     }
 }

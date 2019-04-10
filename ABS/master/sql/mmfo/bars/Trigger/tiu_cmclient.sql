@@ -8,6 +8,7 @@
 instead of update ON BARS.CM_CLIENT for each row
 declare 
 l_add integer;
+l_check integer;
 begin
    if :new.oper_status not in (2,3,10) then
       raise_application_error (-20000, 'Недопустимый статус операции ' || :new.oper_status);
@@ -37,7 +38,7 @@ begin
    -------------------
       delete from cm_client_que where id = :new.id;
    end if;
-  end if;
+ end if;
 end;
 
 /

@@ -13,17 +13,18 @@
     var isEmptyEny = function (s1, s2) {
         return (isEmpty(s1) && !isEmpty(s2)) || (isEmpty(s2) && !isEmpty(s1));
     };
+    $rootScope.IsGKD = function () { return $rootScope.credit.viddValue !== null && $rootScope.credit.viddValue.Key == 5; };
 
     $rootScope.isNumValueValid = function() { return !isEmpty($rootScope.credit.numValue); };
     $rootScope.isSumValueValid = function() { return !isEmpty($rootScope.credit.sumValue); };
     $rootScope.isCustValueValid = function() { return !isEmpty($rootScope.credit.custValue); };
     $rootScope.isBranchValueValid = function() { return !isEmpty($rootScope.credit.branchValue); };
-    $rootScope.isFirtsPayDateValueValid = function() { return !isEmpty($rootScope.credit.firstPayDateValue); };
-    $rootScope.isDayOfPayValueValid = function() { return !isEmpty($rootScope.credit.dayOfPayValue); };
-    $rootScope.isDdlViddValueValid = function() { return !isEmpty($rootScope.credit.viddValue); };
-    $rootScope.isProdValueValid = function() { return !isEmpty($rootScope.credit.prodValue); };
+    $rootScope.isFirtsPayDateValueValid = function () { return !isEmpty($rootScope.credit.firstPayDateValue) || $rootScope.IsGKD(); };
+    $rootScope.isDayOfPayValueValid = function () { return !isEmpty($rootScope.credit.dayOfPayValue) || $rootScope.IsGKD(); };
+    $rootScope.isDdlViddValueValid = function () { return !isEmpty($rootScope.credit.viddValue) || $rootScope.IsGKD(); };
+    $rootScope.isProdValueValid = function () { return !isEmpty($rootScope.credit.prodValue) || $rootScope.IsGKD(); };
     $rootScope.isBaseRateValueValueValid = function() {
-        var isRateAValue = !isEmpty($rootScope.credit.rateAValue);
+        var isRateAValue = !isEmpty($rootScope.credit.rateAValue) || $rootScope.IsGKD();
         if(!isRateAValue){
             var prodValue = $rootScope.credit.prodValue;
             var isProdValueValid = false;
@@ -51,24 +52,25 @@
         var conslDate = kendo.parseDate($rootScope.credit.conslValue);
         if(conslDate == null){ $scope.DatesValidMsg = "Дата заключення некоректна"; return false;}
         var issueDate = kendo.parseDate($rootScope.credit.issueValue);
-        if(issueDate == null){ $scope.DatesValidMsg = "Дата видачі некоректна"; return false;}
+        if (issueDate == null && !$rootScope.IsGKD()) { $scope.DatesValidMsg = "Дата видачі некоректна"; return false; }
         var endDate = kendo.parseDate($rootScope.credit.endValue);
         if(endDate == null){ $scope.DatesValidMsg = "Дата завершення некоректна"; return false;}
         var startDate = kendo.parseDate($rootScope.credit.startValue);
-        if(startDate == null){ $scope.DatesValidMsg = "Дата початку некоректна"; return false;}
+        if (startDate == null && !$rootScope.IsGKD()) { $scope.DatesValidMsg = "Дата початку некоректна"; return false; }
         var dateFirst = kendo.parseDate($scope.credit.firstPayDateValue);
-        if(dateFirst == null){ return false;}
-        if(startDate < conslDate) { $scope.DatesValidMsg = "Дата заключення більша за дату початку"; return false; }
-        if(startDate > endDate){ $scope.DatesValidMsg = "Дата початку більша за дату завершення"; return false;}
-        if(issueDate > dateFirst){ $scope.DatesValidMsg = "Дата видачі більша за першу платіжну дату"; return false;}
-        if(dateFirst > endDate){ $scope.DatesValidMsg = "Перша платіжна дата більша за дату завершення"; return false;}
-        if((issueDate < startDate) || (issueDate > endDate)){
-            $scope.DatesValidMsg = "Дата видачі меньша за дату початку, або більша за дату завершення";
-            return false;
-        }
-
-        if(conslDate > endDate || conslDate > issueDate || conslDate > dateFirst){
-            $scope.DatesValidMsg = "Дата заключення некоректна"; return false;
+        if (dateFirst == null && !$rootScope.IsGKD()) { return false; }
+        if (!$rootScope.IsGKD()) {
+            if (startDate < conslDate) { $scope.DatesValidMsg = "Дата заключення більша за дату початку"; return false; }
+            if (startDate > endDate) { $scope.DatesValidMsg = "Дата початку більша за дату завершення"; return false; }
+            if (issueDate > dateFirst) { $scope.DatesValidMsg = "Дата видачі більша за першу платіжну дату"; return false; }
+            if (dateFirst > endDate) { $scope.DatesValidMsg = "Перша платіжна дата більша за дату завершення"; return false; }
+            if ((issueDate < startDate) || (issueDate > endDate)) {
+                $scope.DatesValidMsg = "Дата видачі меньша за дату початку, або більша за дату завершення";
+                return false;
+            }
+            if (conslDate > endDate || conslDate > issueDate || conslDate > dateFirst) {
+                $scope.DatesValidMsg = "Дата заключення некоректна"; return false;
+            }
         }
 
         var firstPayDiffValue = kendo.parseDate($rootScope.credit.firstPayDiffValue);
@@ -97,6 +99,40 @@
         return true;
     };
 
+    $rootScope.isGKDInfoValid = function () {
+        if (!$rootScope.isDdlViddValueValid())
+            return false;
+
+        var isKD_UO_notGKD = [1, 2, 3].indexOf($rootScope.credit.viddValue.Key) !== -1;
+        if ($scope.isSave ||
+                (!$scope.isSave &&
+                    (!isKD_UO_notGKD || (isKD_UO_notGKD && $rootScope.credit.belongtoGKD.id === "0"))
+                )
+            )
+            return true;
+
+        if ($rootScope.credit.belongtoGKD.id === "") {
+            $scope.DatesValidMsg = "Поле 'Приналежність до ГКД' обов'язкове!";
+            return false;
+        }
+
+        if ($rootScope.credit.belongtoGKD.id == 1 && $rootScope.credit.gkd_id === null) {
+            $scope.DatesValidMsg = "Введіть номер Ген договору!";
+            return false;
+        }
+        
+        if (kendo.parseDate($rootScope.credit.endValue) > kendo.parseDate($rootScope.GKD.wdate, 'dd/MM/yyyy')) {
+            $scope.DatesValidMsg = "Дата завершення КД більша за дату завершення ГКД";
+            return false;
+        }
+        if ($rootScope.credit.sumValue > kendo.parseFloat($rootScope.GKD.limit)) {
+            $scope.DatesValidMsg = "Сума КД більша за поточний ліміт ГКД";
+            return false;
+        }
+         return true;
+
+    };
+
     $rootScope.isNlsValid = function () {
         if (!isEmpty($rootScope.credit.nlsValue) && !isEmpty($rootScope.credit.mfoValue)){
             return bars.utils.vkrz($rootScope.credit.mfoValue.toString(), $rootScope.credit.nlsValue.toString()) == $rootScope.credit.nlsValue.toString();
@@ -121,6 +157,8 @@
     $rootScope.credit = dataService.clearCredit();
 
     $rootScope.CUST_INFO = dataService.CUST_INFO();
+
+    $rootScope.GKD = dataService.GKD();
 
     $rootScope.update = function (mode) {
         var url = "";
@@ -152,18 +190,22 @@
                     $rootScope.ShowCustInfo = true;
                 }
 
-                url = '/creditui/newcredit/getMultiExtInt/?nd=' + $rootScope.nd;
-                $http.get(bars.config.urlContent(url)).then(function (request) {
-                    var res = request.data;
-                    var multiExt = ['B', 'C', 'D', 'E'];
-                    for(var i = 0; i < multiExt.length; i++){
-                        if(res[i]){
-                            save['curr' + multiExt[i] + 'Value'] = res[i].KV;
-                            save['rate' + multiExt[i] + 'Value'] = res[i].PROC;
-                        }
+                var res = request.data.MultiExt;
+                var multiExt = ['B', 'C', 'D', 'E'];
+                for(var i = 0; i < multiExt.length; i++){
+                    if(res[i]){
+                        save['curr' + multiExt[i] + 'Value'] = res[i].KV;
+                        save['rate' + multiExt[i] + 'Value'] = res[i].PROC;
                     }
-                    bars.ui.loader('body', false);
-                });
+                }
+
+                var gkd_info = request.data.Gkd;
+                if (gkd_info != null) {
+                    $rootScope.GKD.wdate = kendo.toString(kendo.parseDate(gkd_info.WDATE, 'yyyy-MM-dd'), 'dd/MM/yyyy');
+                    $rootScope.GKD.limit = kendo.toString(gkd_info.LIMIT, "n2");
+                }
+                bars.ui.loader('body', false);
+
             });
             if (mode === "by_button")
                 $rootScope.LoadMoreCreditData("exist");
@@ -180,6 +222,103 @@
                 $rootScope.credit.endValue = endDate;
             });
         }
+
+
+        $http.get(bars.config.urlContent('/creditui/newcredit/GetDataSources')).then(function (request) {
+            $rootScope.data_sources = request.data;
+            
+            $scope.ddlCurComAccOptions = {
+                dataSource: $rootScope.data_sources.Currency,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+            $scope.ddlMetrOptions = {
+                dataSource: $rootScope.data_sources.Metr,
+                dataTextField: "Value",
+                dataValueField: "Key",
+                optionLabel: " "
+            };
+
+            $scope.ddlDayNP = {
+                dataSource: $rootScope.data_sources.Daynp,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+
+            $scope.ddlFreqOptions = {
+                dataSource: $rootScope.data_sources.Freq,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+            $scope.ddlFreqIntOptions = {
+                dataSource: $rootScope.data_sources.Freq,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+
+            $scope.ddlSourOptions = {
+                dataSource: $rootScope.data_sources.Sour,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+
+            $scope.ddlBaseyOptions = {
+                dataSource: $rootScope.data_sources.Basey,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+
+            $scope.ddlFinOptions = {
+                dataSource: $rootScope.data_sources.FinStan,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+            $scope.ddlObsOptions = {
+                dataSource: $rootScope.data_sources.StanObs,
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+
+            $scope.ddlCurOptions = {
+                dataSource: $rootScope.data_sources.Currency,
+                change: function (e) {
+                    if ($rootScope.credit.baseRateValue != null) {
+                        $rootScope.credit.baseRateValue = null;
+                        $rootScope.credit.baseRateNameValue = null;
+                        $scope.$apply();
+                    }
+                    if ($scope.isSave)
+                        bars.ui.alert({ text: "Не забудьте змінити валюту рахунків" });
+                },
+                filter: "startswith",
+                dataTextField: "Value",
+                dataValueField: "Key"
+            };
+
+            $scope.ddlPOCIOptions = {
+                dataSource: $rootScope.data_sources.Poci,
+                dataTextField: "Value",
+                dataValueField: "Key",
+                optionLabel: { "Key": "", "Value": "" },
+                change: function () {
+                    $rootScope.credit.prodValue = null;
+                    $rootScope.credit.prodNameValue = null;
+                    $scope.$apply();
+                }
+            }
+
+            $scope.ddlSPPIOptions = {
+                dataSource: $rootScope.data_sources.Sppi,
+                dataTextField: "Value",
+                dataValueField: "Key",
+                optionLabel: { "Key": -1, "Value": "" },
+                change: function () {
+                    $rootScope.SetIFRS();
+                    $rootScope.credit.prodValue = null;
+                    $rootScope.credit.prodNameValue = null;
+                }
+            }
+        });
     };
 
     $scope.$on('kendoWidgetCreated', function (ev, widget) {
@@ -229,11 +368,11 @@
         if ($rootScope.isTagOnly) {
             return true;
         }
-        return $rootScope.isDatesValid()
+        return $rootScope.isProdValueValid() //a little perf magic 
             && $rootScope.isCurrValid()
             && $rootScope.isDayOfPayValueValid()
             && $rootScope.isBranchValueValid()
-            && $rootScope.isProdValueValid()
+            && $rootScope.isDatesValid()
             && $rootScope.isNumValueValid()
             && $rootScope.isSumValueValid()
             && $rootScope.isBaseRateValueValueValid()
@@ -241,9 +380,11 @@
             && $rootScope.isCustValueValid()
             && $rootScope.credit.rnkValue != null
             && $rootScope.isNlsValid()
+            //&& $rootScope.isGKDInfoValid()
             && ($rootScope.credit.dayOfPayValue == null || ($rootScope.credit.dayOfPayValue >= 1 && $rootScope.credit.dayOfPayValue <= 31))
             && (!$rootScope.credit.diffDaysValue || ($rootScope.credit.dayPayDiffValue == null || ($rootScope.credit.dayPayDiffValue >= 1 && $rootScope.credit.dayPayDiffValue <= 31)))
-            && $rootScope.isFlagsValid();
+            && $rootScope.isFlagsValid()
+            ;
     };
 
     $scope.save = function () {
@@ -267,11 +408,11 @@
                 bars.ui.alert({ text: "Не обрано фінансовий стан позичальника" });
                 bars.ui.loader('body', false);
             }
-            else if (save.aimValue == null) {       //kendo-drop-down-list="ddlAim"
+            else if (save.aimValue == null && !$rootScope.IsGKD()) {       //kendo-drop-down-list="ddlAim"
                 bars.ui.alert({ text: "Не обрано ціль кредитування" });
                 bars.ui.loader('body', false);
             }
-            else if (save.rangValue == null) {      //kendo-drop-down-list="ddlRang"
+            else if (save.rangValue == null && !$rootScope.IsGKD()) {      //kendo-drop-down-list="ddlRang"
                 bars.ui.alert({ text: "Не обрано шаблон погашення" });
                 bars.ui.loader('body', false);
             }
@@ -293,7 +434,7 @@
             //}
             else {
                 if ($rootScope.nd == null) {
-                    dataService.create($scope.create, save);
+                    dataService.create($scope.create, save, $rootScope.IsGKD());
                     $scope.create.ID = null;
 
                     var url = '/creditui/newcredit/createdeal';
@@ -311,7 +452,7 @@
                                 if(!$scope.validateRequest(request)){ return; }
 
                                 url = '/creditui/newcredit/afterSaveDeal';
-                                $http.post(bars.config.urlContent(url), dataService.afterSaveDeal($rootScope.ndtxtsave.nd, save)).then(function (request) {
+                                $http.post(bars.config.urlContent(url), dataService.afterSaveDeal($rootScope.ndtxtsave.nd, save, $rootScope.IsGKD())).then(function (request) {
                                     if(!$scope.validateRequest(request)){ return; }
 
                                     if (save.currBValue || save.baseRateValue || save.serviceValue) {

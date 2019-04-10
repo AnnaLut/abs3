@@ -29,7 +29,7 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
 
         public string DepColName { get; set; }
         public string ColName { get; set; }
-
+        public string Condition { get; set; }
         public DependencyModel BuildFromDbModel(Dependency dependency, List<ColumnMetaInfo> colsInfo)
         {
             this.Id = dependency.ID;
@@ -42,6 +42,7 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
             this.DefaultValue = dependency.DEFAULT_VALUE;
             this.ColName = colsInfo.FirstOrDefault(u => u.COLID == dependency.COLiD).COLNAME;
             this.DepColName = colsInfo.FirstOrDefault(u => u.COLID == dependency.DEPCOLID).COLNAME;
+            this.Condition = dependency.CONDITION;
             return this;
         }
     
