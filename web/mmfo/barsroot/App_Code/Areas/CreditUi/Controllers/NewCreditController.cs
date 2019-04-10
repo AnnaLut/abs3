@@ -7,6 +7,7 @@ using BarsWeb.Areas.CreditUi.Models;
 using Kendo.Mvc.UI;
 using Kendo.Mvc.Extensions;
 using System.Collections.Generic;
+using BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation;
 
 namespace BarsWeb.Areas.CreditUi.Controllers
 {
@@ -49,106 +50,24 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return View();
         }
 
-        public ActionResult getCurrency()
-        {
-            IQueryable<CurrencyList> session = _creditRepository.getCurrency();
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getStanFin()
-        {
-            IQueryable<StanFinList> session = _creditRepository.getStanFin();
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getStanObs()
-        {
-            IQueryable<StanObsList> session = _creditRepository.getStanObs();
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getCRisk(decimal fin, decimal obs)
-        {
-            IQueryable<CRiskList> session = _creditRepository.getCRisk(fin,obs);
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
         public ActionResult getVidd(decimal rnk)
         {
-            IQueryable<ViddList> session = _creditRepository.getVidd(rnk);
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getSour()
-        {
-            IQueryable<SourList> session = _creditRepository.getSour();
-            return Json(session, JsonRequestBehavior.AllowGet);
+            return Json(_creditRepository.getVidd(rnk).ToList(), JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult getAim(byte vidd, string dealDate)
         {
-            IQueryable<AimList> session = _creditRepository.getAim(vidd, dealDate);
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-        [HttpGet]
-        public ActionResult getAimBal(byte vidd, decimal? aim, bool yearDiff)
-        {
-            NlsParam session = _creditRepository.getAimBal(vidd, aim, yearDiff);
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-        [HttpPost]
-        public void setMasIni(string nbs)
-        {
-            _creditRepository.setMasIni(nbs);
-        }
-
-        public ActionResult getBasey()
-        {
-            IQueryable<BaseyList> session = _creditRepository.getBasey();
-            return Json(session, JsonRequestBehavior.AllowGet);
+            return Json(_creditRepository.getAim(vidd, dealDate).ToList(), JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult getRang(byte vidd)
         {
-            IQueryable<RangList> session = _creditRepository.getRang(vidd);
-            return Json(session, JsonRequestBehavior.AllowGet);
+            return Json(_creditRepository.getRang(vidd).ToList(), JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult getFreq()
+        public ActionResult getBusMod(decimal rnk)
         {
-            IQueryable<FreqList> session = _creditRepository.getFreq();
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getMetr()
-        {
-            IQueryable<MetrList> session = _creditRepository.getMetr();
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getTabList()
-        {
-            IQueryable<ParamsList> session = _creditRepository.getTabList();
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getDaynpList()
-        {
-            Dictionary<int, string> getDaynpList = _creditRepository.getDaynpList();
-            return Json(getDaynpList.ToList(), JsonRequestBehavior.AllowGet);
-
-        }
-
-        public ActionResult getNdTxt([DataSourceRequest]DataSourceRequest request, string code)
-        {
-            IQueryable<NdTxtList> session = _creditRepository.getNdTxt(code);
-            return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult getNdTxtDeal([DataSourceRequest]DataSourceRequest request, decimal nd, string code)
-        {
-            IQueryable<NdTxtList> session = _creditRepository.getNdTxtDeal(nd, code);
-            return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            return Json(_creditRepository.getBusMod(rnk).ToDictionary(p => p.Key, p => p.Key + ") " + p.Value).ToList(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -218,8 +137,8 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             string Status = "OK";
             try
             {
-                CreateDeal session = _creditRepository.getDeal(nd);
-                return Json(new { Status = session.CUST_DATA.Error_Message ?? Status, Data = session }, JsonRequestBehavior.AllowGet);
+                CreditFormData session = _creditRepository.getDeal(nd);
+                return Json(new { Status = session.Deal.CUST_DATA.Error_Message ?? Status, Data = session.Deal, MultiExt = session.MultiInts, Gkd = session.DealGkd }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
             return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
@@ -231,11 +150,6 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(session, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult getMultiExtInt(decimal nd)
-        {
-            IQueryable<MultiExtInt> session = _creditRepository.getMultiExtInt(nd);
-            return Json(session, JsonRequestBehavior.AllowGet);
-        }
 
         [HttpPost]
         public ActionResult SetProlog(decimal nd, DateTime bnkDate, decimal kprolog, decimal sos, DateTime dateStart, DateTime dateEnd)
@@ -256,7 +170,27 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(session, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetCustData(decimal rnk)
+        public ActionResult GetDataSources()
+        {
+            return Json( _creditRepository.GetDataSources(), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetMoreCreditsParams(decimal? nd)
+        {
+            return Json(_creditRepository.GetMoreCreditsParams(nd), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetIFRS(int bus_mod, string sppi) 
+        {
+            return Json(new { IFRS = _creditRepository.GetIFRS(bus_mod, sppi) }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetSPPI(decimal rnk)
+        {
+            return Json(new { SPPI = _creditRepository.GetSPPI(rnk) }, JsonRequestBehavior.AllowGet);
+        }
+
+		public ActionResult GetCustData(decimal rnk)
         {
             string Status = "OK";
             try
@@ -266,6 +200,11 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             }
             catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
             return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetActualLimit(long? sub_nd, long? gkd_nd)
+        {
+            return Json(new { Limit = _creditRepository.GetActualLimit(sub_nd, gkd_nd) }, JsonRequestBehavior.AllowGet);
         }
     }
 }

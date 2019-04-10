@@ -231,9 +231,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 paramsInfo.AddRange(func.UploadParamsInfo);
             }
 
-            if (!string.IsNullOrEmpty(func.ConvertParams))
+            if (!string.IsNullOrEmpty(func.UploadExcelParam))
             {
-                func.ConvertParamsInfo = GetSqlFuncCallParamsDescription<ConvertParams>(func.PROC_NAME, func.ConvertParams);
+                func.UploadExcelParamsInfo = GetSqlFuncCallParamsDescription<UploadExcelParams>(func.PROC_NAME, func.UploadExcelParam);
             }
             if (!string.IsNullOrEmpty(func.OutParams))
             {
@@ -266,6 +266,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                         if (Enumerable.Count(colRowParams) > 0)
                             paramsInfo.AddRange(Enumerable.Distinct(colRowParams));
                     }
+                    //для загрузки и парсинга к примеру экселя,  т.к. файл экселя является одновременно загружаемым и 
+                    //много строчным параметром.
+                    List<UploadParamsInfo> multiUploadParams = ConvertMultiRowToUploadParams(func.MultiRowsParams);
+                    if (multiUploadParams != null && multiUploadParams.Count > 0)
+                        func.UploadParamsInfo.AddRange(multiUploadParams);
+
 
                 }
 
@@ -326,8 +332,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     oracleConnector.GetCommand.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Blob, blobProp.ByteBody, ParameterDirection.Input));
                     funcParams.Remove(blobProp);
                 }
-
-
+                
                 if (item.ColType == "S" && item.GetFrom == "FILE_NAME")
                 {
                     UploadFileName fileName = item as UploadFileName;
@@ -339,13 +344,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                         oracleConnector.GetCommand.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Varchar2, 4000, fileNameProp.Value, ParameterDirection.Input));
                         funcParams.Remove(fileNameProp);
                     }
-
                 }
-
-
             }
-            //command.Parameters.Add(new OracleParameter("p_name", OracleDbType.Varchar2, "TEST", ParameterDirection.Input));
-            //command.Parameters.Add( new OracleParameter("p_pob", OracleDbType.Int32, 0, ParameterDirection.Input));
         }
         public static List<FieldProperties> GetFieldsFromString(string sqlStatement, List<FieldProperties> rowData)
         {
@@ -384,8 +384,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 AddOptionsFromDictionary(paramMetaInfo as UploadParamsInfo, options);
             else if (paramMetaInfo is OutParamsInfo)
                 AddOptionsFromDictionary(paramMetaInfo as OutParamsInfo, options);
-            else if (paramMetaInfo is ConvertParams)
-                AddOptionsFromDictionary(paramMetaInfo as ConvertParams, options);
+            else if (paramMetaInfo is UploadExcelParams)
+                AddOptionsFromDictionary(paramMetaInfo as UploadExcelParams, options);
             else if (paramMetaInfo is MultiRowsParams)
                 AddOptionsFromDictionary(paramMetaInfo as MultiRowsParams, options);
             else if (paramMetaInfo is ComplexParams)
@@ -564,7 +564,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
         }
 
-        private static void AddOptionsFromDictionary(ConvertParams paramMetaInfo, Dictionary<string, string> options)
+        private static void AddOptionsFromDictionary(UploadExcelParams paramMetaInfo, Dictionary<string, string> options)
         {
             if (options == null || options.Count < 1)
                 return;
@@ -573,6 +573,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             {
                 switch (option.Key)
                 {
+                    case "COL_NAMES_FROM":
+                        paramMetaInfo.ColNameGetFrom = option.Value;
+                        break;
                     case "GET_FROM":
                         paramMetaInfo.GetFrom = option.Value;
                         break;
@@ -770,5 +773,22 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
             return res;
         }
+
+        public static List<UploadParamsInfo> ConvertMultiRowToUploadParams(List<MultiRowsParams> multyParams)
+        {
+            MultiRowsParams multiUpload = multyParams.FirstOrDefault(x => x.Kind == "FROM_UPLOAD_EXCEL");
+            if (multiUpload == null)
+                return null;
+            List<UploadParamsInfo> uploadParams = new List<UploadParamsInfo>();
+            uploadParams.Add(new UploadParamsInfo
+            {
+                Kind = "UPLOAD_FILE",
+                Name = multiUpload.Name,
+                ColType = multiUpload.ColType,
+                Semantic = multiUpload.Semantic,
+                ExtValid = "xlsx"
+            });
+            return uploadParams;
+    }
     }
 }

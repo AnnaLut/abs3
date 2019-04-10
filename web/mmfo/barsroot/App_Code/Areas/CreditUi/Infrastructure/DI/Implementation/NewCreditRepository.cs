@@ -8,6 +8,7 @@ using System;
 using BarsWeb.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Models;
 using System.Reflection;
+using System.Collections;
 
 namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
 {
@@ -20,492 +21,120 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             _homeRepository = homeRepository;
         }
 
-        public IQueryable<CurrencyList> getCurrency()
-        {
-            List<CurrencyList> curr = new List<CurrencyList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select kv, lcv||' '||name as lcv from tabval where d_close is null order by skv";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        CurrencyList r = new CurrencyList();
-                        r.KV = reader.GetInt16(0);
-                        r.LCV = reader.GetString(1);
-                        curr.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return curr.AsQueryable();
-        }
-
-        public IQueryable<StanFinList> getStanFin()
-        {
-            List<StanFinList> stan = new List<StanFinList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select fin, name from stan_fin order by fin";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        StanFinList r = new StanFinList();
-                        r.FIN = reader.GetInt16(0);
-                        r.NAME = reader.GetString(1);
-                        stan.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return stan.AsQueryable();
-        }
-
-        public IQueryable<StanObsList> getStanObs()
-        {
-            List<StanObsList> stan = new List<StanObsList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select obs, name from stan_obs order by obs";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        StanObsList r = new StanObsList();
-                        r.OBS = reader.GetInt16(0);
-                        r.NAME = reader.GetString(1);
-                        stan.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return stan.AsQueryable();
-        }
-
-        public IQueryable<CRiskList> getCRisk(decimal fin, decimal obs)
+        private List<CRiskList> getCRisks(OracleConnection conn)
         {
             List<CRiskList> risk = new List<CRiskList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
+            using (OracleCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select c.crisk, c.name from FIN_OBS_S080 f, crisk c where f.fin=:p_fin and f.obs=:p_obs and f.s080=c.crisk";
-                cmd.Parameters.Add("p_fin", OracleDbType.Decimal, fin, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("p_obs", OracleDbType.Decimal, obs, System.Data.ParameterDirection.Input);
-                using (OracleDataReader reader = cmd.ExecuteReader())
+                try
                 {
-
-                    while (reader.Read())
+                    cmd.CommandText = "select f.fin, f.obs, c.crisk, c.name from FIN_OBS_S080 f, crisk c where f.s080=c.crisk";
+                    using (OracleDataReader reader = cmd.ExecuteReader())
                     {
-                        CRiskList r = new CRiskList();
-                        r.CRISK = reader.GetString(0);
-                        r.NAME = reader.GetString(1);
-                        risk.Add(r);
+                        while (reader.Read())
+                        {
+                            risk.Add(new CRiskList()
+                            {
+                                FIN = reader.GetByte(0),
+                                OBS = reader.GetByte(1),
+                                CRISK = reader.GetString(2),
+                                NAME = reader.GetString(3)
+                            });
+                        }
                     }
                 }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return risk.AsQueryable();
-        }
-
-        public IQueryable<ViddList> getVidd(decimal rnk)
-        {
-            List<ViddList> vidd = new List<ViddList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                byte custtype = 0;
-                string k050 = "";
-                cmd.CommandType = System.Data.CommandType.Text;
-
-                cmd.CommandText = @"select t.custtype,t.k050
-                                    from bars.customer t
-                                    where t.rnk=:p_rnk";
-                cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, System.Data.ParameterDirection.Input);
-                using (OracleDataReader reader = cmd.ExecuteReader())
+                catch (Exception e)
                 {
-
-                    while (reader.Read())
-                    {
-                        custtype = reader.GetByte(0);
-                        k050 = reader.GetString(1);
-                    }
-                }
-
-                string vidd_range = ((custtype == 2) || ((custtype == 3) && k050 == "910")) ? "(1, 2, 3)" : "(11, 12, 13)";
-                cmd.CommandText = @"select cv.vidd, cv.name
-                                      from bars.cc_vidd cv
-                                     where cv.vidd in " + vidd_range +
-                                       @"and cv.tipd = 1
-                                     order by cv.vidd";
-
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        ViddList r = new ViddList();
-                        r.VIDD = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        vidd.Add(r);
-                    }
+                    throw new Exception(e.Message);
                 }
             }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return vidd.AsQueryable();
+            return risk;
         }
 
-        public IQueryable<SourList> getSour()
+        public Dictionary<int, string> getVidd(decimal rnk)
         {
-            List<SourList> sour = new List<SourList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select sour, name from cc_source order by name desc";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
+                return GetDataSourceList<Dictionary<int, string>>(
+                    @"select vidd,name from v_cust2vidd where rnk = :p_rnk",
+                    connection,
+                    new OracleParameter[] { new OracleParameter("p_rnk", OracleDbType.Decimal, rnk, System.Data.ParameterDirection.Input) }
+                    );
+        }
 
-                    while (reader.Read())
-                    {
-                        SourList r = new SourList();
-                        r.SOUR = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        sour.Add(r);
-                    }
+        public Dictionary<int, string> getAim(byte vidd, string dealDate)
+                {
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
+                return GetDataSourceList<Dictionary<int, string>>(
+                    String.Format(@" select distinct(aim), name from cc_aim_2 
+                                                  where custtype = {0} and (d_close is null or d_close > to_date(:p_deal_date, 'dd.mm.yyyy')) order by aim",
+                                                          GetCusttype(vidd)),
+                    connection,
+                    new OracleParameter[] { new OracleParameter("p_deal_date", OracleDbType.Varchar2, String.Format("{0:dd.MM.yyyy}", dealDate), System.Data.ParameterDirection.Input) }
+                    );
+        }
+
+        public Dictionary<int, string> getRang(byte vidd)
+        {
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
+                return GetDataSourceList<Dictionary<int, string>>(
+                    String.Format(@"select rang, name from cc_rang_name where (d_close < gl.bd or d_close is null) and (custtype is null or custtype = {0})
+                                    order by rang {1}", GetCusttype(vidd), (GetCusttype(vidd) == 3 ? "desc" : "")),
+                    connection
+                    );
+        }
+
+        public Dictionary<int, string> getBusMod(decimal rnk)
+        {
+            string range = " (6, 7, 8, 9, 10, 11, 14) ";
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            {
+                using (OracleCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.CommandText = @"bars.msfz9.f_business_model";
+                    OracleParameter output = new OracleParameter("l_BUS_MOD", OracleDbType.Int32, null, System.Data.ParameterDirection.ReturnValue);
+                    cmd.Parameters.Add(output);
+                    cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, System.Data.ParameterDirection.Input);
+                    cmd.ExecuteNonQuery();
+                    if (output.Value.ToString() != "null")
+                        range = "(" + output.Value.ToString() + ")";
+                }
+                return GetDataSourceList<Dictionary<int, string>>(
+                    String.Format(@"select bus_mod_id, bus_mod_name from bus_mod where bus_mod_id in {0}", range),
+                    connection
+                    );
+            }
+
+        }
+
+        public MoreCreditDataSource GetMoreCreditsParams(decimal? nd)
+        {
+            MoreCreditDataSource ds = new MoreCreditDataSource();
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
+            {
+                try
+                {
+                    ds.TabList = GetDataSourceList<Dictionary<string, string>>(@"select code, name from cc_tag_codes order by ord", connection).ToList();
+
+                    foreach (var tab in ds.TabList)
+                        ds.NdTxt.Add(tab.Key, getNdTxtDeal(nd, tab.Key, connection));
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
                 }
             }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return sour.AsQueryable();
+            return ds;
         }
 
-        public IQueryable<AimList> getAim(byte vidd, string dealDate)
-        {
-            List<AimList> aim = new List<AimList>();
-
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = String.Format(@"select aim, name 
-                                                  from cc_aim 
-                                                  where {0} is not null and (d_close is null or d_close > to_date(:p_deal_date, 'dd.mm.yyyy'))",
-                                                  GetNBSByCusttype(GetCusttype(vidd)));
-                cmd.Parameters.Add("p_deal_date", OracleDbType.Varchar2, String.Format("{0:dd.MM.yyyy}", dealDate), System.Data.ParameterDirection.Input);
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        AimList r = new AimList();
-                        r.AIM = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        aim.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return aim.AsQueryable();
-        }
-
-        public NlsParam getAimBal(byte vidd, decimal? aim, bool yearDiff)
-        {
-            NlsParam nls = new NlsParam();
-
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = String.Format(@"select {0}
-                                                  from cc_aim 
-                                                  where aim = :aim",
-                                                  GetNBSByCusttype(GetCusttype(vidd), yearDiff));
-                cmd.Parameters.Add("aim", OracleDbType.Decimal, aim, System.Data.ParameterDirection.Input);
-
-                nls.NLS = cmd.ExecuteScalar().ToString();
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return nls;
-        }
-
-        public void setMasIni(string nbs)
-        {
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            decimal result = -1;
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.CommandText = @"bars.PUL.Set_Mas_Ini";
-                cmd.Parameters.Add("tag_", OracleDbType.Varchar2, "NBS_AIM", System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("val_", OracleDbType.Varchar2, nbs, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("comm_", OracleDbType.Varchar2, "Бал.рах по цілі кредиту", System.Data.ParameterDirection.Input);
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-        }
-
-        public IQueryable<BaseyList> getBasey()
-        {
-            List<BaseyList> basey = new List<BaseyList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select basey, name from basey order by basey";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        BaseyList r = new BaseyList();
-                        r.BASEY = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        basey.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return basey.AsQueryable();
-        }
-
-        public IQueryable<RangList> getRang(byte vidd)
-        {
-            List<RangList> rang = new List<RangList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                int cusstype = GetCusttype(vidd);
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = String.Format(@"select rang, name
-                                    from cc_rang_name
-                                    where (d_close < gl.bd or d_close is null)
-                                    and (custtype is null or
-                                        custtype = {0})
-                                    order by rang {1}", cusstype, (cusstype == 3 ? "desc" : "") );
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        RangList r = new RangList();
-                        r.RANG = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        rang.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return rang.AsQueryable();
-        }
-
-        public IQueryable<FreqList> getFreq()
-        {
-            List<FreqList> freq = new List<FreqList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"select freq, name from freq order by freq desc";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        FreqList r = new FreqList();
-                        r.FREQ = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        freq.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return freq.AsQueryable();
-        }
-
-        public IQueryable<MetrList> getMetr()
-        {
-            List<MetrList> metr = new List<MetrList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                /*cmd.CommandText = @"select m.metr, m.name
-                                      from params p, int_metr m
-                                     where p.par = 'CC_KOM'
-                                       and to_char(m.metr) = p.val";*/
-                cmd.CommandText = @"select metr as id, metr || ' - ' || name as name from int_metr order by metr";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        MetrList r = new MetrList();
-                        r.METR = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        metr.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return metr.AsQueryable();
-        }
-
-        public IQueryable<ParamsList> getTabList()
-        {
-            List<ParamsList> par = new List<ParamsList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"select code, name from cc_tag_codes order by ord";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        ParamsList r = new ParamsList();
-                        r.CODE = reader.GetString(0);
-                        r.NAME = reader.GetString(1);
-                        par.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return par.AsQueryable();
-        }
-
-        public Dictionary<int,string> getDaynpList()
-        {
-            Dictionary<int, string> list = new Dictionary<int, string>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"select KOD,TXT from V_CC_DAYNP";
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-                        list.Add(reader.GetInt16(0), reader.GetString(1));
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return list;
-        }
-
-        public IQueryable<NdTxtList> getNdTxt(string code)
+        private IQueryable<NdTxtList> getNdTxtDeal(decimal? nd, string code, OracleConnection _conn)
         {
             List<NdTxtList> txt = new List<NdTxtList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
+            OracleCommand cmd = _conn.CreateCommand();
             try
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"select * from (select tag,
-                                           name,
-                                           substr(txt, 1, 250) TXT,
+                cmd.CommandText = String.Format(@"select * from (select t.tag,
+                                           t.name, {0} 
                                            '' SEM,
                                            (case
                                              when table_name is not null then
@@ -540,92 +169,14 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                                        and INSTNSSEMANTIC = 1
                                                        and mt.tabname = t.table_name) fk
                                               FROM CC_TAG t
-                                             WHERE t.TAGTYPE = 'CCK')
-                                     where code = :code) order by tag";
+                                             WHERE t.TAGTYPE = 'CCK') t {1} where code = :code) order by tag",
+                                                 (nd.HasValue ? @" (case when nd.TXT is not null then nd.txt else '' end) txt, " : @" substr(t.txt, 1, 250) TXT, "),
+                                                 (nd.HasValue ? @" left join nd_txt nd on t.tag = nd.tag and nd.nd = :nd " : " "));
+                if (nd.HasValue)
+                    cmd.Parameters.Add("nd", OracleDbType.Decimal, nd.Value, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("code", OracleDbType.Varchar2, code, System.Data.ParameterDirection.Input);
                 using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-
-                    while (reader.Read())
-                    {
-                        NdTxtList r = new NdTxtList();
-                        r.TAG = reader.GetString(0);
-                        r.NAME = reader.GetString(1);
-                        r.TXT = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                        r.SEM = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
-                        r.TYPE = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
-                        r.CODE = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
-                        r.TABLE_NAME = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
-                        r.COL_NAME = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? String.Empty : reader.GetString(7);
-                        txt.Add(r);
-                    }
-                }
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return txt.AsQueryable();
-        }
-
-        public IQueryable<NdTxtList> getNdTxtDeal(decimal nd, string code)
-        {
-            List<NdTxtList> txt = new List<NdTxtList>();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"select * from (select t.tag,
-                                           t.name,
-                                           (case when nd.TXT is not null
-                                             then nd.txt else
-                                              '' end) txt,
-                                           '' SEM,
-                                           (case
-                                             when table_name is not null then
-                                              'R'
-                                             when table_name is null and type is null then
-                                              'S'
-                                             else
-                                              type
-                                           end) as type,
-                                           code,
-                                           table_name,
-                                           (select listagg(mc.colname, ',') within group(order by mc.colid)
-                                              from meta_columns mc, meta_tables mt
-                                             where mt.tabid = mc.tabid
-                                               and mt.tabname = table_name) as col_name
-                                      from (SELECT t.code,
-                                                   t.tag,
-                                                   t.name,
-                                                   null as ND,
-                                                   null as txt,
-                                                   t.table_name,
-                                                   t.nsisqlwhere,
-                                                   t.type,
-                                                   (select min(colname)
-                                                      from meta_tables mt, meta_columns mc
-                                                     where mt.tabid = mc.tabid
-                                                       and showretval = 1
-                                                       and mt.tabname = t.table_name) sk,
-                                                   (select min(colname)
-                                                      from meta_tables mt, meta_columns mc
-                                                     where mt.tabid = mc.tabid
-                                                       and INSTNSSEMANTIC = 1
-                                                       and mt.tabname = t.table_name) fk
-                                              FROM CC_TAG t
-                                             WHERE t.TAGTYPE = 'CCK') t
-                                             left join nd_txt nd
-                                         on t.tag = nd.tag and nd.nd = :nd
-                                     where code = :code) order by tag";
-                cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("code", OracleDbType.Varchar2, code, System.Data.ParameterDirection.Input);
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
-
                     while (reader.Read())
                     {
                         NdTxtList r = new NdTxtList();
@@ -644,8 +195,6 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             finally
             {
                 cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
             }
             return txt.AsQueryable();
         }
@@ -797,9 +346,9 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                             cmd.Parameters.Add("p_TXT", OracleDbType.Varchar2, txt[i].TXT, System.Data.ParameterDirection.Input);
                             cmd.ExecuteNonQuery();
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
-                            error_msg += error_index +") " + e.Message.Substring(10, e.Message.IndexOf("ORA-06512") - 10) + "; </br>";
+                            error_msg += error_index + ") " + e.Message.Substring(10, e.Message.IndexOf("ORA-06512") - 10) + "; </br>";
                             error_index++;
                         }
                     }
@@ -809,7 +358,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     cmd.Dispose();
                     connection.Dispose();
                     connection.Close();
-                }    
+                }
             }
             return error_msg == "" ? "Ok" : error_msg;
         }
@@ -835,7 +384,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                       "End;";
                     cmd.ExecuteNonQuery();
                 }
- 
+
                 cmd.CommandText = "select a.acc from accounts a, nd_acc n where a.acc = n.acc and n.nd = :p_nd and a.tip = 'LIM'";
                 cmd.Parameters.Clear();
                 cmd.Parameters.Add("p_nd", OracleDbType.Decimal, param.nd, System.Data.ParameterDirection.Input);
@@ -901,7 +450,10 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     new { Tag = "I_CR9", Value = param.icr9 != null? param.icr9.ToString() : null},
                     new { Tag = "R_CR9", Value = param.cr9 != null?  param.cr9.ToString() : null},
                     new { Tag = "DAYSN", Value = param.daysn }, new { Tag = "DATSN", Value = param.datsn }, new { Tag = "DAYNP", Value = param.daynp },
-                    new { Tag = "S_S36", Value = param.s_s36 != null? ((decimal)param.s_s36).ToString("F").Replace(",", ".") : null}
+                    new { Tag = "S_S36", Value = param.s_s36 != null? ((decimal)param.s_s36).ToString("F").Replace(",", ".") : null },
+                    //new { Tag = "GKD_IN", Value = param.IsGKD != null? param.IsGKD.ToString() : null }, new { Tag = "GKD_ND", Value = param.GKD_ND != null? param.GKD_ND.ToString() : null },
+                    new { Tag = "BUS_MOD", Value = param.BUS_MOD != null? param.BUS_MOD.ToString() : null },  new { Tag = "SPPI", Value = param.SPPI != null? param.SPPI.ToString() : null },
+                    new { Tag = "IFRS", Value = param.IFRS != null? param.IFRS.ToString() : null }, new { Tag = "POCI", Value = param.POCI != null? param.POCI.ToString() : null }
                 };
 
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -922,7 +474,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     }
                 }
 
-                if(param.inspector_id != null)
+                if (param.inspector_id != null)
                 {
                     cmd.CommandText = @"bars.cck_ui.p_change_responsible_executor";
                     cmd.Parameters.Clear();
@@ -961,16 +513,6 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             try
             {
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                /*cmd.CommandText = "BARS.CCK.MULTI_INT";
-                cmd.Parameters.Add("ND_", OracleDbType.Decimal, param.ND, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("K1_", OracleDbType.Decimal, param.KV1, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("P1_", OracleDbType.Decimal, param.PROC1, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("K2_", OracleDbType.Decimal, param.KV2, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("P2_", OracleDbType.Decimal, param.PROC2, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("K3_", OracleDbType.Decimal, param.KV3, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("P3_", OracleDbType.Decimal, param.PROC3, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("K4_", OracleDbType.Decimal, param.KV4, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("P4_", OracleDbType.Decimal, param.PROC4, System.Data.ParameterDirection.Input);*/
                 cmd.CommandText = "BARS.CCK.MULTI_INT_EX";
                 cmd.Parameters.Add("ND_", OracleDbType.Decimal, param.ND, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("BR_", OracleDbType.Decimal, param.BRID, System.Data.ParameterDirection.Input);
@@ -994,16 +536,19 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
 
         }
 
-        public CreateDeal getDeal(decimal nd)
+        public CreditFormData getDeal(decimal nd)
         {
             CreateDeal credit = new CreateDeal();
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            try
+            GKD gkd_info = new GKD();
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                //Нужно подумать на счет вьюшки
-                cmd.CommandText = @"select cc.nd,--0
+                using (OracleCommand cmd = connection.CreateCommand())
+                {
+                    try
+                    {
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        //Нужно подумать на счет вьюшки
+                        cmd.CommandText = @"select cc.nd,--0
                                            cc.cc_id,--1
                                            cc.dsdate,--2
                                            cc.dwdate,--3
@@ -1030,20 +575,17 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                              else
                                               cc.pr
                                            end) pr,--18
-                                           ia.basey,--19
+                                               (select ia.basey from int_accn ia where ia.acc = cc.acc8 and ia.id = 0) basey,--19
                                            cc.day,--20
-                                           (select apl_dat
-                                              from int_accn
-                                             where acc = cc.acc8
-                                               and id = 0) as apdate,--21
+                                               (select apl_dat from int_accn where acc = cc.acc8 and id = 0) as apdate,--21
                                            cck_app.Get_ND_TXT(cc.nd, 'FREQP') as FREQP,--22
                                            trim(cck_app.Get_ND_TXT(cc.nd, 'R_CR9')) as nkom,--23
                                            cc.rnk,--24
                                            c.okpo,--25
                                            c.nmk,--26
                                            cck_app.Get_ND_TXT(cc.nd, 'INIC') as inic,--27
-                                           cp.txt prod_name,--28
-                                           ca.name as aim_name,--29
+                                               (select cp.txt from sb_ob22 cp where cp.r020||cp.ob22 = cc.prod)  prod_name,--28
+                                               (select ca.name from cc_aim ca where ca.aim = cc.aim) as aim_name,--29
                                            cc.acc8,--30
                                            cc.basem,--31
                                            cck_app.Get_ND_TXT(cc.nd, 'S_SDI') as sdi,--32
@@ -1077,90 +619,119 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                             cck_app.Get_ND_TXT(cc.nd, 'FLAGS') as FLAGS,--55
                                             cc.limit, --56
                                             cc.id, --57
-                                            cck_app.Get_ND_TXT(cc.nd, 'S_S36') as s_s36 --58
-                                      from cc_v cc, customer c, sb_ob22 cp, cc_aim ca, int_accn ia
+                                                cck_app.Get_ND_TXT(cc.nd, 'S_S36') as s_s36, --58
+                                               -- cck_app.Get_ND_TXT(cc.nd, 'GKD_IN') as gkd_in, --59
+                                           -- cck_app.Get_ND_TXT(cc.nd, 'GKD_ND') as gkd_nd, --60
+                                            cck_app.Get_ND_TXT(cc.nd, 'BUS_MOD') as bus_mod, --61
+                                            cck_app.Get_ND_TXT(cc.nd, 'SPPI') as sppi, --62
+                                            cck_app.Get_ND_TXT(cc.nd, 'IFRS') as ifrs, --6
+                                            cck_app.Get_ND_TXT(cc.nd, 'POCI') as poci, --64,
+                                            (select bus_mod_name from bus_mod where bus_mod_id = cck_app.Get_ND_TXT(cc.nd, 'BUS_MOD')) as bus_mod_name--65
+                                      from cc_v cc, customer c--, sb_ob22 cp, cc_aim ca, int_accn ia
                                      where cc.rnk = c.rnk
-                                       and cc.prod = cp.r020||cp.ob22
-                                       and cc.aim = ca.aim
-                                       and cc.acc8 = ia.acc
-                                       and ia.id = 0
+                                        --   and cc.prod = cp.r020||cp.ob22
+                                        --   and cc.aim = ca.aim
+                                        --   and cc.acc8 = ia.acc
+                                        --   and ia.id = 0
                                        and cc.nd = :nd";
-                cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
-                using (OracleDataReader reader = cmd.ExecuteReader())
-                {
+                        cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
+                        using (OracleDataReader reader = cmd.ExecuteReader())
+                        {
 
-                    if (reader.Read())
+                            if (reader.Read())
+                            {
+                                credit.CC_ID = reader.GetString(1);
+                                credit.Dat1 = reader.GetDateTime(2);
+                                credit.Dat4 = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (DateTime?)null : reader.GetDateTime(3);
+                                credit.Dat2 = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (DateTime?)null : reader.GetDateTime(4);
+                                credit.Dat3 = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? (DateTime?)null : reader.GetDateTime(5);
+                                credit.nKV = reader.GetInt32(6);
+                                credit.nS = reader.GetDecimal(7);
+                                credit.nVID = reader.GetInt32(8);
+                                credit.nISTRO = reader.GetInt32(9);
+                                credit.nCEL = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? (decimal?)null : reader.GetInt32(10);
+                                credit.MS_NX = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                                credit.nFIN = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (decimal?)null : reader.GetInt32(12);
+                                credit.nOBS = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? (decimal?)null : reader.GetInt32(13);
+                                credit.sAIM = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
+                                credit.NLS = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? String.Empty : reader.GetString(15);
+                                credit.nBANK = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? String.Empty : reader.GetString(16);
+                                credit.nFREQ = reader.GetInt32(17);
+                                credit.dfPROC = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(18).ToString().Replace(".", ","));
+                                credit.nBasey = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? (decimal?)null : reader.GetInt32(19);
+                                credit.dfDen = String.IsNullOrEmpty(reader.GetValue(20).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(20).ToString().Replace(".", ","));
+                                credit.DATNP = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? (DateTime?)null : reader.GetDateTime(21);
+                                credit.nFREQP = String.IsNullOrEmpty(reader.GetValue(22).ToString()) ? String.Empty : reader.GetString(22);
+                                credit.nKom = String.IsNullOrEmpty(reader.GetValue(23).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(23).ToString().Replace(".", ","));
+                                credit.nRNK = reader.GetInt32(24);
+                                credit.OKPO = reader.GetString(25);
+                                credit.NMK = reader.GetString(26);
+                                credit.INIC = String.IsNullOrEmpty(reader.GetValue(27).ToString()) ? String.Empty : reader.GetString(27);
+                                credit.PRODNAME = String.IsNullOrEmpty(reader.GetValue(28).ToString()) ? String.Empty : reader.GetString(28);
+                                credit.AIMNAME = String.IsNullOrEmpty(reader.GetValue(29).ToString()) ? String.Empty : reader.GetString(29);
+                                credit.ACC8 = String.IsNullOrEmpty(reader.GetValue(30).ToString()) ? (Int64?)null : reader.GetInt64(30);
+                                credit.BASEM = String.IsNullOrEmpty(reader.GetValue(31).ToString()) ? (Int32?)null : reader.GetInt32(31);
+                                credit.S_SDI = String.IsNullOrEmpty(reader.GetValue(32).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(32).Replace(".", ","));
+                                credit.nKVNAME = String.IsNullOrEmpty(reader.GetValue(33).ToString()) ? String.Empty : reader.GetString(33);
+                                credit.nVIDNAME = String.IsNullOrEmpty(reader.GetValue(34).ToString()) ? String.Empty : reader.GetString(34);
+                                credit.nISTRONAME = String.IsNullOrEmpty(reader.GetValue(35).ToString()) ? String.Empty : reader.GetString(35);
+                                credit.nFINNAME = String.IsNullOrEmpty(reader.GetValue(36).ToString()) ? String.Empty : reader.GetString(36);
+                                credit.nOBSNAME = String.IsNullOrEmpty(reader.GetValue(37).ToString()) ? String.Empty : reader.GetString(37);
+                                credit.nFREQNAME = String.IsNullOrEmpty(reader.GetValue(38).ToString()) ? String.Empty : reader.GetString(38);
+                                credit.nBaseyNAME = String.IsNullOrEmpty(reader.GetValue(39).ToString()) ? String.Empty : reader.GetString(39);
+                                credit.nFREQPNAME = String.IsNullOrEmpty(reader.GetValue(40).ToString()) ? String.Empty : reader.GetString(40);
+                                credit.RANG = String.IsNullOrEmpty(reader.GetValue(41).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(41).Replace(".", ","));
+                                credit.RANGNAME = String.IsNullOrEmpty(reader.GetValue(42).ToString()) ? String.Empty : reader.GetString(42);
+                                credit.METR = String.IsNullOrEmpty(reader.GetValue(43).ToString()) ? (decimal?)null : reader.GetDecimal(43);
+                                credit.METRNAME = String.IsNullOrEmpty(reader.GetValue(44).ToString()) ? String.Empty : reader.GetString(44);
+                                credit.METR_R = String.IsNullOrEmpty(reader.GetValue(45).ToString()) ? (decimal?)null : reader.GetDecimal(45);
+                                credit.SN8 = String.IsNullOrEmpty(reader.GetValue(46).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(46).Replace(".", ","));
+                                credit.SK4 = String.IsNullOrEmpty(reader.GetValue(47).ToString()) ? (decimal?)null : reader.GetDecimal(47);
+                                credit.I_CR9 = String.IsNullOrEmpty(reader.GetValue(48).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(48).Replace(".", ","));
+                                credit.I_CR9NAME = String.IsNullOrEmpty(reader.GetValue(49).ToString()) ? String.Empty : reader.GetString(49);
+                                credit.DAYSN = String.IsNullOrEmpty(reader.GetValue(50).ToString()) ? String.Empty : reader.GetString(50);
+                                credit.DATSN = String.IsNullOrEmpty(reader.GetValue(51).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetString(51));
+                                credit.DAYNP = String.IsNullOrEmpty(reader.GetValue(52).ToString()) ? String.Empty : reader.GetString(52);
+                                credit.DAYNPNAME = String.IsNullOrEmpty(reader.GetValue(53).ToString()) ? String.Empty : reader.GetString(53);
+                                credit.nBANKNAME = String.IsNullOrEmpty(reader.GetValue(54).ToString()) ? String.Empty : reader.GetString(54);
+                                credit.FLAGS = String.IsNullOrEmpty(reader.GetValue(55).ToString()) ? String.Empty : reader.GetString(55);
+                                credit.LIM = String.IsNullOrEmpty(reader.GetValue(56).ToString()) ? (decimal?)null : reader.GetDecimal(56);
+                                credit.INSPECTOR_ID = String.IsNullOrEmpty(reader.GetValue(57).ToString()) ? (int?)null : reader.GetInt32(57);
+                                credit.S_S36 = String.IsNullOrEmpty(reader.GetValue(58).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(58).Replace(".", ","));
+                               // credit.IsGKD = String.IsNullOrEmpty(reader.GetValue(59).ToString()) ? String.Empty : reader.GetString(59);
+                               // credit.GKD_ND = String.IsNullOrEmpty(reader.GetValue(60).ToString()) ? String.Empty : reader.GetString(60);
+                                credit.BUS_MOD = String.IsNullOrEmpty(reader.GetValue(59).ToString()) ? String.Empty : reader.GetString(59);
+                                credit.SPPI = String.IsNullOrEmpty(reader.GetValue(60).ToString()) ? String.Empty : reader.GetString(60);
+                                credit.IFRS = String.IsNullOrEmpty(reader.GetValue(61).ToString()) ? String.Empty : reader.GetString(61);
+                                credit.POCI = String.IsNullOrEmpty(reader.GetValue(62).ToString()) ? String.Empty : reader.GetString(62);
+                                credit.BUS_MOD_NAME = String.IsNullOrEmpty(reader.GetValue(63).ToString()) ? String.Empty :
+                                    credit.BUS_MOD + ") " + reader.GetString(63);
+                            }
+                        }
+
+                        if (credit.IsGKD == "1")
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.CommandText = @"Select limit, wdate from cc_deal where nd = :nd";
+                            cmd.Parameters.Add("nd", OracleDbType.Decimal, credit.GKD_ND, System.Data.ParameterDirection.Input);
+                            using (OracleDataReader reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    gkd_info.LIMIT = reader.GetDecimal(0);
+                                    gkd_info.WDATE = reader.GetDateTime(1);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
                     {
-                        credit.CC_ID = reader.GetString(1);
-                        credit.Dat1 = reader.GetDateTime(2);
-                        credit.Dat4 = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (DateTime?)null : reader.GetDateTime(3);
-                        credit.Dat2 = reader.GetDateTime(4);
-                        credit.Dat3 = reader.GetDateTime(5);
-                        credit.nKV = reader.GetInt32(6);
-                        credit.nS = reader.GetDecimal(7);
-                        credit.nVID = reader.GetInt32(8);
-                        credit.nISTRO = reader.GetInt32(9);
-                        credit.nCEL = reader.GetInt32(10);
-                        credit.MS_NX = reader.GetString(11);
-                        credit.nFIN = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (decimal?)null : reader.GetInt32(12);
-                        credit.nOBS = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? (decimal?)null : reader.GetInt32(13);
-                        credit.sAIM = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
-                        credit.NLS = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? String.Empty : reader.GetString(15);
-                        credit.nBANK = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? String.Empty : reader.GetString(16);
-                        credit.nFREQ = reader.GetInt32(17);
-                        credit.dfPROC = reader.GetDecimal(18);
-                        credit.nBasey = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? (decimal?)null : reader.GetInt32(19);
-                        credit.dfDen = reader.GetInt32(20);
-                        credit.DATNP = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? (DateTime?)null : reader.GetDateTime(21);
-                        credit.nFREQP = String.IsNullOrEmpty(reader.GetValue(22).ToString()) ? String.Empty : reader.GetString(22);
-                        credit.nKom = String.IsNullOrEmpty(reader.GetValue(23).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(23).ToString().Replace(".", ","));
-                        credit.nRNK = reader.GetInt32(24);
-                        credit.OKPO = reader.GetString(25);
-                        credit.NMK = reader.GetString(26);
-                        credit.INIC = String.IsNullOrEmpty(reader.GetValue(27).ToString()) ? String.Empty : reader.GetString(27);
-                        credit.PRODNAME = String.IsNullOrEmpty(reader.GetValue(28).ToString()) ? String.Empty : reader.GetString(28);
-                        credit.AIMNAME = String.IsNullOrEmpty(reader.GetValue(29).ToString()) ? String.Empty : reader.GetString(29);
-                        credit.ACC8 = String.IsNullOrEmpty(reader.GetValue(30).ToString()) ? (Int64?)null : reader.GetInt64(30);
-                        credit.BASEM = String.IsNullOrEmpty(reader.GetValue(31).ToString()) ? (Int32?)null : reader.GetInt32(31);
-                        credit.S_SDI = String.IsNullOrEmpty(reader.GetValue(32).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(32).Replace(".", ","));
-                        credit.nKVNAME = String.IsNullOrEmpty(reader.GetValue(33).ToString()) ? String.Empty : reader.GetString(33);
-                        credit.nVIDNAME = String.IsNullOrEmpty(reader.GetValue(34).ToString()) ? String.Empty : reader.GetString(34);
-                        credit.nISTRONAME = String.IsNullOrEmpty(reader.GetValue(35).ToString()) ? String.Empty : reader.GetString(35);
-                        credit.nFINNAME = String.IsNullOrEmpty(reader.GetValue(36).ToString()) ? String.Empty : reader.GetString(36);
-                        credit.nOBSNAME = String.IsNullOrEmpty(reader.GetValue(37).ToString()) ? String.Empty : reader.GetString(37);
-                        credit.nFREQNAME = String.IsNullOrEmpty(reader.GetValue(38).ToString()) ? String.Empty : reader.GetString(38);
-                        credit.nBaseyNAME = String.IsNullOrEmpty(reader.GetValue(39).ToString()) ? String.Empty : reader.GetString(39);
-                        credit.nFREQPNAME = String.IsNullOrEmpty(reader.GetValue(40).ToString()) ? String.Empty : reader.GetString(40);
-                        credit.RANG = String.IsNullOrEmpty(reader.GetValue(41).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(41).Replace(".", ","));
-                        credit.RANGNAME = String.IsNullOrEmpty(reader.GetValue(42).ToString()) ? String.Empty : reader.GetString(42);
-                        credit.METR = String.IsNullOrEmpty(reader.GetValue(43).ToString()) ? (decimal?)null : reader.GetDecimal(43);
-                        credit.METRNAME = String.IsNullOrEmpty(reader.GetValue(44).ToString()) ? String.Empty : reader.GetString(44);
-                        credit.METR_R = String.IsNullOrEmpty(reader.GetValue(45).ToString()) ? (decimal?)null : reader.GetDecimal(45);
-                        credit.SN8 = String.IsNullOrEmpty(reader.GetValue(46).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(46).Replace(".", ","));
-                        credit.SK4 = String.IsNullOrEmpty(reader.GetValue(47).ToString()) ? (decimal?)null : reader.GetDecimal(47);
-                        credit.I_CR9 = String.IsNullOrEmpty(reader.GetValue(48).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(48).Replace(".", ","));
-                        credit.I_CR9NAME = String.IsNullOrEmpty(reader.GetValue(49).ToString()) ? String.Empty : reader.GetString(49);
-                        credit.DAYSN = String.IsNullOrEmpty(reader.GetValue(50).ToString()) ? String.Empty : reader.GetString(50);
-                        credit.DATSN = String.IsNullOrEmpty(reader.GetValue(51).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetString(51));
-                        credit.DAYNP = String.IsNullOrEmpty(reader.GetValue(52).ToString()) ? String.Empty : reader.GetString(52);
-                        credit.DAYNPNAME = String.IsNullOrEmpty(reader.GetValue(53).ToString()) ? String.Empty : reader.GetString(53);
-                        credit.nBANKNAME = String.IsNullOrEmpty(reader.GetValue(54).ToString()) ? String.Empty : reader.GetString(54);
-                        credit.FLAGS = String.IsNullOrEmpty(reader.GetValue(55).ToString()) ? String.Empty : reader.GetString(55);
-                        credit.LIM = String.IsNullOrEmpty(reader.GetValue(56).ToString()) ? (decimal?)null : reader.GetDecimal(56);
-                        credit.INSPECTOR_ID = String.IsNullOrEmpty(reader.GetValue(57).ToString()) ? (int?)null : reader.GetInt32(57);
-                        credit.S_S36 = String.IsNullOrEmpty(reader.GetValue(58).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(58).Replace(".", ","));
+                        throw new Exception(e.Message);
                     }
                 }
                 credit.CUST_DATA = GetCustomerInfo(credit.nRNK, connection);
-
+                return new CreditFormData { Deal = credit, MultiInts = getMultiExtInt(nd, connection), DealGkd = gkd_info };
             }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
-            }
-            return credit;
         }
 
         public PrologParam GetProlog(decimal nd)
@@ -1193,52 +764,29 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             return prolog;
         }
 
-        public IQueryable<MultiExtInt> getMultiExtInt(decimal nd)
+        private IQueryable<MultiExtInt> getMultiExtInt(decimal nd, OracleConnection conn)
         {
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            List<MultiExtInt> multiInts = new List<MultiExtInt>();
-            string tag = String.Empty;
-            decimal? val = null;
-            try
+            List<MultiExtInt> lst = new List<MultiExtInt>();
+            using (OracleCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"select tag, txt from nd_txt where nd = :p_nd and substr(tag,1,1) = 'P'";
-                cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
-
-                using (OracleDataReader readerTag = cmd.ExecuteReader())
+                try
                 {
-                    cmd.CommandText = @"SELECT kv FROM tabval WHERE to_char(kv)=:sKv";
-
-                    while (readerTag.Read())
-                    {
-                        MultiExtInt multi = new MultiExtInt();
-                        tag = readerTag.GetString(0);
-                        var tmpTag = tag.Substring(1, 3);
-                        val = String.IsNullOrEmpty(readerTag.GetValue(1).ToString()) ? (decimal?)null : Convert.ToDecimal(readerTag.GetString(1).Replace(".", ","));
-                        cmd.Parameters.Clear();
-                        cmd.Parameters.Add("sKv", OracleDbType.Varchar2, tmpTag, System.Data.ParameterDirection.Input);
-
-                        using (OracleDataReader reader = cmd.ExecuteReader())
-                        {
-
-                            if (reader.Read())
+                    cmd.CommandText = @"select substr(n.tag,2,3), n.txt from nd_txt n, tabval t where substr(tag,1,1) = 'P' and to_char(t.kv)=substr(n.tag,2,3)  and n.nd = :nd";
+                    cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
+                    using (OracleDataReader reader = cmd.ExecuteReader())
+                        while (reader.Read())
+                            lst.Add(new MultiExtInt
                             {
-                                multi.KV = Convert.ToDecimal(reader.GetValue(0).ToString());
-                                multi.PROC = val;
-                                multiInts.Add(multi);
-                            }
-                        }
-                    }
-                }
+                                KV = Convert.ToDecimal(reader.GetValue(0).ToString()),
+                                PROC = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetString(1).Replace(".", ","))
+                            });
 
-                return multiInts.AsQueryable();
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
+                    return lst.AsQueryable();
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
             }
         }
 
@@ -1322,9 +870,9 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 else
                     data.INSFO = "0";
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                data.ERROR += e.Message; 
+                data.ERROR += e.Message;
             }
             finally
             {
@@ -1342,20 +890,21 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             OracleCommand cmd = connection.CreateCommand();
             try
             {
-                
+
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.Clear();
                 cmd.CommandText = @"cck_ui.AUTOR";
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("p_mode", OracleDbType.Int16, type, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("p_x1", OracleDbType.Varchar2, pidstava, System.Data.ParameterDirection.Input);
-                cmd.Parameters.Add("p_x2", OracleDbType.Varchar2, initiative, System.Data.ParameterDirection.Input);  
+                cmd.Parameters.Add("p_x2", OracleDbType.Varchar2, initiative, System.Data.ParameterDirection.Input);
+                cmd.Parameters.Add("p_txt", OracleDbType.Varchar2, 32767, null, System.Data.ParameterDirection.Output);
                 cmd.ExecuteNonQuery();
-                
+                error_msg = cmd.Parameters["p_txt"].Value.ToString();
             }
             catch (Exception e)
             {
-                error_msg+= e.Message;
+                error_msg += e.Message;
             }
             finally
             {
@@ -1364,17 +913,111 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 connection.Close();
             }
 
-            return error_msg == "" ? "Ok" : error_msg;
+            return error_msg;
         }
 
-        private string GetNBSByCusttype (byte custtype, bool yeardiff = true)
+        public DataSourceInfo GetDataSources()
         {
-            switch (custtype)
+            DataSourceInfo output = new DataSourceInfo();
+            using (OracleConnection connection = OraConnector.Handler.UserConnection)
             {
-                case 2:  return yeardiff? "nbs" : "nbs2";
-                case 3:  return yeardiff? "nbsf" : "nbsf2";
+                var data_sources = new[] {
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Currency), Query = "select kv, lcv||' '||name as lcv from tabval where d_close is null order by skv" },
+                    new { Name = DataSourceInfo.GetMemberName(() => output.FinStan), Query = "select fin, name from stan_fin order by fin" },
+                    new { Name = DataSourceInfo.GetMemberName(() => output.StanObs), Query = "select obs, name from stan_obs order by obs" },
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Sour), Query = "select sour, name from cc_source order by name desc" },
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Basey), Query = "select basey, name from basey order by basey"},
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Freq), Query = "select freq, name from freq order by freq desc" },
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Metr), Query = "select metr as id, metr || ' - ' || name as name from int_metr order by metr"},
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Daynp), Query = "select KOD,TXT from V_CC_DAYNP" },
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Poci), Query = "select id, name from POCI" },
+                    new { Name = DataSourceInfo.GetMemberName(() => output.Sppi), Query = "select SPPI_VALUE, SPPI_ID from SPPI" },
 
-                default: return "nbs";
+                };
+
+                foreach (var source in data_sources)
+                    output.SetObjectProperty(source.Name, GetDataSourceList<Dictionary<int, string>>(source.Query, connection));
+
+                output.Crisk = getCRisks(connection);
+            }
+            return output;
+        }
+
+        private T GetDataSourceList<T>(string query, OracleConnection conn, OracleParameter[] param = null) where T : IDictionary, new()
+        {
+            T tmp = new T();
+            try
+            {
+                using (OracleCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = query;
+                    cmd.Parameters.Clear();
+                    if (param != null)
+                        cmd.Parameters.AddRange(param);
+
+                    using (OracleDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (tmp is Dictionary<int, string>)
+                                tmp.Add(reader.GetInt32(0), reader.GetString(1));
+                            else
+                                tmp.Add(reader.GetString(0), reader.GetString(1));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return tmp;
+        }
+
+        public string GetIFRS(int bus_mod, string sppi)
+        {
+            using (OracleConnection conn = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = conn.CreateCommand())
+            {
+                try
+                {
+                    cmd.CommandText = @" Select IFRS from BUSMOD_SPPI_IFRS where BUS_MOD = :bus_mode and SPPI = :sppi ";
+                    cmd.Parameters.Add("bus_mode", OracleDbType.Int32, bus_mod, System.Data.ParameterDirection.Input);
+                    cmd.Parameters.Add("sppi", OracleDbType.Int32, sppi, System.Data.ParameterDirection.Input);
+                    return cmd.ExecuteScalar().ToString();
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+            }
+        }
+
+        public string GetSPPI(decimal rnk)
+        {
+            using (OracleConnection conn = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = conn.CreateCommand())
+            {
+                try
+                {
+                    byte custtype = 0;
+                    string bussl = "";
+                    cmd.CommandText = @" select c.custtype, cw.value from customer c left join customerw cw on c.rnk = cw.rnk and cw.tag = 'BUSSL' where c.rnk = :rnk ";
+                    cmd.Parameters.Add("rnk", OracleDbType.Decimal, rnk, System.Data.ParameterDirection.Input);
+                    using (OracleDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            custtype = reader.GetByte(0);
+                            bussl = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                        }
+                    }
+                    return (custtype == 3) || (custtype == 2 && bussl == "2") ? "1" : "";
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
             }
         }
 
@@ -1384,7 +1027,8 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             {
                 case 1:
                 case 2:
-                case 3: 
+                case 3:
+                case 5:
                     return 2;
 
                 case 11:
@@ -1427,7 +1071,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     if (search_data == null) //without tab_name
                         prop.SetValue(cst_inf, query_data[prop.Name.ToString()], null);
                     else
-                        prop.SetValue(cst_inf, GetNameValue(search_data.Item2, search_data.Item3, search_data.Item4, query_data[prop.Name.ToString()], connect ), null);
+                        prop.SetValue(cst_inf, GetNameValue(search_data.Item2, search_data.Item3, search_data.Item4, query_data[prop.Name.ToString()], connect), null);
                 }
 
 
@@ -1448,7 +1092,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 }
 
                 return cst_inf;
-                
+
             }
             catch (Exception e)
             {
@@ -1457,7 +1101,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             }
             finally
             {
-                if(conn == null)
+                if (conn == null)
                 {
                     connect.Dispose();
                     connect.Close();
@@ -1474,6 +1118,25 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             {
                 cmd.CommandText = String.Format("Select {0} from {1} where {2} = {3}", name_column, tab_name, id_column, value);
                 return cmd.ExecuteScalar().ToString();
+            }
+        }
+
+        public float GetActualLimit(long? sub_nd, long? nd_gkd)
+        {
+            using (OracleConnection conn = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = conn.CreateCommand())
+            {
+                try
+                {
+                    cmd.CommandText = @" select cck_app.gkd_limit_rest(:sub_nd, :gkd_nd) from dual ";
+                    cmd.Parameters.Add("sub_nd", OracleDbType.Int64, sub_nd, System.Data.ParameterDirection.Input);
+                    cmd.Parameters.Add("gkd_nd", OracleDbType.Int64, nd_gkd, System.Data.ParameterDirection.Input);
+                    return Convert.ToSingle(cmd.ExecuteScalar().ToString());
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
             }
         }
     }

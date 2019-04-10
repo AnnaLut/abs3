@@ -21,5 +21,6 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Abstract
         void setMasIni(decimal nd);
         void FinDebit(decimal acc);
         string GetTabId();
+        bool IsNBShasOB22(string nbs);
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using barsroot.core;
+using BarsWeb.Areas.Ndi.Models.DbModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,10 +18,16 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
             // TODO: Add constructor logic here
             //
         }
-        public const string HiddenColumnsKeyPrefix = "hiddenColumnsKey";
-        public string FiltersStorageKey { get; set; }
+        public LocalStorageModel(MetaTable tableInfo,UserMap user)
+        {
+            HiddenColumnsViewModel  = new HiddenColumnsViewModel(tableInfo, user);
+            FiltersStorageKey = user.user_id + "_" + tableInfo.TABID;
+        }
 
-        public string HiddenColumnsKey { get; set; }
+
+        public string FiltersStorageKey { get; set; }
+        public HiddenColumnsViewModel HiddenColumnsViewModel;
+        
 
     }
 }

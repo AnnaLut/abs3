@@ -832,6 +832,11 @@ public partial class DptClientRequestCreate : Bars.BarsPage
                 dtDateFinish.Visible = false;
                 validatorDateFinish.Enabled = false;
                 CompareValidatorDate2.Enabled = false;
+
+                lbSignsCard.Visible = scSignsCard.Visible = 
+                    lbPrintSignsCard.Visible = PrintSignsCard.Visible = false;
+
+
                 break;
 
             // Довірена особа
@@ -841,6 +846,10 @@ public partial class DptClientRequestCreate : Bars.BarsPage
                 lbRequestDates.Text = "Дата початку дії: &nbsp;";
                 lbDateFinish.Text = "Дата завершення дії: &nbsp;";
                 lbWarrant.Text = "Сканування довіреності: &nbsp;";
+				
+				lbSignsCard.Visible = scSignsCard.Visible = 
+                    lbPrintSignsCard.Visible = PrintSignsCard.Visible = false;
+				
                 break;
 
             default:

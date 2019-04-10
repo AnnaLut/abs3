@@ -167,6 +167,12 @@ is
                         p_adds in cc_docs.adds%type, -- номер доп.соглашени€ (=dpt_agreements.agrmnt_num)
                         p_text in cc_docs.text%type); -- текст договора
 
+  procedure CREATE_TEXT
+  ( p_id   in cc_docs.id%type   -- идентификатор шаблона
+  , p_nd   in cc_docs.nd%type   -- идентификатор договора
+  , p_adds in cc_docs.adds%type -- номер доп.соглашени€ (=dpt_agreements.agrmnt_num)
+  , p_text in cc_docs.data%type -- текст договора
+  );
   --
   -- «апись текста договора при пролонгации
   --
@@ -2785,6 +2791,53 @@ is
     end if;
 
   end create_text;
+
+  procedure CREATE_TEXT
+  ( p_id   in cc_docs.id%type
+  , p_nd   in cc_docs.nd%type
+  , p_adds in cc_docs.adds%type
+  , p_text in cc_docs.data%type
+  ) is
+    title     varchar2(64) := $$PLSQL_UNIT||'.CREATE_TEXT';
+    l_id      cc_docs.id%type;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_id=%s, p_nd=%s, p_adds=%s ).'
+                    , title, p_id, to_char(p_nd), to_char(p_adds) );
+
+    -- есть запись с пустым текстом
+    update CC_DOCS
+       set DATA    = p_text
+         , VERSION = sysdate
+     where ID    = p_id
+       and ND    = p_nd
+       and ADDS  = p_adds
+       and STATE = 1;
+
+    if ( sql%rowcount = 0 )
+    then
+
+      begin
+        insert
+          into CC_DOCS
+             ( ID, ND, ADDS, DATA, VERSION, STATE )
+        values
+             ( p_id, p_nd, p_adds, p_text, sysdate, 1 );
+      exception
+        when DUP_VAL_ON_INDEX
+        then bars_error.raise_nerror( g_modcode, 'TEXT_ALREADY_EXISTS', to_char(p_adds), to_char(p_nd), p_id );
+      end;
+
+      bars_audit.trace( '%s: добавили запись.', title );
+
+    else
+
+      bars_audit.trace( '%s: заполнен текст пустого договора / ƒ—.', title );
+
+    end if;
+
+  end CREATE_TEXT;
+
   -- ======================================================================================
   procedure prolongation_create_text(p_id   in cc_docs.id%type,
                                      p_nd   in cc_docs.nd%type,

@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/11/2013 17:00:06" ReportInfo.Modified="03/19/2019 15:13:54" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoUS6qvaX0ql313TsNWhQ15ks9qe1cxnJMEisbF72jWJ7A==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ID, CHAR00 ACCOUNT_NUMBER, CHAR01 LCV, NUM01 CURRENCY_ID, DAT00 START_DATE, DAT01 EXPIRY_DATE, NUM02 AMOUNT_TRANCHE, CHAR02 STATE_NAME, NUM03 CUSTOMER_ID, CHAR03 OKPO, CHAR04 CUSTOMER_NAME, CHAR05 BRANCH_ID, CHAR06 BRANCH_NAME, NUM04 INTEREST_RATE_GENERAL, NUM05 INTEREST_RATE_ADD_BONUS, NUM06 INTEREST_RATE_BONUS, NUM07 CURRENT_INTEREST_RATE, NUM08 IS_PROLONGATION, NUM09 IS_REPLENISHMENT_TRANCHE, NUM10 INTEREST_RATE_PROLONGATION, NUM11 AMOUNT_ON_START_DATE, NUM12 AMOUNT_ON_END_DATE, NUM13 DIFFERENCE_AMOUNTS, NUM14 ACCOUNT_ID, NUM15 OBJECT_TYPE_ID, NUM16 STATE_ID, CHAR07 DEPOSIT_NUMBER, CHAR08 MFO_CODE, CHAR09 DBO_CONTRACT_NUMBER, CHAR10 DBO_CONTRACT_DATE, NUM17 IS_SHORT_TERM, NUM18 DEPOSIT_TERM from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="DEPOSIT_NUMBER" DataType="System.String"/>
+        <Column Name="ACCOUNT_NUMBER" DataType="System.String"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="CUSTOMER_NAME" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="CURRENCY_ID" DataType="System.Decimal"/>
+        <Column Name="BRANCH_ID" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="START_DATE" DataType="System.DateTime"/>
+        <Column Name="EXPIRY_DATE" DataType="System.DateTime"/>
+        <Column Name="AMOUNT_TRANCHE" DataType="System.Decimal"/>
+        <Column Name="STATE_NAME" DataType="System.String"/>
+        <Column Name="CUSTOMER_ID" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE_GENERAL" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE_ADD_BONUS" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE_BONUS" DataType="System.Decimal"/>
+        <Column Name="CURRENT_INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="IS_PROLONGATION" DataType="System.Decimal"/>
+        <Column Name="IS_REPLENISHMENT_TRANCHE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE_PROLONGATION" DataType="System.Decimal"/>
+        <Column Name="AMOUNT_ON_START_DATE" DataType="System.Decimal"/>
+        <Column Name="AMOUNT_ON_END_DATE" DataType="System.Decimal"/>
+        <Column Name="DIFFERENCE_AMOUNTS" DataType="System.Decimal"/>
+        <Column Name="ACCOUNT_ID" DataType="System.Decimal"/>
+        <Column Name="OBJECT_TYPE_ID" DataType="System.Decimal"/>
+        <Column Name="STATE_ID" DataType="System.Decimal"/>
+        <Column Name="DBO_CONTRACT_NUMBER" DataType="System.String"/>
+        <Column Name="DBO_CONTRACT_DATE" DataType="System.String"/>
+        <Column Name="IS_SHORT_TERM" DataType="System.Decimal"/>
+        <Column Name="MFO_CODE" DataType="System.String"/>
+        <Column Name="DEPOSIT_TERM" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="Table2" DataType="System.Int32" Enabled="true" SelectCommand="select user_name, bankdate from dual">
+        <Column Name="USER_NAME" DataType="System.String"/>
+        <Column Name="BANKDATE" DataType="System.DateTime"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.String" Description="Дата з"/>
+    <Parameter Name="sFdat2" DataType="System.String" Description="Дата по"/>
+    <Parameter Name="session_id" DataType="System.String"/>
+    <Total Name="MFODat1" Expression="[Table.AMOUNT_ON_START_DATE]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="TotalDat1" Expression="[Table.AMOUNT_ON_START_DATE]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="TotalDat2" Expression="[Table.AMOUNT_ON_END_DATE]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="TotalZmin" Expression="[Table.DIFFERENCE_AMOUNTS]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="MFODat2" Expression="[Table.AMOUNT_ON_END_DATE]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="MFOZmin" Expression="[Table.DIFFERENCE_AMOUNTS]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="UAH_Dat1" Expression="[Table.AMOUNT_ON_START_DATE]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==980"/>
+    <Total Name="USD_Dat2" Expression="[Table.AMOUNT_ON_END_DATE]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==840"/>
+    <Total Name="EUR_Zmin" Expression="[Table.DIFFERENCE_AMOUNTS]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==978"/>
+    <Total Name="UAH_Dat2" Expression="[Table.AMOUNT_ON_END_DATE]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==980"/>
+    <Total Name="UAH_Zmin" Expression="[Table.DIFFERENCE_AMOUNTS]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==980"/>
+    <Total Name="USD_Dat1" Expression="[Table.AMOUNT_ON_START_DATE]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==840"/>
+    <Total Name="USD_Zmin" Expression="[Table.DIFFERENCE_AMOUNTS]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==840"/>
+    <Total Name="EUR_Dat1" Expression="[Table.AMOUNT_ON_START_DATE]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==978"/>
+    <Total Name="EUR_Dat2" Expression="[Table.AMOUNT_ON_END_DATE]" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[Table.CURRENCY_ID]==978"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="74.64" CanShrink="true">
+      <TableObject Name="Table1" Top="28.35" Width="1030.5" Height="46.29" Border.Lines="All">
+        <TableColumn Name="Column1" Width="41.22"/>
+        <TableColumn Name="Column4" Width="41.22"/>
+        <TableColumn Name="Column5" Width="41.22"/>
+        <TableColumn Name="Column8" Width="41.22"/>
+        <TableColumn Name="Column16" Width="41.22"/>
+        <TableColumn Name="Column17" Width="41.22"/>
+        <TableColumn Name="Column18" Width="41.22"/>
+        <TableColumn Name="Column22" Width="41.22"/>
+        <TableColumn Name="Column23" Width="41.22"/>
+        <TableColumn Name="Column24" Width="41.22"/>
+        <TableColumn Name="Column25" Width="41.22"/>
+        <TableColumn Name="Column26" Width="41.22"/>
+        <TableColumn Name="Column27" Width="41.22"/>
+        <TableColumn Name="Column28" Width="41.22"/>
+        <TableColumn Name="Column29" Width="41.22"/>
+        <TableColumn Name="Column30" Width="41.22"/>
+        <TableColumn Name="Column31" Width="41.22"/>
+        <TableColumn Name="Column32" Width="41.22"/>
+        <TableColumn Name="Column33" Width="41.22"/>
+        <TableColumn Name="Column34" Width="41.22"/>
+        <TableColumn Name="Column35" Width="41.22"/>
+        <TableColumn Name="Column36" Width="41.22"/>
+        <TableColumn Name="Column37" Width="41.22"/>
+        <TableColumn Name="Column38" Width="41.22"/>
+        <TableColumn Name="Column39" Width="41.22"/>
+        <TableRow Name="Row1" Height="37.8">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№ ДБО" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Дата ДБО" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Номер депозитного рахунку*" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="Валюта депозитного рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="Ідентифікатор траншу" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="Дата розмішення траншу*" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="Дата повернення траншу*" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell62" Border.Lines="All" Text="Сума траншу*" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell63" Border.Lines="All" Text="Валюта траншу*" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell64" Border.Lines="All" Text="Статус траншу" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="РНК Клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell66" Border.Lines="All" Text="ЄДРПОУ Клієнта*" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="Назва Клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell68" Border.Lines="All" Text="№ ТВБВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="Назва РУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell70" Border.Lines="All" Text="Базова ставка" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="Бонусна ставка" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="Акційна ставка" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="Діюча ставка*" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell74" Border.Lines="All" Text="Автопролонгація(так/ні)" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell75" Border.Lines="All" Text="Поповнення (так/ні)" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="Бонусна ставка при пролонгації" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="Станом на &quot;дата&quot;" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell78" Border.Lines="All" Text="Станом на &quot;дата&quot;" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell79" Border.Lines="All" Text="Зміни  (+/-)" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="8.49" AutoSize="true">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell80" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell81" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell82" Border.Lines="All" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell83" Border.Lines="All" Text="11" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell84" Border.Lines="All" Text="12" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell85" Border.Lines="All" Text="13" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell86" Border.Lines="All" Text="14" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell87" Border.Lines="All" Text="15" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell88" Border.Lines="All" Text="16" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell89" Border.Lines="All" Text="17" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell90" Border.Lines="All" Text="18" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell91" Border.Lines="All" Text="19" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell92" Border.Lines="All" Text="20" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell93" Border.Lines="All" Text="21" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell94" Border.Lines="All" Text="22" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell95" Border.Lines="All" Text="23" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell96" Border.Lines="All" Text="24" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell97" Border.Lines="All" Text="25" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text2" Left="9.45" Width="699.3" Height="18.9" CanBreak="false" Text="ведомість Додаток 1&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="76.78" Width="1047.06" Height="16.47" CanGrow="true" Condition="[Table.MFO_CODE]">
+      <TextObject Name="Text1" Top="3.45" Width="451.55" Height="13.02" CanGrow="true" CanShrink="true" Text="МФО [Table.MFO_CODE] [Table.BRANCH_NAME]" AutoWidth="true" Font="Arial, 7pt, style=Bold"/>
+      <GroupHeaderBand Name="GroupHeader2" Top="95.39" Width="1047.06" Height="9.45" CanGrow="true" CanShrink="true" Condition="[Table.LCV]">
+        <TextObject Name="Text4" Left="9.45" Width="396.9" Height="9.45" CanGrow="true" CanShrink="true" Text="По валюте [Table.LCV]" AutoWidth="true" Font="Arial, 7pt, style=Bold"/>
+        <DataBand Name="Data1" Top="106.98" Width="1047.06" Height="37.8" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true">
+          <TableObject Name="Table4" Width="1030.5" Height="37.8" Border.Lines="All">
+            <TableColumn Name="Column40" Width="41.22"/>
+            <TableColumn Name="Column41" Width="41.22"/>
+            <TableColumn Name="Column42" Width="41.22"/>
+            <TableColumn Name="Column43" Width="41.22"/>
+            <TableColumn Name="Column44" Width="41.22"/>
+            <TableColumn Name="Column45" Width="41.22"/>
+            <TableColumn Name="Column46" Width="41.22"/>
+            <TableColumn Name="Column47" Width="41.22"/>
+            <TableColumn Name="Column48" Width="41.22"/>
+            <TableColumn Name="Column49" Width="41.22"/>
+            <TableColumn Name="Column50" Width="41.22"/>
+            <TableColumn Name="Column51" Width="41.22"/>
+            <TableColumn Name="Column52" Width="41.22"/>
+            <TableColumn Name="Column53" Width="41.22"/>
+            <TableColumn Name="Column54" Width="41.22"/>
+            <TableColumn Name="Column55" Width="41.22"/>
+            <TableColumn Name="Column56" Width="41.22"/>
+            <TableColumn Name="Column57" Width="41.22"/>
+            <TableColumn Name="Column58" Width="41.22"/>
+            <TableColumn Name="Column59" Width="41.22"/>
+            <TableColumn Name="Column60" Width="41.22"/>
+            <TableColumn Name="Column61" Width="41.22"/>
+            <TableColumn Name="Column62" Width="41.22"/>
+            <TableColumn Name="Column63" Width="41.22"/>
+            <TableColumn Name="Column64" Width="41.22"/>
+            <TableRow Name="Row3" Height="37.8" AutoSize="true">
+              <TableCell Name="Cell98" Border.Lines="All" Text="[Table.DBO_CONTRACT_NUMBER]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell99" Border.Lines="All" Text="[Table.DBO_CONTRACT_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell100" Border.Lines="All" Text="[Table.ACCOUNT_NUMBER]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell101" Border.Lines="All" Text="[Table.LCV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell102" Border.Lines="All" Text="[Table.ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell103" Border.Lines="All" Text="[Table.START_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell104" Border.Lines="All" Text="[Table.EXPIRY_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell105" Border.Lines="All" Text="[Table.AMOUNT_TRANCHE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell106" Border.Lines="All" Text="[Table.LCV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell107" Border.Lines="All" Text="[Table.STATE_NAME]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell108" Border.Lines="All" Text="[Table.CUSTOMER_ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell109" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell110" Border.Lines="All" Text="[Table.CUSTOMER_NAME]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell111" Border.Lines="All" Text="[Table.BRANCH_ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell112" Border.Lines="All" Text="[Table.BRANCH_NAME]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell113" Border.Lines="All" Text="[Table.INTEREST_RATE_GENERAL]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell114" Border.Lines="All" Text="[Table.INTEREST_RATE_BONUS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell115" Border.Lines="All" Text="[Table.INTEREST_RATE_ADD_BONUS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell116" Border.Lines="All" Text="[Table.CURRENT_INTEREST_RATE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell117" Border.Lines="All" Text="[IIf([Table.IS_PROLONGATION]==0,&quot;Ні&quot;,&quot;Так&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell118" Border.Lines="All" Text="[IIf([Table.IS_REPLENISHMENT_TRANCHE]==0,&quot;Ні&quot;,&quot;Так&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell119" Border.Lines="All" Text="[Table.INTEREST_RATE_PROLONGATION]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell120" Border.Lines="All" Text="[sFdat1]" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell121" Border.Lines="All" Text="[sFdat2]" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+              <TableCell Name="Cell122" Border.Lines="All" Text="[Table.DIFFERENCE_AMOUNTS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+            </TableRow>
+          </TableObject>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter2" Top="146.92" Width="1047.06" Height="18.9" CanGrow="true" CanShrink="true">
+          <TextObject Name="Text5" Left="9.45" Width="226.8" Height="9.45" CanGrow="true" CanShrink="true" Text="Всього валюте [Table.LCV]:" AutoWidth="true" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text7" Left="907.2" Width="40.82" Height="18.9" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[TotalDat1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text8" Left="949" Width="37.8" Height="18.9" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[TotalDat2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text9" Left="990.25" Width="39.74" Height="18.9" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[TotalZmin]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt, style=Bold"/>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter1" Top="167.96" Width="1047.06" Height="47.26" CanGrow="true" CanShrink="true">
+        <TextObject Name="Text3" Top="9.45" Width="189" Height="9.45" CanGrow="true" CanShrink="true" Text="Всього по МФО [Table.MFO_CODE]: " AutoWidth="true" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text6" Left="907.2" Top="9.45" Width="44.63" Height="9.45" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[MFODat1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text11" Left="991.99" Top="9.46" Width="37.8" Height="9.45" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[MFOZmin]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text10" Left="952.45" Top="9.45" Width="37.8" Height="9.45" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[MFODat2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt, style=Bold"/>
+        <LineObject Name="Line1" Top="20.9" Width="1030.05" Border.Style="Dash" Diagonal="true"/>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="217.35" Width="1047.06" Height="113.4" CanGrow="true" CanShrink="true">
+      <TextObject Name="Text12" Top="9.45" Width="236.25" Height="18.9" Text="Всього по усім МФО" Font="Arial, 7pt, style=Bold, Italic"/>
+      <LineObject Name="Line2" Width="1030.05" Border.Style="Double" Diagonal="true"/>
+      <TextObject Name="Text13" Left="793.8" Top="9.45" Width="94.5" Height="18.9" Text="UAH:" Font="Arial, 7pt, style=Bold, Italic"/>
+      <TextObject Name="Text14" Left="907.2" Top="9.45" Width="47.25" Height="18.9" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[UAH_Dat1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text15" Left="954.45" Top="9.45" Width="37.8" Height="18.9" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[UAH_Dat2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text16" Left="992.25" Top="9.45" Width="37.8" Height="18.9" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[UAH_Zmin]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text17" Left="793.8" Top="37.8" Width="94.5" Height="18.9" Text="USD:" Font="Arial, 7pt, style=Bold, Italic"/>
+      <TextObject Name="Text18" Left="793.8" Top="66.15" Width="94.5" Height="18.9" Text="EUR:" Font="Arial, 7pt, style=Bold, Italic"/>
+      <TextObject Name="Text19" Left="954.45" Top="37.8" Width="37.8" Height="18.9" Text="[USD_Dat2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text20" Left="907.2" Top="37.8" Width="47.25" Height="18.9" Text="[USD_Dat1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text21" Left="992.25" Top="37.8" Width="37.8" Height="18.9" Text="[USD_Zmin]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text22" Left="992.25" Top="66.15" Width="37.8" Height="18.9" Text="[EUR_Zmin]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text23" Left="907.2" Top="66.15" Width="47.25" Height="18.9" Text="[EUR_Dat1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+      <TextObject Name="Text24" Left="954.45" Top="66.15" Width="37.8" Height="18.9" Text="[EUR_Dat2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" Font="Arial, 7pt"/>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

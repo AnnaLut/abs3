@@ -1,0 +1,72 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/settingsService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/saveDataService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/modelService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/baseController.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/validationService.js?v1.0.0"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+
+
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/DepositOnDemand.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/DepositOnDemandCalc.js?v1.0.1"></script>
+
+
+
+
+
+
+<link rel="stylesheet" href="~/Areas/GDA/Css/GDA/Main.css" />
+@*-------------------*@
+<div class="page-header"><h1>Довідник: "Умови вкладу на вимогу"</h1></div>
+<div id='tabStripDictDemand' kendo-tab-strip="tabStrip" k-options="tabStripOptions" k-content-urls="[ null, null]">
+
+   
+    <!-- tab list -->
+    <ul>
+        <li id="tabDemand" class="k-state-active">Процентні ставки по Вкладу на вимогу</li>
+        <li id="tabDemandCalc">Метод нарахування %%</li>
+    </ul>
+
+    <div ng-controller="DepositOnDemand">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionDepositDemand"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="depositdemandoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionDepositDemand" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionDepositDemand" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelDepositDemand"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            <div id="depositdemandoptions" kendo-grid="DemandDepositGrid" k-options="DemandDepositGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionDepositDemand" disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="depositdemandconditionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionDepositDemand" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionDepositDemand" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="depositdemandconditions" kendo-grid="DepositDemandConditionsGrid" k-options="DepositDemandConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="DepositOnDemandCalc">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionDepositOnDemandCalc"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="depositondemandcalcoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionDepositOnDemandCalc" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionDepositOnDemandCalc" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelDepositOnDemandCalc"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            <div id="depositondemandcalcoptions" kendo-grid="DepositOnDemandCalcGrid" k-options="DepositOnDemandCalcGridOptions"></div>
+        </div>
+    </div>
+
+</div>

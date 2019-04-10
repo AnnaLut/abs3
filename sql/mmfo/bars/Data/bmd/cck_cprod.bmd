@@ -126,6 +126,7 @@ begin
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 1, 'CPROD_ID', 'N', 'Код продукта', '.5', 22, 1, 1, 1, 0, 0, '', '#0', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'CPROD_NAME', 'C', 'Наименование продукта', '2', 70, 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'PROD_VKB', 'C', 'Код продукта ВКБ ~(АТ Ощадбанк)', '2', 70, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

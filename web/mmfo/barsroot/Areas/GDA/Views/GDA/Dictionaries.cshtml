@@ -1,0 +1,303 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/settingsService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/saveDataService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/modelService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/baseController.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/validationService.js?v1.0.0"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+
+
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/ProlongationDeposit.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/CapitalizationDeposit.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/PaymentDeposit.js?v.1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/ActionRateDeposit.js?v.1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/BaseRateDeposit.js?v.1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/PenaltyRateDeposit.js?v.1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/SumTranches.js?v.1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/TimeAddTranches.js?v.1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/ReplenishmentDeposit.js?v.1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/BlockRateDeposit.js"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Dictionaries/BonusProlongationDeposit.js"></script>
+
+
+
+
+
+<link rel="stylesheet" href="~/Areas/GDA/Css/GDA/Main.css" />
+@*-------------------*@
+<div class="page-header"><h1>Довідник: "Умови строкового депозиту"</h1></div>
+<div id='tabStripDict' kendo-tab-strip="tabStrip" k-options="tabStripOptions" k-content-urls="[ null, null]">
+    <!-- tab list -->
+    <ul>
+        <li id="tabBase" class="k-state-active">Базова ставка по депозиту ММСБ</li>
+        <li id="tabAction">Акційна ставка по депозиту ММСБ</li>
+        <li id="tabPayment">Виплата по депозиту ММСБ</li>
+        <li id="tabCapital">Капіталізація по депозиту ММСБ</li>
+        <li id="tabProlong">Пролонгація по депозиту ММСБ</li>
+        <li id="tabPenalty">Шкала % ставок при достроковому поверненню траншів</li>
+        <li id="tabSum">Суми траншів</li>
+        <li id="tabTimeAdd">Строки поповнення траншів</li>
+        <li id="tabReplenishment">Поповнення</li>
+        <li id="tabBlockRate">Процентна ставка заблокованих траншів</li>
+        <li id="tabBonusProlong">Бонусна процентна ставка при пролонгації</li>
+    </ul>
+
+    <div ng-controller="BaseRateDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionBase"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="generaloptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionBase" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+
+                <button class='btn btn-default' id="cancelOptionBase" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelBase" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            
+                <div id="generaloptions" kendo-grid="GeneralOptionGrid" k-options="GeneralOptionGridOptions"></div>
+        </div>
+            <div style="padding: 1em">
+                <div style="margin-bottom:5px;">
+                    <button class='btn btn-default' id="addConditionBase" disabled><i class='pf-icon pf-16 pf-add'></i></button>
+                    <button class='btn btn-default' id="generalconditionsEdit" disabled><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                    <button class='btn btn-default' id="saveConditionBase" disabled><i class='pf-icon pf-16 pf-save'></i></button>
+                    <button class='btn btn-default' id="cancelConditionBase" disabled><i class="pf-icon pf-16 pf-delete"></i></button>
+                </div>
+                <div id="generalconditions" kendo-grid="GeneralConditionsGrid" k-options="GeneralConditionsGridOptions"></div>
+            </div>
+        </div>
+
+    <div ng-controller="ActionRateDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionAction"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="actionoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionAction" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionAction" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelAct"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            <div  id="actionoptions" kendo-grid="ActionOptionGrid" k-options="ActionOptionGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionAction" disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="actionconditionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionAction" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionAction" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="actionconditions" kendo-grid="ActionConditionsGrid" k-options="ActionConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="PaymentDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionPayment"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="paymentoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionPayment" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionPayment" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelPayment" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+
+            </div>
+            <div id="paymentoptions" kendo-grid="PaymentOptionGrid" k-options="PaymentOptionGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionPayment"  disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="paymentconditionsEdit"  disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionPayment"  disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionPayment"  disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="paymentconditions" kendo-grid="PaymentConditionsGrid" k-options="PaymentConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="CapitalizationDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionCapital"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="capitalizationoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionCapital" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionCapital" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                @*<button class='btn btn-default' id="refreshOptionCapital"><i class="pf-icon pf-16 pf-reload_rotate"></i></button>*@
+                <button class='btn btn-default' id="exportToExcelCapital" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+
+            </div>
+            <div id="capitalizationoptions" kendo-grid="CapitalizationOptionGrid" k-options="CapitalizationOptionGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionCapital"  disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="capitalizationconditionsEdit"  disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionCapital"  disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionCapital"  disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="capitalizationconditions" kendo-grid="CapitalizationConditionsGrid" k-options="CapitalizationConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="ProlongationDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionProlong"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="prolongationoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionProlong" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionProlong" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                @*<button class='btn btn-default' id="refreshOptionProlong"><i class="pf-icon pf-16 pf-reload_rotate"></i></button>*@
+                <button class='btn btn-default' id="exportToExcelProlong" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+
+            </div>
+            <div id="prolongationoptions" kendo-grid="ProlongationOptionGrid" k-options="ProlongationOptionGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionProlong"  disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="prolongationconditionsEdit"  disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionProlong"  disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionProlong"  disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="prolongationconditions" kendo-grid="ProlongationConditionsGrid" k-options="ProlongationConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="PenaltyDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionPenalty"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="penaltyoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionPenalty" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionPenalty" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelPenalty" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+
+            </div>
+            <div id="penaltyoptions" kendo-grid="PenaltyOptionGrid" k-options="PenaltyOptionGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionPenalty"  disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="penaltyconditionsEdit"  disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionPenalty"  disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionPenalty"  disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="penaltyconditions" kendo-grid="PenaltyConditionsGrid" k-options="PenaltyConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="SumTranches">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionTranches"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="sumtranchesoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionTranches" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionTranches" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelSum" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+
+            </div>
+            <div id="sumtranchesoptions" kendo-grid="SumTranchesGrid" k-options="SumTranchesGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionSum"  disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="sumconditionsEdit"  disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionSum"  disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionSum"  disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="sumconditions" kendo-grid="SumConditionsGrid" k-options="SumConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="TimeAddTranches">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionTimeAddTranches"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="timeaddtranchesoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionTimeAddTranches" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionTimeAddTranches" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelTimeAddTranches" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            <div id="timeaddtranchesoptions" kendo-grid="TimeAddTranchesGrid" k-options="TimeAddTranchesGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionTimeAddTranches"  disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="timeaddtranchesconditionsEdit"  disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionTimeAddTranches"  disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionTimeAddTranches"  disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="timeaddtranchesconditions" kendo-grid="TimeAddTranchesConditionsGrid" k-options="TimeAddTranchesConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="ReplenishmentDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionReplenishmentDeposit"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="replenishmentdepositoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionReplenishmentDeposit" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionReplenishmentDeposit" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                @*<button class='btn btn-default' id="refreshOptionReplenishmentDeposit"><i class="pf-icon pf-16 pf-reload_rotate"></i></button>*@
+                <button class='btn btn-default' id="exportToExcelReplenishmentDeposit" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            <div id="replenishmentdepositoptions" kendo-grid="ReplenishmentDepositGrid" k-options="ReplenishmentDepositGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionReplenishmentDeposit"  disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="replenishmentdepositconditionsEdit"  disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionReplenishmentDeposit"  disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionReplenishmentDeposit"  disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="replenishmentdepositconditions" kendo-grid="ReplenishmentDepositConditionsGrid" k-options="ReplenishmentDepositConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="BlockRateDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionBlockRateDeposit"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="blockratedepositoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionBlockRateDeposit" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionBlockRateDeposit" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelBlockRateDeposit" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            <div id="blockratedepositoptions" kendo-grid="BlockRateDepositGrid" k-options="BlockRateDepositGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionBlockRateDeposit" disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="blockratedepositconditionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionBlockRateDeposit" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionBlockRateDeposit" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="blockratedepositconditions" kendo-grid="BlockRateDepositConditionsGrid" k-options="BlockRateDepositConditionsGridOptions"></div>
+        </div>
+    </div>
+
+    <div ng-controller="BonusProlongationDeposit">
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addOptionBonusProlongationDeposit"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="bonusprolongationdepositoptionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveOptionBonusProlongationDeposit" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelOptionBonusProlongationDeposit" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+                <button class='btn btn-default' id="exportToExcelBonusProlongationDeposit" title="Експортувати у Ексель"><i class="pf-icon pf-16 pf-exel"></i></button>
+            </div>
+            <div id="bonusprolongationdepositoptions" kendo-grid="BonusProlongDepositGrid" k-options="BonusProlongDepositGridOptions"></div>
+        </div>
+        <div style="padding: 1em">
+            <div style="margin-bottom:5px;">
+                <button class='btn btn-default' id="addConditionBonusProlongationDeposit" disabled="disabled"><i class='pf-icon pf-16 pf-add'></i></button>
+                <button class='btn btn-default' id="bonusprolongationdepositconditionsEdit" disabled="disabled"><i class='pf-icon pf-16 pf-tool_pencil'></i></button>
+                <button class='btn btn-default' id="saveConditionBonusProlongationDeposit" disabled="disabled"><i class='pf-icon pf-16 pf-save'></i></button>
+                <button class='btn btn-default' id="cancelConditionBonusProlongationDeposit" disabled="disabled"><i class="pf-icon pf-16 pf-delete"></i></button>
+            </div>
+            <div id="bonusprolongationdepositconditions" kendo-grid="BonusProlongDepositConditionsGrid" k-options="BonusProlongDepositConditionsGridOptions"></div>
+        </div>
+    </div>
+</div>

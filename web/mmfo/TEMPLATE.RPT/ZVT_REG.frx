@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/25/2018 14:30:26" ReportInfo.Modified="12/21/2018 10:33:13" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQEp1PMJEJ/oiiw871JZxIZU=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select r.char00 as branch,r.char01 as tt,r.char02 as nlsd,r.char03 as nlsk,r.char04 as name,r.char05 as namet, r.num00 as tema, r.num01 as userid, r.num02 as kv, r.num03 as ref, r.num04 as s, r.num05 as sq, r.char06 as struct, r.dat00 as dat_zvt, char07 as fio&#13;&#10;from rs_tmp_report_data r &#13;&#10;where session_id = :session_id/*&#13;&#10;select t.TEMA, b.BRANCH, d.isp USERID, d.KV, d.TT, d.REF, d.NLSD, d.NLSK,&#13;&#10;     d.S S, d.SQ, b.NAME,t.name NAMET&#13;&#10;from  branch b, TEST_ZVT t, zvt_doc d&#13;&#10;where d.fdat = to_date( '18.12.2017','dd-mm-yyyy')&#13;&#10;  and ( nvl('4','0') = '0' or t.PRN ='4' )&#13;&#10;  and b.branch = substr( d.branch,1,15)&#13;&#10;  and t.tema =abs(d.tema )&#13;&#10;  and t.tema = decode('0','0', t.tema, to_number('0'))&#13;&#10;  and b.branch like '%' || decode ( length('%'), 8, '','%' )&#13;&#10;  and d.isp = decode('0','0', d.ISP, to_number('0'))&#13;&#10;order by 1, 2, 3,  sign(tema),   4, 5, 6*/">
+        <Column Name="TEMA" DataType="System.Decimal"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="USERID" DataType="System.Decimal"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="NLSD" DataType="System.String"/>
+        <Column Name="NLSK" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="NAMET" DataType="System.String"/>
+        <Column Name="STRUCT" DataType="System.String"/>
+        <Column Name="DAT_ZVT" DataType="System.DateTime"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+    <Total Name="USERID_COUNT" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="USERID_DOS" Expression="IIf([Table.S]&gt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="USERID_KOS" Expression="IIf([Table.S]&lt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="USERID_SQ" Expression="[Table.SQ]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="BRANCH_COUNT" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="BRANCH_DOS" Expression="IIf([Table.S]&gt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="BRANCH_KOS" Expression="IIf([Table.S]&lt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="BRANCH_SQ" Expression="[Table.SQ]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="TEMA_COUNT" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter3"/>
+    <Total Name="TEMA_DOS" Expression="IIf([Table.S]&gt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="GroupFooter3"/>
+    <Total Name="TEMA_KOS" Expression="IIf([Table.S]&lt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="GroupFooter3"/>
+    <Total Name="TEMA_SQ" Expression="[Table.SQ]" Evaluator="Data1" PrintOn="GroupFooter3"/>
+    <Total Name="Total_COUNT" TotalType="Count" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total__DOS" Expression="IIf([Table.S]&gt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total__KOS" Expression="IIf([Table.S]&lt;0,[Table.SQ],0)" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total__SQ" Expression="[Table.SQ]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="47.28">
+      <TableObject Name="Table1" Width="717.49" Height="47.28">
+        <TableColumn Name="Column51" Width="358.34"/>
+        <TableColumn Name="Column52" Width="359.15"/>
+        <TableRow Name="Row15" Height="23.64">
+          <TableCell Name="Cell118" Text="Реєстр проводок по папках по [Table.STRUCT]" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell119" VertAlign="Center" Font="Courier New, 7pt"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="23.64">
+          <TableCell Name="Cell120" Text="за" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell121" Text="[Table.DAT_ZVT]" Format="Date" Format.Format="d" VertAlign="Center" Font="Courier New, 7pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader3" Top="51.28" Width="718.2" Height="23.64" Condition="[Table.TEMA]">
+      <TableObject Name="Table1" Width="717.49" Height="23.64">
+        <TableColumn Name="Column1" Width="358.34"/>
+        <TableColumn Name="Column2" Width="359.15"/>
+        <TableRow Name="Row1" Height="23.64">
+          <TableCell Name="Cell1" Text="[Table.TEMA]" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell2" Text="Папка &lt;&lt; [Table.NAMET]&gt;&gt;" VertAlign="Center" Font="Courier New, 7pt"/>
+        </TableRow>
+      </TableObject>
+      <GroupHeaderBand Name="GroupHeader2" Top="78.92" Width="718.2" Height="37.8" Condition="[Table.BRANCH]">
+        <TableObject Name="Table4" Width="718.2" Height="37.8">
+          <TableColumn Name="Column19" Width="61.4"/>
+          <TableColumn Name="Column20" Width="33.05"/>
+          <TableColumn Name="Column21" Width="33.05"/>
+          <TableColumn Name="Column22" Width="110.7"/>
+          <TableColumn Name="Column23" Width="120"/>
+          <TableColumn Name="Column24" Width="120"/>
+          <TableColumn Name="Column25" Width="120"/>
+          <TableColumn Name="Column26" Width="120"/>
+          <TableRow Name="Row6">
+            <TableCell Name="Cell54" Text="[Table.BRANCH]" Font="Courier New, 7pt" ColSpan="4"/>
+            <TableCell Name="Cell55" Border.Lines="All" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell56" Border.Lines="All" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell57" Border.Lines="All" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell58" Text="[Table.NAME]" Font="Courier New, 7pt" ColSpan="4"/>
+            <TableCell Name="Cell59" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell60" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell61" Font="Courier New, 7pt"/>
+          </TableRow>
+          <TableRow Name="Row7">
+            <TableCell Name="Cell46" Text="Вик." HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell47" Text="Вал" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell48" Text="Оп" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell49" Text="Референс" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell50" Text="Дебет" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell51" Text="Кредит" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell52" Text="Номінал" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell53" Text="Еквівалент" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+          </TableRow>
+        </TableObject>
+        <GroupHeaderBand Name="GroupHeader1" Top="120.72" Width="718.2" Condition="[Table.USERID]">
+          <DataBand Name="Data1" Top="124.72" Width="718.2" Height="18.9" Guides="0" DataSource="Table">
+            <TableObject Name="Table2" Width="718.2" Height="18.9">
+              <TableColumn Name="Column3" Width="61.4"/>
+              <TableColumn Name="Column4" Width="33.05"/>
+              <TableColumn Name="Column5" Width="33.05"/>
+              <TableColumn Name="Column6" Width="110.7"/>
+              <TableColumn Name="Column7" Width="120"/>
+              <TableColumn Name="Column8" Width="120"/>
+              <TableColumn Name="Column9" Width="120"/>
+              <TableColumn Name="Column10" Width="120"/>
+              <TableRow Name="Row4">
+                <TableCell Name="Cell10" Text="[Table.USERID]" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell11" Text="[Table.KV]" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell12" Text="[Table.TT]" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell13" Text="[Table.REF]" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell14" Text="[Table.NLSD]" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell35" Text="[Table.NLSK]" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell36" Text="[Abs([Table.S]/100)]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell37" Text="[[Table.SQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+              </TableRow>
+            </TableObject>
+          </DataBand>
+          <GroupFooterBand Name="GroupFooter1" Top="147.62" Width="718.2" Height="18.9">
+            <TableObject Name="Table3" Width="718.2" Height="18.9">
+              <TableColumn Name="Column11" Width="61.4"/>
+              <TableColumn Name="Column12" Width="33.05"/>
+              <TableColumn Name="Column13" Width="33.05"/>
+              <TableColumn Name="Column14" Width="110.7"/>
+              <TableColumn Name="Column15" Width="120"/>
+              <TableColumn Name="Column16" Width="120"/>
+              <TableColumn Name="Column17" Width="120"/>
+              <TableColumn Name="Column18" Width="120"/>
+              <TableRow Name="Row5">
+                <TableCell Name="Cell38" Text="по Вик." HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt" ColSpan="3"/>
+                <TableCell Name="Cell39" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell40" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell41" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell42" Text="[USERID_COUNT]" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell43" Text="[[USERID_DOS]/100]=Дб" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell44" Text="[[USERID_KOS]/100]=Кт" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+                <TableCell Name="Cell45" Text="[[USERID_SQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+              </TableRow>
+            </TableObject>
+          </GroupFooterBand>
+        </GroupHeaderBand>
+        <GroupFooterBand Name="GroupFooter2" Top="170.52" Width="718.2" Height="18.9">
+          <TableObject Name="Table5" Width="718.2" Height="18.9">
+            <TableColumn Name="Column27" Width="61.4"/>
+            <TableColumn Name="Column28" Width="33.05"/>
+            <TableColumn Name="Column29" Width="33.05"/>
+            <TableColumn Name="Column30" Width="110.7"/>
+            <TableColumn Name="Column31" Width="120"/>
+            <TableColumn Name="Column32" Width="120"/>
+            <TableColumn Name="Column33" Width="120"/>
+            <TableColumn Name="Column34" Width="120"/>
+            <TableRow Name="Row8">
+              <TableCell Name="Cell62" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt" ColSpan="4"/>
+              <TableCell Name="Cell63" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt"/>
+              <TableCell Name="Cell64" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt"/>
+              <TableCell Name="Cell65" Border.Lines="All" VertAlign="Center" Font="Courier New, 7pt"/>
+              <TableCell Name="Cell66" Text="[BRANCH_COUNT]" VertAlign="Center" Font="Courier New, 7pt"/>
+              <TableCell Name="Cell67" Text="[[BRANCH_DOS]/100]=Дб" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+              <TableCell Name="Cell68" Text="[[BRANCH_KOS]/100]=Кт" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+              <TableCell Name="Cell69" Text="[[BRANCH_SQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            </TableRow>
+          </TableObject>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter3" Top="193.42" Width="718.2" Height="18.9">
+        <TableObject Name="Table6" Width="718.2" Height="18.9">
+          <TableColumn Name="Column35" Width="61.4"/>
+          <TableColumn Name="Column36" Width="33.05"/>
+          <TableColumn Name="Column37" Width="33.05"/>
+          <TableColumn Name="Column38" Width="110.7"/>
+          <TableColumn Name="Column39" Width="120"/>
+          <TableColumn Name="Column40" Width="120"/>
+          <TableColumn Name="Column41" Width="120"/>
+          <TableColumn Name="Column42" Width="120"/>
+          <TableRow Name="Row9">
+            <TableCell Name="Cell70" Text="[Table.NAMET]" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt" ColSpan="4"/>
+            <TableCell Name="Cell71" HorzAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell72" HorzAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell73" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell74" Text="[TEMA_COUNT]" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell75" Text="[[TEMA_DOS]/100]=Дб" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell76" Text="[[TEMA_KOS]/100]=Кт" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+            <TableCell Name="Cell77" Text="[[TEMA_SQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="216.32" Width="718.2" Height="94.5">
+      <TableObject Name="Table7" Width="718.2" Height="94.5">
+        <TableColumn Name="Column43" Width="61.4"/>
+        <TableColumn Name="Column44" Width="33.05"/>
+        <TableColumn Name="Column45" Width="33.05"/>
+        <TableColumn Name="Column46" Width="110.7"/>
+        <TableColumn Name="Column47" Width="120"/>
+        <TableColumn Name="Column48" Width="120"/>
+        <TableColumn Name="Column49" Width="120"/>
+        <TableColumn Name="Column50" Width="120"/>
+        <TableRow Name="Row10">
+          <TableCell Name="Cell78" Text="&lt;&lt;Разом по Звiту&gt;&gt;" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt" ColSpan="4"/>
+          <TableCell Name="Cell79" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell80" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell81" Border.Lines="All" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell82" Text="[Total_COUNT]" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell83" Text="[[Total__DOS]/100]=Дб" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell84" Text="[[Total__KOS]/100]=Кт" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell85" Text="[[Total__SQ]/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Courier New, 7pt"/>
+        </TableRow>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell86"/>
+          <TableCell Name="Cell87"/>
+          <TableCell Name="Cell88"/>
+          <TableCell Name="Cell89"/>
+          <TableCell Name="Cell90"/>
+          <TableCell Name="Cell91"/>
+          <TableCell Name="Cell92"/>
+          <TableCell Name="Cell93"/>
+        </TableRow>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell94"/>
+          <TableCell Name="Cell95"/>
+          <TableCell Name="Cell96"/>
+          <TableCell Name="Cell97" Text="Сформовано" Font="Courier New, 7pt" ColSpan="4"/>
+          <TableCell Name="Cell98"/>
+          <TableCell Name="Cell99"/>
+          <TableCell Name="Cell100"/>
+          <TableCell Name="Cell101"/>
+        </TableRow>
+        <TableRow Name="Row13">
+          <TableCell Name="Cell102"/>
+          <TableCell Name="Cell103"/>
+          <TableCell Name="Cell104"/>
+          <TableCell Name="Cell105"/>
+          <TableCell Name="Cell106" Text="Бухгалтер" HorzAlign="Right" Font="Courier New, 7pt"/>
+          <TableCell Name="Cell107" Text="_________________________"/>
+          <TableCell Name="Cell108" Text="[Table.FIO]" Font="Courier New, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell109"/>
+        </TableRow>
+        <TableRow Name="Row14">
+          <TableCell Name="Cell110"/>
+          <TableCell Name="Cell111"/>
+          <TableCell Name="Cell112"/>
+          <TableCell Name="Cell113"/>
+          <TableCell Name="Cell114"/>
+          <TableCell Name="Cell115" Text="(пiдпис, ПIБ)" Font="Courier New, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell116"/>
+          <TableCell Name="Cell117"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

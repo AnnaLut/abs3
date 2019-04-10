@@ -45,6 +45,20 @@ $(document).ready(function () {
             editWindow.wrapper.css({ width: 400 });
             var update = $(e.container).parent().find(".k-grid-update");
             $(update).html('<span class="k-icon k-update"></span>Відкрити');
+
+
+            $.ajax({
+                async: true,
+                type: 'POST',
+                url: bars.config.urlContent("/CreditUI/Accounts/IsNBShasOB22/"),
+                data: { nbs: e.model.NLS.substring(0, 4) },
+                success: function (data) {
+                    if (CatchErrors(data)) {
+                        $("#ob22").prop('required', data.IsHasOb22);
+                    }
+                }
+            });
+
             if (e.model.ACC != null) {
                 $("#NLS").attr("readonly", true);
                 $("#KV").data("kendoDropDownList").readonly();

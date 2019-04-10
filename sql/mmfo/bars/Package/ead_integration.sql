@@ -739,8 +739,9 @@ begin
     if    nvl(rec.tip,'0') =  p_tip and nvl(rec.ob22,'0') =  p_ob22           then l_id:= rec.id ; 
     elsif nvl(rec.tip,'0') =  p_tip and nvl(rec.ob22,'0') <> nvl(p_ob22, 'x') then l_id:= rec.id ; 
     elsif nvl(rec.tip,'0') <> p_tip and nvl(rec.ob22,'0') =  p_ob22           then l_id:= rec.id ;
+    elsif p_tip is null and rec.ob22 =  p_ob22                                then l_id:= rec.id ;
     end if;
-
+    if l_id is not null then exit; end if;
  end loop;
 
   if l_id is null  then
@@ -809,7 +810,7 @@ end  ead_nbs_check_param;
         l_DDBO := kl.get_customerw (l_rnk, 'DDBO');
         l_SDBO := kl.get_customerw (l_rnk, 'SDBO');
 
-        if (l_acc_type in ('pr_uo', 'kpk_uo') and l_SDBO is not null and l_NDBO is not null and l_daos >= to_date(replace(l_DDBO,'.','/'),'dd/mm/yyyy'))
+        if (l_acc_type in ('pr_uo', 'kpk_uo', 'terminable_dep_uo', 'request_dep_uo') and l_SDBO is not null and l_NDBO is not null and l_daos >= to_date(replace(l_DDBO,'.','/'),'dd/mm/yyyy'))
         then
          rAccAgrParam.agr_date     := l_DDBO;
          rAccAgrParam.agr_code     := l_NDBO;
@@ -910,7 +911,7 @@ end  ead_nbs_check_param;
         l_DDBO := kl.get_customerw (l_rnk, 'DDBO');
         l_SDBO := kl.get_customerw (l_rnk, 'SDBO');
 
-        if (l_acc_type in ('pr_uo', 'kpk_uo') and l_SDBO is not null and l_NDBO is not null and l_daos >= to_date(replace(l_DDBO,'.','/'),'dd/mm/yyyy')) then
+        if (l_acc_type in ('pr_uo', 'kpk_uo', 'terminable_dep_uo', 'request_dep_uo') and l_SDBO is not null and l_NDBO is not null and l_daos >= to_date(replace(l_DDBO,'.','/'),'dd/mm/yyyy')) then
          rAccAgrParam.agr_date     := l_DDBO;
          rAccAgrParam.agr_code     := l_NDBO;
          l_agr_type     := 'dbo_uo';
@@ -1976,6 +1977,11 @@ FUNCTION get_DocDPA_Instance(p_doc_id ead_docs.id%TYPE) RETURN Doc_Instance_Set 
                        a.daos AS open_date,
                        a.dazs AS close_date,
                        CASE
+                          -- для SMB передаем только 2-а значения 1 - Opened 2 - Closed
+                          WHEN rAccAgrParam.acc_type in ('terminable_dep_uo', 'request_dep_uo') THEN
+                              case when a.dazs is not null then 2
+                                   else 1
+                              end     
                           WHEN L_SAL_TYPE='SALARY_OPEN' THEN 1
                           WHEN L_SAL_TYPE='SALARY_CLOSE' THEN 2
                           WHEN L_SAL_TYPE='SALARY_RESERVED' THEN 6
@@ -2033,6 +2039,7 @@ FUNCTION get_DocDPA_Instance(p_doc_id ead_docs.id%TYPE) RETURN Doc_Instance_Set 
                     2610, 2615, 2651 ,2652, 2600 з типом DEP та ОБ22=03, 2650 з типом DEP та ОБ22=03*/
                          case
                          when substr(p_agr_type,1,6)='SALARY' then 'transit_uo'
+                         when rAccAgrParam.acc_type in ('terminable_dep_uo', 'request_dep_uo') then rAccAgrParam.acc_type
                          WHEN
                          (a.nbs ='2650' and a.tip = 'DEP' and a.ob22 = '03' )
                          or (a.nbs ='2600' and a.tip = 'DEP' and a.ob22 in ('03','04','05','06','07','08','09','11'))

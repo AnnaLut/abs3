@@ -1,4 +1,10 @@
-CREATE OR REPLACE PACKAGE BARS_ZAY
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_zay.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_ZAY 
 is
  head_ver constant varchar2(64) := 'version 6.2 09.07.2018';
  head_awk constant varchar2(512) := ''
@@ -92,7 +98,7 @@ is
     p_nls_acc0      in  zayavka.nls0%type,                        -- № счета в нац.вал.(для 1 - грн счет списания, для 2 - грн счет зачисления(при зачислении выруч.грн на межбанк - поле пустует,зато заполняются поля mfo0, nls0,okpo0), для 3 - вал счет для списания)
     p_nataccnum     in  zayavka.nls0%type          default null,  -- счет в нац.валюте в др.банке     (для dk = 2)
     p_natbnkmfo     in  zayavka.mfo0%type          default null,  -- МФО банка счета в нац.валюте     (для dk = 2)
-    p_cmsprc        in  zayavka.kom%type           default null,  -- процент (%) комиссии
+    p_cmsprc        in  varchar2                   default null,  -- процент (%) комиссии
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
@@ -222,7 +228,7 @@ is
     p_nls_acc0      in  zayavka.nls0%type,                        -- внутр.№ счета в нац.вал.
     p_nls0          in  zayavka.nls0%type          default null,  -- счет в нац.валюте в др.банке     (для dk = 2)
     p_mfo0          in  zayavka.mfo0%type          default null,  -- МФО банка счета в нац.валюте     (для dk = 2)
-    p_kom           in  zayavka.kom%type           default null,  -- процент (%) комиссии
+    p_kom           in  varchar2                   default null,  -- процент (%) комиссии
     p_skom          in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_meta          in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_f092          in  zayavka.f092%type          default null,  -- код параметра F092
@@ -650,7 +656,7 @@ gTransfer_eroor   number(1) default 0;
 gTransfer_success number(1) default 1;
 
 mmfo              boolean;
-
+g_digit           constant varchar2(100) := '1234567890.';
 
 --
 -- определение версии заголовка пакета
@@ -710,6 +716,38 @@ begin
   -- gWallet_pass := 'qwerty123';
 end init;
 
+-------------------------------------------------------------------------------
+-- check_permitted_char
+-- функция проверки разрешенных символов
+--
+function check_permitted_char (p_str varchar2, p_permitted_char varchar2) return boolean
+is
+  b_check boolean := false;
+  l_char  varchar2(1);
+begin
+  for i in 1..length(p_str)
+  loop
+     b_check := false;
+     l_char  := substr(p_str, i, 1);
+     for j in 1..length(p_permitted_char)
+     loop
+        if l_char = substr(p_permitted_char, j, 1) then
+           b_check := true;
+           exit;
+        end if;
+     end loop;
+     if not b_check then
+        exit;
+     end if;
+  end loop;
+  return b_check;
+end check_permitted_char;
+
+function check_digit (p_str varchar2) return boolean
+is
+begin
+  return check_permitted_char(p_str, g_digit);
+end check_digit;
 -------------------------------------------------------------------------------
 -- кодируем строку
 --
@@ -3603,7 +3641,7 @@ procedure create_request_ex
     p_nls_acc0      in  zayavka.nls0%type,                        -- № счета в нац.вал.(для 1 - грн счет списания, для 2 - грн счет зачисления(при зачислении выруч.грн на межбанк - поле пустует,зато заполняются поля mfo0, nls0,okpo0), для 3 - вал счет для списания)
     p_nataccnum     in  zayavka.nls0%type          default null,  -- счет в нац.валюте в др.банке     (для dk = 2)
     p_natbnkmfo     in  zayavka.mfo0%type          default null,  -- МФО банка счета в нац.валюте     (для dk = 2)
-    p_cmsprc        in  zayavka.kom%type           default null,  -- процент (%) комиссии
+    p_cmsprc        in  varchar2                   default null,  -- процент (%) комиссии
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
@@ -3644,8 +3682,18 @@ is
   err        EXCEPTION;
   prm        VARCHAR2(25)  := null;  -- параметр, передаваемый в сообщения об ошибке
   prm1       VARCHAR2(25)  := null;  -- параметр, передаваемый в сообщения об ошибке
+  l_cmsprc number;
   l_title    varchar2(30)  := 'zay.create_request_ex:';
 begin
+  if check_digit(p_cmsprc)=false    then   
+     msg  := 'Відсоток комісії вказаний помилково!' ;
+     ern  := 68;
+     prm  := p_reqnum;
+     bars_audit.trace('Відсоток комісії вказаний помилково!');
+     raise err;
+   else
+     l_cmsprc:=to_number(p_cmsprc);       
+  End if;
 
   if p_reqdate < gl.bd - gZAYDAY - ( case when p_reqtype in (1, 3) then -1 else 0 end ) then
      msg  := 'Дата заявки ' || p_reqnum || ' устарела!' ;
@@ -3710,7 +3758,7 @@ begin
   l_request.acc0          := l_acc0;
   l_request.nls0          := p_nataccnum;
   l_request.mfo0          := p_natbnkmfo;
-  l_request.kom           := p_cmsprc;
+  l_request.kom           := l_cmsprc;
   l_request.skom          := p_cmssum;
   l_request.fl_pf         := p_taxflg;
   l_request.nlsp          := p_taxacc;
@@ -3756,11 +3804,11 @@ begin
         values (p_custid, p_nls_acc0, p_nls_acc1, f_ourmfo, p_tel, p_fio, p_natbnkmfo, p_nataccnum);
     end if;
     if p_reqtype = 1 then
-       update cust_zay set  kom = p_cmsprc where rnk = p_custid;
+       update cust_zay set  kom = l_cmsprc where rnk = p_custid;
     elsif p_reqtype = 2 then
-       update cust_zay set kom2 = p_cmsprc where rnk = p_custid;
+       update cust_zay set kom2 = l_cmsprc where rnk = p_custid;
     elsif p_reqtype = 3 then
-       update cust_zay set kom3 = p_cmsprc where rnk = p_custid;
+       update cust_zay set kom3 = l_cmsprc where rnk = p_custid;
     end if;
   end if;
 
@@ -4601,7 +4649,7 @@ procedure upd_request
     p_nls_acc0      in  zayavka.nls0%type,                        -- № счета списания
     p_nls0          in  zayavka.nls0%type          default null,  -- счет в нац.валюте в др.банке     (для dk = 2)
     p_mfo0          in  zayavka.mfo0%type          default null,  -- МФО банка счета в нац.валюте     (для dk = 2)
-    p_kom           in  zayavka.kom%type           default null,  -- процент (%) комиссии
+    p_kom           in  varchar2                   default null,  -- процент (%) комиссии
     p_skom          in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_meta          in  zayavka.meta%type          default null,   -- код цели покупки/продажи
     p_f092          in  zayavka.f092%type          default null,  -- код параметра f092
@@ -4633,6 +4681,7 @@ is
   l_viza     zayavka.viza%type;
   l_dk       zayavka.dk%type;
   l_kv_conv  zayavka.kv_conv%type;
+  l_kom number;
 
   ern        NUMBER;          -- код ошибки (из err_zay)
   msg        VARCHAR2(254);   -- текстовка ошибки "для себя"
@@ -4647,7 +4696,17 @@ begin
                                          ', p_mfo0='||p_mfo0||
                                          ', p_kv_conv='||to_char(p_kv_conv)||
                                          ' ).' );
-
+--перевірка на число в % комісії
+  if (p_kom is not null and  check_digit(p_kom)=false)    then
+     msg  := 'Відсоток комісії вказаний помилково!' ;
+     ern  := 68;
+     prm  := p_kom;
+     bars_audit.trace('Відсоток комісії вказаний помилково!');
+     raise err;
+   else
+     l_kom:=to_number(p_kom);    
+  End if;
+  
   begin
     select z.kv2, t.dig, z.viza, z.dk, z.kv_conv
       into l_kv,  l_dig, l_viza, l_dk, l_kv_conv
@@ -4721,7 +4780,7 @@ begin
                                            WHERE trunc(dat) = trunc(sysdate)
                                              AND kv = d.kv)
                         ), 0, p_s2s*power(10,l_dig), s2),
-            kom = p_kom,
+            kom = l_kom,
            skom = p_skom,
            fdat = p_fdat,
          kurs_z = p_kurs,
@@ -5172,6 +5231,7 @@ begin
     where id = p_id;
     
 end set_visa_parameters;
+
 -------------------------------------------------------------------------------
 procedure check_lim (p_id number,p_mode varchar2 ) as
  l_dk zayavka.dk%type;
@@ -7582,4 +7642,16 @@ begin
   init;
 end BARS_ZAY;
 /
+ show err;
+ 
+PROMPT *** Create  grants  BARS_ZAY ***
+grant EXECUTE                                                                on BARS_ZAY        to BARSAQ with grant option;
+grant EXECUTE                                                                on BARS_ZAY        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on BARS_ZAY        to ZAY;
 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_zay.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 

@@ -115,5 +115,8 @@ namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Abstract
         /// </summary>
         /// <param name="login"></param>
         void CloseUser(string login);
+
+        IEnumerable<UserBranches> GerBranchesDdlData();
+        KendoDataSource<V_STAFF_USER_ADM> ADMUList(Kendo.Mvc.UI.DataSourceRequest request, string parameters, MainFilters mainFilters);
     }
 }

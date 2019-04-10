@@ -7,6 +7,8 @@ var g_isGridRecordsInited = false;
 var g_isGridFilesInited = false;
 
 var g_recordStatusData = null;
+var selectedIds = [];
+var allowedForSelectStatuses = [1, 2, 3, 4, 5, 8, 9, 13, 14, 15, 16, 17, 19, 20, 99];
 
 function getGridRecordsUrl(ID) {
     var arr_statenames = [];
@@ -393,6 +395,18 @@ function getLineData(FileId) {
             fileName: "Інформаційні рядки реєстру.xlsx",
             proxyURL: bars.config.urlContent('/Pfu/Pfu/ConvertBase64ToFile/')
         },
+        excelExport: function (e) { //remove html tags from header
+            var row = e.workbook.sheets[0].rows[0];
+            for (var ci = 0; ci < row.cells.length; ci++) {
+                var cell = row.cells[ci];
+                if (cell.value) {
+                    cell.value = cell.value.replace(/(<([^>]+)>)/ig, ' ');
+                }
+            }
+        },
+        change: function (e) {
+
+        },
         //excel: {
         //    allPages: true,
         //    proxyURL: bars.config.urlContent('/Pfu/Pfu/ConvertBase64ToFile/')
@@ -565,13 +579,170 @@ function getLineData(FileId) {
             title: " ",
             filterable: false,
             sortable: false,
-            template: "<input type='checkbox' class='checkbox' style='margin-left: 26%;' />",
+            template: "<input type='checkbox' class='checkbox' onclick='onCheckChangStatusPayed()' style='margin-left: 26%;' />",
             width: 30
         });
     }
 
     $("#gridRecords").kendoGrid(settings);
 }
+
+function onCheckChangStatusPayed() {
+
+    var grid = $("#gridRecords").data("kendoGrid");
+    var fileRecords = [];
+    var setStatuseToPayedBtn = $("#SetStatusToPayed");
+    var revertFromPayBtn = $("#revertFromPayBtn");
+    if (!setStatuseToPayedBtn || !revertFromPayBtn)
+        return;
+    var ds = bars.extension.findCheckedGrid(grid);
+    if (ds.length && ds.length > 0) {
+        revertFromPayBtn.prop('disabled', false);
+        if (ds.some(function (el) { return allowedForSelectStatuses.indexOf(Number(el.state)) == -1 }))
+            setStatuseToPayedBtn.prop('disabled', true);
+        else
+            setStatuseToPayedBtn.prop('disabled', false);
+    }
+    else {
+        setStatuseToPayedBtn.prop('disabled', true);
+        revertFromPayBtn.prop('disabled', true);
+    }
+
+}
+
+function OnClickPayData() {
+
+    $("#fileRecordsPayedDate").kendoDatePicker({ format: "dd.MM.yyyy" });
+    $("#fileRecordsPayedDate").data("kendoDatePicker").setOptions(fileRecordsPayedDateOptions);
+    $("#fileRecordsPayedDate").data("kendoDatePicker").open();
+}
+
+fileRecordsPayedDateOptions = {
+    max: new Date(),
+    change: function (event) {
+
+        var date = this.value();
+        bars.ui.loader("body", true);
+        var grid = $("#gridRecords").data("kendoGrid");
+
+        var fileRecords = [];
+        var ds = bars.extension.findCheckedGrid(grid);
+        for (var i = 0; i < ds.length; i++) {
+            fileRecords.push(ds[i].id);
+        }
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(
+                {
+                    Date: date,
+                    FileRecords: fileRecords
+                }),
+            contentType: "application/json",
+            dataType: "json",
+            url: bars.config.urlContent('/api/Pfu/FilesGrid/SetFileRecordsPayed'),
+            success: function (data) {
+
+                bars.ui.loader("body", false);
+                grid.dataSource.read();
+                disabledPayButtons();
+                bars.ui.notify("До відома", "Статус інформаційних рядків змінено на Оплачено.",
+                    "info", { autoHideAfter: 5 * 1000 });
+            },
+            error: function (response) {
+                bars.ui.loader("body", false);
+                bars.ui.error({ title: 'Помилка!', text: response.responseText });
+            }
+        });
+
+    }
+};
+
+function OnChangeFileRecordsPayedDate(value) {
+
+    var date = value;
+    bars.ui.loader("body", true);
+    var grid = $("#gridRecords").data("kendoGrid");
+
+    var fileRecords = [];
+    var ds = bars.extension.findCheckedGrid(grid);
+    for (var i = 0; i < ds.length; i++) {
+        fileRecords.push(ds[i].id);
+    }
+
+
+
+    $.ajax({
+        type: "POST",
+        data: JSON.stringify(
+            {
+                Date: date,
+                FileRecords: fileRecords
+            }),
+        contentType: "application/json",
+        dataType: "json",
+        url: bars.config.urlContent('/api/Pfu/FilesGrid/SetFileRecordsPayed'),
+        success: function (data) {
+
+            bars.ui.loader("body", false);
+            grid.dataSource.read();
+            ds
+            bars.ui.notify("До відома", "Статус інформаційних рядків змінено на Оплачено.",
+                "info", { autoHideAfter: 5 * 1000 });
+        },
+        error: function (response) {
+            bars.ui.loader("body", false);
+            bars.ui.error({ title: 'Помилка!', text: statusText });
+        }
+    });
+
+
+};
+function disabledPayButtons() {
+    var setStatuseToPayedBtn = $("#SetStatusToPayed");
+    var revertFromPayBtn = $("#revertFromPayBtn");
+    if (setStatuseToPayedBtn && revertFromPayBtn) {
+        setStatuseToPayedBtn.prop('disabled', true);
+        revertFromPayBtn.prop('disabled', true);
+    }
+}
+
+function OnSetFileRecordReverted() {
+
+    bars.ui.loader("body", true);
+    var grid = $("#gridRecords").data("kendoGrid");
+
+    var fileRecords = [];
+    var ds = grid.dataSource.view();
+
+    var ds = bars.extension.findCheckedGrid(grid);
+    for (var i = 0; i < ds.length; i++) {
+        fileRecords.push(ds[i].id);
+    }
+
+    $.ajax({
+        type: "POST",
+        data: JSON.stringify(
+            {
+                FileRecords: fileRecords
+            }),
+        contentType: "application/json",
+        dataType: "json",
+        url: bars.config.urlContent('/api/Pfu/FilesGrid/SetFileRecordsReverted'),
+        success: function (data) {
+
+            bars.ui.loader("body", false);
+            grid.dataSource.read();
+            disabledPayButtons();
+            bars.ui.notify("До відома", "Статус інформаційних рядків змінено на Повернутий.",
+                "info", { autoHideAfter: 5 * 1000 });
+        },
+        error: function (response) {
+            bars.ui.loader("body", false);
+            bars.ui.error({ title: 'Помилка!', text: response.responseText });
+        }
+    });
+}
+
 var StateDrop = 0
 var selectedline = 0
 function StateFilter(element) {
@@ -654,6 +825,15 @@ function initFilesGrid(qv) {
             fileName: "Перелік реєстрів.xlsx",
             proxyURL: bars.config.urlContent('/Pfu/Pfu/ConvertBase64ToFile/')
         },
+        excelExport: function (e) { //remove html tags from header
+            var row = e.workbook.sheets[0].rows[0];
+            for (var ci = 0; ci < row.cells.length; ci++) {
+                var cell = row.cells[ci];
+                if (cell.value) {
+                    cell.value = cell.value.replace(/(<([^>]+)>)/ig, ' ');
+                }
+            }
+        },
         toolbar: ["excel",
             {
                 template: kendo.template($("#fileTitle-template").html())
@@ -661,7 +841,7 @@ function initFilesGrid(qv) {
         ],
         change: function (e) {
             goToLines(false);
-             
+
             $("#gridRecords").data("kendoGrid").dataSource.read();
         },
         columns: FILES_GRID_COLUMNS,
@@ -730,6 +910,15 @@ function initFiles(qv) {
             fileName: "Перелік реєстрів.xlsx",
             proxyURL: bars.config.urlContent('/Pfu/Pfu/ConvertBase64ToFile/')
         },
+        excelExport: function (e) { //remove html tags from header
+            var row = e.workbook.sheets[0].rows[0];
+            for (var ci = 0; ci < row.cells.length; ci++) {
+                var cell = row.cells[ci];
+                if (cell.value) {
+                    cell.value = cell.value.replace(/(<([^>]+)>)/ig, ' ');
+                }
+            }
+        },
         toolbar: ["excel",
             {
                 template: kendo.template($("#fileTitle-template").html())
@@ -740,7 +929,7 @@ function initFiles(qv) {
             grid = this;
             var info = [];
             selected = grid.dataItem(grid.select());
-            debugger;
+            //debugger;
             if (selected.file_sum_rec > selected.rest_2909 && selected.state == "CHECKING_PAY") {
                 info.push("Виконати оплату реєстра неможливо. Залишоку коштів на 2909 недостатньо для здійснення операції.");
                 AlertNotifyError(info);
@@ -750,6 +939,17 @@ function initFiles(qv) {
             else if (selected.file_sum_rec <= selected.rest_2909 && selected.state == "CHECKING_PAY") {
                 $("#payFileBtn").prop("disabled", false);
             }
+
+            if (!selected)
+                $('#moveToArchiveBtn').prop("disabled", true);
+            else
+                $('#moveToArchiveBtn').prop("disabled", false);
+
+            selectedIds = [];
+            grid.select().each(function () {
+                selectedIds.push(grid.dataItem(this).id);
+            });
+
             $("#gridRecords").data("kendoGrid").dataSource.read();
         },
         columns: FILES_GRID_HISTORY_COLUMNS,
@@ -767,6 +967,12 @@ function initFiles(qv) {
             }
             else if (state == "CHECKING_PAY")
                 $("#payFileBtn").show();
+
+            selected = grid.dataItem(grid.select());
+            if (!selected)
+                $('#moveToArchiveBtn').prop("disabled", true);
+            else
+                $('#moveToArchiveBtn').prop("disabled", false);
         },
         filterMenuInit: function (e) { e.container.addClass("widerMenu"); },
         dataSource: dataSource,
@@ -870,7 +1076,7 @@ function CheckBalancePaymentBtn(selectedCatalog) {
 
     var restdate = kendo.parseDate(selectedCatalog.restdate, 'yyyy-MM-dd');
     var diff = (now - restdate) / 1000;
-    debugger;
+    //debugger;
     if (selectedCatalog.state_name === "Очікує оплати") {
         $('#payFileBtn').show();
     }
@@ -1726,3 +1932,31 @@ $(document).ready(function () {
         });
     }
 });
+
+function moveToArchive() {
+    var gview = $("#gridFiles").data("kendoGrid");
+    var ids = selectedIds;
+
+    if (ids.length > 0) {
+        bars.ui.confirm({ text: 'Перенести в архів вибрані  реєстри?' },
+            function () {
+                AJAX({
+                    srcSettings: {
+                        method: "POST",
+                        contentType: "application/json",
+                        url: bars.config.urlContent("/api/pfu/filesgrid/movetoarchive"),
+                        data: JSON.stringify(ids),
+                        success: function (e) {
+                            if (e === "")
+                                bars.ui.notify("Перенос реєстрy", "Перенос реєстрів id=" + ids + " до архіву виконано успішно ", 'success');
+                            else
+                                bars.ui.alert({ text: e });
+                            gview.dataSource.read();
+                        }
+                    }
+                });
+            });
+    } else {
+        bars.ui.error({ title: 'Помилка!', text: 'Необхідно вибрати реестр!' });
+    }
+}

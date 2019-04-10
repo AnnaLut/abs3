@@ -1,0 +1,193 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/settingsService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/saveDataService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/modelService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/baseController.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/validationService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/depositDemand.js?v1.0.0"></script>
+
+<link rel="stylesheet" href="~/Areas/GDA/Css/GDA/Main.css" />
+
+<div ng-controller="depositDemand">
+    <div class="page-header"><h1>{{Title}}</h1></div>
+        
+        <div data-kendo-toolbar="toolbarDepositDemand" k-options="toolbarDepositDemandOptions"> </div>
+
+        <div class="panel panel-default" >
+            <div class="panel-body">
+                <div class="form-group">
+                    <table border="0">
+                        <tr>
+                            <td>
+                                <label>№ ДБО:</label>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.dbo"
+                                       style="width: 140px;background-color:cornsilk" ng-disabled="true" />
+
+                                <label>Дата ДБО:</label>
+                                <input type="text" class="form-control" style="width:140px" ng-disabled="true"
+                                       ng-model="depositDemand.dboDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+
+                        <tr>
+                            <td>
+                                <h2><label>Клієнт</label></h2>
+
+                                <label>Рег.№:</label>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.clientRnk"
+                                       style="width: 140px;background-color:cornsilk" ng-disabled="true" />
+
+                                <label>ОКПО:</label>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.clientOkpo"
+                                       style="width: 140px;background-color:cornsilk" ng-disabled="true" />
+
+                                <label>ПІБ/назва:</label>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.clientName"
+                                       style="width: 250px;background-color:cornsilk" ng-disabled="true" />
+
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+
+                                <label>Поповнення в день оформлення:</label>
+                                <input type="checkbox" ng-model="depositDemand.replenishmentOnDayRegistration" ng-disabled="!isEditable('depositDemand')" >
+
+                                <label>Сума:</label>
+                                <span style="color: red" ng-show="!isValueValid('depositDemand','sumValue')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 160px"
+                                       k-max="999999999999999999999999999999"
+                                       ng-disabled="!isEditable('depositDemand') || !depositDemand.replenishmentOnDayRegistration"
+                                       k-ng-model="depositDemand.sumValue"/>
+
+                                <label>Валюта:</label>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.currency" ng-disabled="true"  style="width: 80px;background-color:cornsilk" />
+                                <a class='k-button' ng-click="onHandBook('depositDemand','currency')" ng-disabled="!isEditable('depositDemand')">
+                                    <i class='pf-icon pf-16 pf-book'></i></a>
+
+                                <br><br>
+
+                                <label>Депозитний рахунок:</label>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.acc"
+                                       style="width: 250px;background-color:cornsilk" ng-disabled="true"/>
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Рахунок для списання:</label>
+                                <span style="color: red" ng-show="!isValueValid('depositDemand','accDebit')">*</span>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.accDebit" ng-disabled="true"
+                                       style="width: 250px" />
+                                <a class='k-button' ng-click="onHandBook('depositDemand','accDebit')" ng-disabled="!isEditable('depositDemand')"><i class='pf-icon pf-16 pf-book'></i></a>
+
+                                <label>Залишок на рахунку:</label>
+                                <input kendo-numeric-text-box k-min="0" style="width: 160px;background-color:cornsilk"
+                                       k-max="999999999999999999999999999999" k-spinners="false" k-ng-disabled="true"
+                                       k-ng-model="depositDemand.accDebitBalance"/>
+
+                                <br><br>
+
+                                <!--<label>Рахунок для виплат %:</label>-->
+                                <!--<input type="text" class="k-textbox" ng-model="depositDemand.accCreit" ng-disabled="true"-->
+                                       <!--style="width: 250px" />-->
+                                <!--<a class='k-button' ng-click="onHandBook('depositDemand','accCreit')"><i class='pf-icon pf-16 pf-book'></i></a>-->
+
+                                <label>Рахунок для повернення:</label>
+                                <span style="color: red" ng-show="!isValueValid('depositDemand','accCreit')">*</span>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.accCreit" ng-disabled="true"
+                                       style="width: 250px" />
+                                <a class='k-button' ng-click="onHandBook('depositDemand','accCreit')" ng-disabled="!isEditable('depositDemand')">
+                                    <i class='pf-icon pf-16 pf-book'></i></a>
+
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Варіанти виплати %:</label>
+                                <input type="text" class="k-textbox" ng-model="depositDemand.payingInterest" ng-disabled="true"
+                                       style="width: 140px;background-color:cornsilk" />
+
+                                <label>% ставка:</label>
+                                <span style="color: red" ng-show="!isValueValid('depositDemand','interestRate')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="100" ng-disabled="!isEditable('depositDemand') || depositDemand.individualInterestRate"
+                                       k-ng-model="depositDemand.interestRate"  />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Індивідуальна % ставка:</label>
+                                <input type="checkbox" ng-model="depositDemand.individualInterestRate" ng-disabled="!isEditable('depositDemand')" >
+                                <span style="color: red" ng-show="!isValueValid('depositDemand','individualInterestRateValue')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="100" ng-disabled="!isEditable('depositDemand') || !depositDemand.individualInterestRate"
+                                       k-ng-model="depositDemand.individualInterestRateValue"  />
+
+                                <br>
+
+                                <label>Коментар (максимум - 1000 символів):</label>
+                                <span style="color: red" ng-show="!isValueValid('depositDemand','comment')">*</span>
+                                <textarea rows="3" maxlength="1000" ng-model="depositDemand.comment"
+                                          ng-disabled="!isEditable('depositDemand') || !depositDemand.individualInterestRate"
+                                          class="k-textbox">
+                                </textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Оператор:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                               ng-model="depositDemand.OperatorName" ng-disabled="true" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                               ng-model="depositDemand.OperatorDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Контролер:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                               ng-disabled="true" ng-model="depositDemand.ControllerName"/>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                               ng-model="depositDemand.ControllerDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Статус:</b></label>
+                        <input type="text" class="k-textbox" style="width: 80px;background-color:cornsilk"
+                               ng-disabled="true" ng-value="getStateTranche(depositDemand.State)"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</div>

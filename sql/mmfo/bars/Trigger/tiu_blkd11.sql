@@ -10,7 +10,9 @@ PROMPT *** Create  trigger TIU_BLKD11 ***
    BEFORE INSERT OR UPDATE OF blkd
    ON accounts
    FOR EACH ROW
-     WHEN (NEW.blkd in (11, 19, 40) OR (OLD.blkd in (11, 19, 40) AND NEW.blkd = 0)) DECLARE
+     WHEN (NEW.blkd = 11 OR (OLD.blkd = 11 AND NEW.blkd = 0)) DECLARE
+     -- добавлена обработка депозитов ММСБ
+     -- убрал неявное привидение типов
    /* 03/08/2015 Евгений Сошко, Инга Павленко Заявка http://jira.unity-bars.com.ua:11000/browse/COBUSUPABS-3507
       В картці рахунку на вкладці «Фінансові» в полі «Блокування по дебету» передбачити параметр
       «Заарештувати частково» та водночас забезпечити при виборі цього параметру обов’язковий
@@ -42,11 +44,23 @@ PROMPT *** Create  trigger TIU_BLKD11 ***
    l_br    int_ratn.br%TYPE;
    l_op    int_ratn.op%TYPE;
 
-   FUNCTION f_is_dp (p_acc accounts.nbs%TYPE, p_nbs accounts.nbs%TYPE)
+   FUNCTION f_is_dp (p_acc accounts.acc%TYPE, p_nbs accounts.nbs%TYPE)
       RETURN INT
    IS
    BEGIN
       IF :OLD.TIP NOT LIKE 'W4%' THEN
+          -- проверка на депозитные транши ММСБ
+          -- % ставка для ММСБ не хранится в int_ratn
+          -- если нашли, то устанавливаем в 0, дальнейшая обработка не нужна
+          select max(0) 
+            into is_dp 
+            from deal_account da
+                ,smb_deposit t
+           where 1 = 1
+             and da.account_id = p_acc
+             and da.deal_id = t.id;
+              
+          if is_dp is null then   
         BEGIN
            SELECT 1
              INTO is_dp
@@ -71,6 +85,7 @@ PROMPT *** Create  trigger TIU_BLKD11 ***
                  is_dp := 0;
               END IF;
         END;
+      END IF;
       END IF;
       RETURN is_dp;
    END;

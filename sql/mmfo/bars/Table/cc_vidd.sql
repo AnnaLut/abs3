@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CC_VIDD.sql =========*** Run *** =====
 PROMPT ===================================================================================== 
@@ -38,7 +36,19 @@ exception when others then
 end; 
 /
 
-
+declare 
+  v_num integer;
+begin
+  select count(1)
+    into v_num
+    from user_tab_columns
+    where table_name = 'CC_VIDD'
+      and column_name= 'BLOCKED';
+  if v_num = 0 then
+   execute immediate 'alter table CC_VIDD add blocked NUMBER(1)';
+  end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to CC_VIDD ***

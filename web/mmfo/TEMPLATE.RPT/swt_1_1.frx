@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="11/20/2018 17:19:59" ReportInfo.Modified="12/04/2018 15:56:20" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void Cell65_BeforePrint(object sender, EventArgs e)
+    {
+      if( ((Int32)Report.GetVariableValue(&quot;Row#&quot;))&gt;=2)
+      {
+        Cell65.Text = &quot;&quot;;
+      }
+    }
+  }
+}
+</ScriptText>
+  <Styles Name="Standard">
+    <Style Name="Title" Font="Arial, 12pt, style=Bold"/>
+    <Style Name="Header" Font="Arial, 10pt, style=Bold"/>
+    <Style Name="Group" Font="Arial, 10pt, style=Bold"/>
+    <Style Name="Data"/>
+    <Style Name="Footer"/>
+    <Style Name="EvenRows" Fill.Color="WhiteSmoke"/>
+  </Styles>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoUvjuBGNua5WKStRJSHfBTK">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 DAT1, CHAR01 DAT2, CHAR02 BANK_NAME, DAT00 DOC_DATE, CHAR03 CURRENCY, NUM00 AMOUNT from rs_tmp_report_data where session_id=:session_id order by id">
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="DOC_DATE" DataType="System.DateTime"/>
+        <Column Name="CURRENCY" DataType="System.String"/>
+        <Column Name="AMOUNT" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="NAME" DataType="System.Int32" Enabled="true" SelectCommand="SELECT val val  FROM params WHERE par='NAME'">
+        <Column Name="VAL" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="mfo" DataType="System.Int32" Enabled="true" SelectCommand="select f_ourmfo from dual">
+        <Column Name="F_OURMFO" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="tab_sum" DataType="System.Int32" Enabled="true" SelectCommand="select  CHAR03 CURRENCY       , SUM(NUM00) AMOUNT   from rs_tmp_report_data  where session_id=:session_id  group by CHAR03">
+        <Column Name="CURRENCY" DataType="System.String"/>
+        <Column Name="AMOUNT" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Total Name="Current_Total_Sum" Expression="[Table.AMOUNT]" Evaluator="Data1" PrintOn="GroupFooter3"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="94.5">
+      <TableObject Name="Table5" Width="717.96" Height="94.5">
+        <TableColumn Name="Column36" Width="150.34"/>
+        <TableColumn Name="Column37" Width="248.04"/>
+        <TableColumn Name="Column38" Width="150.34"/>
+        <TableColumn Name="Column39" Width="169.24"/>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell40" Text="[NAME.VAL]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell41" ColSpan="2"/>
+          <TableCell Name="Cell42"/>
+          <TableCell Name="Cell43" Format="Number" Format.UseLocale="true" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row13">
+          <TableCell Name="Cell44" Text="[mfo.F_OURMFO]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell45" ColSpan="2"/>
+          <TableCell Name="Cell46"/>
+          <TableCell Name="Cell47" Text="Надруковно [Date]р." Format="Date" Format.Format="dd.MM.yyyy"/>
+        </TableRow>
+        <TableRow Name="Row14">
+          <TableCell Name="Cell48"/>
+          <TableCell Name="Cell49" Text="Реєстр сформованих повідомлень за період " HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell50" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell51"/>
+        </TableRow>
+        <TableRow Name="Row15">
+          <TableCell Name="Cell52"/>
+          <TableCell Name="Cell53" Text="з [Table.DAT1]р. по [Table.DAT2]р." HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2">
+            <Formats>
+              <DateFormat/>
+              <GeneralFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell54" Format="Date" Format.Format="d" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell55"/>
+        </TableRow>
+        <TableRow Name="Row16">
+          <TableCell Name="Cell56"/>
+          <TableCell Name="Cell57"/>
+          <TableCell Name="Cell58"/>
+          <TableCell Name="Cell59"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader2" Top="96.72" Width="718.2" Height="18.9" Condition="[Table.BANK_NAME]">
+      <TableObject Name="Table1" Height="18.9">
+        <TableColumn Name="Column10" Width="0"/>
+        <TableColumn Name="Column11" Width="0"/>
+        <TableColumn Name="Column12" Width="0"/>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell10"/>
+          <TableCell Name="Cell11"/>
+          <TableCell Name="Cell12" Text="[[Current_Total_Sum]/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table1" Width="718.05" Height="18.9">
+        <TableColumn Name="Column16" Width="129.1"/>
+        <TableColumn Name="Column17" Width="440.95"/>
+        <TableColumn Name="Column18" Width="148"/>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell16" Text="[Table.BANK_NAME]" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell17"/>
+          <TableCell Name="Cell18" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+      <GroupHeaderBand Name="GroupHeader3" Top="117.84" Width="718.2" Height="18.9" Visible="false" Condition="[Table.CURRENCY]">
+        <TableObject Name="Table1" Width="717.96" Height="18.9">
+          <TableColumn Name="Column20" Width="150.34"/>
+          <TableColumn Name="Column21" Width="248.04"/>
+          <TableColumn Name="Column22" Width="150.34"/>
+          <TableColumn Name="Column23" Width="169.24"/>
+          <TableRow Name="Row7">
+            <TableCell Name="Cell20"/>
+            <TableCell Name="Cell21"/>
+            <TableCell Name="Cell22"/>
+            <TableCell Name="Cell23" Format="Number" Format.UseLocale="true" HorzAlign="Center"/>
+          </TableRow>
+        </TableObject>
+        <DataBand Name="Data1" Top="138.97" Width="718.2" Height="18.9" EvenStyle="EvenRows" DataSource="Table">
+          <TableObject Name="Table1" Width="717.96" Height="18.9">
+            <TableColumn Name="Column28" Width="150.34"/>
+            <TableColumn Name="Column29" Width="248.04"/>
+            <TableColumn Name="Column30" Width="150.34"/>
+            <TableColumn Name="Column31" Width="169.24"/>
+            <TableRow Name="Row9">
+              <TableCell Name="Cell28"/>
+              <TableCell Name="Cell29" Text="[Table.DOC_DATE]" Format="Date" Format.Format="d"/>
+              <TableCell Name="Cell30" Text="[Table.CURRENCY]"/>
+              <TableCell Name="Cell31" Text="[[Table.AMOUNT]/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+            </TableRow>
+          </TableObject>
+          <Sort>
+            <Sort Expression="[Table.DOC_DATE]"/>
+            <Sort Expression="[Table.CURRENCY]"/>
+            <Sort Expression="[Table.AMOUNT]"/>
+          </Sort>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter3" Top="160.09" Width="718.2" Height="37.8">
+          <TableObject Name="Table1" Width="717.96" Height="37.8">
+            <TableColumn Name="Column24" Width="150.34"/>
+            <TableColumn Name="Column25" Width="248.04"/>
+            <TableColumn Name="Column26" Width="150.34"/>
+            <TableColumn Name="Column27" Width="169.24"/>
+            <TableRow Name="Row8">
+              <TableCell Name="Cell24"/>
+              <TableCell Name="Cell25" Text="Разом: " HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell26" Border.Lines="Top" Text="[Table.CURRENCY]" Font="Arial, 10pt, style=Bold"/>
+              <TableCell Name="Cell27" Border.Lines="Top" Text="[[Current_Total_Sum]/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+            </TableRow>
+            <TableRow Name="Row11">
+              <TableCell Name="Cell36"/>
+              <TableCell Name="Cell37"/>
+              <TableCell Name="Cell38"/>
+              <TableCell Name="Cell39"/>
+            </TableRow>
+          </TableObject>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter2" Top="200.11" Width="718.2" Height="18.9">
+        <TableObject Name="Table1" Width="717.96" Height="18.9">
+          <TableColumn Name="Column32" Width="150.34"/>
+          <TableColumn Name="Column33" Width="248.04"/>
+          <TableColumn Name="Column34" Width="150.34"/>
+          <TableColumn Name="Column35" Width="169.24"/>
+          <TableRow Name="Row10">
+            <TableCell Name="Cell32" Border.Lines="Bottom"/>
+            <TableCell Name="Cell33" Border.Lines="Bottom"/>
+            <TableCell Name="Cell34" Border.Lines="Bottom"/>
+            <TableCell Name="Cell35" Border.Lines="Bottom" Format="Number" Format.UseLocale="true" HorzAlign="Center"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <DataBand Name="Data2" Top="221.23" Width="718.2" Height="18.9" DataSource="Table3">
+      <TableObject Name="Table5" Width="717.96" Height="18.9">
+        <TableColumn Name="Column40" Width="150.34"/>
+        <TableColumn Name="Column41" Width="248.04"/>
+        <TableColumn Name="Column42" Width="150.34"/>
+        <TableColumn Name="Column43" Width="169.24"/>
+        <TableRow Name="Row18">
+          <TableCell Name="Cell64"/>
+          <TableCell Name="Cell65" BeforePrintEvent="Cell65_BeforePrint" Text="Загальна сума:" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell66" Text="[tab_sum.CURRENCY]" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell67" Text="[[tab_sum.AMOUNT]/100]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="242.36" Width="718.2" Height="28.35"/>
+  </ReportPage>
+</Report>
