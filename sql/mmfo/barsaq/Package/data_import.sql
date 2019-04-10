@@ -6448,6 +6448,10 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_back_reason   varchar2(4000);
     l_docid         integer;
     l_scn           number;
+	  l_t             number:=dbms_utility.get_time;
+	  l_t_set_time    number;
+    l_n             number:= 0;
+	  l_t_st_main     number:= 0;
   begin
     --
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_STARTED);
@@ -6507,6 +6511,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             --
             l_back_reason := nvl(c.back_reason, 'ѕричину сторнуванн€ не вказано');
             --
+			      l_t_set_time := dbms_utility.get_time;
+			--
             set_status_info(
                 p_docid                   => c.doc_id,
                 p_statusid                => c.status,
@@ -6517,8 +6523,19 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
 
+			      l_t_st_main := l_t_st_main + (dbms_utility.get_time - l_t_set_time);
+            
+            l_n := l_n + 1;
+
+			--logger.info('BARSAQ.DATA_IMPORT.SYNC_DOC_EXPORT SET_STATUS OPER TIME = ' || dbms_utility.get_time - l_t_set_time)/100);
+
             commit;
         end loop;
+		    logger.info('BARSAQ.DATA_IMPORT.SYNC_DOC_EXPORT OPER TIME = ' || (dbms_utility.get_time - l_t)/100);
+		    logger.info('BARSAQ.DATA_IMPORT.SYNC_DOC_EXPORT SET_STATUS OPER TIME = ' || l_t_st_main/100 || ' COUNT = ' || l_n);
+		    l_t := dbms_utility.get_time;
+		    l_t_st_main := 0;
+        l_n := 0;
         -- идем по за€вкам на покупку/продажу валюты
         for c in (select *
                     from (select d.doc_id,
@@ -6561,6 +6578,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 --
                 l_back_reason := nvl(c.bank_back_reason, 'ѕричину в≥дхиленн€ не вказано');
                 --
+				        l_n := l_n + 1;
+				--
                 set_status_info(
                     p_docid                   => c.doc_id,
                     p_statusid                => c.status,
@@ -6570,8 +6589,11 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                     p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                     p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
                 );
+				        l_t_st_main := l_t_st_main + (dbms_utility.get_time - l_t_set_time);
 
         end loop;
+		    logger.info('BARSAQ.DATA_IMPORT.SYNC_DOC_EXPORT ZAY TIME = ' || (dbms_utility.get_time - l_t)/100);
+		    logger.info('BARSAQ.DATA_IMPORT.SYNC_DOC_EXPORT SET_TIME ZAY TIME = ' || l_t_st_main/100 || ' COUNT = ' || l_n);
         -- фиксируем изменени€
         commit;
         -- устанавливаем SCN, с которого необходимо синхронизировать таблицу в будущем
@@ -6611,6 +6633,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_back_reason   varchar2(4000);
     l_docid         integer;
     l_scn           number;
+	  resource_busy   exception;
+	  pragma exception_init(resource_busy, -54);
   begin
     --
     write_sync_status(TAB_DOC_EXPORT||'_'||p_kf, JOB_STATUS_STARTED);
@@ -6620,7 +6644,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     --
     begin
         -- точка отката
-       -- savepoint sp;
+        savepoint sp;
         -- точка отсчета
 /*      l_scn := dbms_flashback.get_system_change_number();
         --
@@ -6664,27 +6688,29 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                          )
                  )
         loop
-            -- блокируем строку в doc_export
-            select doc_id into l_docid from doc_export where doc_id=c.doc_id for update nowait;
-            -- если нету истории изменений по oper.sos, то ставим врем€ создани€ документа
-            l_change_time := nvl(c.change_time, c.pdat);
-            --
-            l_back_reason := nvl(c.back_reason, 'ѕричину сторнуванн€ не вказано');
-            --
-            set_status_info(
-                p_docid                   => c.doc_id,
-                p_statusid                => c.status,
-                p_status_change_time      => l_change_time,
-                p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
-                p_bank_ref                => c.ref,
-                p_bank_back_date          => case when c.status<0 then l_change_time else null end,
-                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
-            );
+            begin
+				-- блокируем строку в doc_export
+				select doc_id into l_docid from doc_export where doc_id=c.doc_id for update nowait;
+				-- если нету истории изменений по oper.sos, то ставим врем€ создани€ документа
+				l_change_time := nvl(c.change_time, c.pdat);
+				--
+				l_back_reason := nvl(c.back_reason, 'ѕричину сторнуванн€ не вказано');
+				--
+				set_status_info(
+					p_docid                   => c.doc_id,
+					p_statusid                => c.status,
+					p_status_change_time      => l_change_time,
+					p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
+					p_bank_ref                => c.ref,
+					p_bank_back_date          => case when c.status<0 then l_change_time else null end,
+					p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
+				);
+			exception when resource_busy then
+              logger.info('BARSAQ.DOC_IMPORT.SYNC_DOC_EXPORT LOCK DOC_ID' || c.doc_id);
+		    end;
 
-            commit;
         end loop;
-		savepoint sp;
-        -- идем по за€вкам на покупку/продажу валюты
+		   -- идем по за€вкам на покупку/продажу валюты
         for c in (select *
                     from (select d.doc_id,
                                  case
