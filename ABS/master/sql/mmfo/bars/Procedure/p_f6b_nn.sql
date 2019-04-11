@@ -12,7 +12,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.19.003      29.01.2019
+ % VERSION     :   v.19.005      11.04.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    —труктура показател€    GGG CC N H I OO R VVV
@@ -28,6 +28,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+11.04.2019  резидентность определ€етс€ по коду страны клиента
 29.01.2019  дисконты,не вход€щие в список #6D, и имеющие резерв в nbu23_rez
 22.01.2019  дисконты с типом SDF: расширен список балансовых дл€ обработки
 27.12.2018  обработка дисконтов 2396/SDF без учета r013
@@ -103,7 +104,7 @@ BEGIN
 
    EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
-   logger.info ('P_F6B_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy')||' v.19.003');
+   logger.info ('P_F6B_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy')||'  v.19.004');
 -------------------------------------------------------------------
    userid_ := user_id;
 
@@ -152,7 +153,8 @@ BEGIN
                        nvl(nb.s180,'0') s180, nb.s080 FIN,
                        nvl(nb.pd_0,0) pd_0,
                        c.codcagent, c.custtype,
-                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                       decode(c.country, 804,'1','2') REZ,
+                       NVL(trim(c.sed),'00') sed,
                        NVL(nb.s250_23,'0') s250,
                        NVL(Trim(sp.s031),'90') S031, NVL(nb.r013,'0') R013,
                        NVL(nb.tip,'ODB') TIP,
@@ -611,7 +613,8 @@ BEGIN
                        NVL(round(nb.bvq*100,0),0) BV,
                        nb.s080 FIN, nvl(nb.pd_0,0) pd_0,
                        c.codcagent, c.custtype,
-                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                       decode(c.country, 804,'1','2') REZ,
+                       NVL(trim(c.sed),'00') sed,
                        NVL(nb.s250_23,'0') s250, nb.tip
                   from nbu23_rez nb, customer c
                  where nb.fdat = z.fdat1
@@ -751,7 +754,8 @@ BEGIN
                        NVL(round(nb.bvq*100,0),0) BV,
                        nb.s080 FIN, nvl(nb.pd_0,0) pd_0,
                        c.codcagent, c.custtype,
-                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                       decode(c.country, 804,'1','2') REZ,
+                       NVL(trim(c.sed),'00') sed,
                        NVL(nb.s250_23,'0') s250, nb.tip
                   from nbu23_rez nb, customer c
                  where nb.fdat = z.fdat1
@@ -894,7 +898,8 @@ BEGIN
                        NVL(round(nb.rezq*100,0),0) rezq,
                        nb.s080 FIN, nvl(nb.pd_0,0) pd_0,
                        c.codcagent, c.custtype,
-                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                       decode(c.country, 804,'1','2') REZ,
+                       NVL(trim(c.sed),'00') sed,
                        NVL(nb.s250_23,'0') s250, nb.tip
                   from nbu23_rez nb, customer c
                  where nb.fdat = z.fdat1
@@ -1032,14 +1037,16 @@ BEGIN
 
    for k in ( select  a.acc, a.nls, a.nbs, a.kv, a.rnk, a.tip,
                       NVL(m.ostq-m.crdosq+m.crkosq, 0) BV,
-                      2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                      decode(c.country, 804,'1','2') REZ,
+                      NVL(trim(c.sed),'00') sed,
                       c.codcagent, c.custtype
                 from agg_monbals m, accounts a, customer c
                where m.kf =mfo_ and m.fdat =dato_
                  and m.acc = a.acc
                  and a.rnk = c.rnk
                  and m.ost-m.crdos+m.crkos !=0
-                 and m.acc in ( select acc  from accounts  where tip='SNA' )
+                 and m.acc in ( select acc  from accounts
+                                 where tip='SNA' or tip !='REZ' and nbs='2209' )
                  and not exists ( select 1  from nbu23_rez n
                                    where n.kf=mfo_ and n.fdat =dat1_
                                      and n.acc =m.acc and (-100)*n.bv = m.ost-m.crdos+m.crkos )
