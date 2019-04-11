@@ -24,6 +24,8 @@ using System.IO;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
+using Bars.Oracle;
+using Oracle.DataAccess.Types;
 
 namespace Bars.UserControls
 {
@@ -67,9 +69,26 @@ namespace Bars.UserControls
             _dbLogger = DbLoggerConstruct.NewDbLogger();
             FastReport.Utils.RegisteredObjects.AddConnection(typeof(OracleDataConnection));
         }
+
+        public FrxDocLocal(string fileName, Page page)
+        {
+            ValidateFilePath(fileName);
+            _templatePath = fileName;
+            _page=page;
+            _dbLogger = DbLoggerConstruct.NewDbLogger();
+            FastReport.Utils.RegisteredObjects.AddConnection(typeof(OracleDataConnection));
+        }
         #endregion
 
         #region Приватные методы
+
+        private void ValidateFilePath(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new Bars.Exception.BarsException(String.Format("Файл звіту {0} не знайдено", filePath));
+            }
+        }
         public void ValidateTemplatePath(String templatePath)
         {
             if (!File.Exists(templatePath))
@@ -387,6 +406,152 @@ namespace Bars.UserControls
             }
 
         }
+
+        /// <summary>
+        /// Запись в базу сформированого текста депозитного договора
+        /// </summary>
+        /// <param name="ctx">HTTP контекст</param>
+        /// <param name="deposit">депозитный договор</param>
+        /// <param name="templateId">имя шаблона</param>
+        /// <returns></returns>
+        public void AddContractText(HttpContext ctx, Deposit deposit, string templateId)
+        {
+            var connect = new OracleConnection();
+
+            try
+            {
+                _dbLogger.Debug("Пользователь начал запись в базу текста депозитного договора №"
+                                + deposit.ID, "deposit");
+
+                // Создаем соединение
+                var conn = (IOraConnection)ctx.Application["OracleConnectClass"];
+                connect = conn.GetUserConnection();
+
+                // Открываем соединение с БД
+
+                // Устанавливаем роль
+                using (var cmdSetRole = new OracleCommand())
+                {
+                    cmdSetRole.Connection = connect;
+                    cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
+                    cmdSetRole.ExecuteNonQuery();
+                }
+
+                //contractText = WriteContractText(connect, ctx, deposit, templateId);
+                WriteContractText(connect, deposit, templateId);
+
+                _dbLogger.Debug("Пользователь успешно записал в базу текст депозитного договора №"
+                                + deposit.ID, "deposit");
+            }
+            finally
+            {
+                if (connect.State != ConnectionState.Closed)
+                { connect.Close(); connect.Dispose(); }
+            }
+        }
+
+        /// <summary>
+        /// Создание текста договора в базе данных
+        /// </summary>
+        /// <param name="connection">З'єднання з БД</param>
+        /// <param name="deposit">об'єкт депозитного договору</param>
+        /// <param name="template">назва шаблону договору</param>
+        private void WriteContractText(OracleConnection connection, Deposit deposit, string template)
+        {
+            _dbLogger.Debug("Формирование текста депозитного договора №" +
+                           deposit.ID + " началось.", "deposit");
+            decimal mainContractFlag = 0;
+
+            using (var repText = new OracleBlob(connection))
+            using (OracleCommand cmdCkSign = connection.CreateCommand())
+            {
+                cmdCkSign.CommandText = "select nvl(state,0) from cc_docs " +
+                                        "where nd=:dpt_id and adds=0 and id=:template";
+                cmdCkSign.Parameters.Add("dpt_id", OracleDbType.Decimal, deposit.ID, ParameterDirection.Input);
+                cmdCkSign.Parameters.Add("template", OracleDbType.Varchar2, template, ParameterDirection.Input);
+                String result = Convert.ToString(cmdCkSign.ExecuteScalar());
+
+                if (result == "2")
+                {
+                    throw new DepositException("Текст депозитного договору №" +
+                                               deposit.ID + " (шаблон " + template +
+                                               ") вже підписано! Формувати його повторно заборонено!");
+                }
+                if (result == "1")
+                {
+                    // Повторне формування
+                    // спочатку видаляємо попередній
+                    OracleCommand cmdDelPrevDpt = connection.CreateCommand();
+                    cmdDelPrevDpt.CommandText = "delete from cc_docs " +
+                                                "where nd=:dpt_id and adds=0 and state=1 and id=:template";
+                    cmdDelPrevDpt.Parameters.Add("dpt_id", OracleDbType.Decimal, deposit.ID, ParameterDirection.Input);
+                    cmdDelPrevDpt.Parameters.Add("template", OracleDbType.Varchar2, template, ParameterDirection.Input);
+                    cmdDelPrevDpt.ExecuteNonQuery();
+                }
+
+                // потім формуємо договір
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    ExportToMemoryStream(FrxExportTypes.Pdf, ms);
+                    int streamLength = (int)ms.Length;
+                    repText.Write(ms.GetBuffer(), 0, streamLength);
+                }
+
+                // записуємо текст депоитного договору в БД 
+                // (у форматі BLOB тому, що містить картинки - штрихкод та логотип ощада )
+                using (OracleCommand cmdInsertDoc = connection.CreateCommand())
+                {
+                    Connection conn = new Connection();
+                    cmdInsertDoc.CommandText = conn.GetSetRoleCommand("REPORTER");
+                    cmdInsertDoc.ExecuteNonQuery();
+                    cmdInsertDoc.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
+                    cmdInsertDoc.ExecuteNonQuery();
+                    cmdInsertDoc.CommandText = conn.GetSetRoleCommand("CC_DOC");
+                    cmdInsertDoc.ExecuteNonQuery();
+
+                    cmdInsertDoc.CommandText = "begin dpt_web.create_text(:template, :dptid, :adds, :txt); end;";
+                    cmdInsertDoc.Parameters.Add("template", OracleDbType.Varchar2, template, ParameterDirection.Input);
+                    cmdInsertDoc.Parameters.Add("dptid", OracleDbType.Decimal, deposit.ID, ParameterDirection.Input);
+                    cmdInsertDoc.Parameters.Add("adds", OracleDbType.Decimal, mainContractFlag, ParameterDirection.Input);
+                    cmdInsertDoc.Parameters.Add("txt", OracleDbType.Blob, repText, ParameterDirection.Input);
+                    cmdInsertDoc.ExecuteNonQuery();
+                }
+            }
+
+            _dbLogger.Debug("Формирование текста депозитного договора №" +
+                           deposit.ID + " прошло успешно.", "deposit");
+        }
+
+        public byte[] ReadContractText(HttpContext ctx, decimal contractNumber, string templateId)
+        {
+            // Создаем соединение
+            using (OracleConnection conn = ((IOraConnection)ctx.Application["OracleConnectClass"]).GetUserConnection())
+            using (OracleCommand cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = "SELECT DATA FROM CC_DOCS WHERE ND = :p_nd AND ID = :p_id";
+                cmd.Parameters.Add("p_nd", OracleDbType.Decimal, contractNumber, ParameterDirection.Input);
+                cmd.Parameters.Add("p_id", OracleDbType.Varchar2, templateId, ParameterDirection.Input);
+
+                using (OracleDataReader rdr = cmd.ExecuteReader())
+                {
+                    if (!rdr.Read() || rdr.IsDBNull(0))
+                        throw new System.Exception(
+                            string.Format("Не знайдено збережений договір {0} у таблиці cc_docs", contractNumber));
+
+                    using (OracleBlob blobDpt = rdr.GetOracleBlob(0))
+                    {
+                        if (blobDpt.IsNull || blobDpt.IsEmpty)
+                            throw new System.Exception(string.Format(
+                                "Не знайдено збережений договір {0} у таблиці cc_docs", contractNumber));
+
+                        byte[] buffer = new byte[blobDpt.Length];
+                        blobDpt.Read(buffer, 0, (int)blobDpt.Length);
+                        return buffer;
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Приватные события
@@ -776,9 +941,12 @@ namespace Bars.UserControls
                 ViewState["AddParams"] = value;
             }
         }
-        # endregion
 
-        # region События
+        public Action<FrxDocLocal, Deposit> PrintDepositReport;
+        
+        #endregion
+
+        #region События
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -847,13 +1015,23 @@ namespace Bars.UserControls
                     pars,
                     this.Page);
 
-                // открываем контрол подписи
-                cbSigned.Checked = false;
-                cbSigned.Enabled = true;
                 // выбрасываем в поток в формате PDF
                 try
                 {
-                    doc.Print(FrxExportTypes.Pdf);
+                    if (null != PrintDepositReport)
+                    {
+                        Deposit dpt = (Deposit) Session["DepositInfo"];
+                        PrintDepositReport.Invoke(doc, dpt);
+                        //Session["PrintDepositReport"] = true;
+                    }
+                    else
+                    {
+                        // открываем контрол подписи
+                        cbSigned.Checked = false;
+                        cbSigned.Enabled = true;
+
+                        doc.Print(FrxExportTypes.Pdf);
+                    }
                 }
                 catch (System.Exception ex) {
                     _dbLogger.Info(String.Format("FrxDocLocal:try alt template; FrxDocLocal_1: {0} , {1}", ex.Message, ex.StackTrace));

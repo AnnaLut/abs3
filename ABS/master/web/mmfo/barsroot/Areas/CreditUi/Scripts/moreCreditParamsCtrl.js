@@ -21,28 +21,44 @@
         { tag: "INIC", tab: $scope.ArrayTabs[0], fields: "Ініціатива" }, { tag: "CCRNG", tab: $scope.ArrayTabs[1], fields: "Шаблон погашення рахунку \"SG\" " },
         { tag: "I_CR9", tab: $scope.ArrayTabs[0], fields: "Вид" }, { tag: "R_CR9", tab: $scope.ArrayTabs[2], fields: "Комісія за невикористаний ліміт" },
         { tag: "FREQ", tab: $scope.ArrayTabs[1], fields: "Погашення основного боргу -> Періодичність" }, { tag: "FREQP", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу -> Періодичність" },
-        { tag: "S_S36", tab: $scope.ArrayTabs[2], fields: "Комісія за обслуговування кредиту (сплачується перед видачею кредиту)" }];
+        { tag: "S_S36", tab: $scope.ArrayTabs[2], fields: "Комісія за обслуговування кредиту (сплачується перед видачею кредиту)" },
+        { tag: "GKD_IN", tab: $scope.ArrayTabs[0], fields: "Приналежність до ГКД", blockOnTagOnly: true }, { tag: "GKD_ND", tab: $scope.ArrayTabs[0], fields: "Ген. договір" },
+        { tag: "BUS_MOD", tab: $scope.ArrayTabs[0], fields: "BUS_MOD", blockOnTagOnly: true }, { tag: "SPPI", tab: $scope.ArrayTabs[0], fields: "SPPI", blockOnTagOnly: true },
+        { tag: "IFRS", tab: $scope.ArrayTabs[0], fields: "IFRS", blockOnTagOnly: true }, { tag: "POCI", tab: $scope.ArrayTabs[0], fields: "POCI", blockOnTagOnly: true }
+    ];
 
     $scope.GetMessage = function (tag) {
-        if (!$rootScope.isTagOnly) {
-            for (var i = 0; i < $scope.NoEditParams.length; i++) {
-                if ($scope.NoEditParams[i].tag === tag)
-                    return [$scope.NoEditParams[i].tab, $scope.NoEditParams[i].fields];
-            }
+        for (var i = 0; i < $scope.NoEditParams.length; i++) {
+            if (($rootScope.isTagOnly && $scope.NoEditParams[i].blockOnTagOnly && $scope.NoEditParams[i].tag === tag) ||
+                (!$rootScope.isTagOnly && $scope.NoEditParams[i].tag === tag))
+                return [$scope.NoEditParams[i].tab, $scope.NoEditParams[i].fields];
         }
         return false;
     };
 
     $rootScope.ndtxtsave = { nd: null, txt: [] };
 
-    $scope.tabDataSource = new kendo.data.DataSource({
-        transport: {
-            read: {
-                url: bars.config.urlContent("/creditui/newcredit/getTabList/"),
-                dataType: "json"
-            }
-        }
+    $http.post(bars.config.urlContent('/creditui/newcredit/GetMoreCreditsParams'), { nd: $rootScope.nd }).then(function (request) {
+        $rootScope.moreCreditsParamsDataSource = request.data;
+        $scope.tabDataSource = new kendo.data.DataSource({
+            data: $rootScope.moreCreditsParamsDataSource.TabList
+        });
+
+        $scope.tabDataSource.fetch(function () {
+            bars.ui.loader('body', true);
+            $rootScope.LoadMoreCreditData("new");
+            bars.ui.loader('body', false);
+        });
     });
+
+    //$scope.tabDataSource = new kendo.data.DataSource({
+    //    transport: {
+    //        read: {
+    //            url: bars.config.urlContent("/creditui/newcredit/getTabList/"),
+    //            dataType: "json"
+    //        }
+    //    }
+    //});
 
     $scope.tabParamsOptions = {
         animation: false        
@@ -153,50 +169,37 @@
         }
     }
 
-    $scope.tabDataSource.fetch(function () {
-        bars.ui.loader('body', true);
-        $rootScope.LoadMoreCreditData("new");
-        bars.ui.loader('body', false);
-    });
-
     $rootScope.LoadMoreCreditData = function(mode)
     {
         var tabs = $scope.tabDataSource.view();
         var tabStrip = $scope.tabParams;
-        var nd = bars.extension.getParamFromUrl('nd', $location.absUrl());
+        //var nd = bars.extension.getParamFromUrl('nd', $location.absUrl());
         for (i = 0; i < tabs.length; i++) {
             if (mode === "new") {
                 tabStrip.append({
-                    text: tabs[i].NAME,
-                    content: "<div kendo-grid='" + tabs[i].CODE + "' k-columns='gridColumns' k-filterable='true' k-options='gridOptions' k-pageable='true'></div>"
+                    text: tabs[i].Value,
+                    content: "<div kendo-grid='" + tabs[i].Key + "' k-columns='gridColumns' k-filterable='true' k-options='gridOptions' k-pageable='true'></div>"
                 });
             }
-            var urlTxt = "";
-            var dataTxt;
-            if (nd != null) {
-                urlTxt = "/creditui/newcredit/getNdTxtDeal/";
-                dataTxt = { nd: nd, code: tabs[i].CODE };
-            }
-            else {
-                urlTxt = "/creditui/newcredit/getNdTxt/";
-                dataTxt = { code: tabs[i].CODE };
-            }
+            //var urlTxt = "";
+            //var dataTxt;
+            //if (nd != null) {
+            //    urlTxt = "/creditui/newcredit/getNdTxtDeal/";
+            //    dataTxt = { nd: nd, code: tabs[i].CODE };
+            //}
+            //else {
+            //    urlTxt = "/creditui/newcredit/getNdTxt/";
+            //    dataTxt = { code: tabs[i].CODE };
+            //}
             var gridDataSource = new kendo.data.DataSource({
-                transport: {
-                    read: {
-                        url: bars.config.urlContent(urlTxt),
-                        data: dataTxt,
-                        dataType: "json"
-                    },
-                    update: {
-                        url: "#"
-                    }
-                },
+                data: $rootScope.moreCreditsParamsDataSource.NdTxt,
                 batch: true,
                 pageSize: 20,
                 schema: {
-                    data: "Data",
-                    total: "Total",
+                    data: tabs[i].Key,
+                    total: function () {
+                        return $rootScope.moreCreditsParamsDataSource.NdTxt[tabs[i].Key].length;
+                    },
                     errors: "Errors",
                     model: {
                         id: "TAG",
@@ -209,7 +212,7 @@
                     }
                 }
             });
-            $scope[tabs[i].CODE].setDataSource(gridDataSource);
+            $scope[tabs[i].Key].setDataSource(gridDataSource);
         }
         tabStrip.select(0);
     }

@@ -151,9 +151,6 @@
         referenceGrid.metadata.CurrentActionInform.lastClickRowInform.rowNumber = referenceGrid.store.indexOf(record) + 1;
         var columns = grid.getGridColumns();
         var cellInform = columns[cellIndex];
-
-        
-
         var col = cellInform.columnMetaInfo;
         var params = new Array();
         if (!col || !col.WEB_FORM_NAME || record.phantom)
@@ -216,7 +213,15 @@
 
         }
         else {
+            if(href.indexOf("jsonSqlParams") > -1 && href.indexOf("?code=") > -1)
+            {
+                //в случе, если разработчик бд хочет сам динамически генерировать url на бмд и параметры.
+                this.openWindowByFunction(href);
+                return;
+            }
             var parameters = [];
+
+
             if (col.ParamsNames && col.ParamsNames.length && col.ParamsNames.length > 0)
 
                 Ext.each(col.ParamsNames, function (parName) {
@@ -282,17 +287,21 @@
     },
 
     onHideColumns: function (col) {
+        
         var thisController = this;
-        var metadata = col.up('grid').metadata;
-        if (metadata.saveColumnsParam == 'BY_DEFAULT')
-            thisController.updateColumnsHidden();
+        var grid = col.up('grid');
+        var metadata = grid.metadata;
+        if (metadata.saveColumnsParam && metadata.saveColumnsParam == 'BY_DEFAULT')
+            ExtApp.utils.RefBookUtils.syncHiddenColumnsToLocalStorage(grid)
     },
 
     onShowColumns: function (col) {
+        
         var thisController = this;
-        var metadata = col.up('grid').metadata;
-        if (metadata.saveColumnsParam == 'BY_DEFAULT')
-            thisController.updateColumnsHidden();
+        var grid =  col.up('grid');
+        var metadata = grid.metadata;
+        if (metadata.saveColumnsParam && metadata.saveColumnsParam == 'BY_DEFAULT')
+            ExtApp.utils.RefBookUtils.syncHiddenColumnsToLocalStorage(grid);
     },
 
     openRefWindow: function (href, formTitle) {
@@ -370,6 +379,7 @@
 
     //метод вызывается при нажатии на кнопку "Зберегти" в плагине RowEditing
     onEdit: function (editor, e) {
+
         var isPhantom = e.record.phantom;
         if (editor.pluginId == 'cellEditPlugin') {
             if (ExtApp.utils.RefBookUtils.isValueEquelToOriginal(e.value, e.originalValue))
@@ -500,9 +510,10 @@
     },
 
     onSaveColumnsButton: function (button, e) {
+        
         var thisController = this;
         var grid = thisController.getGrid();
-        var columnsHiddenNames = ExtApp.utils.RefBookUtils.getColumnsHiddenFromGrid(grid);
+        ExtApp.utils.RefBookUtils.sy
         ExtApp.utils.RefBookUtils.setHiddenColumnsToLocalSrorage(columnsHiddenNames, grid.metadata.localStorageModel);
 
     },
@@ -512,7 +523,8 @@
         var grid = thisController.getGrid();
         ExtApp.utils.RefBookUtils.clearHiddenColumnsFromLocalSrorage(grid.metadata.localStorageModel);
         ExtApp.utils.RefBookUtils.showAllGridColumns(grid);
-        thisController.updateColumnsHidden();
+        ExtApp.utils.RefBookUtils.setDisabledClearColumnBtn(true);
+        ExtApp.utils.RefBookUtils.setDisabledSaveColumnBtn(true);
     },
 
     clearConstructorGrid: function (grid) {
@@ -680,15 +692,6 @@
                 field.Name = 'FILTER_ID';
                 field.Value = selectedRow.data['FILTER_ID'];
                 deletableRow.push(field);
-                //Ext.each(grid.metadata.filtersMetainfo.FiltersMetaColumns, function () {
-                //    if (this.COLNAME != 'IsApplyFilter') {
-                //        var field = {};
-                //        field.Name = this.COLNAME;
-                //        field.Type = this.COLTYPE;
-                //        field.Value = selectedRow.data[this.COLNAME];
-                //        deletableRow.push(field);
-                //    }
-                //});
                 Ext.MessageBox.show({ msg: 'Виконується оновлення даних, зачекайте...' + '</br></br>', wait: true, waitConfig: { interval: 200 }, iconCls: "save" });
                 thisController.sendToServer(
                     "/barsroot/ReferenceBook/DeleteData",
@@ -1286,12 +1289,6 @@
         var thisController = this;
         //каждый пункт меню содержит свойство metaInfo с информацией о вызываемой процедуре
         var funcMetaInfo = item.metaInfo;
-        //thisController.fillCallFuncInfo(funcMetaInfo);
-        //var func = thisController.currentCalledSqlFunction;
-        //if (!funcMetaInfo.isFuncOnly || (funcMetaInfo.WEB_FORM_NAME && funcMetaInfo.WEB_FORM_NAME.indexOf('/') > 0 && funcMetaInfo.WEB_FORM_NAME.indexOf('/ndi/') < 0)) {
-        //    window.open(funcMetaInfo.WEB_FORM_NAME, '_blank');
-        //    return;
-        //}
          if(funcMetaInfo.MultiRowsParams != null &&funcMetaInfo.MultiRowsParams.length > 0 && funcMetaInfo.MultiRowsParams[0].Kind =='FROM_UPLOAD_EXCEL')
          {
              thisController.openWindowForUploadOnly(funcMetaInfo.TABID,funcMetaInfo.FUNCID);
@@ -1339,26 +1336,6 @@
 
     //onapplyCustomFilter: function (button, e) {
 
-    //    controllerMetadata.applyFilters.CustomBeforeFilters = [];
-    //    controllerMetadata.startFilter = [];
-    //    var mainGrid = controllerMetadata.mainGrid;
-    //    var referenceGrid = button.up('grid');
-    //    referenceGrid.getStore().each(function (record) {
-    //        if (record.data['IsApplyFilter'] == 1)
-    //            controllerMetadata.applyFilters.CustomBeforeFilters.push({
-    //                //к имени поля добавляем имя таблицы
-    //                FILTER_ID: record.data['FILTER_ID']
-    //            });
-    //    });
-    //    if (mainGrid && controllerMetadata.applyFilters.CustomBeforeFilters.length > 0) {
-    //        Ext.each(controllerMetadata.applyFilters.CustomBeforeFilters, function (filter) {
-    //            controllerMetadata.startFilter.push(filter);
-    //        });
-    //        controllerMetadata.startFilter = Ext.encode(controllerMetadata.startFilter);
-    //        mainGrid.store.getProxy().extraParams.startFilter = controllerMetadata.startFilter;
-    //        mainGrid.store.reload();
-    //    }
-    //},
 
     SetFiltersByApplyFilters: function (btn, e) {
         
@@ -1612,9 +1589,6 @@
             
             thisController.controllerMetadata.applyFilters = applyFilters;
             if (
-                //applyFilters.CustomBeforeFilters && applyFilters.CustomBeforeFilters.length ||
-                //applyFilters.SystemBeforeFilters && applyFilters.SystemBeforeFilters.length ||
-                //applyFilters.DynamicBeforeFilters &&  applyFilters.DynamicBeforeFilters.length ||
                 applyFilters.ConstructorStructure && applyFilters.ConstructorStructure.length)
                 thisController.controllerMetadata.applyFilters.hasAplyFilters = true;
             else
@@ -1643,15 +1617,6 @@
         controllerMetadata.SympleFilters = ExtApp.utils.RefBookUtils.configFieldsForeSympleFilters(controllerMetadata.filtersMetainfo.FilterColumns);
         
         if (controllerMetadata.filtersMetainfo.ShowFilterWindow != 'false' || hasCustomFilter || hasSystemFilter) {
-            //if (controllerMetadata.filtersMetainfo.CustomFilters && controllerMetadata.filtersMetainfo.CustomFilters.length > 0
-            //    || controllerMetadata.filtersMetainfo.SystemFilters && controllerMetadata.filtersMetainfo.SystemFilters.length > 0) {
-            //Ext.each(metadata.CustomFilters, function (filter) {
-            //    ;
-            //    CustomFilters.push(filter);
-            //    var formField = ExtApp.utils.RefBookUtils.configCustomFilters(filter);
-            //    formFields.push(formField);
-            //})
-            // thisApp.setAccessLevel(metadata);
             var tab = Ext.create('Ext.tab.Panel', {
                 width: '100%',
                 minHeight: 200,
@@ -1704,13 +1669,6 @@
             {
                 title: 'Звичайні',
                 items: Ext.create('ExtApp.view.refBook.SimpleFilterPanel', { thisController: thisController }),
-                //    items: thisController.controllerMetadata.SympleFilters,
-                //    height: 300,
-                //    fieldDefaults: {
-                //        labelAlign: 'left',
-                //        labelWidth: 200
-                //    }
-                //}),
                 id: 'SympleFilterTub',
                 minHeight: 100,
                 width: '100%',
@@ -1753,7 +1711,6 @@
             }
             wind.setSize(500, 400);
             tab.setActiveTab('ConstructorTabId');
-            // if (applyFilters && applyFilters.DynamicBeforeFilters.length > 0)
             thisController.insertDefaultFiltersValues();
             controllerMetadata.tabPanel = tab;
         } else {
@@ -1852,7 +1809,6 @@
 
                           Ext.MessageBox.hide();
                           myWindow.close();
-                          // controllerMetadata.tabPanel = tab;
                           thisController.updateGridByFilters();
                       }
                       else {
@@ -1872,7 +1828,6 @@
             }
             Ext.MessageBox.hide();
             myWindow.close();
-            //controllerMetadata.tabPanel = tab;
             thisController.updateGridByFilters();
         }
 
@@ -1907,9 +1862,6 @@
                 count++;
             });
 
-
-        //model.setFields({ LogicalOp : 'sdfdsfs' });
-
         store.sync();
 
     },
@@ -1938,7 +1890,6 @@
                     var formWindow = btn.up('window');
                     var form = formWindow.down('form').getForm();
                     var param = {
-                        //filterId: filterModel.filterId,
                         Name: 'filterName',
                         value: form.findField('filterName').getValue()
                     }
@@ -2108,8 +2059,6 @@
         var applyFilters = thisController.controllerMetadata.applyFilters;
         if (!applyFilters)
             return false;
-        //if (applyFilters.DynamicBeforeFilters.length > 0)
-        //    thisController.insertDynamicFiltersInGrid(applyFilters.DynamicBeforeFilters);
         if (applyFilters.ConstructorStructure && applyFilters.ConstructorStructure.length != undefined && applyFilters.ConstructorStructure.length > 0) {
 
             thisController.insertConstructorStructure(applyFilters.ConstructorStructure);
@@ -2283,8 +2232,6 @@
                         keyField.Value = values[this.COLNAME];
                     }
 
-                    //if ((keyField.Type == 'S' || keyField.Type == 'C') && keyField.Value.indexOf("href=") > 0)
-                    //    return;
                     rowKeysToEdit.push(keyField);
 
                     //если значение изменилось (есть в массиве измененных значений) то добавляем в список update field1=val1, field2=val2...
@@ -2299,9 +2246,6 @@
                 var editDataObj = new Object();
                 editDataObj.OldRow = rowKeysToEdit;
                 editDataObj.Modified = rowDataToEdit;
-                //editDataObj.TableId = "";
-                //editDataObj.TableName = referenceGrid.metadata.tableInfo.TABNAME;
-                //editDataObj.random = Math.random;
 
 
                 Ext.MessageBox.show({ msg: 'Виконується оновлення даних, зачекайте...' + '</br></br>', wait: true, waitConfig: { interval: 200 }, iconCls: "save" });
@@ -2396,8 +2340,9 @@
     updateColumnsHidden: function () {
         var grid = this.getGrid();
         
-        var hiddenColumns = ExtApp.utils.RefBookUtils.getColumnsHiddenFromGrid(grid);
+
         var clearColBtn = Ext.getCmp('cleareColumnsButton');
+
         if (clearColBtn)
         {
             if (hiddenColumns && hiddenColumns.length)
@@ -2409,19 +2354,12 @@
         ExtApp.utils.RefBookUtils.setHiddenColumnsToLocalSrorage(hiddenColumns, grid.metadata.localStorageModel);
 
     },
-    onExportToExcelBtnClick: function (menu, item) {
 
+
+    onExportToExcelBtnClick: function (menu, item) {
         var grid = menu.up('referenceGrid');
-        
 
         var columnsHiddenNames = ExtApp.utils.RefBookUtils.getHiddenColumnsFromLocalSrorage(grid.metadata.localStorageModel);
-        
-           
-        //Ext.each(grid.columns, function (column, index) {
-        //    if (column.isHidden()) {
-        //        columnsVisible.push(column.dataIndex);
-        //    }
-        //});
 
         //В зависимости от выбранного пункта меню загружаем всю таблицу либо только текущую страницу
         var pageSize = grid.store.pageSize;
@@ -2449,7 +2387,7 @@
             "&gridFilter=" + oper.params.gridFilter +
             "&startFilter=" + grid.store.proxy.extraParams.startFilter +
             "&Base64DynamicFilter=" + ExtApp.utils.RefBookUtils.getBase64().encode(grid.store.proxy.extraParams.dynamicFilter)  +
-            "&columnsVisible=" + columnsHiddenNames +
+            "&columnsUnVisible=" + columnsHiddenNames +
             "&externalFilter=" + grid.store.proxy.extraParams.externalFilter +
             "&sort=" + Ext.encode(sort) +
             "&start=" + start +
@@ -2673,11 +2611,6 @@
             {
                 //если процедуру нужно вызвать для всех строк, то выделяем все строки, для более простого их получения
                 gridSelectModel.selectAll();
-                //selectedRows = gridSelectModel.getSelection();
-                //var params = new Array();
-                //Ext.each(gridSelectModel.getStore().data.items,function (item) {
-                //    params.push(item.data);
-                //});
                 selectedRows = gridSelectModel.getStore().data.items
                 func.allFuncCallCount = selectedRows.length;
                 func.infoDialogTitle = 'Виконання процедури для всіх рядків, що відображаються';
@@ -2882,9 +2815,7 @@
                 }
 
                 var paramsString = Ext.JSON.encode(params);
-                //var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
 
-                // var bas64Params = Base64.encode(paramsString);
                 var WEB_NAME = funcMetaInfo.WEB_FORM_NAME + "&jsonSqlParams=" + paramsString;
                 if (insertDefParams.length > 0)
                     WEB_NAME += "&InsertDefParams=" + Ext.JSON.encode(insertDefParams);
@@ -2987,7 +2918,6 @@
                     title: "Тип процедури не знайдено",
                     msg: "Тип функції " + +"'" + funcMetaInfo.PROC_EXEC + "'" + " не знайдено" + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK
                 });
-                //thisController.functionLinkWithRow(funcMetaInfo);
                 break;
         };
     },

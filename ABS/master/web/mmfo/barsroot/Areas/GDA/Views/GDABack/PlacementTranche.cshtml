@@ -1,0 +1,276 @@
+﻿@using Kendo.Mvc.UI
+@using Areas.GDA.Models
+
+@model SMBDepositTranche
+<script src="~/Areas/GDA/Scripts/GDABack/PlacementTranche.js"></script>
+<script src="~/Areas/GDA/Scripts/GDABack/Index.js"></script>
+<link rel="stylesheet" href="~/Areas/GDA/Css/GDA/Main.css" />
+
+<style>
+    .non-active {
+        pointer-events: none;
+        cursor: default;
+        text-decoration: none;
+    }
+</style>
+@Html.HiddenFor(x => x.ProcessId)
+@Html.HiddenFor(x => x.DebitAccount)
+@Html.HiddenFor(x => x.ReturnAccount)
+@Html.HiddenFor(x => x.IsProlongation)
+@Html.HiddenFor(x => x.ApplyBonusProlongation)
+@Html.HiddenFor(x => x.IsReplenishmentTranche)
+@Html.HiddenFor(x => x.FrequencyPayment)
+@Html.HiddenFor(x => x.IsIndividualRate)
+@Html.HiddenFor(x => x.IsCapitalization)
+@Html.HiddenFor(x => x.InterestRateCapitalization)
+@Html.HiddenFor(x => x.CustomerId)
+@Html.HiddenFor(x => x.CurrencyId)
+@Html.HiddenFor(x => x.StartDate)
+@Html.HiddenFor(x => x.NumberProlongation)
+
+<div>
+@(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        if (ViewBag.ShowAutorizeBtn)
+        {
+            if (ViewBag.StateCode == "DONE")
+            {
+                items.Add().Type(CommandType.Button).Text("Відхилити").Icon("pf-icon pf-16 pf-delete_button_error").Click("reject").Enable(false);
+                items.Add().Type(CommandType.Button).Text("Авторизувати").Icon("pf-icon pf-16 pf-user").Click("autorize").Enable(false);
+            }
+            else
+            {
+                items.Add().Type(CommandType.Button).Text("Відхилити").Icon("pf-icon pf-16 pf-delete_button_error").Click("reject").Enable(true);
+                items.Add().Type(CommandType.Button).Text("Авторизувати").Icon("pf-icon pf-16 pf-user").Click("autorize").Enable(true);
+            }
+        }
+        if (ViewBag.ShowBlockBtn)
+        {
+            items.Add().Type(CommandType.Button).Text("Заблокувати").Icon("pf-icon pf-16 pf-user").Click("block").Enable(true);
+            items.Add().Type(CommandType.Button).Text("Відхилити").Icon("pf-icon pf-16 pf-delete_button_error").Click("cancel").Enable(true);
+        }
+        if (ViewBag.ShowUnblockBtn)
+        {
+            items.Add().Type(CommandType.Button).Text("Розблокувати").Icon("pf-icon pf-16 pf-user").Click("unblock").Enable(true);
+            items.Add().Type(CommandType.Button).Text("Відхилити").Icon("pf-icon pf-16 pf-delete_button_error").Click("cancel").Enable(true);
+        }
+        items.Add().Template("<a class='k-button clientBtn' onclick='showClientCard(" + @Model.CustomerId+ ")'><span class='pf-icon pf-16 pf-book'></span>Відкрити картку клієнта</a>");
+    })
+)
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="form-group">
+            <table border="0">
+                <tr>
+                    <td>
+                        <div id="labelReplaceDBO">
+                            <div style="display:inline-block; margin-right:10px;">
+                                <label>ЄДРПОУ:</label>
+                                <input type="text" class="k-textbox" style="width: 160px;background-color:cornsilk"
+                                       ng-disabled="true" value="@(ViewBag.Okpo)" />
+                            </div>
+                            <div style="display:inline-block">
+                                <label>Назва Клієнта:</label>
+                                <input type="text" class="k-textbox" style="width: 480px;background-color:cornsilk"
+                                       ng-disabled="true" value="@(ViewBag.Nmk)" />
+                            </div>
+                            <hr>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>№ Заяви про розміщення траншу</label>
+                        <input type="text" class="k-textbox" style="width: 300px;background-color:cornsilk" value="@Model.DealNumber" readonly/>
+
+                        <label style="margin-left: 10px;">Рег.№:</label>
+                        <input type="text" class="k-textbox" style="width: 140px;background-color:cornsilk" value="@Model.CustomerId" readonly/>
+                        <br />
+                        <label style="margin-top: 20px;">Дата заяви про розміщення траншу:</label>
+                        @*<span style="color: red">*</span>*@
+                        <input type="text" class="kendoDate form-control" style="width:140px" value='@Model.StartDate' disabled/>
+
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Валюта:</label>
+                        @*<span style="color: red">*</span>*@
+                        <input id="test" type="text" class="k-textbox"  style="width: 80px; background-color:cornsilk" value="@Model.CurrencyId" readonly/>
+                        <a class='k-button non-active'>
+                            <i class='pf-icon pf-16 pf-book pf-disabled'></i>
+                        </a>
+
+                        <label>Сума траншу:</label>
+                        @*<span style="color: red">*</span>*@
+                        <input kendo-numeric-text-box k-min="0" style="width: 160px"
+                               k-max="999999999999999999999999999999" value="@Model.AmountTranche" readonly />
+
+                        <label>Депозитний рахунок:</label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk" value="@Model.PrimaryAccount" readonly/>
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Строк траншу (дні):</label>
+                        @*<span style="color: red">*</span>*@
+                        <input type="text" class="k-textbox" style="width: 80px;background-color:cornsilk" value="@Model.NumberTrancheDays" readonly/>
+
+                        <label>Дата розміщення:</label>
+                        <input type="text" class="kendoDate form-control" style="width:140px" value="@Model.StartDate" disabled/>
+
+                        <label>Дата повернення:</label>
+                        @*<span style="color: red">*</span>*@
+                        <input type="text" class="kendoDate form-control" style="width:140px" value="@Model.ExpiryDate" disabled/>
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Рахунок для списання:</label>
+                        @*<span style="color: red">*</span>*@
+                        <select id="DebitAcc" kendo-drop-down-list style="width: 30%" disabled></select>
+
+                        <label>Залишок на рахунку для списання:</label>
+                        <input kendo-numeric-text-box k-min="0" style="width: 160px;background-color:cornsilk"
+                               k-max="999999999999999999999999999999" k-spinners="false" k-ng-disabled="true"
+                               @*k-ng-model="depositDemand.accDebitBalance"*@ id="DebitAccOstc" />
+                        <br>
+                        <br>
+
+                        <label>Рахунок для повернення:</label>
+                        @*<span style="color: red">*</span>*@
+                        <select id="DebitAccReplacement" kendo-drop-down-list style="width: 30%" disabled></select>
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Автопролонгація:</label>
+                        <select id="AutoProlongation" kendo-drop-down-list style="width: 65px" disabled></select>
+                        <a title="Деталі автопролонгації" onclick="getProlongationDetails()"><i class="pf-icon pf-16 pf-info"></i></a>
+                        <label>Кількість автопролонгацій:</label>
+                        <input class="k-textbox" style="width:80px;" id="NumberProlongation"
+                               ng-disabled="true" k-spinners="true" k-ng-disabled="true" value="@Model.NumberProlongation" />
+
+                        <label>Термін:</label>
+                        <input id="applyprologField" class="k-textbox" style="width:100px;background-color:cornsilk"
+                               ng-disabled="true" k-spinners="false" k-ng-disabled="true" />
+
+                        @*<label>Бонусна % ставка:</label>
+        <input kendo-numeric-text-box k-min="0" style="width: 80px;" value="@Model.InterestRateProlongation" disabled/>
+
+        <label>Пролонгація:</label>
+        <select id="BonusProlongation"style="width: 110px" disabled></select>*@
+
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Поповнення траншу:</label>
+                        <select id="ReplenishmentTranche" kendo-drop-down-list
+                                @*k-options="isReplenishmentTrancheOptions"*@
+                                @*ng-model="replacementTranche.isReplenishmentTranche"*@ style="width:65px" disabled></select>
+
+                        @*<label>Максимальна сума траншу:</label>
+                        <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                               k-max="999999999999999999999999999999" value="@Model.MaxSumTranche" disabled/>
+
+                        <label>Мінімальна сума поповнення:</label>
+                        <input kendo-numeric-text-box k-min="0" style="width: 80px" value="@Model.MinReplenishmentAmount" disabled/>*@
+
+                        <label>Строк поповнення траншу до:</label>
+                        <input type="text" class="kendoDate form-control"  style="width:140px" 
+                               value="@Model.LastReplenishmentDate" disabled />
+
+                        <label>Періодичність виплати</label>
+                        <select id="FrequencyPaymentDrp" kendo-drop-down-list style="width:105px" disabled></select>
+                    </td>
+                </tr>
+
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Капіталізація:</label>
+                        <select id="IsCapitalizationSelect" kendo-drop-down-list style="width:75px" disabled></select>                        
+                        
+                        <label>Індивідуальна ставка:</label>
+                        <select id="IndividualRate" kendo-drop-down-list style="width:65px" disabled></select>
+
+                        <label>% ставка:</label>
+                        @*<span style="color: red" ng-show="!isValueValid('placementTranche','isIndividualRate')">*</span>*@
+                        <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                               k-max="100" value="@(Model.IndividualInterestRate == null ? "0.00" : Model.IndividualInterestRate)" disabled/>
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Розрахункова % ставка:</label>
+                        <input kendo-numeric-text-box k-min="-100" style="width: 80px; background-color:cornsilk" k-spinners="false"
+                               k-max="100" ng-disabled="true" value="@(Model.InterestRate == null ? (Model.IndividualInterestRate == null ? "0.00" : Model.IndividualInterestRate) : Model.InterestRate)" disabled/>
+                        @*<button id="countPercentBtn" class='btn btn-default' ng-click="onClick('replacementTranche', 'count')" title="Розрахувати"><i class="pf-icon pf-16 pf-application-update"></i>Розрахувати</button>*@
+                        <button id="showDetailsPercentBtn" class='btn btn-default' onclick='showDetailsPercent();' title="Показати деталі"><i class="pf-icon pf-16 pf-application-update"></i>Показати деталі</button>
+                    </td>
+                </tr>
+                <tr> <td> <hr /> </td> </tr>
+                <tr>
+                    <td>
+                        <label>Коментар (максимум - 1000 символів):</label>
+                        @*<span style="color: red" ng-show="!isValueValid('placementTranche','comment')">*</span>*@
+                        <textarea rows="3" maxlength="1000" @*ng-model="replacementTranche.Comment"
+                                  ng-disabled="!replacementTranche.IsIndividualRate"*@
+                                  class="k-textbox" readonly>@Model.Comment</textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="well">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="form-group">
+                <label><b>Оператор:</b></label>
+                <input type="text" class="k-textbox" id="operator" style="width: 200px;background-color:cornsilk" disabled
+                       @*ng-model="replacementTranche.OperatorName" ng-disabled="true"*@ />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label><b>Дата:</b></label>
+                <input type="text" class="kendoDate form-control" id="operatorDate" style="width:110px" disabled/>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                <label><b>Контролер:</b></label>
+                <input type="text" class="k-textbox" id="controller" style="width: 200px;background-color:cornsilk" disabled
+                       @*ng-disabled="true" ng-model="replacementTranche.ControllerName"*@ />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label><b>Дата:</b></label>
+                <input type="text" class="kendoDate form-control" id="controllerDate" style="width:110px" disabled/>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label><b>Статус:</b></label>
+                <input type="text" class="k-textbox" style="width: 120px;background-color:cornsilk" disabled value="@(ViewBag.StateName)"
+                       @*ng-disabled="true" ng-value="getStateTranche(replacementTranche.State)"*@ />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ConfirmPopup"></div>

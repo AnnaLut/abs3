@@ -149,5 +149,17 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(new { Status = Status, TabId = tabid });
         }
 
+        public ActionResult IsNBShasOB22(string nbs)
+        {
+            try
+            {
+                return Json(new { Status = "ok", IsHasOb22 = _accountsRepository.IsNBShasOB22(nbs) });
+            }
+            catch (Exception e)
+            {
+                return Json(new { Status = e.Message + " StackTrace=" + e.StackTrace });
+            }
+        }
+
     }
 }

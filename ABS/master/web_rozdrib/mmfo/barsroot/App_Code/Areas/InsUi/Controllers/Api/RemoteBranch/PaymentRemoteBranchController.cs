@@ -9,9 +9,9 @@ using Bars.Classes;
 using Oracle.DataAccess.Client;
 using System.IO;
 using System.Web;
+using System.Text;
 using System.Xml;
 using System.Runtime.Serialization.Json;
-using Oracle.DataAccess.Types;
 
 namespace Areas.InsUi.Controllers.Api.RemoteBranch
 {
@@ -21,34 +21,43 @@ namespace Areas.InsUi.Controllers.Api.RemoteBranch
         public HttpResponseMessage Post()
         {
             PaymentsResponse response = new PaymentsResponse() { success = true, message = "Ok" };
-            string p_xml = String.Empty;
-
-            using (StringWriter XmlStrWriter = new StringWriter())
-            using (XmlTextWriter XmlWriter = new XmlTextWriter(XmlStrWriter))
-            {
-                XmlDocument xml = new XmlDocument();
-                xml.Load(JsonReaderWriterFactory.CreateJsonReader(HttpContext.Current.Request.InputStream, new XmlDictionaryReaderQuotas()));
-                xml.Save(XmlWriter);
-
-                p_xml = XmlStrWriter.ToString();
-            }
-
             using (OracleConnection con = OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = con.CreateCommand())
             {
                 try
                 {
-                    using (OracleXmlType _xml = new OracleXmlType(con, p_xml))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "bars.ins_ewa_mgr.pay_isu";
-                        cmd.Parameters.Add("p_xml", OracleDbType.XmlType, _xml, ParameterDirection.Input);
-                        cmd.Parameters.Add("p_ref", OracleDbType.Decimal, ParameterDirection.Output);
-                        cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, ParameterDirection.Output);
-                        cmd.Parameters.Add("p_errmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+                    string p_xml = String.Empty;
+                    string p_request = String.Empty;
 
-                        cmd.ExecuteNonQuery();
+                    using (StreamReader ReqStream = new StreamReader(HttpContext.Current.Request.InputStream))
+                    using (MemoryStream MemStream = new MemoryStream())
+                    {
+                        p_request = ReqStream.ReadToEnd();
+                        if (string.IsNullOrWhiteSpace(p_request)) throw new ArgumentNullException("p_request", "Empty request body");
+
+                        XmlDocument xml = new XmlDocument();
+                        xml.Load(JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(p_request), new XmlDictionaryReaderQuotas()));
+                        xml.Save(MemStream);
+                        MemStream.Position = 0;
+
+                        using (StreamReader XmlStrRead = new StreamReader(MemStream))
+                        {
+                            p_xml = XmlStrRead.ReadToEnd();
+                        }
                     }
+
+                    //using (OracleXmlType _xml = new OracleXmlType(con, p_xml))
+                    //{
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "bars.ins_ewa_mgr.pay_isu";
+                    cmd.Parameters.Add("p_xml", OracleDbType.Clob, p_xml, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_ref", OracleDbType.Decimal, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_errmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_request", OracleDbType.Clob, p_request, ParameterDirection.Input);
+
+                    cmd.ExecuteNonQuery();
+                    //}
 
                     if (cmd.Parameters["p_errcode"].Status == OracleParameterStatus.NullFetched || Convert.ToInt32(cmd.Parameters["p_errcode"].Value.ToString()) == 0)
                     {

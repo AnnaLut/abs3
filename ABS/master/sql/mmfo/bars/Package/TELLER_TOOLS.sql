@@ -394,6 +394,7 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
                               else nvl(p_non_atm,0)
                             end
            ,oper_amount   = p_oper_amn
+           ,oper_amount   = p_oper_amn
            ,last_dt       = sysdate
            ,last_user     = g_ws_name
            ,op_type       = v_oper_type

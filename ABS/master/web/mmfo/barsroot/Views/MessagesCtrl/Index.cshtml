@@ -63,7 +63,8 @@
       }, 'json');
     return false;
   }
-  function loadMassages(page, elem) {
+    function loadMassages(page, elem) {
+        debugger;
       elem.load('/barsroot/messagesctrl/index/', { userId: $('#curentUserIdentifier').val(), pageNum: page }, function () {
           elem.parent().loader('remove');
       });

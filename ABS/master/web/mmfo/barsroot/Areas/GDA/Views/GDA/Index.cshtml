@@ -1,0 +1,585 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/settingsService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/saveDataService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/modelService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/baseController.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/validationService.js?v1.0.0"></script>
+<script src="~/Areas/GDA/Scripts/GDA/Main.js?v1.0.8"></script>
+
+<link rel="stylesheet" href="~/Areas/GDA/Css/GDA/Main.css" />
+
+<div ng-controller="GDACtrl">
+    <div class="page-header"><h1>{{Title}}</h1></div>
+
+    <label><b>ROLE:</b></label>
+    <input ng-model="userInfo.ROLE">
+
+    <div class="well">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label><b>№ ГДД:</b></label>
+                    <input type="text" class="form-control" style="display: inline;width: 140px"
+                           ng-model="nd" ng-disabled="true" />
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label><b>Дата відкриття ГДД:</b></label>
+                    <input type="text" class="form-control" style="width:120px" ng-disabled="true"
+                           ng-model="dateNd" kendo-masked-date-picker="" k-options="dateOptions" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div data-kendo-toolbar="toolbarMain" k-options="toolbarMainOptions"> </div>
+
+    <div data-kendo-window="placementTrancheWindow" data-options="placementTrancheWindowOptions" style="display: none">
+
+        <div data-kendo-toolbar="toolbarPlacementTranche" k-options="toolbarPlacementTrancheOptions"> </div>
+        <div class="panel panel-default" >
+            <div class="panel-body">                
+                <div class="form-group">
+                    <table border="0">
+                        <tr>
+                            <td>
+                                <label>№ Заяви про розміщення траншу</label>
+                                <input type="text" class="k-textbox" style="width: 160px;background-color:cornsilk"
+                                       ng-disabled="true" ng-model="placementTranche.kontractPlacement"/>
+
+                                <label>Дата заяви про розміщення траншу</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','dateKontractPlacement')">*</span>
+                                <input type="text" class="form-control" style="width:140px" kendo-masked-date-picker=""
+                                       ng-model="placementTranche.dateKontractPlacement" ng-disabled="!isEditable('placementTranche')"
+                                       k-options="dateOptions"
+                                    />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <h2><label>Клієнт</label></h2>
+
+                                <label>Рег.№:</label>
+                                <input type="text" class="k-textbox" ng-model="placementTranche.clientRnk"
+                                       style="width: 140px;background-color:cornsilk" ng-disabled="true" />
+
+                                <label>ОКПО:</label>
+                                <input type="text" class="k-textbox" ng-model="placementTranche.clientOkpo"
+                                       style="width: 140px;background-color:cornsilk" ng-disabled="true" />
+                                
+                                <label>ПІБ/назва:</label>
+                                <input type="text" class="k-textbox" ng-model="placementTranche.clientName"
+                                       style="width: 250px;background-color:cornsilk" ng-disabled="true" />
+
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Сума:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','sumValue')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 160px"
+                                       k-max="999999999999999999999999999999"
+                                       k-ng-model="placementTranche.sumValue" ng-disabled="!isEditable('placementTranche')"/>
+
+                                <label>Валюта:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','currency')">*</span>
+                                <input type="text" class="k-textbox" ng-model="placementTranche.currency" ng-disabled="true"  style="width: 80px;background-color:cornsilk" />
+                                <a class='k-button' ng-click="onHandBook('placementTranche','currency')"
+                                   ng-disabled="!isEditable('placementTranche')">
+                                    <i class='pf-icon pf-16 pf-book'></i></a>
+
+                                <label>Депозитний рахунок:</label>
+                                <input type="text" class="k-textbox" ng-model="placementTranche.acc"
+                                       style="width: 250px;background-color:cornsilk" ng-disabled="true" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Строк:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','period')">*</span>
+                                <input type="text" class="k-textbox" style="width: 80px;background-color:cornsilk"
+                                       ng-model="placementTranche.period" ng-disabled="true"  />
+
+                                <label>Дата розміщення:</label>
+                                <input type="text" class="form-control" style="width:140px"
+                                       ng-model="placementTranche.datePlacement" kendo-masked-date-picker="" 
+                                       k-options="dateOptions" ng-disabled="true" />
+
+                                <label>Дата повернення:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','dateReturn')">*</span>
+                                <input type="text" class="form-control" style="width:140px" ng-disabled="!isEditable('placementTranche')"
+                                       ng-model="placementTranche.dateReturn" kendo-masked-date-picker="" k-options="dateOptions"
+                                ng-blur="blurValue('placementTranche', 'dateReturn')" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Рахунок для списання:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','accDebit')">*</span>
+                                <input type="text" class="k-textbox" ng-model="placementTranche.accDebit" ng-disabled="true"  style="width: 250px;background-color:cornsilk" />
+                                <a class='k-button' ng-click="onHandBook('placementTranche','accDebit')" ng-disabled="!isEditable('placementTranche')">
+                                    <i class='pf-icon pf-16 pf-book'></i></a>
+
+                                <label>Залишок на рахунку для списання:</label>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px;background-color:cornsilk"
+                                       k-max="999999999999999999999999999999" ng-disabled="true"
+                                       k-ng-model="placementTranche.accDebitBalance" k-spinners="false" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Автопролонгація:</label>
+                                <input type="checkbox" ng-model="placementTranche.autoExtension" ng-disabled="!isEditable('placementTranche')">
+
+                                <label>Кількість автопролонгацій:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','numberAutoparts')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="999999999999999999999999999999"
+                                       ng-disabled="!isEditable('placementTranche') || !placementTranche.autoExtension"
+                                       k-ng-model="placementTranche.numberAutoparts"  />
+
+                                <label>Бонусна % ставка:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','interestRateBonus')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="100" ng-disabled="!isEditable('placementTranche') || !placementTranche.autoExtension"
+                                       k-ng-model="placementTranche.interestRateBonus"  />
+
+                                <label>Акційна пропозиція:</label>
+                                <input type="checkbox" ng-model="placementTranche.promotionalOffer" ng-disabled="!isEditable('placementTranche')">
+
+                                <label>Початкова сума траншу:</label>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="999999999999999999999999999999"
+                                       k-ng-model="placementTranche.sumValueInit" ng-disabled="!isEditable('placementTranche')"/>
+
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Поповнення траншу:</label>
+                                <input type="checkbox" ng-model="placementTranche.replenishmentTranche" ng-disabled="!isEditable('placementTranche')">
+
+                                <label>Максимальна сума траншу:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','sumValueMax')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="999999999999999999999999999999"
+                                       k-ng-model="placementTranche.sumValueMax" ng-disabled="!isEditable('placementTranche') || !placementTranche.replenishmentTranche" />
+
+                                <label>Мінімальна сума поповнення:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','sumValueMin')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="999999999999999999999999999999" ng-disabled="!isEditable('placementTranche') || !placementTranche.replenishmentTranche"
+                                       k-ng-model="placementTranche.sumValueMin" />
+
+                                <label>Строк поповнення траншу до:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','dateCompletingTranche2')">*</span>
+                                <input type="text" class="form-control" style="width:140px" ng-disabled="!isEditable('placementTranche') || !placementTranche.replenishmentTranche"
+                                       ng-model="placementTranche.dateCompletingTranche2" kendo-masked-date-picker="" k-options="dateOptions" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Варіанти виплати %:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','payingInterest')">*</span>
+                                <input type="text" class="k-textbox" ng-model="placementTranche.payingInterest" ng-disabled="true"  style="width: 140px;background-color:cornsilk" />
+                                <a class='k-button' ng-click="onHandBook('placementTranche','payingInterest')" ng-disabled="!isEditable('placementTranche')">
+                                    <i class='pf-icon pf-16 pf-book'></i></a>
+
+                                <label>% ставка:</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','interestRate')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="100" ng-disabled="!isEditable('placementTranche') || placementTranche.individualInterestRate"
+                                       k-ng-model="placementTranche.interestRate"  />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Капіталізація %:</label>
+                                <input type="checkbox" ng-model="placementTranche.capitalization" ng-disabled="!isEditable('placementTranche')">
+
+                                <label style="margin:8px">Індивідуальна % ставка:</label>
+                                <input type="checkbox" ng-model="placementTranche.individualInterestRate" ng-disabled="!isEditable('placementTranche')" >
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','individualInterestRateValue')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="100" ng-disabled="!isEditable('placementTranche') || !placementTranche.individualInterestRate"
+                                       k-ng-model="placementTranche.individualInterestRateValue"  />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Коментар (максимум - 1000 символів):</label>
+                                <span style="color: red" ng-show="!isValueValid('placementTranche','comment')">*</span>
+                                <textarea rows="3" maxlength="1000" ng-model="placementTranche.comment" 
+                                         ng-disabled="!isEditable('placementTranche') || !placementTranche.individualInterestRate"
+                                         class="k-textbox">
+                                </textarea>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Оператор:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                            ng-model="placementTranche.OperatorName" ng-disabled="true" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                            ng-model="placementTranche.OperatorDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Контролер:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                            ng-disabled="true" ng-model="placementTranche.ControllerName"/>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                               ng-model="placementTranche.ControllerDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Статус:</b></label>
+                        <input type="text" class="k-textbox" style="width: 80px;background-color:cornsilk"
+                            ng-disabled="true" ng-value="getStateTranche(placementTranche.State)"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div data-kendo-window="replenishmentTrancheWindow" data-options="replenishmentTrancheWindowOptions" style="display: none">
+        <div data-kendo-toolbar="toolbarReplacementTranche" k-options="toolbarReplacementTrancheOptions"> </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <table border="0">
+                        <tr>
+                            <td>
+                                <label>№ Заяви про розміщення траншу</label>
+                                <input type="text" class="k-textbox" ng-model="replacementTranche.kontractPlacement"
+                                       ng-disabled="true" style="width: 160px;background-color:cornsilk"/>
+
+                                <label>Дата заяви про розміщення траншу</label>
+                                <input type="text" class="form-control" style="width:140px" ng-disabled="true"
+                                       ng-model="replacementTranche.dateKontractPlacement" kendo-masked-date-picker="" k-options="dateOptions" />
+
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>№ Заяви поповнення</label>
+                                <input type="text" class="k-textbox" style="width: 130px;background-color:cornsilk"
+                                       ng-disabled="true" ng-model="replacementTranche.numberReplenishment" />
+
+                                <label>Дата заяви на поповнення</label>
+                                <input type="text" class="form-control" style="width:140px" ng-disabled="true"
+                                       ng-model="replacementTranche.dateReplenishment" kendo-masked-date-picker="" k-options="dateOptions" />
+
+                                <label>Депозитний рахунок</label>
+                                <input type="text" class="k-textbox" ng-model="replacementTranche.acc" ng-disabled="true"  style="width: 200px;background-color:cornsilk" />
+
+                                <label>Валюта</label>
+                                <input type="text" class="k-textbox" ng-model="replacementTranche.currency" ng-disabled="true"  style="width: 40px;background-color:cornsilk" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Сума поповнення:</label>
+                                <span style="color: red" ng-show="!isValueValid('replacementTranche','sumValue')">Має бути між:{{replacementTranche.sumValueMin}}-{{replacementTranche.sumValueMax}}</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 160px"
+                                       k-max="999999999999999999999999999999"
+                                       k-ng-model="replacementTranche.sumValue" ng-disabled="!isEditable('replacementTranche')"  />
+
+                                <label>Рахунок для списання:</label>
+                                <span style="color: red" ng-show="!isValueValid('replacementTranche','accDebit')">*</span>
+                                <input type="text" class="k-textbox" ng-model="replacementTranche.accDebit" ng-disabled="true"  style="width: 200px" />
+                                <a class='k-button' ng-click="onHandBook('replacementTranche','accDebit')" ng-disabled="!isEditable('replacementTranche')">
+                                    <i class='pf-icon pf-16 pf-book'></i></a>
+
+                                <label>Залишок на рахунку:</label>
+                                <input type="text" class="k-textbox" style="width: 80px;background-color:cornsilk"
+                                       ng-model="replacementTranche.accBalance" ng-disabled="true"  />
+                            </td>
+                        </tr>                                              
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Оператор:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                               ng-model="replacementTranche.OperatorName" ng-disabled="true" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                               ng-model="replacementTranche.OperatorDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Контролер:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                               ng-disabled="true" ng-model="replacementTranche.ControllerName"/>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                               ng-model="replacementTranche.ControllerDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Статус:</b></label>
+                        <input type="text" class="k-textbox" style="width: 80px;background-color:cornsilk"
+                               ng-disabled="true" ng-value="getStateTranche(replacementTranche.State)"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div data-kendo-window="earlyRepaymentTrancheWindow" data-options="earlyRepaymentTrancheWindowOptions" style="display: none">
+        <div data-kendo-toolbar="toolbarEarlyReplacementTranche" k-options="toolbarEarlyReplacementTrancheOptions"> </div>
+
+        <div class="panel panel-default" >
+            <div class="panel-body">
+                <div class="form-group">
+                    <table border="0">
+                        <tr>
+                            <td>
+                                <label>№ Заяви про розміщення траншу</label>
+                                <input type="text" class="k-textbox" ng-model="earlyRepaymentTranche.kontractPlacement"
+                                       ng-disabled="true" style="width: 160px;background-color:cornsilk"/>
+
+                                <label>Дата заяви про розміщення траншу</label>
+                                <input type="text" class="form-control" style="width:140px"
+                                       kendo-masked-date-picker="" ng-model="earlyRepaymentTranche.dateKontractPlacement"
+                                       k-options="dateOptions" ng-disabled="true" />
+
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>№ Заяви про дострокове повернення траншу</label>
+                                <input type="text" class="k-textbox" style="width: 160px;background-color:cornsilk"
+                                    ng-disabled="true"/>
+
+                                <label>Дата заяви про дострокове повернення траншу</label>
+                                <span style="color: red" ng-show="!isValueValid('earlyRepaymentTranche','dateReturnStatement')">*</span>
+                                <input type="text" class="form-control" style="width:140px" ng-model="earlyRepaymentTranche.dateReturnStatement"
+                                       kendo-masked-date-picker="" k-options="dateOptions" ng-disabled="!isEditable('earlyRepaymentTranche')" />
+
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Сума:</label>
+                                <input kendo-numeric-text-box k-min="0" style="width: 160px;background-color:cornsilk"
+                                       k-max="999999999999999999999999999999" k-spinners="false" k-ng-disabled="true"
+                                       k-ng-model="earlyRepaymentTranche.sumValue"/>
+
+                                <label>Валюта:</label>
+                                <input type="text" class="k-textbox" ng-model="earlyRepaymentTranche.currency" ng-disabled="true"
+                                       style="width: 80px;background-color:cornsilk" />
+
+                                <label>Депозитний рахунок:</label>
+                                <input type="text" class="k-textbox" ng-model="earlyRepaymentTranche.acc"
+                                       style="width: 250px;background-color:cornsilk" ng-disabled="true"/>
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Строк:</label>
+                                <input type="text" class="k-textbox" ng-model="earlyRepaymentTranche.period"
+                                       style="width: 50px;background-color:cornsilk" ng-disabled="true"/>
+
+                                <label>Дата розміщення:</label>
+                                <input type="text" class="form-control" style="width:140px"
+                                       ng-model="earlyRepaymentTranche.datePlacement" kendo-masked-date-picker=""
+                                       k-options="dateOptions" ng-disabled="true" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Рахунок для повернення:</label>
+                                <span style="color: red" ng-show="!isValueValid('earlyRepaymentTranche','accCreit')">*</span>
+                                <input type="text" class="k-textbox" ng-model="earlyRepaymentTranche.accCreit" ng-disabled="true"
+                                       style="width: 250px" />
+                                <a class='k-button' ng-click="onHandBook('earlyRepaymentTranche','accCreit')" ng-disabled="!isEditable('earlyRepaymentTranche')">
+                                    <i class='pf-icon pf-16 pf-book'></i></a>
+
+                                <label>Дата повернення:</label>
+                                <input type="text" class="form-control" style="width:140px" ng-disabled="true"
+                                       ng-model="earlyRepaymentTranche.dateReturn" kendo-masked-date-picker="" k-options="dateOptions" />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Варіанти виплати %:</label>
+                                <input type="text" class="k-textbox" ng-model="earlyRepaymentTranche.payingInterest" ng-disabled="true"
+                                       style="width: 140px;background-color:cornsilk" />
+
+                                <label>% ставка:</label>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px;background-color:cornsilk"
+                                       k-max="100" ng-disabled="true" k-spinners="false"
+                                       k-ng-model="earlyRepaymentTranche.interestRate"  />
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Індивідуальна % ставка:</label>
+                                <input type="checkbox" ng-model="earlyRepaymentTranche.individualInterestRate" ng-disabled="true" >
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px;background-color:cornsilk"
+                                       k-max="100" ng-disabled="true" k-spinners="false"
+                                       k-ng-model="earlyRepaymentTranche.individualInterestRateValue"  />
+
+                                <br>
+
+                                <label>Коментар:</label>
+                                <textarea rows="3" ng-model="earlyRepaymentTranche.comment"
+                                          ng-disabled="true" style="background-color:cornsilk"
+                                          class="k-textbox">
+                                </textarea>
+                            </td>
+                        </tr>
+                        <tr> <td> <hr /> </td> </tr>
+                        <tr>
+                            <td>
+                                <label>Штрафна % ставка:</label>
+                                <input type="checkbox" ng-model="earlyRepaymentTranche.penaltyInterestRate" ng-disabled="!isEditable('earlyRepaymentTranche')" >
+                                <span style="color: red" ng-show="!isValueValid('earlyRepaymentTranche','penaltyInterestRateValue')">*</span>
+                                <input kendo-numeric-text-box k-min="0" style="width: 80px"
+                                       k-max="100" ng-disabled="!isEditable('earlyRepaymentTranche') || !earlyRepaymentTranche.penaltyInterestRate"
+                                       k-ng-model="earlyRepaymentTranche.penaltyInterestRateValue"  />
+
+                                <br>
+
+                                <label>Коментар (максимум - 1000 символів):</label>
+                                <span style="color: red" ng-show="!isValueValid('earlyRepaymentTranche','commentPenalty')">*</span>
+                                <textarea rows="3" maxlength="1000" ng-model="earlyRepaymentTranche.commentPenalty"
+                                          ng-disabled="!isEditable('earlyRepaymentTranche') || !earlyRepaymentTranche.penaltyInterestRate"
+                                          class="k-textbox">
+                                </textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Оператор:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                               ng-model="earlyRepaymentTranche.OperatorName" ng-disabled="true" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                               ng-model="earlyRepaymentTranche.OperatorDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label ><b>Контролер:</b></label>
+                        <input type="text" class="k-textbox" style="width: 250px;background-color:cornsilk"
+                               ng-disabled="true" ng-model="earlyRepaymentTranche.ControllerName"/>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Дата:</b></label>
+                        <input type="text" class="form-control" style="width:110px" ng-disabled="true"
+                               ng-model="earlyRepaymentTranche.ControllerDate" kendo-masked-date-picker="" k-options="dateOptions" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label ><b>Статус:</b></label>
+                        <input type="text" class="k-textbox" style="width: 80px;background-color:cornsilk"
+                               ng-disabled="true" ng-value="getStateTranche(earlyRepaymentTranche.State)"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div kendo-tab-strip="tabStrip" k-options="tabStripOptions" k-content-urls="[ null, null]">
+        <!-- tab list -->
+        <ul>
+            <li class="k-state-active">Депозитні рахунки</li>
+            <li>Перегляд траншів</li>
+        </ul>
+
+        <div style="padding: 1em">
+            <div kendo-grid="accountsGrid" k-options="accountsGridOptions"></div>
+        </div>
+
+        <div style="padding: 1em">
+
+            <label><b>Показати закриті транші:</b></label>
+            <input type="checkbox" ng-model="isShowClosedTranches" ng-change="onShowClosedTranches()">
+
+            <h2><span class="label label-success"><b>Депозитний рахунок: {{curAccInfo('Acc')}}</b></span></h2>
+      
+            <div kendo-grid="tranchesGrid" k-options="tranchesGridOptions"></div>
+        </div>
+    </div>
+</div>

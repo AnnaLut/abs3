@@ -4,14 +4,14 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ins_pack.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.INS_PACK is
+CREATE OR REPLACE PACKAGE BARS.INS_PACK is
 
   -- Author  : TVSUKHOV
   -- Created : 09.02.2011 15:35:02
   -- Purpose : Пакет для работи с договорами страхования
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64) := 'version 3.0 07/07/2017';
+  g_header_version  constant varchar2(64) := 'version 3.2 23/01/2019';
   g_awk_header_defs constant varchar2(512) := '';
 
   g_dbgcode constant varchar2(12) := 'ins_pack.';
@@ -245,7 +245,8 @@
                        p_grt_id      in ins_deals.grt_id%type,
                        p_nd          in ins_deals.nd%type,
                        p_pay_freq    in ins_deals.pay_freq%type,
-                       p_renew_need  in ins_deals.renew_need%type default 0)
+                       p_renew_need  in ins_deals.renew_need%type default 0,
+                       p_ext_deal_id in ins_deals.ext_deal_id%type default null)
     return ins_deals.id%type;
 
   -- Створення дод. угоды до СД
@@ -293,7 +294,8 @@
                         p_rnk         in ins_deals.rnk%type,
                         p_grt_id      in ins_deals.grt_id%type,
                         p_nd          in ins_deals.nd%type,
-                        p_renew_need  in ins_deals.renew_need%type default 0);
+                        p_renew_need  in ins_deals.renew_need%type default 0,
+                        p_ext_deal_id in ins_deals.ext_deal_id%type default null);
 
   -- Завершення вводу даних СД
   procedure finish_datainput(p_deal_id     in ins_deals.id%type,
@@ -409,7 +411,7 @@ end ins_pack;
 CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64) := 'version 3.1 25/10/2018';
+  g_body_version  constant varchar2(64) := 'version 3.2 23/01/2019';
   g_awk_body_defs constant varchar2(512) := '';
 --3.0
 --исправлены мелкие ошибки при создании договоров страхования (форматы дат и т.п.)
@@ -1274,10 +1276,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
         then l_tmp_date:=last_day(l_d_row.sdate);
         else l_tmp_date:=to_date(lpad(extract(DAY from l_d_row.edate),2,'0')||to_char(l_d_row.sdate,'mmyyyy'),'dd.mm.yyyy');
       end if;
-      while (l_tmp_date < l_d_row.edate) loop
-        l_id       := set_deal_pmt(null, p_deal_id, l_tmp_date, l_pmt_sum);
-        l_tmp_date := add_months(l_tmp_date, l_months);
-      end loop;
+      -- якщо договір відкрито і закрито в одному місяці то створюємо 1 запис
+      if trunc(l_d_row.sdate, 'month') = trunc(l_d_row.edate, 'month') then
+        l_id := set_deal_pmt(null, p_deal_id, l_tmp_date, l_pmt_sum);
+      -- інакше розбивка сум
+      else
+        while (l_tmp_date < l_d_row.edate) loop
+          l_id       := set_deal_pmt(null, p_deal_id, l_tmp_date, l_pmt_sum);
+          l_tmp_date := add_months(l_tmp_date, l_months);
+        end loop;
+      end if;
     end;
   end build_deal_pmts_schedule;
 
@@ -1327,7 +1335,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
                        p_grt_id      in ins_deals.grt_id%type,
                        p_nd          in ins_deals.nd%type,
                        p_pay_freq    in ins_deals.pay_freq%type,
-                       p_renew_need  in ins_deals.renew_need%type default 0)
+                       p_renew_need  in ins_deals.renew_need%type default 0,
+                       p_ext_deal_id in ins_deals.ext_deal_id%type default null)
     return ins_deals.id%type is
     l_th constant varchar2(100) := g_dbgcode || 'create_deal';
 
@@ -1359,7 +1368,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
        grt_id,
        nd,
        pay_freq,
-       renew_need)
+       renew_need,
+       ext_deal_id)
     values
       (bars_sqnc.get_nextval('s_insdeals'),
        l_branch,
@@ -1381,7 +1391,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
        p_grt_id,
        p_nd,
        p_pay_freq,
-       p_renew_need)
+       p_renew_need,
+       p_ext_deal_id)
     returning id into l_deal_id;
 
     set_status(l_deal_id, 'NEW');
@@ -1747,7 +1758,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
                         p_rnk         in ins_deals.rnk%type,
                         p_grt_id      in ins_deals.grt_id%type,
                         p_nd          in ins_deals.nd%type,
-                        p_renew_need  in ins_deals.renew_need%type default 0) is
+                        p_renew_need  in ins_deals.renew_need%type default 0,
+                        p_ext_deal_id in ins_deals.ext_deal_id%type default null) is
     l_th constant varchar2(100) := g_dbgcode || 'update_deal';
   begin
     update ins_deals d
@@ -1766,7 +1778,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
            d.rnk         = p_rnk,
            d.grt_id      = p_grt_id,
            d.nd          = p_nd,
-           d.renew_need  = p_renew_need
+           d.renew_need  = p_renew_need,
+           d.ext_deal_id = p_ext_deal_id
      where d.id = p_deal_id;
 
     -- чистим пустые доп. соглашения

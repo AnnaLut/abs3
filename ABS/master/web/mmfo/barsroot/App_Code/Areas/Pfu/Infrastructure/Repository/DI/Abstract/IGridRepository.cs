@@ -111,7 +111,12 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Abstract
         string PrepareForNoTurnover(decimal id, string mfo);
         void GenNoTurnover(FileForNoTurnOver d);
         string GetBranch();
-
+        string MoveToArchive(decimal[] fileIds);
+        string MoveFromArchive(decimal[] fileId);
+        IEnumerable<V_PFU_REGISTERS_ARC> PaidArchives(DataSourceRequest request);
+        decimal CountPaidArchives(DataSourceRequest request);
+        IEnumerable<V_PFU_REGISTERS_ARC> UnpaidArchives(DataSourceRequest request);
+        decimal CountUnpaidArchives(DataSourceRequest request);
 
         IEnumerable<FileType> GetFileTypes();
     }

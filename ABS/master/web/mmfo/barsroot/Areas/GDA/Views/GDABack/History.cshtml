@@ -1,0 +1,56 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.GDA.Models
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<script src="~/Areas/GDA/Scripts/GDABack/History.js"></script>
+
+<div>
+    @(Html.Kendo().Grid<BackHistoryTrancheInfo>
+        ()
+        .Name("grid")
+        .Columns(col =>
+        {
+            col.Bound(x => x.DEPOSIT_ID).Title("Номер траншу").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.TRANSACTION_TYPE).Title("Тип транзакції").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.STATE_NAME).Title("Статус операції").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.REASON).Title("Причина").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.PROCESS_NAME).Title("Процес").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.SYS_TIME).Title("Дата").ClientTemplate("#=formatDateOperationTemplate(data)#").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.FIO).Title("Користувач").HeaderHtmlAttributes(new { style = "white-space: normal" });
+        })
+        .Resizable(resizable => resizable.Columns(true))
+        .Reorderable(reorderable => reorderable.Columns(true))
+        .Scrollable()
+        .Selectable()
+        .Events(ev => ev.DataBound("DataBound"))
+        .HtmlAttributes(new { style = "min-height: 600px; height: 100%;" })
+        .ToolBar(toolbar =>
+        {
+        toolbar.Template(@<text>
+                <a class="k-button k-button-icontext k-grid-excel" href="#">
+                    <span class="k-icon k-i-excel"></span>Завантажити в Excel
+                </a>
+                <div class="label label-success" style="font-size:14px; margin-left:30px;">Період вибірки</div>
+                <input id="dateFrom" value="@DateTime.Today.AddDays(-2)" onchange="filterDate()" />
+                <input id="dateTo" value="@DateTime.Today" onchange="filterDate()" />
+            </text>);
+        })
+        .Excel(excel => excel.FileName("History.xlsx").Filterable(false).AllPages(true).ProxyURL("/GDA/GDA/ConvertBase64ToFile/"))
+        .Sortable()
+        .Filterable()
+        .Pageable(page => page
+        .Refresh(true)
+        .PageSizes(new List<Int32>
+            { 5, 10, 20, 50 })
+            .ButtonCount(10))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("Get_HisoryData", "GDABack"))
+            .PageSize(20)
+            )
+    )
+</div>

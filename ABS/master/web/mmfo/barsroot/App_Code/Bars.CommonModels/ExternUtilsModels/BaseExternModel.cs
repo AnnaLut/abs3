@@ -8,7 +8,7 @@ using System.Web.Script.Serialization;
 namespace Bars.CommonModels.ExternUtilsModels
 {
     /// <summary>
-    /// Model for execut functional in other process from ABS
+    /// Model for execut functional in other process, or services from ABS
     /// </summary>
     [Serializable]
     public class BaseExternModel
@@ -32,5 +32,10 @@ namespace Bars.CommonModels.ExternUtilsModels
         ExcelImport,
         CsvExport,
         ZipArchive
+    }
+
+    public enum Urls
+    {
+        ExternalApiUrl
     }
 }

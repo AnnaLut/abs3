@@ -55,6 +55,7 @@
   l_s     oper.s%type         ;
   l_ob22_2620 accounts.ob22%type;
   l_262037_amn number;
+  l_262037_tar number := 10;-- код тарифа для 2620/37
   -----------------------------
 begin  ------Есть ли "свой-2620" ?
   if NEWNBS.GET_STATE = 1 then
@@ -76,10 +77,10 @@ begin  ------Есть ли "свой-2620" ?
      begin
        -- 2018-04-19 VPogoda COBUMMFO-7553 - для 2620_37 - тариф выбирается по максимальному значению шкалы
        if substr(l_nls26,1,4) = '2620' and l_ob22_2620 = '37' then
-         select vt.smax
+         select vt.tar
            into l_262037_amn
            from v_tarif vt
-           where vt.kod = l_kod;
+           where vt.kod = l_262037_tar;
        end if;
        select coalesce(l_262037_amn,f_tarif ( l_Kod, kv_, l_nls26, sa_, 0, null)) ,
               nbs_ob22_bra ( l_nbs, l_ob, substr( l_br,1,15) )

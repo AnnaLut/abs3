@@ -32,7 +32,8 @@ begin
 	KOD_NBU VARCHAR2(5), 
 	MFOB VARCHAR2(12), 
 	NLSB VARCHAR2(15), 
-	ID NUMBER(*,0)
+	ID NUMBER(*,0),
+        is_active INTEGER default 1
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -43,7 +44,13 @@ end;
 /
 
 
-
+begin 
+  execute immediate '
+  alter table MONEX0 add is_active INTEGER default 1 ';
+exception when others then       
+  if sqlcode=-1430 then null; else raise; end if; 
+end; 
+/
 
 PROMPT *** ALTER_POLICIES to MONEX0 ***
  exec bpa.alter_policies('MONEX0');

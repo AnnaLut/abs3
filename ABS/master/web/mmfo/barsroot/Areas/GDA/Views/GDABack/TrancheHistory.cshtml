@@ -1,0 +1,76 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.GDA.Models
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.min.js"></script>
+
+<div>
+    @(Html.Kendo().Grid<BackHistoryTrancheInfo>
+        ()
+        .Name("grid")
+        .Columns(col =>
+        {
+            col.Bound(x => x.DEAL_NUMBER).Title("Номер траншу").Width(200).HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.TRANSACTION_TYPE).Title("Тип транзакції").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.STATE_NAME).Title("Статус операції").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.REASON).Title("Причина").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.PROCESS_NAME).Title("Процес").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.SYS_TIME).Title("Дата").ClientTemplate("#=formatDateOperationTemplate(data)#").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            col.Bound(x => x.FIO).Title("Користувач").HeaderHtmlAttributes(new { style = "white-space: normal" });
+        })
+        .Resizable(resizable => resizable.Columns(true))
+        .Reorderable(reorderable => reorderable.Columns(true))
+        .Scrollable()
+        .Selectable()
+        //.Events(ev => ev.DataBound("DataBound"))
+        .HtmlAttributes(new { style = "min-height: 600px; height: 100%;" })
+        .ToolBar(toolbar =>
+        {
+        toolbar.Template(@<text>
+        <a class="k-button k-button-icontext k-grid-excel" href="#">
+            <span class="k-icon k-i-excel"></span>Завантажити в Excel
+        </a>
+        </text>);
+        })
+        .Excel(excel => excel.FileName("History.xlsx").Filterable(false).AllPages(true).ProxyURL("/GDA/GDA/ConvertBase64ToFile/"))
+        .Sortable()
+        .Filterable()
+        .Pageable(page => page
+        .Refresh(true)
+        .PageSizes(new List<Int32>
+            { 5, 10, 20, 50 })
+            .ButtonCount(10))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("Get_HisoryTrancheData", "GDABack", new { trancheId = (string)ViewBag.TranchId}))
+            .PageSize(20)
+            )
+    )
+</div>
+
+<script>
+    function formatDateOperationTemplate(item) {
+        if (!item.SYS_TIME)
+            return "";
+
+        if (item.SYS_TIME.getFullYear() < 1900)
+            return "";
+
+        var month = item.SYS_TIME.getMonth() + 1;
+        month = month.length > 1 ? month : '0' + month;
+
+        var day = item.SYS_TIME.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+
+        var hours = item.SYS_TIME.getHours().toString();
+        hours = hours.length > 1 ? hours : '0' + hours;
+
+        var minutes = item.SYS_TIME.getMinutes().toString();
+        minutes = minutes.length > 1 ? minutes : '0' + minutes;
+
+        return day + "." + month + "." + item.SYS_TIME.getFullYear() + " " + hours + ":" + minutes;
+    }
+</script>

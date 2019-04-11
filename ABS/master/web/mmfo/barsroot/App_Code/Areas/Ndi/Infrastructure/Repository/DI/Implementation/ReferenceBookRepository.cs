@@ -39,7 +39,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         private bool IsDebug = true;
         private string LoggerPrefix = "ReferenceBookRepository.";
         private OracleDbModel oracleConnector = null;
-        private UserMap _user;// = ConfigurationSettings.GetCurrentUserInfo;
+        private UserMap _user;
 
 
         public OracleDbModel GetOracleConnector
@@ -184,7 +184,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         public ExternalApiUrls GetExternalApiByParamName(string paramName)
         {
             var parameters = new OracleParameter[1];
-            //parameters[0] = DbAccess.CreateCustomTypeArrayInputParameter("P_DYN_FILTER_COND_LIST", "BARS.T_DYN_FILTER_COND_LINE", filterRowList.ToArray());
             parameters[0] = new OracleParameter("p_parameterName", OracleDbType.Varchar2, paramName, ParameterDirection.Input);
             string sql = "SELECT PARAMETER_NAME as ParameterName, PARAMETER_VALUE as ParameterVlue, DESCRIPTION as Discription " +
                 "FROM MBM_PARAMETERS WHERE PARAMETER_NAME = :p_parameterName";
@@ -196,16 +195,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             IconsMetainfo result = _entities.ExecuteStoreQuery<IconsMetainfo>("SELECT * FROM META_ICONS WHERE ICON_ID = 2").FirstOrDefault();
             return result.IMAGE;
         }
-
-        //public IEnumerable<Dictionary<string,object>> BindDataResult(IEnumerable<Dictionary<string,object>> resultForBind,List<ColumnMetaInfo> columns)
-        //{
-        //    List<Dictionary<string, object>> resList = new List<Dictionary<string, object>>();
-        //    Dictionary<string, object> dict;
-        //    foreach (var item in resultForBind.ToList())
-        //    {
-        //        columns.Select( x => x.COLNAME).ToDictionary( item, item.FirstOrDefault(e => e.Key == ))
-        //    }
-        //}
+        
         /// <summary>
         /// Обновить данные справочника
         /// </summary>
@@ -217,7 +207,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         /// <returns>Признак успешной операции</returns>
         public bool EditData(int tableId, string tableName, EditRowModel editDataModel, bool multipleUse = false)
         {
-            // OracleConnection connection = OraConnector.Handler.UserConnection;
             try
             {
                 // выполнить sql-процедуру, которая подменяет выполенение прямого запроса к таблице
@@ -232,8 +221,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     else
                         editDataModel.OldRow.RemoveAll(x => editDataModel.Modified.All(u => u.Name == x.Name));
                     // выполнить прямой запрос к таблице
-                    //
-                    //Logger.Debug(string.Format("begin update with sql c#   updatableRowKeys count: ", editDataModel.RowKeysToEdit.Count, LoggerPrefix + "UpdateData"), LoggerPrefix + "UpdateData");
                     OracleCommand sqlUpdateCommand = GetOracleConnector.CreateCommand;
                     sqlUpdateCommand.BindByName = true;
                     var updateCmdText = new StringBuilder();
@@ -280,8 +267,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 Logger.Debug(string.Format("count updated rows: {0}", updRowsCount), LoggerPrefix + "UpdateData");
                 return substituationProcedureExecuted || updRowsCount > 0;
             }
-            catch (Exception e)
+            catch (Exception)
             {
+                Logger.Error(string.Format("error with editing tableId: {0}", tableId), LoggerPrefix + "UpdateData");
                 throw;
             }
             finally
@@ -809,7 +797,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         public string CallBatchFuncWithMultypleRowsParams(CallFunctionMetaInfo callFunction, MultiRowParamsDataModel dataModel, string msg = "")
         {
             if ((callFunction.MultiRowsParams == null || callFunction.MultiRowsParams.Count() < 1) &&
-                (callFunction.ConvertParamsInfo == null || callFunction.ConvertParamsInfo.Count() < 1))
+                (callFunction.UploadExcelParamsInfo == null || callFunction.UploadExcelParamsInfo.Count() < 1))
                 throw new Exception("немає багаторядкових параметрів");
             try
             {
@@ -1649,8 +1637,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 string excelParam = string.Empty;
                 string saveColumnsParam = string.Empty;
 
-                //string funNsiEditFParamsString = GetFunNSIEditFParamsString(data.TableId, data.CodeOper, data.SparColumn, data.NativeTabelId, data.NsiTableId, data.NsiFuncId);
-                //if (!string.IsNullOrEmpty(funNsiEditFParamsString))
                 FunNSIEditFParams nsiPar = GetNsiParamsByMetadataModel(data, tableInfo);// new FunNSIEditFParams(FunNSIEditFParamsString);
                                                                                         //    nsiPar = new FunNSIEditFParams(GetMetaCallSettingsByCode(data.Code));
                 HttpContext context = HttpContext.Current;
@@ -1661,33 +1647,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                 //сформируем также информацию о дефолтной сортировке
                 var sorters = GetMetaSortOrder(data.TableId, nativeColumnsInfo);
-                //_entities.ExecuteStoreQuery<META_SORTORDER>("select * from META_SORTORDER")
-                //    .Where(so => so.TABID == data.TableId)
-                //    .OrderBy(so => so.SORTORDER)
-                //    .Select(so => new
-                //    {
-                //        direction = so.SORTWAY != null ? so.SORTWAY.Trim() : "ASC",
-                //        property = nativeColumnsInfo.Single(ci => ci.COLID == so.COLID).COLNAME.Trim()
-                //    }).ToList();
-
-                //string getCustomFiltersSqlString = string.Format("select * from DYN_FILTER where USERID = {0} and TABID = {1}", user.user_id, tableId);
-
-
-                ////формат даты и числовых полей в описании справочников не совпадает с форматом даты extjs, поэтому делаем переконвертацию
-                //foreach (var column in nativeColumnsInfo)
-                //{
-                //    if (!string.IsNullOrEmpty(column.SHOWFORMAT))
-                //    {
-                //        if (column.COLTYPE == "N" || column.COLTYPE == "E")
-                //        {
-                //            column.SHOWFORMAT = FormatConverter.ConvertToExtJsDecimalFormat(column.SHOWFORMAT);
-                //        }
-                //        if (column.COLTYPE == "D")
-                //        {
-                //            column.SHOWFORMAT = FormatConverter.ConvertToExtJsDateFormat(column.SHOWFORMAT);
-                //        }
-                //    }
-                //}
+                
 
                 //CallFunctionMetaInfo functionMetaInfo = null;
                 //bool isFuncOnly;
@@ -1769,15 +1729,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 }
 
                 //получим метаинформацию о фильтрах по внешних справочниках
-                //List<ExtFilterMeta> extFilters = GetExtFilterMeta(data.TableId).ToList(); //new List<ExtFilterMeta>(); //
                 if (nsiPar != null)
                 {
                     addEditRowsInform = nsiPar.addEditRowsInform;
                     excelParam = nsiPar.ExcelParam;
                     saveColumnsParam = nsiPar.SaveColumns;
-                    //if (rowParams != null && rowParams.Count > 0)
-                    //    nsiPar.ReplaceParams(rowParams);
-                    //информация о функциях которые могут быть вызваны
                     if (nsiPar.IsInMeta_NSIFUNCTION)
                     {
                         IEnumerable<CallFunctionMetaInfo> funcs = GetAllCallFunctions(data.TableId).ToList();
@@ -1818,10 +1774,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 };
 
                 bool addSummaryRow = selectBuilder.TotalColumns.Count > 0;
-                LocalStorageModel localStorageModel = new LocalStorageModel();
-                localStorageModel.FiltersStorageKey = _user.user_id + "_" + tableInfo.TABID;
-                localStorageModel.HiddenColumnsKey = LocalStorageModel.HiddenColumnsKeyPrefix + "_" + _user.user_id + "_" + tableInfo.TABID;
-
+                LocalStorageModel localStorageModel = new LocalStorageModel(tableInfo,_user);
+ 
                 bool showRecordsCount = nsiPar != null && nsiPar.ShowRecordsCount;
 
 
@@ -1843,7 +1797,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     localStorageModel,
                     sorters,
                     filtersMetainfo,
-                    // CustomFilters = customFilters,
                     callFunctions,
                     onlineFunctions,
                     additionalProperties,
@@ -2148,54 +2101,50 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         /// </summary>
         /// <param name="tableId">ID таблицы</param>
         /// <returns></returns>
-        private IEnumerable<FallDownFilter> GetFallDownFilters(int tableId)
-        {
-            var filters = new List<FallDownFilter>();
+        //private IEnumerable<FallDownFilter> GetFallDownFilters(int tableId)
+        //{
+        //    var filters = new List<FallDownFilter>();
 
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            try
-            {
-                OracleCommand cmdGetAllFilters = connection.CreateCommand();
-                cmdGetAllFilters.BindByName = true;
-                cmdGetAllFilters.CommandText =
-                    "select cols.colname, cols.colid, cols.tabid, filtertbl.filter_tabid, filtertbl.filter_code, filters.condition from meta_columns cols, meta_filtertbl filtertbl, meta_filtercodes filters " +
-                    "where " +
-                    "cols.tabid=:tabid and cols.colid=filtertbl.colid and cols.tabid=filtertbl.tabid " +
-                    "and filters.code=filtertbl.filter_code";
-                var param = new OracleParameter("tabid", tableId);
-                string s1 = tableId.ToString();
-                cmdGetAllFilters.Parameters.Add(param);
-                using (var reader = cmdGetAllFilters.ExecuteReader())
-                {
-                    if (reader != null)
-                    {
-                        while (reader.Read())
-                        {
-                            var colName = reader.GetString(reader.GetOrdinal("colname"));
-                            var filterTabid = (int)reader.GetDecimal(reader.GetOrdinal("filter_tabid"));
-                            var filterCode = reader.GetString(reader.GetOrdinal("filter_code"));
-                            var condition = reader.GetString(reader.GetOrdinal("condition"));
-                            filters.Add(new FallDownFilter
-                            {
-                                FromColumn = colName,
-                                ToTable = filterTabid,
-                                Code = filterCode,
-                                Condition = condition
-                            });
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return filters;
-        }
+        //    OracleConnection connection = OraConnector.Handler.UserConnection;
+        //    try
+        //    {
+        //        OracleCommand cmdGetAllFilters = connection.CreateCommand();
+        //        cmdGetAllFilters.BindByName = true;
+        //        cmdGetAllFilters.CommandText =
+        //            "select cols.colname, cols.colid, cols.tabid, filtertbl.filter_tabid, filtertbl.filter_code, filters.condition from meta_columns cols, meta_filtertbl filtertbl, meta_filtercodes filters " +
+        //            "where " +
+        //            "cols.tabid=:tabid and cols.colid=filtertbl.colid and cols.tabid=filtertbl.tabid " +
+        //            "and filters.code=filtertbl.filter_code";
+        //        var param = new OracleParameter("tabid", tableId);
+        //        string s1 = tableId.ToString();
+        //        cmdGetAllFilters.Parameters.Add(param);
+        //        using (var reader = cmdGetAllFilters.ExecuteReader())
+        //        {
+        //            if (reader != null)
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    var colName = reader.GetString(reader.GetOrdinal("colname"));
+        //                    var filterTabid = (int)reader.GetDecimal(reader.GetOrdinal("filter_tabid"));
+        //                    var filterCode = reader.GetString(reader.GetOrdinal("filter_code"));
+        //                    var condition = reader.GetString(reader.GetOrdinal("condition"));
+        //                    filters.Add(new FallDownFilter
+        //                    {
+        //                        FromColumn = colName,
+        //                        ToTable = filterTabid,
+        //                        Code = filterCode,
+        //                        Condition = condition
+        //                    });
+        //                }
+        //            }
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        connection.Close();
+        //    }
+        //    return filters;
+        //}
 
         /// <summary>
         /// Получить метаданные дополнительных колонок справочника (например наименований для кодов)
@@ -2871,9 +2820,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             }
             else if (!string.IsNullOrEmpty(code))
                 callFunction = this.GetFunctionsMetaInfo(null, code);
-            string convertParams = callFunction.CUSTOM_OPTIONS;
-            // ExcelHelper excelHelper = new ExcelHelper();
-            List<CallFuncRowParam> RowsData = new List<CallFuncRowParam>();// excelHelper.ParseExcelFile(excelFile, callFunction);
+            List<CallFuncRowParam> RowsData = new List<CallFuncRowParam>();
 
 
             MultiRowParamsDataModel dataModel = new MultiRowParamsDataModel()

@@ -6,7 +6,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 21/12/2018 (18/12/2018)
+% VERSION     : 25/02/2019  (21/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -28,8 +28,8 @@ IS
 19/10/2018 - добавлен блок пересчета процентной ставки для Инстолмента
 17/08/2018 - не будет включаться овердрафт для 2620 с OB22='36' с нулевой %%
              ставкой
-15/06/2018 - виключення оборот_в по IF0,IF1,IF2,IF3,IF4,IF5,IF6
-            (ручн_ операц_ї по переклассиф_кац_ї актив_в)
+15/06/2018 - виключення оборотів по IF0,IF1,IF2,IF3,IF4,IF5,IF6
+            (ручні операції по переклассифікації активів)
 05/06/2018 - для счетов оведрафтов убрал условие R011 = '3'
 18/05/2018 - не будут включаться Дт обороты выполненные операцией '024'
 10/05/2018 - не будут включаться в файл Дт обороты которые были в
@@ -253,7 +253,7 @@ IS
              a.kos,
              a.ostf - a.dos + a.kos,
              0,
-             s.tip, s.kom, -- % щом_сячної ком_с_ї
+             s.tip, s.kom, -- % щомісячної комісії
              s.accc, NVL(s.ob22,'00'), s.tobo, s.nms, nvl(p.r011, '0') r011
         FROM (SELECT s.acc, s.nls, s.kv, s.PAP, s.nbs, s.mdate, s.isp, s.tip,
                      0 kom,
@@ -288,7 +288,8 @@ IS
          AND a.FDAT = Dat_
          AND s.acc = p.acc(+)
          AND s.rnk = c.rnk
-         and s.nbs = k.r020;
+         and s.nbs = k.r020
+         and a.acc not in (select acc from rnbu_trace);
 
    --- овердрафты ---
    CURSOR saldoost
@@ -387,7 +388,7 @@ IS
    BEGIN
       comm_ := substr(comm1_ || '  ' || comm_, 1, 200);
 
-      if data_ >= to_date('02092013','ddmmyyyy') then
+      if dat_ >= to_date('02092013','ddmmyyyy') then
          kodp_ := p_kodp_ || '0';
       end if;
 
@@ -694,6 +695,73 @@ BEGIN
        WHERE odate = dat_ and
              kf = to_char(mfo_);
     ----------------------------------------------------------------------------
+    -- депозити МСБ
+       FOR k in (select a.document_date as data, 
+                    a.account_id as acc,
+                    a.account_number as nls,
+                    substr(a.account_number, 1, 4) as nbs,
+                    a.currency_id as kv, 
+                    a.customer_id as rnk, 
+                    nvl(a.s180, '0') as s180,
+                    nvl(a.r011, '0') as r011,
+                    nvl(a.amount_document, 0) as skos,
+                    nvl(a.interest_rate, 0) as rate,
+                    nvl(a.expiry_date, b.mdate) as mdate,
+                    a.ref, to_char(2 - mod (c.codcagent, 2)) as k030,
+                    a.deposit_id, trim(c.nmk) as nms, b.tobo, b.isp 
+                from table(smb_calculation_deposit.get_report_3a(p_date => dat_)) a
+                join customer c
+                on (a.customer_id = c.rnk)
+                join accounts b
+                on (a.account_id = b.acc)                
+                where a.sos = 5 and
+                      nvl(a.amount_document, 0) <> 0) 
+       LOOP
+        -- кредитовые обороты
+           skos_ := Gl.P_Icurval (k.kv, k.skos, k.data);
+           se_ := fostq(k.acc, dat_);
+           spcnt_ := k.rate;
+           
+           data_ := k.data; 
+           acc_ := k.acc;
+           nls_ := k.nls;
+           kv_ := k.kv;
+           rnk_ := k.rnk;
+           mdate_ := k.mdate;
+           tobo_ := k.tobo;
+           isp_ := k.isp;
+           
+           comm1_ := substr('МСБ dep_id = '||k.deposit_id||' ' || tobo_ || '  ' || k.nms, 1, 200);
+
+           d020_:='01';
+
+           IF typ_ > 0 THEN
+              nbuc_ := NVL (F_Codobl_Tobo (k.acc, typ_), nbuc1_);
+           ELSE
+              nbuc_ := nbuc1_;
+           END IF;
+
+           kodp_ := '6' || k.nbs || k.r011 || k.s180 || k.k030 || d020_ || LPAD (k.kv, 3, '0');
+
+           IF k.s180 = '0'
+           THEN
+              nls_ := 'X' || k.nls;
+           END IF;
+
+          -- Кр. обороты
+           p_ins ('1' || kodp_, TO_CHAR (skos_));
+           
+           -- %% ставка
+           p_ins ('2' || kodp_, LTRIM (TO_CHAR (ROUND (spcnt_, 4), fmt_)));
+           
+           -- Кт.обороты*%% ставка
+           p_ins ('3' || kodp_, TO_CHAR (skos_ * ROUND(spcnt_,4)));
+
+           INSERT INTO RNBU_HISTORY
+                  (recid, odate, nls, kv, CODCAGENT, ints, s180, dos, kos, mdate, d020, ost, acc, isp, tobo, mb)
+           VALUES (k.ref, dat_, k.nls, k.kv, k.k030, spcnt_, k.s180, 0, k.skos, k.mdate, d020_, se_, k.acc, k.isp, k.tobo, k.r011);
+       END LOOP;
+    ----------------------------------------------------------------------------
 
        OPEN saldo;
 
@@ -777,7 +845,7 @@ BEGIN
           end if;
 
           -- 06/09/2013 Розрахунок середньої процентної ставки по депозитах
-          -- як_ передбачають р_зн_ процентн_ ставки на протяз_ "життя"  депозиту
+          -- які передбачають різні процентні ставки на протязі "життя"  депозиту
           if se_ > 0 and spcnt_ <> 0 then
              spcnt_ := f_ret_avg_ratn(acc_, 1, dat_, mdate_, spcnt_);
           end if;
@@ -866,7 +934,7 @@ BEGIN
              IF nbs_ in ('2202', '2203') and newnbs.g_state = 0
              THEN
 
-                comm1_ := comm1_ || 'зам_на S180 з ' || s180_;
+                comm1_ := comm1_ || 'заміна S180 з ' || s180_;
 
                 BEGIN
                    select s.value, p.grp_code
@@ -1223,7 +1291,7 @@ BEGIN
 
                    sdos_ := sdos_ - vost_;
 
-                   -- перекласиф_кац_я актив_в
+                   -- перекласифікація активів
                    BEGIN
                       vost_ := 0;
 
@@ -1234,9 +1302,9 @@ BEGIN
                         AND t.FDAT = data_
                         and t.accd = acc_;
 
-                      p_ins_del (acc_, nls_, kv_, '(перекласиф_кац_я актив_в)', sdos_, vost_);
+                      p_ins_del (acc_, nls_, kv_, '(перекласифікація активів)', sdos_, vost_);
 
-                      p_ins_log (   '(перекласиф_кац_я актив_в) DK=1 r020='''
+                      p_ins_log (   '(перекласифікація активів) DK=1 r020='''
                                  || nbs_
                                  || ''' Счет='''
                                  || nls_
@@ -1832,9 +1900,9 @@ BEGIN
                         AND nlsd LIKE '3739%'
                         AND lower(nazn) like '%виправлено помилку%';
 
-                      p_ins_del (acc_, nls_, kv_, '(з 3739 на 26 розд_л помилка ТВБВ)', skos_, vost_);
+                      p_ins_del (acc_, nls_, kv_, '(з 3739 на 26 розділ помилка ТВБВ)', skos_, vost_);
 
-                      p_ins_log (   '(з 3739 на 26 розд_л виправлення помилки ТВБВ) DK=1 r020='''
+                      p_ins_log (   '(з 3739 на 26 розділ виправлення помилки ТВБВ) DK=1 r020='''
                                  || nbs_
                                  || ''' Счет (OB22)='''
                                  || nls_ || ' (' || ob22_ || ')'
@@ -1867,9 +1935,9 @@ BEGIN
                              lower(nazn) like '%в_дкрит%внутр_шн%банк_вс%'
                             );
 
-                      p_ins_del (acc_, nls_, kv_, '(з 3739 на 26 розд_л м_грац_я чи перенос)', skos_, vost_);
+                      p_ins_del (acc_, nls_, kv_, '(з 3739 на 26 розділ міграція чи перенос)', skos_, vost_);
 
-                      p_ins_log (   '(з 3739 на 26 розд_л м_грац_я чи перенос) DK=1 r020='''
+                      p_ins_log (   '(з 3739 на 26 розділ міграція чи перенос) DK=1 r020='''
                                  || nbs_
                                  || ''' Счет (OB22)='''
                                  || nls_ || ' (' || ob22_ || ')'
@@ -1894,9 +1962,9 @@ BEGIN
                         AND acck = acc_
                         AND nlsd LIKE '6%';
 
-                      p_ins_del (acc_, nls_, kv_, '(з 6 класу на 26 розд_л виправлення)', skos_, vost_);
+                      p_ins_del (acc_, nls_, kv_, '(з 6 класу на 26 розділ виправлення)', skos_, vost_);
 
-                      p_ins_log (   '(з 6 класу на 26 розд_л виправлення) DK=1 r020='''
+                      p_ins_log (   '(з 6 класу на 26 розділ виправлення) DK=1 r020='''
                                  || nbs_
                                  || ''' Счет (OB22)='''
                                  || nls_ || ' (' || ob22_ || ')'
@@ -2803,9 +2871,9 @@ BEGIN
                        and acck = acc_
                        AND lower(NAZN) like '%сторно%';
 
-                     p_ins_del (acc_, nls_, kv_, '(операц_ї сторно)', skos_,  vost_);
+                     p_ins_del (acc_, nls_, kv_, '(операції сторно)', skos_,  vost_);
 
-                     p_ins_log (   '(операц_ї сторно) DK=1 r020='''
+                     p_ins_log (   '(операції сторно) DK=1 r020='''
                                      || nbs_
                                      || ''' Счет (OB22)='''
                                      || nls_ || ' (' || ob22_ || ')'
@@ -3013,8 +3081,8 @@ BEGIN
        END LOOP;
 
        CLOSE saldo;
-    ----------------------------------------------------------------------------
 
+    ----------------------------------------------------------------------------
     -- овердрафты --
        OPEN saldoost;
 
@@ -3359,7 +3427,7 @@ BEGIN
                  se_ > 0 and codc_ not in (5, 6))
              THEN
                -- 06/09/2013 Розрахунок середньої процентної ставки по депозитах
-               -- якы передбачають рїзнї процентнї ставки на протяз_ "життя"  депозиту
+               -- якы передбачають рїзнї процентнї ставки на протязі "життя"  депозиту
                 if se_ > 0 and spcnt_ <> 0 then
                    spcnt_ := f_ret_avg_ratn(acc_, 1, dat_, mdate_, spcnt_);
                 end if;

@@ -157,7 +157,7 @@
                                 <tr id="tr" runat="server">
                                     <td class="command_first">
                                         <asp:LinkButton ID="lbCreate" runat="server" CausesValidation="False" CommandName="Create" 
-                                        Text="Створити" Enabled='<%# CommandEnabled() %>' />
+                                        Text="Створити" Enabled='<%# CommandEnabled(Eval("TYPE_ID").ToString()) %>' />
                                     </td>
                                     <td style="text-align: center">
                                         <asp:Label ID="ID" runat="server" Text='<%# Eval("TYPE_ID") %>'></asp:Label>
@@ -302,7 +302,7 @@
                                     <asp:Label ID="COMM" runat="server" Text='<%# Eval("COMM") %>'></asp:Label>
                                 </td>
                                 <td>
-                                   <uc:EADoc ID="EADDocPrint" runat="server" Enabled='<%# (Check(Eval("EASTRUCTID"))) %>'
+                                   <uc:EADoc ID="EADDocPrint" runat="server" Enabled='<%# (Check(Eval("EASTRUCTID").ToString())) %>'
                                         CausesValidation="true" ValidationGroup="Params"
                                         TitleText =" "
                                         AgrID = '<%# Convert.ToDecimal(Eval("DPT_ID")) %>'  

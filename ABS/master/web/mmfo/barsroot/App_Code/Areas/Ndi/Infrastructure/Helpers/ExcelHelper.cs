@@ -23,7 +23,7 @@ using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract;
 /// </summary>
 namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
 {
-    public class ExcelHelper
+    public class ExcelHelper :ImportToFile
     {
         public ExcelHelper()
         {
@@ -35,7 +35,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
         public static ExcelResulModel ExcelExport(string tableSemantic, GetDataResultInfo dataResult, List<ColumnMetaInfo> allColumnsInfo,
             ExcelDataModel excelDataModel, GridFilter[] filterParams, IReferenceBookRepository repository)
         {
-            List<string> values = excelDataModel.ColumnsVisible == null ? new List<string>() : excelDataModel.ColumnsVisible.Split(',').ToList();
+            List<string> values = excelDataModel.ColumnsUnVisible == null ? new List<string>() : excelDataModel.ColumnsUnVisible.Split(',').ToList();
             List<ColumnMetaInfo> allShowColumns = new List<ColumnMetaInfo>();
             // СКРЫТЬ НЕОТОБРАЖАЕМЫЕ КОЛОНКИ:
             foreach (var item in allColumnsInfo)
@@ -256,22 +256,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                 if (!response.IsSuccessStatusCode)
                     throw new Exception(response.RequestMessage.ToString());
                 byte[] res = response.Content.ReadAsByteArrayAsync().Result;
-
-                //  string strError = proc.StandardError.ReadToEnd();
-                ////  bool flagTerm = proc.WaitForExit(200000);
-                //  if (!flagTerm)
-                //  {
-                //      proc.Kill();
-                //      throw new Exception(
-                //          "Процес 'BarsCoreWorkerService.exe' не завершив роботу у відведений час (200000 сек).");
-                //  }
-                //  int nExitCode = proc.ExitCode;
-                //  if (0 != nExitCode)
-                //  {
-                //      throw new Exception(
-                //          "Процес 'BarsCoreWorkerService.exe' аварійно завершив работу. Код " + nExitCode + "."
-                //          + "Опис коду повернення з потоку помилок: " + strError);
-                //  }
 
                 return new ExcelResulModel { FileName = externalExecModel.Semantic +  ".xlsx", ContentResult = res, ContentType = "application/ms-excel" };
 

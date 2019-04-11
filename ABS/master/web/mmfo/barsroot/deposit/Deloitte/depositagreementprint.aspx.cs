@@ -501,6 +501,9 @@ public partial class DepositAgreementPrint : Bars.BarsPage
                     btPrint.Enabled = false;
                     EADocPrint.Enabled = false;
                     break;
+                case 38:
+                    EADocPrint.HideCheckBoxes();
+                    break;
                 default:
                     // отображение кнопок печати FR для scheme == "DELOITTE"
                     btNextAgr.Enabled = false;
@@ -694,6 +697,10 @@ public partial class DepositAgreementPrint : Bars.BarsPage
             // Заява на дозвіл дострокового закриття невідкличного вкладу
             case 36:
                 EADocPrint.EAStructID = 2111;
+                break;
+            //онлайн ощад24
+            case 38:
+                EADocPrint.EAStructID = 541;
                 break;
             default:
                 Response.Write("<script>alert('Не вказано, або неправильний код типу додугоди!');</script>");
