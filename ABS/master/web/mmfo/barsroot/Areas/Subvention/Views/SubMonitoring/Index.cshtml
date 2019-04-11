@@ -1,0 +1,77 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.min.js?27_03_2019__17_02_15"></script>
+<script src="~/Scripts/respond.min.js?27_03_2019__17_02_15"></script>
+<script src="~/Areas/Subvention/Scripts/CommonJS.js?27_03_2019__17_02_15"></script>
+<script src="~/Areas/Subvention/Scripts/SubMonitoring/GetReportForm.js?27_03_2019__17_02_15"></script>
+<script src="~/Areas/Subvention/Scripts/SubMonitoring/Main.js?27_03_2019__17_02_15"></script>
+<link rel="stylesheet" href="~/Areas/Subvention/Css/SubMonitoring/Main.css?27_03_2019__17_02_15" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div id="toolbox">
+    <div class="btn-group">
+        <button id="btnRefresh" type="button" class="k-button" title="Оновити"><i class="pf-icon pf-16 pf-reload_rotate"></i> Оновити</button>
+        <button id="btnRunJob" type="button" class="k-button" title="Запустити джоб обробки для пакетів"><i class="pf-icon pf-16 pf-gears"></i> Запустити джоб</button>
+        <button id="btnPrintReport" type="button" class="k-button" title="Сформувати звіт по 3720"><i class="pf-icon pf-16 pf-print"></i></button>
+    </div>
+</div>
+
+
+<div class="grid-title-div">
+    <div style="float:left;">
+        <div class="inlineBlock">
+            <label class="k-label" for="date_from_packagesGrid">З</label>
+            <input id="date_from_packagesGrid" maxlength="10" />
+        </div>
+        <div class="inlineBlock">
+            <label class="k-label" for="date_to_packagesGrid">По</label>
+            <input id="date_to_packagesGrid" maxlength="10" />
+        </div>
+        <div class="inlineBlock">
+            <label class="k-label" for="filterPackagesByStatus">Статус</label>
+            <input id="filterPackagesByStatus" title="Фільтрувати пакети по статусу" />
+        </div>
+
+        <button type="button" class="k-button" title="Застосувати фільтр по періоду до 'Реєстру запитів'" onclick="filterGrid('packagesGrid');"><i class="pf-icon pf-16 pf-filter-ok"></i></button>
+        <label class="k-label" style="margin-left:7px;">Кількість : <label class="k-label" style="font-weight:bold;" id="packagesCount">0</label></label>
+    </div>
+
+    <label class="k-label grid-title" id="packagesGridTitle">Реєстр отриманих пакетів</label>
+</div>
+<div id="packagesGrid"></div>
+<br />
+<div class="grid-title-div">
+    <div style="float:left;">
+        <div class="inlineBlock">
+            <label class="k-label" for="date_from_documentsGrid">З</label>
+            <input id="date_from_documentsGrid" maxlength="10" />
+        </div>
+        <div class="inlineBlock">
+            <label class="k-label" for="date_to_documentsGrid">По</label>
+            <input id="date_to_documentsGrid" maxlength="10" />
+        </div>
+
+        <button type="button" class="k-button" title="Застосувати фільтр по періоду до 'Реєстру документів'" onclick="filterGrid('documentsGrid');"><i class="pf-icon pf-16 pf-filter-ok"></i></button>
+
+        <div class="inlineBlock invisible">
+            <label class="k-label" for="filterByPackages">Фільтр по пакету</label>
+            <input id="filterByPackages" title="Фільтрувати документи по пакету" />
+        </div>
+
+        <div class="inlineBlock">
+            <button type="button" class="k-button" title="Вивантажити грід 'Реєстр документів' в Exсel" onclick="downloadExcelFromGrid('documentsGrid')"><i class="pf-icon pf-16 pf-exel"></i></button>
+        </div>
+    </div>
+    <label class="k-label grid-title" id="receivedDocumentsGridTitle">Реєстр документів</label>
+</div>
+<br />
+<label calss="k-label" id="lblDocumentsCount"></label>
+
+<div id="documentsGrid"></div>
+
+<div class="search-main"></div>
