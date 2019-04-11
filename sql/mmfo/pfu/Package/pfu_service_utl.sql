@@ -6399,7 +6399,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
   begin
     prepare_new_claims();
     prepare_activation_claims();
-    --prepare_cardkill_claim();
+    prepare_cardkill_claim();
     process_w4_statuses();
     gen_epp_matching2();
   end;
@@ -6414,7 +6414,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
   begin
     send_data_to_bank_units_ebp;
     process_receipt_ebp;
-    prepare_cardkill_claim();
+   -- prepare_cardkill_claim();
   end;
 
   procedure process_transport_lock_stage is
