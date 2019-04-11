@@ -1,13 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/ACCD_2604.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure ACCD_2604 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.ACCD_2604 (p_dat2 date) is
+-----------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE BARS.ACCD_2604 (p_dat2 date) is
  acc_2600  INTEGER ;
  nls_7     varchar2(15);
  S6110_    varchar2(15);
@@ -25,9 +17,11 @@ begin
 --  2). Проставляем счетам 2603,2604,2600/не01 в качестве "Рахункiв
 --      списання" счет 2600/01 (2650) этого же Клиента (берем 2600/01 с
 --      максимальным остатком)
+--      Счету 2654 проставляем 2650.
 --
 --  3). Довносим в RKO_LST вновь-открывшиеся 2620\07,32
 --      Обнуляем 70 тариф для по всем 2620\07.
+--      Удаляем из RKO_LST счета 2600/14, 2650/12
 --
 --  4). Удаляем 3570 у счетов, которые сидят в "Плате за РО", если этот же
 --      3570 встречается в счетах, сидящих в "Плате за РО-только 3570"
@@ -63,36 +57,33 @@ begin
       Update RKO_LST set ACCD=null  where ACC=k.ACC ;
  End Loop;
 
------------------------------------------------------------------------
 
---  2). Проставляем счетам 2603, 2604, 2600/не01 в качестве "Рахункiв
---      списання" счет 2600/01 (или 2650) этого же Клиента.
-
-
- -----------------------------------
-
-
- For k in ( SELECT ACC
+------ Если ACC = ACCD  - удаляем ACCD:
+ 
+ For k in ( SELECT ACC         
             FROM   RKO_LST
             where  ACC = ACCD and ACCD is not NULL
           )
-
  Loop
-
     Update RKO_LST set ACCD=null  where ACC=k.ACC ;
-
  End Loop;
 
- -----------------------------------
+
+-----------------------------------------------------------------------
+
+--  2). Cчетам 2603,2604,2606,2600/не01 в качестве "Рахункiв списання" 
+--      проставляем счет 2600/01 (или 2650) этого же Клиента.
+--
+--      Счету 2654 проставляем 2650.
 
 
  For k in (SELECT r.ACC, a.RNK
            FROM   RKO_LST r, ACCOUNTS a
            WHERE
                   r.ACC=a.ACC
-             and  ( a.NBS in ('2603','2604')
+             and  ( a.NBS in ('2603','2604','2606')
                      or
-                    a.NBS='2600' and a.OB22 is not NULL and a.OB22<>'01'
+                    a.NBS='2600' and  a.OB22<>'01'
                   )
              and  r.ACCD is NULL
           )
@@ -160,10 +151,47 @@ begin
 
  End Loop;
 
+------------------------  Счету 2654 проставляем 2650:  ----------------------
+
+ For k in (SELECT r.ACC, a.RNK
+           FROM   RKO_LST r, ACCOUNTS a
+           WHERE
+                  r.ACC = a.ACC
+             and  a.NBS = '2654'
+             and  r.ACCD is NULL
+          )
+
+ Loop
+
+   Begin        ---  Ищем 2650
+
+      Select ACC into acc_2600
+      From   Accounts
+      Where  NBS='2650'
+         and RNK=k.RNK  and DAZS is NULL and KV=980 
+         and OSTC=( Select max(OSTC)
+                    from   Accounts
+                    where  NBS='2650'
+                       and RNK=k.RNK and DAZS is NULL and KV=980
+                   )
+         and rownum=1;
+
+     Update RKO_LST set ACCD=acc_2600  where ACC=k.ACC ;
+
+   EXCEPTION WHEN OTHERS then
+
+     null;
+
+   End;
+
+ End Loop;
+
+
 ----=========================================================================
 
 --  3). Довносим в RKO_LST вновь-открывшиеся 2620\07,32
-
+--      Обнуляем тариф 70 у счетов 2620\07
+--      Удаляем из  RKO_LST счета 2600/14, 2650/12
 
  For k in (Select ACC From ACCOUNTS
            WHERE  NBS='2620' and OB22 in ('07','32')
@@ -187,6 +215,15 @@ begin
     END IF;
  End Loop;
 
+-------------------------------------------
+
+ For k in ( Select ACC From ACCOUNTS
+            WHERE  (NBS='2600' and OB22='14'  OR  NBS='2650' and OB22='12') and  KV=980 and ACC in (Select ACC from RKO_LST)
+          )
+ Loop
+     DELETE from RKO_LST where ACC=k.ACC;
+ End Loop;
+
 ---=========================================================================
 
 --  4). Удаляем 3570 у счетов, которые сидят в "Плате за РО", если этот же
@@ -202,6 +239,7 @@ UPDATE RKO_LST set ACC2=null where
    ACC2 in (Select ACC2 from RKO_LST where ACC in (Select ACC from RKO_3570));
 
 ---======================================================================
+
 --  6). В проц.карточках ЗАКРЫТЫХ счетов 2600,2603,2604,2650,2620/07
 --      проставляем      "Дата закiнчення" =  "Нараховано по"
 
@@ -224,8 +262,6 @@ UPDATE RKO_LST set ACC2=null where
 
  End Loop;
 
-
-
 ---======================================================================
 
 --  7).  Проставление ИНДИВИДУАЛЬНЫХ 6510 по Корпор.Клиентам
@@ -239,10 +275,10 @@ UPDATE RKO_LST set ACC2=null where
 
     If     n.KOD_CLI =  1  then  OB22_ := '73';    --- ПФУ
     elsif  n.KOD_CLI =  2  then  OB22_ := '77';    --- Укрпошта
-    elsif  n.KOD_CLI =  5  then  OB22_ := '99';    --- ОблЕнерго
-    elsif  n.KOD_CLI =  6  then  OB22_ := 'A4';    --- ПЕК
-    elsif  n.KOD_CLI =  8  then  OB22_ := 'A6';    --- ГАЗ
-    elsif  n.KOD_CLI = 11  then  OB22_ := 'A7';    --- Тепловики
+    elsif  n.KOD_CLI =  5  then  OB22_ := '99';    --- ЕнергоРынок
+    elsif  n.KOD_CLI =  6  then  OB22_ := 'A4';    --- Енергогенеруючі компанії (ПЕК)
+    elsif  n.KOD_CLI =  8  then  OB22_ := 'A6';    --- УкрГАЗ
+    elsif  n.KOD_CLI = 11  then  OB22_ := 'A7';    --- ТеплоЕнергетики
     elsif  n.KOD_CLI = 17  then  OB22_ := 'E3';    --- Укрзалізниця
     End If;
 
@@ -404,13 +440,13 @@ UPDATE RKO_LST set ACC2=null where
 
 ---================================================================
 --
--- 10). Удаляем из RKO_LST счета, закрывшиеся более 2-ух месяцев назад 
+-- 10). Удаляем из RKO_LST счета, закрывшиеся более ГОДА назад 
 --
 
   FOR k IN  ( Select r.ACC
               FROM   RKO_LST r, ACCOUNTS a
               WHERE  r.ACC = a.ACC
-                 and a.DAZS is not NULL and a.DAZS < gl.BD - 60
+                 and a.DAZS is not NULL and a.DAZS < gl.BD - 365
             )
   LOOP
      DELETE from  RKO_LST where ACC=k.ACC;
@@ -419,14 +455,3 @@ UPDATE RKO_LST set ACC2=null where
 
 end ACCD_2604;
 /
-show err;
-
-PROMPT *** Create  grants  ACCD_2604 ***
-grant EXECUTE                                                                on ACCD_2604       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on ACCD_2604       to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/ACCD_2604.sql =========*** End ***
-PROMPT ===================================================================================== 

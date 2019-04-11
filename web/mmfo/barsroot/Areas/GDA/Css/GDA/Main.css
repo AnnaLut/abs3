@@ -1,0 +1,287 @@
+btnSearch.search-catalog {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+}
+
+#tabstrip .k-content {
+    min-height: 10px !important;
+}
+
+#tabstrip h2 {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#gridFiles th.k-header {
+    text-align: center;
+}
+
+.search-box {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+    padding: 10px;
+    max-width: 1111px;
+    position: relative;
+}
+
+.widerMenu .k-combobox,
+.widerMenu .k-datepicker,
+.widerMenu .k-timepicker,
+.widerMenu .k-datetimepicker,
+.widerMenu .k-numerictextbox,
+.widerMenu .k-dropdown,
+.widerMenu .k-textbox {
+    width: 200px;
+}
+
+div.form-group {
+    display: inline-block;
+}
+
+#contract_number {
+    float: left;
+    margin-top: 5px;
+    margin-left: 8%;
+}
+
+#rnk {
+    margin-top: 5px;
+    margin-left: 8%;
+}
+
+#okpo {
+    margin-top: 5px;
+    margin-left: 8%;
+}
+
+#btnSearch {
+    /*float:right;
+    margin-top: 1%;
+    width: 80px;
+    height: 35px;
+    padding-top: 5px;*/
+}
+
+#btnResetSearch {
+    /*float: right;
+    margin-top: 1%;
+    margin-left: 1%;
+    margin-right: 20%;
+    width: 30px;
+    height: 33px;
+    padding-top: 5px;*/
+}
+
+#searchButtonWrap {
+    padding: 15px;
+}
+
+#btnHistoryOp {
+    float: right;
+    margin-top: 5px;
+    margin-right: 5%;
+    width: 170px;
+    height: 35px;
+    padding-top: 5px;
+}
+
+.well {
+    padding: 0;
+}
+
+.disableSearch {
+    display: none;
+    visibility: hidden;
+}
+
+#message {
+    color: grey;
+    margin-top: 30px;
+    font-style: italic;
+}
+
+.classCreated {
+    background-color: #FFEC8B;
+}
+
+.classEditCell {
+    background-color: #ffffe6;
+}
+
+.classAuthCellError {
+    background-color: #ffe6e6;
+}
+
+.classAuthSuccess {
+    background-color: #e6ffe6;
+}
+
+.k-state-selected .classAuthSuccess {
+    background-color: #add8e6;
+}
+
+.k-state-selected .classAuthCellError {
+    background-color: #add8e6;
+}
+
+.k-state-selected .classEditCell {
+    background-color: #add8e6;
+}
+
+.classAuthorized {
+    background-color: lightgreen;
+}
+
+.classOnAuthorizing {
+    background-color: #CD5C5C;
+}
+
+.classClose {
+    background-color: lightgray;
+}
+
+.classBlue {
+    background-color: #AFEEEE;
+}
+
+.classCanceled {
+    background-color: rgba(20,53,80,0.05);
+    
+}
+
+.classActive {
+    background-color: rgb(152,251,152);
+}
+
+.classReturn {
+    background-color: #FA8072;
+}
+
+.classExpiredAndBlocked {
+    background-color: #93969b;
+}
+
+.k-grid .k-state-selected {
+    background-color: lightblue !important;
+    color: #000000;
+    font-weight: 900;
+}
+
+.k-grid td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-default {
+    margin: 5px;
+}
+
+hr {
+    margin: 12px;
+}
+
+.list-group-item {
+    width: 235px;
+}
+
+input {
+    color: black;
+    font-weight: 300;
+}
+
+textarea.k-textbox {
+    overflow: auto;
+    white-space: pre-wrap;
+    padding: 10px;
+    width: 100% !important;
+    height: 50px !important;
+    resize: none;
+}
+
+/*textarea.k-textbox:hover {
+        border: 1px solid #336896 !important;
+        background-color: white !important;
+        box-shadow: 5px 5px 10px #888888;
+    }*/
+
+.k-edit-buttons {
+    right: 0;
+    margin: 5px 5px 5px 5px;
+    bottom: 0;
+}
+
+.modal-buttons {
+    float: right;
+    margin: 5px;
+}
+
+.modal-buttons-left {
+    float: left;
+    margin: 5px;
+}
+
+.k-grid-content > table > tbody > tr:hover > td.classEditCell,
+.k-grid-content > table > tbody > tr:hover > td.classAuthCellError,
+.k-grid-content > table > tbody > tr:hover > td.classAuthSuccess {
+    background-color: lightblue;
+}
+.k-grid > table > tbody > tr:hover,
+.k-grid-content > table > tbody > tr:hover {
+    background-color: lightblue;
+    /*color: white;*/
+}
+
+#messageDBO > div {
+    display: inline-block;
+    margin-right: 30px;
+}
+
+#messageOperator > div {
+    display: inline-block;
+    margin-right: 30px;
+}
+i.pf-icon.pf-16.pf-help:active {
+    border-radius: 50%;
+    border: 1px solid blue;
+}
+
+.k-grid-header .k-grid-header-wrap th.k-header {
+    text-align: center;
+    vertical-align: middle;
+}#tlbarTimeTranshes, #tlbarRequireDeposit {
+    white-space: pre-line;
+}
+#leftbtn:disabled,
+#leftbtn[disabled],
+#rightbtn:disabled,
+#rightbtn[disabled] {
+    box-shadow: none;
+    background-color: #fff;
+    background-image: none;
+    color: #a1a1a1;
+    border-color: #ccc;
+}
+
+.text-right {
+    text-align: center;
+}
+
+.clientBtn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 5px !important;
+}
+
+.k-window-content.k-content {
+    overflow:hidden;
+}
+
+.page-header{
+    margin: 10px 0 0 !important;
+    padding-bottom: 0 !important;
+}
+

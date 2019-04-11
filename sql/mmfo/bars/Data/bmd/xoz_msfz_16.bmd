@@ -1,0 +1,355 @@
+set serveroutput on
+
+declare
+
+  type t_rec_extrnval is record (
+    tabid            meta_extrnval.tabid%type,
+    colid            meta_extrnval.colid%type,
+    srccolname       meta_columns.colname%type,
+    tab_alias        meta_extrnval.tab_alias%type,
+    tab_cond         meta_extrnval.tab_cond%type,
+    src_cond         meta_extrnval.src_cond%type,
+    col_dyn_tabname  varchar2(30));
+  type t_tab_extrnval is table of t_rec_extrnval;
+  l_extrnval     t_tab_extrnval := t_tab_extrnval();
+
+  type t_rec_browsetbl is record (
+    hosttabid   meta_browsetbl.hosttabid%type,
+    hostcolid   meta_browsetbl.hostcolkeyid%type,
+    addcolname  meta_columns.colname%type,
+    varcolname  meta_columns.colname%type,
+    addtabalias meta_browsetbl.addtabalias%type,
+    cond_tag    meta_browsetbl.cond_tag%type);
+  type t_tab_browsetbl is table of t_rec_browsetbl;
+  l_browsetbl    t_tab_browsetbl := t_tab_browsetbl();
+
+  type t_rec_filtertbl is record (
+    tabid       meta_filtertbl.tabid%type,
+    colid       meta_filtertbl.colid%type,
+    fltcode     meta_filtertbl.filter_code%type,
+    flag_ins    meta_filtertbl.flag_ins%type,
+    flag_del    meta_filtertbl.flag_del%type,
+    flag_upd    meta_filtertbl.flag_upd%type);
+  type t_tab_filtertbl is table of t_rec_filtertbl;
+  l_filtertbl    t_tab_filtertbl := t_tab_filtertbl();
+
+  type t_rec_dependency is record (
+    id               meta_dependency_cols.id%type,
+    tabid            meta_dependency_cols.tabid%type,
+    colid            meta_dependency_cols.colid%type,
+    event            meta_dependency_cols.event%type,
+    depcolid         meta_dependency_cols.depcolid%type,
+    action_type      meta_dependency_cols.action_type%type,
+    action_name      meta_dependency_cols.action_name%type,
+    default_value    meta_dependency_cols.default_value%type,
+    condition        meta_dependency_cols.condition%type);
+  type t_tab_dependency is table of t_rec_dependency;
+  l_dependency     t_tab_dependency := t_tab_dependency();
+
+  l_tabid        meta_tables.tabid%type;
+  l_tabname      meta_tables.tabname%type;
+  l_tabsemantic  meta_tables.semantic%type;
+  l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
+  l_newtabid     meta_tables.tabid%type;
+  l_newcolid     meta_columns.colid%type;
+  l_varcolid     meta_columns.colid%type;
+  l_colname      meta_columns.colname%type;
+
+begin
+
+  l_tabsemantic := 'XOZ_MSFZ_16.Госп.Угоди, їх рахунки та операції';
+  l_tablinesdef := '15';
+  l_tabselect_statement := 'select (select S/100 from TMP_XOZ16 where nd = d.ND) S, a1.BRANCH, a1.acc, D.RNK, u.OKPO, u.NMK, a1.KF,  a1.nls NLS_3519, a1.ostc/100 OST_3519, 
+       a2.NLS NLS_3615, a2.ostc/100 OST_3615, 
+       (select NLS from accounts a3, nd_acc n3  where n3.nd = d.ND and n3.acc= a3.acc 
+           and nbs=''3500''and ob22=''05'' and dazs is null and kv = 980)  NLS_3500,
+       (select a3.OSTC/100 from accounts a3, nd_acc n3 where n3.nd = d.ND and n3.acc= a3.acc 
+           and nbs=''3500''and ob22=''05'' and dazs is null and kv = 980) OST_3500,  
+       a4.NLS NLS_3618, a4.ostc/100 OST_3618, 
+       d.PROD, d.ND, d.CC_ID, d.SDATE
+from customer u, cc_deal d,
+    (select * from accounts where nbs=''3519''and ob22=''26'' and dazs is null and kv = 980) a1 , nd_acc n1 ,
+    (select * from accounts where nbs=''3615''and ob22=''04'' and dazs is null and kv = 980) a2 , nd_acc n2,
+   -- (select * from accounts where nbs=''3500''and ob22=''05'' and dazs is null and kv = 980) a3 , nd_acc n3,    
+    (select * from accounts where nbs=''3618''and ob22=''01'' and dazs is null and kv = 980) a4 , nd_acc n4    
+where d.vidd =351 and u.rnk = d.rnk 
+  and d.nd  = n1.nd  and n1.acc = a1.acc 
+  and d.nd  = n2.nd  and n2.acc = a2.acc 
+--and d.nd  = n3.nd  and n3.acc = a3.acc  
+  and d.nd  = n4.nd  and n4.acc = a4.acc  
+union ALL
+select NULL, a.BRANCH, a.acc, a.RNK, u.OKPO, u.NMK, a.KF, a.nls NLS_3519, a.ostc/100 OST_3519,
+       null, null, NULL, null,null,  null, NULL, null, NULL, NULL  
+from customer u, (select * from accounts where nbs=''3519''and ob22=''26'' and dazs is null and kv = 980) a
+where   a.rnk = u.rnk and not exists (select 1 from nd_acc where acc =a.acc)
+  ';
+  l_tabname     := 'XOZ_MSFZ_16';
+
+  -- получаем код таблицы
+  l_tabid := bars_metabase.get_tabid(l_tabname);
+
+  -- если таблица не описана в БМД
+  if l_tabid is null then
+
+    -- получаем код для новой таблицы
+    l_tabid := bars_metabase.get_newtabid();
+
+    -- добавляем описание таблицы в БМД
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+
+  -- если таблица описана в БМД
+  else
+
+    -- обновляем семантику таблицы
+    bars_metabase.set_tabsemantic(l_tabid, l_tabsemantic);
+
+    -- обновляем linesdef таблицы
+    bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
+
+    -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
+    select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
+      bulk collect
+      into l_extrnval
+      from meta_extrnval e, meta_columns c
+     where e.srctabid = l_tabid
+       and e.srctabid = c.tabid and e.srccolid = c.colid;
+
+    -- сохраняем ссылки для условий фильтра полей других таблиц на поля нашей таблицы
+    select b.hosttabid, b.hostcolkeyid, c.colname, v.colname, b.addtabalias, v.semantic
+      bulk collect
+      into l_browsetbl
+      from meta_browsetbl b, meta_columns c, meta_columns v
+     where b.addtabid = l_tabid
+       and b.addtabid = c.tabid and b.addcolkeyid = c.colid
+       and b.addtabid = v.tabid and b.var_colid = v.colid;
+
+    -- сохраняем ссылки полей других таблиц на нашу вложенную таблицу
+    select tabid, colid, filter_code, flag_ins, flag_del, flag_upd
+      bulk collect
+      into l_filtertbl
+      from meta_filtertbl
+     where filter_tabid = l_tabid and tabid <> l_tabid;
+
+    -- сохраняем зависимости между колонками таблицы
+    select id, tabid, colid, event, depcolid, action_type, action_name, default_value, condition
+      bulk collect
+      into l_dependency
+      from meta_dependency_cols
+     where tabid = l_tabid;
+
+    -- удаляем описание полей
+    bars_metabase.delete_metatables(l_tabid);
+
+  end if;
+
+  -- добавляем описание полей
+  bars_metabase.add_column(l_tabid, 0, 'ND', 'N', 'Реф~Дог', '', null, 30, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'KF', 'C', 'Код РУ', '', null, 31, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'RNK', 'N', 'РНК~кл.', '', null, 29, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'OKPO', 'C', 'Ід.код~кл.', '', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NMK', 'C', 'Назва~кл.', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/customerlist/custacc.aspx?type=3'||chr(38)||'nd=:ND', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ACC', 'N', 'ACC*XOZ~3519*26', '', null, 30, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLS_3519', 'C', 'Рах*XOZ~3519*26', '', null, 7, 0, 1, 0, 0, '', '', 0, 0, 'To_Char(Count(*))', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OST_3519', 'N', 'Залиш*XOZ~3519*26', '', null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(OST_3519)', 1, 0, 0, 'sPar=V_XOZREF[NSIFUNCTION][PROC=>PUL.PUT(''PROD'',351926);PUL.PUT(''XOZ_NLS'',:NLS_3519);PUL.PUT(''XOZ_ACC'',:ACC);PUL.PUT(''XOZ_KV'',980)]
+[EXEC=>BEFORE][ACCESSCODE=>2][CONDITIONS=>V_XOZREF.ACC=:ACC][showDialogWindow=>false]
+', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLS_3615', 'C', 'Рах~3615*04', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OST_3615', 'N', 'Залиш~3615*04', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(OST_3615)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLS_3618', 'C', 'Рах~3618*01', '', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OST_3500', 'N', 'Залиш~3500*04', '', null, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(OST_3500)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'CC_ID', 'C', 'Ід.~Дог.', '', null, 3, 0, 0, 1, 0, '', '', 0, 0, ' to_char ( Count(ND) )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OST_3618', 'N', 'Залиш~3618', '', null, 19, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(OST_3618)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SDATE', 'D', 'Дата~Дог.', '', null, 4, 0, 0, 1, 0, '', '', 0, 0, ' to_char ( Count(ND) )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PROD', 'C', '4600**', '', null, 5, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'NLS_3500', 'C', 'Рах~3500*04', '', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'S', 'N', 'Сума для~проводки', '', null, 1, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (S) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'BRANCH', 'C', 'Бранч', '', null, 45, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('BANKS_RU');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'MFO');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 1, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица BANKS_RU для описания сложного поля таблицы XOZ_MSFZ_16.');
+  end if;
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('V_NBSOB22');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'KOD');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 16, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица V_NBSOB22 для описания сложного поля таблицы XOZ_MSFZ_16.');
+  end if;
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'XOZ16.OPR ( :ND, 0, :S, null  )    ');
+
+  -- очищаем описание функций на справочник
+  bars_metabase.delete_nsifunction(l_tabid);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 0, 'НОВА угода оренди', 'XOZ16.ADD1  ( :R, :C,  :D, :P  )', ':R(SEM=RNK_партнера,TYPE=N,REF=CUSTOMER),:C(SEM=Номер_дог,TYPE=S),:D(SEM=Дата_дог,TYPE=D),:P(SEM=4600**,TYPE=S,REF=V_NBSOB22)', 'ONCE', '', '', '', '', '', 165);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Параметри угоди оренди ', 'XOZ16.UPD1  ( :ND , :CC_ID, :SDATE,  :PROD, :ACC )', '', 'EACH', '', '', '', '', '', 27);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Робота  з XLS-файлом', '', '', 'ONCE', '', '', '', '', 'sPar=TMP_XOZ16_XLS[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false]', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 11, 'Переглянути створені документи,<br> та сформувати тікет', '', '', 'ONCE', '', '', '', '', 'sPar=OPER_MON[ACCESSCODE=>1][CONDITIONS=>OPER_MON.tt in (''PS1'',''IF0'')][showDialogWindow=>false][EXEC=>BEFORE]', 51);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 21, '1.1)ВИДІЛЕНІ.Визнання зобов`язань:4600/**=>3615/04', 'XOZ16.OPR ( :ND, 11, null, ''Кредиторська заборгованість за фінансовим лізингом (орендою)'' ) ', '', 'EACH', 'Виконати проводки по 
+"Визнанню на балансі активу з права користування та зобов’язання з оренди", 
+за рахунок створення 3615/04 = Кредиторської заборгованостіь за фінансовим лўзингом (орендою)?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 22, '1.2)ВИДІЛЕНІ.Визнання активу:4600/**=>3500/04', 'XOZ16.OPR ( :ND, 12, null, ''Дебiторська заборгованiсть за послуги'' ) ', '', 'EACH', 'Виконати проводки по 
+"Визнанню на балансі активу з права користування та зобов’язання з оренди", 
+за рахунок закриття 3519/26 = Дебiторської заборгованості за послуги ?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 31, '2.1)ВИДІЛЕНІ.Нарахування витрат:7028/01=>3618/01
+', 'XOZ16.OPR ( :ND, 21, null, :X ) ', ':X(SEM=Період,TYPE=S)', 'EACH', 'Виконати проводки по нарахуванню процентних витрат з оренди за місяць ?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 32, '2.2) ВИДІЛЕНІ.Переоцінка активу:3615/04<=>4600/**', 'XOZ16.OPR ( :ND, 22, null, :X ) ', ':X(SEM=Період,TYPE=S)', 'EACH', 'Виконати проводки по нарахуванню процентних витрат з оренди за місяць ?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 41, '3.1)ВИДІЛЕНІ.Закриття нар/витрат:3618/01=>3519/26
+', 'XOZ16.OPR ( :ND, 31, null, :X ) ', ':X(SEM=Деталі,TYPE=S)', 'EACH', 'Виконати проводки по Закриттю 
+   3615/04 = КРЕД.заборгованості за фінансовим лізингом (орендою) 
+на 3519/26 = ДЕБ. заборгованість за послуги ?
+', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 42, '3.2)ВИДІЛЕНІ.Закриття ДЗ:3615/04=>3519/26
+', 'XOZ16.OPR ( :ND, 32, null, :X ) ', ':X(SEM=Деталі,TYPE=S)', 'EACH', 'Виконати проводки по Закриттю 
+   3618/01 = нарахованих процентних витрат з оренди 
+на 3519/26 = ДЕБ. заборгованість за послуги ?
+', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 43, '3.3)ВИДІЛЕНІ.Закриття ДЗ(ПДВ):7399/67=>3519/26', 'XOZ16.OPR ( :ND, 33, null, :X ) ', ':X(SEM=Деталі,TYPE=S)', 'EACH', 'Виконати проводки по Визнанню витрат на 
+7410/09 = сплачений ПДВ за попередні звітні періоди, який не входить до складу ВВ
+та закриттю ДЕБ заборгованості з ПДВ ?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание раскраски
+  bars_metabase.add_tblcolor(l_tabid, 1, null, 'ND is null', 1, 'COLOR_Blue');
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'NLS_3500');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, 'ND >0', 2, 'COLOR_LightAqua');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'OST_3615');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 3, l_newcolid, 'ND >0', 2, 'COLOR_LightGreen');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'NLS_3615');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 4, l_newcolid, 'ND >0', 2, 'COLOR_LightGreen');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'OST_3500');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 5, l_newcolid, 'ND >0', 2, 'COLOR_LightAqua');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'OST_3618');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 6, l_newcolid, 'ND >0', 2, 'COLOR_Yellow');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'NLS_3618');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 7, l_newcolid, 'ND >0', 2, 'COLOR_Yellow');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'NLS_3519');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 8, l_newcolid, '1 = 1', 2, 'COLOR_LightGray');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'OST_3519');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 9, l_newcolid, '1 = 1', 2, 'COLOR_LightGray');
+  end if;
+
+  -- восстанавливаем ссылки сложных полей других таблиц
+  for i in 1..l_extrnval.count loop
+    l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
+    if (l_newcolid is not null) then
+      bars_metabase.add_extrnval(
+        l_extrnval(i).tabid,
+        l_extrnval(i).colid,
+        l_tabid,
+        l_newcolid,
+        l_extrnval(i).tab_alias,
+        l_extrnval(i).tab_cond,
+        l_extrnval(i).src_cond,
+        l_extrnval(i).col_dyn_tabname);
+    end if;
+  end loop;
+
+  -- восстанавливаем ссылки полей для условий фильтра других таблиц
+  for i in 1..l_browsetbl.count loop
+    l_newcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).addcolname);
+    l_varcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).varcolname);
+    if (l_newcolid is not null and l_varcolid is not null) then
+      bars_metabase.add_browsetbl( 
+        l_browsetbl(i).hosttabid,
+        l_tabid,
+        l_browsetbl(i).addtabalias,
+        l_browsetbl(i).hostcolid,
+        l_newcolid,
+        l_varcolid,
+        l_browsetbl(i).cond_tag);
+    end if;
+  end loop;
+
+  -- восстанавливаем ссылки полей других таблиц на нашу вложенную таблицу
+  for i in 1..l_filtertbl.count loop
+    bars_metabase.add_filtertbl(
+      l_filtertbl(i).tabid,
+      l_filtertbl(i).colid,
+      l_tabid,
+      l_filtertbl(i).fltcode,
+      l_filtertbl(i).flag_ins,
+      l_filtertbl(i).flag_del,
+      l_filtertbl(i).flag_upd);
+  end loop;
+
+  -- восстанавливаем зависимости между колонками таблицы
+  for i in 1..l_dependency.count loop
+    bars_metabase.add_dependency(
+      l_dependency(i).tabid,
+      l_dependency(i).colid,
+      l_dependency(i).event ,
+      l_dependency(i).depcolid  ,
+      l_dependency(i).action_type ,
+      l_dependency(i).action_name ,
+      l_dependency(i).default_value ,
+      l_dependency(i).condition );
+  end loop;
+
+end;
+/
+
+commit;

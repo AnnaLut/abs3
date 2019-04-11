@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/11/2013 17:00:06" ReportInfo.Modified="03/19/2019 15:58:05" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoUS6qvaX0ql313TsNWhQ15kUHkZdqVwmGlBsefL+ZgcTQ==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ID, CHAR00 DEPOSIT_NUMBER, CHAR01 ACCOUNT_NUMBER, CHAR02 LCV, CHAR03 CUSTOMER_NAME, CHAR04 OKPO, NUM01 REF_, NUM02 DOCUMENT_AMOUNT, CHAR05 COMMENT_TEXT, NUM03 CURRENCY_ID, CHAR06 BRANCH_ID, CHAR07 BRANCH_NAME, CHAR08 UNAME, DAT00 BDATE from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="DEPOSIT_NUMBER" DataType="System.String"/>
+        <Column Name="ACCOUNT_NUMBER" DataType="System.String"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="CUSTOMER_NAME" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="REF_" DataType="System.Decimal"/>
+        <Column Name="DOCUMENT_AMOUNT" DataType="System.Decimal"/>
+        <Column Name="COMMENT_TEXT" DataType="System.String"/>
+        <Column Name="CURRENCY_ID" DataType="System.Decimal"/>
+        <Column Name="BRANCH_ID" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="UNAME" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+    <Parameter Name="sFdat2" DataType="System.String"/>
+    <Parameter Name="session_id" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="151.2" CanShrink="true" Guides="245.7">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="699.3" Height="37.8" CanShrink="true" Text="Надруковано [Date] [Table.UNAME]" HorzAlign="Center" Font="Arial, 11pt, style=Bold">
+        <Formats>
+          <CustomFormat Format="dd.MM.yyyy HH:mm:ss"/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text2" Left="9.45" Top="56.7" Width="699.3" Height="37.8" CanShrink="true" Text="Протокол виконання автоматичної операції&#13;&#10;Закриття строкових траншів ММСБ&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <LineObject Name="Line1" Left="9.45" Top="103.95" Width="699.3" Border.Style="Double" Border.Width="0.25"/>
+      <LineObject Name="Line2" Left="9.45" Top="151.2" Width="699.3" Border.Style="Double" Border.Width="0.25"/>
+      <TextObject Name="Text3" Left="9.45" Top="113.4" Width="699.3" Height="28.35" CanShrink="true" Text="Виконавець: [Table.UNAME]&#13;&#10;Час: [sFdat1] - [sFdat2]     банк.дата: [Date]&#13;&#10;">
+        <Formats>
+          <GeneralFormat/>
+          <DateFormat Format="dd.MM.yyyy"/>
+          <DateFormat Format="dd.MM.yyyy"/>
+          <DateFormat Format="dd.MM.yyyy"/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="212.18" Width="718.2" Height="9.45" CanGrow="true" Guides="0" DataSource="Table">
+      <TableObject Name="Table2" Width="704.97" Height="9.45" Border.Lines="All" GrowToBottom="true">
+        <TableColumn Name="Column9" Width="90.72"/>
+        <TableColumn Name="Column10" Width="130.41"/>
+        <TableColumn Name="Column11" Width="223.02"/>
+        <TableColumn Name="Column12" Width="177.66"/>
+        <TableColumn Name="Column13" Width="83.16"/>
+        <TableRow Name="Row4" Height="9.45" AutoSize="true">
+          <TableCell Name="Cell46" Border.Lines="All" Text="[Table.ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[Table.DEPOSIT_NUMBER]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[Table.CUSTOMER_NAME]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Table.ACCOUNT_NUMBER]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[Table.LCV]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="153.34" Width="718.2" Height="56.7">
+        <TableObject Name="Table1" Width="704.97" Height="56.7" Border.Lines="All">
+          <TableColumn Name="Column1" Width="90.72"/>
+          <TableColumn Name="Column2" Width="130.41"/>
+          <TableColumn Name="Column3" Width="223.02"/>
+          <TableColumn Name="Column4" Width="177.66"/>
+          <TableColumn Name="Column5" Width="83.16"/>
+          <TableRow Name="Row1" Height="47.25">
+            <TableCell Name="Cell1" Border.Lines="All" Text="№ траншу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell2" Border.Lines="All" Text="№ депозиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell3" Border.Lines="All" Text="Назва клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell4" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell5" Border.Lines="All" Text="Вал" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          </TableRow>
+          <TableRow Name="Row2" Height="9.45">
+            <TableCell Name="Cell6" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+            <TableCell Name="Cell7" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+            <TableCell Name="Cell8" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+            <TableCell Name="Cell9" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+            <TableCell Name="Cell10" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>

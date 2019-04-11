@@ -192,6 +192,14 @@ begin
     bars_error.add_message(l_mod, 65, l_exc, l_rus, '%s %s - карточного типа !', '', 1 );
     bars_error.add_message(l_mod, 65, l_exc, l_ukr, '%s %s - карткового типу ! ', '', 1);   
 
+    bars_error.add_message(l_mod, 66, l_exc, l_rus, '%s %s - карточного типа !', '', 1 );
+    bars_error.add_message(l_mod, 66, l_exc, l_ukr, '%s %s - карткового типу ! ', '', 1);   
+
+    bars_error.add_message(l_mod, 67, l_exc, l_rus, 'Сохранить новую заявку в данной функции возможно только на третьем уровне !', '', 1 );
+    bars_error.add_message(l_mod, 67, l_exc, l_ukr, 'Зберегти нову заявку в даній функції можливо лише на третьому рівні!', '', 1);   
+
+    bars_error.add_message(l_mod, 68, l_exc, l_rus, 'Процент комиссии указжан с ошибкой !', '', 1 );
+    bars_error.add_message(l_mod, 68, l_exc, l_ukr, 'Відсоток комісії вказаний помилково!', '', 1);   
 
   commit;
 end;

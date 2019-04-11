@@ -676,7 +676,10 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                                      vidd_custtype,
                                      ob22,
                                      nms,
-									 nls)
+                                     nls_SG,
+                                     acc_SS  ---COBUMMFO-10627
+
+)
             select  s_credits.nextval,
                     :l_per_id,
                     ccd.nd,
@@ -741,7 +744,9 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                       case when (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') then 2 else ccv.custtype end as vidd_custtype, -- #COBUSUPABS-6567
                       main_acc.ob22,
                       main_acc.nms,
-					  a_acc.nls
+		      a_acc.nls,
+                      main_acc.acc
+
             from bars.cc_deal ccd
             join bars.customer c on ccd.rnk = c.rnk
             join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
@@ -780,7 +785,8 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
             (select na.kf,
                     na.nd,
                     max(ob22) keep (dense_rank first order by dazs desc nulls first) as ob22,
-                    max(nms) keep (dense_rank first order by dazs desc nulls first) as nms
+                    max(nms) keep (dense_rank first order by dazs desc nulls first) as nms,
+                    max(na.acc)  keep (dense_rank first order by dazs desc nulls first) as acc
              from bars.nd_acc na
              join bars.accounts a on na.kf = a.kf and na.acc = a.acc
              where a.tip = 'SS'
@@ -843,7 +849,9 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
                                      vidd_custtype,
                                      ob22,
                                      nms,
-									 nls)
+                                     nls_SG,
+                                     acc_SS  ---COBUMMFO-10627
+)
             with cur as
             (select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a.branch, a.kf, a.nbs, a.ob22, a.daos, a.dazs, a.kv, c.okpo,
                                            aa.lim, aa.nls nls2625, aa.daos daos2625, AA.DAZS dazs2625, a.ostc ost_ovr, A9129.OSTC ost_9129, a9129.daos daos9129,
@@ -924,7 +932,9 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
             3 as vidd_custtype, -- хардкод по #COBUSUPABS-6567
             main_acc.ob22,
             main_acc.nms,
-			main_nls.nls
+            main_nls.nls,
+            main_acc.acc
+
             from cur
             left join
             (select acc, nvl(to_number(aw.value), 0) as bpk_term
@@ -934,7 +944,9 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
             (select na.kf,
                     na.nd,
                     max(ob22) keep (dense_rank first order by dazs desc nulls first) as ob22,
-                    max(nms) keep (dense_rank first order by dazs desc nulls first) as nms
+                    max(nms) keep (dense_rank first order by dazs desc nulls first) as nms,
+                    max(na.acc)  keep (dense_rank first order by dazs desc nulls first) as acc
+
              from bars.nd_acc na
              join bars.accounts a on na.kf = a.kf and na.acc = a.acc
              where a.tip = 'SS'

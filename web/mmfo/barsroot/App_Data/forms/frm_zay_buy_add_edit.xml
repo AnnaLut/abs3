@@ -15,7 +15,7 @@
               l_nls_acc0 varchar2(36) := :P_NLS_ACC0;
               l_nls0 varchar2(36) := :P_NLS0;
               l_mfo0 varchar2(20) := :P_MFO0;
-              l_kom number := :P_KOM;
+              l_kom varchar2(20) := :P_KOM;
               l_skom number := :P_SKOM;
               l_meta number := :P_META;
               l_f092 char(3):= :P_F092;
@@ -274,8 +274,8 @@
         <customfield name="P_ND" label="Номер заявки(кл.)" datatype="String" size="100" datasourcefield="ND" columnindex="2" index="1">
           <uicontrol type="TextBox" controlwidth="150" />
         </customfield>
-        <customfield name="P_KOM" label="%% коміс." datatype="Decimal" datasourcefield="KOM" columnindex="2" index="2">
-          <uicontrol type="DecimalInput" controlwidth="148" />
+       <customfield name="P_KOM" label="%% коміс." datatype="String" datasourcefield="KOM" columnindex="2" index="2">
+          <uicontrol type="TextBox" controlwidth="148" />
         </customfield>
         <customfield name="P_SKOM" label="або сума коміс." datatype="Decimal" datasourcefield="SKOM" columnindex="2" index="3">
           <uicontrol type="DecimalInput" controlwidth="148" />

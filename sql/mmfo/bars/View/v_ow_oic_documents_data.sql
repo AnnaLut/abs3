@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_OW_OIC_DOCUMENTS_DATA ***
 
- CREATE OR REPLACE FORCE VIEW BARS.V_OW_OIC_DOCUMENTS_DATA ("ID", "IDN", "NLSA", "KV", "S", "MFOB", "ID_B", "NAM_B", "NLSB", "KV2", "S2", "NAZN", "ERR_TEXT", "URL", "FAILURES_COUNT", "STATE") AS 
+ CREATE OR REPLACE FORCE VIEW BARS.V_OW_OIC_DOCUMENTS_DATA ("ID", "IDN", "NLSA", "KV", "S", "MFOB", "ID_B", "NAM_B", "NLSB", "KV2", "S2", "NAZN", "ERR_TEXT", "URL", "FAILURES_COUNT", "STATE","DOC_DRN") AS 
  select id, idn, org_cbsnumber nlsa, bill_currency kv, bill_amount * 100 s,
        dest_institution mfob, cnt_clientregnumber id_b,
        substr(cnt_clientname, 1, 38) nam_b, cnt_contractnumber nlsb,
@@ -59,7 +59,8 @@ PROMPT *** Create  view V_OW_OIC_DOCUMENTS_DATA ***
                          'set role bars_access_defrole@begin bars_ow.set_pay_flag('||id||','||idn||',:REF, 1);end;'
                          ) as url,
                          failures_count,
-                         state
+                         state,
+			 doc_drn
   from ow_oic_documents_data;
 
 

@@ -8,6 +8,7 @@
 instead of update ON BARS.CM_CLIENT for each row
 declare 
 l_add integer;
+l_check integer;
 begin
    if :new.oper_status not in (2,3,10) then
       raise_application_error (-20000, 'Недопустимый статус операции ' || :new.oper_status);
@@ -18,15 +19,14 @@ begin
           resp_txt    = :new.resp_txt
     where id = :new.id;
 
-   select count(*) into l_check
+     select count(*) into l_check
      from cm_client_que q
-    INNER JOIN accounts a
-       on a.acc = q.acc
-    inner join w4_card_ADD ad
-       on ad.card_code = q.card_type
+    INNER JOIN accounts a   on a.acc = q.acc
+    inner join w4_card_ADD ad  on ad.card_code = q.card_type
+           and ad.en>0
     where q.id = :new.id;
 
-  if  l_check != 0 then
+ if  l_check != 0 then
    if :new.oper_status = 3 then
    -- відкриття дод. Кр.картки, ящо це дозволено     зміна статусу 99>1 w4_card_add
       bars_ow.add_deal_to_cmque_dk(
@@ -37,7 +37,7 @@ begin
    -------------------
       delete from cm_client_que where id = :new.id;
    end if;
-  end if;
+ end if;
 end;
 
 /

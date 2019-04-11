@@ -26,7 +26,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <select kendo-drop-down-list name="ddlFreq" id="ddlFreq" style="width: 280px" k-ng-model="credit.freqValue" k-options="ddlFreqOptions" k-ng-disabled="isSaveFunc()"></select>
+                                        <select kendo-drop-down-list name="ddlFreq" id="ddlFreq" style="width: 280px" k-ng-model="credit.freqValue" k-options="ddlFreqOptions"  k-rebind="ddlFreqOptions" k-ng-disabled="isSaveFunc()"></select>
                                     </td>
                                 </tr>
                                 <tr>
@@ -71,7 +71,7 @@
                                 </tr>
                                 <tr colspan="2">
                                     <td colspan="2">
-                                        <select kendo-drop-down-list style="width: 270px" k-ng-model="credit.daynp" k-options="ddlDayNP" ng-disabled="isSaveFunc()" ></select>
+                                        <select kendo-drop-down-list style="width: 270px" k-ng-model="credit.daynp" k-options="ddlDayNP"  k-rebind="ddlDayNP" ng-disabled="isSaveFunc()" ></select>
                                     </td>
                                 </tr>
                             </table>
@@ -92,7 +92,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <select kendo-drop-down-list name="ddlFreqInt" id="ddlFreqInt" style="width: 280px" k-ng-model="credit.freqIntValue" k-options="ddlFreqIntOptions" k-ng-disabled="isSaveFunc()"></select>
+                                        <select kendo-drop-down-list name="ddlFreqInt" id="ddlFreqInt" style="width: 280px" k-ng-model="credit.freqIntValue" k-options="ddlFreqIntOptions"  k-rebind="ddlFreqIntOptions" k-ng-disabled="isSaveFunc()"></select>
                                     </td>
                                 </tr>
                                 <tr>

@@ -13,6 +13,7 @@ using System.Linq;
 using Bars.Classes;
 using BarsWeb.Areas.Ndi.Infrastructure;
 using Oracle.DataAccess.Types;
+using Dapper;
 
 namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
 {
@@ -22,8 +23,7 @@ namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
         private readonly IKendoSqlTransformer _sqlTransformer;
         private readonly IKendoSqlCounter _kendoSqlCounter;
 
-
-
+        #region variables
         public BarsSql _getAllAPPsSql;
         public BarsSql _getAllTTSSql;
         public BarsSql _getAllCHKGRPSSql;
@@ -57,21 +57,117 @@ namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
 
         public BarsSql _setLockUser;
         public BarsSql _setUnlockUser;
+        #endregion
         public ADMURepository(IKendoSqlTransformer kendoSqlTransformer, IKendoSqlCounter kendoSqlCounter, IAdminModel model)
         {
             _entities = model.Entities;
             _sqlTransformer = kendoSqlTransformer;
-            _kendoSqlCounter = kendoSqlCounter; 
+            _kendoSqlCounter = kendoSqlCounter;
         }
 
         public IQueryable<V_STAFF_USER_ADM> GetADMUList(string parameters)
         {
             string query = string.Format(@"
                     select * from V_STAFF_USER_ADM
-                    {0}", String.IsNullOrEmpty(parameters) ? "" : " where " + parameters);
+                    {0}", string.IsNullOrEmpty(parameters) ? "" : " where " + parameters);
 
             return _entities.ExecuteStoreQuery<V_STAFF_USER_ADM>(query).AsQueryable();
         }
+
+        private BarsSql AdmuListSql(string parameters, MainFilters mainFilters = null)
+        {
+            var res = new BarsSql
+            {
+                SqlParams = new object[] { },
+                SqlText = "select * from V_STAFF_USER_ADM"
+            };
+
+            if (string.IsNullOrWhiteSpace(parameters) && (null == mainFilters || mainFilters.IsEmpty())) return res;
+
+            List<string> predicates = new List<string>();
+            List<OracleParameter> _params = new List<OracleParameter>();
+
+            if (!string.IsNullOrWhiteSpace(parameters))
+                predicates.Add(parameters);
+            if (null != mainFilters && !mainFilters.IsEmpty())
+            {
+                if (null != mainFilters.Id)
+                {
+                    predicates.Add(" V_STAFF_USER_ADM.ID = :p_id ");
+                    _params.Add(new OracleParameter("p_id", OracleDbType.Decimal, mainFilters.Id, ParameterDirection.Input));
+                }
+                if (null != mainFilters.UserState)
+                {
+                    predicates.Add(" V_STAFF_USER_ADM.STATE_ID = :p_state_id ");
+                    _params.Add(new OracleParameter("p_state_id", OracleDbType.Decimal, mainFilters.UserState, ParameterDirection.Input));
+                }
+                if (!string.IsNullOrWhiteSpace(mainFilters.UserLogin))
+                {
+                    predicates.Add(" V_STAFF_USER_ADM.LOGIN_NAME like :p_login || '%' ");
+                    _params.Add(new OracleParameter("p_login", OracleDbType.Varchar2, mainFilters.UserLogin.ToUpper(), ParameterDirection.Input));
+                }
+
+                if (!string.IsNullOrWhiteSpace(mainFilters.UserName))
+                {
+                    predicates.Add(" UPPER(V_STAFF_USER_ADM.USER_NAME) like '%' || :p_name || '%' ");
+                    _params.Add(new OracleParameter("p_name", OracleDbType.Varchar2, mainFilters.UserName.ToUpper(), ParameterDirection.Input));
+                }
+
+                if (!string.IsNullOrWhiteSpace(mainFilters.UserBranch))
+                {
+                    predicates.Add(" V_STAFF_USER_ADM.BRANCH_CODE = :p_branch ");
+                    _params.Add(new OracleParameter("p_branch", OracleDbType.Varchar2, mainFilters.UserBranch, ParameterDirection.Input));
+                }
+            }
+
+            res.SqlParams = _params.ToArray();
+            res.SqlText += " WHERE " + string.Join(" AND ", predicates.ToArray());
+
+            return res;
+        }
+
+        public KendoDataSource<V_STAFF_USER_ADM> ADMUList(Kendo.Mvc.UI.DataSourceRequest request, string parameters, MainFilters mainFilters)
+        {
+            BarsSql sql = AdmuListSql(parameters, mainFilters);
+
+            KendoDataSource<V_STAFF_USER_ADM> result = new KendoDataSource<V_STAFF_USER_ADM>
+            {
+                Data = GetADMUList(request, sql),
+                Total = GetADMUListCount(request, sql)
+            };
+
+            return result;
+        }
+
+        private IQueryable<V_STAFF_USER_ADM> GetADMUList(Kendo.Mvc.UI.DataSourceRequest request, BarsSql sql)
+        {
+            var _a = _sqlTransformer.TransformSql(sql, request);
+            return _entities.ExecuteStoreQuery<V_STAFF_USER_ADM>(_a.SqlText, _a.SqlParams).AsQueryable();
+        }
+        private int GetADMUListCount(Kendo.Mvc.UI.DataSourceRequest request, BarsSql sql)
+        {
+            return GetCount(request, sql);
+        }
+        private int GetCount(Kendo.Mvc.UI.DataSourceRequest request, BarsSql sql)
+        {
+            var _a = _kendoSqlCounter.TransformSql(sql, request);
+            return _entities.ExecuteStoreQuery<int>(_a.SqlText, _a.SqlParams).ToList().FirstOrDefault();
+        }
+
+        public IEnumerable<UserBranches> GerBranchesDdlData()
+        {
+            string sql = @"select branch, name
+                            from branch
+                           where deleted is null
+                             and date_closed is null
+                           order by 1";
+
+            using (OracleConnection con = OraConnector.Handler.UserConnection)
+            {
+                return con.Query<UserBranches>(sql);
+            }
+        }
+
         public IQueryable<V_USERADM_BRANCHES> GetBranchList()
         {
             return _entities.V_USERADM_BRANCHES;
@@ -116,7 +212,7 @@ namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
                 command.Parameters.Add("p_user_name", OracleDbType.Varchar2, 300, user.Name, ParameterDirection.Input);
                 command.Parameters.Add("p_branch_code", OracleDbType.Varchar2, 30, user.DefaultBranch, ParameterDirection.Input);
 
-                command.Parameters.Add("p_can_select_branch_flag", OracleDbType.Decimal,  user.CanSelectBranch ? 1 : 0, ParameterDirection.Input);
+                command.Parameters.Add("p_can_select_branch_flag", OracleDbType.Decimal, user.CanSelectBranch ? 1 : 0, ParameterDirection.Input);
                 command.Parameters.Add("p_extended_access_flag", OracleDbType.Decimal, user.ExtendedAccess ? 1 : 0, ParameterDirection.Input);
 
                 command.Parameters.Add("p_security_token_pass", OracleDbType.Varchar2, 300, user.Token, ParameterDirection.Input);
@@ -141,7 +237,7 @@ namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
 
                 command.ExecuteNonQuery();
 
-                return ((OracleDecimal) userId.Value).Value;
+                return ((OracleDecimal)userId.Value).Value;
             }
             finally
             {
@@ -1262,7 +1358,7 @@ namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
 
 
 
-        
+
     }
 }
 

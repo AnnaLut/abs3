@@ -60,7 +60,10 @@ begin
 
   l_tabsemantic := 'BRAG-1) Довідник ЮО, що працюють в СТП / MONEX_UO';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
+  l_tabselect_statement := 'select x.ID, x.NAME, x.OKPO, x.MFO, x.NLS, x.NLS_KOM, x.RNK,
+(select count(*) from monex_UO_PL where id = x.ID) DOD
+from monex_UO x
+';
   l_tabname     := 'MONEX_UO';
 
   -- получаем код таблицы
@@ -124,13 +127,15 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NAME', 'C', 'Назва ЮО,~ що працює в СТП~БРАНЧІ ЮО', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=BRANCH_UO[CONDITIONS=>BRANCH_UO.IDPDR=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("BRANCH_UO" , 0 , "IDPDR=" || Str( :ID )   )', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', '№ ~п/п ЮО~СТП ЮО', '', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=MONEX_MV_UO[CONDITIONS=>MONEX_MV_UO.UO=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("MONEX_MV_UO" , 0 , "UO=" || Str( :ID )   )', 0);
-  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'ПЛ.рекв ЮО:~МФО', '', null, 10, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'ПЛ.рекв ЮО:~Рахунок-1~основний', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'ПЛ.рекв ЮО:~Ід.код', '', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NAME', 'C', 'Назва ЮО,~ що працює в СТП~ВІРТУАЛЬН~БРАНЧІ', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=BRANCH_UO[CONDITIONS=>BRANCH_UO.IDPDR=:ID][ACCESSCODE=>0][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', '№ ~п/п ЮО~СТП ЮО~Рах.3739 в ОБ', '', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=MONEX_MV_UO[CONDITIONS=>MONEX_MV_UO.UO=:ID][ACCESSCODE=>0][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'ОСН.пл.рекв~МФО', '', null, 10, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'ОСН.пл.рекв~Рахунок-1~осн.перекази', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'Код~ЄДРПО~ ЮО', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК,~ (за наявності)', '', null, 50, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLS_KOM', 'C', 'ПЛ.рекв ЮО:~Рахунок-2~дод, для ком', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLS_KOM', 'C', 'ОСН.пл.рекв~Рахунок-2~дод.комісія', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DOD', 'N', 'ДОД.пл.рекв~для різних СТП', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=MONEX_UO_PL[CONDITIONS=>MONEX_UO_PL.ID=:ID][ACCESSCODE=>0][showDialogWindow=>false]
+[PROC=>PUL.PUT(''ID_UO'',:ID)][EXEC=>BEFORE]', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BANKS');
@@ -141,17 +146,14 @@ begin
     dbms_output.put_line('В БМД не описана таблица BANKS для описания сложного поля таблицы MONEX_UO.');
   end if;
 
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('CUSTOMER');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'RNK');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 6, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица CUSTOMER для описания сложного поля таблицы MONEX_UO.');
-  end if;
-
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 1, 'ASC ');
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'begin insert into MONEX_UO (id, name, mfo, nls, okpo, rnk, nls_kom) values (:ID, :NAME, :MFO, :NLS, :OKPO, :RNK, :NLS_KOM); end');
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'begin update MONEX_UO set name = :NAME, mfo = :MFO, nls = :NLS, okpo = :OKPO, rnk = :RNK, nls_kom = :NLS_KOM where id = :ID; end');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

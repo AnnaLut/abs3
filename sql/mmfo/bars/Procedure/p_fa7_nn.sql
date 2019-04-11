@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.008 18/03/2019 (11/03/2019)
+% VERSION     :  v.19.009 06/04/2019 (18/03/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -32,6 +32,7 @@ IS
 12     VVV        R030 код валюты
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 06/04/2019 депозити МСБ
  11/03/2019 для рахунк?в SNA добавив зм?нив 
             znap_ := to_char(round(gl.p_icurval(k.kv, k.proc_SNA, dat_)*k.koef)); 
  16/01/2019 для дочерних счетов по ЦБ будет формироваться код остатка 
@@ -45,17 +46,6 @@ IS
             бал.рах. 2396 буде оброблятися аналогiчно як i 2046                   
             (в VIEW V_TMP_REZ_RISK_C5 для цього бал.рах. буде заповнено
              поле ZPR)                                                 
- 24.10.2018 розраховуємо суму обтяження для ЦП в еквiвалентi
- 23.10.2018 доработки для Инстолменту
- 09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок
-            активу 3541
- 20.09.2018 для счетов резерва параметр S181 изменяем на "1" если значение
-            равно нулю
- 21.08.2018 добавлены бал.счета 2206, 2236 для выравнивания с балансом
- 22.03.2018 для 3648 устанавливается R011 =0 по умолчанию
- 02.03.2018 для pmode_=2 переменная  Datn_ определяется как и для pmode_=0
-            (включались балансовые счета у которых D_CLOSE='31/12/2017')
- 10.01.2018 измененный алгоритм расчета S190
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_           VARCHAR2 (2)           := 'A7';
    sheme_          Varchar2(1) := 'G';
@@ -71,6 +61,7 @@ IS
    rez_            VARCHAR2 (1);
    kv_             SMALLINT;
    r011_           VARCHAR2 (1);
+   r011_1419       VARCHAR2 (1);
    r013_           VARCHAR2 (1);
    r013_1          VARCHAR2 (1);
    r013_30         NUMBER;
@@ -155,7 +146,8 @@ IS
    exist_cp        NUMBER                 := 0;
    exist_cp_acc    NUMBER                 := 0;
    exist_sno_gr    NUMBER                 := 0;
-   exist_cclim_acc      NUMBER                 := 0;
+   exist_cclim_acc NUMBER                 := 0;   
+   exist_msb_acc   NUMBER                 := 0;
 
    tobo_           accounts.tobo%TYPE;
    branch_         accounts.tobo%TYPE;
@@ -183,7 +175,7 @@ IS
           END
          );
 
-   fl_mode_ char(8);
+   fl_mode_ char(9);
    pr_01    Number;
 
    sql_doda_ varchar2(2000);
@@ -594,6 +586,30 @@ IS
 
       RETURN cnt_;
    END;
+   
+   -- депозити МСБ
+   FUNCTION  f_exist_msb_acc (pacc_ IN NUMBER, pdat_ in date)
+      RETURN NUMBER
+   IS
+      sql_   VARCHAR2 (1000);
+      cnt_   NUMBER;
+   BEGIN
+      sql_ := 'select count(distinct a.acc) ' ||
+              'from accounts a, deal_account da, object o  '||
+              'where a.acc = :acc_ 
+                 and a.daos >=:dat_
+                 and o.object_type_id = (select ot.id from object_type ot where ot.type_code = ''SMB_DEPOSIT_TRANCHE'')
+                 and o.id = da.deal_id
+                 and da.account_type_id = (select ak.id from attribute_kind ak where ak.attribute_code = ''DEPOSIT_PRIMARY_ACCOUNT'')
+                 and da.account_id = a.acc ';
+
+      EXECUTE IMMEDIATE sql_
+                   INTO cnt_
+                  USING pacc_, pdat_;
+
+      RETURN cnt_;
+   END;
+   
 BEGIN
    IF pmode_ = 0
    THEN                                                      -- для отчетности
@@ -1157,11 +1173,11 @@ BEGIN
              BEGIN
                 SELECT a.ost
                   INTO se1_
-                  FROM sal a, accounts s
+                  FROM snap_balances a, accounts s
                  WHERE a.fdat = dat_
                    AND s.acc = acc_
                    AND s.accc = a.acc
-                   AND a.nbs IS NOT NULL;
+                   AND nbs_ IS NOT NULL;
 
                 dk_k := iif_n (se1_, 0, '1', '2', '2');
              EXCEPTION
@@ -1254,6 +1270,13 @@ BEGIN
                 exist_cp_acc := f_exist_cp_acc (acc_, dat_);
              else
                 exist_cp_acc := 0;
+             end if;
+             
+             -- депозити МСБ
+             if nbs_ in ('2600', '2610', '2650', '2651') and se_ > 0 then
+                exist_msb_acc := f_exist_msb_acc (acc_, dat_);
+             else
+                exist_msb_acc := 0;
              end if;
 
              IF fa7p_ = 0                                     -- депоз./кред. счет
@@ -1886,6 +1909,7 @@ BEGIN
                    AND exist_sbb_acc =0
                    and exist_cclim_acc =0
                    and exist_cp_acc =0
+                   and exist_msb_acc =0
                 OR                                -- обычный режим
                        pmode_ = 1
                    AND tips_ IN ('SS', 'XS')
@@ -2355,6 +2379,8 @@ BEGIN
                    fa7p_ > 0 and tips_ = 'SNO'
                 OR
                    tips_ = 'DEP' and nls_ like '132%'
+                OR
+                   exist_msb_acc > 0 -- депозити МСБ
              THEN
                 -- наличие доп. модулей
                 -- flag 1
@@ -2416,7 +2442,14 @@ BEGIN
                 else
                    fl_mode_ := trim(fl_mode_)||'1';
                 end if;
-
+                
+                -- flag 9
+                if exist_msb_acc = 0 then
+                   fl_mode_ := trim(fl_mode_)||'0';
+                else
+                   fl_mode_ := trim(fl_mode_)||'1';
+                end if;
+                
                 IF fa7p_ > 0 and se_ < 0 and
                    not (substr(nbs_, 1, 3) in ('141','142','143','311','321''331') and
                         tips_ = 'SNO')
@@ -2474,6 +2507,7 @@ BEGIN
                                    ldate,
                                    nd,
                                    comm || DECODE (nd, null, '', ' (Реф=' || TO_CHAR (nd) || ')')
+                          HAVING SUM (ost) <> 0
                           )
                 LOOP
                    s240_ := i.s240;
@@ -2726,15 +2760,16 @@ BEGIN
        insert into otcn_f42_zalog(ACC, ACCS, ND, NBS, R013, OST)
        SELECT /*+ leading(z) */
                z.acc, z.accs, z.nd, a.nbs, nvl(p.r013, '0'),
-               gl.p_icurval (a.kv, a.ost, dat_) ost
-          FROM cc_accp z, sal a, specparam p
+               gl.p_icurval (a.kv, s.ost, dat_) ost
+          FROM cc_accp z, snap_balances s, accounts a, specparam p
          WHERE z.acc in (select acc from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
            AND z.accs = a.acc
-           and a.fdat=dat_
-           AND a.acc = p.acc
+           and s.fdat=dat_
+           and s.acc = a.acc
+           AND s.acc = p.acc
            AND a.nbs || p.r013 <> '91299'
            and a.nbs not in (select r020 from otcn_fa7_temp)
-           and a.ost<0;
+           and s.ost<0;
 
        -- сумма задолженности, кот. покрывает данный залог
        for p in (select * from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
@@ -2776,10 +2811,11 @@ BEGIN
 
             -- определяем остаток счетов дисконта или премии
              BEGIN
-               select SUM(NVL(Gl.P_Icurval(s.KV, s.ost, dat_) ,0))
+               select SUM(NVL(Gl.P_Icurval(a.KV, s.ost, dat_) ,0))
                   INTO s04_
-               from sal s
+               from snap_balances s, accounts a
                where s.fdat=dat_
+                 and s.acc = a.acc
                  AND s.acc in (select d.acc
                                from accounts s, nd_acc d, cc_deal c
                                where nvl(c.ndg, c.nd) = nd_ and
@@ -3181,7 +3217,20 @@ BEGIN
              end if;
 
              if srezp_ <> 0  then
-                kodp_ := k.sign_rez||nbs_||r011_||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
+                kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
+                if nbs_ = '1419'
+                then
+                   BEGIN
+                      select r011
+                         into r011_1419
+                      from specparam 
+                      where acc = k.acc;
+                   EXCEPTION WHEN NO_DATA_FOUND THEN
+                      r011_1419 := substr(k.kodp,6,1);
+                   END;
+                   kodp_ := k.sign_rez||nbs_||r011_1419||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
+                end if;
+
 
                 znap_ := to_char(sign(k.szq) * srezp_);
                 comm_ := SUBSTR (k.tobo || ' перевищення резерву над активом (3) ', 1, 200);

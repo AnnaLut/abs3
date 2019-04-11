@@ -363,15 +363,51 @@ begin
   r_spar_lst.CODE            := nvl(p_code,'OTHERS');
   r_spar_lst.HIST            := nvl(p_hist,0);
   r_spar_lst.MAX_CHAR        := p_max_char;
---r_spar_lst.BRANCH          := sys_context('BARS_CONTEXT','USER_BRANCH');
+  r_spar_lst.BRANCH          := sys_context('BARS_CONTEXT','USER_BRANCH');
 
   select nvl(max(SPID),0) + 1
     into r_spar_lst.SPID
     from BARS.SPARAM_LIST;
 
-  insert
+/*  insert
     into BARS.SPARAM_LIST
-  values r_spar_lst;
+  values r_spar_lst;*/
+
+  insert into BARS.SPARAM_LIST --for oracle 11
+    (spid,
+     NAME,
+     SEMANTIC,
+     TABNAME,
+     TYPE,
+     NSINAME,
+     INUSE,
+     PKNAME,
+     DELONNULL,
+     NSISQLWHERE,
+     SQLCONDITION,
+     TAG,
+     TABCOLUMN_CHECK,
+     CODE,
+     HIST,
+     MAX_CHAR)
+  values
+    (r_spar_lst.SPID,
+     r_spar_lst.NAME,
+     r_spar_lst.SEMANTIC,
+     r_spar_lst.TABNAME,
+     r_spar_lst.TYPE,
+     r_spar_lst.NSINAME,
+     r_spar_lst.INUSE,
+     r_spar_lst.PKNAME,
+     r_spar_lst.DELONNULL,
+     r_spar_lst.NSISQLWHERE,
+     r_spar_lst.SQLCONDITION,
+     r_spar_lst.TAG,
+     r_spar_lst.TABCOLUMN_CHECK,
+     r_spar_lst.CODE,
+     r_spar_lst.HIST,
+     r_spar_lst.MAX_CHAR)
+  ;  
 
 end SET_SPARAM_LIST;
 
@@ -2143,6 +2179,7 @@ procedure RSRV_ACC_NUM
   title    constant varchar2(64) := $$PLSQL_UNIT || 'RSRV_ACC_NUM';
   l_rsrv_id         accounts_rsrv.rsrv_id%type;
   l_agrm_num        accounts_rsrv.agrm_num%type;
+  l_is_send         number := 1;
 begin
 
   bars_audit.trace( '%s: Entry with ( p_nls=>%s, p_kv=>%s, p_nms=>%s, p_branch=>%s, p_isp=>%s, p_rnk=>%s ).'
@@ -2189,6 +2226,19 @@ $end
       return RSRV_ID
         into l_rsrv_id;
 
+        
+      --2610 в ЕАД не резервируется -- COBUMMFO-8473 (как сказать )), по депозитам ММСБ  резервируется)
+      if p_nls like '2610%' then
+          -- для terminable_dep_uo передаем, если находим   
+          select case when count(*) > 0 then 1 else 0 end
+            into l_is_send 
+            from ead_nbs n
+           where n.nbs = substr(p_nls, 1, 4)
+             and n.ob22 = p_ob22
+             and n.acc_type = 'terminable_dep_uo';  
+      end if;
+      
+      if l_is_send  = 1 then        
 $if ACC_PARAMS.MMFO
 $then
       EAD_PACK.MSG_CREATE( 'UACC', 'ACC;'||to_char(l_rsrv_id)||';RSRV', p_rnk, GL.KF() );
@@ -2196,6 +2246,8 @@ $else
       EAD_PACK.MSG_CREATE( 'ACC', 'ACC;'||to_char(l_rsrv_id)||';RSRV' );
 $end
 
+      end if;
+        
     exception
       when DUP_VAL_ON_INDEX then
         p_errmsg := 'Номер рахунку '||p_nls||' з кодом валюти '||p_kv||' вже зарезервовано!';

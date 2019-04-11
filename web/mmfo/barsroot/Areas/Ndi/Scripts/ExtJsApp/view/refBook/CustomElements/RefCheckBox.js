@@ -17,34 +17,33 @@
     initComponent: function () {
         var thistExtBox = this;
         thistExtBox.listeners = {
-            change: function (field, newValue, oldValue, eOpts) {
+            change: function (column, newValue, oldValue, eOpts) {
                 
-                //т.к. во время конвертации с true на 1 вызыется этот метод
-                if (newValue == oldValue)
+                var event = newValue  ? 'CHECK' : "UNCHECK";
+                    ExtApp.utils.RefBookUtils.onBeforeEditRowByDependencies(column, newValue, oldValue,event);
                     return;
-                var colMetaInfo = field.column ? field.column.columnMetaInfo : field.colMetaInfo;
-                var form = field.up('form');
-                if (!form)
-                    return;
-                form = form.getForm();
-                var dependencies = colMetaInfo.Dependencies;
-                if (!colMetaInfo || !form || !dependencies || !dependencies.length || dependencies.length < 1)
-                    return;
-                var checkDeps = Ext.Array.filter(dependencies, function (dep) { return dep.Event == 'CHECK' });
-                if (checkDeps && checkDeps.length && checkDeps.length > 0 && field.checked)
-                Ext.each(checkDeps, function (dep) {
-                    ExtApp.utils.RefBookUtils.executeDepAction(form, form._record, dep);
-                })
-               
-                var UncheckDep = Ext.Array.filter(dependencies, function (dep) { return dep.Event == 'UNCHECK' });
-                if (UncheckDep && UncheckDep.length && UncheckDep.length > 0 && !field.checked)
-                    Ext.each(UncheckDep, function (dep) {
-                        ExtApp.utils.RefBookUtils.executeDepAction(form, form._record, dep);
-                    })
 
+
+            },
+            check: function (field,isChec,orig) {
+                
+            },
+            cellEditRecord:function (field, isValid, eOpts) {
+                
             },
             validitychange: function( field, isValid, eOpts ){
                 //alert('validitychange')
+            },
+            afteredit: function(e) {
+                
+                var rec   = e.record;
+                var field = e.field;
+                var val   = e.value;
+
+                if (field == 'myDateColumnName') {
+                    var newDay = Ext.util.Format.date(val, 'l');
+                    rec.set('myDOWColumnName', newDay);
+            }
             }
         };
 

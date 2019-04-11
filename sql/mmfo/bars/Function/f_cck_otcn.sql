@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION BARS.F_CCK_OTCN (FDAT_ DATE, ACC_ INT, MDATE_ DATE,
-             VST_ number, FAKT_ varchar2 default '00000000', PDAT_ date default null,
+             VST_ number, FAKT_ varchar2 default '000000000', PDAT_ date default null,
              typen_ number default 1,
              fdatb_ in date default null,
              fdate_ in date default null,
@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :    Вспомогательная функция для формирования #A7
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.008  03/07/2018 (16/05/2018)
+% VERSION     : v.17.009  06/04/2019 (03/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: FDAT_ - отчетная дата
             ACC_ - ид. счета основного долга
@@ -26,6 +26,7 @@ IS
             = 2 - не враховуємо 9129 (зауваження Ощадбанку)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+06/04/2019 - депозити МСБ
 16/05/2018 - доопрацювання по розділених кредитах
 11.09.2017 - txt_sql8: для счетов 2701,3660 в портфеле мбдк
 26.08.2016 - txt_sql7: (счета SNO) добавлен ограничительный интервал на дату погашения
@@ -130,6 +131,10 @@ IS
                                        where acc=:acc_
                                          and fdat >= :fdat_
                                        ORDER BY 1 desc';
+
+  txt_sql9         varchar2(1000) := 'select expiry_date, deposit_amount, currency_id
+                                        from table(smb_calculation_deposit.get_report_a7(p_date => :dat_)) a
+                                        where account_id = :acc_';
 
   TYPE ref_type_curs IS REF CURSOR;
 
@@ -457,6 +462,37 @@ BEGIN
              pipe ROW(i);
           END IF;
        end if;
+   elsif substr(fakt_,9, 1) = '1' then
+       open cc_curs
+       for txt_sql9 using odat_, acc_;
+
+       comm_ := 'депозити МСБ ';
+
+       LOOP
+          FETCH cc_curs into i_mdate, pog_, kv1_;
+          EXIT WHEN cc_curs%NOTFOUND;
+
+          L_ := least(Gl.P_Icurval(kv1_, pog_, fdat_), OST_);
+
+          IF L_ > 0 AND (OST_ -L_)>=0 THEN
+             DEL(L_, i_mdate, i);
+             pipe ROW(i);
+
+             OST_:= OST_ - L_;
+          END IF;
+       END LOOP;
+
+       close cc_curs;
+
+       IF ost_ >0 THEN
+          if abs(ost_)<=100 then -- вирівнювання
+             DEL(zn_ * OST_, i_mdate, i);
+             pipe ROW(i);
+          else
+             DEL(zn_ * OST_, MDATE_, i);
+             pipe ROW(i);
+          END IF;
+       end if;   
    elsif substr(fakt_,4,1) = '1' then -- платіжний календар по ЦП
        open sb_curs
        for txt_sql4 using acc_, odat_;

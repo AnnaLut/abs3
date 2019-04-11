@@ -129,6 +129,8 @@ begin
   bars_metabase.add_column(l_tabid, 3, 'OB22_2909', 'C', 'Бал+ОБ22~кред.заборг.', '', null, 3, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'OB22_KOM', 'C', 'Бал+ОБ22~комісії', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 5, 'UO', 'N', '№ ЮО~в СТП', '', null, 1, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KOMB6', 'C', 'Рах-6*дох~комісії~ЮО в СТП', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KOMB7', 'C', 'Рах-7*витр~комісії~ЮО в СТП', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('MONEX0');
