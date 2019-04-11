@@ -1,4 +1,4 @@
-CREATE OR REPLACE package BARS.NBUR_XML
+create or replace package NBUR_XML
 is
 
 
@@ -47,13 +47,13 @@ show errors;
 
 ----------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE package body BARS.NBUR_XML
+create or replace package body NBUR_XML
 is
-
+  -- 01.04.2019 Зміни в формуванні/структурі #3E згідно COBUMMFO-9558
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 3.6  2018.12.27';
+  g_body_version  constant varchar2(64) := 'version 3.7  2019.04.01';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -321,37 +321,37 @@ $end
       l_prvn_dt := l_last_dt + 1;
       
       open p_recordset
-      for select /* XML_RPT_3E */ 1              as NN
-               , 'A3E001'                        as EKP
-               , z.NNNNN                         as Q003_1  --
-               , z.CC_IDZ                        as Q003_3  -- 108
-               , to_char(z.SDATZ,g_dt_fmt)       as Q007_2  -- 109
-               , z.S031                          as IDS031  --
+      for select /* XML_RPT_3E */ 
+                 'A3E001'                        as EKP
+               , 1                               as NN
+               , LPAD(z.NNNNN,5,'0')             as Q003_1  -- !
                , d1.CC_ID                        as Q003_2  -- 102
-               , to_char(d1.SDATE,g_dt_fmt)      as Q007_1  -- 103
-               , 0                               as T070_14 --
-               , b.DBT_ADJ_KOS                   as T070_15 -- 335
-               , b.INT_ADJ_KOS                   as T070_16 -- 336
-               , 0                               as T070_17 --
+               , to_char(d1.SDATE,'dd.mm.yyyy')  as Q007_1  -- 103
+               , NVL(z.S031,'00')                as S031  -- --!IDS031
+               , z.CC_IDZ                        as Q003_3  -- 108
+               , to_char(z.SDATZ,'dd.mm.yyyy')   as Q007_2  -- 109
                , d2.CC_ID                        as Q003_5  -- 307
-               , to_char(d2.SDATE,g_dt_fmt)      as Q007_5  -- 308
-               , to_char(d2.WDATE,g_dt_fmt)      as Q007_6  -- 309
-               , t1.TXT                          as T070_10 -- 311
+               , to_char(d2.SDATE,'dd.mm.yyyy')  as Q007_5  -- 308
+               , to_char(d2.WDATE,'dd.mm.yyyy')  as Q007_6  -- 309
+               , nvl(tx.CCY_ID  ,db.KV)          as R030  --IDR030
+               , NVL(t1.TXT,0)                   as T070_10 -- 311
                , db.DBT_ADJ_BAL                  as T071    -- 312
+               , t18.T070_18 * 100               as T070_18
+               , t19.T070_19 * 100               as T070_19
                , case
                    when ( c1.CUSTTYPE = 2 )
                    then 1
                    when ( c1.CUSTTYPE = 3 and c1.SED = '91  ')
                    then 2
                    else 3
-                 end                             as IDK014  -- 313
+                 end                             as K014  -- 313 --IDK014
                , c1.NMK                          as Q001_4  -- 314
-               , c1.OKPO                         as K020_2  -- 315
+               , LPAD(c1.OKPO,10,'0')            as K020_2  -- 315
                , t2.TXT                          as S080_1  -- 316
                , rz.S080                         as S080_2  -- 317
-               , nvl(tx.CCY_ID  ,db.KV)          as IDR030  --
-               , nvl(tx.DBT_AMNT,  0  )          as T070_12 -- 332
-               , nvl(tx.INT_AMNT,  0  )          as T070_13 -- 333
+               , NVL(T080,0)                     as T080
+               , '99'                            as F093
+               , '0'                             as F094
                , ct.ZAL_NAME                     as Q001_5  -- 318
                , ct.ZAL_TEH                      as Q015_3  -- 319
                , ct.ZAL_KOL                      as Q015_4  -- 320
@@ -360,14 +360,23 @@ $end
                , abs( nvl(cb.ost,  0)
                     - nvl(cb.crDos,0)
                     + nvl(cb.crKos,0) )          as T070_11 -- 323
+               , 0                               as T070_20
+               , '1'                             as F095
                , ct.ZAL_OBL                      as KU_2    -- 324
                , ct.ZAL_RAJ                      as Q002_4  -- 325
                , ct.ZAL_GOR                      as Q002_5  -- 326
                , ct.ZAL_ADR                      as Q002_6  -- 327
-               , ct.ZAL_STAN                     as F017_2  -- 328
+               , NVL(ct.ZAL_STAN,'#')            as F017_2  -- 328
                , ct.ZAL_DAT                      as Q007_7  -- 329
-               , ct.ZAL_ST_D                     as F018_2  -- 330
+               , NVL(ct.ZAL_ST_D,'#')            as F018_2  -- 330
                , ct.ZAL_STRA                     as Q007_8  -- 331
+               , '0'                             as F096
+               , nvl(tx.DBT_AMNT,  0  )          as T070_12 -- 332
+               , nvl(tx.INT_AMNT,  0  )          as T070_13 -- 333
+               , 0                               as T070_14 --
+--               , b.DBT_ADJ_KOS                   as T070_15 -- 335 --виключаємо згдіно заявки COBUMMFO-9558
+--               , b.INT_ADJ_KOS                   as T070_16 -- 336 --виключаємо згдіно заявки COBUMMFO-9558
+--               , 0                           
             from ( -- NNNNN OO LLLLL
                    select a.KF     as KF
                         , a.RNK    as RNK_9500
@@ -397,7 +406,7 @@ $end
                  ) z
             join CC_DEAL  d1 --
               on ( d1.KF = z.KF and d1.ND = z.ND )
-            join ( select rd.ND
+/*            join ( select rd.ND
                         , nvl(bd.dos ,0) + nvl(bd.crdos ,0) as DBT_ADJ_KOS
                         , nvl(bi.dos ,0) + nvl(bi.crdos ,0) as INT_ADJ_KOS
                      from ND_ACC   rd
@@ -417,6 +426,7 @@ $end
                       and ( bd.ACC is Not Null or bi.ACC is Not Null ) -- наявні залишки / обороти в звітному міс.
                  ) b
               on ( b.ND = d1.ND )
+*/--виключаємо згдіно заявки COBUMMFO-9558
             join CC_DEAL  d2 --
               on ( d2.KF = z.KF  and d2.ND = z.REF_ND )
             join ND_TXT t1
@@ -545,6 +555,29 @@ $end
                       and ID like 'CCK%'
                  ) rz
               on ( rz.ND = d2.ND )
+            left
+            join ( select nd, kf, SUM(nvl(bvq,0)) - SUM(nvl(rezq,0)) as T070_18
+                     from NBU23_REZ
+                    where FDAT = l_prvn_dt
+                      and tip in ('SS','SP','SN','SPN','SNO','SNA','SDI','SDA','SDF','SDM')
+                    group by nd, kf
+                 ) t18
+              on ( t18.ND = d2.ND and t18.kf = d2.kf)
+            left
+            join ( select nd, kf, SUM(nvl(bvq,0)) as T070_19
+                     from NBU23_REZ
+                    where FDAT = l_prvn_dt
+                      and tip in ('SS','SP','SN','SPN','SNO')
+                    group by nd, kf
+                 ) t19
+              on ( t19.ND = d2.ND and t19.kf = d2.kf)
+            left
+            join ( select nd, kf, MAX(KOL_351) as T080
+                     from NBU23_REZ
+                    where FDAT = l_prvn_dt
+                    group by nd, kf
+                 ) t080
+              on ( t080.ND = d2.ND and t080.kf = d2.kf)
            where d1.SDATE <= l_last_dt
              and d1.WDATE  > l_last_dt;
 
@@ -835,6 +868,9 @@ $end
                       case l_rpt_code
                       when '3E'
                       then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q001_5|<Q001_6)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<K020_3)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q002_4|<Q002_5|<Q002_6)(></)', '\1 xsi:nil = "true" \2' );
                         l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)(></)', '\1 xsi:nil = "true" \2' );
                       when '3K'
                       then
