@@ -105,7 +105,7 @@ public partial class deposit_AddRegular : Page
 										   and ca.acc = a.acc
 										   and c.rnk = :rnk
 										   and c.nd = :p_nd
-										   and ( a.nbs in ('2620','2625') or a.tip = 'SG ')
+										   and ((a.nbs ='2620' and a.tip='DEP') or a.tip ='SG ')
 									       and a.dazs is null
 										 order by a.nbs)
 								 where rownum = 1";
