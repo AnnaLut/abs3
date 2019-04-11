@@ -11,6 +11,8 @@ PROMPT *** ALTER_POLICY_INFO to OBJECT_TYPE ***
 BEGIN 
         execute immediate  
           'begin  
+               bpa.alter_policy_info(''OBJECT_TYPE'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''OBJECT_TYPE'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''OBJECT_TYPE'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -22,12 +24,11 @@ PROMPT *** Create  table OBJECT_TYPE ***
 begin 
   execute immediate '
   CREATE TABLE BARS.OBJECT_TYPE 
-   (
-         ID NUMBER(5,0),
-         TYPE_CODE VARCHAR2(30 CHAR),
-         TYPE_NAME VARCHAR2(300 CHAR),
-         PARENT_TYPE_ID NUMBER(5,0),
-         IS_ACTIVE char(1 byte)
+   (	ID NUMBER(5,0), 
+	TYPE_CODE VARCHAR2(30 CHAR), 
+	TYPE_NAME VARCHAR2(300 CHAR), 
+	STATE_ID NUMBER(5,0), 
+	PARENT_TYPE_ID NUMBER(5,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING

@@ -48,8 +48,7 @@ begin
 	PAY_FREQ NUMBER(3,0), 
 	RENEW_NEED NUMBER DEFAULT 0, 
 	RENEW_NEWID NUMBER, 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
-  EXT_DEAL_ID NUMBER(38)
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -540,27 +539,6 @@ end;
 PROMPT *** Disable  constraint fk_insdeals_grtid_grtdeals ***
 begin   
  execute immediate 'alter table ins_deals disable constraint fk_insdeals_grtid_grtdeals';
-end;
-/
-
-PROMPT *** add ext_deal_id ***
-begin
-    execute immediate 'alter table bars.ins_deals add (ext_deal_id number(38))';
- exception when others then 
-    if sqlcode = -955 or sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/
-
-PROMPT *** comment on ext_deal_id ***
-comment on column bars.ins_deals.ext_deal_id is 'ID договору зовнішньої системи';
-
-PROMPT *** create index i_insdeals_ext_deal_id ***
-begin
-    execute immediate 'create index i_insdeals_ext_deal_id on bars.ins_deals (ext_deal_id)';
- exception when others then 
-    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
-    end if; 
 end;
 /
 

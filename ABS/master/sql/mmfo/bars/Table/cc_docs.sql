@@ -45,23 +45,8 @@ exception when others then
 end; 
 /
 
-PROMPT *** Alter table CC_DOCS ***
 
-declare
-  e_col_exists           exception;
-  pragma exception_init( e_col_exists, -01430 );
-begin
-  execute immediate 'alter table CC_DOCS add ( DATA BLOB ) 
-LOB ( DATA ) STORE AS SECUREFILE ( TABLESPACE BRSLOBD
-                                   DISABLE STORAGE IN ROW
-                                   COMPRESS HIGH
-                                   NOCACHE )';
-  dbms_output.put_line( 'Table altered.' );
-exception
-  when e_col_exists
-  then null;
-end;
-/
+
 
 PROMPT *** ALTER_POLICIES to CC_DOCS ***
  exec bpa.alter_policies('CC_DOCS');

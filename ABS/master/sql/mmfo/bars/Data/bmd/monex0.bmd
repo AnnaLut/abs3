@@ -60,24 +60,7 @@ begin
 
   l_tabsemantic := '0.Системи переводiв(СП), що дiють в ОБ';
   l_tablinesdef := '';
-  l_tabselect_statement := 'select m0.kod_nbu, swi.id, m0.name as name_monex0, swi.name as name_swi, swi.description as desc_swi, 
-       decode (m0.IS_ACTIVE, 1, 0, 1) as IS_NOT_ACTIVE, m0.ob22 as ob22_2909, m0.ob22_2809 as ob22_2809, m0.ob22_kom as ob22_kom, m0.NLST, m0.MFOB, m0.nlsb,
-(select case when count(a.acc) > 0 then ''Рахунки заблоковано'' else ''Рахунки не заблоковано'' end 
-  from ACCOUNTS a
- where a.dazs is null--не закрытые
-   and ((a.ob22 in (select substr(m.ob22_2909, 5, 2)
-                      from MONEX_MV_UO m
-                     where m.mv = m0.kod_nbu
-                       and m.uo = 0) and a.nbs = ''2909'' and a.blkk = 1) or
-       (a.ob22 in (select substr(m.ob22_2809, 5, 2)
-                      from MONEX_MV_UO m
-                     where m.mv = m0.kod_nbu
-                       and m.uo = 0) and a.nbs = ''2809'') and a.blkd = 1)
-) as blk  
-from monex0 m0
-left join monex_mv_uo mmu on m0.kod_nbu = mmu.mv and mmu.uo = 0
-left join SWI_MTI_LIST swi on m0.kod_nbu = swi.kod_nbu
-order by 1';
+  l_tabselect_statement := '';
   l_tabname     := 'MONEX0';
 
   -- получаем код таблицы
@@ -141,28 +124,10 @@ order by 1';
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NAME_SWI', 'C', 'Назва~системи~(по вал)', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ID', 'C', 'Ідентифікатор~Profix', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KOD_NBU', 'C', 'Код~системи~по "НБУ"', '', null, 0, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAME_MONEX0', 'C', 'Назва~системи~(Фронт)', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DESC_SWI', 'C', 'Опис~системи~(Фронт)', '', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLSB', 'C', 'Транз.рах системи~(в ГОУ)', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'IS_NOT_ACTIVE', 'B', 'Ознака~блокування~ПС', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OB22_2909', 'C', 'ob22_2909', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OB22_2809', 'C', 'ob22_2809', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OB22_KOM', 'C', 'ob22_kom', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NLST', 'C', 'Транзитний~рахунок~платіжної~системи', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'MFOB', 'C', 'Банк~обслуговування~системи', '', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'BLK', 'C', 'Наявність~заблокованих~ рахунків', '', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('KL_D060');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'D060');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 6, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица KL_D060 для описания сложного поля таблицы MONEX0.');
-  end if;
+  bars_metabase.add_column(l_tabid, 1, 'NAME', 'C', 'Назва~системи~(по вал)', '', null, 2, 0, 0, 1, 0, '', '', 0, 1, '', 1, 0, 0, 'sPar=SWI_MTI_CURR[CONDITIONS=>SWI_MTI_CURR.num = :ID ][ACCESSCODE=>0]', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NLST', 'C', 'Транз.рах системи (в ГОУ)', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=3'||chr(38)||'nd=:KOD_NBU', 'ShowAccList(0, AVIEW_ALL, AVIEW_Financial | AVIEW_ReadOnly, "a.nls =  :NLST" )', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KOD_NBU', 'C', 'Код~системи~по "НБУ"', '', null, 0, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ID', 'N', 'Числ.~код~СТП', '', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание вложенных таблиц
   l_newtabid := bars_metabase.get_tabid('SWI_MTI_CURR');
@@ -173,56 +138,8 @@ order by 1';
     dbms_output.put_line('В БМД не описана таблица SWI_MTI_CURR для описания вложенности таблицы MONEX0.');
   end if;
 
-  -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'MONEX_RU.add_kod_nbu(:KOD_NBU, :ID, :NAME_SWI, :NAME_MONEX0, :DESC_SWI, :NLST, :MFOB, :NLSB, :OB22_2909, :OB22_2809, :OB22_KOM)');
-
-  -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'MONEX_RU.upd_kod_nbu (:KOD_NBU, :ID, :NAME_SWI, :NAME_MONEX0, :DESC_SWI, :NLST, :MFOB, :NLSB, :OB22_2909, :OB22_2809, :OB22_KOM)');
-
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Зупинити розрахунки з вибраною ситемою', 'MONEX_RU.STOP_START_OPERATIONS (1,:KOD_NBU)', '', 'SELECTED_ONE', 'Призупинити розрахунки з вибраною системою?', 'Готово!', '', '', '', 104);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Відновити розрахунки з вибраною ситемою', 'MONEX_RU.STOP_START_OPERATIONS  (0,:KOD_NBU)', '', 'SELECTED_ONE', 'Відновити розрахунки з вибраною системою?', 'Готово!', '', '', '', 63);
-
-  -- добавляем описание раскраски
-  l_newcolid := bars_metabase.get_colid(l_tabid, 'BLK');
-  if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, 'BLK = ''Рахунки заблоковано''', 2, 'COLOR_Red');
-  end if;
-
-  -- добавляем описание раскраски
-  l_newcolid := bars_metabase.get_colid(l_tabid, 'OB22_2909');
-  if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, 'BLK = ''Рахунки заблоковано''', 1, 'COLOR_Red');
-  end if;
-
-  -- добавляем описание раскраски
-  l_newcolid := bars_metabase.get_colid(l_tabid, 'OB22_2809');
-  if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 3, l_newcolid, 'BLK = ''Рахунки заблоковано''', 1, 'COLOR_Red');
-  end if;
-
-  -- добавляем описание раскраски
-  l_newcolid := bars_metabase.get_colid(l_tabid, 'NAME_SWI');
-  if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 4, l_newcolid, 'IS_NOT_ACTIVE > 0', 1, 'COLOR_Red');
-  end if;
-
-  -- добавляем описание раскраски
-  l_newcolid := bars_metabase.get_colid(l_tabid, 'KOD_NBU');
-  if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 5, l_newcolid, 'IS_NOT_ACTIVE > 0', 1, 'COLOR_Red');
-  end if;
-
-  -- добавляем описание раскраски
-  l_newcolid := bars_metabase.get_colid(l_tabid, 'NAME_MONEX0');
-  if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 6, l_newcolid, 'IS_NOT_ACTIVE > 0', 1, 'COLOR_Red');
-  end if;
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

@@ -70,7 +70,6 @@
     }
 
     $("#bt_auth_ok").click(function () {
-        bars.ui.loader('#dialogAuthorication', true);
         $.ajax({
             async: true,
             type: 'POST',
@@ -83,8 +82,13 @@
                 initiative: $("#auth_initiative").val()
             },
             success: function (data) {
-                bars.ui.loader('#dialogAuthorication', false);
-                bars.ui.alert({ text: data });
+                if (data === "Ok") 
+                    bars.ui.alert({ text: "Авторизація успішно зроблена!" });
+                else
+                    bars.ui.error({
+                        title: "Помилки при авторизації кредитного договору",
+                        text: data
+                    });
             }
         });
     });

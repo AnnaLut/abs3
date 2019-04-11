@@ -70,7 +70,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                         parMetaInfo = new GetFileParInfo() as T;
                         break;
                     case "FROM_UPLOAD_EXCEL":
-                        parMetaInfo = new UploadExcelParams() as T;
+                        parMetaInfo = new ConvertParams() as T;
                         break;
                     case "DEF_VAL_BY_INSERT":
                         DefParam e = new DefParam();

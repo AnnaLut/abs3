@@ -59,10 +59,6 @@ namespace BarsWeb.Areas.Pfu.Controllers
         {
             return View();
         }
-        public ActionResult Archives()
-        {
-            return View();
-        }
         public ActionResult MonitorEnquiryKM()
         {
             return View();

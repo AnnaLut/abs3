@@ -1,10 +1,9 @@
-﻿using System.Web;
+﻿using System.Data;
+using System.Data.EntityClient;
+using System.Web;
 using barsroot.core;
 using BarsWeb.Infrastructure;
 using Models;
-using System.Data.EntityClient;
-using System.Data;
-using Oracle.DataAccess.Client;
 
 namespace BarsWeb.Models
 {
@@ -12,10 +11,10 @@ namespace BarsWeb.Models
     /// Сводное описание для EntitiesBarsCore
     /// </summary>
     public partial class EntitiesBarsCore 
-    {
+    { 
         private void AddStateChange(System.Data.Common.DbConnection conn)
         {
-            conn.StateChange += OnStateChange;
+            conn.StateChange += OnStateChange; 
         }
 
         /// <summary>
@@ -30,16 +29,12 @@ namespace BarsWeb.Models
                 try
                 {
                     var conn = (EntityConnection)sender;
-                    string sessionId = HttpContext.Current.Session.SessionID;
-                    using (var command = conn.StoreConnection.CreateCommand())
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.CommandText = "bars.bars_login.set_user_session";
-                        command.Parameters.Add(new OracleParameter("p_sessionid", sessionId));
-                        command.ExecuteNonQuery();
-                    }
+                    var command = conn.StoreConnection.CreateCommand();
+                    command.CommandText = "begin bars.bars_login.set_user_session('" + System.Web.HttpContext.Current.Session.SessionID + "'); end;";
+                    command.ExecuteNonQuery();
+                    //_newEntity.ExecuteStoreCommand("begin bars.bars_login.set_user_session('" + System.Web.HttpContext.Current.Session.SessionID + "'); end;");
                 }
-                catch (OracleException ex)
+                catch (Oracle.DataAccess.Client.OracleException ex)
                 {
                     if (ex.Message.StartsWith("ORA-20984") /*Банковский день закрыт*/||
                         ex.Message.StartsWith("ORA-20982")
@@ -47,12 +42,12 @@ namespace BarsWeb.Models
                         ex.Message.StartsWith("ORA-20981") /*Не передан идентификатор сессии или он пустой*/
                         )
                     {
-                        HttpContext.Current.Session.Abandon();
+                        System.Web.HttpContext.Current.Session.Abandon();
                         if (ex.Message.StartsWith("ORA-20984"))
                         {
-                            HttpContext.Current.Response.Write(
+                            System.Web.HttpContext.Current.Response.Write(
                                 "<script language=javascript>alert('Банківський день закрито. Спробуйте перезайти в систему.');parent.location.reload();</script>");
-                            HttpContext.Current.Response.Flush();
+                            System.Web.HttpContext.Current.Response.Flush();
                         }
                     }
                     else
@@ -62,21 +57,19 @@ namespace BarsWeb.Models
                 }
             }
         }
-
+        
         /// <summary>
         /// строка подключения пользователя для EF
         /// </summary>
         /// <returns></returns>
         private string UserConnStr(string modelName = "EntityBarsModel")
         {
-            string connStr = string.Empty;
-
+            string connStr = "metadata=res://*/App_Code.Models." + modelName + ".csdl|res://*/App_Code.Models." + modelName + ".ssdl|res://*/App_Code.Models." + modelName + ".msl;provider=Oracle.DataAccess.Client;";//barsroot.core;
+            connStr += "provider connection string=\"";
+            string userConnStr = "";
             try
             {
-                string userConnStr = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
-                connStr = string.Format("metadata =res://*/App_Code.Models.{0}.csdl|res://*/App_Code.Models.{0}.ssdl|res://*/App_Code.Models.{0}.msl;provider=Oracle.DataAccess.Client;provider connection string=\"{1}\"", 
-                                         modelName, 
-                                         userConnStr);
+                userConnStr = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
             }
             catch (BarsCoreException e)
             {
@@ -85,6 +78,7 @@ namespace BarsWeb.Models
                 response.End();
                 response.Flush();
             }
+            connStr += userConnStr + "\"";
             return connStr;
         }
         /// <summary>
@@ -96,6 +90,7 @@ namespace BarsWeb.Models
         {
             connectionStr = string.IsNullOrWhiteSpace(connectionStr) ? UserConnStr() : connectionStr;
             var newEntity = new EntitiesBars(connectionStr);
+            //_newEntity.Connection.StateChange += new StateChangeEventHandler(OnStateChange);
             AddStateChange(newEntity.Connection);
             return newEntity;
         }

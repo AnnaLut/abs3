@@ -1,9 +1,3 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/monex.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
-
 CREATE OR REPLACE PACKAGE BARS.monex is
   -- 07.05.2018 Sta Универсальное название участника
   -- 19.09.2017  Sta + Artem Юрченко Очистка пользовательского контекста
@@ -13,14 +7,20 @@ CREATE OR REPLACE PACKAGE BARS.monex is
   TYPE tab1 IS TABLE  OF rec1 INDEX BY VARCHAR2(17);
 
 ---------------------------------------------------------
-function  UNAME ( p_Branch varchar2 )  return varchar2 ;
+function UNAME ( p_Branch varchar2 )  return varchar2 ;
+
 procedure clear_session_context; -- Очистка пользовательского контекста
-function  OB3  ( p_ob22 varchar2 )  return varchar2 ;
-function  NLSM_ext ( p_UO int, p_BBBBOO varchar2,  p_branch monexr.branch%type ) return varchar2 ;
-function  NLSM ( p_nbs  accounts.nbs%type,  p_ob22  monexr.ob22%type,  p_branch monexr.branch%type )  return varchar2 ;
-function  show_monex_ctx( tag VARCHAR2) return varchar2 ;
+
+function OB3  ( p_ob22 varchar2 )  return varchar2 ;
+function NLSM_ext ( p_UO int, p_BBBBOO varchar2,  p_branch monexr.branch%type ) return varchar2 ;
+function NLSM ( p_nbs  accounts.nbs%type,  p_ob22  monexr.ob22%type,  p_branch monexr.branch%type )  return varchar2 ;
+
+function show_monex_ctx( tag VARCHAR2) return varchar2 ;
+
 PROCEDURE set_monex_ctx( tag VARCHAR2, val VARCHAR2, client_id VARCHAR2 DEFAULT NULL);
+
 PROCEDURE monex_KL (  p_UL number) ; --- p_dat1 date, p_dat2 date) ---- Выполнить расчеты  по ЮЛ --  текущее сальдо счета
+
 --------------------------------------------------------------------- Загрузка XML-файла в таблицу MONEXR
  procedure GET_FIle (p_Mode int);
  ------------------------------------------
@@ -44,13 +44,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.monex is
   NLS6_AG varchar2(15) := '65102012600000';
 
 /*
-  28.02.2019 Комиссия komb1,2,3 ЮЛ должна идти на другой 3739
-
-  29.01.2019 Суховпа - Для комиссии суб/аг надо брать NLS_KOm
-                     - УСовие для наглой визы
-                     - 191992 заменила на 37391192
-                     - В СПРАВОЧНИК ЮЛ добавила код системы = для разных пл.инструкций по разным системам. Или пусто - для все систем
-
   22.10.2018 Sta COBUMMFO-9569
      - добавить деб.инф.сообщение для ОТРИЦ.сальдовых позиций на счета Агентов(т.е. Агент должен Ощадбанку)
      - В справочнике «BRAG-1 Довідник ЮО що працюють в СТП» необходимо добавить колонку с счетом для расчета по комиссии.
@@ -196,28 +189,16 @@ END set_monex_ctx;
 PROCEDURE monex_KL (  p_UL number) is ----, p_dat1 date, p_dat2 date) is  
   oo oper%rowtype     ;
 begin 
-  oo.sos := 1 ; -- c визированием
-  --------------
   oo.datd := gl.bdate;
   oo.mfoa := gl.aMfo ;
-
-  for kk in (  select  1 PL, u.ID , u.NAME,  x.MFO, x.NLS, u.OKPO,  x.NLS_KOM  , x.MV   
-               from monex_UO U , monex_UO_PL x 
-               where u.id=decode( p_ul,0, U.id, p_UL) and u.id = x.id 
-               union all
-               select  2 PL, u.ID , u.NAME,  u.MFO, u.NLS, u.OKPO,  u.NLS_KOM  , null MV 
-               from monex_UO U               where u.id=decode( p_ul,0, U.id, p_UL)
-               order by 1
-            )
+  for kk in (select * from monex_UO where id > 0 and id=decode(p_ul,0, id, p_UL) and mfo is not null and nls is not null and okpo is not null)
   loop
       oo.id_b := trim(kk.okpo);
       oo.mfob := kk.Mfo ;  
       oo.nam_b:= substr(kk.name,1,38);
 
       -- по сумі переказів
-      For ss in (select * from accounts where ostc <> 0 and ostb = ostc 
-                    and nls in ( select trim(M.ob22_2909) from monex_mv_UO M where M.uo = kk.ID and M.ob22_2909 is not null AND  NVL(KK.MV, M.MV ) = M.MV ) 
-                 )
+      For ss in (select * from accounts where ostc <> 0 and ostb = ostc and nls in ( select trim(ob22_2909) from monex_mv_UO where uo = kk.ID and ob22_2909 is not null) )
       loop oo.kv    := ss.kv; 
            oo.kv2   := oo.KV; 
            oo.s     := abs(ss.ostc);  
@@ -242,7 +223,7 @@ begin
            oo.s2    := oo.s; 
            oo.nlsa  := ss.nls ;  
            oo.nam_a := substr(ss.nms,1,38);  
-           oo.nlsb  := trim(kk.NLS_KOM) ;  
+           oo.nlsb  := trim(kk.nls) ;  
            SELECT okpo INTO oo.id_a FROM customer WHERE rnk=ss.rnk ;   -- COBUMMFO-5076 SC-0366458 При формуванні проводки не вірно відображається ЕДРПО відправника платежу
            If ss.ostc > 0          then oo.dk  := 1 ; oo.nazn := 'Перерахування кредитового' ;         oo.vob := 1 ;
            elsIf oo.MFOb = oo.Mfoa then oo.dk  := 0 ; oo.nazn := 'Списання дебетового';                oo.vob := 2 ;
@@ -398,7 +379,7 @@ end monex_KL;
  begin
     If    oo.kv <> oo.Kv2  
       and oo.nlsa like '3739%' 
-      and oo.nlsb like '3739%' then oo.tt := '013' ; 
+      and oo.nlsb like '3739%' then oo.tt := '013' ;
     ElsIf oo.kv <> oo.Kv2      then oo.tt := 'D06' ;
     ElsIf oo.MFOa = oo.MFOB    then oo.tt := 'PS1' ;
     ElsIf oo.dk = 1            then oo.tt := 'MNK' ;
@@ -408,7 +389,7 @@ end monex_KL;
 
     gl.ref(oo.REF);
     oo.nd := substr(to_char(oo.ref), 1, 10);
-    ---dbms_output.put_line( oo.Ref ||'*;*'|| oo.tt ||'*;*'|| oo.vob ||'*;*'|| oo.nd||'*;*'|| SYSDATE||'*;*'|| gl.BDATE||'*;*'|| oo.dk ||'*;*'|| oo.kv  ||'*;*'|| oo.S  ||'*;*'|| oo.kv2 ||'*;*'|| oo.S2||'*;*'|| null||'*;*'|| oo.datd ||'*;*'|| gl.bdate||'*;*'|| oo.nam_a||'*;*'|| oo.nlsa||'*;*'|| oo.Mfoa||'*;*'|| oo.nam_b||'*;*'|| oo.nlsb||'*;*'|| oo.mfob||'*;*'|| oo.nazn||'*;*'|| oo.d_rec||'*;*'|| oo.id_a ||'*;*'|| oo.id_b||'*;*'|| oo.id_o);
+    dbms_output.put_line( oo.Ref ||'*;*'|| oo.tt ||'*;*'|| oo.vob ||'*;*'|| oo.nd||'*;*'|| SYSDATE||'*;*'|| gl.BDATE||'*;*'|| oo.dk ||'*;*'|| oo.kv  ||'*;*'|| oo.S  ||'*;*'|| oo.kv2 ||'*;*'|| oo.S2||'*;*'|| null||'*;*'|| oo.datd ||'*;*'|| gl.bdate||'*;*'|| oo.nam_a||'*;*'|| oo.nlsa||'*;*'|| oo.Mfoa||'*;*'|| oo.nam_b||'*;*'|| oo.nlsb||'*;*'|| oo.mfob||'*;*'|| oo.nazn||'*;*'|| oo.d_rec||'*;*'|| oo.id_a ||'*;*'|| oo.id_b||'*;*'|| oo.id_o);
 
     gl.in_doc3(ref_  => oo.Ref  , tt_  => oo.tt  , vob_ => oo.vob , nd_  => oo.nd,  pdat_  => SYSDATE,  vdat_ => gl.BDATE,  dk_ => oo.dk ,
                 kv_  => oo.kv   , s_   => oo.S   , kv2_ => oo.kv2 , s2_  => oo.S2,  sk_    => null,     data_ => gl.BDATE, datp_=> gl.bdate,
@@ -416,16 +397,10 @@ end monex_KL;
               nam_b_ => oo.nam_b, nlsb_=> trim(oo.nlsb), mfob_=> oo.mfob, nazn_=> oo.nazn, d_rec_=> oo.d_rec,
               id_a_  => oo.id_a , id_b_=> oo.id_b, id_o_=> oo.id_o, sign_=> null ,  sos_  => 1,   prty_ => null,  uid_ => null );
 
-    If oo.dk in (1,0) then  
-
-       iF OO.TT = '013' THEN set_operw (  p_ref => OO.REF,   p_tag =>'OB22',   p_value => '10' ) ; END IF;
-
-       paytt(0, oo.REF, gl.bDATE, oo.TT, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2, oo.nlsb, oo.S2);    
-
-    end if;
+    If oo.dk in (1,0) then  paytt(0, oo.REF, gl.bDATE, oo.TT, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2, oo.nlsb, oo.S2);    end if;
 
 
-   if nvl(GetGlobalOption('PEDAL_PROFIX'),0)=1 AND oo.SOS is null  then
+   if nvl(GetGlobalOption('PEDAL_PROFIX'),0)=1 then
 
     gl.pay(2, oo.ref, gl.bDATE);
     If oo.mfoa <> oo.mfob then
@@ -573,7 +548,7 @@ begin
               if oo.ref >'999999999' then oo.nd := substr(to_char(oo.REF), -10);
               else                        oo.nd :=        to_char(oo.REF)      ;
               end if ;
-              oo.nlsb  := vkrzn( substr( gl.Amfo,1,5),'37391192' )  ;
+              oo.nlsb  := vkrzn( substr( gl.Amfo,1,5),'191992' )  ;
               oo.nam_b := 'Транзит для закорд.переказiв';
               gl.in_doc3(ref_ => oo.ref  , tt_   => oo.TT  , vob_  => oo.VOB  , nd_   => oo.nd   , pdat_  => SYSDATE,
                          vdat_=> gl.BDATE, dk_   => 1      , kv_   => z.kv    , s_    => z.S     , kv2_   => z.kv,
@@ -714,7 +689,7 @@ begin
 
      begin
        If  UU.UO = 0 then select okpo into oo.id_b from BANKS_RU where mfo = oo.mfob ;
-       else               select okpo into oo.id_b from monex_uo where id  = uu.UO AND ROWNUM = 1  ;
+       else               select okpo into oo.id_b from monex_uo where id  = uu.UO   ;
        end if ;
      EXCEPTION WHEN NO_DATA_FOUND THEN oo.id_b := gl.aOkpo ;
      end;
@@ -907,7 +882,7 @@ begin
            -- k.KOMB1 это грн-сумма для расчета с агентом
            oo.dk   := 0 ;
            oo.kv   := k.kv;        oo.s  := gl.p_Ncurval( k.kv, k.KOMB1, gl.bdate) ;   oo.nlsa := x0.nlsT;
-           oo.kv2  := gl.baseval;  oo.s2 := k.KOMB1 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_KOM, trim(k.branch) );
+           oo.kv2  := gl.baseval;  oo.s2 := k.KOMB1 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_2809, trim(k.branch) );
            oo.nazn := substr(to_char(p_dat, 'dd.mm.yyyy') || ';SENTSYFEE.Стягнення комiсiї оператора СТП. Вал='||k.kv||',Сума='||to_char(oo.s/100),  1, 160 );
 
            monex.opl1(oo) ;
@@ -928,7 +903,7 @@ begin
         If k.KOMB2 > 0 and k.K_2809 > 0 then   --- Деб Тр  по СТП вал на сумму KOMB2  кред Комм.ЮЛ в грн
            oo.dk   := 1 ;
            oo.kv   := k.kv;        oo.s  := gl.p_Ncurval( k.kv, k.KOMB2, gl.bdate) ;   oo.nlsa := x0.nlsT;
-           oo.kv2  := gl.baseval;  oo.s2 := k.KOMB2 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_KOM, trim(k.branch) );
+           oo.kv2  := gl.baseval;  oo.s2 := k.KOMB2 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_2809, trim(k.branch) );
            oo.nazn := substr(to_char(p_dat, 'dd.mm.yyyy') || ';RECEIVESAFEE.Перерахування комiсiї Субагенту.Вал='||k.kv||',Сума='||to_char(oo.s/100),  1, 160 );
            monex.opl1(oo) ;
            --
@@ -948,7 +923,7 @@ begin
         If k.KOMB3 > 0 and k.k_0000 > 0  then   --- Деб Тр  по СТП вал на сумму KOMB3  кред кред ЮЛ в грн
            oo.dk   := 1 ;
            oo.kv   := k.kv;        oo.s  := gl.p_Ncurval( k.kv, k.KOMB3, gl.bdate) ;   oo.nlsa := x0.nlsT;
-           oo.kv2  := gl.baseval;  oo.s2 := k.KOMB3 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_KOM, trim(k.branch) );
+           oo.kv2  := gl.baseval;  oo.s2 := k.KOMB3 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_2809, trim(k.branch) );
            oo.nazn := substr(to_char(p_dat, 'dd.mm.yyyy') || ';RETURNSAFEE.Перерахування комiсiї для відшкодування кл.Вал='||k.kv||',Сума='||to_char(oo.s/100),  1, 160 );
            monex.opl1(oo) ;
            --
@@ -1014,17 +989,5 @@ end DEL_FIle ;
 
 
 end monex;
-
 /
- show err;
- 
-PROMPT *** Create  grants  MONEX_RU ***
-grant EXECUTE                                                                on MONEX_RU        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on MONEX_RU        to CUST001;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/monex.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 
+alter package bars_login compile;

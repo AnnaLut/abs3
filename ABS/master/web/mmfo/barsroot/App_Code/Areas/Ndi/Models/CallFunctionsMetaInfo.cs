@@ -49,8 +49,8 @@ namespace BarsWeb.Areas.Ndi.Models
         public List<UploadParamsInfo> UploadParamsInfo { get; set; }
         public List<ParamMetaInfo> SystemParamsInfo { get; set; }
         public List<OutParamsInfo> OutParamsInfo { get; set; }
-        public List<UploadExcelParams> UploadExcelParamsInfo { get; set; }
-        public string  UploadExcelParam { get; set; }
+        public List<ConvertParams> ConvertParamsInfo { get; set; }
+        public string  ConvertParams { get; set; }
         public string MultiParams { get; set; }
         public List<MultiRowsParams> MultiRowsParams { get; set; }
         public bool HasFileResult { get; set; }

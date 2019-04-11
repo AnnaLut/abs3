@@ -8,7 +8,6 @@ using System.Web;
 /// </summary>
 namespace BarsWeb.Areas.Ndi.Models
 {
-    //параметры, которые пробрасываются в дочерние таблицы
     public class ThrowParams : ParamMetaInfo
     {
         public ThrowParams()

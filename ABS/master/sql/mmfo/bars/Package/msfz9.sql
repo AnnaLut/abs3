@@ -43,18 +43,7 @@
 
   procedure P9129 ( p_NDG cc_deal.ndG%type)  ; -- 9129 по ген.согл
 
-
-  function f_business_model (p_rnk customer.rnk%type)
-    return bus_mod.bus_mod_id%type;
-	--function f_sppi           ( p_sppi       sppi.sppi_value%type   , p_rnk customer.rnk%type  )  return sppi.sppi_value%type       ;
-  function f_ifrs (p_bus_mod bus_mod.bus_mod_id%type
-                  ,p_sppi sppi.sppi_id%type ) 
-    return ifrs.ifrs_id%type;
-
-  function f_k9 (p_ifrs ifrs.ifrs_id%type
-                ,p_poci poci.id%type) 
-    return k9.k9%type;
-	-----------------
+  procedure FINIS_3600  ( p_NDG cc_deal.ndG%type ) ; -- на финише дня делать перенос с БС=3600 на счет дисконта в пропорции от суммы выдачи по  SS к неиспол.лимиту на 9129
 
 END msfz9;
 
@@ -137,20 +126,11 @@ S36 (доходи майбутніх періодів ) БР 3600  (ОБ 22 09, 10).
     а частина, що пропорційна CR9, залишається на рахунку типу S36,  який повинен бути прив'язаний до генерального договору.
 */
 
-	g_k111             KL_K110.k111%type;
-	gc_bussl_dkb       constant smallint(1) := 1;
-	gc_bussl_mmcb      constant smallint(1) := 2;
-	gc_busss_micro     constant smallint(2) := 23;
-	gc_busss_small     constant smallint(2) := 22;
-	gc_busss_mddle     constant smallint(2) := 21;
-	g_bussl            customerw.value%type;
-	g_busss            customerw.value%type;
-	kk                 customer%rowtype;
 ----------------------------
 procedure PUL9  ( p_NDG cc_deal.ndG%type ) is
 begin
    PUL.put('NDG',p_NDG);
-   PUL.put('WACC','A.ACC in (select n.acc from nd_acc n,cc_deal d where d.ND =n.ND and d.ndg='||p_ndg||')');
+   PUL.put('WACC','A.ACC in (select n.acc from nd_acc n,cc_deal d where d.ND =n.ND and d.ndg='||p_ndg||' union select n.acc FROM ACCOUNTS n,cc_accp cp,CC_add d, cc_deal dd WHERE cp.accs = d.accs AND n.ACC = cp.ACC and d.nd =dd.nd and dd.ndg ='||p_ndg||')');
 end PUL9;
 
 
@@ -208,29 +188,26 @@ begin
     v_ret := MSFZ9.Get_NLS(p_kv,p_nbs) ;
     return v_ret;
   end if;
-  ---------------------------- Для других,  не LIM      ищем какой-нбудь
-  begin 
-    select n.acc into v_acc 
-      from nd_acc n, 
-           accounts a 
-      where nd = p_nd 
-        and n.acc = a.acc 
-        and a.tip = 'LIM' 
-        and a.dazs is null  
-        and rownum = 1;
-    v_ret := f_newnls(acc2_=>v_acc, 
-                      descrname_=>p_tip, 
-                      nbs_=> p_nbs) ;
-    select count(1)  
-      into v_flag   
-      from accounts 
-      where nls = v_ret   ; 
-    if v_flag > 0  then 
-      v_ret := MSFZ9.Get_NLS(p_kv,p_nbs) ; 
-    end if; 
-  EXCEPTION WHEN NO_DATA_FOUND THEN
+
+  select n.acc
+    into v_acc
+    from nd_acc n, accounts a
+    where nd = p_nd
+      and n.acc = a.acc
+      and a.tip = 'LIM'
+      and a.dazs is null
+      and rownum = 1;
+
+  v_ret := f_newnls(acc2_      => v_acc,
+                    descrname_ => p_tip,
+                    nbs_       => p_nbs);
+  select count(1) into v_flag
+    from accounts
+      where nls = v_ret;
+  if v_flag != 0 then
     v_ret := MSFZ9.Get_NLS(p_kv,p_nbs) ;
-  end ;
+  end if;
+
   return v_ret;
 
 exception
@@ -242,7 +219,7 @@ end get_nls4rnk;
 
 procedure step_x ( p_ndG number  ) is  --  откатить разбиение
                    x_NDG number ;
- v_num number;
+ v_num integer;--     cc_deal%rowtype  ;
  a8_acc accounts.acc%type ;
  sTmp_ varchar2(38)  ;
  l_ref number :=  0  ;
@@ -1823,287 +1800,6 @@ begin
   end loop ; -- s36
 
 end FINIS_3600;
-
-function f_business_model (p_rnk customer.rnk%type)
-	 return bus_mod.bus_mod_id%type --COBUPRVNIXIII-5
-is 
-  l_BUS_MOD         BUS_MOD.BUS_MOD_Id%type ; 
-	c_build_types     string_list := string_list('41', '42', '43', '49', '50', '51', '52');
-	c_agricult_types  string_list := string_list('01', '02', '03', '10', '11', '12');
-	c_other_types     string_list := string_list('01', '02', '03', '10', '11', '12', '41', '42', '43', '49', '50', '51', '52');	
-begin
-  -----------------------------------------------------------
-  --If p_BUS_MOD is not null then Return (p_BUS_MOD); end if ;  --when edit 
-  -----------------------------------------------------------
-  begin 		
-		select * into kk from customer where rnk = p_rnk; 
-
-	begin
-	  select k111 
-      into g_k111 
-      from kl_k110 
-      where k110 = kk.ved 
-        and d_close is null;
-  exception 
-    when no_data_found then
-			 g_k111 := null;
-  end;
-	
-  g_busss := kl.get_customerw(p_rnk => p_rnk, p_tag => 'BUSSS');
-	g_bussl := kl.get_customerw(p_rnk => p_rnk, p_tag => 'BUSSL');
-	
---If kk.custtype = 1 then  --БН
-	
-	--l_BUS_MOD := p_BUS_MOD ;
-					
---els
-if kk.Custtype = 2 then  --ЮЛ
-
-		if g_bussl = gc_bussl_dkb then 
-						 if      g_k111 = '35' then l_BUS_MOD :=  6;	
-							 elsif g_k111 member of c_build_types     then l_BUS_MOD :=  7;	
-							 elsif g_k111 member of c_agricult_types  then l_BUS_MOD :=  8;
-							 elsif g_k111 not member of c_other_types then l_BUS_MOD :=  14;
-						 end if;
-		elsif g_bussl = gc_bussl_mmcb then 
-			if       g_busss = gc_busss_mddle then l_BUS_MOD :=  9;
-				elsif  g_busss = gc_busss_small then l_BUS_MOD :=  10;
-				elsif  g_busss = gc_busss_micro then l_BUS_MOD :=  11;				
-				end if; 
-		elsif g_bussl is null or g_busss is null then 
-/*У випадку якщо параметри «Бізнес-напрямок» або(було і) «Бізнес-сектор» для контрагента-юридичної особи не заповнені,
-   то параметр «BUS_MOD» залишається пустим до вибору оператором певного значення. 
-   При цьому заповнення значення цього параметру є обов’язковою умовою для обчислення значення параметру «IFRS»,
-   а отже і для збереження кредитного договору взагалі.*/
-			l_BUS_MOD :=  null; --(6, 7, 8, 9, 10, 11, 14)			
-		end if;
-
-elsif kk.Custtype = 3 and kk.sed = '91' then --ФЛП	 
-	
-		l_BUS_MOD :=  11;
-
-elsif  kk.custtype = 3 then  --ФЛ
--- Для ФО автоматично заповнюватись значенням 12 (збирання грошових коштів за кредитами, виданими фізичним особам).
--- При цьому, можливість редагування цього параметру через інтерфейс користувача повинна бути заборонена.
-
-    l_BUS_MOD := 12;
-end if;
-exception 
- when no_data_found then null;
-end;
-	return   L_BUS_MOD;
-end  f_business_model;
-
-/*function f_sppi(p_sppi sppi.sppi_value%type, p_rnk customer.rnk%type)  --moved to web
-	return SPPI.sppi_value%type  
-\*Вид контрагента  Бізнес-напрямок    Бізнес-сектор   Значення параметру SPPI, що автоматично проставляється
-  Юридична особа    ДКБ                 Будь який          Не проставляється (залишається пустим)
-  Юридична особа    ММСБ                Будь який          Так (Відповідність критерію SPPI («Пройдено»))
-  Юридична особа    Не визначений       Не визначений      Не проставляється (залишається пустим)
-  ФОП,              Будь який           Будь який          Так (Відповідність критерію SPPI («Пройдено»))*\
-is
- l_sppi    SPPI.sppi_value%type;
-begin
-  -----------------------------------------------------------
-  If p_SPPI is not null then Return (p_SPPI); end if ;
-  -----------------------------------------------------------
-  begin select * into kk from customer where rnk = p_rnk ;
-	
-	g_busss := kl.get_customerw(p_rnk => p_rnk, p_tag => 'BUSSS');
-	g_bussl := kl.get_customerw(p_rnk => p_rnk, p_tag => 'BUSSL');
-	 
-   if kk.custtype = 3 then  --ФЛ
-			 l_SPPI := 1;  --Да, 1, Yes 
-	 elsif kk.Custtype = 3 and kk.sed = '91' then --ФЛП			 
-	     l_SPPI := 1;  --«Пройдено»    
-	 elsif kk.custtype = 2 then --ЮЛ
-			 if g_bussl = gc_bussl_dkb then
-		    l_SPPI := null;
-			 elsif g_bussl = gc_bussl_mmcb then	
-				l_SPPI := 1;		
-			 end if;    
-   end if; 
-		 
-		 --Не проставляється (залишається пустим)
-		 if g_busss is null and g_bussl is null  
-			 then 
-			 l_SPPI := null; 
-		 end if;
-			 
-  exception 
-		when no_data_found then null;
-  end;
-  return   l_SPPI ; 
-end f_sppi;*/
-----------------------------
-function f_ifrs(p_BUS_MOD BUS_MOD.BUS_MOD_Id%type, p_sppi SPPI.SPPI_ID%type) return IFRS.ifrs_id%type    
-	IS  
-	l_ifrs IFRS.ifrs_id%type;  
-begin
-    begin
-		 select ifrs into l_ifrs 
-		       from BUSMOD_SPPI_IFRS  bsi
-		      where bsi.bus_mod = p_BUS_MOD 
-				    and bsi.sppi = p_sppi;
-  EXCEPTION 
-		WHEN NO_DATA_FOUND 
-			THEN  null;
-  end;
-  RETURN l_ifrs;
-end f_ifrs;
-----------------------------
-function f_K9 (p_IFRS IFRS.ifrs_id%type, p_poci POCI.id%type ) return K9.k9%type             
-IS
-l_k9 k9.k9%type;
-begin 
-	begin
-		select k9 into l_k9 
-		  from k9 where IFRS = p_IFRS 
-			        and poci = p_poci;
-	EXCEPTION 
-		WHEN NO_DATA_FOUND 
-			THEN  null;
-  end;
-  RETURN l_k9;
-end f_K9;	
------------------
-/*procedure FROM_TO ( p_mode int, p_ND_FROM number, p_TO_PROD varchar ) is -- процедура переклассификации актива
---   p_mode = 1  = c открытием нового дог 
---   p_mode = 0  = Без открытия нового дог 
-   d1  cc_deal%rowtype   ;
-   d2  cc_deal%rowtype   ;
-   FF  cck_ob22%rowtype  ;
-   tt  cck_ob22%rowtype  ;
-   a8  accounts%rowtype  ;
-   a2  accounts%rowtype  ;
-   --SP  specparam%rowtype ;
-   --SI  specparam_int%rowtype ;
-   CA  cc_add%rowtype   ;
-   i8  int_accn%rowtype ;
-   oo  oper%rowtype     ;
-   KK  IFRS%Rowtype     ; 
-   NN  Nd_txt%Rowtype   ; 
-   ------------------------
-   s_Err varchar2(100)  ; 
-   p4_   int;
-   s_DATVZ varchar2(10) ;
-begin
-  begin  
-    s_Err := 'cck_ob22.BBBB.OO='||p_TO_PROD ;  select *   into tt  from cck_ob22 where nbs||ob22 =      p_TO_PROD     and D_CLOSE is null ;
-    s_Err := 'CC_DEAL.nd=' ||    p_ND_FROM  ;  select *   into d1 from cc_deal  where nd = p_ND_FROM and sos < 14  ;
-    If D1.nd = d1.NDG then raise_application_error( -20333,'Не перекласифіковується ген.угода ' || s_Err ); end if ;
-    s_Err := 'cck_ob22.BBBB.OO='||substr(d1.prod,1,6) ;  select *   into ff from cck_ob22 where nbs||ob22 = substr(d1.prod,1,6) and D_CLOSE is null ;
-    s_Err := 'int_accn.8999*LIM' ;                       select a.* into a8 from accounts a, nd_acc n where n.nd = d1.nd and n.acc= a.acc and a.tip='LIM' ;
-                                                         select *   into i8 from int_accn where acc = a8.acc and id = 0 ;
-  exception when no_data_found then raise_application_error( -20333,'Не знайдено ' || s_Err );
-  end;
-
-
-
-
-  If ff.K9  = tt.k9  then raise_application_error( -20333,'Корзина <FROM> = '||ff.k9  || ' та корзина <TO> = '|| tt.k9  || ' співпадають');  end if;
-  If ff.NBS = tt.NBS then raise_application_error( -20333,'Бал.рах <FROM> = '||ff.NBS || ' та Бал.рах <TO> = '|| tt.NBS || ' співпадають');  end if;
-
-  begin select * into KK from IFRS   where k9 = tt.k9;                 exception when no_data_found then raise_application_error( -20333,'Не знайдено корзину № '|| tt.k9 || ' в довіднику IFRS');  end;
-  begin select * into NN from nd_txt where ND = d1.ND and tag ='IFRS'; exception when no_data_found then raise_application_error( -20333,'Не знайдено Дод.рекв <IFRS> для дог.'||d1.ND);  end;
-  If NVL(KK.K9,0) <> NVL(tt.k9, 9) then raise_application_error( -20333,'Дод.рекв <IFRS> дог.'||d1.ND || ' НЕ відповідає коду продукту <TO> = '|| p_TO_PROD );  end if;
-  
-  d2 := d1 ;
-  If p_mode = 1 then  -- c открытием нового дог 
-     D2.nd   := bars_sqnc.get_nextval('s_cc_deal')  ;
-     INSERT INTO cc_deal values D2 ;
-     update   cc_deal  set  ndi = d2.nd where nd = d1.nd ;
-     ----------------------------- cc_add --------------
-     begin  select * into CA from cc_add where nd = d1.ND and adds = 0 ;        INSERT INTO cc_add values CA ;
-     exception when no_data_found then null ;
-     end;
-     ---------------------------------доп.рекв
-     for dop in (select * from nd_txt where nd = d1.ND and tag not in  ('PR_TR' )  )
-     loop begin dop.ND :=D2.ND;  INSERT INTO nd_txt values dop;   exception when others then   if SQLCODE = -00001 then null;   else raise; end if;  end;  end loop;
-
-     ---accounts -8999 -------
-     a8.nls := get_nls4rnk('LIM','8999', a8.rnk, a8.kv, d2.nd);
-     Op_Reg(99,0,0,0, p4_, a8.RNK, a8.nls, a8.kv, A8.NMS, 'LIM', A8.isp, A8.acc);
-     update accounts set nbs = null, tobo = a8.branch, mdate = a8.mdate, accc = a8.acc  where acc = A8.acc;
-     INSERT INTO nd_acc (nd, acc) VALUES ( D2.ND , A8.acc);
-     i8.acc := A8.acc;
-     insert into int_accn    values i8 ;
-     insert into int_ratn (acc, id, BDAT, IR ) values (i8.acc, i8.id, gl.bdate, acrn.fprocn ( i8.acc, 0, gl.bdate ) );
-     -------------------------------- CC_lim--------------
-     INSERT INTO cc_lim (nd,fdat,acc,lim2,sumg, sumo ) select D2.ND, fdat, a8.acc,lim2,sumg, sumo  from  cc_lim where nd = d1.nd ;
-     ---------------------------------cc_sob + ????
-     INSERT INTO cc_sob (ND,FDAT,ISP,TXT ,otm) VALUES (D2.ND, gl.bDATE, gl.auid,'Перекласифікація ' || d1.ND ||' => ' || d2.ND,6);
-  else update cc_deal set prod = p_TO_PROD || substr( prod,7,20) where nd = d1.nd ;
-  end if;
-  INSERT INTO cc_sob (ND,FDAT,ISP,TXT ,otm) VALUES (D1.ND, gl.bDATE, gl.auid,'Перекласифікація ' || d1.ND ||' => ' || d2.ND,6);
-
-
-  -- узнать о предварительном обнулении  счетов, которіе не свойственны новой корзине
-  -- пока предлагаю предварительно пользователю свернуть такие руками
-  for a1 in (select a.* from accounts a, nd_acc n where a.acc = n.acc and n.nd = d1.nd and a.dazs is null and a.rnk =  d1.rnk and a.tip <> 'LIM'
-             order by decode (a.tip, 'LIM', 0, 'SS ',1, 'SP ',2,  'SN ',3, 'SPN', 4, 5)
-            )
-  loop
-      If a1.tip not in ('SS ','SP ','SN ','SPN','SDI','SDF','SDM','SDA') then
-         If d1.nd <> d2.ND then 
-            delete from nd_acc where nd = d1.nd and acc =a1.acc ;
-            insert into nd_acc (nd, acc) values ( d2.nd, a1.acc); 
-         end if;
-         goto NEXT_; 
-      end if; -- доп.счет
-
-      If a1.tip in ('SS ','SN ') OR a1.ostc <> 0  then  --- -открыт новый счет и перебросить остаток
-
-         If    a1.tip = 'SS '                      then a2.NBS :=        tt.NBS           ; a2.ob22 := tt.ob22 ;
-         ElsIf a1.tip = 'SP '                      then a2.NBS :=        tt.NBS           ; a2.ob22 := tt.SP   ;
-         ElsIf a1.tip = 'SN '                      then a2.NBS := Substr(tt.NBS,1,3)||'8' ; a2.ob22 := tt.SN   ;
-         ElsIf a1.tip = 'SPN'                      then a2.NBS := Substr(tt.NBS,1,3)||'8' ; a2.ob22 := tt.SPN  ;
-         ElsIf a1.tip in ('SDI','SDF','SDM','SDA') then a2.NBS := Substr(tt.NBS,1,3)||'6' ; a2.ob22 := tt.SDI  ;
-         else a2.ob22 := null;
-         end if;
-
-         a2.nls := get_nls4rnk( a1.tip, a2.NBS, a1.rnk, a1.kv, d2.nd );
---       Op_Reg_Ex( 1, d2.Nd, 0, a1.GRP, p4_, a1.RNK, a2.NLS, a1.kv, a1.NMS, a1.TIP, a1.ISP, a2.ACC,'1',NULL,NULL,NULL,NULL,NULL,NULL,null,NULL,NULL,NULL,null,a1.branch,NULL ) ;
---       Update accounts set mdate = a1.mdate, accc = decode (a1.accc, null, null, a2.accc) where acc = a2.Acc;
-         cck.cc_op_nls(d2.nd, a1.kv, a2.nls, a1.tip, a1.isp, a1.grp,  null, d1.wdate, a2.acc);
-         If a2.ob22 is not  null then       Accreg.setAccountSParam(a2.acc, 'OB22', a2.ob22 ) ; end if;
-
-\*         -- !!!!! узнать про спец.парам
-         begin select * into SP from specparam where acc = a1.acc ;  SP.acc := a2.acc; INSERT INTO specparam values SP ;
-         exception when no_data_found then null;
-         end;
-         begin select * into SI from specparam_int where acc = a1.acc ;   
-               SI.acc := a2.acc; INSERT INTO specparam_int values SI ;
-         exception when no_data_found then null;
-         end;
-*\
-         -- Для вновь открываемых – я его расчитываю
-         insert into ACCOUNTSW (ACC,TAG,VALUE) select   a2.acc, TAG,VALUE from ACCOUNTSW where acc = a1.acc  and tag <> 'DATVZ'; 
-         If a1.tip in ( 'SP ', 'SPN') then 
-            s_DATVZ := to_char( DAT_SPZ(a1.ACC,gl.Bdate,0), 'DD/MM/YYYY') ;
-            insert into ACCOUNTSW (ACC,TAG,VALUE) values ( a2.acc, 'DATVZ' , s_DATVZ  ) ;
-         end if;
-         -- Связываем счет с новым КД 
-         insert into nd_acc(nd, acc) select  D2.nd,a2.acc from dual where not exists (select 1 from nd_acc where nd= d2.nd and acc=a2.acc) ;
-
-         If a1.ostc  <>  0 then oo.S := Abs( a1.OSTC);
-            If a1.ostc < 0 then oo.dk := 1 ;  
-            else                oo.dk := 0 ; 
-            end if ;
-            oo.nd    := Substr ( d1.cc_id,1,10);
-            oo.kv    := a1.KV;
-            oo.kv2   := a1.KV;
-            oo.nam_a := substr(a1.nms,1,38) ;  oo.nlsa  := a2.nls ;
-            oo.nam_b := substr(a1.nms,1,38) ;  oo.nlsb  := a1.nls ;
-            oo.nazn  := Substr('Перекласифікація КД №'|| d1.cc_id || ' від ' || to_char( d1.sdate,'dd.mm.yyyy') || ' в зв`язку зі зміною принципу обліку Актива по МСФЗ-9',1,160)  ;
-            MSFZ9.opl(oo);
-         end if;
-
-      end if;
-      <<NEXT_>>  null;
-  end loop ; ---a1
-
-end FROM_TO;*/
 
 ---Аномимный блок --------------
 begin

@@ -25,8 +25,7 @@ begin
   execute immediate '
   CREATE TABLE BARS.CCK_CPROD 
    (	CPROD_ID NUMBER, 
-	CPROD_NAME VARCHAR2(70), 
-	PROD_VKB VARCHAR2(20)
+	CPROD_NAME VARCHAR2(70)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -36,18 +35,7 @@ exception when others then
 end; 
 /
 
-declare
-  v_num integer;
-begin
-  select count(1) into v_num
-    from user_tab_columns 
-    where table_name = 'CCK_CPROD'
-      and column_name = 'PROD_VKB';
-  if v_num = 0 then
-    execute immediate 'alter table cck_cprod add prod_vkb varchar2(70)';
-  end if;
-end;
-/
+
 
 
 PROMPT *** ALTER_POLICIES to CCK_CPROD ***
@@ -55,7 +43,6 @@ PROMPT *** ALTER_POLICIES to CCK_CPROD ***
 
 
 COMMENT ON TABLE BARS.CCK_CPROD IS 'Перелік кредитних продуктів';
-COMMENT ON COLUMN BARS.CCK_CPROD.PROD_VKB IS 'Код продукта ВКБ';
 COMMENT ON COLUMN BARS.CCK_CPROD.CPROD_ID IS 'Код продукта';
 COMMENT ON COLUMN BARS.CCK_CPROD.CPROD_NAME IS 'Наименование продукта';
 
@@ -79,7 +66,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CCCPRODID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CCK_CPROD MODIFY (CPROD_ID CONSTRAINT CC_CCCPRODID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CCK_CPROD MODIFY (CPROD_ID CONSTRAINT CC_CCCPRODID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;

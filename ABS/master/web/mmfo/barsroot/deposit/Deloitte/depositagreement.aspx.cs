@@ -11,7 +11,7 @@ using BarsWeb.Core.Logger;
 public partial class DepositAgreement2 : Bars.BarsPage
 {
 
-
+  
     private String _dpt_num;
     private Int64? _rnk;
     private Boolean? ActionsEnabled;
@@ -68,7 +68,7 @@ public partial class DepositAgreement2 : Bars.BarsPage
             return _dpt_num;
         }
     }
-
+    
     /// <summary>
     /// 
     /// </summary>
@@ -83,8 +83,8 @@ public partial class DepositAgreement2 : Bars.BarsPage
 
                 try
                 {
-                    if (closed)
-                        cmd.CommandText = "select d.cust_id as rnk from V_DPT_PORTFOLIO_ALL_CLOSED d where d.dpt_id = :p_dptid";
+                    if(closed)
+                         cmd.CommandText = "select d.cust_id as rnk from V_DPT_PORTFOLIO_ALL_CLOSED d where d.dpt_id = :p_dptid";
                     else
                         cmd.CommandText = "select d.rnk from dpt_deposit d where d.deposit_id = :p_dptid";
 
@@ -131,7 +131,7 @@ public partial class DepositAgreement2 : Bars.BarsPage
         {
             if (Request["rnk_tr"] == null)
                 return null;
-            else
+            else 
                 return Convert.ToInt64(Request["rnk_tr"]);
         }
     }
@@ -171,7 +171,7 @@ public partial class DepositAgreement2 : Bars.BarsPage
 
             //для закритих не відображати нові
             lbNewDopAgr.Visible = !closed;
-
+            
 
             // инициализация источников данных
             InitDataSources();
@@ -225,11 +225,11 @@ public partial class DepositAgreement2 : Bars.BarsPage
                                 return;
                             }
                         }
-
+                        
 
                         // &name={2}&other={3} // , HttpUtility.UrlEncode(TypeName), other
                         String Url = String.Format("/barsroot/deposit/deloitte/depositcommissionquest.aspx?dpt_id={0}&agr_id={1}", dpt_id, TypeID);
-
+                        
                         if (rnk_tr.HasValue)
                             Url += String.Format("&rnk_tr={0}", rnk_tr);
 
@@ -253,7 +253,7 @@ public partial class DepositAgreement2 : Bars.BarsPage
                 break;
         }
     }
-
+    
     /// <summary>
     /// 
     /// </summary>
@@ -263,7 +263,7 @@ public partial class DepositAgreement2 : Bars.BarsPage
     {
         Deposit dpt = new Deposit();
         Decimal AGR_UID = Convert.ToDecimal(lvCA.DataKeys[(e.Item as ListViewDataItem).DataItemIndex]["AGR_UID"]);
-        Decimal AGR_TYPE = Convert.ToDecimal(lvCA.DataKeys[(e.Item as ListViewDataItem).DataItemIndex]["AGR_ID"]);
+    Decimal AGR_TYPE = Convert.ToDecimal(lvCA.DataKeys[(e.Item as ListViewDataItem).DataItemIndex]["AGR_ID"]);
 
 
         switch (e.CommandName)
@@ -287,12 +287,12 @@ public partial class DepositAgreement2 : Bars.BarsPage
                                  String.Format("alert('Заборонено сторнувати дану додаткову угоду для договору №{0}! Створіть відповідну ДУ.'); ", dpt_id), true);
                     return;
                 }
-                /* if (AGR_TYPE == 17)
-                 {
-                     ScriptManager.RegisterStartupScript(this, this.GetType(), "alert_check_condition",
-                                  String.Format("alert('Заборонено сторнувати дану додаткову угоду для договору №{0}!'); ", dpt_id), true);
-                     return;
-                 }*/
+               /* if (AGR_TYPE == 17)
+                {
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert_check_condition",
+                                 String.Format("alert('Заборонено сторнувати дану додаткову угоду для договору №{0}!'); ", dpt_id), true);
+                    return;
+                }*/
                 dpt.ReverseAgreement(AGR_UID);
 
                 //видалення ДУ на регулярного платежу 
@@ -329,46 +329,46 @@ public partial class DepositAgreement2 : Bars.BarsPage
     {
         if (Request.QueryString["inherit_irr_id"] == null)
         {
-            if (!closed)//по закритим договорам заборонено формувати ДУ
-            {
-                // доступные типы ДУ
-                sdsAA1.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
-                sdsAA1.SelectCommand = @"select dat.type_id, dat.type_name, dat.type_description
+        if (!closed)//по закритим договорам заборонено формувати ДУ
+        {
+            // доступные типы ДУ
+            sdsAA1.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
+            sdsAA1.SelectCommand = @"select dat.type_id, dat.type_name, dat.type_description
                                   from v_dpt_agreements_types dat
                                  where dat.dpt_id = :p_dpt_id
                                    and dat.used_ebp = decode(:p_scheme, 'DELOITTE', 1, dat.used_ebp)
                                  order by dat.type_id";
-                sdsAA1.SelectParameters.Clear();
-                sdsAA1.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
-                sdsAA1.SelectParameters.Add("p_scheme", DbType.String, scheme);
+            sdsAA1.SelectParameters.Clear();
+            sdsAA1.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
+            sdsAA1.SelectParameters.Add("p_scheme", DbType.String, scheme);
 
-                sdsAA2.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
-                sdsAA2.SelectCommand = @"select dat.type_id, dat.type_name, dat.type_description
+            sdsAA2.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
+            sdsAA2.SelectCommand = @"select dat.type_id, dat.type_name, dat.type_description
                                   from v_dpt_agreements_types dat
                                  where dat.dpt_id = :p_dpt_id
                                    and dat.used_ebp = 2 ";
-                sdsAA2.SelectParameters.Clear();
-                sdsAA2.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
+            sdsAA2.SelectParameters.Clear();
+            sdsAA2.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
 
-                // Створення / Анулювання довіреності довіреною особою заборонено
-                if (rnk_tr.HasValue)
-                    sdsAA2.SelectCommand += " and dat.type_id Not in (12, 13) ";
+            // Створення / Анулювання довіреності довіреною особою заборонено
+            if (rnk_tr.HasValue)
+                sdsAA2.SelectCommand += " and dat.type_id Not in (12, 13) ";
 
-                sdsAA2.SelectCommand += " order by dat.type_id";
+            sdsAA2.SelectCommand += " order by dat.type_id";
 
-                sdsAA3.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
-                sdsAA3.SelectCommand = @"select dat.type_id, dat.type_name, dat.type_description
+            sdsAA3.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
+            sdsAA3.SelectCommand = @"select dat.type_id, dat.type_name, dat.type_description
                                   from v_dpt_agreements_types dat
                                  where dat.dpt_id = :p_dpt_id
                                    and dat.used_ebp = decode(:p_scheme, 'DELOITTE', 3, dat.used_ebp)
                                  order by dat.type_id";
-                sdsAA3.SelectParameters.Clear();
-                sdsAA3.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
-                sdsAA3.SelectParameters.Add("p_scheme", DbType.String, scheme);
-            }
-            // текущие ДУ
-            sdsCA.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
-            sdsCA.SelectCommand = @"SELECT v.agrmnt_num AS adds,
+            sdsAA3.SelectParameters.Clear();
+            sdsAA3.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
+            sdsAA3.SelectParameters.Add("p_scheme", DbType.String, scheme);
+        }
+        // текущие ДУ
+        sdsCA.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
+        sdsCA.SelectCommand = @"SELECT v.agrmnt_num AS adds,
                                     v.agrmnt_date AS version,
                                     v.agrmnt_type AS agr_id,
                                     v.agrmnt_typename AS agr_name,
@@ -412,9 +412,9 @@ public partial class DepositAgreement2 : Bars.BarsPage
                                     AND c.nd(+) = v.dpt_id
                                     AND c.adds(+) = v.agrmnt_num
                         ORDER BY adds";
-            sdsCA.SelectParameters.Clear();
-            sdsCA.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
-        }
+        sdsCA.SelectParameters.Clear();
+        sdsCA.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
+    }
         else
         { // доступно только ДУ 35 "Дод.договір на дострокове вилучення вкладу за невідкличними депозитами"
             sdsAA1.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
@@ -456,7 +456,7 @@ public partial class DepositAgreement2 : Bars.BarsPage
 
         return res;
     }
-
+    
     /// <summary>
     /// Перевірка:
     /// 1) угода має заключатися мінімум за 5 банківсих днів до дати закінчення договору
@@ -562,9 +562,8 @@ public partial class DepositAgreement2 : Bars.BarsPage
                     _dbLogger.Debug(String.Format("Дод.угоду 35 по договору №{0} не можна формувати {1}", DptID, rdr.GetOracleDecimal(0).Value), "deposit");
                 }
                 else
-                {
-                    res = true;
-                    _dbLogger.Debug(String.Format("Дод.угоду 35 по договору №{0} можна формувати {1}", DptID, rdr.GetOracleDecimal(0).Value), "deposit");
+                {   res = true; 
+                    _dbLogger.Debug(String.Format("Дод.угоду 35 по договору №{0} можна формувати {1}", DptID, rdr.GetOracleDecimal(0).Value), "deposit"); 
                 }
             }
         }
@@ -595,8 +594,8 @@ public partial class DepositAgreement2 : Bars.BarsPage
             {
                 if (Request.QueryString["inherit_irr_id"] == null)
                 {
-                    ActionsEnabled = false;
-                }
+                ActionsEnabled = false;
+            }
                 else { ActionsEnabled = true; }
             }
             else
@@ -607,16 +606,7 @@ public partial class DepositAgreement2 : Bars.BarsPage
             return ActionsEnabled.Value;
         }
     }
-
-    protected bool CommandEnabled(string id)
-    {
-        char wb = ((Deposit)Session["DepositInfo"]).wb;
-        string[] array_wb_codes = { "38", "39", "40" };
-        bool is_deposit_wb = Array.Exists(array_wb_codes, x => x == id);
-        return (is_deposit_wb && wb == 'Y' || !is_deposit_wb && wb == 'N') ? CommandEnabled() : false;
-    }
-
-    #endregion
+    # endregion
 
     // Повернутися на картку договору
     protected void btnBack_Click(object sender, EventArgs e)
@@ -639,6 +629,6 @@ public partial class DepositAgreement2 : Bars.BarsPage
     }
     protected bool Check(object value)
     {
-        return value.ToString()[0] != '5';
+        return value.ToString()[0] != '5'; 
     }
 }

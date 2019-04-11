@@ -1,4 +1,10 @@
-create or replace package ddl_utl is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ddl_utl.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.DDL_UTL is
 
     DEFAULT_SCHEMA constant varchar2(30 char) := 'BARS';
 
@@ -16,9 +22,6 @@ create or replace package ddl_utl is
     column_already_nullable exception;
     column_cant_be_set_nullable exception;
     column_already_not_nullable exception;
-    cant_drop_nonexistent_pk exception;
-    cant_drop_nonexistent_uk exception;
-
     pragma exception_init(name_already_used, -955);
     pragma exception_init(table_can_have_only_one_pk, -2260);
     pragma exception_init(unique_key_already_exists, -2261);
@@ -33,8 +36,6 @@ create or replace package ddl_utl is
     pragma exception_init(column_already_nullable, -2);
     pragma exception_init(column_cant_be_set_nullable, -1451);
     pragma exception_init(column_already_not_nullable, -1442);
-    pragma exception_init(cant_drop_nonexistent_pk, -2441);
-    pragma exception_init(cant_drop_nonexistent_uk, -2442);
 
     procedure execute_statement_autonomous(
         p_statement in varchar2);
@@ -113,12 +114,6 @@ create or replace package ddl_utl is
     procedure drop_index(
         p_index_statement in varchar2);
 
-    procedure drop_primary_key(
-        p_drop_statement in varchar2);
-
-    procedure drop_unique_key(
-        p_drop_statement in varchar2);
-
     procedure drop_constraint(
         p_constraint_statement in varchar2);
 
@@ -141,7 +136,7 @@ create or replace package ddl_utl is
         nested in boolean default false);
 end;
 /
-create or replace package body ddl_utl as
+CREATE OR REPLACE PACKAGE BODY BARS.DDL_UTL as
 
     procedure execute_statement_autonomous(
         p_statement in varchar2)
@@ -376,26 +371,6 @@ create or replace package body ddl_utl as
              null;
     end;
 
-    procedure drop_primary_key(
-        p_drop_statement in varchar2)
-    is
-    begin
-        execute immediate p_drop_statement;
-    exception
-        when cant_drop_nonexistent_pk then
-             null;
-    end;
-
-    procedure drop_unique_key(
-        p_drop_statement in varchar2)
-    is
-    begin
-        execute immediate p_drop_statement;
-    exception
-        when cant_drop_nonexistent_uk then
-             null;
-    end;
-
     procedure drop_index(
         p_index_statement in varchar2)
     is
@@ -475,3 +450,11 @@ create or replace package body ddl_utl as
     end;
 end;
 /
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/ddl_utl.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 

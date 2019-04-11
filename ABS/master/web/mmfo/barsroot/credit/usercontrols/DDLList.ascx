@@ -4,7 +4,7 @@
     <asp:ListItem Text="" Value=""></asp:ListItem>
 </asp:DropDownList>
 <asp:RequiredFieldValidator ID="rfv" runat="server" Enabled="false" Display="None"
-    ControlToValidate="ddl" InitialValue="" ErrorMessage='<%# RequiredErrorText %>' SetFocusOnError="true"></asp:RequiredFieldValidator>
+    ControlToValidate="ddl" InitialValue="" ErrorMessage='<%# RequiredErrorText %>'></asp:RequiredFieldValidator>
 <act:ValidatorCalloutExtender ID="vceRFV" runat="server" Enabled="false" TargetControlID="rfv"
     CloseImageUrl="/Common/Images/default/16/cancel_blue.png" CssClass="validatorCallout"
     WarningIconImageUrl="/Common/Images/default/16/warning.png">

@@ -129,8 +129,7 @@ procedure add_nsifunction (
   p_formname     meta_nsifunction.form_name%type,
   p_checkfunc    meta_nsifunction.check_func%type,
   p_webformname  varchar2 default null,
-  p_iconid       int default 0,
-  p_custom_option meta_nsifunction.custom_options%type default null);
+  p_iconid       int default 0);
 
 procedure add_dependency (
   p_tabid         number,
@@ -686,23 +685,14 @@ begin
                           tab_cond ,
                           src_cond ,
                           COL_DYN_TABNAME)
-                  values (:p_tabid    ,
-                          :p_colid    ,
-                          :p_srctabid ,
-                          :p_srccolid ,
-                          :p_tab_alias,
-                          :p_tab_cond ,
-                          :p_src_cond,
-                          :p_coldyntabname)'
-     using p_tabid    ,
-           p_colid    ,
-           p_srctabid ,
-           p_srccolid ,
-           p_tab_alias,
-           p_tab_cond ,
-           p_src_cond,
-           p_coldyntabname;
-
+                  values ('''||p_tabid        ||''',
+                          '''||p_colid        ||''',
+                          '''||p_srctabid     ||''',
+                          '''||p_srccolid     ||''',
+                          '''||p_tab_alias    ||''',
+                          '''||p_tab_cond     ||''',
+                          '''||p_src_cond     ||''',
+                          '''||p_coldyntabname||''')';
   else
     insert
     into   meta_extrnval (tabid    ,
@@ -813,8 +803,7 @@ procedure add_nsifunction (
   p_formname     meta_nsifunction.form_name%type,
   p_checkfunc    meta_nsifunction.check_func%type,
   p_webformname  varchar2 default null,
-  p_iconid       int default 0,
-  p_custom_option meta_nsifunction.custom_options%type default null)
+  p_iconid       int default 0)
 is
   l_webformname  varchar2(254);
 begin
@@ -829,8 +818,7 @@ begin
                            qst,
                            msg,
                            form_name,
-                           check_func,
-                           custom_options)
+                           check_func)
                    values (p_tabid,
                            p_funcid,
                            p_descr,
@@ -840,8 +828,7 @@ begin
                            p_qst,
                            p_msg,
                            p_formname,
-                           p_checkfunc,
-                           p_custom_option);
+                           p_checkfunc);
 
   begin
     l_webformname := replace(replace(p_webformname, chr(39), chr(39) || chr(39)),
@@ -1444,7 +1431,6 @@ is
   l_msg            meta_nsifunction.msg%type;
   l_form_name      meta_nsifunction.form_name%type;
   l_check_func     meta_nsifunction.check_func%type;
-  l_custom_options meta_nsifunction.custom_options %type;
   l_web_form_name  varchar2(254);
   l_icon_id        int;
 
@@ -1814,10 +1800,9 @@ $end
                    qst       ,
                    msg       ,
                    form_name ,
-                   check_func,
+                  check_func
 --                web_form_name,
---                icon_id,
-                  custom_options 
+--                icon_id
             from   meta_nsifunction
            where  tabid='||to_char(l_tabid)||'
            order by funcid';
@@ -1832,8 +1817,7 @@ $end
                     l_qst      ,
                     l_msg      ,
                     l_form_name,
-                    l_check_func,
-                    l_custom_options;
+                    l_check_func;
 
     begin
     execute immediate 'select web_form_name
@@ -1867,9 +1851,7 @@ $end
                   replace(replace(l_form_name,    chr(39), chr(39)||chr(39)),chr(38),'''||chr(38)||''') || ''', ''' ||
                   replace(replace(l_check_func,   chr(39), chr(39)||chr(39)),chr(38),'''||chr(38)||''') || ''', ''' ||
                   replace(replace(l_web_form_name,chr(39), chr(39)||chr(39)),chr(38),'''||chr(38)||''') || ''', '   ||
-                  nvl(to_char(l_icon_id),'null') ||', ''' || 
-                  replace(replace(l_custom_options,chr(39), chr(39)||chr(39)),chr(38),'''||chr(38)||''') || ''' '||
-                  ');');
+                  nvl(to_char(l_icon_id),'null') || ');');
     add_line('');
   end loop;
   close cur_;

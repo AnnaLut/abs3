@@ -21,11 +21,7 @@ begin
     select crisk into :NEW.FIN from customer where rnk = :NEW.RNK ;
  end if;
  If :NEW.FIN23 is null     then
-  begin
-    select c.crisk into :NEW.FIN23 from customer c, stan_fin f  where c.rnk = :NEW.RNK and c.crisk = F.FIN;
-  exception when NO_DATA_FOUND then
-    null; -- Нет соответсвия поэтому ничего не ставим
-  end;
+    select crisk into :NEW.FIN23 from customer where rnk = :NEW.RNK ;
  end if;
 :NEW.OBS:=:NEW.OBS23;
 :NEW.FIN:=:NEW.FIN23;

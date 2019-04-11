@@ -650,8 +650,6 @@ FUNCTION get_crd_response_new (p_okpo     IN bars.customer.okpo%TYPE,
         raise_application_error(-20001,'No data for ACC ('|| TO_CHAR(p_nls) || ') AND kv ('||TO_CHAR(p_kv) || ') in MFO '|| substr(p_branch,2,6)  );
        end;
 
- -- сохранение параметров клиента
-
      --знаходимо договір w4_acc
      begin
       SELECT t2.nd

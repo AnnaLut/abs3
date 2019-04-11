@@ -15,9 +15,6 @@ using System.Web;
 /// </summary>
 namespace BarsWeb.Areas.Ndi.Models
 {
-    //объект который парсит строку описания(строка с квадратными скобками). 
-    //Весь функционал использует его для информации об общем описании.
-
     public class FunNSIEditFParams
     {
         private string WebFormName;
@@ -46,7 +43,7 @@ namespace BarsWeb.Areas.Ndi.Models
             this.EditMode = settings.EDIT_MODE ?? this.EditMode;
             this.SummVisibleRows = settings.SUMM_VISIBLE == 1 ? "TRUE" : "FALSE";
             this.Conditions = settings.CONDITIONS ?? "";
-            this.CustomOptions = settings.CUSTOM_OPTIONS ?? "";
+            this.CustomOprions = settings.CUSTOM_OPTIONS ?? "";
             this.Code = settings.CODE;
             BuildParams();
 
@@ -68,7 +65,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public Type TargetType { get; set; }
         
         public CallFunctionMetaInfo TargetObject { get; set; }
-        public string CustomOptions { get; set; }
+        public string CustomOprions { get; set; }
         public bool ShowRecordsCount { get; set; }
         public string SaveColumns { get; set; }
         public int? CodeOper { get; set; }
@@ -159,7 +156,7 @@ namespace BarsWeb.Areas.Ndi.Models
             {
                 this.CustomOptionsToClass = optionsToClass.Substring(optionsToClass.IndexOf("CUSTOM_OPTIONS_TO_CLASS=>") + "CUSTOM_OPTIONS_TO_CLASS=>".Length).Trim();
                 this.TargetType = Type.GetType(this.CustomOptionsToClass);
-                this.TargetObject = FormatConverter.JsonToObject<CallFunctionMetaInfo>(this.CustomOptions);
+                this.TargetObject = FormatConverter.JsonToObject<CallFunctionMetaInfo>(this.CustomOprions);
                 this.IsFuncOnly = this.TargetObject.isFuncOnly;
                 this.TargetObject.Code = this.Code;
                 return;
@@ -354,9 +351,9 @@ namespace BarsWeb.Areas.Ndi.Models
             func.SysPar = this.SystemParams;
             func.UploadParams = UploadParams;
             func.ThrowNsiParams = this.ThrowNsiParams;
-            func.UploadExcelParam = this.ConvertParams;
+            func.ConvertParams = this.ConvertParams;
             func.MultiParams = this.MultiParams;
-            func.CUSTOM_OPTIONS = this.CustomOptions;
+            func.CUSTOM_OPTIONS = this.CustomOprions;
             func.OutParams = this.OutParams;
             List<ParamMetaInfo> paramsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.PROC_PAR);
             //List<UploadParamsInfo> uploadParamsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<UploadParamsInfo>(func.PROC_NAME, func.PROC_PAR);
@@ -407,7 +404,7 @@ namespace BarsWeb.Areas.Ndi.Models
             func.UploadParams = this.UploadParams;
             func.PROC_EXEC = GetProcExec(func, this);
             func.ThrowNsiParams = this.ThrowNsiParams;
-            func.UploadExcelParam = this.ConvertParams;
+            func.ConvertParams = this.ConvertParams;
             return func;
         }
 

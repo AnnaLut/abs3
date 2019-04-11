@@ -2,7 +2,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pkg_dkbo_utl.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-create or replace package pkg_dkbo_utl is
+create or replace package bars.pkg_dkbo_utl is
 
   g_header_version   CONSTANT VARCHAR2(64) := 'version 6.0 01/12/2018';
 
@@ -49,6 +49,9 @@ create or replace package pkg_dkbo_utl is
 
 end pkg_dkbo_utl;
 /
+show errors
+
+
 
 CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
   g_body_version     CONSTANT VARCHAR2(64) := 'version 6.01 03/04/2018';
@@ -64,7 +67,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
   deal_type_id  deal.deal_type_id%TYPE;
   deal_id       deal.id%TYPE;
   deal_date_to  deal.close_date%TYPE;
-  deal_state_id number;
+  deal_state_id deal.state_id%TYPE;
   /*****************************************************************************
     FUNCTION header_version
   *****************************************************************************/
@@ -347,30 +350,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
   *********************************************/
   FUNCTION f_get_deal_state(in_deal_number IN INTEGER DEFAULT NULL)
     RETURN NUMBER IS
-       invalid_identifier_state_id exception;
-       pragma exception_init(invalid_identifier_state_id, -904);
   BEGIN
-        begin
-            -- попытка выполнить запрос с возвращением поля STATE_ID из OBJECT_STATE
-            execute immediate 'select state_id from object_state o where o.state_code = :p_state_code '
-              into deal_state_id using lc_deal_state_code;
-            -- выполнилось без ошибки выходим
-            return deal_state_id;
-        exception
-           when invalid_identifier_state_id then
-              null;
-        end;
-        begin
-            -- попытка выполнить запрос с возвращением поля STATE_ID из OBJECT_STATE
-            execute immediate 'select id from object_state o where o.state_code = :p_state_code '
-              into deal_state_id using lc_deal_state_code;
-            -- выполнилось без ошибки выходим
-            return deal_state_id;
-        exception
-           when invalid_identifier_state_id then
-              null;
-        end;
-        return null;  
+    BEGIN
+      SELECT o.state_id
+        INTO deal_state_id
+        FROM object_state o
+       WHERE o.state_code = lc_deal_state_code;
+    EXCEPTION
+      WHEN no_data_found THEN
+        NULL;
+    END;
+    RETURN deal_state_id;
   END f_get_deal_state;
   /*****************************************************************************
     PROCEDURE p_acc_ins
@@ -448,9 +438,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
     l_all_acc_list   number_list;
     resourse_busy EXCEPTION;
     PRAGMA EXCEPTION_INIT(resourse_busy, -00054);
-   
-    plsql_error_6550 exception;
-    pragma exception_init(plsql_error_6550, -6550);
     CURSOR get_rnk (n_RNK customer.rnk%TYPE)  IS
     SELECT * FROM customer  where rnk=n_RNK
     FOR UPDATE  OF customer.rnk NOWAIT;
@@ -469,90 +456,19 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
                                    ,'У клієнта з РНК ' || in_customer_id ||
                                     ' знайдено кілька договорів ДКБО.Необхідно вказати номер ДКБО до якого потрібно приєднати рахунки');
           ELSIF deal_id IS NULL THEN
-            
             deal_number  := f_set_new_deal_numb(in_customer_id, in_dkbo_date_from);
             deal_type_id := f_get_deal_type(NULL);
-            /*
-            -- было
             deal_id      := bars.deal_utl.create_deal(p_deal_type_id => deal_type_id
                                                      ,p_deal_number  => deal_number
                                                      ,p_customer_id  => in_customer_id
                                                      ,p_product_id   => NULL
                                                      ,p_start_date   => in_dkbo_date_from);
-            */
-            begin                                               
-              -- new call                                                      
-                execute immediate 
-                   q'[begin
-                          :deal_id := bars.deal_utl.create_deal(
-                                                          p_deal_type_code => :deal_type_code
-                                                         ,p_deal_number    => :deal_number
-                                                         ,p_customer_id    => :in_customer_id
-                                                         ,p_product_id     => NULL
-                                                         ,p_start_date     => :in_dkbo_date_from
-                                                         ,p_state_code     => :LC_DEAL_STATE_CODE
-                                                         );
-                      end;]'
-                using out deal_id, lc_deal_type_code, deal_number, in_customer_id, in_dkbo_date_from, LC_DEAL_STATE_CODE ;
-             exception
-              -- ожидаемая ошибка, wrong number or types of arguments in call 'xxxx'
-              when plsql_error_6550 then
-               if sqlerrm like '%PLS-%306%' then
-                   -- old
-                   -- вызов старого блока, без exception 
-                   begin
-                      -- если первый блок не отработал, то этот должен ()                                              
-                       execute immediate 
-                           q'[begin
-                                  :deal_id := 
-                                  bars.deal_utl.create_deal(
-                                                             p_deal_type_id => :deal_type_id
-                                                            ,p_deal_number  => :deal_number
-                                                            ,p_customer_id  => :in_customer_id
-                                                            ,p_product_id   => NULL
-                                                            ,p_start_date   => :in_dkbo_date_from);
-                              end;
-                              ]'
-                       using out deal_id, deal_type_id, deal_number, in_customer_id, in_dkbo_date_from;
-                   end;  
-               else 
-                   raise; 
-               end if;    
-            end;
             -- Присвоюємо договору статус
             deal_state_id := f_get_deal_state(NULL);
             IF deal_state_id IS NOT NULL THEN
-               /*
-                -- было
-                bars.deal_utl.set_object_state_id(p_deal_id  => deal_id
+              bars.deal_utl.set_object_state_id(p_deal_id  => deal_id
                                                ,p_state_id => deal_state_id);
-                */
-               -- new, новый функционал  
-               begin 
-                    execute immediate
-                      q'[begin
-                           bars.object_utl.set_object_state(p_object_id => :deal_id
-                                                           ,p_state_id  => :deal_state_id);
-                         end;]'
-                    using deal_id, deal_state_id;
-               exception
-                   when plsql_error_6550 then
-                     -- ожидаемая ошибка, component 'xxxx' must be declared
-                     if sqlerrm like '%PLS-%302%' then
-                        -- old
-                        -- вызов старого блока, без exception
-                        begin
-                            execute immediate
-                              q'[begin
-                                   bars.deal_utl.set_object_state_id(p_deal_id  => :deal_id
-                                                                    ,p_state_id => :deal_state_id);
-                                 end;]'
-                            using deal_id, deal_state_id;
-                       end;          
-                    else
-                        raise;
-                    end if;    
-               end;          
+
             END IF;
           ELSIF deal_id IS NOT NULL
                 AND deal_id <> -999 THEN
@@ -718,9 +634,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
   END f_dkbo_list_print;
 END pkg_dkbo_utl;
 /
-
+show errors
 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/pkg_dkbo_utl.sql =========*** End *** ==
- PROMPT =====================================================================================
-
+ PROMPT ===================================================================================== 

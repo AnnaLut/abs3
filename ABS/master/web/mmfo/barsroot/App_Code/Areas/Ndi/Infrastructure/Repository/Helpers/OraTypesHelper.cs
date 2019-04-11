@@ -8,7 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Web;
+using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
 using Oracle.DataAccess.Types;
+using System.Text;
 /// <summary>
 /// Summary description for OraTypesHelper
 /// </summary>
@@ -50,7 +53,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
             return dictionaryList;
         }
 
-        static public List<OraDictionary> BuildRowsDataDict(List<CallFuncRowParam> RowsData, UploadExcelParams multiParam)
+        static public List<OraDictionary> BuildRowsDataDict(List<CallFuncRowParam> RowsData, ConvertParams multiParam)
         {
 
             List<OraDictionary> dictionaryList = new List<OraDictionary>();
@@ -92,8 +95,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
             {
                 List<OraDictionary> oraDictionary;
                 OracleParameter dictionaryParameter = new OracleParameter(item.ColName, OracleDbType.Array, ParameterDirection.Input);
-                if(item is UploadExcelParams)
-                    oraDictionary = OraTypesHelper.BuildRowsDataDict(dataModel.RowsData, item as UploadExcelParams);
+                if(item is ConvertParams)
+                    oraDictionary = OraTypesHelper.BuildRowsDataDict(dataModel.RowsData, item as ConvertParams);
                 else
                     oraDictionary =  OraTypesHelper.BuildRowsDataDict(dataModel.RowsData, item);
                 dictionaryParameter.Value = (OraDictionaryList)oraDictionary;
@@ -107,8 +110,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
         {
             OracleCommand command = oraConnector.GetCommand;
             oraConnector.CommandClob = new OracleClob(oraConnector.GetConnOrCreate);
-            ExcelImporter excelImporter = new ExcelImporter(oraConnector);
-             excelImporter.WriteExcelFileToClob(dataModel.UploadedFile, callFunction,oraConnector);
+            ExcelHelper excelHelper = new ExcelHelper();
+             excelHelper.GetExcelResByBytes(dataModel.UploadedFile, callFunction, oraConnector);
                  
             
             oraConnector.GetCommand.Parameters.Add(new OracleParameter("p_clob", OracleDbType.Clob, oraConnector.CommandClob, ParameterDirection.Input));

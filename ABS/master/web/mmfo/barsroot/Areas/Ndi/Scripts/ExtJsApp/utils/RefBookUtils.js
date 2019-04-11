@@ -20,78 +20,33 @@
              thisUtils.formatDataValue(param.Value,param.Type,null)
              saveInPageParams.ReplaceModels.ReplaceSemanticFields.push(param);
              return saveInPageParams;
+
+
          },
-         setToLocalSrorage: function (key,value) {
-             if(!key)
-                 return;
-            var myLocalStore = Ext.state.LocalStorageProvider.create();
-            myLocalStore.set(key, value);
-        },
-
-        getFromLocalSrorage: function (key) {
-            if(!key)
-                return;
-            var myLocalStore = Ext.state.LocalStorageProvider.create();
-            return myLocalStore.get(key);
-        },
-
-        syncHiddenColumnsToLocalStorage: function (grid) {
-             var Util = this;
-
-            var hiddenColModel = grid.metadata.localStorageModel.HiddenColumnsViewModel;
-            hiddenColModel.HiddenColumns = Util.getColumnsHiddenFromGrid(grid);
+         setHiddenColumnsToLocalSrorage: function (columnNames, localStorageModel) {
+            
             var columnsNamesString = '';
-
-            if (hiddenColModel.HiddenColumns && hiddenColModel.HiddenColumns.length)
+            if (columnNames.length)
             {
-                Ext.each(hiddenColModel.HiddenColumns, function (name) {
+                Ext.each(columnNames, function (name) {
                     columnsNamesString += name + ',';
                 });
-                Util.setDisabledClearColumnBtn(false);
+               
             }
             columnsNamesString = columnsNamesString.slice(0, -1);
-            Util.setToLocalSrorage(hiddenColModel.HiddenColumnsKey,columnsNamesString);
-        },
-
-        syncHiddenColumnsFromLocalStorage: function (grid) {
-             var Util = this;
-
-            var savedHiddenColumns = grid.metadata.saveColumnsParam ?
-                Util.getHiddenColumnsFromLocalSrorage(grid.metadata.localStorageModel)
-                : '';
-
-            if (savedHiddenColumns &&  savedHiddenColumns.length)
-            {
-                Ext.each(grid.columns, function (column) {
-                    if (Ext.Array.contains(savedHiddenColumns, column.dataIndex)) {
-                        column.hide();
-                    }
-                });
-                Util.setDisabledClearColumnBtn(false);
-            }
-
-        },
-
-        setDisabledSaveColumnBtn: function (disable) {
-            var saveColumnsButton =  Ext.getCmp('saveColumnsButton');
-            if(saveColumnsButton)
-                saveColumnsButton.setDisabled(disable);
-
-        },
-        setDisabledClearColumnBtn: function (disable) {
-            var cleareColumnsButton =  Ext.getCmp('cleareColumnsButton');
-            if(cleareColumnsButton)
-                cleareColumnsButton.setDisabled(disable);
+            var myLocalStore = Ext.state.LocalStorageProvider.create();
+            myLocalStore.set(localStorageModel.HiddenColumnsKey, columnsNamesString);
         },
 
         clearHiddenColumnsFromLocalSrorage: function (localStorageModel) {
-            var Util = this;
-            Util.setToLocalSrorage(localStorageModel.HiddenColumnsViewModel.HiddenColumnsKey,'');
+            var myLocalStore = Ext.state.LocalStorageProvider.create();
+            myLocalStore.set(localStorageModel.HiddenColumnsKey, '');
         },
         getHiddenColumnsFromLocalSrorage: function (localStorageModel) {
-            var Util = this;
+            
             var hiddenColumns;
-            var hiddenColumnsNames = Util.getFromLocalSrorage(localStorageModel.HiddenColumnsViewModel.HiddenColumnsKey);
+            var myLocalStore = Ext.state.LocalStorageProvider.create();
+            var hiddenColumnsNames = myLocalStore.get(localStorageModel.HiddenColumnsKey);
             if (hiddenColumnsNames)
                 hiddenColumns = hiddenColumnsNames.split(",");
             return hiddenColumns;
@@ -421,13 +376,13 @@
 
         getColumnsHiddenFromGrid: function (grid) {
             
-            var columnsUnVisible = [];
+            columnsVisible = [];
             Ext.each(grid.columns, function (column, index) {
                 if (column.isHidden()) {
-                    columnsUnVisible.push(column.dataIndex);
+                    columnsVisible.push(column.dataIndex);
                 }
             });
-            return columnsUnVisible;
+            return columnsVisible;
 
         },
 
@@ -499,23 +454,6 @@
 
             return strForReplace;
         },
-
-        replaceParamsFromRowWithQuotes: function (rowArray, strForReplace) {
-            Ext.each(rowArray, function (param) {
-                var par = ':' + param.Name;
-                if (strForReplace.indexOf(par) > -1)
-                {
-                    if(param.Value === '')
-                        strForReplace = strForReplace = strForReplace.replace(par, "''");
-                    else
-                        strForReplace = strForReplace.replace(par, param.Value);
-                }
-
-            })
-
-            return strForReplace;
-        },
-
         replaceLastParameter:function (rowArray, strForReplace) {
             Ext.each(rowArray, function (param) {
                 var par = ':' + param.Name;
@@ -620,6 +558,9 @@
                     if (!thisUtils.isEquelValues(record.data[item.Name], item.Value))
                         record.set(item.Name, item.Value)
                 })
+        },
+        deleteFromEditRowsByKeys: function (recordForDelete, keys) {
+
         },
         updateOrAddRecordsForUpdate: function (AddEditRowsInform, record, columnsInfo) {
             var keyNames = AddEditRowsInform.keyNames;
@@ -830,7 +771,7 @@
                 return null;
             thisUtils = this;
             var metadata = grid.metadata;
-            var columnsinfo = metadata.nativeMetaColumns;
+            var columnsinfo = metadata.nativeMetaColumns
             var addingArray = new Array();
             Ext.each(records, function (record) {
                 if (record.phantom) {
@@ -934,34 +875,6 @@
 
         },
 
-        executeDepActionForRecord: function ( record,rowArray, dependency) {
-
-            var Util = this;
-            if(!record || !dependency || !dependency.DepColName)
-                return;
-            var _depColName = dependency.DepColName;
-            if (dependency.ActionType == "SETVALUE") {
-                var execSatValue = true;
-                if(dependency.DefaultValue != undefined)
-                {
-                    if(dependency.Condition)
-                    {
-                        
-                        var condition =  Util.replaceParamsFromRowWithQuotes(rowArray, dependency.Condition);
-                        if(!eval(condition))
-                            return false;
-                    }
-
-                    if(dependency.DefaultValue == 'null')
-                        record.set(_depColName, '');
-                    else
-                        record.set(_depColName,dependency.DefaultValue);
-                }
-
-            }
-
-        },
-
         executeDepAction: function (form, record, dependency) {
             if (!form)
                 return;
@@ -1023,41 +936,10 @@
 
         },
 
-        onBeforeEditRowByDependencies: function (column, newValue, oldValue, event) {
-            var grid = column.up('grid');
-
-            var Util = this;
-            if(!grid || !grid.metadata || !grid.metadata.CurrentActionInform || !grid.metadata.CurrentActionInform.lastClickRowInform
-                || !grid.metadata.CurrentActionInform.lastClickRowInform.currentSelectedRecord)
-                return;
-            var depColsInfo  = ExtApp.utils.RefBookUtils.getDependColsInfo(grid.metadata.nativeMetaColumns);
-
-            if (!depColsInfo || depColsInfo.length < 1 )
-                return;
-            var record = grid.metadata.CurrentActionInform.lastClickRowInform.currentSelectedRecord;
-            var rowArray = Util.buildRowToArray(record, grid.metadata.nativeMetaColumns);
-            Ext.each(depColsInfo,function (col) {
-                if (col.COLNAME != column.name)
-                    return false;
-                Ext.each(col.Dependencies, function (dep) {
-                    if(dep.Event == event)
-                        Util.executeDepActionForRecord( record,rowArray, dep);
-                });
-
-
-
-
-            });
-
-
-
-        },
-
         getDependColsInfo: function (columnsInfo) {
             return Ext.Array.filter(columnsInfo, function (item) { return item.Dependencies && item.Dependencies.length > 0 });
         },
 
-        //для однострочного редактирования(через форму)
         parsDependencies: function (form, record, dependency) {
             var Util = this;
             if (!form)
@@ -1072,21 +954,19 @@
                 case 'CHECK':
                     {
                         if (srcValue)
-                            Util.executeDepAction(form,record, dependency);
+                            Util.executeDepAction(form, record, dependency);
                         break;
                     }
                 case 'UNCHECK':
                     {
                         if (!srcValue)
-                            Util.executeDepAction(form,record, dependency);
+                            Util.executeDepAction(form, record, dependency);
                         break;
                     }
                 default:
                     break;
             }
         },
-        //для многострочного редактирования строк(без формы)
-
 
         calculateLabelWidth: function (label) {
             if (label < 10) {

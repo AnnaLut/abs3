@@ -30,7 +30,6 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Abstract
         void UpdateSyncParams(CreateParams param);
         void DeleteSyncParams(CreateParams param);
         string CreateDealEWA(ParamsEwa parameters, OracleConnection connection);
-        string SendAccStatus(int id,string state);
         byte[] GetReport(decimal insextid, decimal insexttmp, bool? draft);
         string GetParameter(string par);
     }

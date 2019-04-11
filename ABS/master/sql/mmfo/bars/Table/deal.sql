@@ -1,36 +1,55 @@
-BEGIN
-    execute immediate
-    'begin  
-         bpa.alter_policy_info(''DEAL'', ''FILIAL'' , null, null, null, null);
-         bpa.alter_policy_info(''DEAL'', ''WHOLE'' , null, null, null, null);
-     end;';
-END;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DEAL.sql =========*** Run *** ========
+PROMPT ===================================================================================== 
+
+
+PROMPT *** ALTER_POLICY_INFO to DEAL ***
+
+
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''DEAL'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''DEAL'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''DEAL'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
 /
 
-declare
-    name_already_used exception;
-    pragma exception_init(name_already_used, -955);
+PROMPT *** Create  table DEAL ***
 begin 
-    execute immediate
-    'CREATE TABLE BARS.DEAL 
-    (
-            ID NUMBER(38,0), 
-            DEAL_TYPE_ID NUMBER(38), 
-            DEAL_NUMBER VARCHAR2(30 CHAR), 
-            CUSTOMER_ID NUMBER(38), 
-            PRODUCT_ID NUMBER(38), 
-            START_DATE DATE, 
-            EXPIRY_DATE DATE, 
-            CLOSE_DATE DATE, 
-            BRANCH_ID VARCHAR2(30 CHAR), 
-            CURATOR_ID NUMBER(38)
-    )
-    TABLESPACE BRSMDLD';
-exception
-    when name_already_used then
-         null;
+  execute immediate '
+  CREATE TABLE BARS.DEAL 
+   (	ID NUMBER(10,0), 
+	DEAL_TYPE_ID NUMBER(5,0), 
+	DEAL_NUMBER VARCHAR2(30 CHAR), 
+	CUSTOMER_ID NUMBER(38,0), 
+	PRODUCT_ID NUMBER(5,0), 
+	START_DATE DATE, 
+	EXPIRY_DATE DATE, 
+	CLOSE_DATE DATE, 
+	STATE_ID NUMBER(5,0), 
+	BRANCH_ID VARCHAR2(30 CHAR), 
+	CURATOR_ID NUMBER(38,0)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+
+
+
+
+PROMPT *** ALTER_POLICIES to DEAL ***
+ exec bpa.alter_policies('DEAL');
+
 
 COMMENT ON TABLE BARS.DEAL IS 'Угоди банку з клієнтами.';
 COMMENT ON COLUMN BARS.DEAL.ID IS 'Ідентифікатор угоди';
@@ -41,14 +60,19 @@ COMMENT ON COLUMN BARS.DEAL.PRODUCT_ID IS 'Банківський продукт, що надається за 
 COMMENT ON COLUMN BARS.DEAL.START_DATE IS 'Дата початку дії угоди';
 COMMENT ON COLUMN BARS.DEAL.EXPIRY_DATE IS 'Дата завершення дії угоди';
 COMMENT ON COLUMN BARS.DEAL.CLOSE_DATE IS 'Дата фактичного закриття угоди';
+COMMENT ON COLUMN BARS.DEAL.STATE_ID IS 'Стан угоди';
 COMMENT ON COLUMN BARS.DEAL.BRANCH_ID IS 'Філіал заключення угоди';
 COMMENT ON COLUMN BARS.DEAL.CURATOR_ID IS 'Ідентифікатор співробітника банку - куратора угоди';
 
-begin
-    execute immediate 'ALTER TABLE BARS.DEAL ADD CONSTRAINT CC_DEAL_CUSTOMER_ID_NN CHECK (CUSTOMER_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception
-    when others then
-         if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+
+
+
+PROMPT *** Create  constraint CC_DEAL_CUSTOMER_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEAL ADD CONSTRAINT CC_DEAL_CUSTOMER_ID_NN CHECK (CUSTOMER_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
@@ -157,21 +181,14 @@ exception when others then
 /
 
 
-declare
-    name_already_used exception;
-    such_constraint_already_exists exception;
-    pragma exception_init(name_already_used, -955);
-    pragma exception_init(such_constraint_already_exists, -2275);
-begin
-    execute immediate 'ALTER TABLE DEAL ADD CONSTRAINT FK_DEAL_REF_OBJECT FOREIGN KEY (ID) REFERENCES OBJECT (ID)';
-exception
-    when name_already_used or such_constraint_already_exists then
-         null;
-end;
-/
-
 
 PROMPT *** Create  grants  DEAL ***
 grant SELECT                                                                 on DEAL            to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on DEAL            to BARS_DM;
 grant SELECT                                                                 on DEAL            to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/DEAL.sql =========*** End *** ========
+PROMPT ===================================================================================== 

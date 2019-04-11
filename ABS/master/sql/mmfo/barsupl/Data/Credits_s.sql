@@ -34,9 +34,7 @@ select
                           ,VIDD_CUSTTYPE
 						  ,ob22
 						  ,nms
-						  ,nls_SG
-                                                  ,acc_SS   
-
+						  ,nls
                    from bars_dm.credits_stat c
                    where c.per_id=bars_dm.dm_import.GET_PERIOD_ID('DAY',nvl(to_date(:param1, 'dd/mm/yyyy'), trunc(sysdate)))
 				   and kf = sys_context('bars_context', 'user_mfo')
@@ -44,13 +42,13 @@ select
 l_descript varchar2(250) := q'[CRM, Платіжні картки, зміни]';
 begin
     insert into upl_sql(sql_id, sql_text, descript, vers)
-    values (52, l_sql_text, l_descript, '1.0');
+    values (59, l_sql_text, l_descript, '1.0');
 exception
     when dup_val_on_index then
         update barsupl.upl_sql
         set sql_text = l_sql_text,
             descript = l_descript,
-            vers = '1.5'
+            vers = '1.3'
         where sql_id = 52;
 end;
 /
@@ -160,13 +158,7 @@ begin
     values (52, 30, 'nms', 'Название счета', 'VARCHAR2', 70, null, null, null, 'Y', null, null, null, null, null);
 	
 	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-    values (52, 31, 'nls_SG', 'Номер рахунку оплати', 'VARCHAR2', 15, null, null, null, 'Y', null, null, null, null, null);
-
-     insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-    values (52, 32, 'acc_SS', 'Номер ACC основного рахунку', 'NUMBER', 15, 0, null, null, 'Y', null, null, null, null, null);
-
-
-
+    values (52, 31, 'NLS', 'Номер рахунку', 'VARCHAR2', 15, null, null, null, 'Y', null, null, null, null, null);
 
 end;
 /

@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+﻿$(document).ready(function() {
 
     // MainGridToolBar:
     $("#UsersConfigToolBar").kendoToolBar({
@@ -6,16 +6,16 @@
             { template: "<button id='pbAddUser' type='button' class='k-button' title='Додати користувача'><i class='pf-icon pf-16 pf-add_button'></i></button>" },
             { template: "<button id='pbEditUser' type='button' class='k-button' title='Редагувати користувача'><i class='pf-icon pf-16 pf-tool_pencil'></i></button>" },
             { template: "<button id='pbDropUser' type='button' class='k-button' title='Видалити користувача'><i class='pf-icon pf-16 pf-delete_button_error'></i></button>" },
-            // { template: "<button id='pbCloneUser' type='button' class='k-button' title='Клонувати користувача'><i class='pf-icon pf-16 pf-accept_doc'></i></button>" },
-            // { template: "<button id='pbSendUsersActives' type='button' class='k-button' title='Передати рахунки користувача'><i class='pf-icon pf-16 pf-list-arrow_right'></i></button>" },
+           // { template: "<button id='pbCloneUser' type='button' class='k-button' title='Клонувати користувача'><i class='pf-icon pf-16 pf-accept_doc'></i></button>" },
+           // { template: "<button id='pbSendUsersActives' type='button' class='k-button' title='Передати рахунки користувача'><i class='pf-icon pf-16 pf-list-arrow_right'></i></button>" },
             { template: "<button id='pbUnblockUser' type='button' class='k-button' title='Розблокувати користувача'><i class='pf-icon pf-16 pf-security_unlock'></i></button>" },
             { template: "<button id='pbBlockUser' type='button' class='k-button' title='Заблокувати користувача'><i class='pf-icon pf-16 pf-security_lock'></i></button>" },
-            // { template: "<button id='pbLoadUsersRes' type='button' class='k-button' title='Вигрузити ресурси користувача'><i class='pf-icon pf-16 pf-arrow_download'></i></button>" }
-            { template: "<button id='pbFilter' type='button' class='k-button' title='Складний фільтр'><i class='pf-icon pf-16 pf-filter-ok'></i></button>" },
-            { template: "<button id='pbRefresh' type='button' class='k-button' title='Оновити грід'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>" }
+           // { template: "<button id='pbLoadUsersRes' type='button' class='k-button' title='Вигрузити ресурси користувача'><i class='pf-icon pf-16 pf-arrow_download'></i></button>" }
+           { template: "<button id='pbFilter' type='button' class='k-button' title='Складний фільтр'><i class='pf-icon pf-16 pf-filter-ok'></i></button>" },
+           { template: "<button id='pbRefresh' type='button' class='k-button' title='Оновити грід'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>" }
         ]
     });
-
+   
     // Create user
     $("#CreateUserWindow").kendoWindow({
         title: "Введення даних нового користувача",
@@ -41,7 +41,7 @@
     });
 
     $("#addBranchBtn").kendoButton({
-        click: function () {
+        click: function() {
             $("#branchWindow").data("kendoWindow").center().open();
         },
         enable: true
@@ -55,7 +55,7 @@
     });
 
     function cleanUp() {
-
+        
         $(":input").val("");
 
         $('#absBox :input').attr('disabled', true);
@@ -82,7 +82,7 @@
         }
     });
 
-
+    
 
     $("#pbFilter").kendoButton({
         click: function () {
@@ -93,24 +93,21 @@
                     paramObj.urlParams = response.join(' and ');
                     //localStorage.setItem('paramObj', JSON.stringify(paramObj));
 
-                    //grid.dataSource.read({
-                    //    parameters: paramObj.urlParams
-                    //});
-
-                    grid.dataSource.read();
+                    grid.dataSource.read({
+                        parameters: paramObj.urlParams
+                    });
                 }
             }, { tableName: "V_STAFF_USER_ADM" });
         }
     });
 
     $("#pbRefresh").kendoButton({
-        click: function () {
+        click: function() {
             paramObj.urlParams = '';
 
-            //$("#ADMUGrid").data("kendoGrid").dataSource.read({
-            //    parameters: paramObj.urlParams
-            //});
-            $("#ADMUGrid").data("kendoGrid").dataSource.read();
+            $("#ADMUGrid").data("kendoGrid").dataSource.read({
+                parameters: paramObj.urlParams
+            });
         }
     });
 
@@ -139,10 +136,10 @@
             }
         }
     });
-
+    
     var editFormTabs = $("#edit-form-tabs").kendoTabStrip().data("kendoTabStrip");
     editFormTabs.select(0);
-
+    
     $("#btnCancel-editing").kendoButton({
         click: function () {
             $("#EditUserWindow").data("kendoWindow").close();
@@ -158,10 +155,10 @@
     });
 
     // ********************************************************************************************************
-
+    
     function initChangePasswordBtn() {
         $("#changePassword").kendoButton({
-            click: function () {
+            click: function() {
 
                 var gridAdmu = $("#ADMUGrid").data("kendoGrid"),
                     currentRow = gridAdmu.dataItem(gridAdmu.select());
@@ -183,7 +180,7 @@
                 }
             },
             enable: false
-        });
+    });
     }
 
     function initAbsChangeOptions(authMode) {
@@ -195,7 +192,7 @@
             resizable: false,
             actions: ["Close"]
         });
-
+                
         function changeUserAbsPassword() {
             var login = $("#ed_login").val(),
                 password = hex_sha1($("#chPass-ABS").val());
@@ -222,7 +219,7 @@
             },
             enable: false
         });
-
+       
         $("#cencelChPass-ABS").kendoButton({
             click: function () {
                 $("#changePass-ABS").data("kendoWindow").close();
@@ -230,7 +227,7 @@
             },
             enable: true
         });
-
+        
         function absChangePasswordCompare() {
             var password = $("#chPass-ABS").val(),
                 confirmPass = $("#chPassConfirm-ABS").val();
@@ -261,7 +258,7 @@
 
         function changeUserOraPassword() {
             var login = $("#ed_login").val(),
-                password = $("#chPass-ORA").val();
+            password = $("#chPass-ORA").val();
 
             return {
                 login: login,
@@ -317,7 +314,7 @@
             enable: false
         });
     }
-
+    
     function initDelegateUserRights(data) {
         /*  Кнопка активна тільки для статусів користувача: Активний, Блокований  */
         $("#delegateUserRightsWindow").kendoWindow({
@@ -384,7 +381,7 @@
         });
 
         $("#cencelDelegateOptions").kendoButton({
-            click: function () {
+            click: function() {
                 $("#delegateUserRightsWindow").data("kendoWindow").close();
             }
         });
@@ -488,8 +485,8 @@
 
     function lockUserConfirm() {
         var winLock = $("#lockWindow").data("kendoWindow"),
-            lockInfoBox = $("#lockInfoBox"),
-            lockTemplate = kendo.template($("#lockUser-template").html());
+                    lockInfoBox = $("#lockInfoBox"),
+                    lockTemplate = kendo.template($("#lockUser-template").html());
         var gridAdmu = $("#ADMUGrid").data("kendoGrid"),
             currentRow = gridAdmu.dataItem(gridAdmu.select());
 
@@ -510,10 +507,10 @@
         $("#unlock").unbind("click");
 
         $("#unlock").kendoButton({
-            click: function () {
+            click: function() {
                 bars.ui.confirm({
                     text: 'Розблокувати користувача?'
-                }, function () {
+                }, function() {
                     unlockUser();
                 });
             }
@@ -540,11 +537,11 @@
                         arr[j].disabled = false;
                     }
                 }
-            }
+            } 
         }
     }
 
-
+    
     function initEditOraRoles(data) {
         var editTree = $("#edit-oraRoles-grid").data("kendoGrid"),
             currentRoles = data.UserOraRoles, // []
@@ -566,11 +563,17 @@
             cleanUp();
 
             var gridAdmu = $("#ADMUGrid").data("kendoGrid"),
-                currentRow = gridAdmu.dataItem(gridAdmu.select());
+            currentRow = gridAdmu.dataItem(gridAdmu.select());
 
             if (currentRow) {
                 $("#edit-role-grid").data("kendoGrid").dataSource.read();
-                bars.ui.loader('#allMenus', true);
+
+                //var branchTree = $("#treelist").data("kendoTreeList"),
+                var roleTree = $("#role-treelist").data("kendoGrid");
+
+                //branchTree.dataSource.read();
+                //roleTree.dataSource.read();
+
                 $.ajax({
                     type: "GET",
                     url: bars.config.urlContent("/admin/admu/GetUserData"),
@@ -578,8 +581,11 @@
                     dataType: "json",
                     data: { loginName: currentRow.LOGIN_NAME },
                     traditional: true
-                }).done(function (result) {
+                }).done(function(result) {
                     if (result.Data !== null) {
+
+                        debugger;
+
                         var div = $("#mainPart"),
                             edSignBox = $("#ed_signBox"),
                             edSignTemplate = kendo.template($("#edSignContent").html()),
@@ -620,7 +626,7 @@
                         //var button = $("#changePassword").kendoButton().data("kendoButton");
 
                         $("#editBranchBtn").kendoButton({
-                            click: function () {
+                            click: function() {
                                 $("#editBranchWindow").data("kendoWindow").center().open();
                             },
                             enable: true
@@ -638,7 +644,7 @@
                     } else {
                         bars.ui.alert({ text: result.Errors.message });
                     }
-                    bars.ui.loader('#allMenus', false);
+
                 });
             } else {
                 bars.ui.alert({ text: "Оберіть запис!" });
@@ -648,9 +654,9 @@
     });
     $("#pbDropUser").kendoButton({
         click: function () {
-            bars.ui.confirm({ text: 'Користувача буде видалено, продовжити?' }, function () {
+            bars.ui.confirm({ text: 'Користувача буде видалено, продовжити?' }, function() {
                 var gridAdmu = $("#ADMUGrid").data("kendoGrid"),
-                    currentRow = gridAdmu.dataItem(gridAdmu.select());
+                currentRow = gridAdmu.dataItem(gridAdmu.select());
 
                 $.ajax({
                     type: "GET",
@@ -676,10 +682,10 @@
         enable: false
     });
     $("#pbUnblockUser").kendoButton({
-        click: function () {
+        click: function() {
             bars.ui.confirm({
                 text: 'Розблокувати користувача?'
-            }, function () {
+            }, function() {
                 unlockUser();
             });
         },

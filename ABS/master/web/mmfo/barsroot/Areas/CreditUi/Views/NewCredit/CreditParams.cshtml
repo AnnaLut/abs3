@@ -14,94 +14,96 @@
                 <label>Валюта</label>
             </td>
             <td>
-                <label>Ініціатива</label>
+                <label>Ініціатива</label>  
                 @*<a class='k-button' ng-click="showReferBranch('OUR_BRANCH','BRANCH,NAME','where date_closed is null')" ng-disabled="isSave"><i class='pf-icon pf-16 pf-book'></i></a>*@
 
                 <kendo-button ng-click="showReferBranch('OUR_BRANCH','BRANCH,NAME','where date_closed is null')"
                               class="pf-icon pf-16 pf-book">
                 </kendo-button>
-                <input id="inptBranch"
-                       type="text"
-                       ng-model="credit.branchValue"
-                       ng-required="string"
-                       name="inptNum"
-                       class="k-textbox"
-                       style="width:350px"
-                       disabled />
-                <span style="color: red" ng-show="!isBranchValueValid()">Обов'язкове</span>
 
             </td>
-            <td></td>
+            <td>
+                <input id="inptBranch"
+                        type="text"
+                        ng-model="credit.branchValue"
+                        ng-required="string"
+                        name="inptNum"
+                        class="k-textbox"
+                        style="width:350px"
+                        disabled/>
+                <span style="color: red" ng-show="!isBranchValueValid()">Обов'язкове</span>
+            </td>
         </tr>
         <tr>
             <td>
-                <input id="inptNum"
-                       type="text"
-                       ng-model="credit.numValue"
-                       ng-required="string"
-                       ng-disabled="isSaveFunc()"
-                       name="inptNum"
-                       class="k-textbox"
-                       style="width:150px" />
+                <input id="inptNum" 
+                       type="text" 
+                       ng-model="credit.numValue" 
+                       ng-required="string" 
+                       ng-disabled="isSaveFunc()" 
+                       name="inptNum" 
+                       class="k-textbox" 
+                       style="width:150px"
+                       />
                 <span style="color: red" ng-show="!isNumValueValid()">Обов'язкове</span>
             </td>
             <td>
-                <select kendo-drop-down-list name="ddlCur" id="ddlCur" style="width: 250px" k-ng-model="credit.curValue" k-options="ddlCurOptions" k-rebind="ddlCurOptions" k-ng-disabled="isSaveFunc()"></select>
+                <select kendo-drop-down-list name="ddlCur" id="ddlCur" style="width: 250px" k-ng-model="credit.curValue" k-options="ddlCurOptions" k-ng-disabled="isSaveFunc()"></select>
             </td>
-            <td colspan="2" rowspan="{{ isShowCustInfo() ? '20' : '15' }}">
-                <div class="panel panel-default" style="width:100%">
+            <td colspan="2" rowspan="11">
+                <div class="panel panel-default" style="display: inline-flex;width:100%">
                     <div class="panel-body">
                         <div class="form-group">
                             <label><b>Пошук клієнта - позичальника</b></label>
                             <table>
                                 <tr>
                                     <td style="text-align:right">
-                                        @*<a class='k-button'
-                                           ng-click="showReferCust('CUSTOMER','RNK,NMK,OKPO,CUSTTYPE,DATE_ON,DATE_OFF,TGR,C_DST,C_REG,ND,CODCAGENT,COUNTRY,PRINSIDER,STMT,SAB,ADR,VED,SED','')"
+                                        @*<a class='k-button' 
+                                           ng-click="showReferCust('CUSTOMER','RNK,NMK,OKPO,CUSTTYPE,DATE_ON,DATE_OFF,TGR,C_DST,C_REG,ND,CODCAGENT,COUNTRY,PRINSIDER,STMT,SAB,ADR,VED,SED','')" 
                                            ng-disabled="isSave">
                                            <i class='pf-icon pf-16 pf-book'></i>
                                         </a>*@
 
-                                        <kendo-button ng-disabled="isSave"
+                                        <kendo-button ng-disabled="isSave" 
                                                       ng-click="showReferCust('CUSTOMER','RNK,NMK,OKPO,CUSTTYPE,DATE_ON,DATE_OFF,TGR,C_DST,C_REG,ND,CODCAGENT,COUNTRY,PRINSIDER,STMT,SAB,ADR,VED,SED','')"
-                                                      class="pf-icon pf-16 pf-book">
+                                                      class="pf-icon pf-16 pf-book" >
                                         </kendo-button>
 
                                         <!--a class='k-button' ng-click="openWinCustRefer()" ng-disabled="isSave"><i class='pf-icon pf-16 pf-book'></i></a-->
                                     </td>
                                     <td>
                                         <label>OKПO</label>
-                                        <input ng-model="credit.custValue"
-                                               id="refCust"
-                                               name="refCust"
-                                               class="k-textbox"
-                                               ng-minlength="8"
-                                               ng-maxlength="10"
+                                        <input ng-model="credit.custValue" 
+                                               id="refCust" 
+                                               name="refCust" 
+                                               class="k-textbox" 
+                                               ng-minlength="8" 
+                                               ng-maxlength="10" 
                                                style="width:100px"
-                                               disabled />
+                                               disabled/>
                                     </td>
                                     <td>
                                         <label>Реє. №</label>
-                                        <input id="inptRnk"
-                                               type="text"
-                                               ng-model="credit.rnkValue"
-                                               name="inptRnk"
-                                               class="k-textbox"
-                                               ng-model-options="{ updateOn: 'blur' }"
-                                               ng-chang="readVidd()"
-                                               style="width:100px"
-                                               disabled />
+                                        <input id="inptRnk" 
+                                               type="text" 
+                                               ng-model="credit.rnkValue" 
+                                               name="inptRnk" 
+                                               class="k-textbox" 
+                                               ng-model-options="{ updateOn: 'blur' }" 
+                                               ng-chang="readVidd()" 
+                                               style="width:100px" 
+                                               disabled/>
                                         <span style="color: red" ng-show="!isCustValueValid()">Обов'язкове</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td></td>
                                     <td colspan="2">
-                                        <input id="inptNmk"
-                                               type="text"
-                                               ng-model="credit.nmkValue"
-                                               name="inptNmk"
-                                               class="k-textbox"
+                                        <input id="inptNmk" 
+                                               type="text" 
+                                               ng-model="credit.nmkValue" 
+                                               name="inptNmk" 
+                                               class="k-textbox" 
                                                style="width:300px"
                                                disabled />
                                     </td>
@@ -123,10 +125,10 @@
                                         <input id="inptSCat" type="text" ng-model="credit.sCatValue" disabled name="inptSCat" class="k-textbox" style="width:100px" />
                                     </td>
                                     <td>
-                                        <select kendo-drop-down-list name="ddlFin" id="ddlFin" style="width: 150px" k-ng-model="credit.finValue" k-options="ddlFinOptions" k-rebind="ddlFinOptions" k-ng-disabled="isSave" k-on-change="checkRisk()" k-ng-change="checkRisk()"></select>
+                                        <select kendo-drop-down-list name="ddlFin" id="ddlFin" style="width: 150px" k-ng-model="credit.finValue" k-options="ddlFinOptions" k-ng-disabled="isSave"></select>
                                     </td>
                                     <td>
-                                        <select kendo-drop-down-list name="ddlObs" id="ddlObs" style="width: 150px" k-ng-model="credit.obsValue" k-options="ddlObsOptions" k-rebind="ddlObsOptions" k-ng-disabled="isSave" k-on-change="checkRisk()"></select>
+                                        <select kendo-drop-down-list name="ddlObs" id="ddlObs" style="width: 150px" k-ng-model="credit.obsValue" k-options="ddlObsOptions" k-ng-disabled="isSave"></select>
                                     </td>
                                 </tr>
                                 <tr ng-show="isShowCustInfo()">
@@ -189,14 +191,16 @@
                                         <input type="text" ng-model="CUST_INFO.NREMO" disabled class="k-textbox" />
                                     </td>
                                 </tr>
-                                <tr ng-show="isShowCustInfo()">
+                                  <tr ng-show="isShowCustInfo()">
                                     <td>
                                         <label>Середній підтв. дохід особи</label>
                                     </td>
                                     <td>
                                         <label>Регулярний непідтв. дохід особи</label>
                                     </td>
-                                    <td></td>
+                                    <td>
+                                       
+                                    </td>
                                 </tr>
                                 <tr ng-show="isShowCustInfo()">
                                     <td>
@@ -205,13 +209,144 @@
                                     <td>
                                         <input type="text" ng-model="CUST_INFO.NOREAL6INCOME" disabled class="k-textbox" />
                                     </td>
-                                    <td></td>
+                                    <td>
+
+                                    </td>
                                 </tr>
                             </table>
                         </div>
                     </div>
                 </div>
-                <div class="panel panel-default" style="width:100%">
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Початкова сума</label>
+            </td>
+            <td>
+                <input kendo-numeric-text-box k-min="0"
+                       k-max="999999999999999999999999999999"
+                       k-ng-model="credit.sumValue"
+                       k-ng-disabled="isSave"
+                       name="inptSum"
+                       ng-blur="FillLim()" 
+                       />
+                <span style="color: red" ng-show="!isSumValueValid()">Обов'язкове</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Поточний ліміт</label>
+            </td>
+            <td>
+                <input kendo-numeric-text-box k-min="0"
+                       k-max="999999999999999999999999999999"
+                       k-ng-model="credit.lim"
+                       name="inptSum"
+                       disabled/>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Дати:</label>
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата заключення</label></td>
+                        <td>
+                            <input masked-date-picker kendo-date-picker
+                                   k-ng-model="credit.conslValue" 
+                                   id="dpConsl" 
+                                   k-options="dpConslOptions" 
+                                   k-ng-disabled="isSaveFunc()"
+                                    />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><span style="color: red" ng-show="!isDatesValid() || !isCurrValid()">{{DatesValidMsg}}</span></td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата початку</label></td>
+                        <td>
+                            <input masked-date-picker kendo-date-picker
+                                   k-ng-model="credit.startValue" 
+                                   id="dpStart" 
+                                   k-options="dpConslOptions" 
+                                   k-ng-disabled="isSaveFunc()"
+                                   />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата видачі</label></td>
+                        <td>
+                            <input masked-date-picker kendo-date-picker="dpIssue"
+                                   name="dpIssue" 
+                                   k-ng-model="credit.issueValue" 
+                                   k-options="dpConslOptions" 
+                                   data-issue-msg="Не коректна дата видачі" 
+                                   k-ng-disabled="isSaveFunc()"
+                                   />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата завершення</label></td>
+                        <td>
+                            <input masked-date-picker kendo-date-picker="dpEnd"
+                                   name="dpEnd" 
+                                   k-ng-model="credit.endValue" 
+                                   k-options="dpConslOptions" 
+                                   data-end-msg="Не коректна дата завершення" 
+                                   k-ng-disabled="isSaveFunc()"
+                                   /></td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
+        <tr>
+            <td>
+                <label>Вид</label>
+            </td>
+            <td>
+                
+            </td>
+            <td colspan="2" rowspan="8">
+                <div class="panel panel-default" style="display: inline-flex;width:100%">
                     <div class="panel-body">
                         <div class="form-group">
                             <label><b>Відсотки</b></label>
@@ -227,39 +362,39 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <input ng-model="credit.curValue.Key"
+                                        <input ng-model="credit.curValue.KV"
                                                ng-disabled="true"
-                                               class="k-textbox"
-                                               style="width: 50px;margin-left: 38px" />
-                                        <input kendo-numeric-text-box k-min="0"
+                                               class="k-textbox" 
+                                               style="width: 50px;margin-left: 38px"/>
+                                        <input kendo-numeric-text-box k-min="0" 
                                                ng-disabled="isSave"
-                                               k-max="100"
-                                               k-ng-model="credit.rateAValue"
-                                               style="width: 70px" />
+                                               k-max="100" 
+                                               k-ng-model="credit.rateAValue" 
+                                               style="width: 70px"/>
                                     </td>
                                     <td>
-                                        <input ng-model="credit.baseRateValue"
-                                               ng-show="custtype==3"
-                                               id="refBaseRate"
-                                               name="refBaseRate"
-                                               class="k-textbox"
+                                        <input ng-model="credit.baseRateValue" 
+                                               ng-show="custtype==3" 
+                                               id="refBaseRate" 
+                                               name="refBaseRate" 
+                                               class="k-textbox" 
                                                style="width: 70px"
-                                               disabled />
+                                               disabled/>
                                         @*<a class='k-button' ng-click="showReferBRate('BRATES','BR_ID,NAME','where br_id in (select br_id from br_normal where kv=980) order by br_id desc')" ng-show="custtype==3" ng-disabled="isSave"><i class='pf-icon pf-16 pf-book'></i></a>*@
-
+                                        
                                         <kendo-button ng-disabled="isSave"
                                                       ng-click="showReferBRate('BRATES','BR_ID,NAME','')"
                                                       ng-show="custtype==3"
                                                       class="pf-icon pf-16 pf-book">
                                         </kendo-button>
 
-                                        <input ng-model="credit.baseRateNameValue"
+                                        <input ng-model="credit.baseRateNameValue" 
                                                ng-show="custtype==3"
                                                disabled
-                                               id="refBaseNameRate"
-                                               name="refBaseNameRate"
-                                               class="k-textbox"
-                                               style="width: 200px" />
+                                               id="refBaseNameRate" 
+                                               name="refBaseNameRate" 
+                                               class="k-textbox" 
+                                               style="width: 200px"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -292,7 +427,7 @@
                                         <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateCValue" style="width: 70px" k-ng-disabled="isSave" />
                                     </td>
                                     <td>
-                                        <select kendo-drop-down-list name="ddlBAsey" id="ddlBAsey" style="width: 300px" k-ng-model="credit.baseyValue" k-options="ddlBaseyOptions" k-rebind="ddlBaseyOptions"></select>
+                                        <select kendo-drop-down-list name="ddlBAsey" id="ddlBAsey" style="width: 300px" k-ng-model="credit.baseyValue" k-options="ddlBaseyOptions"></select>
                                     </td>
                                 </tr>
                                 <tr>
@@ -329,176 +464,31 @@
                     </div>
                 </div>
             </td>
-            <td></td>
         </tr>
         <tr>
             <td>
-                <label>Початкова сума</label>
-            </td>
-            <td>
-                <input kendo-numeric-text-box k-min="0"
-                       k-max="999999999999999999999999999999"
-                       k-ng-model="credit.sumValue"
-                       k-ng-disabled="isSave"
-                       name="inptSum"
-                       ng-blur="FillLim()" />
-                <span style="color: red" ng-show="!isSumValueValid()">Обов'язкове</span>
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>
-                <label>Поточний ліміт</label>
-            </td>
-            <td>
-                <input kendo-numeric-text-box k-min="0"
-                       k-max="999999999999999999999999999999"
-                       k-ng-model="credit.lim"
-                       name="inptSum"
-                       disabled />
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>
-                <label>Дати:</label>
-            </td>
-            <td>
-                <table>
-                    <tr>
-                        <td width="120px"><label>Дата заключення</label></td>
-                        <td>
-                            <input masked-date-picker kendo-date-picker
-                                   k-ng-model="credit.conslValue"
-                                   id="dpConsl"
-                                   k-options="dpConslOptions"
-                                   k-ng-disabled="isSaveFunc()" />
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td style="width: 210px"><span style="color: red" ng-show=" !isDatesValid() || !isCurrValid()">{{DatesValidMsg}}</span></td>
-            <td>
-                <table>
-                    <tr>
-                        <td width="120px"><label>Дата початку</label></td>
-                        <td>
-                            <input masked-date-picker kendo-date-picker
-                                   k-ng-model="credit.startValue"
-                                   id="dpStart"
-                                   k-options="dpConslOptions"
-                                   k-ng-disabled="isSaveFunc()" />
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <table>
-                    <tr>
-                        <td width="120px"><label>Дата видачі</label></td>
-                        <td>
-                            <input masked-date-picker kendo-date-picker="dpIssue"
-                                   name="dpIssue"
-                                   k-ng-model="credit.issueValue"
-                                   k-options="dpConslOptions"
-                                   data-issue-msg="Не коректна дата видачі"
-                                   k-ng-disabled="isSaveFunc()" />
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <table>
-                    <tr>
-                        <td width="120px"><label>Дата завершення</label></td>
-                        <td>
-                            <input masked-date-picker kendo-date-picker="dpEnd"
-                                   name="dpEnd"
-                                   k-ng-model="credit.endValue"
-                                   k-options="dpConslOptions"
-                                   data-end-msg="Не коректна дата завершення"
-                                   k-ng-disabled="isSaveFunc()" />
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr></tr>
-        <tr>
-            <td>
-                <label>Вид</label>
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>
-                <select kendo-drop-down-list style="width: 150px" k-ng-model="credit.listUnsedValue" k-options="ddlListUnsedOptions"></select>
+                <select kendo-drop-down-list style="width: 150px" k-ng-model="credit.listUnsedValue" k-options="ddlListUnsedOptions" ></select>
             </td>
             <td><label>Джерело залучення коштів</label></td>
         </tr>
         <tr>
             <td>
-                <select kendo-drop-down-list="ddlVidd"
-                        name="ddlVidd"
-                        id="ddlVidd"
-                        style="width: 200px"
-                        k-ng-model="credit.viddValue"
-                        k-options="ddlViddOptions"
-                        ng-disabled="AvalibleViddChange"></select>
+                <select kendo-drop-down-list="ddlVidd" 
+                        name="ddlVidd" 
+                        id="ddlVidd" 
+                        style="width: 200px" 
+                        k-ng-model="credit.viddValue" 
+                        k-options="ddlViddOptions" 
+                        ng-disabled="AvalibleViddChange">
+                </select>
                 <span style="color: red" ng-show="!isDdlAimEnabled()">Оберіть позичальника</span>
                 <span style="color: red" ng-show="!isDdlViddValueValid() && isDdlAimEnabled()">Обов'язкове</span>
             </td>
             <td>
-                <select kendo-drop-down-list="ddlSour" name="ddlSour" id="ddlSour" style="width: 250px" k-ng-model="credit.sourValue" k-options="ddlSourOptions" k-rebind="ddlSourOptions" k-ng-disabled="isSaveFunc()"></select>
+                <select kendo-drop-down-list="ddlSour" name="ddlSour" id="ddlSour" style="width: 250px" k-ng-model="credit.sourValue" k-options="ddlSourOptions" k-ng-disabled="isSaveFunc()"></select>
             </td>
             <td></td>
             <td></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <label>BUS_MOD:</label>
-                <select kendo-drop-down-list="ddlBusMod" name="ddlBusMod" id="ddlBusMod" style="width: 400px" k-ng-model="credit.bus_mod" k-options="ddlBusModOptions" ng-disabled="credit.rnkValue === null ||
-                         credit.viddValue === null || credit.viddValue.Key === 5 || isSave"></select>
-                @*<input type="text" ng-model="credit.bus_mod" class="k-textbox" style="width: 50px" disabled />
-
-                <kendo-button ng-click="ShowBusMode()"
-                              class="pf-icon pf-16 pf-book">
-                </kendo-button>*@
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <label style="margin-left:5px;">SPPI:</label>
-                <select kendo-drop-down-list="sppi_ddl" style="width: 60px" k-ng-model="credit.sppi" k-options="ddlSPPIOptions" ng-disabled="credit.bus_mod === underfined || credit.bus_mod.Key === null ||
-                        [11, 12, 13].indexOf(credit.viddValue.Key) !== -1 || credit.viddValue === null || credit.viddValue.Key === 5 || isSave"></select>
-
-                <label style="margin-left:5px;">IFRS:  </label>
-                <input type="text" class="k-textbox" style="width: 90px" ng-model="credit.ifrs" disabled />
-
-                <label style="margin-left:5px;">POCI:</label>
-                <select kendo-drop-down-list="ddlPoci" style="width: 60px" k-ng-model="credit.poci" k-options="ddlPOCIOptions" ng-disabled="credit.ifrs === underfined || credit.ifrs === 'FVTPL/Other' || credit.viddValue.Key === 5 || isSave"></select>
-            </td>
         </tr>
         <tr>
             <td>
@@ -512,20 +502,20 @@
         </tr>
         <tr>
             <td>
-                <select kendo-drop-down-list="ddlAim" name="ddlAim" id="ddlAim" style="width: 200px" k-ng-model="credit.aimValue" k-options="ddlAimOptions" ng-disabled="credit.viddValue === null || credit.viddValue.Key === 5 "></select>
+                <select kendo-drop-down-list="ddlAim" name="ddlAim" id="ddlAim" style="width: 200px" k-ng-model="credit.aimValue" k-options="ddlAimOptions" k-ng-disabled="isSaveFunc()" ></select>
                 <span style="color: red" ng-show="!isDdlAimEnabled()">Оберіть позичальника</span>
             </td>
             <td>
-                <input ng-model="credit.prodValue" id="refProd" name="refProd" class="k-textbox" style="width: 200px" disabled />
+                <input ng-model="credit.prodValue" id="refProd" name="refProd" class="k-textbox" style="width: 200px" disabled/>
+                @*<a class='k-button' ng-click="showReferProd('CC_POTR','ID,NAME')" ng-disabled="isSave"><i class='pf-icon pf-16 pf-book'></i></a>*@
 
-                <kendo-button ng-disabled="!(isPruductBtnEnabled() && isIFRSchosen())"
-                              ng-click="showReferProd()"
+                <kendo-button ng-disabled="isSaveFunc()"
+                              ng-click="showReferProd('CC_POTR','ID,NAME')"
                               ng-show="isPruductBtnVisible()"
                               class="pf-icon pf-16 pf-book">
                 </kendo-button>
-                <span style="color: red" ng-show="!isPruductBtnEnabled() && !IsGKD()">Оберіть ціль</span>
-                <span style="color: red" ng-show="!isIFRSchosen() && isPruductBtnEnabled()">Оберіть IFRS</span>
-                <span style="color: red" ng-show="!isProdValueValid() && isPruductBtnEnabled() && isIFRSchosen()">Обов'язкове</span>
+                <span style="color: red" ng-show="!isPruductBtnEnabled()">Оберіть ціль</span>
+                <span style="color: red" ng-show="!isProdValueValid() && isPruductBtnEnabled()">Обов'язкове</span>
             </td>
             <td></td>
             <td></td>
@@ -540,7 +530,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                @*<input type="checkbox" ng-model="credit.serviceValue" id="chkService" name="chkService" /> *@  <label>Обслуговування по схемі: </label>
+               @*<input type="checkbox" ng-model="credit.serviceValue" id="chkService" name="chkService" /> *@  <label>Обслуговування по схемі: </label>
                 <select kendo-drop-down-list style="width: 100px" k-ng-model="credit.serviceValue" k-options="ddlListServiceOptions"></select>
             </td>
             <td></td>
@@ -556,44 +546,18 @@
                               class="pf-icon pf-16 pf-book">
                 </kendo-button>
         </tr>
-        @*
-        <tr ng-show="credit.viddValue !== undefined && [1,2,3].indexOf(credit.viddValue.Key) > -1">
-            <td>
-                <label>Приналежність до ГКД:</label>
-                <select kendo-drop-down-list style="width: 60px" k-ng-model="credit.belongtoGKD" k-options="ddlGPKOptions"></select>
-            </td>
-            <td ng-show="credit.belongtoGKD !== undefined && credit.belongtoGKD.id == 1">
-                <label>Ген. договір:</label>
-                <input type="text" ng-model="credit.gkd_id" class="k-textbox" style="width: 170px" disabled />
-
-                <kendo-button ng-click="showGKD('CC_DEAL')"
-                              class="pf-icon pf-16 pf-book">
-                </kendo-button>
-            </td>
-            <td ng-show="GKD.wdate !== undefined && GKD.wdate !== null && credit.belongtoGKD.id == 1">
-                <label>Ліміт ГКД:</label>
-                <input type="text" ng-model="GKD.limit" class="k-textbox" style="width: 140px" disabled />
-                <label>Дата завершення ГКД:</label>
-                <input masked-date-picker kendo-date-picker ng-model="GKD.wdate" disabled style="width: 120px" />
-            </td>
-            <td></td>
-        </tr>*@
-        <tr>
-            <td><br /></td>
-            <td></td>
-        </tr>
         <tr>
             <td colspan="4">
                 <label>Платіжні інструкції</label>
                 <input type="text" ng-model="credit.mfoValue" ng-disabled="isSaveFunc()" class="k-textbox" style="width: 100px" />
                 @*<a class='k-button' ng-click="showReferBanks('BANKS','MFO,SAB,NB','where blk!=4')" ng-disabled="isSave"><i class='pf-icon pf-16 pf-book'></i></a>*@
-
+                
                 <kendo-button ng-disabled="isSaveFunc()"
                               ng-click="showReferBanks('BANKS','MFO,SAB,NB','where blk!=4')"
-                              class="pf-icon pf-16 pf-book">
+                              class="pf-icon pf-16 pf-book">                    
                 </kendo-button>
-
-                <input type="text" name="nls" id="nls" ng-model="credit.nlsValue" ng-disabled="isSaveFunc()" class="k-textbox" style="width: 200px" data-nls-msg="Не вірний контрольний розряд рахунку" />
+                
+                <input type="text" name="nls" id="nls" ng-model="credit.nlsValue" ng-disabled="isSaveFunc()" class="k-textbox" style="width: 200px" data-nls-msg="Не вірний контрольний розряд рахунку"/>
                 <input type="text" ng-model="credit.branchNameValue" ng-disabled="isSaveFunc()" class="k-textbox" style="width: 400px" />
             </td>
         </tr>

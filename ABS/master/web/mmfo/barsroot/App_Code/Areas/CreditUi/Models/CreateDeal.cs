@@ -13,8 +13,8 @@ namespace BarsWeb.Areas.CreditUi.Models
         public decimal? ND { get; set; }
         public DateTime Dat1 { get; set; }
         public DateTime? Dat4 { get; set; }
-        public DateTime? Dat2 { get; set; }
-        public DateTime? Dat3 { get; set; }
+        public DateTime Dat2 { get; set; }
+        public DateTime Dat3 { get; set; }
         public decimal nKV { get; set; }
         public string nKVNAME { get; set; }
         public decimal nS { get; set; }
@@ -22,7 +22,7 @@ namespace BarsWeb.Areas.CreditUi.Models
         public string nVIDNAME { get; set; }
         public decimal nISTRO { get; set; }
         public string nISTRONAME { get; set; }
-        public decimal? nCEL { get; set; }
+        public decimal nCEL { get; set; }
         public string MS_NX { get; set; }
         public string PRODNAME { get; set; }
         public decimal? nFIN { get; set; }
@@ -37,10 +37,10 @@ namespace BarsWeb.Areas.CreditUi.Models
         public string FLAGS { get; set; }
         public decimal nFREQ { get; set; }
         public string nFREQNAME { get; set; }
-        public decimal? dfPROC { get; set; }
+        public decimal dfPROC { get; set; }
         public decimal? nBasey { get; set; }
         public string nBaseyNAME { get; set; }
-        public decimal? dfDen { get; set; }
+        public decimal dfDen { get; set; }
         public DateTime? DATNP { get; set; }
         public /*decimal?*/string nFREQP { get; set; }
         public string nFREQPNAME { get; set; }
@@ -68,12 +68,5 @@ namespace BarsWeb.Areas.CreditUi.Models
         public int? INSPECTOR_ID { get; set; }
         public CustomerInfo CUST_DATA { get; set; }
         public decimal? S_S36 { get; set; }
-        public string IsGKD { get; set; }
-        public string GKD_ND { get; set; }
-        public string BUS_MOD { get; set; }
-        public string SPPI { get; set; }
-        public string IFRS { get; set; }
-        public string POCI { get; set; }
-        public string BUS_MOD_NAME { get; set; }
     }
 }

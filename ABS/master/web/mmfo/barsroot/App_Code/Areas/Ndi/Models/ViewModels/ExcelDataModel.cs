@@ -11,7 +11,7 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
             // TODO: Add constructor logic here
             //
         }
-        public string ColumnsUnVisible { get; set; }
+        public string ColumnsVisible { get; set; }
 
         public override string DynamicFilter
         {

@@ -135,7 +135,7 @@ mainApp.controller("KendoMainController", function ($controller, $scope, $http) 
           animation: false,
           visible: false,
           width: '1200px',
-          actions: ["Close"],
+          actions: ["Maximize", "Minimize", "Close"],
           draggable: true,
           height: "700px",
           modal: true,

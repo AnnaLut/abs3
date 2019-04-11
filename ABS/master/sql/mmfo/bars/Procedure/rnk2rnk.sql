@@ -355,39 +355,8 @@ begin
 
             if ( ( dazs_ is null ) and ( nbs_ = '2625' ) )
             then
-                -- и неважно, открыт или закрыт deal. Все равно забираем счет и присоединяем к другому, ведь счет открыт
-                -- Artem Yurchenko 02.05.2018 переписав на використання deal_account.
-                -- Так і не зрозумів навіщо цикл запускати для кожного рахунку окремо, якщо все одно будуть переноситись всі рахунки клієнта.
-                -- Не хочу змінювати логіку роботи поки не дізнаюся більше - старий код залишаю в коментарі
-                for cur2 in (select da.deal_id
-                             from   deal_account da
-                             where  da.account_id = acc_ and
-                                    da.account_type_id = (select a.id from attribute_kind a where a.attribute_code = lc_acc_list) and
-                                    exists (select 1 from deal d
-                                            where  d.id = da.deal_id and
-                                                   d.customer_id = p_rnkfrom)) loop
 
-                    -- Визначаємо всі рахунки клієнта ,включені в ДКБО
-                    l_dkbo_acc_list := deal_utl.get_deal_accounts(cur2.deal_id, lc_acc_list);
-
-                    -- виключаємо рахунок з переліку прив'язаних до ДКБО клієнта з p_rnkfrom
-                    l_acc_list_union := l_dkbo_acc_list multiset except distinct number_list(acc_);
-
-                    deal_utl.set_deal_accounts(cur2.deal_id, lc_acc_list, l_acc_list_union);
-
-                    -- Artem Yurchenko - далі код залишається без змін
-                    -- присоединяем счет к ДКБО
-                    PKG_DKBO_UTL.P_ACC_MAP_TO_DKBO( in_customer_id => to_number(p_rnkto)
-                                                  , in_acc_list    => number_list(acc_)
-                                                  , out_deal_id    => l_dkbo_deal );
-                    -- пишем в историю переноса
-                    insert
-                      into RNK2DEAL_ACC
-                         ( RNKFROM, RNKTO, SDATE, DEAL_FROM, DEAL_TO, ACC, ID )
-                    values ( to_number(p_rnkfrom), to_number(p_rnkto), sysdate, cur2.deal_id, l_dkbo_deal, acc_, user_id );
-
-                end loop;
-              /*for cur2  
+              for cur2  -- и неважно, открыт или закрыт deal. Все равно забираем счет и присоединяем к другому, ведь счет открыт
                in ( select d.id
                       from ATTRIBUTE_VALUES avs
                       JOIN ( select max(t.nested_table_id) keep (dense_rank last order by t.value_date) nested_table_id ,
@@ -427,7 +396,7 @@ begin
                      ( RNKFROM, RNKTO, SDATE, DEAL_FROM, DEAL_TO, ACC, ID )
                 values ( to_number(p_rnkfrom), to_number(p_rnkto), sysdate, cur2.id, l_dkbo_deal, acc_, user_id );
 
-              end loop;*/
+              end loop;
 
             end if;
 

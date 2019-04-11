@@ -4,7 +4,6 @@ execute bars.bars_context.set_policy_group('WHOLE');
 
 set constraint FK_EADDOCS_EASTRCID_STRCS deferred;
 
-prompt delete from ead_struct_codes
 delete from ead_struct_codes;
 
 insert into ead_struct_codes (ID, NAME, FULLTITLE, OBSOLETE)
@@ -1881,63 +1880,5 @@ values ('612', 'Заява про відмову від автопролонгації за депозитом через Ощад 24
 
 insert into ead_struct_codes (ID, NAME, FULLTITLE, OBSOLETE)
 values ('613', 'Заява про зміну рахунку виплати відсотків та тіла депозиту через Ощад 24/7', 'Заява про зміну рахунку виплати відсотків та тіла депозиту через Ощад 24/7', 'Y');
-
-prompt SMB
-
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('093', 'Строковий депозит', 'Строковий депозит');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930001', 'Заява про розміщення Траншу', 'Заява про розміщення Траншу');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930002', 'Заява на поповнення Траншу', 'Заява про поповнення Траншу');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930003', 'Заява на зменшення терміну дії Траншу', 'Заява про зменшення терміну дії Траншу');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930004', 'Повідомлення ДФС про взяття на облік депозитного рахунку', 'Повідомлення ДФС про взяття на облік депозитного рахунку');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930005', 'Повідомлення ДФС про зняття з обліку рахунку', 'Повідомлення ДФС про зняття з обліку рахунку');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930006', 'Повідомлення ДФС про взяття на облік закриття депозитного рахунку', 'Повідомлення ДФС про взяття на облік закриття депозитного рахунку');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930007', 'Постанова держ. виконавця, рішення, ухвала, постанова суду про арешт', 'Постанова держ. виконавця, рішення, ухвала, постанова суду про арешт');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930008', 'Листування щодо арешту депозиту', 'Листування щодо арешту депозиту');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930009', 'Документ на примусове списання', 'Документ на примусове списання');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930010', 'Реєстр документів на примусове списання', 'Реєстр документів на примусове списання');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930011', 'Документи про зняття арешту', 'Документи про зняття арешту');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE)
-Values ('0930012', 'Індивідуальні рішення', 'Індивідуальні Рішення');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0930013', 'Інше', 'Інше');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('094', 'Вклад на вимогу', 'Вкладу на вимогу');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940001', 'Заява на відкриття Вкладу на вимогу', 'Заява про відкриття Вкладу на вимогу');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940002', 'Заява про закриття Вкладу на вимогу', 'Заява про  закриття Вкладу на вимогу');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940003', 'Повідомлення ДФС про взяття на облік депозитного рахунку', 'Повідомлення ДФС про взяття на облік депозитного рахунку');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940004', 'Повідомлення ДФС про зняття з обліку рахунку', 'Повідомлення ДФС про зняття з обліку рахунку');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940005', 'Повідомлення ДФС про взяття на облік закриття депозитного рахунку', 'Повідомлення ДФС про взяття на облік закриття депозитного рахунку');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940006', 'Постанова держ. виконавця, рішення, ухвала, постанова суду про арешт', 'Постанова держ. виконавця, рішення, ухвала, постанова суду про арешт');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940007', 'Листування щодо арешту депозиту', 'Листування щодо арешту депозиту');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940008', 'Документ на примусове списання', 'Документ на примусове списання');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940009', 'Реєстр документів на примусове списання', 'Реєстр документів на примусове списання');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940010', 'Документи про зняття арешту', 'Документи про зняття арешту');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940011', 'Індивідуальні рішення', 'Індивідуальні рішення');
-Insert into ead_struct_codes (ID, NAME, FULLTITLE) 
-Values ('0940012', 'Інше', 'Інше');
-
 
 commit work;

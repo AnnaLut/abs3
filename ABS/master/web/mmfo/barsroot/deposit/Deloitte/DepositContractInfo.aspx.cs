@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Data;
-using System.IO;
-using System.Web;
 using System.Web.UI;
 using System.Web.Services;
-using System.Web.UI.HtmlControls;
 using Bars.Classes;
 using Bars.Oracle;
 using Bars.Requests;
-using Bars.UserControls;
 using BarsWeb.Core.Logger;
-using FastReport;
-using FastReport.Web;
 using Oracle.DataAccess.Client;
 
 /// <summary>
@@ -924,82 +918,8 @@ public partial class DepositContractInfo : Page
     protected void PrintContract_BeforePrint(object sender, EventArgs e)
     {
         eadPrintContract.TemplateID = Tools.Get_TemplateID((Session["DepositInfo"] as Deposit).ID, 1);
-        eadPrintContract.PrintDepositReport = PrintReport;
     }
-
-    public void PrintReport(FrxDocLocal docLocal, Deposit dpt)
-    {
-        var contractNumber = decimal.Parse(dpt.Number);
-        // если не разрешено повторно сформировать договор
-        if (dpt.canRecreate == 0)
-        {
-            // берем договор из БД и выбрасываем в поток в формате PDF
-            PrintReportFromDb(docLocal, contractNumber);
-        }
-        else if (dpt.canRecreate == 1)
-        {
-            eadPrintContract.UnSigned();
-
-            // повторно формируем договор и сохраняем в БД
-            docLocal.AddContractText(HttpContext.Current, dpt, eadPrintContract.TemplateID);
-
-            // берем договор из БД и выбрасываем в поток в формате PDF
-            PrintReportFromDb(docLocal, contractNumber);
-        }
-
-    }
-
-    private void PrintReportFromDb(FrxDocLocal docLocal, decimal contractNumber)
-    {
-
-        HtmlGenericControl div = new HtmlGenericControl("div");
-        div.Attributes.Add("id", "divReport");
-        div.Style.Add("visibility", "hidden");
-
-        if (Page.Controls.Contains(div))
-        {
-            Page.Controls.Remove(div);
-        }
-
-        try
-        {
-            String res = Path.GetTempPath() + Path.GetFileNameWithoutExtension(Path.GetTempFileName()) + ".pdf";
-            byte[] depositBytes =
-                docLocal.ReadContractText(HttpContext.Current, contractNumber, eadPrintContract.TemplateID);
-
-            File.WriteAllBytes(res, depositBytes);
-
-            HtmlGenericControl script = new HtmlGenericControl("script");
-            script.InnerHtml = @";(function(){ document.getElementById('tmpFileUploadLink').click(); })();";
-            HtmlGenericControl anchor = new HtmlGenericControl("a");
-            anchor.Attributes.Add("href",
-                string.Format("javascript:location.href('/barsroot/api/deposit/getReport?tmpFileName={0}');",
-                    Path.GetFileName(res)));
-            anchor.Attributes.Add("id", "tmpFileUploadLink");
-            div.Controls.Add(anchor);
-            div.Controls.Add(script);
-        }
-        catch (Exception ex)
-        {
-            if (null!=ex.Message && ex.Message.Contains("Не знайдено збережений договір"))
-            {
-                HtmlGenericControl script = new HtmlGenericControl("script");
-                script.InnerHtml = @";(function(){ alert('Договір може бути повторно роздрукований з Електронного Архіву.'); })();";
-
-                div.Controls.Add(script);
-            }
-            else
-            {
-                throw ex;
-            }
-        }
-
-        if (Page != null)
-        {
-            Page.Controls.Add(div);
-        }
-    }
-
+    
     /// <summary>
     /// ЕАД (Збереження відмітки про наявність підписаного клієнтом депозитного договору)
     /// </summary>
