@@ -306,7 +306,7 @@ end teller_tools;
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
 
   g_min_banknote constant  number := 10;
-  g_body_version constant  varchar2(64)  := 'version 3.4 19/03/2019';
+  g_body_version constant  varchar2(64)  := 'version 3.5 08/04/2019';
   g_ws_name      varchar2(100) := sys_context('bars_global', 'host_name');
   g_eq_url       constant  varchar2(100) := case get_teller
                                               when 0 then null
@@ -389,7 +389,10 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
     if v_oper_type != 'NONE' then
       update teller_cash_opers
         set atm_amount    = nvl(p_atm_amn,0)
-           ,non_atm_amount= nvl(p_non_atm,0)
+           ,non_atm_amount= case g_eq_type
+                              when 'M' then p_oper_amn
+                              else nvl(p_non_atm,0)
+                            end
            ,oper_amount   = p_oper_amn
            ,last_dt       = sysdate
            ,last_user     = g_ws_name
@@ -403,7 +406,12 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
           and cur_code= teller_utils.get_r030(p_cur_code);
       if sql%rowcount = 0 then
         insert into teller_cash_opers (doc_ref, op_type, cur_code, atm_amount, non_atm_amount, oper_amount, last_dt, last_user,atm_status)
-                               values (v_doc_ref, v_oper_type, teller_utils.get_r030(p_cur_code), nvl(p_atm_amn,0), nvl(p_non_atm,0), p_oper_amn, sysdate, g_ws_name,decode(v_final,1,2,0));
+                               values (v_doc_ref, v_oper_type, teller_utils.get_r030(p_cur_code), nvl(p_atm_amn,0), 
+                                       case g_eq_type
+                                         when 'M' then p_oper_amn
+                                         else nvl(p_non_atm,0)
+                                       end, 
+                                       p_oper_amn, sysdate, g_ws_name,decode(v_final,1,2,0));
       end if;
     end if;
   
