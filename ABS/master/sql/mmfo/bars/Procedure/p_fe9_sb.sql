@@ -3,14 +3,35 @@ CREATE OR REPLACE PROCEDURE BARS.P_FE9_SB ( dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 03/08/2018 (21/05/2018, 10/05/2018)
+%
+% VERSION     : v.19.001             10.04.2019   (03.08.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   Структура показателя   L W ЦЦ F A ZZZZZZZZZZ NN VVV MMM KKK DDD PPP
+
+ 1     L          1/3/8/9  (сумма/количество/код системы/назв.банка)
+ 2     W          1/2      (наличие систем-парнеров)
+ 3     ЦЦ         D060 код системы переводов
+ 5     F          1/2
+ 6     A          K021 признак идентифик.кода
+ 7     ZZZZZZZZZZ K020 идентифик.код отправителя/получателя
+17     NN         условный номер системы/банка
+19     VVV        R030 код валюты
+22     MMM        K040 код страны-отправителя
+25     KKK        код региона Украины отправителя, kodobl.ko
+28     DDD        K040 код страны-получателя
+31     PPP        код региона Украины получателя, kodobl.ko
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+10.04.2019  отдельная обработка проводок дт2909/75 для определения
+              правильной системы перевода (исключены из KL_FE9)
 19/07/2018 - выбираем параметр OB22 из табл.ACCOUNTS вместо SPECPARAM_INT
-             т.к. для некоторых лицевых счетов балансового 2909 не 
-             заполнено поле OB22 в табл. SPECPARAM_INT 
+             т.к. для некоторых лицевых счетов балансового 2909 не
+             заполнено поле OB22 в табл. SPECPARAM_INT
 05/04/2018 - для операций M37, MMV, CN3, CN4
              (операции анулирования переводов)
              удаляем референс проводки анулирования и
@@ -101,7 +122,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FE9_SB ( dat_     DATE,
    data_      DATE;
    dat1_      DATE;
    sum0_      DECIMAL (24);
-   sumk0_     DECIMAL (24);                            --ком_с_я по контракту
+   sumk0_     DECIMAL (24);                            --комiсiя по контракту
    kodp_      VARCHAR2 (33);
 
    znap_      VARCHAR2 (70);
@@ -163,7 +184,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FE9_SB ( dat_     DATE,
 
    l_err      Number := 0;
    l_message  Varchar2 (255);
-   
+
    dat_rep_   date;
 
 -- переказ коштiв по мiжнароднiй системi переказу коштiв або отримання переказу
@@ -257,7 +278,7 @@ BEGIN
    dat2_ := one_day_;
 
    -- это выходной?
-   SELECT COUNT (*)
+   SELECT COUNT ( * )
      INTO kolvo_
      FROM holiday
     WHERE holiday = dat2_ AND kv = 980;
@@ -323,6 +344,44 @@ BEGIN
           lower(p.nazn) not like '%western%' and
           p.sos = 5;
 
+--                                           отдельная обработка проводок дт2909/75
+   INSERT INTO OTCN_PROV_TEMP
+   (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, s_kom, nazn, branch)
+   select /*+ FULL(k) LEADING(k) */
+           nvl(( select max(k.d060)  from kl_fe9 k, provodki_otc o
+                  where o.ref = p.ref
+                    and o.kv = p.kv
+                    and o.acck = ad.acc
+                    and o.nbsd = '2809'
+                    and k.nlsd = '2809'
+                    and k.ob22 = nvl(o.ob22d,'00')
+                    and k.kf = mfo_
+                ),'99')         D060,
+           1, od.fdat, od.ref, od.tt,
+           ad.acc accd, ad.nls nlsd, ad.kv, ak.acc acck, ak.nls nlsk, od.s  s_nom,
+           gl.p_icurval (ad.kv, od.s, od.fdat) s_eqv,
+           0 S_KOM, p.nazn, p.branch
+    from opldok od, accounts ad, opldok ok, accounts ak, oper p
+    where od.fdat between dat1_ and dat_ and
+          od.acc = ad.acc and
+          od.DK = 0 and
+          ad.nls LIKE '2909%' and ad.OB22 = '75' and
+          od.ref = ok.ref and
+          od.stmt = ok.stmt and
+          ok.fdat between dat1_ and dat_ and
+          ok.acc = ak.acc and
+          ok.DK = 1 and
+          regexp_like(ak.nls, '^((2900)|(2620)|(100)|(3800))') and 
+          od.tt NOT IN ('C55', 'C56', 'C57', 'CNC', 'R01') and
+          not (ad.NLS like '2909%' and ak.NLS like '2909%' and ak.ob22 <> '60') and
+          not (ad.NLS  like '29091030046500%' and ak.NLS  like '29094030046530%') and
+          not (substr(ad.NLS,1,4) = substr(ak.NLS,1,4) and ad.ob22 = ak.ob22 and lower(p.nazn) like '%перенес%') and
+          not (lower(p.nazn) like '%повернення%' and p.tt not in ('M37','MMV','CN3','CN4')) and
+          not (ad.kv = 980 and lower(od.txt) like '%ком_с_я%') and
+          od.ref = p.ref and
+          lower(p.nazn) not like '%western%' and
+          p.sos = 5;
+
    -- если отчетный день не последний день месяца то выпоняем включение в файл проводок
    -- введенных в последние календарные дни и проведенные в балансе 1 рабочего дня след. месяца
    if mfou_ = 300465 then
@@ -331,7 +390,7 @@ BEGIN
           (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
          SELECT *
          FROM (
-                -- ТIЛЬКИ ДЛЯ ВС?Х ОБЛУПРАВЛIННЬ ОЩАДБАНКУ    перерахування переказiв
+                -- ТIЛЬКИ ДЛЯ ВСIХ ОБЛУПРАВЛIННЬ ОЩАДБАНКУ    перерахування переказiв
                 SELECT  /*+ PARALLEL(8) */
                      k.d060, ca.rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                      o.acck, o.nlsk,
@@ -369,6 +428,35 @@ BEGIN
                   AND p.pdat > Dat_
                   AND to_char(p.pdat,'MM') = to_char(dat_,'MM')
                   AND p.pdat < one_day_ );
+
+         INSERT /*+ APPEND */ INTO OTCN_PROV_TEMP
+          (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
+                SELECT  /*+ PARALLEL(8) */
+                       nvl(( select max(k.d060)  from kl_fe9 k, provodki_otc t
+                              where t.ref = o.ref
+                                and t.kv = o.kv
+                                and t.acck = o.accd
+                                and t.nbsd = '2809'
+                                and k.nlsd = '2809'
+                                and k.ob22 = nvl(t.ob22d,'00')
+                                and k.kf = mfo_
+                            ),'99')         D060,
+                     ca.rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
+                     o.acck, o.nlsk,
+                     o.s * 100 s_nom,
+                     gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
+                FROM provodki_otc o, cust_acc ca, oper p
+                WHERE o.fdat = one_day_
+                  AND o.kv != 980
+                  AND mfou_ = 300465
+                  AND o.nlsd LIKE '2909%'   and o.ob22d ='75'
+                  and regexp_like(o.nlsk, '^((2900)|(2620)|(100)|(3800))') 
+                  AND o.accd = ca.acc
+                  AND o.ref = p.ref
+                  AND p.pdat > Dat_
+                  AND to_char(p.pdat,'MM') = to_char(dat_,'MM')
+                  AND p.pdat < one_day_ ;
+
             commit;
       end if;
    end if;
@@ -521,7 +609,7 @@ BEGIN
             nls1_ := nlsk_;
          end if;
 
-         if d060_ = '11' and nls_ like '2909%' then
+/*         if d060_ = '11' and nls_ like '2909%' then
             BEGIN
                select ob22
                   into ob22_
@@ -556,7 +644,7 @@ BEGIN
                null;
             END;
          end if;
-
+*/
          -- на 01.04.2014 файл будет консолидированній
          -- но в показатель добавлен код региона (код KKK)
          IF dat_ >= dat_izm1 then
@@ -731,16 +819,16 @@ BEGIN
 
    if mfo_ = 300465 then
       dat_rep_ := last_dayF + 1;
-      
+
       begin
           select count(*)
           into kol_
           from NBUR_TMP_E9_CLOB
           where report_date = dat_rep_;
-          
+
           if kol_ <> 0 then
              delete from NBUR_TMP_E9_CLOB where report_date = dat_rep_;
-             
+
              kol_ := 0;
           end if;
 
@@ -812,4 +900,3 @@ BEGIN
    logger.info ('P_FE9_SB: End ');
 END p_fe9_sb;
 /
-SHOW ERRORS;
