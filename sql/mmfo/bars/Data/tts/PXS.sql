@@ -66,12 +66,34 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk, ob22)
+    values ('2924', 'PXS', 1, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2924'', ''PXS'', 1, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
     values ('2924', 'PXS', 0, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2924'', ''PXS'', 0, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('2560', 'PXS', 0, '06');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2560'', ''PXS'', 0, ''06'') - первичный ключ не найден!');
       else raise;
       end if;
   end;
