@@ -1,11 +1,7 @@
 ﻿$(document).ready(function () {
+
     paramObj = { urlParams: '' };
 
-    initMainFilters();
-    initGrid();
-});
-
-function initGrid() {
     var admuDataSource = new kendo.data.DataSource({
         type: "aspnetmvc-ajax",
         pageSize: 10,
@@ -15,19 +11,19 @@ function initGrid() {
         transport: {
             read: {
                 dataType: "json",
+
+                //TODO: change url after
+
                 url: bars.config.urlContent("/admin/ADMU/GetADMUList"),
-                data: function () {
-                    var a = {
-                        parameters: paramObj.urlParams || '',
-                        mainFilter: {
-                            UserLogin: $('#userLogin').val(),
-                            UserName: $('#userName').val(),
-                            Id: $('#userId').data('kendoNumericTextBox').value(),
-                            UserBranch: $('#userBranch').data('kendoAutoComplete').value(),
-                            UserState: $('#userState').data('kendoDropDownList').value()
+                data: {
+                    parameters:
+                        function () {
+                            debugger;
+                            return paramObj.urlParams || '';
                         }
-                    };
-                    return a;
+                },
+                success: function () { 
+                    //
                 },
                 error: function (xhr, error) {
                     bars.ui.error({ text: "Сталася помилка при спробі завантажити дані таблиці.<br/>" + error });
@@ -35,10 +31,12 @@ function initGrid() {
             }
         },
         requestStart: function (e) {
-            bars.ui.loader($('#allMenus'), true);
+            //kendo.ui.progress($("#grid-container"), true);
+            bars.ui.loader("body", true);
         },
         requestEnd: function (e) {
-            bars.ui.loader($('#allMenus'), false);
+            //kendo.ui.progress($("#grid-container"), false);
+            bars.ui.loader("body", false);
         },
         schema: {
             data: "Data",
@@ -60,13 +58,36 @@ function initGrid() {
 
     function setDefaultSelectedRow() {
         var grid = $("#ADMUGrid").data("kendoGrid");
-        if (grid) {
-            grid.select(grid.tbody.find("tr:first"));
+        if (!!grid) {
+            grid.select("tr:eq(2)");
+
+            // color mark for ADMU data:
+            //grid.tbody.find(">tr").each(function () {
+            //    var dataItem = grid.dataItem(this);
+            //    var d = new Date();
+
+            //    if (dataItem.USER_ACTIVE == 0) {
+            //        $(this).addClass("k-row-isNotActive");
+            //    } else if (kendo.parseDate(dataItem.USER_RDATE2, "dd/MM/yyyy") >= d) {
+            //        $(this).addClass("k-row-isDisable");
+            //    }
+            //});
+        }
+    }
+
+    function setContextAndRefreshAllGrids() {
+        var grid = $("#ADMUGrid").data("kendoGrid");
+        var currentRow = grid.dataItem(grid.select());
+
+        if (!!currentRow) {
+            //$("#pbUnblockUser").data("kendoButton").enable(currentRow.STATE_ID !== 2);
+            //$("#pbBlockUser").data("kendoButton").enable(currentRow.STATE_ID === 2);
+            //$("#pbDropUser").data("kendoButton").enable(currentRow.STATE_ID !== 4);
         }
     }
 
     $("#ADMUGrid").kendoGrid({
-        autoBind: false,
+        autoBind: true,
         selectable: "row",
         sortable: true,
         pageable: {
@@ -78,101 +99,85 @@ function initGrid() {
             {
                 field: "ID",
                 title: "ID",
-                width: "10%"
+                width: "10%",
+                filterable: {
+                    cell: {
+                        template: function (args) {
+                            args.element.kendoNumericTextBox({
+                                format: "#",
+                                decimals: 0
+                            });
+                        }
+
+                    }
+                }
             },
             {
                 field: "LOGIN_NAME",
                 title: "Логін",
-                width: "15%"
+                width: "15%",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
             },
             {
                 field: "USER_NAME",
                 title: "Ім'я користувача",
-                width: "20%"
+                width: "20%",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
             },
             {
                 field: "BRANCH_CODE",
                 title: "Відділення",
-                width: "15%"
+                width: "15%",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
             },
             {
                 field: "AUTHENTICATION_MODE_NAME",
                 title: "Режим автентифікації",
-                width: "15%"
+                width: "15%",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
             },
             {
                 field: "STATE_NAME",
                 title: "Стан",
-                width: "10%"
+                width: "10%",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
             },
             {
                 field: "ADM_COMMENTS",
                 title: "Додаткова інформація",
-                width: "15%"
+                width: "15%",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
             }
         ],
         dataSource: admuDataSource,
-        filterable: false,
+        filterable: {
+            mode: "row"
+        },
+        change: setContextAndRefreshAllGrids,
         dataBound: setDefaultSelectedRow
     });
-}
-
-function initMainFilters() {
-    $('#mainFilterSearchBtn').on('click', function () {
-        var grid = $("#ADMUGrid").data("kendoGrid");
-        grid.dataSource.read();
-        grid.dataSource.page(1);
-    });
-
-    $('#mainFilters input').on('keypress', function (e) {
-        var char = e.which || e.keyCode;
-        if (char === 13) {
-            $('#mainFilterSearchBtn').click();
-        }
-    });
-
-    $('#userId').kendoNumericTextBox({
-        spinners: false,
-        decimals: 0,
-        restrictDecimals: true,
-        format: 'n0',
-        max: 999999999999
-    });
-    $('#userState').kendoDropDownList(getDropDownOptions({
-        dataSource: [
-            { code: 4, name: 'Закритий' },
-            { code: 3, name: 'Блокований' },
-            { code: 2, name: 'Активний' }
-        ]
-    }));
-
-    $("#userBranch").kendoAutoComplete({
-        dataSource: {
-            type: 'json',
-            transport: {
-                read: bars.config.urlContent('/admin/ADMU/GetBranchesDdlData')
-            }
-        },
-        filter: 'contains',
-        placeholder: 'Почніть вводити відділення',
-        dataTextField: "Branch",
-        template: '<span class="k-state-default" style="font-size:12px;">#: data.Branch #</span>'
-    });
-}
-
-function getDropDownOptions(options) {
-    if (options === undefined || options === null) options = {};
-    options = $.extend(
-        {
-            dataTextField: 'name',
-            dataValueField: 'code',
-            optionLabel: ' --- '
-        },
-        options
-    );
-
-    options.template = '<span class="k-state-default" style="font-size:12px;">#: data.' + options.dataTextField + ' #</span>';
-    options.valueTemplate = '<span class="k-state-default" style="font-size:12px;">#: data.' + options.dataTextField + ' #</span>';
-
-    return options;
-}
+});

@@ -1,6 +1,3 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/v_sw_gpi_statuses.sql =========*** START
-PROMPT ===================================================================================== 
 
 CREATE OR REPLACE VIEW v_sw_gpi_statuses (
    ref,
@@ -22,48 +19,47 @@ CREATE OR REPLACE VIEW v_sw_gpi_statuses (
    status_code,
    status_description )
 AS
-SELECT
-         bars_swift.get_document_ref (j.swref)  ref,
+SELECT   q.REF,
          j.mt AS mt103,
          j.io_ind AS io_ind_103,
-         j.swref AS swref_103,
+         q.swref AS swref_103,
          j.date_in AS date_input_103,
          j.date_out AS date_output_103,
          j.vdate AS vdate_103,
          j.sender AS sender_103,
          j.receiver AS receiver_103,
-         (SELECT regexp_replace (value , '([^[:cntrl:]]+)[[:cntrl:]]+\d?/? *([^[:cntrl:]]*)[[:cntrl:]]+(.*)', '\2', 1,1,'n')  FROM   sw_operw w WHERE  w.swref = j.swref AND w.tag = 50)  AS payer_103,
-         nvl( j.payee , (SELECT regexp_replace (value , '([^[:cntrl:]]+)[[:cntrl:]]+\d?/? *([^[:cntrl:]]*)[[:cntrl:]]*(.*)', '\2', 1,1,'n') FROM   sw_operw w  WHERE  w.swref = j.swref AND w.tag = 59)    ) AS payee_103,
-         (SELECT  regexp_replace (value , '/([^[:cntrl:]]+?)[[:cntrl:]](.+)', '\1', 1,1,'n')  FROM   sw_operw w WHERE  w.swref = j.swref AND w.tag = 50) as   sender_account,
+         j.payer AS payer_103,
+         j.payee AS payee_103,
+         (SELECT REGEXP_replace (VALUE, '(/*)([^[:cntrl:]]+)(.*)' ,'\2',1,1,'n')
+          FROM   sw_operw w
+          WHERE  w.swref = q.swref AND w.tag = 50)
+             sender_account,
          j.amount / 100 AS amount,
          j.currency,
          j.sti,
          j.uetr,
-         j.statusvalue  as status_code,
-         s.DESCRIPTION  as status_description
-FROM (
-select j.* ,
-  (SELECT  MIN( regexp_replace (VALUE, '(^//[^/]+//?)([[:print:]]+)(.+)', '\2',1,1,'n') )
-          KEEP (DENSE_RANK FIRST  ORDER BY date_in DESC)
-        FROM   sw_journal jj, sw_operw ow
-        WHERE      jj.swref = ow.swref
-               AND jj.uetr = j.uetr
-               AND jj.mt = decode (j.mt, 103, 199, 299)
-               --- исключаем странные 199 со статусами INVA/X003, INVA/X002 ...
-               and jj.io_ind <> j.io_ind
-               AND ow.tag = 79) as statusvalue
-from sw_journal j
- where j.mt in (103, 202)
-) j left join   sw_statuses s  ON j.statusvalue = s.VALUE
+
+         s.VALUE AS status_code,
+         s.description AS status_description
+FROM
+           sw_journal j
+           left join  sw_oper_queue q  ON j.swref = q.swref
+           left  JOIN sw_statuses s  ON q.status = s.id
+      ---     LEFT JOIN oper o    ON o.REF = q.REF
+
+WHERE  ( q.swref_199 is null or   q.swref_199 = (SELECT MAX (swref_199)
+                        FROM   sw_oper_queue qq
+                        WHERE  qq.swref = q.swref))
+
+  AND j.mt <> 199
+
 /
 
 -- Grants for View
 GRANT SELECT ON v_sw_gpi_statuses TO bars_access_defrole
 /
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_sw_gpi_statuses.sql =========*** End
-PROMPT ===================================================================================== 
+ 
 
 
 

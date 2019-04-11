@@ -318,45 +318,6 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
             }
         }
 
-        public string SendAccStatus(int id, string state)
-        {
-            string res = String.Empty;
-            string setStateResult = String.Empty;
-
-            Login login = new Login();
-            login.email = Bars.Configuration.ConfigurationSettings.AppSettings["EWA.EWAEMAIL"];  //GetParameter("EWAEMAIL");
-            login.password = Bars.Configuration.ConfigurationSettings.AppSettings["EWA.EWAHASH"];  //GetParameter("EWAHASH");
-            try
-            {
-                var response = RemoteLogin(login, "POST", "user/login");
-            }
-            catch (Exception ex)
-            {
-                res = "Error while trying to Remote login to EWA. Message: " + ex.Message;
-                throw new Exception(res);
-            }
-
-            try
-            {
-                setStateResult = Send(null, "POST", "contractpayment/setState?id=" + id + "&state=" + state);
-
-                JObject pointres = JObject.Parse(setStateResult);
-                string sessionId = pointres.SelectToken(@"sessionId").Value<string>(); ;
-                res = "State has changed successfully. SessionId = " + sessionId;
-
-                return res;
-            }
-            catch (JsonReaderException JsonEx)
-            {
-                res = "Error while parsing result JSON. StackTrace: " + JsonEx.StackTrace +". Result string is: " + setStateResult;
-                throw new Exception(res);
-            }
-            finally
-            {
-                Send(null, "PUT", "user/logout");
-            }
-        }
-
         public byte[] GetReport(decimal insextid, decimal insexttmp, bool? draft)
         {
             Login login = new Login();
@@ -380,9 +341,8 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
             string body = "email=" + register.email + "&password=" + register.password;
             byte[] arrStream = Encoding.UTF8.GetBytes(body);
 
-            //var serviceUrl = "https://test.ewa.ua/ewa/api/v6/";
-            var serviceUrl = Bars.Configuration.ConfigurationSettings.AppSettings["EWA.EWAURL"];
-            //var serviceUrl = GetParameter("EWAURL");
+            //var serviceUrl = "https://test.ewa.ua/";
+            var serviceUrl = GetParameter("EWAURL");
 
             var request = (HttpWebRequest)WebRequest.Create(serviceUrl + func);
             request.Method = method;
@@ -423,8 +383,7 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
             }
 
             //var serviceUrl = "https://test.ewa.ua/";
-            //var serviceUrl = GetParameter("EWAURL");
-            var serviceUrl = Bars.Configuration.ConfigurationSettings.AppSettings["EWA.EWAURL"];
+            var serviceUrl = GetParameter("EWAURL");
 
             var request = (HttpWebRequest)WebRequest.Create(serviceUrl + func);
             request.Method = method;

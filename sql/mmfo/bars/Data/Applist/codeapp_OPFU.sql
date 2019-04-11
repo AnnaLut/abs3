@@ -36,16 +36,6 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
-          --  Створюємо функцію 'Перегляд реєстрів ПФУ що пернесені до архіву'
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Перегляд реєстрів ПФУ що перенесені до архіву',
-                                                  p_funcname => '/barsroot/pfu/pfu/Archives',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
           --  Створюємо функцію Друк звітів

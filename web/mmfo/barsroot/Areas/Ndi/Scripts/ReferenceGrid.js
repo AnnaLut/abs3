@@ -17,7 +17,7 @@
 
     //точка входа в приложение
     launch: function () {
-        
+
         var thisApp = this;
         //заполняется из ViewBag в представлении
         var tableId = window.tableId;

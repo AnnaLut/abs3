@@ -16,7 +16,6 @@ using Dapper;
 using Bars.Classes;
 using System.Data;
 using System.Text;
-using Oracle.DataAccess.Types;
 
 namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
 {
@@ -1487,92 +1486,6 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
         public IEnumerable<FileType> GetFileTypes()
         {
             return _pfu.ExecuteStoreQuery<FileType>("select id, name from pfu.PFU_FILE_TYPE", null).AsEnumerable();
-        }
-        public string MoveToArchive(decimal[] fileIds)
-        {
-            decimal?[] ids = fileIds.Cast<decimal?>().ToArray();
-
-            string command = @"
-                    begin
-                         pfu.pfu_files_utl.move_to_arc(:pi_fileid, :po_errortext);
-                    end;";
-
-            var parameters = new object[]
-            {
-                new OracleParameter("pi_fileid", OracleDbType.Array, ids.Length, (Bars.Oracle.NumberList)ids, ParameterDirection.Input) { UdtTypeName = "BARS.NUMBER_LIST", Value = ids},
-                new OracleParameter("po_errortext", OracleDbType.Varchar2) {Direction = ParameterDirection.Output, Size = 4000}
-            };
-            _pfu.ExecuteStoreCommand(command, parameters);
-
-            OracleString errortext = ((OracleString)((OracleParameter)parameters[1]).Value);
-            return errortext.IsNull ? "" : errortext.Value;
-        }
-
-        public string MoveFromArchive(decimal[] fileIds)
-        {
-            decimal?[] ids = fileIds.Cast<decimal?>().ToArray();
-
-            string command = @"
-            begin
-                 pfu.pfu_files_utl.move_from_arc(:pi_fileid, :po_errortext);
-            end;";
-
-            var parameters = new object[]
-            {
-                new OracleParameter("pi_fileid", OracleDbType.Array, ids.Length, (Bars.Oracle.NumberList)ids, ParameterDirection.Input) { UdtTypeName = "BARS.NUMBER_LIST", Value = ids},
-                new OracleParameter("po_errortext", OracleDbType.Varchar2) {Direction = ParameterDirection.Output, Size = 4000}
-            };
-            _pfu.ExecuteStoreCommand(command, parameters);
-
-            OracleString errortext = ((OracleString)((OracleParameter)parameters[1]).Value);
-            return errortext.IsNull ? "" : errortext.Value;
-        }
-
-        public IEnumerable<V_PFU_REGISTERS_ARC> PaidArchives(DataSourceRequest request)
-        {
-            var searchQuery = InitPaidArchives();
-            var query = _sqlTransformer.TransformSql(searchQuery, request);
-            var item = _pfu.ExecuteStoreQuery<V_PFU_REGISTERS_ARC>(query.SqlText, query.SqlParams);
-            return item;
-        }
-
-        public decimal CountPaidArchives(DataSourceRequest request)
-        {
-            var searchQuery = InitPaidArchives();
-            var query = _kendoSqlCounter.TransformSql(searchQuery, request);
-            var count = _pfu.ExecuteStoreQuery<decimal>(query.SqlText, query.SqlParams).Single();
-            return count;
-        }
-        private BarsSql InitPaidArchives()
-        {
-            return new BarsSql()
-            {
-                SqlText = @"select * from pfu.v_pfu_registers_arc_match_send",
-                SqlParams = new object[] { }
-            };
-        }
-        public IEnumerable<V_PFU_REGISTERS_ARC> UnpaidArchives(DataSourceRequest request)
-        {
-            var searchQuery = InitUnaidArchives();
-            var query = _sqlTransformer.TransformSql(searchQuery, request);
-            var item = _pfu.ExecuteStoreQuery<V_PFU_REGISTERS_ARC>(query.SqlText, query.SqlParams);
-            return item;
-        }
-        public decimal CountUnpaidArchives(DataSourceRequest request)
-        {
-            var searchQuery = InitUnaidArchives();
-            var query = _kendoSqlCounter.TransformSql(searchQuery, request);
-            var count = _pfu.ExecuteStoreQuery<decimal>(query.SqlText, query.SqlParams).Single();
-            return count;
-        }
-
-        private BarsSql InitUnaidArchives()
-        {
-            return new BarsSql()
-            {
-                SqlText = @"select * from pfu.v_pfu_registers_arc_ERROR",
-                SqlParams = new object[] { }
-            };
         }
     }
 

@@ -117,7 +117,7 @@ namespace Bars.WebServices.OutsideServices
                 XmlDocument xmlDoc = new XmlDocument();
                 dynamic records = response;
 
-            if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW ||    
+                if (serviceName == TypeClient.ServiceName.SINGLE_WINDOW ||
                     (serviceName == TypeClient.ServiceName.QUICK_MONEY && response[0].Length == 1)) //old version for single_window & quick_money.TransactionShortReport
                 {
 

@@ -9,6 +9,35 @@
 
 <link href="~/Areas/Admin/Css/admu.css" rel="stylesheet">
 
+<style>
+.sample-show-hide {
+  padding: 10px;
+  border: 1px solid black;
+  background: white;
+}
+
+.sample-show-hide {
+  transition: all linear 0.5s;
+}
+
+.sample-show-hide.ng-hide {
+  opacity: 0;
+}
+.button {
+    background-image: none;
+    padding-bottom: 10px;
+}
+.active {
+    color: #fff;
+    background-color: #32408f;
+    border-color: #32408f;
+}
+.disabled {
+    background: #eee;
+    color: #aaa;
+}
+</style>
+
 <script>
     var proxy = "@ViewBag.Proxy";
     var funcType = "none";
@@ -17,38 +46,9 @@
 <div class="page-header">
     <h1>@ViewBag.Title</h1>
 </div>
-<div id="allMenus">
-    <div id="UsersConfigToolBar"></div>
 
-    <div id="mainFilters" class="k-toolbar k-widget k-toolbar-resizable" style="padding-left:10px;white-space: normal;">
-        <div>
-            <label for="userId">ID</label>
-            <input id="userId" maxlength="12" style="width:125px;" title="Унікальний ідентифікатор користувача" />
-        </div>
 
-        <div>
-            <label for="userLogin">Логін</label>
-            <input id="userLogin" class="k-textbox" type="text" title="Пошук по принципу 'починається на'" />
-        </div>
-
-        <div>
-            <label for="userName">Ім'я користувача</label>
-            <input id="userName" class="k-textbox" type="text" style="width:200px;" title="Пошук по принципу 'містить'" />
-        </div>
-
-        <div>
-            <label for="userBranch">Відділення</label>
-            <input id="userBranch" style="width:180px;font-size:12px;" title="Код відділення користувача" />
-        </div>
-
-        <div>
-            <label for="userState">Стан</label>
-            <input id="userState" style="width:120px;" title="Стан користувача" />
-        </div>
-
-        <button class="k-button" id="mainFilterSearchBtn">Пошук</button>
-    </div>
-</div>
+<div id="UsersConfigToolBar"></div>
 <div id="ADMUGrid"></div>
 
 <div id="CreateUserWindow">
@@ -170,12 +170,12 @@
                 </div>
             </div>
             @*<div id="create-branch-tab">
-                    <div class="form-group">
-                        <div style="padding-top: 2em;">
-                            <div id="treelist"></div>
-                        </div>
+                <div class="form-group">
+                    <div style="padding-top: 2em;">
+                        <div id="treelist"></div>
                     </div>
-                </div>*@
+                </div>
+            </div>*@
             <div id="create-role-tab" style="height: 430px">
                 <div class="form-group">
                     <div style="padding-top: 2em;">
@@ -227,10 +227,10 @@
                 <div class="panels">
                     <div class="" style="float:right;width: 20%;">
                         @*<div>
-                                <button type="button" id="changePassword" class="k-button" style="margin:1px;width: 100px;">
-                                    <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Змінити<br/>пароль</h5>
-                                </button>
-                            </div>*@
+                            <button type="button" id="changePassword" class="k-button" style="margin:1px;width: 100px;">
+                                <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Змінити<br/>пароль</h5>
+                            </button>
+                        </div>*@
                         <div>
                             <button type="button" id="lock" class="k-button" style="margin:1px;width: 100px;">
                                 <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Блокувати</h5>
@@ -250,12 +250,12 @@
                             </div>
                         </div>
                     </div>
-
+                    
                 </div>
                 <div class="panels">
                     <div style="float:left;width: 70%;"><h5 style="color: #428bca;">Примітки:</h5></div>
                     <div class="well" style="float:left;width: 70%;" id="edComments">
-
+                        
                     </div>
                 </div>
             </div>
@@ -322,59 +322,58 @@
                 </div>
             </div>
             <div id="edit-role-tab">
-
-
-                <div class="row">
-                    <div class="form-inline">
-                        <h3>Поле пошуку ролі</h3>
-                        <div id="custom-search-input">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="rCode" placeholder="Код ролі" style="height: 34px !important;" maxlength="15" size="25" />
-                                <span class="input-group-btn">
-                                    <button id="showWindow" class="btn btn-info" type="button">
-                                        <i class="pf-icon pf-16 pf-find"></i>
-                                        Пошук
-                                    </button>
-                                </span>
-                            </div>
-                            <div class="control-group" style="width: 25px; float: right; margin-left: 30px;">
-                                <button id="clearFilter" class="btn btn-default" type="button">
-                                    <i class="pf-icon pf-16 pf-filter-remove"></i>
-                                </button>
+     
+                    
+                        <div class="row">
+                            <div class="form-inline">
+                                <h3>Поле пошуку ролі</h3>
+                                <div id="custom-search-input">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="rCode" placeholder="Код ролі" style="height: 34px !important;" maxlength="15" size="25" />
+                                        <span class="input-group-btn">
+                                            <button id="showWindow" class="btn btn-info" type="button">
+                                                <i class="glyphicon glyphicon-search">Пошук</i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="control-group" style="width: 25px; float: right; margin-left: 30px;">
+                                        <button id="clearFilter" class="btn btn-default" type="button">
+                                            <i class="pf-icon pf-16 pf-filter-remove"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-
+                    
+                
                 <div id="edit-role-grid"></div>
             </div>
             <div id="edit-delegation-tab">
                 <div id="delegationBody"></div>
                 <div>
                     <button type="button" id="delegate" class="k-button" style="margin: 1px; width: 100px;">
-                        <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Делегувати<br />права</h5>
+                        <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Делегувати<br/>права</h5>
                     </button>
 
                     <button type="button" id="cencelDelegate" class="k-button" style="margin: 1px; width: 100px;">
-                        <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Відмінити<br />делегування</h5>
+                        <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Відмінити<br/>делегування</h5>
                     </button>
                 </div>
             </div>
         </div>
         <div class="form-group" style="margin-bottom: 1px; float: right; margin-right: 20px;margin-top: 15px;">
-            <button id="btnSave-editing" type="submit" class="k-button btnSave">Зберегти</button>
-            <button id="btnCancel-editing" type="button" class="k-button btnCancel">Відмінити</button>
+                <button id="btnSave-editing" type="submit" class="k-button btnSave">Зберегти</button>
+                <button id="btnCancel-editing" type="button" class="k-button btnCancel">Відмінити</button>
         </div>
     </form>
 </div>
 
 <script type="text/x-kendo-template" id="authTemp">
-
-    <label for="ed_adLogin">Логін</label>
-    <input type="text" class="input" placeholder="Логін" id="ed_adLogin" value="#= AdName !== 'null' ? AdName : ''#">
-    <p class="rez"></p>
-
+   
+        <label for="ed_adLogin">Логін</label>
+        <input type="text" class="input" placeholder="Логін" id="ed_adLogin" value="#= AdName !== 'null' ? AdName : ''#">
+        <p class="rez"></p>
+ 
 </script>
 
 <!-- Edit template -->
@@ -413,7 +412,7 @@
             <div class="form-group" style="margin-left: 10px; float: left">
                 <input id="" class="form-control" readonly style="width: 250px; height: 20px; margin-left: 5px;" value="#=UserStateName#">
             </div>
-        </div>
+        </div>        
     </div>
 </script>
 
@@ -431,7 +430,7 @@
 <script type="text/x-kendo-template" id="edSignContent">
     <div>
         <label>
-            <input id="ed_canSelectBranch" type="checkbox" data-bind="checked:CanSelectBranch" #=CanSelectBranch ? checked='checked' : '' #>Може обирати відділення
+            <input id="ed_canSelectBranch" type="checkbox" data-bind="checked:CanSelectBranch" #=CanSelectBranch ? checked='checked' : '' #>Може обирати відділення 
 
         </label>
     </div>
@@ -500,7 +499,7 @@
             <div class="panels">
                 <div class="form-group" style="margin-left: 20px;">
                     <h5><label for="chPassConfirm-ABS" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;">Підтвердження:</label></h5>
-                    <input type="password" class="form-control" id="chPassConfirm-ABS" required style="height: 20px; width: 50%;" placeholder="Підтвердіть пароль" />
+                    <input type="password" class="form-control" id="chPassConfirm-ABS" required style="height: 20px; width: 50%;" placeholder="Підтвердіть пароль"/>
                 </div>
             </div>
         </div>
@@ -517,13 +516,13 @@
             <div class="panels">
                 <div class="form-group" style="margin-left: 20px;">
                     <h5><label for="chPass-ORA" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px; margin-right: 48px;">Пароль:</label></h5>
-                    <input type="password" class="form-control" id="chPass-ORA" required style="height: 20px; width: 50%;" placeholder="Новий пароль" />
+                    <input type="password" class="form-control" id="chPass-ORA" required style="height: 20px; width: 50%;" placeholder="Новий пароль"/>
                 </div>
             </div>
             <div class="panels">
                 <div class="form-group" style="margin-left: 20px;">
                     <h5><label for="chPassConfirm-ORA" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;">Підтвердження:</label></h5>
-                    <input type="password" class="form-control" id="chPassConfirm-ORA" required style="height: 20px; width: 50%;" placeholder="Підтвердіть пароль" />
+                    <input type="password" class="form-control" id="chPassConfirm-ORA" required style="height: 20px; width: 50%;" placeholder="Підтвердіть пароль"/>
                 </div>
             </div>
         </div>
@@ -540,9 +539,9 @@
         <div class="panels">
             <div class="form-group" style="margin-left: 10px; margin-bottom: 20px;">
                 <h5><label style="padding-top: 6px; float: left; margin-top: 5px; margin-right: 10px;">Період делегування прав:</label></h5>
-                <input type="text" class="form-control" id="delegateDateFrom" required style="height: 20px; width: 30%; float: left; margin-bottom: 15px" />
+                <input type="text" class="form-control" id="delegateDateFrom" required style="height: 20px; width: 30%; float: left; margin-bottom: 15px"/>
                 <h5><label for="delegateDateTo" style="padding-top: 6px; padding-right: 12px; padding-left: 10px; float: left;"></label></h5>
-                <input type="text" class="form-control" id="delegateDateTo" required style="height: 20px; width: 30%;" />
+                <input type="text" class="form-control" id="delegateDateTo" required style="height: 20px; width: 30%;"/>
             </div>
         </div>
         <div class="panels">
@@ -606,3 +605,76 @@
         #= AdmComments !== 'null' ? AdmComments : 'Відсутні'#
     </p>
 </script>
+
+
+<style>
+    #create-form-tabs {
+        margin-bottom: 20px;
+    }
+    #create-form-tabs .k-content
+    {
+        height: 400px;
+        overflow: auto;
+    }
+    #tabstrip-left .k-tabstrip .k-content
+    {
+        height: 10px;
+    }
+
+    .fieldlist {
+        margin: 0 0 -1em;
+        padding: 0;
+    }
+
+    .fieldlist li {
+        list-style: none;
+        padding-bottom: 1em;
+    }
+
+    #tabstrip-left .k-content.k-state-active {
+        height: 180px !important;
+    }
+
+    
+    .isUse {
+        color: #468847;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+    .outUse {
+        color: #3a87ad;
+        background-color: #d9edf7;
+        border-color: #bce8f1;
+    }
+
+
+    .switch-wrapper {
+        display: inline-block;
+        position: relative;
+        top: 3px;
+    }
+
+
+
+    /*Edit*/
+    .table {
+        display:table;
+        width:100%;
+        height:100%;
+    }
+    .cell {
+        display:table-cell;
+        width:50%;
+        height:50%;
+    }
+    .row {
+        display:table-row;
+    }
+
+
+</style>
+
+
+
+
+

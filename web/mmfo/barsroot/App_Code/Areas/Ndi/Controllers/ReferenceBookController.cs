@@ -721,6 +721,11 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
                 List<FieldProperties> jsonSqlProcParameter;
                 List<FieldProperties> funcParams = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonFuncParams);
+                //if (!string.IsNullOrEmpty(jsonSqlProcParams) && jsonSqlProcParams != "undefined")
+                //{
+                //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
+                //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
+                //}
                 GetFileResult res = _repository.CallFunctionWithFileResult(tableId, funcId, codeOper, funcParams, procName, msg, web_form_name);
                 if (res.Result == "ok" && (res.FileBytesBody != null) && !string.IsNullOrEmpty(res.FileName))
                     return File(res.FileBytesBody, "text/html", HttpUtility.UrlEncode(res.FileName));
@@ -814,7 +819,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
             }
             catch (Exception e)
             {
-                return Json(new { status = "error", msg = "Помилка прstring[] columnsUnVisible отриманні списку довідників.\r\n" + GetErrorInfo(e) + "<br />" + e.Message });
+                return Json(new { status = "error", msg = "Помилка прstring[] columnsVisibleи отриманні списку довідників.\r\n" + GetErrorInfo(e) + "<br />" + e.Message });
             }
         }
 

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/gl.sql =========*** Run *** ========
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.GL 
+CREATE OR REPLACE PACKAGE BARS.GL
 IS
 --***************************************************************--
 --                 General Ledger Package Header
@@ -528,7 +522,11 @@ function USR_ID return number;
 
 END gl;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.GL 
+
+
+----------------------------------------------------------------------
+
+create or replace package body GL
 is
   --***************************************************************--
   --                     General Ledger Package
@@ -921,10 +919,6 @@ IS
 
  nbsa_       CHAR(4) :=NULL;
  nbsb_       CHAR(4) :=NULL;
- 
- ob22a_      char(2);
- ob22b_      char(2);
- ob22_       char(2);
 
  err         EXCEPTION;
  erm         VARCHAR2(80);
@@ -1003,7 +997,7 @@ BEGIN
    IF mfoa_ = gl.aMFO THEN
 
       BEGIN
-        SELECT tip,nbs,ob22 INTO tip_a_,nbsa_, ob22a_
+        SELECT tip,nbs INTO tip_a_,nbsa_
           FROM accounts
          WHERE kv=kv_ AND nls=nlsa_;
       EXCEPTION
@@ -1014,7 +1008,7 @@ BEGIN
    IF mfob_ = gl.aMFO THEN
 
       BEGIN
-        SELECT tip,nbs,ob22 INTO tip_b_,nbsb_,ob22b_
+        SELECT tip,nbs INTO tip_b_,nbsb_
           FROM accounts
          WHERE kv=kv2_ AND nls=nlsb_;
       EXCEPTION
@@ -1042,25 +1036,22 @@ BEGIN
          IF i_=dk_ THEN
             nbs_ := nbsb_;
             nls_ := nlsb_;
-            ob22_:= ob22b_;
          ELSE
             nbs_ := nbsa_;
             nls_ := nlsa_;
-            ob22_:= ob22a_;
          END IF;
 
          IF nbs_ IS NOT NULL THEN
             x := 0;
 
-            FOR nbs_rec IN (SELECT nbs,1 x, ob22 FROM ps_tts WHERE tt=tt_ AND dk=i_)
+            FOR nbs_rec IN (SELECT nbs,1 x FROM ps_tts WHERE tt=tt_ AND dk=i_)
 
             LOOP
                x := nbs_rec.x;
-               IF (nbs_rec.nbs = nbs_   OR
+               IF nbs_rec.nbs = nbs_   OR
                   RTRIM(nbs_rec.nbs) = SUBSTR(nbs_,1,3) OR
                   RTRIM(nbs_rec.nbs) = SUBSTR(nbs_,1,2) OR
-                  RTRIM(nbs_rec.nbs) = SUBSTR(nbs_,1,1))
-                  and (nbs_rec.ob22 is null or nbs_rec.ob22 = ob22_)
+                  RTRIM(nbs_rec.nbs) = SUBSTR(nbs_,1,1)
                THEN
                   x := 1-nbs_rec.x;
                   EXIT;
@@ -1068,7 +1059,7 @@ BEGIN
             END LOOP;
             IF x>0 THEN
                erm := '9309 - Improper acc operation \#'||
-                       nls_||'('||tt_||'-'||i_||'), ob22 = '||ob22_;
+                       nls_||'('||tt_||'-'||i_||')';
                RAISE err;
             END IF;
          END IF;
@@ -1875,7 +1866,7 @@ IF p_flag IN (1,2,3) THEN -- Pay cleared
                     , KOSQ_YR = KOSQ_YR + kosq_
                 where ACC     = acc_
                   and FDAT    = fdat_;
-
+               
                IF SQL%ROWCOUNT=0 THEN
                   insert into SALDOZ ( ACC, FDAT, DOS, DOSQ, KOS, KOSQ, DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR )
                   values ( acc_, fdat_, 0, 0, 0, 0, dos_, dosq_, kos_, kosq_ );
@@ -2212,7 +2203,7 @@ BEGIN
 
                END IF;
 
-               IF ( vob_ = 99 )
+               IF ( vob_ = 99 ) 
                THEN -- Виконати вилучення виправних за рік
 
                  DECLARE
@@ -3777,7 +3768,7 @@ begin
       when NO_DATA_FOUND then
         raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' ще не відкрита!', true );
     end;
-
+    
     if ( nvl(sys_context('USERENV','ACTION'), '0') <> 'BARS_LOGIN.CLEAR_EXPIRED_SESSION' ) then
       if ( l_bnk_dt_st = 9 )
       then

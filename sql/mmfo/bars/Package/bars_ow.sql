@@ -603,12 +603,7 @@ type t_insurance is record(nd         w4_acc.nd%type,
                            ins_nls    varchar2(15),
                            ins_mfo    varchar2(12),
                            ins_okpo   customer.okpo%type,
-                           ins_name   ins_partners.name%type,
-                           --COBUMMFO-9623---- 
-                           rezident   varchar2(10),
-                           citizenship varchar2(60) 
-                           ------------------- 
-
+                           ins_name   ins_partners.name%type
                            );
 
 type t_newnb is record(nbs varchar2(4),
@@ -1024,11 +1019,7 @@ begin
          wd.ins_ukr_id, wd.ins_wrd_id, a.nls,
          sys_context('bars_global', 'user_name') logname,
          a.branch branch,
-         sys_context('bars_context', 'user_mfo') mfo,
-         --9623---------|
-         decode(cag.rezid, 1, 'rez', 'notrez')rezident,
-         country.country||' '||country.name citizenship
-         ---------------|
+         sys_context('bars_context', 'user_mfo') mfo
     into l_insurance.nd,
          l_insurance.last_name,
          l_insurance.first_name,
@@ -1042,12 +1033,7 @@ begin
          l_insurance.ins_ukr_id, l_insurance.ins_wrd_id, l_insurance.nls,
          l_insurance.logname,
          l_insurance.branch_u,
-         l_insurance.mfo,
-         --9623---------|
-         l_insurance.rezident,
-         l_insurance.citizenship
-         ---------------|
-
+         l_insurance.mfo
     from customer t
     join person p
       on t.rnk = p.rnk
@@ -1057,10 +1043,6 @@ begin
       on a.acc = w.acc_pk
     join w4_card wd
       on w.card_code = wd.code
-    --9623---------|
-     join codcagent cag on cag.codcagent = t.codcagent
-     join country on country.country=t.country
-    ---------------|  
     left join ins_w4_deals iw
       on w.nd = iw.nd
     left join customerw tt
@@ -1087,13 +1069,7 @@ begin
             end,
             decode(iw.nd, null, 0, case when iw.ins_ext_id in (wd.ins_ukr_id, wd.ins_wrd_id) then 1 else 0 end),
             decode(iw.nd, null, 0, 1),
-            wd.ins_ukr_id, wd.ins_wrd_id, a.nls, a.branch,
-            --9623---------|
-            decode(cag.rezid, 1, 'rez', 'notrez'),
-            country.country||' '||country.name
-            ---------------|
-
-	;
+            wd.ins_ukr_id, wd.ins_wrd_id, a.nls, a.branch;
 
   --отримання реквізитів страхової компанії
     ins_ewa_mgr.get_prodpack_ins_k(l_insurance.ext_id,
@@ -13540,9 +13516,7 @@ begin
 
 
   -- внесение данных в очередь для обработки в CardMake
-  ---for subcard from w4_card_add (6327)
-  -- p_salaryproect<>-1 = З/П проект
- if p_salaryproect<>-1 then
+    ---for subcard from w4_card_add (6327)
   begin
    select count('x') into l_add_card
    from w4_card_add a where a.card_code_add=p_cardcode;
@@ -13550,7 +13524,6 @@ begin
    when no_data_found then
      null;
   end;
- end if; 
  ---
 
   add_deal_to_cmque(
@@ -14937,7 +14910,7 @@ begin
        for card_add in (select cad.card_code_add
                           from W4_CARD_ADD cad where cad.card_code=p_card_code and cad.en=1)
        loop
-        if check_cust_dk(l_rnk, card_add.card_code_add )=0 then     --перевірка умов по клієнту
+        if check_cust_dk(l_rnk, null )=0 then     --перевірка умов по клієнту
          open_card (
           p_rnk           => l_rnk,
           p_nls           => l_instant_nls,

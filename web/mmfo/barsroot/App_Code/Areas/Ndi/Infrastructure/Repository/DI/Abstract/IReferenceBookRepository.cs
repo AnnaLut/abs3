@@ -27,7 +27,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         /// <param name="gridFilter"></param>
         /// <param name="externalFilter"></param>
         /// <param name="fallDownFilter"></param>
-        /// <param name="columnsUnVisible"></param>
+        /// <param name="columnsVisible"></param>
         /// <param name="start"></param>
         /// <param name="limit"></param>
         /// <param name="getAllRecords">Экспорт всех строк. Если указано, то игнорируются параметры <see cref="start"/>, <see cref="limit"/></param>

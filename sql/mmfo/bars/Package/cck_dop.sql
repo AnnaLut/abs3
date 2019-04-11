@@ -369,12 +369,11 @@ BEGIN
     end if;
 
     -- узнаем цель
-/*    if NEWNBS.GET_STATE = 1 then
+    if NEWNBS.GET_STATE = 1 then
      select nvl(min(AIM),62) into aim_ from cc_aim where substr(PROD_,1,4) in ( nvl(NBS,'2063'), nvl(NBS2,'2063'), nvl(NBSF,'2203'), nvl(NBSF2,'2203'));
     else
      select nvl(min(AIM),62) into aim_ from cc_aim where substr(PROD_,1,4) in ( nvl(NBS,'2062'), nvl(NBS2,'2063'), nvl(NBSF,'2202'), nvl(NBSF2,'2203'));
-    end if;*/
-    select nvl(min(AIM),62) into aim_ from cc_aim_2 where nbs = substr(PROD_,1,4);
+    end if;
     -- pасчитываем дату первого гашени€
 
     -- отбраковываем несуществующий день
@@ -390,7 +389,8 @@ BEGIN
     -- вид кредита
     if substr(prod_, 2, 1) = 2 then
       Vid_ := 11;
-    else      if prod_ = '206309' then
+    else
+      if prod_ = '206309' then
         Vid_ := 2;
       else
         Vid_ := 1;

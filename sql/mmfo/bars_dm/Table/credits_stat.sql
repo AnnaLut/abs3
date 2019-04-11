@@ -89,7 +89,7 @@ end;
 
 prompt add column nls
 begin
-execute immediate 'alter table bars_dm.credits_stat add nls_SG VARCHAR2(15)';
+execute immediate 'alter table bars_dm.credits_stat add nls VARCHAR2(15)';
 exception
   when others then
      if sqlcode = -1430 then null;
@@ -98,20 +98,6 @@ exception
      end if;
 end;
 /
-
-
-prompt add column acc 2203
-begin
-execute immediate 'alter table bars_dm.credits_stat add acc_SS number';
-exception
-  when others then
-     if sqlcode = -1430 then null;
-     else
-       raise;
-     end if;
-end;
-/
-
 
 prompt drop error log
 begin
@@ -165,8 +151,7 @@ COMMENT ON COLUMN BARS_DM.CREDITS_STAT.PTN_MOTHER_NAME IS 'найменування материнс
 COMMENT ON COLUMN BARS_DM.CREDITS_STAT.OPEN_DATE_BAL22 IS 'дата відкриття рахунку 2202/03 або 2232/33';
 COMMENT ON COLUMN BARS_DM.CREDITS_STAT.ES000 IS '';
 COMMENT ON COLUMN BARS_DM.CREDITS_STAT.ES003 IS '';
-COMMENT ON COLUMN BARS_DM.CREDITS_STAT.nls_SG IS 'Номер рахунку оплати';
-COMMENT ON COLUMN BARS_DM.CREDITS_STAT.acc_SS IS 'Номер ACC основного рахунку';
+COMMENT ON COLUMN BARS_DM.CREDITS_STAT.NLS IS 'Номер рахунку';
 
 PROMPT *** Create  grants  CREDITS_STAT ***
 grant SELECT                                                                 on CREDITS_STAT    to BARS;

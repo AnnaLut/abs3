@@ -127,13 +127,13 @@ begin
   bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Точка~обслуг.', '', null, 3, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'Звiтна~дата', '', null, 0, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'KV', 'N', 'Код~вал', '', null, 10, 0, 1, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'K_0000', 'N', 'Ком.анул~(зарах.)', '', null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'K_2809', 'N', 'Комiсiя~(зарах.)', '', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'K_2909', 'N', 'Комiсiя~(списан)', '', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'K_0000/100', 'N', 'Ком.анул~(зарах.)', '', null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'K_2809/100', 'N', 'Комiсiя~(зарах.)', '', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'K_2909/100', 'N', 'Комiсiя~(списан)', '', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'OB22', 'C', 'Код~системи~по ОБ', '', null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'S_0000', 'N', 'Сума~анульованих', '', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'S_2809', 'N', 'Сума~виплачених', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'S_2909', 'N', 'Сума~вiдправлених', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'S_0000/100', 'N', 'Сума~анульованих', '', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'S_2809/100', 'N', 'Сума~виплачених', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'S_2909/100', 'N', 'Сума~вiдправлених', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 11, 'FL', 'N', '1 - Оплачений~0 - Неоплачений', '', null, 30, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'RS_0000', 'C', 'Реф~суми анул.', '', null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:RS_0000', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'RS_2809', 'N', 'Реф~суми випл', '', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:RS_2809', '', 0);
@@ -145,7 +145,6 @@ begin
   bars_metabase.add_column(l_tabid, 19, 'KOMB1', 'N', 'Коміс-1~оператора', '', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'KOMB2', 'N', 'Коміс-2~субагента', '', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 21, 'KOMB3', 'N', 'Коміс-3~суб.аг за ан.', '', null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'RET_SEND', 'N', 'Коміс.~для поверн.кл', '', null, 54, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('MONEX1');
