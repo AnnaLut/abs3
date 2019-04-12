@@ -428,6 +428,7 @@ BEGIN
                   AND p.pdat > Dat_
                   AND to_char(p.pdat,'MM') = to_char(dat_,'MM')
                   AND p.pdat < one_day_ );
+            commit;
 
          INSERT /*+ APPEND */ INTO OTCN_PROV_TEMP
           (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
