@@ -13,13 +13,14 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6GX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 6GX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.003    14.02.2019 (05.12.2018)
+ VERSION     :    v.19.004    12.04.2019 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-14.02.2019	виправлено помилку з населенням VERSION_ID, VERSION_D8
+12.04.2019   Q007 перевірка на відповідність формату дати
+14.02.2019   виправлено помилку з населенням VERSION_ID, VERSION_D8
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.003  14.02.2019';
+  ver_              char(30)  := 'v.19.004  12.04.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -69,14 +70,17 @@ begin
   insert
     into NBUR_LOG_F6GX
        (REPORT_DATE, KF, NBUC, VERSION_ID, VERSION_D8, EKP,K020,K021,Q003_2, Q003_3, Q007, B040, T070_1,
-    DESCRIPTION,KV,CUST_ID,CUST_CODE,CUST_NAME,ND,AGRM_NUM,BEG_DT,END_DT,BRANCH)
+                     DESCRIPTION,KV,CUST_ID,CUST_CODE,CUST_NAME,ND,AGRM_NUM,BEG_DT,END_DT,BRANCH)
   select p_report_date, p_kod_filii, nvl(trim(nbuc), l_nbuc), l_version_id, version_id 
         , 'A6G001'  as  EKP
         , LPAD(K020,10,'0')   as  K020 
         , K021
         , Q003_2
         , Q003_3
-        , to_date(Q007,'ddmmyyyy')  as Q007
+        , (case when is_date(Q007, 'ddmmyyyy') =1
+                   then      to_date(Q007,'ddmmyyyy')
+                  else       to_date('31122999', 'ddmmyyyy')
+            end)                                as Q007
         , LPAD('00626804'||B040,20,'0')         as B040
         , NVL(T070_1,0)             as T070_1
         , DESCRIPTION
