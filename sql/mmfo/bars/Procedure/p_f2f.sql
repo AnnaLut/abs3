@@ -5,14 +5,12 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F2F.sql =========***
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  procedure P_F2F ***
-
   CREATE OR REPLACE PROCEDURE BARS.P_F2F (dat_ IN DATE)
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла                  MMFO
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :  v.18.002        15.11.2018
+% VERSION     :  v.19.001        11.04.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    Структура показателя   L DDD N R E KKK ЛЛ MMM VVV H
@@ -783,7 +781,7 @@ BEGIN
                (case when lower(trim(rizik_value)) like '%низький%' then '104'
                      when lower(trim(rizik_value)) like '%середн_й%' then '105'
                      when lower(trim(rizik_value)) like '%в_сокий%' then '106'
-                     when lower(trim(rizik_value)) like '%неприйнятно%в_сокий%' then '107'
+                     when lower(trim(rizik_value)) like '%неприйнятно%в_с%' then '106'
                       else decode( mfo_, 344443,'108','104' )
                     end) ||
                '000'||
@@ -855,7 +853,7 @@ BEGIN
                                and (a.dazs is null or a.dazs > dat_))
               group by c.rnk, c.okpo, c.nmk
            )
-     where lower(trim(rizik_value)) like '%неприйнятно%в_сокий%';
+     where lower(trim(rizik_value)) like '%неприйнятно%в_с%';
 
    logger.info ('P_F2F: part 1.2 '||to_char(dat_,'dd.mm.yyyy'));
 
