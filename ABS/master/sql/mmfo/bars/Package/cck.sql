@@ -1167,10 +1167,10 @@
 END cck;
 
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
+CREATE OR REPLACE PACKAGE BODY CCK IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.08  27.09.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.18  12.04.2019';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
@@ -2076,7 +2076,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS    ll cc_lim%ROWTYPE; l_Kv8 int;
     l_NDG number ;
     title constant varchar2(32) := 'zbd.cck.lim_bdate ';
-    l_error_message varchar2(4000);	
+    l_error_message varchar2(4000);
   BEGIN
 
     BEGIN --  22.05.2018 Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
@@ -3237,7 +3237,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                  AND mode_ IN (0, d.nd)
                  AND (custtype_ = 0 OR
                      (custtype_ <= 2 AND d.vidd IN (1, 2, 3) and not d.prod like '9000%') OR
-                     (custtype_ = 3 AND d.vidd IN (11, 12, 13)) 
+                     (custtype_ = 3 AND d.vidd IN (11, 12, 13))
                      )
               ) LOOP
       cck.cc_asp(k.nd, 0);
@@ -6232,7 +6232,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
         where nd = l_nd
           and substr(c.prod,1,6) = co.nbs||co.ob22;
     exception
-      when no_data_found then 
+      when no_data_found then
         v_s260 := null;
     end;
 /*    if v_vidd != 5 and v_s260 is null then
@@ -6800,7 +6800,7 @@ end if;
       INSERT INTO nd_txt (nd, tag, txt) VALUES (nd_, 'PAWN', spawn_);
     END IF;
 
-    SELECT nvl(MIN(fdat), datwid_) INTO dat3_ FROM cc_lim WHERE nd = nd;
+    SELECT nvl(MIN(fdat), datwid_) INTO dat3_ FROM cc_lim WHERE nd = nd_;
     IF datwid_ > dat3_ THEN
       DELETE FROM cc_lim
        WHERE nd = nd_
@@ -9639,7 +9639,7 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
     -- IF nn_ = 0 THEN  RE_ost8 (0) ;  END IF; -- 0. Аварийное Исправление остатка на счете 8999
     -----------------------------------------------------
 	logger.tms_info( title||'Start #0) КП S1: Установить лим.по графику');
-    FOR k IN (SELECT *  FROM cc_deal d WHERE sos < 14    AND vidd IN (1, 2, 3, 11, 12, 13)    AND (nn_ = 0 OR nd = nn_)) 
+    FOR k IN (SELECT *  FROM cc_deal d WHERE sos < 14    AND vidd IN (1, 2, 3, 11, 12, 13)    AND (nn_ = 0 OR nd = nn_))
     LOOP
        cck.set_floating_rate(p_nd => k.nd);                -- пересмотр плавающей % ставки
        cck.lim_bdate(p_nd => k.nd, p_dat => fdat_);        -- установка cc_deal.limit,  cc_add.s, accounts.ostx
@@ -9711,7 +9711,7 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
 
     -- 5. Установка плановых пролонгаций КД
     cck.cc_prolong(0, fdat_);
-	
+
   logger.tms_info( title||'Finish #0) КП S1: Установить лим.по графику');
 
   exception when others
@@ -13685,11 +13685,11 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
     -- 1- считать сумму досрочным с учетом уже уплаченной суммы за
     --    досрочное погашение
   BEGIN
-  
+
     if nregim_ = 0 then
     logger.tms_info( title||'Start КП F0: Авто-разбір рахунків погашення SG');
     end if;
-  
+
     BEGIN
       SELECT nvl(substr(TRIM(val), 1, 3), 'W4X')
         INTO tt_bpk
@@ -14477,7 +14477,7 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
                   where a.nls = l_nlsk
                     and a.kv = 980;
               exception
-                when others then 
+                when others then
                   v_crd_name := p.nmsk;
                   v_crd_okpo := gl.aMFO;
               end;
@@ -14557,8 +14557,8 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
       <<met_kon>>
       NULL;
     END LOOP; -- k
-	
-	
+
+
     if nregim_ = 0 then
        logger.tms_info( title||'Finish КП F0: Авто-разбір рахунків погашення SG');
     end if;
@@ -14766,8 +14766,8 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
 
   BEGIN
     logger.tms_info( title||'Start "Start/ Авто-просрочка рахунків боргу SS -  ЮО"');
-	
-	
+
+
     SELECT MAX(fdat) INTO l_dat1 FROM fdat WHERE fdat < gl.bdate; -- прошлый раб день
     IF l_dat1 IS NULL THEN      RETURN;    END IF;
     SELECT MAX(fdat) INTO l_dat2 FROM fdat WHERE fdat < l_dat1; -- поза-прошлый раб день
@@ -14932,14 +14932,14 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
     pul.set_mas_ini('SP_KOL', to_char(l_kol), 'Кол.просроч.');
     i_commit := 0;
 
-	
+
 	 logger.tms_info( title||'Finish "Start/ Авто-просрочка рахунків боргу SS -  ЮО"');
 
    exception when others
     then
     l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
     logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
-	
+
   END cc_asp;
 
   -------------------
@@ -15169,10 +15169,11 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
       WHEN no_data_found THEN
         l_nazn := NULL;
     END;
+
     IF substr(l_cc_deal.prod, 1, 6) IN ('206219', '206309', '206325') AND
-       l_cc_deal.ndi IS NOT NULL AND l_cc_deal.ndi <> l_nd THEN
+       l_cc_deal.ndg IS NOT NULL AND l_cc_deal.ndg <> l_nd THEN
       BEGIN
-        SELECT cc.ndi INTO l_ndi FROM cc_deal cc WHERE cc.nd = l_nd;
+        l_ndi := l_cc_deal.ndg;
       EXCEPTION
         WHEN no_data_found THEN
           l_nazn := NULL;
@@ -15188,21 +15189,12 @@ IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
           l_sdate := l_cc_deal.sdate;
       END;
 
-      l_nazn := l_nazn || l_cc_id || ' aia ' ||
+      l_nazn := l_nazn || l_cc_id || ' від ' ||
                 to_char(l_sdate, 'dd/mm/yyyy');
 
     ELSE
-      BEGIN
-        SELECT cc.cc_id, cc.sdate
-          INTO l_cc_id, l_sdate
-          FROM cc_deal cc
-         WHERE cc.nd = l_nd;
-      EXCEPTION
-        WHEN no_data_found THEN
-          l_nazn := NULL;
-      END;
-      l_nazn := l_nazn || l_cc_id || ' aia ' ||
-                to_char(l_sdate, 'dd/mm/yyyy');
+      l_nazn := l_nazn || l_cc_deal.cc_id || ' від ' ||
+                to_char(l_cc_deal.sdate, 'dd/mm/yyyy');
 
     END IF;
 
