@@ -39,6 +39,7 @@ IS
    ret_            NUMBER;
    add_            NUMBER;
    acc_            NUMBER;
+   acc_proc_sna    NUMBER := 0;
    nbs_            VARCHAR2 (4);
    nbs1_           VARCHAR2 (4);
    nls_            VARCHAR2 (15);
@@ -46,10 +47,12 @@ IS
    rez_            VARCHAR2 (1);
    kv_             SMALLINT;
    r011_           VARCHAR2 (1);
+   r011_1419       VARCHAR2 (1);
    r013_           VARCHAR2 (1);
    r013_1          VARCHAR2 (1);
    r013_30         NUMBER;
    dk_             VARCHAR2 (1);
+   dk_k            VARCHAR2 (1);
    tips_           VARCHAR2 (3);
    r030_           VARCHAR2 (3);
    r031_           CHAR (1);
@@ -96,6 +99,7 @@ IS
    zm_date2_       DATE                  := TO_DATE ('21122012', 'ddmmyyyy');
    zm_date3_       DATE                  := TO_DATE ('30092013', 'ddmmyyyy');
    zm_date4_       DATE                  := TO_DATE ('26122017', 'ddmmyyyy');
+   zm_date5_       DATE                  := TO_DATE ('10012019', 'ddmmyyyy');
    dp_date_        DATE                  := TO_DATE ('06062015', 'ddmmyyyy');
    dat23_          date;
 
@@ -129,6 +133,7 @@ IS
    exist_cp_acc    NUMBER                 := 0;
    exist_sno_gr    NUMBER                 := 0;
    exist_cclim_acc      NUMBER                 := 0;
+   exist_msb_acc   NUMBER                 := 0;
 
    tobo_           accounts.tobo%TYPE;
    branch_         accounts.tobo%TYPE;
@@ -156,7 +161,7 @@ IS
           END
          );
 
-   fl_mode_ char(8);
+   fl_mode_ char(9);
    pr_01    Number;
 
    sql_doda_ varchar2(2000);
@@ -217,6 +222,7 @@ IS
    apl_dat#_        DATE;
 
    sum_zal          number:=0;
+   sum_dk           number:=0;
 
 ----------------------------------------------------------------------------
    TYPE ref_type_curs IS REF CURSOR;
@@ -566,7 +572,30 @@ IS
 
       RETURN cnt_;
    END;
-BEGIN
+
+   -- депозити МСБ
+   FUNCTION  f_exist_msb_acc (pacc_ IN NUMBER, pdat_ in date)
+      RETURN NUMBER
+   IS
+      sql_   VARCHAR2 (1000);
+      cnt_   NUMBER;
+   BEGIN
+      sql_ := 'select count(distinct a.acc) ' ||
+              'from accounts a, deal_account da, object o  '||
+              'where a.acc = :acc_ 
+                 and o.object_type_id = (select ot.id from object_type ot where ot.type_code = ''SMB_DEPOSIT_TRANCHE'')
+                 and o.id = da.deal_id
+                 and da.account_type_id = (select ak.id from attribute_kind ak where ak.attribute_code = ''DEPOSIT_PRIMARY_ACCOUNT'')
+                 and da.account_id = a.acc ';
+
+      EXECUTE IMMEDIATE sql_
+                   INTO cnt_
+                  USING pacc_;
+
+      RETURN cnt_;
+   END;
+   
+   BEGIN
     -- фктична дата кінця декади
     dc_ := extract( day from dat_ );
 
@@ -918,8 +947,8 @@ BEGIN
                                      s.dapp, ''0'' pr, s.tobo
                                 FROM otcn_saldo aa, otcn_acc s
                                WHERE aa.acc = s.acc and
-                                     s.tip <> ''REZ'' and
-                                     not (s.nls like ''204%'' and s.tip = ''SDF'')) a,
+                                     s.tip not in (''REZ'', ''SNA'') and
+                                     not ((s.nls like ''204%'' or s.nls like ''239%'') and s.tip = ''SDF'')) a,
                              kl_r030 l,
                              specparam p,
                              customer c
@@ -1013,6 +1042,7 @@ BEGIN
           ap_ := (case when ap_ = 3 then (case when sign(sn_) = -1 then 1 else 2 end) else ap_ end);
 
           pr_accc := 0;
+          dk_k := null;
 
           IF typ_ > 0 THEN
              nbuc_ := NVL (F_Codobl_branch (tobo_, typ_), nbuc1_);
@@ -1050,7 +1080,7 @@ BEGIN
              -- добавил для банка ОПЕРУ СБ обработку дочерних счетов по ЦБ
              -- вместо консолидированных
              IF     nbs_ IS NOT NULL
-                AND (mfo_ = 300465 and nbs_ NOT IN ('1415', '1435', '3007', '3015', '3107', '3115') or
+                AND (mfo_ = 300465 and nbs_ NOT IN ('1435', '3007', '3107') or
                      mfo_ <> 300465)
              THEN
                 BEGIN
@@ -1113,7 +1143,7 @@ BEGIN
           IF    (    mfou_ IN (300465)
                  AND (   (    nbs_ IS NULL
                           AND (mfo_ = 300465 and SUBSTR (nls_, 1, 4) NOT IN
-                                 ('1415', '1435', '3007', '3015', '3107','3115') or
+                                 ('1435', '3007', '3107') or
                                mfo_ <> 300465)
                          )
                       OR (pr_accc = 0 AND nbs_ IS NOT NULL)
@@ -1121,6 +1151,23 @@ BEGIN
                 )
              OR mfou_ NOT IN (300465)
           THEN
+
+             BEGIN
+                SELECT a.ost
+                  INTO se1_
+                  FROM snap_balances a, accounts s
+                 WHERE a.fdat = dat_
+                   AND s.acc = acc_
+                   AND s.accc = a.acc
+                   AND nbs_ IS NOT NULL;
+
+                dk_k := iif_n (se1_, 0, '1', '2', '2');
+             EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                     null;
+             END;
+
              IF nbs_ IS NULL
              THEN
                 nbs_ := SUBSTR (nls_, 1, 4);
@@ -1207,7 +1254,14 @@ BEGIN
                 exist_cp_acc := 0;
              end if;
 
-             IF fZ7p_ = 0                                     -- депоз./кред. счет
+             -- депозити МСБ
+             if nbs_ in ('2600', '2610', '2650', '2651') and se_ > 0 then
+                exist_msb_acc := f_exist_msb_acc (acc_, dat_);
+             else
+                exist_msb_acc := 0;
+             end if;
+
+             IF fz7p_ = 0                                     -- депоз./кред. счет
              THEN
                 IF mdate_ IS NOT NULL OR p240_ = '0'
                 THEN
@@ -1761,9 +1815,17 @@ BEGIN
                         || rez_
                         || s190_
                         || r030_;
+                   sum_dk := abs(sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end)
+                                           ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_dk := 0 -sum_dk;
+                          end if;
 
                     p_add_rec(s_rnbu_record.NEXTVAL, userid_, nls_, kv_,
-                                data_, kodp_, TO_CHAR (ABS (sum_zal)), acc_, rnk_,
+                                data_, kodp_, TO_CHAR (sum_dk), acc_, rnk_,
                                 isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                );
                 END IF;
@@ -1781,9 +1843,17 @@ BEGIN
                         || rez_
                         || s190_
                         || r030_;
+                   sum_dk := abs(se_ - sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || r011_
+                                           ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_dk := 0 -sum_dk;
+                          end if;
 
                     p_add_rec(s_rnbu_record.NEXTVAL, userid_, nls_, kv_,
-                                data_, kodp_, TO_CHAR (ABS (se_ - sum_zal)), acc_, rnk_,
+                                data_, kodp_, TO_CHAR (sum_dk), acc_, rnk_,
                                 isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                );
                 END IF;
@@ -1820,6 +1890,7 @@ BEGIN
                    AND exist_sbb_acc =0
                    and exist_cclim_acc =0
                    and exist_cp_acc =0
+                   and exist_msb_acc =0
                 OR                                -- обычный режим
                        pmode_ = 1
                    AND tips_ IN ('SS', 'XS')
@@ -2219,25 +2290,47 @@ BEGIN
                                 || SUBSTR (kodp_, 10);
                       END IF;
 
+                      znap_ := TO_CHAR (ABS (se_));
+
+                      if dk_k is not null and dk_ <> dk_k 
+                      then
+                         kodp_ := dk_k || nbs_ || r011_||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                         znap_ := 0 - znap_;
+                      end if;
+
                       p_add_rec (s_rnbu_record.NEXTVAL, userid_, rnls_, kv_,
-                                   data_, kodp_, TO_CHAR (ABS (se_)), acc_, rnk_,
+                                   data_, kodp_, znap_, acc_, rnk_,
                                    isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                   );
 
                       if sum_zal <> 0 then
                          kodp_ := dk_ || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                         sum_zal := abs(sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_zal := 0 - sum_zal;
+                          end if;
 
                          p_add_rec (s_rnbu_record.NEXTVAL, userid_, rnls_, kv_,
-                                       data_, kodp_, TO_CHAR (ABS (sum_zal)), acc_, rnk_,
+                                       data_, kodp_, TO_CHAR (sum_zal), acc_, rnk_,
                                        isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                       );
                       end if;
                    else
                       if sum_zal <> 0 then
                          kodp_ := dk_ || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                         sum_zal := abs(sum_zal);
+
+                         if dk_k is not null and dk_ <> dk_k 
+                         then
+                             kodp_ := dk_k || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             sum_zal := 0 - sum_zal;
+                          end if;
 
                          p_add_rec (s_rnbu_record.NEXTVAL, userid_, rnls_, kv_,
-                                       data_, kodp_, TO_CHAR (ABS (sum_zal)), acc_, rnk_,
+                                       data_, kodp_, TO_CHAR (sum_zal), acc_, rnk_,
                                        isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                       );
                       end if;
@@ -2267,6 +2360,8 @@ BEGIN
                    fZ7p_ > 0 and tips_ = 'SNO'
                 OR
                    tips_ = 'DEP' and nls_ like '132%'
+                OR
+                   exist_msb_acc > 0 -- депозити МСБ
              THEN
                 -- наличие доп. модулей
                 -- flag 1
@@ -2329,7 +2424,14 @@ BEGIN
                    fl_mode_ := trim(fl_mode_)||'1';
                 end if;
 
-                IF fZ7p_ > 0 and se_ < 0 and
+                -- flag 9
+                if exist_msb_acc = 0 then
+                   fl_mode_ := trim(fl_mode_)||'0';
+                else
+                   fl_mode_ := trim(fl_mode_)||'1';
+                end if;
+                
+                IF fz7p_ > 0 and se_ < 0 and
                    not (substr(nbs_, 1, 3) in ('141','142','143','311','321''331') and
                         tips_ = 'SNO')
                 THEN
@@ -2386,6 +2488,7 @@ BEGIN
                                    ldate,
                                    nd,
                                    comm || DECODE (nd, null, '', ' (Реф=' || TO_CHAR (nd) || ')')
+                          HAVING SUM (ost) <> 0
                           )
                 LOOP
                    s240_ := i.s240;
@@ -2638,15 +2741,16 @@ BEGIN
        insert into otcn_f42_zalog(ACC, ACCS, ND, NBS, R013, OST)
        SELECT /*+ leading(z) */
                z.acc, z.accs, z.nd, a.nbs, nvl(p.r013, '0'),
-               gl.p_icurval (a.kv, a.ost, dat_) ost
-          FROM cc_accp z, sal a, specparam p
+               gl.p_icurval (a.kv, s.ost, dat_) ost
+          FROM cc_accp z, snap_balances s, accounts a, specparam p
          WHERE z.acc in (select acc from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
            AND z.accs = a.acc
-           and a.fdat=dat_
-           AND a.acc = p.acc
+           and s.fdat=dat_
+           and s.acc = a.acc
+           AND s.acc = p.acc
            AND a.nbs || p.r013 <> '91299'
            and a.nbs not in (select r020 from otcn_fa7_temp)
-           and a.ost<0;
+           and s.ost<0;
 
        -- сумма задолженности, кот. покрывает данный залог
        for p in (select * from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
@@ -2688,10 +2792,11 @@ BEGIN
 
             -- определяем остаток счетов дисконта или премии
              BEGIN
-               select SUM(NVL(Gl.P_Icurval(s.KV, s.ost, dat_) ,0))
+               select SUM(NVL(Gl.P_Icurval(a.KV, s.ost, dat_) ,0))
                   INTO s04_
-               from sal s
+               from snap_balances s, accounts a
                where s.fdat=dat_
+                 and s.acc = a.acc
                  AND s.acc in (select d.acc
                                from accounts s, nd_acc d, cc_deal c
                                where nvl(c.ndg, c.nd) = nd_ and
