@@ -226,7 +226,8 @@ OPEN Saldo;
    --- после перехода на новые DRAPSы
    --- обороты по перекрытию 6,7 классов на 5040,5041
    IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '390%' or nls_ like '504%') THEN
-      if nls_ like '504%' or nls_ like '390%' then
+      if nls_ like '504%' --or nls_ like '390%' 
+      then
          Dos96_ := 0;
          Kos96_ := 0; 
       else
