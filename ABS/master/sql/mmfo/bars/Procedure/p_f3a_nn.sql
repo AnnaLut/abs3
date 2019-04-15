@@ -6,18 +6,25 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 25/02/2019  (21/12/2018)
+% VERSION     : 12/04/2019 (02/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-19/12/2018 - для 2203 і деяких OB22 (банківський продукт) будуть включатися 
+12/04/2019 - добавлено блок по формуванню Кт оборотів для депозитів МСБ
+02/04/2019 - для поточних рахункуів 2600,2620,2650 S180='1' і для активних
+             залишків на початок дня значення показника оборотів будемо 
+             формувати суму вихідного залишку на кінець дня  
+27/03/2019 - на 02.04.2019 (за 01.04.2019) показник кредитових оборотів буде
+             формуватися для всіх пасивних рахунків (раніше було тільки 
+             Депозити)    
+19/12/2018 - для 2203 і деяких OB22 (банківський продукт) будуть включатися
              рахунки для яких буде додатня різниця між Дт і Кт оборотами
 18/12/2018 - не будут включаться в файл Дт обороты которые были в
              кореспонденции со счетами овердрафтов - перенос на просрочку
              ( Дт 2063 (тип "SP") Кт 2600 (овердрафт) )
              Добавлено условие для 2063 TIP = "SP".
-             Счета овердрафта выбираем из CC_DEAL VIDD = 10 вместо ACC_OVER   
+             Счета овердрафта выбираем из CC_DEAL VIDD = 10 вместо ACC_OVER
 19/11/2018 - не будут включаться в файл Дт обороты которые были в
              кореспонденции со счетами овердрафтов - перенос на просрочку
              ( Дт 2203 (тип "SP","KSP") Кт 223(2233)
@@ -39,83 +46,6 @@ IS
 27/03/2018 - не будут включаться в файл Дт обороты которые были в
              кореспонденции со счетами овердрафтов - перенос на просрочку
              ( Дт 2063  Кт 2600 (овердрафт) )
-27/12/2017 - с 26.12.2017 (на 27.12.2017) в показателе вместо параметра R013
-             будет формироваться параметр R011
-26/12/2017 - для KL_R020 изменено условие для поля D_CLOSE
-06/11/2017 - вместо кл-ра KL_F3_29 будем использовать кл-р KOD_R020
-27/10/2017 - для бал.рах.2630 добавил обробку OB22 IN ('B2','B3','B4','B5')
-             т.к. будет переброска с 2635 и OB22 IN ('13','14','15','16')
-04/09/2017 - для кредитовых оборотов счетам 2600, 2605, 2650, 2655
-             кроме параметра R013 будет дополнительно анализироваться
-             остаток на счете (должен быть Кт)
-13/02/2017 - изменен расчет %% ставки с учетом комиссионных (сумма ком.
-             будет включаться в эквиваленте)
-20/10/2016 - на вимогу Квашук Т.Р. для 2620 параметр S180 = '1'
-30/09/2016 - если %% ставка больше 9999 то устанавливаем значение 99.00
-26/09/2016 - для ГОУ Сбарбанка в файл не будет включаться бал.счет 1502
-21/09/2016 - для отбора записей из W4_SPARAM добавлено условие ROWNUM = 1
-16/09/2016 - убрал ненужные комментарии
-08/09/2016 - для 2202, 2203  параметр S180 определяем по табл. W4_SPARAM
-             поле VALUE
-29/08/2016 - для 2202 и S180 > 'B' заменяем на "B",
-             для 2203 и S180 <= 'B' то по табл. W4_SPARAM поле VALUE
-03/08/2016 - включаем проводки с 2650 текущего на 2650 депозитный
-             ( R013 in ('1','3','8') )
-02/12/2015 - исключаем проводки капиталлизации процентов где бух.модель
-             Дт 2658 Кт 3739 и Дт 3739 Кт 2651 (один REF)
-             а в OPER  NLSA 2658  NLSB 2651 (капиталлизиция процентов)
-26/11/2015  удалены блоки для кодов МФО ликвидированных банков
-23/11/2015  для деяких бал.рах. будемо включати новий перел_к R013
-            2600 (1,7,8,A), 2605 (1,3), 2620 (1,2,3), 2625 (2),
-            2650 (1,3,8), 2655 (3)
-16/11/2015  при наличии двух записей в KL_R013 для одного бал.счета и
-            параметра R013 и заполненного значения D_CLOSE для одной из
-            записей параметр R013 формировался нулевым. Исправлено.
-08/07/2015  из Дт оборотов исключаются переброски внутри группы бал.cчетов
-            (случайно было отключено ранее)
-22/12/2014  только для МФО=344443 и NBS_ LIKE '16%'
-            для Кт оборотов и блока переброски внутри группы  добавил
-            " sdos_ := sdos_ - vost_; "  т.к. далее из Кт оборотов
-            вычитаются Дт обороты в полной сумме
-            (для 263 группы включались обороты внутри группы)
-17/10/2014  для Кт оборотов и блока переброски внутри группы
-            добавил " sdos_ := sdos_ - vost_; "  т.к. далее из Кт оборотов
-            вычитаются Дт обороты в полной сумме
-01/10/2014 - исключаем проводки капиталлизации процентов где бух.модель
-             Дт 2618 Кт 3739 и Дт 3739 Кт 2610 (один REF)
-             а в OPER  NLSA 2618  NLSB 2610 (капиталлизиция процентов)
-15/08/2014 - в протокол формирования файла и протокол формирования контрольных
-             точек добавлен параметр OB22
-             для банка Петрокоммерц включаем в файл "пох_дн_ ф_н._нструменти"
-             (в ОРЕR Дт 3548 Кт 3648 р_зновалютна проводка)
-             это показатели 150000.... 250000.... 160000.... 260000....
-08/08/2014 - для СБЕРБАНКА не будем включать Кт ооброты по 2630 (OB22='46')
-             2635 (OB22='38') - нерухом_ вклади
-30/07/2014 - для Демарка будем включать обороты с 2620 на 2630,2635 если
-             одинаковые хвосты
-28/07/2014 - для 300465 включаем проводки с 2620 текущего на 2620 депозитный
-23/07/2014 - для Демарка будем включать обороты с 2630,2635 на 2620 если
-             разные хвосты
-21/07/2014 - виключаємо обороти по кап_тал_зац_ї в_дсотк_в на '2651'
-             (було в Донецьку)
-04/07/2014 - для Демарка будем включать обороты с 2620 на 2620, с 2630,2635
-             на 2620
-29/11/2013 - зауваження в_д Демарка
-19/11/2013 - виключаємо обороти по кап_тал_зац_ї выдсотк_в на'2650','2652'
-14/11/2013 - виключено проводки  д.3739 - к.26 розд_л з призначенням
-            "В_дкриття внутр_шньобанк_вське" (зауваження Донецькогг ОБУ)
-07/11/2013 - оптим_зована верс_я процедури
-10/09/2013 - Розрахунок середньозваженої процентної ставки по кредитах, у
-             яких можуть бути р_зн_ процентн_ ставки на протяз_ життя кредиту +
-             для Демарка будемо включати обороти по кредитах/депозитах, що
-             видаються та гасяться протягом одного банк_вського дня
-06/09/2013 - Розрахунок середньозваженоъ процентноъї ставки по депозитах, у
-             яких можуть бути р_зн_ процентн_ ставки на протяз_ життя вкладу
-02/09/2013 - зм_на структури показника
-16.08.2013 - виключаємо обороти д.3739 - к. 2630,2635 з призначенням
-             "перенесено залишки", "%зачислено%в связи с закрытием%"
-30.04.2013 - для показателя процентной ставки изменен формат с '990D0000'
-             на  '99990D0000' (проявилось в Крыму СБ)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_      VARCHAR2 (2)   := '3A';
    fmt_       VARCHAR2 (20)  := '99990D0000';
@@ -227,6 +157,7 @@ IS
    date_spr date := dat_next_u(dat_, 1);
    dat_izm1     date := to_date('26/12/2017','dd/mm/yyyy');
    dat_izm2     date := to_date('31/12/2018','dd/mm/yyyy');
+   dat_izm3     date := to_date('29/03/2019','dd/mm/yyyy');
 --------------------------------------------------------------------------
    CURSOR scheta
    IS
@@ -695,34 +626,34 @@ BEGIN
        WHERE odate = dat_ and
              kf = to_char(mfo_);
     ----------------------------------------------------------------------------
-    -- депозити МСБ
-       FOR k in (select a.document_date as data, 
+     -- депозити МСБ
+       FOR k in (select a.document_date as data,
                     a.account_id as acc,
                     a.account_number as nls,
                     substr(a.account_number, 1, 4) as nbs,
-                    a.currency_id as kv, 
-                    a.customer_id as rnk, 
+                    a.currency_id as kv,
+                    a.customer_id as rnk,
                     nvl(a.s180, '0') as s180,
                     nvl(a.r011, '0') as r011,
                     nvl(a.amount_document, 0) as skos,
                     nvl(a.interest_rate, 0) as rate,
                     nvl(a.expiry_date, b.mdate) as mdate,
                     a.ref, to_char(2 - mod (c.codcagent, 2)) as k030,
-                    a.deposit_id, trim(c.nmk) as nms, b.tobo, b.isp 
+                    a.deposit_id, trim(c.nmk) as nms, b.tobo, b.isp
                 from table(smb_calculation_deposit.get_report_3a(p_date => dat_)) a
                 join customer c
                 on (a.customer_id = c.rnk)
                 join accounts b
-                on (a.account_id = b.acc)                
+                on (a.account_id = b.acc)
                 where a.sos = 5 and
-                      nvl(a.amount_document, 0) <> 0) 
+                      nvl(a.amount_document, 0) <> 0)
        LOOP
         -- кредитовые обороты
            skos_ := Gl.P_Icurval (k.kv, k.skos, k.data);
            se_ := fostq(k.acc, dat_);
            spcnt_ := k.rate;
-           
-           data_ := k.data; 
+
+           data_ := k.data;
            acc_ := k.acc;
            nls_ := k.nls;
            kv_ := k.kv;
@@ -730,7 +661,7 @@ BEGIN
            mdate_ := k.mdate;
            tobo_ := k.tobo;
            isp_ := k.isp;
-           
+
            comm1_ := substr('МСБ dep_id = '||k.deposit_id||' ' || tobo_ || '  ' || k.nms, 1, 200);
 
            d020_:='01';
@@ -750,10 +681,10 @@ BEGIN
 
           -- Кр. обороты
            p_ins ('1' || kodp_, TO_CHAR (skos_));
-           
+
            -- %% ставка
            p_ins ('2' || kodp_, LTRIM (TO_CHAR (ROUND (spcnt_, 4), fmt_)));
-           
+
            -- Кт.обороты*%% ставка
            p_ins ('3' || kodp_, TO_CHAR (skos_ * ROUND(spcnt_,4)));
 
@@ -955,17 +886,17 @@ BEGIN
                 END;
              END IF;
 
-             -- новый блок відбору в файл для 2203 і деяких OB22 (банківський продукт)  
+             -- новый блок відбору в файл для 2203 і деяких OB22 (банківський продукт)
              if dat_ > dat_izm2 and nbs_ = '2203' and ob22_ in ('36','37','38','39','40','41','42','43','44','49','50','70','87','D0','D1')
              then
-                if sdos_ - skos_ > 0 
+                if sdos_ - skos_ > 0
                 then
                    sdos_ := sdos_ - skos_;
-                else 
+                else
                    sdos_ := 0;
                 end if;
              end if;
-    
+
              -- если это не овердрафты и были дебетовые обороты
              IF nbs_ NOT IN
                        ('1500',
@@ -1048,7 +979,7 @@ BEGIN
                              INTO vost_
                           FROM tmp_file03
                           WHERE FDAT = data_
-                            AND accd=acc_
+                            AND accd = acc_
                             AND nlsk like poisk_;
 
                           p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
@@ -1084,12 +1015,12 @@ BEGIN
                                 INTO vost_
                              FROM tmp_file03
                              WHERE FDAT = data_
-                               AND accd=acc_
+                               AND accd = acc_
                                AND nlsk like poisk_
                                AND acck in (select a.acc
                                             from cc_deal cc,
                                                  nd_acc n,
-                                                 accounts a 
+                                                 accounts a
                                             where cc.vidd = 10
                                               and n.nd = cc.nd
                                               and n.acc = a.acc
@@ -1128,7 +1059,7 @@ BEGIN
                                 INTO vost_
                              FROM tmp_file03
                              WHERE FDAT = data_
-                               AND accd=acc_
+                               AND accd = acc_
                                AND nlsk like poisk_
                                AND acck in (select acc_pk from w4_acc where dat_close is null);
 
@@ -1165,7 +1096,7 @@ BEGIN
                                 INTO vost_
                              FROM tmp_file03
                              WHERE FDAT = data_
-                               AND accd=acc_
+                               AND accd = acc_
                                AND nlsk like poisk_;
 
                              p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
@@ -1201,7 +1132,7 @@ BEGIN
                                 INTO vost_
                              FROM tmp_file03
                              WHERE FDAT = data_
-                               AND accd=acc_
+                               AND accd = acc_
                                AND nlsk like poisk_;
 
                              p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
@@ -1268,7 +1199,7 @@ BEGIN
                       SELECT NVL(SUM(t.s*100), 0)
                          INTO vost_
                       FROM tmp_file03 t
-                      WHERE t.TT='024'
+                      WHERE t.TT = '024'
                         AND t.FDAT = data_
                         and t.accd = acc_;
 
@@ -1411,8 +1342,8 @@ BEGIN
                       INTO s_prol_
                    FROM tmp_file03 p, OPERW o
                    WHERE p.FDAT = data_
-                     AND p.accd=acc_
-                     AND p.REF=o.REF
+                     AND p.accd = acc_
+                     AND p.REF = o.REF
                      AND o.tag LIKE 'D020%'
                      AND o.value LIKE poisk_;
 
@@ -1450,8 +1381,8 @@ BEGIN
                       INTO vost_
                    FROM tmp_file03 p, OPERW o
                    WHERE p.FDAT = data_
-                     AND p.accd=acc_
-                     AND p.REF=o.REF
+                     AND p.accd = acc_
+                     AND p.REF = o.REF
                      AND o.tag LIKE 'D020%'
                      AND o.value LIKE poisk_;
 
@@ -1484,8 +1415,8 @@ BEGIN
                       INTO vost_
                    FROM tmp_file03 p, OPERW o
                    WHERE p.FDAT = data_
-                     AND p.accd=acc_
-                     AND p.REF=o.REF
+                     AND p.accd = acc_
+                     AND p.REF = o.REF
                      AND o.tag LIKE 'D020%'
                      AND o.value LIKE poisk_;
 
@@ -1663,62 +1594,26 @@ BEGIN
              END IF;
 
              -- кредитовые обороты
-             IF mfou_ not in (300465) and
-                  (nbs_ = '2620' AND r013_ in ('1','2','3') OR
-                   nbs_ = '2625' AND r013_ = '2') AND
-                   se_ >= 0 and skos_ > 0 and dat_ < dat_izm1
+             IF nbs_ = '2620' AND se_ >= 0 and skos_ > 0 and
+                ob22_ in ('14','15','18','23','24','25','26','27') and dat_ <= dat_izm3
                      OR
-                mfou_ not in (300465) and
-                  (nbs_  in ('2620', '2625') AND r011_ = '3') AND
-                   se_ >= 0 and skos_ > 0 and dat_ >= dat_izm1
-                     OR
-                mfou_  in (300465) and
-                   nbs_ = '2620' AND se_ >= 0 and skos_ > 0 and
-                   ob22_ in ('14','15','18','23','24','25','26','27')
-                     OR
-                mfou_ not in (300465) and
-                   nbs_ = '2625' and se_ >= 0 and skos_ > 0 and spcnt_ <> 0
-                    OR
                 (nbs_ NOT IN ('1500','1600','2600','2605',
                               '2620','2625','2630','2635','2650','2655') and skos_ > 0 )
                      OR
-                (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0)
-                 and dat_ < dat_izm1
-                     OR
                 (nbs_ in ('2600', '2605','2620','2625','2650','2655') and r011_  = '3' and skos_ > 0)
-                 and dat_ >= dat_izm1
+                 and dat_ >= dat_izm1 and dat_ <= dat_izm3
                      OR
-                mfou_ not in (300465) and
-                   nbs_ IN ('2630', '2635') and skos_ > 0
-                     OR
-                mfou_  in (300465) and
-                   ((nbs_ = '2630' AND se_ >= 0 and skos_ > 0 and ob22_ not in ('46')) or
+                ((nbs_ = '2630' AND se_ >= 0 and skos_ > 0 and ob22_ not in ('46')) or
                     (nbs_ = '2635' AND se_ >= 0 and skos_ > 0 and ob22_ not in ('38')))
                     OR
-                (mfou_ <> 300465 and
-                   (nbs_ = '2605' AND r013_ in ('1','3') OR
-                    nbs_ = '2655' AND r013_ = '3') and skos_ > 0) and
-                 dat_ < dat_izm1
-                     OR
-                (mfou_ <> 300465 and
-                   (nbs_ in ('2605', '2655') AND r011_ = '3') and skos_ > 0) and
-                 dat_ >= dat_izm1
-                     OR
-                 mfou_ in (300465) and
-                   ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0)   OR
-                    (nbs_ = '2655' and r013_ = '3' and skos_ > 0) ) and
-                    dat_ < dat_izm1
-                     OR
-                 mfou_ in (300465) and
-                   ((nbs_ ='2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0)   OR
+                ((nbs_ ='2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0)   OR
                     (nbs_ = '2655' and r011_ = '3' and skos_ > 0) ) and
-                    dat_ >= dat_izm1
+                    dat_ >= dat_izm1 and dat_ <= dat_izm3 
                      OR
-                (nbs_ = '2650' and r013_ in ('1','3','8') and skos_ > 0) and
-                dat_ < dat_izm1
+                (nbs_ = '2650' and r011_ = '3' and skos_ > 0 and
+                 dat_ >= dat_izm1 and dat_ <= dat_izm3)
                      OR
-                (nbs_ = '2650' and r011_ = '3' and skos_ > 0) and
-                dat_ >= dat_izm1
+                (nbs_ in ('2600', '2620','2650') and se_ >= 0 and skos_ > 0 and dat_ > dat_izm3)
              THEN
                 if nbs_ in ('2610','2611','2615','2616','2617','2630','2635',
                             '2636','2637','2651','2652','2653','2656') and
@@ -1734,7 +1629,7 @@ BEGIN
                 end if;
 
                 -- текущие счета физ.лиц
-                IF nbs_ IN ('2620', '2625') THEN
+                IF nbs_ IN ('2620', '2625') and dat_ < dat_izm3 THEN
                    d020_ := '01';
 
                    IF nbs_ = '2620' and r013p_ in ('1','2','3') OR
@@ -1753,42 +1648,47 @@ BEGIN
                    END IF;
                 END IF;
 
+                if nbs_ in ('2600','2620','2650') and r011_ <> '3' and dat_ > dat_izm3 
+                then
+                   s180_ := '1';
+                   --- вычисляем входящий остаток
+                   vost_ := se_ + sdos_ - skos_;
+                   IF vost_ < 0 THEN
+                      skos_ := se_;
+                      -- береем только кред. обороты (- погашение овердрафта)
+                   END IF;
+                end if;
+  
                 BEGIN
-                   SELECT NVL(SUM(s*100), 0)
-                     INTO vost_
-                   FROM tmp_file03
-                   WHERE FDAT = data_
-                     AND acck=acc_
-                     AND nlsd LIKE nbs_ || '%';
+                   if nbs_ not in ('2600', '2620', '2650')
+                   then 
+                      vost_ := 0;
 
-                  -- 02/12/2010 OAB: не исключаем переброску с 2600 текущего счета на 2600 депозитный
-                   if nbs_ = '2600' then
+                      SELECT NVL(SUM(s*100), 0)
+                         INTO vost_
+                      FROM tmp_file03
+                      WHERE FDAT = data_
+                        AND acck = acc_
+                        AND nlsd LIKE nbs_ || '%';
+                   end if;
+
+                   -- 02/12/2010 OAB: не исключаем переброску с 2600 текущего счета на 2600 депозитный
+                   -- 03/08/2016 OAB: не исключаем переброску с 2650 текущего счета на 2650 депозитный
+                   if nbs_ in ('2600', '2650') 
+                   then
                       vost_ := 0;
 
                       SELECT NVL(SUM(t.s*100), 0)
                         INTO vost_
                       FROM tmp_file03 t, specparam s
                       WHERE t.FDAT = data_
-                        AND t.acck=acc_
+                        AND t.acck = acc_
                         AND t.nlsd LIKE nbs_ || '%'
                         AND t.accd = s.acc
                         AND NVL(s.r011,'0') = '3';
                    end if;
 
-                  -- 14/07/2014 OAB: не исключаем переброску с 2620 текущего счета на 2620 депозитный
-                   if nbs_ = '2620' then
-                      vost_ := 0;
-
-                      SELECT NVL(SUM(t.s*100), 0)
-                        INTO vost_
-                      FROM tmp_file03 t, specparam s
-                      WHERE t.FDAT = data_
-                        AND t.acck=acc_
-                        AND t.nlsd LIKE nbs_ || '%'
-                        AND t.accd = s.acc
-                        AND NVL(s.r011,'0') = '3';
-                   end if;
-
+                   -- 14/07/2014 OAB: не исключаем переброску с 2620 текущего счета на 2620 депозитный
                    if nbs_ = '2620' and mfou_ = 300465 then
                       vost_ := 0;
 
@@ -1796,7 +1696,7 @@ BEGIN
                         INTO vost_
                       FROM tmp_file03 t, specparam_int si
                       WHERE t.FDAT = data_
-                        AND t.acck=acc_
+                        AND t.acck = acc_
                         AND t.nlsd LIKE nbs_ || '%'
                         AND t.accd = si.acc
                         AND NVL(si.ob22,'00') in ('14','15','18','23','24','25','26','27')
@@ -1805,37 +1705,23 @@ BEGIN
                                           and NVL(s.r013,'0') in ('1','2','3'));
                    end if;
 
-                  -- 03/08/2016 OAB: не исключаем переброску с 2650 текущего счета на 2650 депозитный
-                  if nbs_ = '2650' then
-                     vost_ := 0;
+                   if vost_ <> 0 then
+                      p_ins_del (acc_, nls_, kv_, '(внутри группы)', skos_, vost_);
 
-                     SELECT NVL(SUM(t.s*100), 0)
-                        INTO vost_
-                     FROM tmp_file03 t, specparam s
-                     WHERE t.FDAT = data_
-                       AND t.acck=acc_
-                       AND t.nlsd LIKE nbs_ || '%'
-                       AND t.accd = s.acc
-                       AND NVL(s.r013,'0') in ('1','3','8');
-                  end if;
-
-                  if vost_ <> 0 then
-                     p_ins_del (acc_, nls_, kv_, '(внутри группы)', skos_, vost_);
-
-                     p_ins_log (   '(внутри группы) DK=1 r020='''
-                                || nbs_
-                                || ''' Счет (OB22)='''
-                                || nls_ || ' (' || ob22_ || ')'
-                                || ''' вал='''
-                                || kv_
-                                || ''' дата='''
-                                || data_
-                                || ''' сумма=',
-                                vost_);
-                  end if;
+                      p_ins_log (   '(внутри группы) DK=1 r020='''
+                                 || nbs_
+                                 || ''' Счет (OB22)='''
+                                 || nls_ || ' (' || ob22_ || ')'
+                                 || ''' вал='''
+                                 || kv_
+                                 || ''' дата='''
+                                 || data_
+                                 || ''' сумма=',
+                                 vost_);
+                   end if;
                 EXCEPTION
-                  WHEN NO_DATA_FOUND THEN
-                  vost_ := 0;
+                   WHEN NO_DATA_FOUND THEN
+                   vost_ := 0;
                 END;
 
                 if mfo_ = 344443 and nbs_ like '16%' then
@@ -1991,8 +1877,8 @@ BEGIN
                       INTO s_prol_
                    FROM tmp_file03 p, OPERW o
                    WHERE p.FDAT = data_
-                     AND p.acck=acc_
-                     AND p.REF=o.REF
+                     AND p.acck = acc_
+                     AND p.REF = o.REF
                      AND o.tag LIKE 'D020%'
                      AND o.value LIKE poisk_;
 
@@ -2024,8 +1910,8 @@ BEGIN
                       INTO vost_
                    FROM tmp_file03 p, OPERW o
                    WHERE p.FDAT = data_
-                     AND p.acck=acc_
-                     AND p.REF=o.REF
+                     AND p.acck = acc_
+                     AND p.REF = o.REF
                      AND o.tag LIKE 'D020%'
                      AND o.value LIKE poisk_;
 
@@ -2059,8 +1945,8 @@ BEGIN
                       INTO vost_
                    FROM tmp_file03 p, OPERW o
                    WHERE p.FDAT = data_
-                     AND p.acck=acc_
-                     AND p.REF=o.REF
+                     AND p.acck = acc_
+                     AND p.REF = o.REF
                      AND o.tag LIKE 'D020%'
                      AND o.value LIKE poisk_;
 
@@ -2094,7 +1980,7 @@ BEGIN
                       SELECT NVL(SUM(s*100), 0)  --NVL (SUM (Gl.P_Icurval (kv, s * 100, FDAT)), 0)
                          INTO vost_
                       FROM tmp_file03
-                      WHERE TT='АСВ'
+                      WHERE TT = 'АСВ'
                         AND FDAT = data_
                         and acck = acc_;
 
@@ -2126,7 +2012,7 @@ BEGIN
                       SELECT NVL(SUM(t.s*100), 0)
                          INTO vost_
                       FROM tmp_file03 t
-                      WHERE t.TT='024'
+                      WHERE t.TT = '024'
                         AND t.FDAT = data_
                         and t.acck = acc_
                         and exists (select 1
@@ -2277,7 +2163,7 @@ BEGIN
                           vost_ := 0;
                       end case;
 
-                      if mfou_ not in (300120) and poisk_ is not null then
+                      if poisk_ is not null then
                          -- 15.01.2010 будем выбирать номинал вместо эквивалента
                          SELECT NVL(SUM(s*100), 0)
                             INTO vost_
@@ -2301,47 +2187,6 @@ BEGIN
                       end if;
                    EXCEPTION
                          WHEN NO_DATA_FOUND
-                   THEN
-                      vost_ := 0;
-                   END;
-
-                   skos_ := skos_ - vost_;
-
-                   vost_ := 0;
-
-                   BEGIN
-                      case
-                      when nbs_ in ('2620') then
-                          poisk_ := '2635%';
-                      else
-                         poisk_ := null;
-                         vost_ := 0;
-                      end case;
-
-                      if mfou_ not in (300120) and poisk_ is not null then
-                         -- 15.01.2010 будем выбирать номинал вместо эквивалента
-                         SELECT NVL(SUM(s*100), 0)
-                            INTO vost_
-                         FROM tmp_file03
-                         WHERE FDAT = data_
-                           AND acck = acc_
-                           AND nlsd LIKE poisk_;
-
-                         p_ins_del (acc_, nls_, kv_, '(с 2635 на 2620)', skos_,  vost_);
-
-                         p_ins_log (   '(с 2635 на 2620) DK=1 r020='''
-                                    || nbs_
-                                    || ''' Счет (OB22)='''
-                                    || nls_ || ' (' || ob22_ || ')'
-                                    || ''' вал='''
-                                    || kv_
-                                    || ''' дата='''
-                                    || data_
-                                    || ''' сумма=',
-                                    vost_);
-                      end if;
-                   EXCEPTION
-                          WHEN NO_DATA_FOUND
                    THEN
                       vost_ := 0;
                    END;
@@ -2567,48 +2412,7 @@ BEGIN
 
                       BEGIN
                          case
-                         when nbs_ in ('2625') then
-                             poisk_ := '2202%';
-                         else
-                            poisk_ := null;
-                            vost_ := 0;
-                         end case;
-
-                         if poisk_ is not null then
-                             -- 15.01.2010 будем выбирать номинал вместо эквивалента
-                             SELECT NVL(SUM(s*100), 0)
-                                INTO vost_
-                             FROM tmp_file03
-                             WHERE FDAT = data_
-                               AND nlsd LIKE poisk_
-                               and acck = acc_;
-
-                           p_ins_del (acc_, nls_, kv_, '(с 2625 на 2202)', skos_,  vost_);
-
-                           p_ins_log (   '(с 2625 на 2202) DK=1 r020='''
-                                      || nbs_
-                                      || ''' Счет='''
-                                      || nls_
-                                      || ''' вал='''
-                                      || kv_
-                                      || ''' дата='''
-                                      || data_
-                                      || ''' сумма=',
-                                      vost_);
-                         end if;
-                      EXCEPTION
-                         WHEN NO_DATA_FOUND
-                       THEN
-                         vost_ := 0;
-                      END;
-
-                      skos_ := skos_ - vost_;
-
-                      vost_ := 0;
-
-                      BEGIN
-                         case
-                         when nbs_ in ('2625') then
+                         when nbs_ in ('2620') then
                              poisk_ := '2203%';
                          else
                             poisk_ := null;
@@ -2624,9 +2428,9 @@ BEGIN
                                AND nlsd LIKE poisk_
                                and acck = acc_;
 
-                           p_ins_del (acc_, nls_, kv_, '(с 2625 на 2203)', skos_,  vost_);
+                           p_ins_del (acc_, nls_, kv_, '(с 2203 на 2620)', skos_,  vost_);
 
-                           p_ins_log (   '(с 2625 на 2203) DK=1 r020='''
+                           p_ins_log (   '(с 2203 на 2620) DK=1 r020='''
                                       || nbs_
                                       || ''' Счет='''
                                       || nls_
@@ -2649,7 +2453,7 @@ BEGIN
 
                       BEGIN
                          case
-                         when nbs_ in ('2625') then
+                         when nbs_ in ('2620') then
                              poisk_ := '2924%';
                          else
                             poisk_ := null;
@@ -2665,53 +2469,12 @@ BEGIN
                                AND nlsd LIKE poisk_
                                and acck = acc_;
 
-                           p_ins_del (acc_, nls_, kv_, '(с 2625 на 2924)', skos_,  vost_);
+                           p_ins_del (acc_, nls_, kv_, '(с 2924 на 2620)', skos_,  vost_);
 
-                           p_ins_log (   '(с 2625 на 2924) DK=1 r020='''
+                           p_ins_log (   '(с 2924 на 2620) DK=1 r020='''
                                       || nbs_
                                       || ''' Счет='''
                                       || nls_
-                                      || ''' вал='''
-                                      || kv_
-                                      || ''' дата='''
-                                      || data_
-                                      || ''' сумма=',
-                                      vost_);
-                         end if;
-                      EXCEPTION
-                         WHEN NO_DATA_FOUND
-                       THEN
-                         vost_ := 0;
-                      END;
-
-                      skos_ := skos_ - vost_;
-
-                      vost_ := 0;
-
-                      BEGIN
-                         case
-                         when nbs_ in ('2635') then
-                             poisk_ := '2630%';
-                         else
-                            poisk_ := null;
-                            vost_ := 0;
-                         end case;
-
-                         if poisk_ is not null then
-                             -- 15.01.2010 будем выбирать номинал вместо эквивалента
-                             SELECT NVL(SUM(s*100), 0)
-                                INTO vost_
-                             FROM tmp_file03
-                             WHERE FDAT = data_
-                               AND nlsd LIKE poisk_
-                               and acck = acc_;
-
-                           p_ins_del (acc_, nls_, kv_, '(с 2635 на 2630)', skos_,  vost_);
-
-                           p_ins_log (   '(c 2635 на 2630) DK=1 r020='''
-                                      || nbs_
-                                      || ''' Счет (OB22)='''
-                                      || nls_ || ' (' || ob22_ || ')'
                                       || ''' вал='''
                                       || kv_
                                       || ''' дата='''
@@ -2900,7 +2663,8 @@ BEGIN
 
                 -- кредитовые обороты
                 IF (skos_ > 0 AND r050_ = '22' and se_ >= 0) OR
-                   (skos_ > 0 and se_ >= 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655') and r011_ = '3')
+                   (skos_ > 0 and se_ >= 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655') and r011_ = '3' and dat_ <= dat_izm3) OR 
+                   (skos_ > 0 and se_ >= 0 and nbs_ in ('2600', '2620', '2650') and dat_ > dat_izm3)           
                 THEN
                    skos_ := Gl.P_Icurval (kv_, skos_, data_);
                    cntr1_ := TO_CHAR (2 - cntr_);
@@ -2919,10 +2683,16 @@ BEGIN
                       nls_ := 'X' || nls_;
                    END IF;
 
-                   IF ((mfou_ in (300465) and mfo_ != mfou_ and nbs_ in ('2620','2625') and spcnt_ <> 0) OR
-                       (mfou_ in (300465) and mfo_ != mfou_ and nbs_ not in ('2620','2625')) OR
+                   if nbs_ in ('2600','2620','2650') and r011_ <> '3' 
+                   then
+                      spcnt_ := 0;
+                   end if;
+
+                   IF ((mfou_ in (300465) and mfo_ != mfou_ and nbs_ in ('2620','2625') and spcnt_ <> 0 and dat_ <= dat_izm3) OR
+                       (mfou_ in (300465) and mfo_ != mfou_ and nbs_ in ('2620','2625') and spcnt_ >= 0 and dat_ > dat_izm3) OR 
+                       (mfou_ in (300465) and mfo_ != mfou_ and nbs_ not in ('2620','2625') ) OR
                        (mfou_ in (300465) and mfo_ = mfou_) ) OR
-                       mfou_ not in (300465)
+                       mfou_ not in (300465) 
                    THEN
                       -- Кр. обороты
                       p_ins ('1' || kodp_, TO_CHAR (skos_));
@@ -2987,7 +2757,8 @@ BEGIN
                       nls_ := 'X' || nls_;
                    END IF;
 
-                   IF ((mfou_ in (300465) and mfou_ != mfo_ and nbs_ in ('2620','2625') and spcnt_ <> 0) OR
+                   IF ((mfou_ in (300465) and mfou_ != mfo_ and nbs_ in ('2620','2625') and spcnt_ <> 0 and dat_ <= dat_izm3) OR
+                       (mfou_ in (300465) and mfou_ != mfo_ and nbs_ in ('2620','2625') and spcnt_ >= 0 and dat_ > dat_izm3) OR
                        (mfou_ in (300465) and mfou_ != mfo_ and nbs_ not in ('2620','2625')) OR
                        (mfou_ in (300465) and mfou_ = mfo_ ) ) OR
                        mfou_ not in (300465)
@@ -3204,12 +2975,12 @@ BEGIN
 
     --- если остаток на конец Дебетовый, а на начало дня Кредитовый или
     --- если остаток на конец дня и на начало дня Дебетовый и разница больше нуля
-          IF nbs_ IN ('1600','2600','2605','2620','2625','2650','2655','8025')
+          IF nbs_ IN ('1600','2600','2620','2650','8025')
           THEN
-             if nbs_ = '2625' and mfou_ = 300465 then
+             if nbs_ = '2620' and mfou_ = 300465 then
                  BEGIN
                     case
-                       when nbs_ in ('2625') then
+                       when nbs_ in ('2620') then
                           poisk_ := '2924%';
                        else
                           poisk_ := null;
@@ -3225,7 +2996,7 @@ BEGIN
                          AND nlsk LIKE poisk_
                          and accd = acc_;
 
-                       p_ins_del (acc_, nls_, kv_, '(с 2625 на 2924)', sdos1_,  vost_);
+                       p_ins_del (acc_, nls_, kv_, '(с 2620 на 2924)', sdos1_,  vost_);
 
                        p_ins_log (   '(с 2625 на 2924) DK=1 r020='''
                                    || nbs_
@@ -3263,12 +3034,7 @@ BEGIN
                      znap_ := TO_CHAR (GL.P_Icurval(kv_, ABS(se_)-ABS(vost_), Data_));
                   END IF;
 
-                   -- IF mfo_ = 300465 AND spcnt_ = 0
-                   -- THEN
-                   --    cntr1_ := 'X';
-                   -- ELSE
-                      cntr1_ := TO_CHAR (2 - cntr_);
-                   -- END IF;
+                   cntr1_ := TO_CHAR (2 - cntr_);
 
                    IF s180_ = '0'
                    THEN
