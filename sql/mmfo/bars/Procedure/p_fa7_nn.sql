@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.009 06/04/2019 (18/03/2019)
+% VERSION     :  v.19.11 12/04/2019 (11/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -597,7 +597,6 @@ IS
       sql_ := 'select count(distinct a.acc) ' ||
               'from accounts a, deal_account da, object o  '||
               'where a.acc = :acc_ 
-                 and a.daos >=:dat_
                  and o.object_type_id = (select ot.id from object_type ot where ot.type_code = ''SMB_DEPOSIT_TRANCHE'')
                  and o.id = da.deal_id
                  and da.account_type_id = (select ak.id from attribute_kind ak where ak.attribute_code = ''DEPOSIT_PRIMARY_ACCOUNT'')
@@ -605,7 +604,7 @@ IS
 
       EXECUTE IMMEDIATE sql_
                    INTO cnt_
-                  USING pacc_, pdat_;
+                  USING pacc_;
 
       RETURN cnt_;
    END;
@@ -980,7 +979,7 @@ BEGIN
                                                         c.sdate <= :dat_
                                                group by n.acc) d
                          on (a.acc = d.acc)
-                         left outer join (SELECT i.freq, NVL (i.s, 0) s, i.apl_dat, n8.nd nd
+                         left outer join (SELECT unique i.freq, NVL (i.s, 0) s, i.apl_dat, n8.nd nd
                                            FROM nd_acc n8, accounts a8, int_accn i
                                            WHERE n8.acc = a8.acc
                                              AND a8.nls LIKE ''8999%''
@@ -1169,16 +1168,15 @@ BEGIN
                 )
              OR mfou_ NOT IN (300465)
           THEN
-
              BEGIN
                 SELECT a.ost
                   INTO se1_
-                  FROM snap_balances a, accounts s
+                  FROM sal a, accounts s
                  WHERE a.fdat = dat_
                    AND s.acc = acc_
                    AND s.accc = a.acc
-                   AND nbs_ IS NOT NULL;
-
+                   AND a.nbs IS NOT NULL;
+                   
                 dk_k := iif_n (se1_, 0, '1', '2', '2');
              EXCEPTION
                 WHEN NO_DATA_FOUND
@@ -3217,7 +3215,6 @@ BEGIN
              end if;
 
              if srezp_ <> 0  then
-                kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
                 if nbs_ = '1419'
                 then
                    BEGIN
@@ -3229,8 +3226,44 @@ BEGIN
                       r011_1419 := substr(k.kodp,6,1);
                    END;
                    kodp_ := k.sign_rez||nbs_||r011_1419||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
-                end if;
+                else
+                  r011_ := substr(k.kodp,6,1);
+                  
+                  if nbs_ in ('2609','2629','2659') then
+                     r011_ :='0';
+                  end if;
 
+                  if nbs_ in ('2029','2039','2079','2209','2219','2229')
+                  then
+                        r011_ :='1';
+                  elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548')
+                  then
+                        r011_ :='2';
+                  end if;
+
+                  if r011_ ='0' then
+                     if      nbs_ in ('2239','2249','3599')
+                     then
+                           r011_ :='1';
+                     elsif   nbs_ in ('2019','2089','2119','2139')
+                     then
+                           r011_ :='2';
+                     elsif   nbs_ in ('2069','2109','2129')
+                     then
+                           r011_ :='3';
+                     elsif   nbs_ in ('3692')
+                     then
+                           r011_ :='4';
+                     elsif   nbs_ in ('2890')
+                     then
+                           r011_ :='6';
+                     else
+                           NULL;
+                     end if;
+                  end if;
+                  
+                  kodp_ := k.sign_rez||nbs_||r011_||r013_||s181_||'Z'||k.rz||substr(k.kodp, 11,4);
+                end if;
 
                 znap_ := to_char(sign(k.szq) * srezp_);
                 comm_ := SUBSTR (k.tobo || ' перевищення резерву над активом (3) ', 1, 200);
@@ -4187,7 +4220,7 @@ BEGIN
                                            where fdat between datb_+1 and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
                         o.acc = a.acc
-                        and a.tip = 'REZ'
+                        and a.tip in ('REZ', 'SNA')
                         and o.tt not like 'AR%'
                         and o.ref = z.ref
                         and o.fdat = z.fdat

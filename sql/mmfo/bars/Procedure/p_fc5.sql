@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.008   27/03/2019 (18/03/2019)
+% VERSION : v.19.010  12/04/2019 (08/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -76,6 +76,7 @@ IS
  znap_ VARCHAR2 (30);
 
  r011_ VARCHAR2 (1);
+ r011_1419 VARCHAR2 (1);
  r013_ VARCHAR2 (1);
  r013_30 NUMBER;
  fa7d_ NUMBER;
@@ -367,17 +368,12 @@ BEGIN
      select nvl(max(report_date), dat_)
      into datd_
      from NBUR_TMP_A7_S245
-     where report_date < dat_end_;
+     where report_date = any (select fdat from fdat where fdat between dat_beg_ - 10 and dat_end_);
  end if;
-
- select count(*)
- into cnt_
- from NBUR_TMP_A7_S245
- where report_date = datd_;
 
  EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
-   logger.info ('P_FC5: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+ logger.info ('P_FC5: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
  userid_ := user_id;
 
@@ -1262,8 +1258,8 @@ BEGIN
                     cnt, rnum, decode(suma, 0, 1, sump / suma) koef, r013, rz, discont, prem,
                     round(discont * decode(suma, 0, 1, sump / suma)) discont_row,
                     round(prem * decode(suma, 0, 1, sump / suma)) prem_row,
-                    nd, id, ob22, custtype, accr, accr_30, tip, 
-                    discont_SDF, proc_SNA, 
+                    nd, id, ob22, custtype, accr, accr_30, tip,
+                    discont_SDF, proc_SNA,
                     (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez
              from (
                  select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
@@ -1278,7 +1274,7 @@ BEGIN
                         nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                         nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                         t.nd, t.id,
-                        a.ob22, c.custtype, t.accr, t.accr_30, a.tip, 
+                        a.ob22, c.custtype, t.accr, t.accr_30, a.tip,
                         t.zpr discont_SDF, t.pv proc_SNA
                  from v_tmp_rez_risk_c5 t,
                       (select acc, kodp, substr(kodp,7,1) R013, sum(to_number(znap)) sump
@@ -1319,7 +1315,7 @@ BEGIN
 
       -- новая функция для определения кода R013=1 до 30-и дней, 2 - более 30
       r013_30 := f_ret_type_r013 (dat_, k.nbs, k.r013 );
-      
+
       if k.accr = k.accr_30 or r013_30 = 1
       then
          nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
@@ -1361,16 +1357,18 @@ BEGIN
                 kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              end if;
 
-             sakt_ := k.suma;
-
-             srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
-             srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
-
-             sum_ := round(srez_ * k.koef);
-
              if k.rnum = 1 then
+                sakt_ := k.suma;
+
+                srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
+                srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
+
+                sum_ := round(srez_ * k.koef);
+
                 sumc_ := sum_;
              else
+                sum_ := round(srez_ * k.koef);
+
                 sumc_ := sumc_ + sum_;
              end if;
 
@@ -1448,6 +1446,18 @@ BEGIN
                     kodp_ := k.sign_rez||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
                 else
                     kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
+                    if nbs_ = '1419'
+                    then
+                       BEGIN
+                          select r011
+                             into r011_1419
+                          from specparam
+                          where acc = k.acc;
+                       EXCEPTION WHEN NO_DATA_FOUND THEN
+                          r011_1419 := substr(k.kodp,6,1);
+                       END;
+                       kodp_ := k.sign_rez||nbs_||r011_1419||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
+                    end if;
                 end if;
 
                 znap_ := to_char(sign(k.szq) * srezp_);
@@ -1470,7 +1480,7 @@ BEGIN
              r011_ := substr(k.kodp,6,1);
 
              kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
-             znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
+             znap_ := to_char(gl.p_icurval(k.kv, round(abs(k.discont_SDF) * k.koef), dat_));
 
              comm_ := SUBSTR(' дисконт SDF c1', 1,100);
 
@@ -1488,10 +1498,10 @@ BEGIN
           -- нарах. в_дсотки (тип рахунку SNA)
           if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
              kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8);
-             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
-             
+             znap_ := to_char(gl.p_icurval(k.kv, round(k.proc_SNA  * k.koef), dat_));
+
              comm_ := SUBSTR(' нарах. в_дсотки SNA c1', 1,100);
-             
+
              insert into rnbu_trace
                      ( recid, userid,
                        nls, kv, odate, kodp,
@@ -1508,7 +1518,7 @@ BEGIN
             r011_ := substr(k.kodp,6,1);
 
             kodp_ := (case when k.discont_SDF < 0 then '1' else '2' end)||substr(k.nls,1,3) ||'6'||r011_||r013_||substr(k.kodp,8);
-            znap_ := to_char(gl.p_icurval(k.kv, abs(k.discont_SDF), dat_));
+            znap_ := to_char(gl.p_icurval(k.kv, round(abs(k.discont_SDF) * k.koef), dat_));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c1', 1,100);
 
@@ -1526,10 +1536,10 @@ BEGIN
          -- нарах. в_дсотки (тип рахунку SNA)
          if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
             kodp_ := '2'||nbs_||substr(k.kodp,6,1)||(case when TP_SND then k.r013 else '4' end)||substr(k.kodp,8);
-            znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
-             
+            znap_ := to_char(gl.p_icurval(k.kv, round(k.proc_SNA * k.koef), dat_));
+
             comm_ := SUBSTR(' нарах. в_дсотки SNA for rez=0 c1', 1,100);
-             
+
             insert into rnbu_trace
                      ( recid, userid,
                        nls, kv, odate, kodp,
@@ -1539,7 +1549,7 @@ BEGIN
                        k.nls, k.kv, data_, kodp_,
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
-         end if; 
+         end if;
 
          if k.rnum = 1 then
               discont_ := k.discont;
@@ -1615,7 +1625,7 @@ BEGIN
                               or
                                 mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
                         )
-                where sz <> 0 and szq <> 0 or 
+                where sz <> 0 and szq <> 0 or
                       sz = 0 and (discont <> 0 or prem <> 0 or proc_SNA <> 0 and tip = 'SNA')
             order by acc )
    loop
@@ -1652,7 +1662,7 @@ BEGIN
 
       srez_ := (case when abs(k.szq) <= sakt_ then abs(k.szq) else sakt_ end);
       srezp_ := (case when abs(k.szq) <= sakt_ then 0 else abs(k.szq) - srez_ end);
-      
+
       if k.accr is not null then
           nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
 
@@ -1660,8 +1670,8 @@ BEGIN
           r013_ := substr(nbs_r013_, 5, 1);
       else
           nbs_ := substr(k.nbs, 1, 3) || '9';
-          r013_ := k.r013; 
-          
+          r013_ := k.r013;
+
           nbs_r013_ := nbs_ || r013_;
       end if;
 
@@ -1807,15 +1817,15 @@ BEGIN
 
           if srezp_ <> 0 and not TP_SND then
              r012_ :='B';
-             
-             if nbs_ = '3599'then 
+
+             if nbs_ = '3599'then
                 if substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
                    r011_ := '2';
                 elsif r011_ ='0'  then
                    r011_ := '1';
                 else     null;
                 end if;
-             end if; 
+             end if;
 
              kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
              znap_ := to_char(sign(k.szq) * srezp_);
@@ -1853,10 +1863,10 @@ BEGIN
           end if;
 
           -- нарах. в_дсотки (тип рахунку SNA)
-          if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
+          if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then
              kodp_ := '2'||nbs_||r011_||(case when TP_SND then '3' else '4' end)||substr(kodp_,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
-             
+
              comm_ := SUBSTR(' нарах. в_дсотки SNA c2', 1,100);
              acc_proc_sna := k.acc;
 
@@ -1890,13 +1900,13 @@ BEGIN
          end if;
 
          -- нарах. в_дсотки (тип рахунку SNA)
-         if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then   
+         if k.acc <> acc_proc_sna and k.proc_SNA <> 0 then
             kodp_ := '2'||nbs_||r011_||(case when TP_SND then '3' else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
             znap_ := to_char(gl.p_icurval(k.kv, k.proc_SNA, dat_));
-             
+
             comm_ := SUBSTR(' нарах. в_дсотки SNA for rez=0 c2', 1,100);
             acc_proc_sna := k.acc;
-       
+
             insert into rnbu_trace
                      ( recid, userid,
                        nls, kv, odate, kodp,
@@ -1906,7 +1916,7 @@ BEGIN
                        k.nls, k.kv, data_, kodp_,
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
-         end if; 
+         end if;
 
          discont_ := k.discont;
          premiy_ := k.prem;
@@ -1932,7 +1942,7 @@ BEGIN
                                            where fdat between datb_+1 and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
                         o.acc = a.acc
-                        and a.tip = 'REZ'
+                        and a.tip in ('REZ', 'SNA')
                         and o.tt not like 'AR%'
                         and o.tt not like 'IF%'
                         and o.ref = z.ref
@@ -2040,10 +2050,10 @@ BEGIN
                     where nvl(a.ost,0)<>nvl(b.ost,0)
                     order by nvl(a.nbs, b.nbs))
        loop
-           update rnbu_trace 
+           update rnbu_trace
            set znap = znap + k.rizn,
                comm = comm || ' *=' || to_char(k.rizn)
-           where acc = k.acc and 
+           where acc = k.acc and
                  kodp like '_'||k.nbs||'__________'||k.s245||'%' and
                  rownum = 1;
        end loop;
@@ -2095,7 +2105,7 @@ BEGIN
                             select (case when typ_ > 0
                                             THEN NVL (F_Codobl_Tobo (a.acc, typ_), nbuc1_)
                                             else nbuc1_
-                                    end) nbuc, 2-MOD(c.codcagent,2) rez,
+                                    end) nbuc, NVL (DECODE (c.country, 804, '1', '2'), '1') rez,
                                 sign(decode(a.kv, 980, a.ost, a.ostq)) t020, a.nbs, a.kv,
                                 sum(decode(a.kv, 980, a.ost, a.ostq)) ostq
                             from otcn_saldo a, otcn_acc s, customer c
@@ -2113,7 +2123,7 @@ BEGIN
                             group by (case when typ_ > 0
                                             THEN NVL (F_Codobl_Tobo (a.acc, typ_), nbuc1_)
                                             else nbuc1_
-                                    end), 2-MOD(c.codcagent,2), sign(decode(a.kv, 980, a.ost, a.ostq)), a.nbs, a.kv)
+                                    end), NVL (DECODE (c.country, 804, '1', '2'), '1'), sign(decode(a.kv, 980, a.ost, a.ostq)), a.nbs, a.kv)
                           where t020 <> 0)) a
                     full outer join
                     (select r.nbuc,
@@ -2613,26 +2623,26 @@ BEGIN
                      and o1.znap <> 0
                  );
     commit;
-	
+    
     merge into otc_c5_proc o
-    using (select c.rnk,
+    using (select c.rnk, 
                   d.link_group,
-                  NVL(d.link_code, '000') link_code,
-                  NVL(d.groupname, c.nmk) link_name,
-                  DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1) prins
+                  nvl(d.link_code, '000') link_code,
+                  nvl(d.groupname, c.nmk) link_name,
+                  decode(c.prinsider, null, 2, 0, 2, 99, 2, 1) prins
            from customer c
            left outer join d8_cust_link_groups d
-            on (trim(c.okpo) = trim(d.okpo))) p
-        on (p.rnk = o.rnk) 
-    WHEN MATCHED THEN
-        UPDATE SET o.LINK_GROUP = p.LINK_GROUP, 
-                   o.LINK_CODE = p.LINK_CODE, 
-                   o.LINK_NAME = p.LINK_NAME, 
-                   o.FL_PRINS = p.PRINS     
+           on (c.okpo = d.okpo) ) p
+    on  (p.rnk = o.rnk)
+    when matched then
+         update set o.link_group = p.link_group, 
+                    o.link_code = p.link_code, 
+                    o.link_name = p.link_name, 
+                    o.fl_prins = p.prins
     where o.datf = dat_;
     commit;
 
-   logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
 
