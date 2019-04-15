@@ -1,5 +1,9 @@
+set lines 1000
+set trimspool on
+set serveroutput on size 1000000
+
 prompt Создание / Обновление операции VZA
-prompt Наименование операции: Підкріплення запасів готівки НБУ
+prompt Наименование операции: VZA-Підкріплення запасів готівки НБУ
 declare
   cnt_  number;
 begin
@@ -8,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('VZA', 'Підкріплення запасів готівки НБУ', 1, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9817'',0))','#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', null, 0, 0, 0, 0, null, null, null, null, null, null, '1001100001000000000000000000000000010000000000000000000000000000', null);
+    values ('VZA', 'VZA-Підкріплення запасів готівки НБУ', 1, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9817'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', null, 0, 0, 0, 0, null, null, null, null, '0', null, '1001100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='VZA', name='Підкріплення запасів готівки НБУ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9817'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1001100001000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='VZA', name='VZA-Підкріплення запасів готівки НБУ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9817'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800='0', rang=null, flags='1001100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='VZA';
   end;
   --------------------------------
@@ -21,23 +25,23 @@ begin
   delete from op_rules where tt='VZA';
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('SAGON', 'VZA', 'M', 1, 1, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D    '', ''VZA'', ''M'', 1, 1, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('SAGOD', 'VZA', 'M', 1, 2, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D    '', ''VZA'', ''M'', 1, 2, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''SAGOD'', ''VZA'', ''M'', 1, 2, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('SAGON', 'VZA', 'M', 1, 1, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''SAGON'', ''VZA'', ''M'', 1, 1, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -48,34 +52,37 @@ begin
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D    '', ''VZA'', ''M'', 1, 3, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''SAGOU'', ''VZA'', ''M'', 1, 3, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
-
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='VZA';
   --------------------------------
   ------- Балансовые счета -------
   --------------------------------
   delete from ps_tts where tt='VZA';
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('9817', 'VZA', 0);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('9817', 'VZA', 0, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9817'', ''VZA'', 0) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9817'', ''VZA'', 0, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('9910', 'VZA', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('9910', 'VZA', 1, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9910'', ''VZA'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9910'', ''VZA'', 1, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
