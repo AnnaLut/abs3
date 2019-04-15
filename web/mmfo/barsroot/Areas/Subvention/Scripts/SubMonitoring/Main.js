@@ -399,9 +399,9 @@ function createGrid(options, dataSource, gridSelector) {
             total: "Total"
         },
         requestEnd: reFunc,
-        serverFiltering: false,
-        serverPaging: false,
-        serverSorting: false
+        serverFiltering: true,
+        serverPaging: true,
+        serverSorting: true
     }, dataSource);
 
     var kendoDs = new kendo.data.DataSource(dataSource);
