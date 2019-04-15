@@ -40,7 +40,7 @@ IS
                              p_dclass    VARCHAR2,
                              p_dvkr      VARCHAR2,
                              p_dsum      NUMBER,
-                             p_ddate         in DATE
+                             p_ddate  in DATE
                              );
 END bars_credit_factory;
 
@@ -218,7 +218,7 @@ FUNCTION get_crd_response_new (p_okpo     IN bars.customer.okpo%TYPE,
          WHEN NO_DATA_FOUND THEN
            RETURN '<Client>No list</Client>';
          when TOO_MANY_ROWS then
-           RETURN '<Client>для МФО '||gl.aMFO||' є декілька записів по вказаним параметрам пошуку. Необхідно виконати об"єднання клієнтів!</Client>';
+           RETURN '<ERROR>для МФО '||gl.aMFO||' є декілька записів по вказаним параметрам пошуку. Необхідно виконати об"єднання клієнтів!</ERROR>';
       END;
 
       select xmlelement("Client",
