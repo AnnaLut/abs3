@@ -55,8 +55,12 @@ CREATE OR REPLACE PACKAGE "BARS"."SUBSIDY" is
   function parse_data(p_id in varchar2, p_file_data in clob)
     return t_sybsidy_list;
   function form_ticket(p_id in varchar2) return clob;
+  
+  function pay_data(p_sybsidy_list in t_sybsidy_list) return t_sybsidy_list;
 
   procedure processing_payments;
+  
+  procedure start_job;
   
   -- получение буферов для подписи
   procedure get_doc_buffers(p_ref in integer, p_key in varchar2, p_int_buf out varchar2, p_sep_buf out varchar2);
@@ -334,9 +338,10 @@ function utf8todeflang(p_clob in    clob) return clob is
     l_refk          oper.ref%type;
     l_refkp          oper.ref%type;
     l_accounts_line accounts%rowtype;
-    l_acc_rec_line accounts%rowtype;
+    l_acc_rec_line  accounts%rowtype;
     l_acc_line_3570 accounts%rowtype;
     l_acc_line_6510 accounts%rowtype;
+    l_acc_ben_line  accounts%rowtype;
     l_branch        accounts.branch%type;
     l_branchk       customer.branch%type; 
     l_okpo          customer.okpo%type;
@@ -390,6 +395,9 @@ function utf8todeflang(p_clob in    clob) return clob is
               l_tt := 'SM4';
             else
               l_tt := 'SM1';
+            end if;
+            if l_sybsidy_list(i).receiveraccnum <> vkrzn( substr(l_sybsidy_list(i).receiverbankcode,1,5), l_sybsidy_list(i).receiveraccnum ) then
+              raise_application_error(-20000, 'Не вірний ключ рахунку - '||l_sybsidy_list(i).receiveraccnum);
             end if;
           elsif l_sybsidy_list(i).paytype = 2 then
             if substr(l_mfo,1,6) != l_sybsidy_list(i).receiverbankcode then
@@ -463,8 +471,8 @@ function utf8todeflang(p_clob in    clob) return clob is
               l_ttk      := 'SM2';
               
               bc.go('/');
-
-			       begin
+			  
+			  begin 
                 select c.rnk
                   into l_sybsidy_list(i).receiverrnk
                   from customer c
@@ -568,51 +576,65 @@ function utf8todeflang(p_clob in    clob) return clob is
                   end if;
                   
                   begin  
-                          commit;
-                  
-                          gl.ref(l_refkp);
+                      commit;
+                      
+                      begin 
+                        select * 
+                          into l_acc_ben_line
+                          from accounts 
+                         where nls = l_sybsidy_list(i).receiveraccnum
+                           and dazs is null;
+                      exception when no_data_found then 
+                         raise_application_error(-20000, 'Рахунок отримувача не знайдено - '||l_sybsidy_list(i).receiveraccnum);
+                      end;
+                      
+                      if l_acc_ben_line.blkd != 0 then
+                         raise_application_error(-20000, 'Рахунок заблоковано по дебету - '||l_sybsidy_list(i).receiveraccnum);
+                      end if;
+                      
+                      gl.ref(l_refkp);
                         
-                          gl.in_doc3(ref_   => l_refkp,
-                                     tt_    => l_ttkp,
-                                     vob_   => 6,
-                                     nd_    => to_char(l_refkp),
-                                     pdat_  => sysdate,
-                                     vdat_  => l_bdate,
-                                     dk_    => l_dk,
-                                     kv_    => l_kv,
-                                     s_     => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
-                                     kv2_   => l_kv,
-                                     s2_    => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
-                                     sk_    => null,
-                                     data_  => l_bdate,
-                                     datp_  => l_bdate,
-                                     nam_a_ => substr(l_sybsidy_list(i).receivername,1,38),
-                                     nlsa_  => l_sybsidy_list(i).receiveraccnum,
-                                     mfoa_  => l_mfok,
-                                     nam_b_ => substr(l_acc_line_3570.nms,1,38),
-                                     nlsb_  => l_nls_3570,
-                                     mfob_  => l_mfok,
-                                     nazn_  => 'Сплата ком. винагороди банку за відправку платежів оплати ком. послуг. за рах. субсидії  згідно постанови КМУ 848.',
-                                     d_rec_ => null,
-                                     id_a_  => l_sybsidy_list(i).receiveridentcode,
-                                     id_b_  => l_okpo_3570,
-                                     id_o_  => null,
-                                     sign_  => null,
-                                     sos_   => 1,
-                                     prty_  => 0,
-                                     uid_   => user_id);
+                      gl.in_doc3(ref_   => l_refkp,
+                                 tt_    => l_ttkp,
+                                 vob_   => 6,
+                                 nd_    => to_char(l_refkp),
+                                 pdat_  => sysdate,
+                                 vdat_  => l_bdate,
+                                 dk_    => l_dk,
+                                 kv_    => l_kv,
+                                 s_     => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
+                                 kv2_   => l_kv,
+                                 s2_    => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
+                                 sk_    => null,
+                                 data_  => l_bdate,
+                                 datp_  => l_bdate,
+                                 nam_a_ => substr(l_sybsidy_list(i).receivername,1,38),
+                                 nlsa_  => l_sybsidy_list(i).receiveraccnum,
+                                 mfoa_  => l_mfok,
+                                 nam_b_ => substr(l_acc_line_3570.nms,1,38),
+                                 nlsb_  => l_nls_3570,
+                                 mfob_  => l_mfok,
+                                 nazn_  => 'Сплата ком. винагороди банку за відправку платежів оплати ком. послуг. за рах. субсидії  згідно постанови КМУ 848.',
+                                 d_rec_ => null,
+                                 id_a_  => l_sybsidy_list(i).receiveridentcode,
+                                 id_b_  => l_okpo_3570,
+                                 id_o_  => null,
+                                 sign_  => null,
+                                 sos_   => 1,
+                                 prty_  => 0,
+                                 uid_   => user_id);
                          
-                         paytt(null,
-                              l_refkp,
-                              l_bdate,
-                              l_ttkp,
-                              l_dk,
-                              l_kv,
-                              l_sybsidy_list(i).receiveraccnum,
-                              l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
-                              l_kv,
-                              l_nls_3570,
-                              l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);
+                     paytt(null,
+                          l_refkp,
+                          l_bdate,
+                          l_ttkp,
+                          l_dk,
+                          l_kv,
+                          l_sybsidy_list(i).receiveraccnum,
+                          l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
+                          l_kv,
+                          l_nls_3570,
+                          l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);
 
                   exception when others then 
                     logger.info('SUBSIDY: Помилка при створенні документу на оплату комісіі для рахунку :' ||l_sybsidy_list(i).receiveraccnum);
@@ -907,6 +929,11 @@ function utf8todeflang(p_clob in    clob) return clob is
 
     end loop;
 
+  end;
+  
+  procedure start_job is
+  begin
+     dbms_scheduler.run_job('BARS.SUBSIDY_PAYMENT_JOB',false);
   end;
   
   procedure get_doc_buffers(p_ref     in integer,
