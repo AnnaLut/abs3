@@ -607,15 +607,6 @@ public partial class DepositAgreement2 : Bars.BarsPage
             return ActionsEnabled.Value;
         }
     }
-
-    protected bool CommandEnabled(string id)
-    {
-        char wb = ((Deposit)Session["DepositInfo"]).wb;
-        string[] array_wb_codes = { "38", "39", "40" };
-        bool is_deposit_wb = Array.Exists(array_wb_codes, x => x == id);
-        return (is_deposit_wb && wb == 'Y' || !is_deposit_wb && wb == 'N') ? CommandEnabled() : false;
-    }
-
     #endregion
 
     // Повернутися на картку договору
@@ -641,4 +632,10 @@ public partial class DepositAgreement2 : Bars.BarsPage
     {
         return ea_struct_id[0] != '5' || ea_struct_id == "541";
     }
+
+    protected bool AvailableStorno(short status, ushort ea_struct_id)
+    {
+        return status != -1 && ea_struct_id != 541 && CommandEnabled(); 
+    }
+
 }
