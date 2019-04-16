@@ -1672,7 +1672,7 @@ is
                 bdat_ := null;
                 ir0_  := 0;
                 op_   := null;
-                nb0_  := null;
+                nb0_  := 0;
 
                 osta_ := 0;
                 sdat_ := null;

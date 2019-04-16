@@ -33,7 +33,12 @@ old.id<10 or new.id<10
     l_rec.fdat          := sysdate;
 
     insert into BARS.INT_RATN_ARC values l_rec;
-
+    -- не понятно откуда идет удаление добавил лог COBUMMFO-9893
+    logger.log_info(p_procedure_name => 'TIUD_INT_RATN'
+                   ,p_log_message    => 'acc : ' || l_rec.acc || chr(10) ||
+                                        'o   : ' || l_rec.VID || chr(10) ||
+                                        dbms_utility.format_call_stack()
+                   );    
   end SAVE_CHANGES;
   ---
 begin
