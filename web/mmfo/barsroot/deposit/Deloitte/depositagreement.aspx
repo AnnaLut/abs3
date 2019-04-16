@@ -157,7 +157,7 @@
                                 <tr id="tr" runat="server">
                                     <td class="command_first">
                                         <asp:LinkButton ID="lbCreate" runat="server" CausesValidation="False" CommandName="Create" 
-                                        Text="Створити" Enabled='<%# CommandEnabled(Eval("TYPE_ID").ToString()) %>' />
+                                        Text="Створити" Enabled='<%# CommandEnabled() %>' />
                                     </td>
                                     <td style="text-align: center">
                                         <asp:Label ID="ID" runat="server" Text='<%# Eval("TYPE_ID") %>'></asp:Label>
@@ -284,7 +284,7 @@
                             <tr id="tr" runat="server">
                                 <td class="command">
                                     <asp:LinkButton ID="lbStorno" runat="server" OnClientClick="if (!confirm('Сторнувати?')) return false; " CausesValidation="False" CommandName="Storno" Text="Сторнувати" 
-                                        Enabled='<%# (Convert.ToInt16(Eval("STATUS")) != -1 && CommandEnabled()) %>'/>
+                                        Enabled='<%# AvailableStorno(Convert.ToInt16(Eval("STATUS")), Convert.ToUInt16(Eval("EASTRUCTID"))) %>'/>
                                 </td>
                                 <td style="text-align: center">
                                     <asp:Label ID="ADDS" runat="server" Text='<%# Eval("ADDS") %>'></asp:Label>
