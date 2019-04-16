@@ -13,3 +13,4 @@ begin
     dbms_output.put_line('Функцiя №' || l_function_id || ' <Обробка пакетів з ЄБК (субсидії)> - добвлена в АРМ Бек-офісу');
 COMMIT;
 end;
+/
