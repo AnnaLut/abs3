@@ -1,5 +1,13 @@
-create or replace procedure nbur_p_prepare_f42k(p_kod_filii        varchar2,
+CREATE OR REPLACE procedure BARS.nbur_p_prepare_f42k(p_kod_filii        varchar2,
                                                 p_report_date      date) is
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DESCRIPTION : Процедура підготовки даних для 42 консолідованого файлу
+% COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
+%
+% VERSION     :  v.16.005  05/04/2019 (18/01/2018)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+  ver_          char(30)  := 'v.16.005  05/04/2019';
+                                                
    se_          number;
    sk_          number;
    sz_          number;
@@ -31,7 +39,8 @@ begin
             where kf = '42'
               and ddd in ('047', '051')
             ) 
-              select a.acc_id, a.acc_num, a.kv, p_report_date, k.ddd, 
+              select /*+ leading(k) */ 
+                     a.acc_id, a.acc_num, a.kv, p_report_date, k.ddd, 
                      a.r013,  a.cust_id, sum (d.ostq), 0
                 from NBUR_DM_ACCOUNTS a, NBUR_DM_BALANCES_DAILY d, perelik k
                 where a.nbs = k.r020 
@@ -175,90 +184,72 @@ begin
             OST_NOM, OST_EQV, AP, R012, DDD, R020, ACCC, ZAL, LINK_GROUP, LINK_CODE, LINK_NAME, FL_PRINS)
     select p_report_date, p_kod_filii, a.rnk, a.acc, a.kv, a.nbs, a.ob22, a.nls,
            a.ost_nom, a.ost_eqv, DECODE(SIGN(a.ost_nom),-1, 1, 2) ap, a.r012,
-           a.ddd, a.r020, a.accc, 0, NVL(d.link_group, c.cust_id),
-           nvl(d.link_code, '000') link_code, nvl(d.groupname, c.cust_name) link_name,
-           decode (c.k060, null, 2, 0, 2, 99, 2, 1) prins
-    from (with perelik as     
-           (select *
-            from KL_F3_29 
-            where kf = '42'
-              and ddd in ('001', '006')
-            ) 
-              select a.acc_id as acc, a.acc_num as nls, a.kv, d.report_date as FDAT, a.nbs, a.ob22,
+           a.ddd, a.r020, a.accc, 0, NVL(d.link_group, a.cust_id), nvl(d.link_code, '000') link_code, 
+           nvl(d.groupname, a.cust_name) link_name, a.prins
+    from (select /*+ ordered index(a, IDX_DMACCOUNTS_ACCNUM_KV) */ 
+                    a.acc_id as acc, a.acc_num as nls, a.kv, d.report_date as FDAT, a.nbs, a.ob22,
                     d.ost as ost_nom, d.ostq as ost_eqv, a.acc_pid as accc,
-                    a.cust_id as rnk, k.r012, k.ddd, k.r020
-                from NBUR_DM_ACCOUNTS a, NBUR_DM_BALANCES_DAILY d, perelik k
-                where a.report_date = p_report_date
+                    a.cust_id as rnk, k.r012, k.ddd, k.r020,
+                    c.cust_id, c.cust_name, c.cust_code, 
+                    decode (c.k060, null, 2, 0, 2, 99, 2, 1) prins
+                from kl_f3_29 k, NBUR_DM_ACCOUNTS a, NBUR_DM_BALANCES_DAILY d, NBUR_DM_CUSTOMERS c
+                where k.kf = '42'
+                and k.ddd in ('001', '006')
+                and a.report_date = p_report_date
                 and a.kf = p_kod_filii
                 and a.acc_num like k.r020 || '%'
                 and (a.nbs is null or substr(a.acc_num,1,4) = a.nbs)
-                and d.acc_id = a.acc_id
+                and a.acc_id = d.acc_id
                 and d.report_date = p_report_date
                 and d.kf = p_kod_filii
+                and a.cust_id = c.cust_id 
+                and c.report_date = p_report_date
+                and c.kf = p_kod_filii 
                 and d.ost <> 0
         ) a
-    join NBUR_DM_CUSTOMERS c
-    on (a.rnk = c.cust_id and
-        c.report_date = p_report_date and
-        c.kf = p_kod_filii)
     left outer join d8_cust_link_groups d
-    on (c.cust_code = d.okpo)
+    on (a.cust_code = d.okpo)
     where decode(sign(a.ost_nom),-1, 1, 2) = a.r012;
     commit;
     
-    -- вдалємо материнські рахунки, якщо є дочірні
---    delete NBUR_TMP_42_DATA d
---    where d.report_date = p_report_date and
---          d.kf = p_kod_filii and
---          d.acc = any (SELECT b.accc
---                       FROM NBUR_TMP_42_DATA b
---                       WHERE b.report_date = p_report_date and
---                             b.kf = p_kod_filii and
---                             b.ddd in ('001', '006') and 
---                             b.nbs IS NULL and
---                             b.accc is not null) ;    
---    commit;
-    
-    -- показник 72 
+    -- показник A0
     insert into NBUR_TMP_42_DATA (REPORT_DATE, KF, RNK, ACC, KV, NBS, OB22, NLS, 
             OST_NOM, OST_EQV, AP, R012, DDD, R020, ACCC, ZAL, LINK_GROUP, LINK_CODE, LINK_NAME, FL_PRINS)
     select p_report_date, p_kod_filii, a.rnk, a.acc, a.kv, a.nbs, a.ob22, a.nls,
-           a.ost_nom, a.ost_eqv, DECODE(SIGN(a.ost_nom), -1, 1, 2) ap, a.r012,
-           a.ddd, a.r020, a.accc, 0, NVL(d.link_group, c.cust_id),
-           nvl(d.link_code, '000') link_code, nvl(d.groupname, c.cust_name) link_name,
-           decode (c.k060, null, 2, 0, 2, 99, 2, 1) prins
-    from (with perelik as     
-           (select *
-            from KL_F3_29 
-            where kf = '42'
-              and ddd in ('0A0')
-            ) 
-              select a.acc_id as acc, a.acc_num as nls, a.kv, d.report_date as FDAT, a.nbs, a.ob22,
+           a.ost_nom, a.ost_eqv, DECODE(SIGN(a.ost_nom),-1, 1, 2) ap, a.r012, 
+           a.ddd, a.r020, a.accc, 0, NVL(d.link_group, a.cust_id), nvl(d.link_code, '000') link_code, 
+           nvl(d.groupname, a.cust_name) link_name, a.prins
+    from (select /*+ ordered index(a, IDX_DMACCOUNTS_ACCNUM_KV) */ 
+                    a.acc_id as acc, a.acc_num as nls, a.kv, d.report_date as FDAT, a.nbs, a.ob22,
                     d.ost as ost_nom, d.ostq as ost_eqv, a.acc_pid as accc,
-                    a.cust_id as rnk, k.r012, k.ddd, k.r020
-                from NBUR_DM_ACCOUNTS a, NBUR_DM_BALANCES_DAILY d, perelik k
-                where a.acc_num like k.r020 || '%'
+                    a.cust_id as rnk, k.r012, k.r050, k.ddd, k.r020,
+                    c.cust_id, c.cust_name, c.cust_code, 
+                    decode (c.k060, null, 2, 0, 2, 99, 2, 1) prins,
+                    (case when d.ostq < 0 then '11' else '22' end) r050_a
+                from kl_f3_29 k, NBUR_DM_ACCOUNTS a, NBUR_DM_BALANCES_DAILY d, NBUR_DM_CUSTOMERS c
+                where k.kf = '42'
+                and k.ddd IN ('0A0')
                 and a.report_date = p_report_date
                 and a.kf = p_kod_filii
-                and d.acc_id = a.acc_id
+                and a.acc_num like k.r020 || '%'
+                and a.acc_id = d.acc_id
                 and d.report_date = p_report_date
                 and d.kf = p_kod_filii
-                and d.ost <> 0
-                and (case when d.ostq < 0 then '11' else '22' end) = k.r050
+                and a.cust_id = c.cust_id 
+                and c.report_date = p_report_date
+                and c.kf = p_kod_filii 
+                and d.ost <> 0                
         ) a
-    join NBUR_DM_CUSTOMERS c
-    on (a.rnk = c.cust_id and
-        c.report_date = p_report_date and
-        c.kf = p_kod_filii)
     left outer join d8_cust_link_groups d
-    on (c.cust_code = d.okpo)
-    where decode(sign(a.ost_nom),-1, 1, 2) = a.r012;
+    on (a.cust_code = d.okpo)
+    where a.r050_a = a.r050;
     commit;    
     
     -- показник A9
     insert into NBUR_TMP_42_DATA (REPORT_DATE, KF, RNK, ACC, KV, NBS, OB22, NLS, 
             OST_NOM, OST_EQV, AP, R012, DDD, R020, ACCC)
-    select p_report_date, p_kod_filii, a.cust_id as rnk, a.acc_id as acc, a.kv, a.nbs, a.ob22, a.acc_num as nls,
+    select /*+ leading(a) */ 
+        p_report_date, p_kod_filii, a.cust_id as rnk, a.acc_id as acc, a.kv, a.nbs, a.ob22, a.acc_num as nls,
         b.ost, b.ostq, null, null, 'A90', null, a.acc_pid as accc
     FROM NBUR_DM_ACCOUNTS a, NBUR_DM_BALANCES_DAILY b, specparam p
     WHERE a.report_date = p_report_date
@@ -276,4 +267,4 @@ begin
       and NVL (p.r011, '0') in ('C','D');
     commit;     
 end;
-/                                                
+/

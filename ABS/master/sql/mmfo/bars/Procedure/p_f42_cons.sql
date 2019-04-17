@@ -7,8 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F42_CONS ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_F42_CONS (dat_ DATE,  
-                                             pkodf_    varchar2 default '#42', 
+CREATE OR REPLACE PROCEDURE BARS.P_F42_CONS (dat_ DATE,
+                                             pkodf_    varchar2 default '#42',
                                              type_ NUMBER DEFAULT 0,
                                              prnk_ NUMBER DEFAULT NULL,
                                              pmode_ number default 0)
@@ -16,12 +16,12 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формування консолідованого #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 15/02/2019 (18/01/2019)
+% VERSION     :  05/04/2019 (15/02/2019)
 %------------------------------------------------------------------------
 % 17/01/2019 - із показників 01, 02, 04 видаляємо банки нерезиденти
 %              у яких ALT_BIC=('8260000013', '8400000053', '8400000054')
 %              і у яких рейтинг 'BBB', 'BBB+','BBB-','Baa1','Baa2','Baa3'
-%              або починається на 'A', 'T', 'F' 
+%              або починається на 'A', 'T', 'F'
 %              і для яких включилися указані бал.рахунки
 %              добавлено формування показника B400000
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -38,16 +38,16 @@ IS
    dat_Zm6_   DATE := TO_DATE('12112015','ddmmyyyy'); -- формуються нов_ показники
                                                       -- A00000000, A10000000, A20000000
    dat_Zm7_   DATE := TO_DATE('02082018','ddmmyyyy'); -- формується новий показник
-                                                      -- A90000000 
+                                                      -- A90000000
 
    datz_      date := Dat_Next_U(dat_, 1);
    pr_bank    VARCHAR2 (1);
    k041_      VARCHAR2 (1);
    k042_      VARCHAR2 (1);
-   kodf_      VARCHAR2 (2):= '42';
+   kodf_      VARCHAR2 (2):= substr(pkodf_,2,2);
    kf1_       VARCHAR2 (2):= '01';
    nls_       VARCHAR2 (15);
-   nlsp_      VARCHAR2 (15);
+   nlsp_      VARCHAR2 (150);
    nlsi_      VARCHAR2 (15);
    nlsi1_     VARCHAR2 (15);
    nlspp_     VARCHAR2 (15);
@@ -61,7 +61,7 @@ IS
    ddd_       VARCHAR2 (3);
    r012_      VARCHAR2 (1);
    r013_      VARCHAR2 (1);
-   r011_      VARCHAR2 (1);   
+   r011_      VARCHAR2 (1);
    r050_      VARCHAR2 (2);
    kv_        SMALLINT;
    kvp_       SMALLINT;
@@ -187,6 +187,9 @@ IS
 
    link_name_     d8_cust_link_groups.groupname%type;
 
+   sum_H9_    DECIMAL (24); -- сума для Н9 (ОК+ДК-В1) із SUM_H9 табл. REGCAPITAL
+   sum_3680_  NUMBER; 
+
    ---Остатки код 01, 02, 03, 04, 06
    CURSOR saldo  IS
    select ddd, rnk, link_code, link_name, prins, znap
@@ -203,7 +206,7 @@ IS
                 o.link_name,
                 o.fl_prins
         having sum(decode(substr(o.kodp, 1, 1), '1', -1, 1)*o.znap)<0)
-    where rnk <> 90092301 and (prins = 1 or znap >= ROUND (sum_k_ * 0.1, 0)) 
+    where rnk <> 90092301 and (prins = 1 or znap >= ROUND (sum_k_ * 0.1, 0))
             union all
     select ddd, rnk, link_code, link_name, prins, sum(znap) znap
     from (
@@ -217,14 +220,14 @@ IS
            GROUP BY a.ddd, a.link_group, a.link_code, a.link_name,
                     a.fl_prins) a
     ) s
-    where s.rnk <> 90092301 
+    where s.rnk <> 90092301
     group by  s.ddd, s.rnk, s.link_code, s.link_name, s.prins
     order by ddd, znap desc;
 
    CURSOR saldoost1 IS
    select b.acc, b.nbs, b.nls, b.kv, b.report_date as fdat, b.rnk, b.ost_eqv as ostq, b.ddd
    from NBUR_TMP_42_DATA b
-   where report_date = dat_ and 
+   where report_date = dat_ and
         ddd = '0A0';
 
 ---------------------------------------------------------------------------
@@ -378,8 +381,9 @@ BEGIN
    our_rnk_ := F_Get_Params ('OUR_RNK', -1);
    our_okpo_ := nvl(to_char(F_Get_Params ('OKPO', 0)), '0');
 
-   -- Сума регулятивного капiталу банку 
-   rgk_ := Rkapital (dat_next_u(dat_, 1), kodf_, userid_, 1); -- зм_на 27.12.2005 - при розрахунку норматив_в використовується нев_дкоригований кап_тал
+  -- новий варіант функціі де вибирається сума регулятивного капіталу і сума для Н9 (ОК+ДК-И1)
+   ret_ := Rkapital_f42 (dat_next_u(dat_, 1), kodf_, userid_, 1, sum_k_, sum_H9_); 
+   rgk_ := sum_k_;
 
    if rgk_ <= 0 then
       sum_k_ := 100;
@@ -408,9 +412,24 @@ BEGIN
       INTO pdat_
    FROM FDAT
    WHERE FDAT <= dat_;
-   
+
    if f_nbur_check_for_42_cons(dat_, pkodf_) then
       bc.home;
+
+      sum_3680_ := 0;
+
+      IF dat_ >= to_date('01032019','ddmmyyyy') THEN    -- з 21.12.2005
+         -- сума показника бал.рахунку 3680 і R011=1 із #C5
+          BEGIN
+             SELECT SUM(field_value)
+                INTO   sum_3680_
+             FROM   V_NBUR_#C5
+             WHERE  report_date = Dat_ AND
+                    seg_02 = '3680' and seg_03 = '1';
+          EXCEPTION WHEN NO_DATA_FOUND THEN
+             sum_3680_:=0 ;
+          END ;
+      END IF;      
 
     ---------------------------------------------------------------------------
        -- формирование кодов 01, 02, 03, 04
@@ -458,21 +477,22 @@ BEGIN
              IF se_ <> 0 AND f42_ = 0
              THEN
                 if se_ <> 0 then
-                    nlsp_ := (case when link_code_='000' then 'RNK =' else 'LINK_CODE =' end) || TO_CHAR (rnk_);
+                    --nlsp_ := (case when link_code_='000' then 'RNK =' else 'LINK_CODE =' end) || TO_CHAR (rnk_);
+                    nlsp_ := TO_CHAR (rnk_);
                     znap_ := TO_CHAR (ABS (se_));
                     s_zal_:= 0;
 
                     if rnk_ <> 90092301 then
                        nnnn00_ := nnnn00_ + 1;
                     end if;
-                    
+
                     begin
                         select nvl(abs(sum(ost_eqv)), 0)
                         into p47_
                         from NBUR_TMP_42_DATA
                         where report_date = dat_ and
                               ddd like '47%' and
-                              nvl(link_group, rnk) = rnk_; 
+                              nvl(link_group, rnk) = rnk_;
                     exception
                         when no_data_found then
                            p47_ := 0;
@@ -484,12 +504,12 @@ BEGIN
                         from NBUR_TMP_42_DATA
                         where report_date = dat_ and
                               ddd like '51%' and
-                              nvl(link_group, rnk) = rnk_; 
+                              nvl(link_group, rnk) = rnk_;
                     exception
                         when no_data_found then
                            p51_ := 0;
                     end;
-                    
+
                     -- 22/11/2016 не будем включать контрагентов
                     -- которые превышают 25% от РК и которые будут включаться в файл #8B
                     -- (контрагенты для файла #8B классификатор KL_F8B)
@@ -617,7 +637,7 @@ BEGIN
 
                       IF dat_ >= dat_Zm6_ and s_zal_ <> 0 THEN
                          kodp_ := 'A1' || '0000' || '000';
-                          
+
                          INSERT INTO RNBU_TRACE
                                      (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm)
                          VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), null, rnk_, link_code_, comm_);
@@ -652,14 +672,14 @@ BEGIN
                              s_zal_ := ABS (se_);
                           END IF;
                        END IF;
-     
+
                        INSERT INTO RNBU_TRACE
                                    (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm )
                        VALUES (nlsp_, 0, dat_, kodp_, to_char(ABS (se_)), rnk_, rnk_, link_code_, comm_);
 
                        IF dat_ >= dat_Zm6_ and s_zal_ <> 0 THEN
                           kodp_ := 'A2' || '0000' || '000';
-                          
+
                           INSERT INTO RNBU_TRACE
                                       (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm)
                           VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), null, rnk_, link_code_, comm_);
@@ -671,7 +691,7 @@ BEGIN
                            and rgk_ >= 0
                        THEN
                           nnnn1_ := nnnn1_ + 1;
-                          
+
                           -- формирование показателя 94NNNN
                           IF Dat_ >= to_date('31012014','ddmmyyyy') then
                              IF p47_<>0 OR p51_ <> 0 THEN
@@ -698,7 +718,7 @@ BEGIN
                              BEGIN
                                 SELECT  ABS (SUM (a.ost_eqv))
                                    INTO se54_
-                             FROM NBUR_TMP_42_DATA a, OTCN_F42_PR o  
+                             FROM NBUR_TMP_42_DATA a, OTCN_F42_PR o
                              WHERE a.report_date = dat_ and
                                    a.rnk = rnk_  AND
                                    a.ddd = ddd_    AND
@@ -971,7 +991,7 @@ BEGIN
            --------------------------------------------------------------------------
 
           -- формирование нового кода A90000000 з 03.08.2018
-          if dat_ >= dat_Zm7_   
+          if dat_ >= dat_Zm7_
           then
              insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, acc, mdate)
              select d.nls, d.kv, report_date, 'A90000000', -1 * d.ost_eqv, d.rnk, d.acc, a.mdate
@@ -990,25 +1010,25 @@ BEGIN
         where (kodp like '01%' or kodp like '02%' or kodp like '61%')
           and rnk = 90092301;
 
-        -- блок для удаления банков нерезидентов с необходимыми значениями ALT_BIG 
+        -- блок для удаления банков нерезидентов с необходимыми значениями ALT_BIG
         -- и с необходимыми рейтингами и с указанными бал.счета
         delete from rnbu_trace
         where (kodp like '01%' or kodp like '02%' or kodp like '04%')
-          and rnk in ( select rnk from customer 
-                       where codcagent = 2  
-                         and rnk in ( select rnk from custbank 
+          and rnk in ( select rnk from customer
+                       where codcagent = 2
+                         and rnk in ( select rnk from custbank
                                       where alt_bic in ('8260000013', '8400000053', '8400000054')
                                         and ( trim(rating) in ('BBB', 'BBB+','BBB-','Baa1','Baa2','Baa3')  or
                                               substr(trim(rating),1,1) in ('A', 'T', 'F') )
                                     )
-                     ) 
-          and rnk in ( select rnk from accounts where nbs in ('1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
-                                                              '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
-                                                              '1532', '1533', '1535', '1536', '1538', 
-                                                              '1542', '1543', '1545', '1546', '1548', '1549', 
+                     )
+          and rnk in ( select rnk from accounts where nbs in ('1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519',
+                                                              '1520', '1521', '1522', '1524', '1526', '1528', '1529',
+                                                              '1532', '1533', '1535', '1536', '1538',
+                                                              '1542', '1543', '1545', '1546', '1548', '1549',
                                                               '1600', '1607', '1609')
                      ) ;
-        
+
         nnnn01_ := 0;
         rnk_ := 0;
         ddd_ := '00';
@@ -1086,17 +1106,89 @@ BEGIN
         IF dat_ >= to_date('18012019','ddmmyyyy') THEN
            select sum(znap)
               into s04_
-           from rnbu_trace 
+           from rnbu_trace
            where kodp like '04%';
 
-           if s04_ > ROUND (sum_k_ * k1_, 0) then
+           if s04_ > ROUND (sum_H9_ * k1_, 0) then
               insert into rnbu_trace(nls, odate, kodp, znap )
               VALUES ('показник B4', dat_, 'B400000', to_char(s04_ - ROUND (sum_k_ * k1_, 0)));
-           end if; 
+           end if;
+        END IF;
+
+        -- з 01/03/2019 формуються нові показники B5, B6, B7, B8, B9 
+        -- якщо сума показника бал.рахунку 3680 і R011=1 із #C5 не нульова
+        IF dat_ >= to_date('01032019','ddmmyyyy') AND sum_3680_ <> 0 
+        THEN 
+           for k in ( select * from V_NBUR_#26_dtl
+                      where report_date <= dat_
+                        and (seg_04 like '15%' OR seg_04 like '16%')
+                        and (seg_11 in ('1', '3', '4') OR (seg_11 = '5' and seg_10  in ('1', '2'))) 
+                        and seg_01 = '10' 
+                        and report_date = any ( select max(v1.report_date) 
+                                             from V_NBUR_#26_dtl v1
+                                             where v1.report_date <= dat_
+                                           )
+                    ) 
+     
+           loop
+              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
+                              '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
+                              '1532', '1533', '1535', '1536', '1538',  
+                              '1542', '1543', '1545', '1546', '1548', '1549', 
+                              '1600', '1607', '1609'
+                            ) and k.seg_11 = '1'  
+              then
+                   insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                   VALUES (k.acc_num, k.kv, dat_, 'B50000000', k.field_value, k.acc_id);
+              end if;
+
+              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
+                              '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
+                              '1532', '1533', '1535', '1536', '1538',  
+                              '1542', '1543', '1545', '1546', '1548', '1549', 
+                              '1600', '1607', '1609'
+                            ) and k.seg_11 = '3'  
+              then
+                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                 VALUES (k.acc_num, k.kv, dat_, 'B60000000', k.field_value, k.acc_id);
+              end if;
+
+              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1516', '1518', '1519', 
+                              '1526', '1528', '1529' 
+                            ) and k.seg_11 = '4'  
+              then
+                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                 VALUES (k.acc_num, k.kv, dat_, 'B70000000', k.field_value, k.acc_id);
+              end if;
+
+              if k.seg_04 in ( '1502', '1508', '1509', '1513', '1516', '1518', '1519', 
+                              '1520', '1522', '1524', '1526', '1528', '1529', 
+                              '1532', '1533', '1535', '1536', '1538',  
+                              '1542', '1543', '1545', '1546', '1548', '1549', 
+                              '1600', '1607', '1609'
+                            ) and k.seg_11 = '5' 
+                              and k.seg_10 = '1' 
+              then
+                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                 VALUES (k.acc_num, k.kv, dat_, 'B80000000', k.field_value, k.acc_id);
+              end if;
+
+              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
+                              '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
+                              '1532', '1533', '1535', '1536', '1538',  
+                              '1542', '1543', '1545', '1546', '1548', '1549', 
+                              '1600', '1607', '1609'
+                            ) and k.seg_11 = '5' 
+                              and k.seg_10 = '2' 
+              then
+                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                   VALUES (k.acc_num, k.kv, dat_, 'B90000000', k.field_value, k.acc_id);
+              end if;
+           end loop;
         END IF;
        
         bc.subst_mfo(mfo_);
-       
+
         IF type_ = 0
         THEN
           DELETE FROM TMP_NBU
@@ -1105,12 +1197,12 @@ BEGIN
           INSERT INTO TMP_NBU (kodf, datf, kodp, znap)
           SELECT kodf_, dat_, kodp, SUM (znap)
           FROM RNBU_TRACE
-          where substr(kodp,1,2) not in ('47','50','51','54','58','61','63','82','83','84','11') 
+          where substr(kodp,1,2) not in ('47','50','51','54','58','61','63','82','83','84','11')
           GROUP BY kodf_, dat_, kodp;
         END IF;
 
        bc.home;
-       
+
        -- детальная расшифровка показателей 01 и 02 в разрезе лицевых счетов
        -- остатки по счетам и резерв
        insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm)
@@ -1118,7 +1210,7 @@ BEGIN
              dat_ odate, o.nls, o.kv, b.kodp,
              decode(substr(o.kodp,1,1),'1', -1, 1) * o.znap znap,
              o.rnk, nvl(o.link_code, '000'), o.nd, b.group_num ref, o.acc,
-             'KF = '||o.kf||' '|| 
+             'KF = '||o.kf||' '||
              (case when (substr(o.kodp,2,4) like '___9' or
                          substr(o.kodp,2,4) in ('1890','2890','3590','3690','3692')) and
                          substr(o.kodp,1,1) = '2'
@@ -1142,15 +1234,15 @@ BEGIN
             NVL(o.link_code, '000') = b.link_code)
         where o.datf = dat_;
 
-       delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
+       --delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
 
        update rnbu_trace
        set kodp = replace(kodp, 'R', '0')
        where kodp like 'R1%' or kodp like 'R2%' or kodp like 'R4%';
    end if;
-   
+
    bc.subst_mfo(mfo_);
-   
+
    logger.info ('P_F42_CONS: End ');
    commit;
 END;
@@ -1161,8 +1253,6 @@ PROMPT *** Create  grants  P_F42_CONS ***
 grant EXECUTE                                                                on P_F42_CONS        to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_F42_CONS        to RPBN002;
 grant EXECUTE                                                                on P_F42_CONS        to START1;
-
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F42_CONS.sql =========*** End *** 
