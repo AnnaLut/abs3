@@ -1,10 +1,32 @@
+
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/v_nbur_d4x_dtl.sql =========*** Run *** =
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/v_nbur_d4x_dtl.sql ======== *** Run *** 
 PROMPT ===================================================================================== 
 
-PROMPT *** Create  view v_nbur_d4x_dtl ***
-
-create or replace view v_nbur_d4x_dtl as
+create or replace view v_nbur_d4x_dtl
+(
+   REPORT_DATE,
+   KF,
+   VERSION_ID,
+   NBUC,
+   FIELD_CODE,
+   EKP,
+   R030,
+   F025,
+   B010,
+   Q006,
+   T071,
+   DESCRIPTION,
+   ACC_ID,
+   ACC_NUM,
+   KV,
+   CUST_ID,
+   CUST_CODE,
+   CUST_NAME,
+   OP_DATE,
+   REF,
+   BRANCH
+) as
 select p.REPORT_DATE
        , p.KF
        , p.VERSION_ID
@@ -20,18 +42,14 @@ select p.REPORT_DATE
        , p.ACC_ID
        , p.ACC_NUM
        , p.KV
-       , p.MATURITY_DATE
        , p.CUST_ID
        , c.CUST_CODE
        , c.CUST_NAME
-       , p.ND
-       , a.AGRM_NUM
-       , a.BEG_DT
-       , a.END_DT
+       , to_char(p.MATURITY_DATE,'dd.mm.yyyy')  as OP_DATE
        , p.REF
        , p.BRANCH
     from NBUR_LOG_FD4X p
-         join NBUR_REF_FILES f on ( f.FILE_CODE = 'D4PX' )
+         join NBUR_REF_FILES f on ( f.FILE_CODE = 'D4X' )
          join NBUR_LST_FILES v on (
                                     v.REPORT_DATE = p.REPORT_DATE
                                     and v.KF = p.KF
@@ -42,12 +60,8 @@ select p.REPORT_DATE
                                               p.REPORT_DATE = c.REPORT_DATE
                                               and p.KF = c.KF
                                               and p.CUST_ID    = c.CUST_ID )
-         left join V_NBUR_DM_AGREEMENTS a on (
-                                               p.REPORT_DATE = a.REPORT_DATE
-                                               and p.KF          = a.KF
-                                               and p.nd          = a.AGRM_ID
-                                             )
    where v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
+
 comment on table V_NBUR_D4X_DTL is 'Детальний протокол файлу D4X';
 comment on column V_NBUR_D4X_DTL.REPORT_DATE is 'Звітна дата';
 comment on column V_NBUR_D4X_DTL.KF is 'Код фiлiалу (МФО)';
@@ -64,17 +78,14 @@ comment on column V_NBUR_D4X_DTL.DESCRIPTION is 'Опис (коментар)';
 comment on column V_NBUR_D4X_DTL.ACC_ID is 'Ід. рахунка';
 comment on column V_NBUR_D4X_DTL.ACC_NUM is 'Номер рахунка';
 comment on column V_NBUR_D4X_DTL.KV is 'Ід. валюти';
-comment on column V_NBUR_D4X_DTL.MATURITY_DATE is 'Дата Погашення';
 comment on column V_NBUR_D4X_DTL.CUST_ID is 'Ід. клієнта';
 comment on column V_NBUR_D4X_DTL.CUST_CODE is 'Код клієнта';
 comment on column V_NBUR_D4X_DTL.CUST_NAME is 'Назва клієнта';
-comment on column V_NBUR_D4X_DTL.ND is 'Ід. договору';
-comment on column V_NBUR_D4X_DTL.AGRM_NUM is 'Номер договору';
-comment on column V_NBUR_D4X_DTL.BEG_DT is 'Дата початку договору';
-comment on column V_NBUR_D4X_DTL.END_DT is 'Дата закінчення договору';
+comment on column V_NBUR_D4X_DTL.OP_DATE is 'Дата операції';
 comment on column V_NBUR_D4X_DTL.REF is 'Ід. платіжного документа';
 comment on column V_NBUR_D4X_DTL.BRANCH is 'Код підрозділу';
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_nbur_d4x_dtl.sql =========*** End *** =
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/v_nbur_d4x_dtl.sql ======== *** End ***
 PROMPT ===================================================================================== 
+
