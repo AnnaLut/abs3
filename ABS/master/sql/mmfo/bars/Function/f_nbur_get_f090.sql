@@ -15,7 +15,7 @@ is
 begin
 
     begin
-          select trim(value)   into l_f090
+          select substr(trim(value),1,3)   into l_f090
             from operw
            where ref = p_ref and tag = 'D1#3M';
 

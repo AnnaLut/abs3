@@ -1,4 +1,3 @@
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_F3MX.sql ======== *** Run ***
 PROMPT ===================================================================================== 
@@ -13,7 +12,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 3MX для схема "C"
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.19.005      08.02.2019
+ VERSION     :    v.19.012      17.04.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 
@@ -22,7 +21,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
     блок 2 #E2  для 300465:       nbur_p_fe2.sql ( часть для 300465 )
     блок 3 #E2  кроме 300465:     переработанный алгоритм из p_fe2_nn.sql
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := ' v.19.005  08.02.2019';
+  ver_              char(30)  := ' v.19.012  17.04.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -40,7 +39,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
     l_sum_kom       number          := gl.p_icurval(840, 100000, p_report_date);
     l_ourOKPO       varchar2(20)    := LPAD (F_Get_Params ('OKPO', NULL), 8, '0');
     l_ourGLB        varchar2(20);
-    l_koef          number          := 0.5;      -- коефіцієнт обов^язкового продажу
+    l_koef          number;                 -- коефіцієнт обов^язкового продажу
 
     l_last_q003     number          := 0;
 
@@ -179,8 +178,13 @@ begin
                                   sum_840, k030, nbuc, branch, description
                      from (select *
                               from ( select /*+ ordered */
-                                            t.report_date, t.kf, t.ref, t.kv,
-                                            c.rnk cust_id, c.nmk cust_name, t.acc_id_cr acc_id, t.acc_num_cr acc_num, 
+                                            t.report_date, t.kf, t.ref, t.kv, c.rnk cust_id,
+                                            (case
+                                                when c.codcagent in ('3','4') 
+                                                  then    nvl(substr(trim(u.nmku),1,135),c.nmk)
+                                                else c.nmk
+                                              end) cust_name,
+                                            t.acc_id_cr acc_id, t.acc_num_cr acc_num, 
                                             lpad((dense_rank() over (order by c.rnk, t.ref)), 3, '0') nnn,
                                             lpad(t.kv, 3, '0') P10,
                                             TO_CHAR (ROUND (t.bal, 0)) P20,
@@ -294,6 +298,7 @@ begin
                                                  where q.report_date = p_report_date
                                                    and q.kf = p_kod_filii 
                                                    and q.kv <> 980
+                                                   and q.ob22_db||q.acc_num_db not like '432909%'     
                                                    and r.file_id =l_file_id
                                                    and r.pr_del =6
                                              union all
@@ -325,6 +330,8 @@ begin
                                        join CUSTOMER c
                                          on ( c.kf      = p_kod_filii   and
                                               c.rnk     = t.cust_id_cr  )
+                                       left outer join CORPS u
+                                               on ( c.rnk = u.rnk )
                                        left outer
                                        join OTCN_TRANSIT_NLS n
                                          on ( n.NLS = t.ACC_NUM_CR )
@@ -359,8 +366,13 @@ begin
                                 union all
                     -----------------------------------------------------------
                                         select /*+ ordered */
-                                            t.report_date, t.kf, t.ref, t.kv,
-                                            c.cust_id, c.cust_name, t.acc_id_cr acc_id, t.acc_num_cr acc_num, 
+                                            t.report_date, t.kf, t.ref, t.kv, c.cust_id,
+                                            (case
+                                                when c.cust_type = '2' 
+                                                  then    nvl(substr(trim(u.nmku),1,135),c.cust_name)
+                                                else c.cust_name
+                                              end) cust_name,
+                                            t.acc_id_cr acc_id, t.acc_num_cr acc_num, 
                                             lpad((dense_rank() over (order by c.cust_id, t.ref)), 3, '0') nnn,
                                             lpad(t.kv, 3, '0') P10,
                                             TO_CHAR (ROUND (t.bal, 0)) P20,
@@ -475,6 +487,8 @@ begin
                                          on ( c.report_date = p_report_date and
                                               c.kf          = p_kod_filii   and
                                               c.cust_id     = t.cust_id_cr  )
+                                       left outer join CORPS u
+                                               on ( c.cust_id = u.rnk )
                                        left outer
                                        join OTCN_TRANSIT_NLS n
                                          on ( n.NLS = t.ACC_NUM_CR )
@@ -523,17 +537,17 @@ begin
         DESCRIPTION, KV, CUST_ID, REF)
             select    p_report_date  as report_date
                    ,  p_kod_filii    as kf
-                   ,  p_kod_filii    as nbuc
+                   ,  nbuc
                    ,  l_version      as version_id
-                   , 'A3M001'                          as EKP
-                   ,  f_get_ku_by_nbuc(p_kod_filii)    as KU
+                   , 'A3M001'                         as EKP
+                   ,  f_get_ku_by_nbuc(NBUC)          as KU
                    ,  T071
                    ,  lpad((dense_rank() over (order by R030, K040)) +l_last_q003, 3, '0')
                                                        as Q003_1
                    ,  '6'                     as F091
                    ,  R030
                    ,  '604'                   as F090
-                   ,  K040
+                   ,  nvl(K040,'000')         as K040
                    ,  '1'                     as F089
                    ,  '1'                     as K030
                    ,  '0'                     as K020
@@ -552,33 +566,46 @@ begin
                    ,  cust_id
                    ,  ref   
               from (
-                    select   trim(TO_CHAR(t.bal))     as T071
+                    select   (case when l_type = 0 then l_nbuc else t.nbuc_db end)   as NBUC
+                           ,  trim(TO_CHAR(t.bal))    as T071
                            ,  t.kv                    as R030
                            ,  f_nbur_get_kod_g(t.ref, 1)
                                                       as K040                      
-                           ,  a.txt    as description
+                           ,  o.nazn      as description
                            ,  t.kv     
                            ,  t.cust_id_db        as cust_id
                            ,  t.ref   
                      from nbur_dm_transactions t
-                          join nbur_dm_transactions_arch a
-                            on (    a.acc_id_cr = t.acc_id_db
-                                and a.kv = t.kv
-                                and a.bal = t.bal )
-                    where  t.report_date = p_report_date
-                      and  t.kf = p_kod_filii
-                      and  t.r020_db ='2909' and t.ob22_db in ('82','56')
-                      and  t.r020_cr ='3720' 
-                      and  gl.p_icurval(t.kv, t.bal, p_report_date) <=15000000
-                      and (a.report_date, a.kf, a.version_id) in
-                                  (select report_date, kf, version_id
-                                     from nbur_lst_objects
-                                    where object_id = (select id from nbur_ref_objects
-                                                        where object_name ='NBUR_DM_TRANSACTIONS' ) 
-                                      and report_date between p_report_date-7 and p_report_date
-                                      and kf = p_kod_filii
-                                      and object_status in ('FINISHED', 'VALID'))
-             );
+                     join oper o    on (     o.vdat = t.report_date
+                                         and o.ref = t.ref )
+                    where t.report_date = p_report_date
+                      and t.kf = p_kod_filii
+                      and t.r020_db ='2909' and t.ob22_db in ('82','56')
+                      and t.r020_cr ='3720' 
+--                      and gl.p_icurval(t.kv, t.bal, p_report_date) <=15000000
+                      and exists ( 
+                            select *    from (
+                                  select kf, report_date, acc_num_cr, kv, bal, ref
+                                    from NBUR_DM_TRANSACTIONS_arch 
+                                   where (report_date, kf, version_id) in (
+                                               select report_date, kf, version_id
+                                                 from nbur_lst_objects
+                                                where object_id = (select id from nbur_ref_objects
+                                                                    where object_name ='NBUR_DM_TRANSACTIONS' ) 
+                                                  and report_date between p_report_date -7 and p_report_date
+                                                  and kf = p_kod_filii
+                                                  and object_status in ('FINISHED', 'VALID'))
+                                  union
+                                  select kf, report_date, acc_num_cr, kv, bal, ref
+                                    from NBUR_DM_TRANSACTIONS 
+                                   where report_date = p_report_date
+                                     and kf = p_kod_filii
+                                 ) x
+                             where x.acc_num_cr = t.acc_num_db
+                               and x.kv = t.kv
+                               and x.bal = t.bal
+                               and x.ref != t.ref )
+                   );
 
    -- додаємо в кінець вже заповненого файлу
     select to_number(nvl(max(Q003_1),'0'))
@@ -587,6 +614,7 @@ begin
     WHERE     report_date = p_report_date
           AND kf = p_kod_filii;
 
+    logger.info(c_title || ' end of part I  C9');
     commit;
 
 -- блок 2 ------------------------------------------------------------- вставка данных #E2 для 300465
@@ -788,6 +816,7 @@ begin
                        o.nlsa like '19198%' and o.nlsb like '1600%' or
                        o.nlsa like '1600%' and o.nlsb like '1500%'  and c.k040 = '804' or
                        t.acc_num_db like '1600%' and c.k040 = '804' or
+                       t.acc_num_db like '2909%' and t.ob22_db ='35' and t.acc_num_cr like '3739%' or
                        o.kf = '300465' and o.mfoa <> o.mfob or
                        t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739') and t.ref <> 88702330401 or
                        o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '750%') and
@@ -994,16 +1023,10 @@ begin
                    ,  R030
                    ,  F090
                    ,  substr(trim(k040),1,3)    K040
-                   , (case when substr(k020,1,1)='0'  then '1'
-                             else '2'
-                       end)                     F089
+                   ,  F089
                    ,  K030
-                   , (case when substr(k020,1,1)='0'  then '0'
-                             else lpad(substr(trim(k020),2),10,'0' )
-                       end)                     K020
-                   , (case when substr(k020,1,1)='0'  then '#'
-                             else substr(k020,1,1)
-                       end)                     K021
+                   ,  K020
+                   ,  K021
                    ,  Q001_1
                    ,  B010
                    ,  Q033
@@ -1029,7 +1052,8 @@ begin
                             , f_nbur_get_f090('E2', t.ref, t.P40)    F090
                             , t.P64                        K040
                             , t.P62                        K030
-                            , f_nbur_get_k020_by_rnk(t.cust_id)            K020
+                            , t.p31                        K020
+                            , t.p33                        K021
                             , t.cust_name                  Q001_1
                             , t.P65                        B010
                             , t.P66                        Q033
@@ -1046,6 +1070,7 @@ begin
                             , decode( t.P54, null, '#', t.P54 )    F027
                             , decode( df.field_value, null, t.D1#2D, df.field_value )    F02D
                             , t.P61                      Q006
+                            , t.P55                      F089
                             , t.description
                             , (case
                                   when t.acc_id is null and t.acc_num is not null
@@ -1062,11 +1087,17 @@ begin
                select report_date, kf, ref, kv, cust_id, cust_name, acc_id, acc_num,
                      lpad((dense_rank()
                            over
-                             (order by nbuc, (case when flag_kons = 0 then to_char(ref) else p10||(case when p31 = '006' then p31 else '0' end) end) )
+                             (order by nbuc, (case when flag_kons = 0 then to_char(ref)
+                                                    else p10||(case when substr(p31,2) ='0000000006'
+                                                                               then substr(p31,2) else '0' end) end) )
                            )+l_last_q003, 3, '0') nnn,
                      p10,
                      p20,
-                     (case when flag_kons = 0 then (case when p31 = '0' and p31_add is not null then p31_add else p31 end) else (case when ltrim(p31, '0') = '6' then p31 else '0' end) end) p31, 
+--                     (case when flag_kons = 0 then (case when p31 = '0' and p31_add is not null then p31_add else p31 end) else (case when ltrim(p31, '0') = '6' then p31 else '0' end) end) p31, 
+                     (case when flag_kons = 0 then substr(p31,2) 
+                                          else (case when substr(p31,2) ='0000000006' then substr(p31,2) else '0' end) end) p31, 
+                     (case when flag_kons = 0 then substr(p31,1,1) 
+                                          else (case when substr(p31,2) ='0000000006' then substr(p31,1,1) else '#' end) end) p33, 
                      (case when flag_kons = 0 then p32 else '0' end) p32,
                      p40,
                      (case when flag_kons = 0 then p51 else '0' end) p51,
@@ -1083,14 +1114,18 @@ begin
         FROM (select z.report_date,
                    z.kf,
                    z.ref,
-                   z.rnk cust_id, c.cust_name,
+                   z.rnk cust_id,
+                      (case
+                          when c.cust_type = '2' 
+                            then    nvl(substr(trim(u.nmku),1,135),c.cust_name)
+                          else c.cust_name
+                        end) cust_name,
                    z.acc acc_id,
                    z.nls acc_num,
                    z.kv,
                    z.p10,
                    z.p20,
-                   z.p31,
-                   (select trim(ser||' '||numdoc) from person where rnk=z.rnk) p31_add,
+                   f_nbur_get_k020_by_rnk(z.rnk)   p31,
                    z.p32,
                    z.p40,
                    z.p51,
@@ -1133,7 +1168,7 @@ begin
                         else nvl(z.d61#E2, z.nazn)
                      end) p61,
                   z.p62, null refd, z.nbuc, z.branch, 'Part 1 ' description, z.D1#2D,
-                  (case when bal_uah > l_gr_sum_980  or ltrim(p31, '0') <> '6' then 0 else 1 end) flag_kons
+                  (case when bal_uah > l_gr_sum_980  or ltrim(z.p31, '0') <> '6' then 0 else 1 end) flag_kons
             from (select a.report_date,
                     a.kf, a.ref, a.tt, a.rnk, a.acc, a.nls, a.kv,
                     a.p10, a.p20, a.p31, a.p40, a.refd,
@@ -1192,7 +1227,9 @@ begin
                 where nvl(nvl(a.d6#E2, a.kod_g), 'ZZZ') not in ('804','UKR')
                     and not ((a.nls like '1919%' or
                               a.nls like '3739%' ) and
-                              a.tt = 'NOS')  )  z  join nbur_dm_customers c on (z.rnk = c.cust_id)
+                              a.tt = 'NOS')  )  z
+                      join nbur_dm_customers c on (z.rnk = c.cust_id)
+                      left outer join CORPS u  on ( c.cust_id = u.rnk )
               ------------------------------------------------------------------
                      union all
               ------------------------------------------------------------------
@@ -1205,8 +1242,7 @@ begin
                    z.kv,
                    z.p10,
                    z.p20,
-                   z.p31,
-                   (select trim(ser||' '||numdoc) from person where rnk=z.rnk) p31_add,
+                   f_nbur_get_k020_by_rnk(z.rnk)   p31,
                    z.p32,
                    z.p40,
                    z.p51,
@@ -1251,12 +1287,17 @@ begin
                      end) p61,
                   z.p62, z.refd, z.nbuc, z.branch,
                   'Part 2 ' description, z.D1#2D,
-                  (case when bal_uah > l_gr_sum_980  or ltrim(p31, '0') <> '6' then 0 else 1 end) flag_kons
+                  (case when bal_uah > l_gr_sum_980  or ltrim(z.p31, '0') <> '6' then 0 else 1 end) flag_kons
             from (select a.report_date,
                         a.kf,
                         a.ref,
                         a.tt,
-                        c.cust_id rnk, c.cust_name,
+                        c.cust_id rnk,
+                         (case
+                             when c.cust_type = '2' 
+                               then    nvl(substr(trim(u.nmku),1,135),c.cust_name)
+                             else c.cust_name
+                           end) cust_name,
                         t1.ACC_ID_DB acc,
                         t1.ACC_NUM_DB nls,
                         a.kv,
@@ -1281,16 +1322,25 @@ begin
                         and x.nlsb = a.nls
                         and x.kv = a.kv
                         and x.refl = a.ref)
-                    left outer join NBUR_DM_TRANSACTIONS t1
-                    on (x.ref = t1.ref and
-                        t1.report_date = a.report_date and
-                        t1.kf = a.kf)
+                    left outer join (select report_date, kf, version_id, ref, tt, acc_id_db, acc_num_db
+                                       from NBUR_DM_TRANSACTIONS_arch
+                                      where (report_date, kf, version_id) in (
+                                                select report_date, kf, version_id
+                                                  from nbur_lst_objects
+                                                 where object_id = (select id from nbur_ref_objects
+                                                                     where object_name ='NBUR_DM_TRANSACTIONS' ) 
+                                                   and report_date between p_report_date -7 and p_report_date
+                                                   and kf = p_kod_filii
+                                                   and object_status in ('FINISHED', 'VALID'))
+                                    ) t1
+                    on ( t1.ref = x.ref )
                     left outer join fx_deal f
                     on (f.refb=x.ref)
                     left outer join NBUR_DM_CUSTOMERS c
-                    on (c.report_date = p_report_date and
-                        c.kf = p_kod_filii and
-                        f.rnk = c.cust_id)
+                        on ( c.report_date = p_report_date and
+                             c.kf = p_kod_filii and
+                             f.rnk = c.cust_id)
+                        left outer join CORPS u  on ( c.cust_id = u.rnk )
                     left outer join NBUR_DM_ACCOUNTS b
                     on (b.report_date = p_report_date and
                         b.kf = p_kod_filii and
@@ -1299,7 +1349,7 @@ begin
                           and ((a.nls like '1919%' or
                                 a.nls like '3739%' ) and
                                 a.tt = 'NOS')
-                          and nvl(t1.tt, '***') like 'FX%'
+                          and nvl(t1.tt, '***') like 'FX%'                         
                           and decode(f.kva, 980, '30', '28')<>'30') z
               ------------------------------------------------------------------
                      union all
@@ -1313,8 +1363,7 @@ begin
                    z.kv,
                    z.p10,
                    z.p20,
-                   z.p31,
-                   (select trim(ser||' '||numdoc) from person where rnk=z.rnk) p31_add,
+                   f_nbur_get_k020_by_rnk(z.rnk)   p31,
                    z.p32,
                    z.p40,
                    z.p51,
@@ -1358,12 +1407,17 @@ begin
                         else z.nazn
                      end) p61,
                   z.p62, z.refd, z.nbuc, z.branch, 'Part 3 ' description, z.D1#2D,
-                  (case when bal_uah > l_gr_sum_980 or ltrim(p31, '0') <> '6' then 0 else 1 end) flag_kons
+                  (case when bal_uah > l_gr_sum_980 or ltrim(z.p31, '0') <> '6' then 0 else 1 end) flag_kons
             from (select a.report_date,
                         a.kf,
                         a.ref,
                         a.tt,
-                        nvl(c.cust_id, a.rnk) rnk,  c.cust_name,
+                        nvl(c.cust_id, a.rnk) rnk,
+                         (case
+                             when c.cust_type = '2' 
+                               then    nvl(substr(trim(u.nmku),1,135),c.cust_name)
+                             else c.cust_name
+                           end) cust_name,
                         nvl(t1.ACC_ID_DB, a.acc) acc,
                         nvl(t1.ACC_NUM_DB, a.nls) nls,
                         nvl(b.kv, a.kv) kv,
@@ -1394,10 +1448,23 @@ begin
                         and x.nlsb = a.nls
                         and x.kv = a.kv
                         and x.refl = a.ref)
-                    left outer join NBUR_DM_TRANSACTIONS t1
-                    on (x.ref = t1.ref and
-                        t1.report_date = a.report_date and
-                        t1.kf = a.kf)
+                    left outer join (select report_date, kf, ref, tt, acc_id_db, acc_num_db
+                                       from NBUR_DM_TRANSACTIONS_arch
+                                      where (report_date, kf, version_id) in (
+                                                select report_date, kf, version_id
+                                                  from nbur_lst_objects
+                                                 where object_id = (select id from nbur_ref_objects
+                                                                     where object_name ='NBUR_DM_TRANSACTIONS' ) 
+                                                   and report_date between p_report_date -7 and p_report_date -1
+                                                   and kf = p_kod_filii
+                                                   and object_status in ('FINISHED', 'VALID'))
+                                      union all
+                                     select report_date, kf, ref, tt, acc_id_db, acc_num_db
+                                       from NBUR_DM_TRANSACTIONS
+                                      where report_date =p_report_date
+                                        and kf =p_kod_filii
+                                    ) t1
+                    on ( t1.ref = x.ref )
                     left outer join (select ref, pid,
                                             min(pid) id_min,
                                             max(id) id,
@@ -1439,9 +1506,10 @@ begin
                         b.kf = p_kod_filii and
                         b.acc_id = t1.ACC_ID_DB)
                     left outer join NBUR_DM_CUSTOMERS c
-                    on (c.report_date = p_report_date and
-                        c.kf = p_kod_filii and
-                        c.cust_id = b.cust_id)
+                        on ( c.report_date = p_report_date and
+                             c.kf = p_kod_filii and
+                             c.cust_id = b.cust_id)
+                        left outer join CORPS u  on ( c.cust_id = u.rnk )
                     where nvl(nvl(a.d6#E2, a.kod_g), 'ZZZ') not in ('804','UKR')
                           and ((a.nls like '1919%' or
                                 a.nls like '3739%' ) and
@@ -1478,9 +1546,9 @@ begin
                    ,  l_version      as version_id
                    , 'A3M001'                          as EKP
                    ,  f_get_ku_by_nbuc(p_kod_filii)    as KU
-                   ,  lpad((dense_rank() over (order by R030, K040)), 3, '0')
-                                                       as Q003_1
                    ,  T071
+                   ,  lpad((dense_rank() over (order by R030, K040))+l_last_q003, 3, '0')
+                                                       as Q003_1
                    ,  '5'                     as F091
                    ,  R030
                    ,  '604'                   as F090
@@ -1529,7 +1597,7 @@ begin
                       and  t.kf = p_kod_filii
                       and  t.r020_db ='3739' and t.acc_num_db = '373911505'
                       and  t.r020_cr ='1500' 
-                      and  gl.p_icurval(t.kv, t.bal, p_report_date) <=15000000
+--                      and  gl.p_icurval(t.kv, t.bal, p_report_date) <=15000000
                       and (a.report_date, a.kf, a.version_id) in
                                   (select report_date, kf, version_id
                                      from nbur_lst_objects
@@ -1710,12 +1778,18 @@ begin
           where ref in (select ref from NBUR_TMP_DEL_70 where kodf = '3M' and datf = p_report_date); 
       
           for k in ( select t.rnk, t.REF, t.fdat, t.tt, t.accd, t.nlsd, t.kv, t.acck, t.nlsk, t.nazn, t.s_nom,
-                            c.okpo, c.nmk, c.codcagent, c.branch,
+                            c.okpo,  (case
+                                         when c.codcagent in ('3','4')
+                                           then    nvl(substr(trim(u.nmku),1,135),c.nmk)
+                                         else c.nmk
+                                       end) nmk,
+                            c.codcagent, c.branch,
                             decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)) nbuc
                        from otcn_prov_temp t,
-                            customer c, tobo b
+                            customer c, tobo b, corps u
                       where t.rnk = c.rnk
                         and c.tobo = b.tobo
+                        and c.rnk = u.rnk(+)
           ) loop
       
                 formOk_ := true;
@@ -1879,14 +1953,19 @@ begin
                             -- если нашли предшествующую операцию, то выбираем рекизиты клиентов
                             if l_ref_d is not null and l_ref_d != l_ref then
                                begin
-                                  select c.rnk, trim(c.okpo), c.nmk, c.codcagent,
-                                         p.tt, p.NLSD, p.accd
+                                  select c.rnk, trim(c.okpo),
+                                           (case
+                                               when c.codcagent in ('3','4')
+                                                 then    nvl(substr(trim(u.nmku),1,135),c.nmk)
+                                               else c.nmk
+                                             end) nmk,
+                                         c.codcagent,  p.tt, p.NLSD, p.accd
                                     into l_rnk, l_okpo, l_q001, l_codc, l_tt_d, l_nlsd_d, l_accd_d
-                                  from provodki_otc p, cust_acc ca, customer c
+                                  from provodki_otc p, cust_acc ca, customer c, corps u
                                   where p.ref = l_ref_d
                                     and p.acck = l_accd
                                     and p.accd =ca.acc  
-                                    and ca.rnk = c.rnk;
+                                    and ca.rnk = c.rnk  and c.rnk = u.rnk(+);
       
                                   -- для банков по коду ОКПО из RCUKRU(IKOD)
                                   -- определяем код банка поле GLB
@@ -2100,7 +2179,7 @@ begin
                          if k.nlsk like '3739%' and l_nlsd like '2909%' and l_ob22 = '35'
                          then
                               l_k020 := '0';
-                              l_k021 := '#';
+                              l_k021 := '2';
                               l_q001 := null;
                          end if;
       
@@ -2243,6 +2322,7 @@ begin
                                 END;
       
                                 l_k040 := substr(l_tag_val,1,3);      */
+                           if l_k040 is null  then   l_k040 :='000';  end if;
       
 --------  9- D9#70    B010
                            if l_b010 is null  then
@@ -2565,6 +2645,17 @@ begin
           AND kf = p_kod_filii;
 
 --------------------------------------------------------------------- Сума що підлягає обов"язковому продажу                    
+-- 
+    if      p_report_date < date '2017-04-05'   then 
+
+         l_koef := 0.65;
+    elsif   p_report_date < date '2019-02-28'   then 
+
+         l_koef := 0.50;
+    else 
+         l_koef := 0.30;
+    end if;
+
    insert
     into NBUR_LOG_F3MX
        (REPORT_DATE, KF, NBUC, VERSION_ID, EKP, 
@@ -2649,8 +2740,8 @@ begin
                                   , t.kf
                                   , t.kv, LPAD(t.kv, 3, '0') as p10
                                   , (case 
-                                          when abs(nvl(round((z.s2 / 0.5), 0), 0) - t.bal)<10 then t.bal
-                                          when z.s2 is not null then nvl(round((z.s2 / 0.5), 0), 0)
+                                          when abs(nvl(round((z.s2 / l_koef), 0), 0) - t.bal)<10 then t.bal
+                                          when z.s2 is not null then nvl(round((z.s2 / l_koef), 0), 0)
                                           else 0 
                                     end) bal
                            from   nbur_dm_transactions t
