@@ -1,4 +1,4 @@
-CREATE OR REPLACE procedure BARS.nbur_p_prepare_f42k(p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.nbur_p_prepare_f42k(p_kod_filii        varchar2,
                                                 p_report_date      date) is
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура підготовки даних для 42 консолідованого файлу
@@ -249,21 +249,20 @@ begin
     insert into NBUR_TMP_42_DATA (REPORT_DATE, KF, RNK, ACC, KV, NBS, OB22, NLS, 
             OST_NOM, OST_EQV, AP, R012, DDD, R020, ACCC)
     select /*+ leading(a) */ 
-        p_report_date, p_kod_filii, a.cust_id as rnk, a.acc_id as acc, a.kv, a.nbs, a.ob22, a.acc_num as nls,
-        b.ost, b.ostq, null, null, 'A90', null, a.acc_pid as accc
-    FROM NBUR_DM_ACCOUNTS a, NBUR_DM_BALANCES_DAILY b, specparam p
-    WHERE a.report_date = p_report_date
-      and a.kf = p_kod_filii
-      and a.acc_num like '14%' 
-      and substr(a.acc_num,4,1) <> '8'
+        p_report_date, p_kod_filii, a.rnk, a.acc, a.kv, a.nbs, a.ob22, a.nls,
+        b.ost, b.ostq, null, null, 'A90', null, a.accc
+    FROM ACCOUNTS a, SNAP_BALANCES b, specparam p
+    WHERE a.kf = p_kod_filii
+      and a.nls like '14%' 
+      and substr(a.nls,4,1) <> '8'
       and a.nbs is null
-      and a.maturity_date is not null   
-      and a.maturity_date - p_report_date < 183  
-      and a.acc_id = b.acc_id
-      and b.report_date = p_report_date
+      and a.mdate is not null   
+      and a.mdate - p_report_date < 183  
+      and a.acc = b.acc
+      and b.fdat = p_report_date
       and b.kf = p_kod_filii
       and b.ost <> 0
-      and a.acc_id = p.acc
+      and a.acc = p.acc
       and NVL (p.r011, '0') in ('C','D');
     commit;     
 end;

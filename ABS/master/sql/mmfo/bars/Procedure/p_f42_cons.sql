@@ -186,9 +186,9 @@ IS
    link_codep1_   d8_cust_link_groups.link_code%type;
 
    link_name_     d8_cust_link_groups.groupname%type;
-
+   
    sum_H9_    DECIMAL (24); -- сума для Н9 (ОК+ДК-В1) із SUM_H9 табл. REGCAPITAL
-   sum_3680_  NUMBER; 
+   sum_3680_  NUMBER;
 
    ---Остатки код 01, 02, 03, 04, 06
    CURSOR saldo  IS
@@ -382,9 +382,9 @@ BEGIN
    our_okpo_ := nvl(to_char(F_Get_Params ('OKPO', 0)), '0');
 
   -- новий варіант функціі де вибирається сума регулятивного капіталу і сума для Н9 (ОК+ДК-И1)
-   ret_ := Rkapital_f42 (dat_next_u(dat_, 1), kodf_, userid_, 1, sum_k_, sum_H9_); 
+   ret_ := Rkapital_f42 (dat_next_u(dat_, 1), kodf_, userid_, 1, sum_k_, sum_H9_);
    rgk_ := sum_k_;
-
+   
    if rgk_ <= 0 then
       sum_k_ := 100;
       s_prizn_ := 1; -- щоб не формувався показник 41
@@ -415,21 +415,19 @@ BEGIN
 
    if f_nbur_check_for_42_cons(dat_, pkodf_) then
       bc.home;
-
+      
       sum_3680_ := 0;
 
-      IF dat_ >= to_date('01032019','ddmmyyyy') THEN    -- з 21.12.2005
-         -- сума показника бал.рахунку 3680 і R011=1 із #C5
+      IF dat_ >= to_date('01032019','ddmmyyyy') THEN    
+          -- сума показника бал.рахунку 3680 і R011=1 із #C5
           BEGIN
-             SELECT SUM(field_value)
+             SELECT nvl(SUM(znap), 0)
                 INTO   sum_3680_
-             FROM   V_NBUR_#C5
-             WHERE  report_date = Dat_ AND
-                    seg_02 = '3680' and seg_03 = '1';
-          EXCEPTION WHEN NO_DATA_FOUND THEN
-             sum_3680_:=0 ;
+             FROM   otc_c5_proc
+             WHERE  datf = Dat_ AND
+                        kodp like '_36801%';
           END ;
-      END IF;      
+       END IF;      
 
     ---------------------------------------------------------------------------
        -- формирование кодов 01, 02, 03, 04
@@ -477,8 +475,7 @@ BEGIN
              IF se_ <> 0 AND f42_ = 0
              THEN
                 if se_ <> 0 then
-                    --nlsp_ := (case when link_code_='000' then 'RNK =' else 'LINK_CODE =' end) || TO_CHAR (rnk_);
-                    nlsp_ := TO_CHAR (rnk_);
+                    nlsp_ := (case when link_code_='000' then 'RNK =' else 'LINK_CODE =' end) || TO_CHAR (rnk_);
                     znap_ := TO_CHAR (ABS (se_));
                     s_zal_:= 0;
 
@@ -532,6 +529,7 @@ BEGIN
 
                           pr_f8b_ := 1;
                        end if;
+                       
                        if pr_f8b_ = 0 then
                           nnnn01_ := nnnn01_ + 1;
                           if dat_ < dat_Zm4_ then
@@ -1115,78 +1113,78 @@ BEGIN
            end if;
         END IF;
 
-        -- з 01/03/2019 формуються нові показники B5, B6, B7, B8, B9 
+        -- з 01/03/2019 формуються нові показники B5, B6, B7, B8, B9
         -- якщо сума показника бал.рахунку 3680 і R011=1 із #C5 не нульова
-        IF dat_ >= to_date('01032019','ddmmyyyy') AND sum_3680_ <> 0 
-        THEN 
-           for k in ( select * from V_NBUR_#26_dtl
-                      where report_date <= dat_
-                        and (seg_04 like '15%' OR seg_04 like '16%')
-                        and (seg_11 in ('1', '3', '4') OR (seg_11 = '5' and seg_10  in ('1', '2'))) 
-                        and seg_01 = '10' 
-                        and report_date = any ( select max(v1.report_date) 
-                                             from V_NBUR_#26_dtl v1
-                                             where v1.report_date <= dat_
-                                           )
-                    ) 
-     
-           loop
-              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
-                              '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
-                              '1532', '1533', '1535', '1536', '1538',  
-                              '1542', '1543', '1545', '1546', '1548', '1549', 
-                              '1600', '1607', '1609'
-                            ) and k.seg_11 = '1'  
-              then
-                   insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
-                   VALUES (k.acc_num, k.kv, dat_, 'B50000000', k.field_value, k.acc_id);
-              end if;
+        IF dat_ >= to_date('01032019','ddmmyyyy') AND sum_3680_ <> 0
+        THEN
+            for k in (select * 
+                        from V_NBUR_#26_dtl
+                        where report_date <= dat_
+                            and (seg_04 like '15%' OR seg_04 like '16%')
+                            and (seg_11 in ('1', '3', '4') OR (seg_11 = '5' and seg_10  in ('1', '2')))
+                            and seg_01 = '10'
+                            and report_date = any ( select max(v1.report_date)
+                                                 from V_NBUR_#26_dtl v1
+                                                 where v1.report_date <= dat_
+                                               )
+                    )
+            loop
+                 if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519',
+                                  '1520', '1521', '1522', '1524', '1526', '1528', '1529',
+                                  '1532', '1533', '1535', '1536', '1538',
+                                  '1542', '1543', '1545', '1546', '1548', '1549',
+                                  '1600', '1607', '1609'
+                                ) and k.seg_11 = '1'
+                 then
+                    insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                       VALUES (k.acc_num, k.kv, dat_, 'B50000000', k.field_value, k.acc_id);
+                 end if;
 
-              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
-                              '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
-                              '1532', '1533', '1535', '1536', '1538',  
-                              '1542', '1543', '1545', '1546', '1548', '1549', 
-                              '1600', '1607', '1609'
-                            ) and k.seg_11 = '3'  
-              then
-                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
-                 VALUES (k.acc_num, k.kv, dat_, 'B60000000', k.field_value, k.acc_id);
-              end if;
+                 if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519',
+                                  '1520', '1521', '1522', '1524', '1526', '1528', '1529',
+                                  '1532', '1533', '1535', '1536', '1538',
+                                  '1542', '1543', '1545', '1546', '1548', '1549',
+                                  '1600', '1607', '1609'
+                                ) and k.seg_11 = '3'
+                 then
+                    insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                       VALUES (k.acc_num, k.kv, dat_, 'B60000000', k.field_value, k.acc_id);
+                 end if;
 
-              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1516', '1518', '1519', 
-                              '1526', '1528', '1529' 
-                            ) and k.seg_11 = '4'  
-              then
-                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
-                 VALUES (k.acc_num, k.kv, dat_, 'B70000000', k.field_value, k.acc_id);
-              end if;
+                 if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1516', '1518', '1519',
+                                  '1526', '1528', '1529'
+                                ) and k.seg_11 = '4'
+                 then
+                    insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                       VALUES (k.acc_num, k.kv, dat_, 'B70000000', k.field_value, k.acc_id);
+                 end if;
 
-              if k.seg_04 in ( '1502', '1508', '1509', '1513', '1516', '1518', '1519', 
-                              '1520', '1522', '1524', '1526', '1528', '1529', 
-                              '1532', '1533', '1535', '1536', '1538',  
-                              '1542', '1543', '1545', '1546', '1548', '1549', 
-                              '1600', '1607', '1609'
-                            ) and k.seg_11 = '5' 
-                              and k.seg_10 = '1' 
-              then
-                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
-                 VALUES (k.acc_num, k.kv, dat_, 'B80000000', k.field_value, k.acc_id);
-              end if;
+                 if k.seg_04 in ( '1502', '1508', '1509', '1513', '1516', '1518', '1519',
+                                  '1520', '1522', '1524', '1526', '1528', '1529',
+                                  '1532', '1533', '1535', '1536', '1538',
+                                  '1542', '1543', '1545', '1546', '1548', '1549',
+                                  '1600', '1607', '1609'
+                                ) and k.seg_11 = '5'
+                                  and k.seg_10 = '1'
+                 then
+                    insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                       VALUES (k.acc_num, k.kv, dat_, 'B80000000', k.field_value, k.acc_id);
+                 end if;
 
-              if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519', 
-                              '1520', '1521', '1522', '1524', '1526', '1528', '1529', 
-                              '1532', '1533', '1535', '1536', '1538',  
-                              '1542', '1543', '1545', '1546', '1548', '1549', 
-                              '1600', '1607', '1609'
-                            ) and k.seg_11 = '5' 
-                              and k.seg_10 = '2' 
-              then
-                 insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
-                   VALUES (k.acc_num, k.kv, dat_, 'B90000000', k.field_value, k.acc_id);
-              end if;
-           end loop;
+                 if k.seg_04 in ( '1500', '1502', '1508', '1509', '1510', '1513', '1516', '1518', '1519',
+                                  '1520', '1521', '1522', '1524', '1526', '1528', '1529',
+                                  '1532', '1533', '1535', '1536', '1538',
+                                  '1542', '1543', '1545', '1546', '1548', '1549',
+                                  '1600', '1607', '1609'
+                                ) and k.seg_11 = '5'
+                                  and k.seg_10 = '2'
+                 then
+                    insert into rnbu_trace(nls, kv, odate, kodp, znap, acc )
+                       VALUES (k.acc_num, k.kv, dat_, 'B90000000', k.field_value, k.acc_id);
+                 end if;
+            end loop;
         END IF;
-       
+    
         bc.subst_mfo(mfo_);
 
         IF type_ = 0
@@ -1198,7 +1196,8 @@ BEGIN
           SELECT kodf_, dat_, kodp, SUM (znap)
           FROM RNBU_TRACE
           where substr(kodp,1,2) not in ('47','50','51','54','58','61','63','82','83','84','11')
-          GROUP BY kodf_, dat_, kodp;
+          GROUP BY kodf_, dat_, kodp
+          having SUM (znap) <> 0;
         END IF;
 
        bc.home;
@@ -1228,13 +1227,40 @@ BEGIN
                             end)||substr(k.kodp,3) kodp,
                             k.ref group_num
             from rnbu_trace k
-            where (kodp like '01%' or kodp like '02%' or kodp like '04%')
+            where (kodp like '01%' or kodp like '02%')
             order by substr(kodp,3,4), rnk, k.nbuc) b
-        on (o.rnk = b.rnk and
-            NVL(o.link_code, '000') = b.link_code)
+        on (NVL(o.link_code, '000') = b.link_code)
         where o.datf = dat_;
+        
+       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm)
+        select /*+ leading(o) */
+             dat_ odate, o.nls, o.kv, b.kodp,
+             decode(substr(o.kodp,1,1),'1', -1, 1) * o.znap znap,
+             o.rnk, nvl(o.link_code, '000'), o.nd, b.group_num ref, o.acc,
+             'KF = '||o.kf||' '||
+             (case when (substr(o.kodp,2,4) like '___9' or
+                         substr(o.kodp,2,4) in ('1890','2890','3590','3690','3692')) and
+                         substr(o.kodp,1,1) = '2'
+                    then '(резерв чи SNA з файлу #C5) '
+                   else '(залишок з файлу #C5) '
+              end) || substr(o.kodp,2,4) ||
+              ' / R011=' || substr(o.kodp,6,1) ||
+              ' / R013=' || substr(o.kodp,7,1) ||
+              ' / S245=' || substr(o.kodp,16,1) comm
+        from otc_c5_proc o
+        join (select distinct k.rnk, k.nbuc link_code,
+                            (case when k.kodp like '01%' then 'R1'
+                                 when k.kodp like '02%' then 'R2'
+                                 else 'R4'
+                            end)||substr(k.kodp,3) kodp,
+                            k.ref group_num
+            from rnbu_trace k
+            where (kodp like '04%')
+            order by substr(kodp,3,4), rnk, k.nbuc) b
+        on (o.rnk = b.rnk)
+        where o.datf = dat_;        
 
-       --delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
+       delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
 
        update rnbu_trace
        set kodp = replace(kodp, 'R', '0')
