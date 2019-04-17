@@ -79,7 +79,7 @@ namespace BarsWeb.Areas.Subvention.Infrastructure.DI.Implementation
             }
             else
             {
-                _params = new object[] { new OracleParameter("p_package_id", OracleDbType.Decimal, packageId, ParameterDirection.Input) };
+                _params = new object[] { new OracleParameter("p_package_id", OracleDbType.Varchar2, packageId, ParameterDirection.Input) };
                 sql += " d.extreqid = :p_package_id";
             }
 
