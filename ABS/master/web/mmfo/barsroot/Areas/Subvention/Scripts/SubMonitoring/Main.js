@@ -188,7 +188,7 @@ function initDocumentsGrid() {
             {
                 field: 'Err',
                 title: 'Опис помилки',
-                width: 250
+                width: 450
             },
             {
                 title: 'Отримувач',
@@ -235,8 +235,7 @@ function initDocumentsGrid() {
             {
                 field: 'Purpose',
                 title: 'Призначення',
-                //width: 450
-                width: 250
+                width: 450
             },
             {
                 title: 'Платник',
@@ -293,10 +292,10 @@ function initDocumentsGrid() {
                 }
             }
             template = template.replace('{totalCnt}', e.response.Data.length)
-                .replace('{totalSum}', totalSum)
-                .replace('{okSum}', okSum)
+                .replace('{totalSum}', totalSum.toMoneyString())
+                .replace('{okSum}', okSum.toMoneyString())
                 .replace('{okCnt}', okCnt)
-                .replace('{errSum}', errSum)
+                .replace('{errSum}', errSum.toMoneyString())
                 .replace('{errCnt}', errCnt);
 
             $('#lblDocumentsCount').html(template);
