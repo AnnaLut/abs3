@@ -44,6 +44,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.monex is
   NLS6_AG varchar2(15) := '65102012600000';
 
 /*
+  17.04.2019 - проверено на контрольном примере из ОБ
+
+  12.04.2019 - cm.D:\K\MMFO\MT\bars\Doc\Комиссия_для_ЮЛ.docx 
   28.02.2019 Комиссия komb1,2,3 ЮЛ должна идти на другой 3739
 
   29.01.2019 Суховпа - Для комиссии суб/аг надо брать NLS_KOm
@@ -750,7 +753,7 @@ begin
 
      -- 2) дебетовый ВАЛ платеж  на 2909 - комиссия
      If k.k_2909 > 0 and k.rk_2909 is null then
-        If UU.UO > 0 then -- для субагентов ничего не делать - 23.03.2018 Атнон И. 
+        If UU.UO > 0 and p_kod_nbu not in ( 94, 95, 96, 97 ) then -- для субагентов по международным  системам ничего не делать - 12.04.2019 + 23.03.2018 Атнон И. 
            null ;
         else
            oo.nlsa := NVL(k.nlsk, x0.nlsT);--x0.nlsT   373990364;
@@ -808,7 +811,7 @@ begin
 ------------------------------------------------------------------------
      -- 4) кредитовый платеж на 6110 - комиссия
      If k.k_2809 > 0 and k.rk_2809 is null then
-        If UU.UO > 0 then -- для субагентов ничего не делать - 23.03.2018 Атнон И. 
+        If UU.UO > 0 and p_kod_nbu not in ( 94, 95, 96, 97 ) then -- для субагентов по международным  системам ничего не делать - 12.04.2019 + 23.03.2018 Атнон И. 
            null ;
         else
            --grishkovmv@oschadbank.ua Если k.nlsk is not null - комиссию списываем с отдельного счета
@@ -856,7 +859,7 @@ begin
      -- нужно сложную БМ
 
      If k.k_0000 > 0 and k.rk_0000 is null then
-        If UU.UO > 0 then -- для субагентов ничего не делать - 23.03.2018 Атнон И. 
+        If UU.UO > 0 and p_kod_nbu not in ( 94, 95, 96, 97 ) then -- для субагентов по международным  системам ничего не делать - 12.04.2019 + 23.03.2018 Атнон И. 
            null ;
         else
            oo.nlsa := NVL(k.nlsk,X0.nlst) ;--X0.nlst;--NVL(k.nlsk,X0.nlst) ;
@@ -875,18 +878,19 @@ begin
 
      --15.03.2018
      If k.RET_SEND > 0 then
-        If UU.UO > 0 then -- для субагентов ничего не делать - 23.03.2018 Атнон И. 
+        If UU.UO > 0 and p_kod_nbu not in ( 94, 95, 96, 97 ) then -- для субагентов по международным  системам ничего не делать - 12.04.2019 + 23.03.2018 Атнон И. 
            null ;
         else
            oo.vob  := 6      ;
            oo.nlsa := X0.nlst   ;
            oo.nazn := substr(to_char(p_dat, 'dd.mm.yyyy') || ';RETURNSENDFEE.Стягнення комiсiї для поверн.кл. Вал='||k.kv||',Сума='||to_char(k.RET_SEND/100), 1, 160 );
            oo.dk   := 0 ;
-           oo.nlsb := monex.NLSM ( p_nbs => '7509', p_ob22=> '02', p_branch => trim(k.branch) ); -- = 7509*02
+           oo.nlsb := monex.NLS7_AG ; ---- monex.NLSM ( p_nbs => '7509', p_ob22=> '02', p_branch => trim(k.branch) ); -- = 7509*02
            oo.kv   := GL.baseVal;
            oo.kv2  := oo.kv   ;
            oo.s    := gl.p_icurval( k.kv, k.RET_SEND, gl.bdate) ;
            oo.S2   := oo.S    ;
+
            monex.opl1(oo);  
            If k.kv <> gl.baseval then
               gl.payv(0, oo.ref, gl.bdate, 'D06', 0, k.kv, X0.nlst,  k.RET_SEND,  gl.baseval, X0.nlst, oo.s  );
@@ -903,7 +907,7 @@ begin
         oo.kv    := gl.baseval ;
         oo.kv2   := gl.baseval ;
 
-        If k.KOMB1 > 0 and k.k_2909 > 0 then   ------ Деб  2809.задоолж по ЮЛ-грн      Кред Тр  по СТП на сумму вал KOMB1
+        If k.KOMB1 > 0 and k.k_2909 > 0 and p_kod_nbu not in ( 94, 95, 96, 97 )  then   ------ Деб  2809.задоолж по ЮЛ-грн      Кред Тр  по СТП на сумму вал KOMB1
            -- k.KOMB1 это грн-сумма для расчета с агентом
            oo.dk   := 0 ;
            oo.kv   := k.kv;        oo.s  := gl.p_Ncurval( k.kv, k.KOMB1, gl.bdate) ;   oo.nlsa := x0.nlsT;
@@ -925,7 +929,7 @@ begin
           end if;
         end if ;
 
-        If k.KOMB2 > 0 and k.K_2809 > 0 then   --- Деб Тр  по СТП вал на сумму KOMB2  кред Комм.ЮЛ в грн
+        If k.KOMB2 > 0 and k.K_2809 > 0 and p_kod_nbu not in ( 94, 95, 96, 97 ) then   --- Деб Тр  по СТП вал на сумму KOMB2  кред Комм.ЮЛ в грн
            oo.dk   := 1 ;
            oo.kv   := k.kv;        oo.s  := gl.p_Ncurval( k.kv, k.KOMB2, gl.bdate) ;   oo.nlsa := x0.nlsT;
            oo.kv2  := gl.baseval;  oo.s2 := k.KOMB2 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_KOM, trim(k.branch) );
@@ -945,7 +949,7 @@ begin
         end if ;
 
 
-        If k.KOMB3 > 0 and k.k_0000 > 0  then   --- Деб Тр  по СТП вал на сумму KOMB3  кред кред ЮЛ в грн
+        If k.KOMB3 > 0 and k.k_0000 > 0 and p_kod_nbu not in ( 94, 95, 96, 97 ) then   --- Деб Тр  по СТП вал на сумму KOMB3  кред кред ЮЛ в грн
            oo.dk   := 1 ;
            oo.kv   := k.kv;        oo.s  := gl.p_Ncurval( k.kv, k.KOMB3, gl.bdate) ;   oo.nlsa := x0.nlsT;
            oo.kv2  := gl.baseval;  oo.s2 := k.KOMB3 ;                                  oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_KOM, trim(k.branch) );
