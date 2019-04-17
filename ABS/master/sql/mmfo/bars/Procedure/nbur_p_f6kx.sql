@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 6KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.006       30/01/2019 (18/12/2018)
+% VERSION     :  v.1.007     16/04/2019 (30/01/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.006   30/01/2019';
+  ver_          char(30)  := 'v.1.007   16/04/2019';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title              constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_base_currency_id   constant varchar2(3 char) := '980';
@@ -185,13 +185,13 @@ BEGIN
                               , null as k190
                               , --Анализируем наличия кода блокировки на счете
                                 case
-                                  when t.blc_code_db <> 0 then '1'
+                                  when nvl(t.blc_code_db, 0) <> 0 or nvl(t.blc_code_cr, 0) <> 0 then '1'
                                 else
                                   '0'
                                 end as blkd
                               , --Анализируем наличия кода блокировки на счете
                                 case
-                                  when t.blc_code_cr <> 0 then '1'
+                                  when nvl(t.blc_code_db, 0) <> 0 or nvl(t.blc_code_cr, 0) <> 0 then '1'
                                 else
                                   '0'
                                 end as blkk
@@ -422,13 +422,13 @@ BEGIN
                                   , null as k190
                                   , --Анализируем наличия кода блокировки на счете
                                     case
-                                      when t.blc_code_db <> 0 then '1'
+                                      when nvl(t.blc_code_db, 0) <> 0 or nvl(t.blc_code_cr, 0) <> 0 then '1'
                                     else
                                       '0'
                                     end as blkd
                                   , --Анализируем наличия кода блокировки на счете
                                     case
-                                      when t.blc_code_cr <> 0 then '1'
+                                      when nvl(t.blc_code_db, 0) <> 0 or nvl(t.blc_code_cr, 0) <> 0 then '1'
                                     else
                                       '0'
                                     end as blkk

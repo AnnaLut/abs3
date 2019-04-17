@@ -2786,7 +2786,7 @@ begin
 	 Values
 	   (109, '2630', '2', NULL, NULL, 
 		NULL, NULL, '0', NULL, NULL, 
-		NULL, NULL, '0', NULL, NULL, 
+		NULL, NULL, '0', '0', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K018', NULL, NULL, 
 		NULL, NULL);
@@ -2800,7 +2800,7 @@ begin
 	 Values
 	   (110, '2630', '2', NULL, NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '1', NULL, NULL, 
+		NULL, NULL, '1', '1', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K019', NULL, NULL, 
 		NULL, NULL);
@@ -2814,7 +2814,7 @@ begin
 	 Values
 	   (111, '2630', '2', NULL, NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '1', 
+		NULL, NULL, '0', '0', '1', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K020', NULL, NULL, 
 		NULL, NULL);
@@ -2828,7 +2828,7 @@ begin
 	 Values
 	   (112, '2630', '2', NULL, NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '0', 
+		NULL, NULL, '0', '0', '0', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K021', NULL, NULL, 
 		NULL, NULL);
@@ -2856,7 +2856,7 @@ begin
 	 Values
 	   (114, '2610', '2', NULL, NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '1', NULL, NULL, 
+		NULL, NULL, '1', '1', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K023', NULL, NULL, 
 		NULL, NULL);
@@ -2870,7 +2870,7 @@ begin
 	 Values
 	   (115, '2610', '2', NULL, NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '1', 
+		NULL, NULL, '0', '0', '1', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K024', NULL, NULL, 
 		NULL, NULL);
@@ -2884,7 +2884,7 @@ begin
 	 Values
 	   (116, '2610', '2', NULL, NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '0', 
+		NULL, NULL, '0', '0', '0', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K025', NULL, NULL, 
 		NULL, NULL);
@@ -5922,7 +5922,7 @@ begin
 	 Values
 	   (530, '2620', '2', '3', NULL, 
 		NULL, NULL, '0', NULL, NULL, 
-		NULL, NULL, '0', NULL, NULL, 
+		NULL, NULL, '0', '0', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K018', NULL, NULL, 
 		NULL, NULL);
@@ -5936,7 +5936,7 @@ begin
 	 Values
 	   (531, '2620', '2', '3', NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '1', NULL, NULL, 
+		NULL, NULL, '1', '1', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K019', NULL, NULL, 
 		NULL, NULL);
@@ -5950,7 +5950,7 @@ begin
 	 Values
 	   (532, '2620', '2', '3', NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '1', 
+		NULL, NULL, '0', '0', '1', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K020', NULL, NULL, 
 		NULL, NULL);
@@ -5964,7 +5964,7 @@ begin
 	 Values
 	   (533, '2620', '2', '3', NULL, 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '0', 
+		NULL, NULL, '0', '0', '0', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K021', NULL, NULL, 
 		NULL, NULL);
@@ -6006,7 +6006,7 @@ begin
 	 Values
 	   (536, '2601', '2', '5', '4', 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '1', NULL, NULL, 
+		NULL, NULL, '1', '1', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K023', NULL, NULL, 
 		NULL, NULL);
@@ -6020,7 +6020,7 @@ begin
 	 Values
 	   (537, '2601', '2', '5', '5', 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '1', NULL, NULL, 
+		NULL, NULL, '1', '1', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K023', NULL, NULL, 
 		NULL, NULL);
@@ -6034,7 +6034,7 @@ begin
 	 Values
 	   (538, '2601', '2', '5', '4', 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '1', 
+		NULL, NULL, '0', '0', '1', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K024', NULL, NULL, 
 		NULL, NULL);
@@ -6048,7 +6048,7 @@ begin
 	 Values
 	   (539, '2601', '2', '5', '5', 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '1', 
+		NULL, NULL, '0', '0', '1', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K024', NULL, NULL, 
 		NULL, NULL);
@@ -6062,7 +6062,7 @@ begin
 	 Values
 	   (540, '2601', '2', '5', '4', 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '0', 
+		NULL, NULL, '0', '0', '0', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K025', NULL, NULL, 
 		NULL, NULL);
@@ -6076,7 +6076,7 @@ begin
 	 Values
 	   (541, '2601', '2', '5', '5', 
 		NULL, NULL, '1', NULL, NULL, 
-		NULL, NULL, '0', NULL, '0', 
+		NULL, NULL, '0', '0', '0', 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K025', NULL, NULL, 
 		NULL, NULL);
@@ -6958,7 +6958,7 @@ begin
 	 Values
 	   (557, '2620', '2', '3', NULL, 
 		NULL, NULL, '0', NULL, NULL, 
-		NULL, NULL, '1', NULL, NULL, 
+		NULL, NULL, '1', '1', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K021', NULL, NULL, 
 		NULL, NULL);
@@ -6972,7 +6972,7 @@ begin
 	 Values
 	   (558, '2630', '2', NULL, NULL, 
 		NULL, NULL, '0', NULL, NULL, 
-		NULL, NULL, '1', NULL, NULL, 
+		NULL, NULL, '1', '1', NULL, 
 		NULL, NULL, NULL, NULL, NULL, 
 		NULL, NULL, 'A6K021', NULL, NULL, 
 		NULL, NULL);
