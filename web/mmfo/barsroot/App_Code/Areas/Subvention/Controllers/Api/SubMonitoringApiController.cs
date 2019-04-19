@@ -64,7 +64,7 @@ namespace BarsWeb.Areas.Subvention.Controllers.Api
         }
 
         [HttpGet]
-        public HttpResponseMessage SearchDocuments([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, string from, string to, decimal? packageId)
+        public HttpResponseMessage SearchDocuments([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, string from, string to, string packageId)
         {
             try
             {
