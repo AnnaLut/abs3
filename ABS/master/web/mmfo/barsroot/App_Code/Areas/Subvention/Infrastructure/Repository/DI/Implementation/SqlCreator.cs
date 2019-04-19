@@ -50,7 +50,7 @@ namespace BarsWeb.Areas.Subvention.Infrastructure.DI.Implementation
             };
         }
 
-        public static BarsSql GetDocuments(string from, string to, decimal? packageId)
+        public static BarsSql GetDocuments(string from, string to, string packageId)
         {
             string sql = @"select d.extreqid,
                                   d.receiveraccnum,
@@ -72,7 +72,7 @@ namespace BarsWeb.Areas.Subvention.Infrastructure.DI.Implementation
                              from v_subsidy_data d where ";
             object[] _params = null;
 
-            if (null == packageId)
+            if (string.IsNullOrWhiteSpace(packageId))
             {
                 _params = FromToParams(from, to).ToArray();
                 sql += " d.sys_time between to_date(:p_from, 'DD.MM.YYYY HH24:MI:SS') and to_date(:p_to, 'DD.MM.YYYY HH24:MI:SS')";
