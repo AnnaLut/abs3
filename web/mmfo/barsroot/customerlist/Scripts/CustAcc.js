@@ -147,6 +147,7 @@ function InitCustAcc() {
         || (type == 3 && getParamFromUrl("nd", location.href))
         || (type == 5 && getParamFromUrl("bpkw4nd", location.href))
         || (type == 4 && getParamFromUrl("acc", location.href))
+        || type == 7 /* виклик з БМД */
         || type == 8
         || type == 9 /* перегляд рахунків угоди з АРМ Цінні Папери ->ЦП Потрфель Загальний */
     ) {
@@ -199,6 +200,11 @@ function LoadCustAcc() {
     } else {
         enableButton("btRefresh");
     }
+
+    // зміна ширини панельки і пейджера після зміни ширини гріда
+    var gridWidth = document.getElementById('accGrid') ? document.getElementById('accGrid').clientWidth : 1704; 
+    document.getElementById('tblParent').style.width = gridWidth + 'px';
+    document.getElementById('tblFooter').style.width = gridWidth + 'px';
 }
 function SetReadOnly() {
     var mod = getParamFromUrl("mod", location.href);
