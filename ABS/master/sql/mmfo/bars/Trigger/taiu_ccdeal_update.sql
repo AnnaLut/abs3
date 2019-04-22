@@ -186,7 +186,7 @@ begin
   If (l_rec.CHGACTION Is Not Null)
   Then
 
-    l_rec.IDUPD      := bars_sqnc.get_nextval(S_CCDEAL_UPDATE.NextVal);
+    l_rec.IDUPD      := bars_sqnc.get_nextval('S_CCDEAL_UPDATE');
     l_rec.EFFECTDATE := COALESCE(gl.bd, glb_bankdate);
     l_rec.CHGDATE    := sysdate;
     l_rec.DONEBY     := gl.aUID;
