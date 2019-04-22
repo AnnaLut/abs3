@@ -103,8 +103,8 @@ else
 @if (Model.TELLER_USER_PARAM.HAS_TELLER_ROLE == 1)
 {
     <link rel="stylesheet" href="@Url.Content("~/Areas/Teller/Css/atm.min.css")" />
-    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerScript.js")"></script>
-    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerEncashment.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerScript.js?v.01")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerEncashment.js?v.01")"></script>
     <script>
         function Restore(currentSum, status) {
             if (currentSum === '-1')

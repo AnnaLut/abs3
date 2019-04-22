@@ -249,16 +249,28 @@ function TellerWindowSuccess(result) {
 function BeginCashInput() {
     if ($('#cant-cancel').length && $('#cant-cancel').val() === '0')
         $('#cant-cancel').val(1);
+    $('#end-task').attr('disabled', 'disabled');
+    $('#cancel-btn').attr('disabled', 'disabled');
     var ref = GetRef();
     Implement({
         url: '/barsroot/teller/tellerATM/atmrequest',
         data: { Ref: ref, SbonFlag: 0, Method: 'makerequest' },
-        error: DefaultError,
+        error: function (e) {
+            showNotification('', 'error');
+            $('#atm-window').css('z-index', zElementIndex.up);
+            showHide.hidePreloaderItems();
+            $('#end-task').removeAttr('disabled');
+            $('#cancel-btn').removeAttr('disabled');
+            if (intervalObj.isRuning())
+                intervalObj.Stop();
+        },
         status: true,
         success: SuccessBeginCashInput
     });
     intervalObj.Run(GetStatus, 500);
 }
+
+
 
 /// обработчик AJAX запроса метода BeginCashInput
 function SuccessBeginCashInput(result) {
@@ -299,6 +311,8 @@ function CashInputConfirm() {
 
 /// обработчик AJAX запроса метода CashInputConfirm
 function SuccessCashInputConfirm(result) {
+    $('#end-task').removeAttr('disabled');
+    $('#cancel-btn').removeAttr('disabled');
     SuccessBeginCashInput(result);
     if (result.statusCode === 200) {
         if (result.model.Status === "Done") {

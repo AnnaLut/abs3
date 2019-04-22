@@ -127,7 +127,10 @@ function StartCashin(btn) {
     var curr = $('#currency-dropdown').val();
     $('#currency-dropdown').prop('disabled', 'disabled');
     showHide.showPreloaderItems();
-
+    $('#cashin-btn').text('Підтвердити внесення');
+    $('#end-cashin-btn').hide();
+    $('#disabled-btn').text('Підтвердити');
+    $('#disabled-btn').show();
     $.ajax({
         type: "POST",
         contentType: "application/json",
@@ -164,7 +167,7 @@ function StartCashin(btn) {
 /// Продолжение операции инкассации (повторное внесение или накручивание наличных с временного контейнера на барабаны)
 function StoreCashin(btn) {
     if ($('#cashin-btn').hasClass(colorGray))
-        return;
+        return;    
     //var interval = new StatusInterval();
     $('#encashment-window').css('z-index', zElementIndex.down);
     showHide.showPreloaderItems();
@@ -174,6 +177,8 @@ function StoreCashin(btn) {
         url: '/barsroot/teller/telleratm/Cashin',
         data: JSON.stringify({ method: 'StoreCashin' }),
         success: function (result) {
+            $('#end-cashin-btn').show();
+            $('#disabled-btn').hide();
             var tempo = parseFloat($('#tempo-input').val()).toFixed(2);
             var txt = '';
             intervalObj.Stop();
