@@ -233,7 +233,71 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+PROMPT *** ADD COLUMN OUTDATED***
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.CUSTOMS_DECL'||
+    '  ADD (OUTDATED  NUMBER)';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+PROMPT *** ADD COLUMN MDAT_NEW***
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.CUSTOMS_DECL'||
+    '  ADD (MDAT_NEW  DATE)';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+PROMPT *** ADD COLUMN CCY_MFO_NEW***
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.CUSTOMS_DECL'||
+    '  ADD (CCY_MFO_NEW  VARCHAR2(6))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+PROMPT *** ADD COLUMN UAH_MFO_NEW***
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.CUSTOMS_DECL'||
+    '  ADD (UAH_MFO_NEW  VARCHAR2(6))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+PROMPT *** ADD COLUMN FN_MM***
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.CUSTOMS_DECL'||
+    '  ADD (FN_MM  VARCHAR2(12))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+PROMPT *** ADD COLUMN N_MM***
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.CUSTOMS_DECL'||
+    '  ADD (N_MM  NUMBER)';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+COMMENT ON COLUMN BARS.CUSTOMS_DECL.OUTDATED IS 'Ознака отримання статусу "застарілого" МФО';
 
+COMMENT ON COLUMN BARS.CUSTOMS_DECL.MDAT_NEW IS 'Дата отримання статусу "застарілого" МФО';
+
+COMMENT ON COLUMN BARS.CUSTOMS_DECL.CCY_MFO_NEW IS 'МФО НОВОГО довіреного банка (валюта)';
+
+COMMENT ON COLUMN BARS.CUSTOMS_DECL.UAH_MFO_NEW IS 'МФО НОВОГО довіреного банка (гривна)';
+
+COMMENT ON COLUMN BARS.CUSTOMS_DECL.FN_MM IS 'Імя MM-файлу';
+
+COMMENT ON COLUMN BARS.CUSTOMS_DECL.N_MM IS 'Номер інформаційного рядку в файлі MM';
 
 
 PROMPT *** Create  grants  CUSTOMS_DECL ***
