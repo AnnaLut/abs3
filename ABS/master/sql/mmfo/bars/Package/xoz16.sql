@@ -434,9 +434,11 @@ procedure OPR  ( p_ND cc_deal.ND%type, p_Mode int , p_S number, p_Txt varchar2 )
   END ;
  
 begin 
-  If p_Mode = 0  then   
-     delete from TMP_XOZ16 where isp= gl.aUid and nd = p_ND ;
-     insert into TMP_XOZ16( isp, nd, S ) values ( gl.aUid, p_nd, p_S*100);
+ If p_Mode = 0  then   
+     If p_ND > 0 then
+        delete from TMP_XOZ16 where isp= gl.aUid and nd = p_ND ;
+        insert into TMP_XOZ16( isp, nd, S ) values ( gl.aUid, p_nd, p_S*100);
+     end if;
      Return ;
   End if ;
   -----------
