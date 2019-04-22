@@ -15,7 +15,7 @@
         tempoTmp = "0";
     }
     String tempo = String.Format("0.00",tempoTmp);
-    String messageText = Model.ToxFlag == 1 ? "" : "Не надано доступ на проведення інкасації готівкових коштів через АТМ! Зверніться, будь ласка, до адміністратора, для надання доступу!";
+    String messageText = Model.ToxFlag == -1 ? "Не надано доступ на проведення інкасації готівкових коштів через АТМ! Зверніться, будь ласка, до адміністратора, для надання доступу!": "";
 }
 <div id="encashment-window">
     <div id="atm-header">
@@ -101,7 +101,7 @@
                         <td class="pad-left">
                             @if (Model.EncashmentType == "INPUT")
                             {
-                                <a class="atm-button atm-color-blue" id="cashin-btn" style="padding-bottom: 8px; padding-top: 8px;" onclick="OnCashinClick(); return false;">Внести</a>
+                                <a class="atm-button atm-color-blue" id="cashin-btn" style="padding-bottom: 8px; padding-top: 8px;" onclick="OnCashinClick(); return false;">Розпочати внесення</a>
                             }
                             else if (Model.EncashmentType == "PARTIAL")
                             {
@@ -114,7 +114,7 @@
                             else if (Model.EncashmentType == "OUTPUT" && String.IsNullOrEmpty(nonAtm))
                             {
                                 <a class="atm-button atm-color-blue" id="cashin-btn" style="padding-bottom: 8px; padding-top: 8px;" onclick="OnCashin(); return false;">Вилучити</a>
-                            }
+                            }                            
                         </td>
                     </tr>
                 }
@@ -132,6 +132,7 @@
                         {
                             <a class="atm-button atm-color-green" style="margin-right: 0px; margin-top: 20px;" id="end-cashin-btn" onclick="endCashout('@Model.EncashmentType')">Підтвердити</a>
                         }
+                        <a class="atm-button atm-color-gray" id="disabled-btn" style="margin-right: 0px; margin-top: 20px; cursor: not-allowed; display: none;"></a>
                     </td>
                     <td class="pad-left">
                         <span>

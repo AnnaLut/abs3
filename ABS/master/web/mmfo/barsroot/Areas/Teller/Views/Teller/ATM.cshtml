@@ -20,7 +20,7 @@
                 <div class="atm-block2">
                     @if (Model.RejectFlag != 1)
                     {
-                        <a class="atm-button atm-color-red" onclick="CancelOperation()">Відмінити</a>
+                        <a class="atm-button atm-color-red" id="cancel-btn" onclick="CancelOperation()">Відмінити</a>
                     }
                     else
                     {
@@ -94,7 +94,7 @@
             </div>
         </div>
         <div class="atm-block" style="height: auto; min-height: 60px;">
-            <a class="atm-button atm-color-green" onclick="AtmTempo()">Завершити операцію</a>
+            <a class="atm-button atm-color-green" id="end-task" onclick="AtmTempo()">Завершити операцію</a>
             <p class="info-style" id="atm-p-err-text"></p>
             @if (String.IsNullOrEmpty(Model.Message) || Model.Message == "OK")
             {
