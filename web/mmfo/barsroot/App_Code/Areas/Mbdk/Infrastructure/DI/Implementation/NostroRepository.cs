@@ -22,7 +22,7 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
                     cmd.CommandText = @"select t.nd, t.ndi, t.rnk, c.nmk, t.kv, tb.name, t.nls, t.acc, t.mfo, t.bic, t.cc_id, t.sdate, 
                     t.wdate, t.limit, t.fin23, fin.name, t.obs23, ob23.name, t.kat23, k23.name, t.k23, t.sos, t.ir, t.sdog, t.branch, t.prod, t.fin_351, t.pd  
                     from NOSTRO_DEAL t, tabval tb, customer c, stan_kat23 k23, stan_fin fin, stan_obs23 ob23
-                    where t.kv = tb.kv and t.rnk = c.rnk and t.kat23 = k23.kat and t.fin23 = fin.fin and t.obs23 = ob23.obs";
+                    where t.kv = tb.kv and t.rnk = c.rnk and t.kat23 = k23.kat(+) and t.fin23 = fin.fin and t.obs23 = ob23.obs(+)";
                     using(OracleDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())

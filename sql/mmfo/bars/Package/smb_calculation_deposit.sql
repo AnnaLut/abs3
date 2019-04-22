@@ -370,16 +370,16 @@ as
                                 ,p_mode                      number       -- тип расчета
                                 ) 
           is
-                   with tObj as( 
+                   with tObj$ as( 
                         select --+ 000999000
                                *
                           from(
                                select 
                                      o.id
-                                    ,t.currency_id currency_id 
+                                    ,t.currency_id 
                                     ,d.start_date
                                     ,nvl(t.expiry_date_prolongation, d.expiry_date) expiry_date
-                                    ,t.tail_amount tail_amount  
+                                    ,t.tail_amount  
                                     ,da.account_id
                                     ,o.object_type_id
                                     ,case when p_mode = 1 
@@ -395,9 +395,13 @@ as
                                                    -- транш еще не закрыт (срок закрытия прошел), но были проблемы со счетом (блокировка, мин. остаток ...)
                                                    ,case when d.close_date is null and
                                                               o.state_id = g_object_active_state_id and
-                                                              nvl(t.expiry_date_prolongation, d.expiry_date) <= p_end_date
+                                                              nvl(t.expiry_date_prolongation, d.expiry_date) <= p_end_date and
+                                                              (select count(*)
+                                                                 from process p
+                                                                where p.object_id = o.id
+                                                                  and p.process_type_id = g_process_processing_blocked) > 0
                                                          then p_end_date
-                                                    end     
+                                                    end 
                                                    -- дату окончания не включаем
                                                    ,t.expiry_date_prolongation - case when t.is_prolongation = 0 then 0
                                                                                       -- последняя пролонгация прошла - закрытие
@@ -408,6 +412,8 @@ as
                                     ,t.is_capitalization
                                     ,t.is_individual_rate
                                     ,d.customer_id
+                                    ,t.is_prolongation
+                                    ,d.expiry_date expiry_date_deposit
                                 from object o
                                     ,deal d
                                     ,smb_deposit t
@@ -436,22 +442,91 @@ as
                                     select x.column_value
                                       from table(p_deposit_list) x
                                         )))
-                         where end_date_ >= start_date_                 
-                     )
+                         where end_date_ >= start_date_
+                         )
+                 , tObj as(
+                         select o.*
+                           from tObj$ o
+                          where o.is_prolongation = 0
+                         union all 
+                         -- тело депозита без пролонгации
+                         select o.id
+                               ,o.currency_id 
+                               ,o.start_date
+                               ,o.expiry_date
+                               ,o.tail_amount  
+                               ,o.account_id
+                               ,o.object_type_id
+                               ,o.start_date_ start_date_ 
+                               ,least(o.end_date_, o.expiry_date_deposit - 1) end_date_
+                               ,o.is_capitalization
+                               ,o.is_individual_rate
+                               ,o.customer_id
+                               ,o.is_prolongation
+                               ,o.expiry_date_deposit
+                           from tObj$ o
+                          where o.is_prolongation = 1
+                            and o.start_date_ < o.expiry_date_deposit
+                         union all 
+                         -- тело депозитав, при заблокированом счете/транше
+                         select o.id
+                               ,o.currency_id 
+                               ,o.start_date
+                               ,o.expiry_date
+                               ,o.tail_amount  
+                               ,o.account_id
+                               ,o.object_type_id
+                               ,o.expiry_date start_date_
+                               ,o.end_date_
+                               ,o.is_capitalization
+                               ,o.is_individual_rate
+                               ,o.customer_id
+                               ,o.is_prolongation
+                               ,o.expiry_date_deposit
+                           from tObj$ o
+                          where o.is_prolongation = 1
+                            and o.end_date_ > o.expiry_date
+                         union all   
+                         -- пролонгации депозита
+                         select o.id
+                               ,o.currency_id 
+                               ,o.start_date
+                               ,o.expiry_date
+                               ,o.tail_amount  
+                               ,o.account_id
+                               ,o.object_type_id
+                               ,greatest(x.start_date + 1, o.start_date_) start_date_ 
+                               ,least(x.expiry_date - 1, o.end_date_) end_date_
+                               ,o.is_capitalization
+                               ,o.is_individual_rate
+                               ,o.customer_id
+                               ,o.is_prolongation
+                               ,o.expiry_date_deposit
+                           from tObj$ o
+                               ,table(smb_deposit_utl.get_prolongation(p_deposit_id => o.id)) x
+                          where o.is_prolongation = 1
+                            and x.start_date < o.end_date_
+                            and x.expiry_date >= o.start_date_)
                  -- % ставки       
                  , ir_ as(
                       -- выбираем процентные ставки
                       --   для ДпТ берем только индивидуальную % ставку, иначе % ставку берем от суммы на счете
                       --   для траншей берем из атрибутов
                       select o.*
-                            ,a.value_date
+                            ,greatest(a.value_date, o.start_date_) value_date
                             ,a.number_value interest_rate
                         from tOBJ o
                             ,attribute_value_by_date a    
                        where a.attribute_id in (p_trn_attr_interest_rate_id, p_dod_attr_interest_rate_id)
                          and a.object_id = o.id
                          and nvl(p_mode, 0) <> 3
-                         and a.value_date <= o.end_date_
+                         and a.value_date between 
+                             (select nvl(max(au.value_date), o.start_date_)
+                                from attribute_value_by_date au
+                               where au.attribute_id = a.attribute_id
+                                 and au.object_id = o.id
+                                 and au.value_date <= o.start_date_)
+                             and o.end_date_
                       union all  -- !!!!
                       -- штраф
                       select o.*
@@ -462,77 +537,67 @@ as
                        where a.attribute_id = g_trn_attribute_penalty_id
                          and a.object_id = o.id
                          and p_mode = 3
-                      /*       
-                      --  от процентных ставок на дату вычитаем штрафную ставку
-                      -- хрень какая то (???)
-                      select o.*
-                            ,a.value_date
-                            ,a.number_value 
-                             -
-                             (select nvl(max(p.number_value) keep (dense_rank first order by p.value_date desc), 0)
-                                from attribute_value_by_date p
-                               where p.attribute_id = g_trn_attribute_penalty_id
-                                 and p.object_id = o.id) interest_rate
-                        from tOBJ o
-                            ,attribute_value_by_date a    
-                       where a.attribute_id = p_trn_attr_interest_rate_id
-                         and a.object_id = o.id
-                         and p_mode = 3*/
                            )
                   -- метод начисления для ДпТ       
                  ,mtd_ as(
                       select o.*
-                            ,a.value_date
+                            ,greatest(a.value_date, o.start_date_) value_date
                             ,a.number_value accrual_method
                         from tOBJ o
                             ,attribute_value_by_date a    
                        where a.attribute_id = p_dod_accrual_method_id
                          and a.object_id = o.id
                          and o.object_type_id = p_dod_type_id
-                         and a.value_date <= o.end_date_
-                    )        
+                         and a.value_date between 
+                             (select nvl(max(au.value_date), o.start_date_)
+                                from attribute_value_by_date au
+                               where au.attribute_id = a.attribute_id
+                                 and au.object_id = o.id
+                                 and au.value_date <= o.start_date_)
+                             and o.end_date_
+                    )
+                 , r$val as (
+                     -- суммы для траншей
+                     select -- сумма учитывается только на следующий день, т.е день поступления денег не учитываем (???)
+                            h.value_date + 1 value_date
+                           ,sum(sum(case when o.is_capitalization = 1 and v.register_type_id = g_reg_trn_paid_int_type_id then -1 else 1 end * h.amount)) 
+                                    over (partition by v.object_id, o.end_date_ order by h.value_date) amount
+                           ,v.object_id
+                       from tObj o
+                           ,register_value v
+                           ,register_history h
+                      where o.object_type_id = p_tranche_type_id
+                        and o.id = v.object_id
+                        and (--  основная сумма
+                             v.register_type_id = p_register_type_amount_id 
+                            or (
+                              -- при p_mode in (2, 3) убираем суммы выплаченных %% по капитализации (???)
+                              v.register_type_id = g_reg_trn_paid_int_type_id
+                              and o.is_capitalization = 1
+                              and p_mode in (2, 3)
+                               ))
+                        and h.register_value_id = v.id
+                        and h.is_active = 'Y'
+                        and h.is_planned = 'N' -- берем только не плановые суммы и активные
+                     group by h.value_date
+                             ,v.object_id
+                             ,o.end_date_
+                   )           
                  , bln as(
                      -- берем суммы по траншу
                      select o.*
-                            -- сумма учитывается только на следующий день, т.е день поступления денег не учитываем (???)
-                           ,h.value_date + 1 value_date
-                           ,sum(h.amount) over (partition by o.id order by h.value_date) amount
+                           ,h.value_date value_date
+                           ,h.amount
                        from tOBJ o
-                            -- если в одну дату и транш и пополнение или 2 и более пополнений
-                            -- то при простом over() сумма будет * 2, ... (можно использовать окно, нужно ли ? )
-                            -- сначала делаем группировку затем over() 
-                           ,(select h.value_date
-                                   ,sum(h.amount) amount
-                                   ,v.object_id
-                               from register_value v
-                                   ,register_history h
-                              where v.register_type_id = p_register_type_amount_id 
-                                and h.register_value_id = v.id
-                                and h.is_active = 'Y'
-                                and h.is_planned = 'N' -- берем только не плановые суммы и активные
-                             group by h.value_date
-                                     ,v.object_id
-                             union all
-                             -- при p_mode in (2, 3) убираем суммы выплаченных %% по капитализации (???)
-                             select h.value_date
-                                   ,-1 * sum(h.amount) amount
-                                   ,v.object_id
-                               from tObj o
-                                   ,register_value v
-                                   ,register_history h
-                              where v.object_id = o.id
-                                and v.register_type_id = g_reg_trn_paid_int_type_id -- капитализация
-                                and h.register_value_id = v.id
-                                and h.is_active = 'Y'
-                                and h.is_planned = 'N' -- берем только не плановые суммы и активные 
-                                and o.is_capitalization = 1
-                                and p_mode in (2, 3)
-                             group by h.value_date
-                                     ,v.object_id
-                                     ) h
+                           ,r$val h 
                       where h.object_id = o.id
                         and o.object_type_id = p_tranche_type_id
-                        and h.value_date < o.end_date_
+                        and h.value_date between
+                            (select nvl(max(v.value_date), o.start_date_)
+                               from r$val v
+                              where v.object_id = o.id      
+                                and v.value_date  <= o.start_date_)
+                        and o.end_date_        
                      union all
                      -- суммы по ДпТ берем из saldoa ()
                      select o.*
@@ -551,7 +616,7 @@ as
                                  and b.fdat <= o.start_date_)
                         and o.end_date_
                                )
-                 , preproc_ as(               
+                 , preproc_ as(
                         select account_id, id object_id, start_date_, end_date_, currency_id, tail_amount, object_type_id, is_capitalization, customer_id 
                               ,greatest(value_date, start_date_) calc_start_date
                               ,least(lead(greatest(value_date, start_date_) - 1, 1, end_date_) 
@@ -561,7 +626,7 @@ as
                                           over (partition by id  order by greatest(value_date, start_date_) desc 
                                                 rows between current row and unbounded following) amount_deposit 
                               ,first_value(max(h.interest_rate) ignore nulls)  
-                                          over (partition by id  order by greatest(value_date, start_date_) desc 
+                                          over (partition by id  order by greatest(value_date, start_date_) desc
                                                 rows between current row and unbounded following) interest_rate
                               ,first_value(max(h.accrual_method) ignore nulls) 
                                           over (partition by id  order by greatest(value_date, start_date_) desc 
@@ -1446,6 +1511,7 @@ as
         end if;
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_accrual_interest start'
                                    ,p_log_message    => 'kf           : ' || bc.current_mfo || chr(10) ||
+                                                        'bank date    : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||                                   
                                                         'date         : ' || to_char(p_date, 'yyyy-mm-dd') || chr(10) ||
                                                         'accrual date : ' || to_char(l_accrual_date, 'yyyy-mm-dd')); 
         with dpt$ as(
@@ -1489,7 +1555,6 @@ as
               select d.id
                 from dpt$ d
                where l_is_last_day = 0
-                 and l_accrual_date = d.expiry_date
                  -- обработка для закрытия депозита
                  -- начисление выполняется на день раньше
                  and (l_accrual_date = d.expiry_date - 1
@@ -2269,7 +2334,7 @@ as
                     ) loop
              begin  
                  logger.log_info(p_procedure_name => $$plsql_unit||'.auto_account_deposit_closing'
-                                ,p_log_message    => null
+                                ,p_log_message    => 'bank date : ' || to_char(gl.bdate, 'yyyy-mm-dd')
                                 ,p_object_id      => i.object_id
                                 ,p_auxiliary_info => null);
                  savepoint account_dpt_closing;     
@@ -2338,6 +2403,12 @@ as
                               p_object_id  => p_id
                              ,p_state_code => 'CLOSED'
                                         ); 
+        select nvl(dpt.expiry_date_prolongation, d.expiry_date)
+          into l_expiry_date
+          from smb_deposit dpt
+              ,deal d
+         where dpt.id = p_id
+           and dpt.id = d.id;
         l_comment := case when l_deposit_type_code = smb_deposit_utl.TRANCHE_OBJECT_TYPE_CODE
                         then case when l_expiry_date <= p_close_date 
                               then 'Закриття траншу'
@@ -2457,6 +2528,7 @@ as
         end if;    
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_deposit_closing'
                                    ,p_log_message    => 'kf        : ' || bc.current_mfo || chr(10) ||
+                                                        'bank date : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||
                                                         'date      : ' || to_char(p_date, 'yyyy-mm-dd') || chr(10) ||
                                                         'calc date : ' || to_char(l_end_date, 'yyyy-mm-dd')); 
         -- может через bulk collect (???)
@@ -2615,8 +2687,10 @@ as
         end if;    
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_deposit_prolongation start'
                                    ,p_log_message    => 'kf        : ' || bc.current_mfo || chr(10) ||
+                                                        'bank date : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||
                                                         'date      : ' || to_char(p_date, 'yyyy-mm-dd') || chr(10) ||
-                                                        'calc date : ' || to_char(l_date, 'yyyy-mm-dd')); 
+                                                        'calc date : ' || to_char(l_date, 'yyyy-mm-dd')
+                                                        ); 
         for i in (select t.id
                         ,d.deal_number 
                         ,nvl(t.expiry_date_prolongation, d.expiry_date) expiry_date
@@ -2645,7 +2719,7 @@ as
                 -- начисление + выплата %%
                 -- начислить %
                 accrual_interest(
-                               p_deposit_list => number_list(i.id)
+                               p_deposit_list => number_list(i.id)   
                               ,p_start_date   => null
                               ,p_end_date     => i.expiry_date
                               ,p_mode         => 1
@@ -2688,6 +2762,7 @@ as
     begin
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_payment_accrued_interest start'
                                    ,p_log_message    => 'kf        : ' || bc.current_mfo || chr(10) ||
+                                                        'bank date : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||
                                                         'date      : ' || to_char(p_date, 'yyyy-mm-dd')); 
         l_end_date := trunc(case when p_date is null then gl.bdate else p_date end);
         if (l_end_date = dat_next_u( last_day(l_end_date) + 1, -1)) then
@@ -3542,8 +3617,32 @@ as
                              o.id
                             ,o.state_id    
                             ,a.kv currency_id 
-                            ,d.start_date
-                            ,nvl(t.expiry_date_prolongation, d.expiry_date) expiry_date
+                            ,case when t.is_prolongation = 1 
+                                    and nvl(t.current_prolongation_number, 0) <> 0 
+                                    and l_date > d.expiry_date then
+                                  (select nvl(max(x.start_date), d.start_date)
+                                     from process prl
+                                         ,xmltable('/SMBDepositProlongation' passing xmltype(prl.process_data) columns
+                                                                      start_date   date path 'StartDate')(+) x 
+                                    where prl.object_id = o.id
+                                      and prl.process_type_id = g_process_prolongation   
+                                      and prl.state_id = process_utl.GC_PROCESS_STATE_SUCCESS
+                                      and x.start_date <= l_date)
+                                 else d.start_date
+                             end start_date
+                            ,case when t.is_prolongation = 1 
+                                   and nvl(t.current_prolongation_number, 0) <> 0 
+                                   and l_date > d.expiry_date  then
+                                  (select nvl(min(x.expiry_date), d.expiry_date)
+                                     from process prl
+                                         ,xmltable('/SMBDepositProlongation' passing xmltype(prl.process_data) columns
+                                                                      expiry_date  date path 'ExpiryDate')(+) x 
+                                    where prl.object_id = o.id
+                                      and prl.process_type_id = g_process_prolongation   
+                                      and prl.state_id = process_utl.GC_PROCESS_STATE_SUCCESS
+                                      and x.expiry_date >= l_date)
+                                  else d.expiry_date
+                             end expiry_date
                             ,a.acc account_id
                             ,o.object_type_id
                             ,a.nls
@@ -3552,7 +3651,6 @@ as
                             ,crn.lcv
                             ,c.nmk
                             ,c.okpo
-                            ,os.state_name
                             ,d.branch_id
                             ,b.name branch_name
                             ,a.ostc
@@ -3562,7 +3660,6 @@ as
                             ,sp.s180
                             ,sp.r011
                         from object o
-                            ,object_state os
                             ,deal d
                             ,smb_deposit t
                             ,deal_account da
@@ -3574,7 +3671,6 @@ as
                        where 1 = 1
                          and o.object_type_id in (g_tranche_object_type_id, g_dod_object_type_id) 
                          and o.state_id in (g_object_active_state_id, g_object_blocked_state_id, g_object_closed_state_id)
-                         and o.state_id = os.id 
                          and o.id = d.id
                          and o.id = t.id 
                          and o.id = da.deal_id 
@@ -3583,7 +3679,8 @@ as
                          and a.kv = crn.kv
                          and d.customer_id = c.rnk
                          and d.branch_id = b.branch
-                         and a.acc = sp.acc(+))
+                         and a.acc = sp.acc(+)
+                         and l_date between d.start_date and coalesce(t.expiry_date_prolongation, d.expiry_date, l_date))
              select x.kf
                    ,x.ref
                    ,x.fdat document_date
@@ -3672,14 +3769,29 @@ as
             fetch l_cursor bulk collect into l_smb_report limit 1000;
             exit when l_smb_report.count = 0;
             for i in 1..l_smb_report.count loop
+                   /* 
+                    от Виктории Семеновой  - Mon 4/8/2019 10:55 AM 
+                    Нужно так :
+                    1)    f_srok(datb_ => start_date, date_ => end_date, type_ => 2);  
+                    если я правильно поняла, что  start_date  - дата выдачи транша, 
+                    end_date  - дата погашения транша 
+                    */
+                -- для ДпТ ставим 1    
+                l_smb_report(i).s180 := case when l_smb_report(i).expiry_date is null then '1'
+                                             else
+                                               f_srok(datb_ => l_smb_report(i).start_date
+                                                     ,date_ => l_smb_report(i).expiry_date
+                                                     ,type_ => 2)
+                                        end;             
                  -- из письма Тетяна Вірко
                  -- параметр S180 у вибірці невірно визначається по таблиці SPECPARAM, а потрібно його визначати за допомогою функції FS180
                  -- Fs180 (acc_id, null, p_date, /*дата початку дії депозиту*/, 0)
+                 /*
                  l_smb_report(i).s180 := Fs180(acc_    => l_smb_report(i).account_id
                                               ,klass_  => null
                                               ,odat_   => l_date
                                               ,bdat_   => l_smb_report(i).start_date
-                                              ,oz_kor_ => 0);
+                                              ,oz_kor_ => 0);*/
                  pipe row (l_smb_report(i));
             end loop;
         end loop;

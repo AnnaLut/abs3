@@ -148,15 +148,12 @@ begin
             when  cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Міста'' then cck_app.Get_ND_TXT(d.nd,''SQCA2'')
             when  cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Міста'' then cck_app.Get_ND_TXT(d.nd,''SQDA2'')
             end LOCALITY,
-       (select ob22.txt 
-                    from nd_acc na, accounts a, sb_ob22 ob22 
-                    where a.nbs =''2620''
+       (select a.ob22
+                    from nd_acc na, accounts a
+                    where a.nbs in (''2620'',''2625'')
                     and a.dazs is null
                     and na.nd = d.nd
                     and na.acc = a.acc
-                    and a.ob22 = ob22.ob22
-                    and ob22.r020 = ''2620''
-                    and ob22.d_close is null
                     and rownum = 1) as ob22_2620
  from cc_v d, customer c
  where
@@ -172,8 +169,7 @@ begin
         and cck_app.Get_ND_TXT(d.nd,''SQAPR'') = 1
         and (select nullif((select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQBA3'') and cck_app.Get_ND_TXT(d.nd,''SQBA3'')=1 and  cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Міста'')||chr(13)||chr(10), chr(13)||chr(10))||
              nullif((select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQCA3'')and cck_app.Get_ND_TXT(d.nd,''SQCA3'')=1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Міста'')||chr(13)||chr(10), chr(13)||chr(10))||
-            (select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQDA3'')and cck_app.Get_ND_TXT(d.nd,''SQDA3'')=1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Міста'') from dual)  is not null
-       ORDER BY locality     ';
+            (select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQDA3'')and cck_app.Get_ND_TXT(d.nd,''SQDA3'')=1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Міста'') from dual)  is not null';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -204,7 +200,7 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Фактичний реєстр клієнтів із залученням місцевих компенсаційних програм (%)(місто) за період';
+    l_rep.description :='Фактичний реєстр клієнтів із залученням компенсаційних програм';
     l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',19,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;

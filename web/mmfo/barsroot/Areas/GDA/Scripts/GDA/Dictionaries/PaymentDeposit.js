@@ -452,7 +452,7 @@ mainApp.controller("PaymentDeposit", function ($controller, $scope, $timeout, $h
                     Currency: { type: 'string' },
                     PaymentTermId: { type: 'string' },
                     PaymentTerm: { type: 'string' },
-                    InterestRate: { type: 'number' }
+                    InterestRate: { type: 'number', validation: { min: 0 } }
                 },
             }
         },

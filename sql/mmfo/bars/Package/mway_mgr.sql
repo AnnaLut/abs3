@@ -166,7 +166,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 4.83  13/09/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.84  02/04/2019';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -3542,8 +3542,11 @@ l_xml xmltype;
           if l_par = 'DEPOSIT_INTEREST_PAYMENT' then
             l_freq_k := l_val;
           end if;
-          if l_par = 'DEPOSIT_TARGET_CONTRACT_NUMBER' then
+          /*if l_par = 'DEPOSIT_TARGET_CONTRACT_NUMBER' then
             l_nls := substr(l_val,instr(l_val, '-')+1, length(l_val));
+          end if;*/
+		  if l_par = 'DEPOSIT_TARGET_CBS_NUMBER' then -- COBUMMFO-11308
+            l_nls := l_val;
           end if;
         end;
       end loop;
@@ -3671,8 +3674,11 @@ l_xml xmltype;
           if l_par = 'DEPOSIT_AUTOPROLONGATION' then
             l_autoprol := l_val;
           end if;
-          if l_par = 'DEPOSIT_TARGET_CONTRACT_NUMBER' then
+          /*if l_par = 'DEPOSIT_TARGET_CONTRACT_NUMBER' then
             l_nls := substr(l_val,instr(l_val, '-')+1, length(l_val));
+          end if;*/
+		  if l_par = 'DEPOSIT_TARGET_CBS_NUMBER' then -- COBUMMFO-11308
+            l_nls := l_val;
           end if;
         end;
       end loop;

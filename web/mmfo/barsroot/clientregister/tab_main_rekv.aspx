@@ -32,7 +32,7 @@
 
     <script type="text/javascript"src="typingCheckerCtrl.js"></script>
 
-    <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t002"></script>
+    <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t003"></script>
 
     <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv_person.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t003"></script>
 
@@ -243,7 +243,7 @@
             <td runat="server" meta:resourcekey="tdClientAdres">
                 Адрес клиента
             </td>
-            <td>
+            <td><!--ShowfullADR();ToDoOnChange();-->
                 <input class="edit long" id="ed_ADR" tabindex="20" type="text" maxlength="70" />
                 <input id="btnOpenWindowAddress" 
                         style="height: 24px;"

@@ -768,7 +768,8 @@
 
             {
                 type: 'button', icon: 'pf-icon pf-16 pf-help', attributes: { 'title': 'Редагування правил блокування документів' },
-                click: showBpRules
+                click: showBpRules,
+                id: 'btnEditRules'
             },
             {
                 type: 'button', icon: 'pf-icon pf-16 pf-clock', attributes: { 'title': 'Включити пересканування' },
@@ -2259,5 +2260,30 @@
             }
         });
     });
+
+    $(document).ready(
+        function () {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("HasEditorRights")',
+                success: function (response) {
+                    if (response.status === "ok") {
+                        //check return value
+                        //if value == 1 then role is available
+                        //enable edit business rules buton
+                        if (response.data != 1) {
+                            var toolbar = $("#SepLockDocsBar").data("kendoToolBar");
+                            toolbar.enable("#btnEditRules", false);
+                        };
+                    }
+                    else {
+                        bars.ui.error({ title: 'Помилка!', text: response.message });
+                    }
+                },
+                error: function (response) {
+                    bars.ui.error({ title: 'Помилка!', text: 'Помилка в методі HasEditorRights  ' + response });
+                }
+            });
+        });
 
 </script>

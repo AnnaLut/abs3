@@ -44,56 +44,41 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'Проблемні кредити по БПК';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1=''Дата з:'',:sFdat2=''Дата по:''';
+    l_zpr.bindvars     := ':sFdat1=''Станом на :''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5804.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'with mas_date as
- (SELECT to_date(:sFdat1, ''dd.mm.yyyy'') + level - 1 dat
-    FROM dual
-  CONNECT BY level <=
-             to_date(:sFdat2, ''dd.mm.yyyy'') - to_date(:sFdat1, ''dd.mm.yyyy'') + 1),
-res as
- (select 
+    l_zpr.txt          := '
+select   row_number() OVER (PARTITION BY acc.kf ORDER BY aw.value)  num
+         ,acc.kf,
          acc.branch,
-         acc.kf,
          c.nmk,
          acc.nls,
          aw.value,
-         w4.acc_2203,
-         w4.acc_2207,
-         w4.acc_2208,
-         w4.acc_2209,
-         w4.acc_pk
-    from w4_acc w4
-    join accountsw aw
+         (nvl(bars.fost(w4.acc_2208, to_date(:sFdat1, ''dd/mm/yyyy'')), 0) +
+         nvl(bars.fost(w4.acc_2209,  to_date(:sFdat1, ''dd/mm/yyyy'')), 0) +
+         nvl(bars.fost(w4.acc_3570,  to_date(:sFdat1, ''dd/mm/yyyy'')), 0) +
+         nvl(bars.fost(w4.acc_3579,  to_date(:sFdat1, ''dd/mm/yyyy'')), 0) +
+         nvl(bars.fost(w4.acc_2627,  to_date(:sFdat1, ''dd/mm/yyyy'')), 0) +
+         nvl(bars.fost(w4.acc_2627x, to_date(:sFdat1, ''dd/mm/yyyy'')), 0) +
+         nvl(bars.fost(w4.acc_ovr,   to_date(:sFdat1, ''dd/mm/yyyy'')), 0)   +
+         nvl(bars.fost(w4.acc_2207,  to_date(:sFdat1, ''dd/mm/yyyy'')), 0))/100  ost
+    from bars.w4_acc w4
+    join bars.accountsw aw
       on w4.acc_pk = aw.acc
      and aw.tag = ''DATEOFKK''
-     and trunc(to_date(aw.value, ''dd.mm.yyyy'')) <= trunc(to_date(:sFdat2, ''dd.mm.yyyy''))
-     and trunc(to_date(aw.value, ''dd.mm.yyyy'')) >= trunc(to_date(:sFdat1, ''dd.mm.yyyy''))
-    join accounts acc
+     and trunc(to_date(aw.value, ''dd/mm/yyyy'')) <=trunc(to_date(:sFdat1,''dd/mm/yyyy''))
+    join bars.accounts acc
       on w4.acc_pk = acc.acc
-    join customer c
+    join bars.customer c
       on acc.rnk = c.rnk
      and acc.rnk = c.rnk
-     )
-select 
-       row_number() over(order by res.acc_pk,mas_date.dat ) N
-       ,res.kf
-       ,res.branch
-       ,res.nmk
-       ,res.nls
-       ,mas_date.dat
-       ,res.value
-       ,(nvl(bars.fost(res.acc_2208, to_date(mas_date.dat , ''dd.mm.yyyy'')), 0) + nvl(bars.fost(res.acc_2209, to_date(mas_date.dat , ''dd.mm.yyyy'')), 0)
-       +nvl(bars.fost(res.acc_2203, to_date(mas_date.dat , ''dd.mm.yyyy'')), 0) +  nvl(bars.fost(res.acc_2207, to_date(mas_date.dat , ''dd.mm.yyyy'')), 0)
-       +nvl(bars.fost(res.acc_2203, to_date(mas_date.dat , ''dd.mm.yyyy'')), 0)
-       +nvl(bars.fost(res.acc_2208, to_date(mas_date.dat , ''dd.mm.yyyy'')), 0) 
-       ) / 100 Сум
-  from mas_date, res where trunc(to_date(res.value, ''dd.mm.yyyy''))<=trunc(mas_date.dat)';
+     and acc.dazs is  null
+     order by kf,aw.value,num
+';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -127,7 +112,7 @@ select
     l_rep.description :='Проблемні кредити по БПК';
     l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat1,sFdat2,"",TRUE,TRUE';
-    l_rep.ndat        :=2;
+    l_rep.ndat        :=1;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
     l_rep.idf         :=null;    

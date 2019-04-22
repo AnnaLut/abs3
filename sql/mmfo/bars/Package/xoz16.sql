@@ -1,11 +1,10 @@
-CREATE OR REPLACE PACKAGE XOZ16 IS g_header_version   CONSTANT VARCHAR2 (64) := 'version 1  04.04.2019';
+CREATE OR REPLACE PACKAGE XOZ16 IS g_header_version   CONSTANT VARCHAR2 (64) := 'version 1  16.04.2019';
 -----------------------------------------------
+procedure put ;
 procedure Get_XLS(p_MODE int, p_file_name varchar2, p_Zdate date, p_clob clob ) ;
-
 procedure CHK1   ( oo IN OUT oper%rowtype, p_sideA  varchar2, p_sideB  varchar2) ;  -- Проверка перед оплатой на счета
 procedure OPL1   ( oo IN OUT oper%rowtype) ;  -- опрлата
 procedure UPD1   ( p_ND cc_deal.ND%type, p_CC_ID cc_deal.CC_ID%type, p_SDATE date,  p_PROD cc_deal.PROD%type, p_ACC accounts.ACC%type )   ;
-
 procedure OPR    ( p_ND cc_deal.ND%type, p_Mode int , p_S number, p_Txt varchar2 ) ;
 procedure ADD1   ( p_RNK cc_Deal.RNK%type, p_CC_ID cc_deal.CC_ID%type, p_SDATE date, p_PROD cc_deal.PROD%type )  ;
 FUNCTION NLS     (ND_ int, RNK_ int, NBS_ varchar2, ob22_ varchar2)  RETURN  varchar2 ; -- Получение лиц счета
@@ -18,11 +17,18 @@ END XOZ16;
 GRANT execute on XOZ16 TO BARS_ACCESS_DEFROLE;
 
 
-CREATE OR REPLACE PACKAGE BODY XOZ16 IS   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1  04.04.2019';
+CREATE OR REPLACE PACKAGE BODY XOZ16 IS   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2  16ё.04.2019';
 -------------------------------------
   nlchr char(2) := chr(13)||chr(10) ;
   p4_ int ;
 --------------------------------------------
+procedure put  is -- установка контекстных переменных модуля
+begin
+   PUl.PUT('R020','4600') ;
+---PUL.put('WACC',' a.nbs=''4600'' '); 
+   PUL.put('WACC','a.nbs=''4600'' OR A.acc in (select n.acc from nd_acc n , cc_deal d where d.vidd=351 and d.nd= n.nd)'); 
+end put;
+
 procedure Get_XLS (p_MODE int, p_file_name varchar2, p_Zdate date, p_clob clob )  IS 
     g_numb_mask varchar2(100) := '9999999999999999999999999D99999999';
     g_nls_mask  varchar2(100) := 'NLS_NUMERIC_CHARACTERS = ''.,''';
@@ -215,6 +221,11 @@ begin
      MX.KF := sys_context('bars_context','user_mfo') ;
      MX.DAT01 := TRUNC( gl.BDATE, 'MM');
      begin select a.* into aa FROM accounts a where a.kv = gl.baseval and a.nls = MX.NLS_3519 ;
+
+           If aa.ob22 <> '26' then
+              raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка G, рах.'||MX.NLS_3519|| ' ob22='||aa.ob22 || ' HE 26 !' );
+           end if ;
+
            MX.RNKA := aa.RNK ;        
 
            begin select d.ND into mx.ND from cc_deal d, nd_acc n where n.acc = aa.acc and n.nd = d.nd and d.vidd =351 ;     
@@ -265,11 +276,19 @@ begin
 end Get_XLS ;  
 
 procedure CHK1   ( oo IN OUT oper%rowtype, p_sideA  varchar2, p_sideB  varchar2) is
-  -- Проверка перед оплатой на счета
+ -- Проверка перед оплатой на счета
+ txt_ varchar2 (20) := 'Рядок '|| oo.nd|| ':';
+ code_   NUMBER;
+ erm_    VARCHAR2(2048);
+ status_ VARCHAR2(10);
 begin
-  if oo.nlsa is null and  p_sideA is not null then raise_application_error(-20000,'Не знайдено рах.'|| p_sideA   ); End if;
-  if oo.nlsB is null and  p_sideB is not null then raise_application_error(-20000,'Не знайдено рах.'|| p_sideB   ); End if;
-  XOZ16.OPL1(oo);
+  if oo.nlsa is null and  p_sideA is not null then raise_application_error(-20000, txt_ || 'Не знайдено рах.'|| p_sideA   ); End if;
+  if oo.nlsB is null and  p_sideB is not null then raise_application_error(-20000, txt_ || 'Не знайдено рах.'|| p_sideB   ); End if;
+
+  begin   XOZ16.OPL1(oo);
+  exception when others then  deb.trap(SQLERRM, code_, erm_, status_);  IF code_ <= -20000 THEN  raise_application_error(-20000, txt_||erm_ );     END IF;
+  end ;
+
 end CHK1 ;
 
 procedure OPL1   ( oo IN OUT oper%rowtype) is  -- опрлата
@@ -306,10 +325,9 @@ begin
 
      oo.mfoa := NVL ( oo.mfoa, gl.aMfo);
      oo.mfoB := NVL ( oo.mfoB, gl.aMfo) ;
-     oo.ND   := NVL ( oo.ND, trim (Substr( '          '||to_char(oo.ref), -10 ) ) ) ;  
- 
+
      gl.ref (oo.REF);
-     oo.nd := trim (Substr( '          '||to_char(oo.ref) , -10 ) ) ;
+     If oo.nd is null then     oo.nd := trim (Substr( '          '||to_char(oo.ref) , -10 ) ) ; end if;
      gl.in_doc3 (ref_=>oo.REF  ,  tt_ =>oo.tt  , vob_=>oo.vob , nd_  =>oo.nd   ,pdat_=>SYSDATE, vdat_=>oo.vdat , dk_ =>oo.dk,
                   kv_=>oo.kv   ,  s_  =>oo.S   , kv2_=>oo.kv2 , s2_  =>oo.S2   ,sk_  => null  , data_=>gl.BDATE,datp_=>gl.bdate,
                nam_a_=>oo.nam_a, nlsa_=>oo.nlsa,mfoa_=>oo.mfoa,nam_b_=>oo.nam_b,nlsb_=>oo.nlsb, mfob_=>oo.mfob,
@@ -395,7 +413,7 @@ procedure OPR  ( p_ND cc_deal.ND%type, p_Mode int , p_S number, p_Txt varchar2 )
   AA ACCOUNTS%rowtype;
   l_Branch ACCOUNTS.BRANCH%type;
   l_Side varchar2(7);
-
+  txt_ varchar2(20);
   PROCEDURE CL_xoz (OO OPER%ROWTYPE) IS    AA ACCOUNTS%ROWTYPE;    l_SP number ;
   BEGIN
     begin select * into aa from accounts where nls = oo.NLSB and kv = oo.kv2 and tip ='XOZ';
@@ -430,22 +448,27 @@ begin
      pul.Put('X2', Null ) ;   
 
      delete from TMP_XOZ16 where isp= gl.aUid ;
-     insert into TMP_XOZ16( isp, nd, S ) 
-                select  gl.aUid, nd, decode ( p_mode, 11,S11,  12,S12,  21,S21,  22,S22,  31,S31,  32,S32,  33, S33, 0) *100  from TMP_XOZ16_XLS where kf = gl.aMFO and nd > 0 ;
+     insert into TMP_XOZ16( isp, nd, S , npp ) 
+                select  gl.aUid, nd, decode ( p_mode, 11,S11,  12,S12,  21,S21,  22,S22,  31,S31,  32,S32,  33, S33, 0) *100, npp
+                from TMP_XOZ16_XLS 
+                where kf = gl.aMFO and nd > 0 ;
      commit;
   end if;
 
   l_Branch := '/'||gl.aMfo ||'/000000/' ;
 
-  FOR x in ( select * from TMP_XOZ16 t where p_ND in ( 0, t.ND)  and t.S <> 0) 
+  FOR x in ( select * from TMP_XOZ16 t where p_ND in ( 0, t.ND)  and t.S <> 0 and isp = gl.aUid order by npp ) 
   LOOP  
+     If p_ND = 0 then txt_ := 'Рядок № '|| x.npp||':' ;  end if ;
+
      oo    := null ;
+     oo.Nd := x.npp ;
      oo.DK := 1    ;
-     oo.tt := 'PS1'; 
+     oo.tt := 'PS1' ; 
      oo.S  := x.S  ;
 
      begin select * into dd from cc_deal where nd = x.ND and vidd = 351 and sos = 10;
-     EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000,'Не знайдено nd='|| x.ND );
+     EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000, txt_||'Не знайдено nd='|| x.ND );
      end ;
 
      l_Side := Substr(dd.prod,1,4) ||'*'|| Substr(dd.prod,5,2) ;
@@ -476,7 +499,7 @@ begin
 --               Accreg.setAccountSParam(aa.ACC, 'R011', '2'  ) ;
                  update accounts set grp = 20 where acc= aa.acc ;
 
-            EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000,'Не знайдено рах.4600' );
+           EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000, txt_||'Не знайдено рах.4600' );
            end ;
 
         end if ;
@@ -608,5 +631,13 @@ end NLS;
    FUNCTION body_version   RETURN VARCHAR2 is BEGIN RETURN 'Package body XOZ16 ' || g_body_version;   END body_version;
 
 --------------
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION  : Anonymous block
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+BEGIN
+ null; ----  param;
 END XOZ16;
 /

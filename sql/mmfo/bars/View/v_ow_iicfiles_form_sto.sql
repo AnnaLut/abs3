@@ -12,11 +12,12 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_STO ***
           p.REF,
           p.dk,
           p.tt,
+/*        устаревшеий избыточный блок
           CASE
              WHEN p.tt = p.tt_asg THEN OW_FILES_PROC.get_w4_msgcode(p.nlsb, p.kv)
              ELSE NVL (m.msgcode, p.w4_msgcode)
-          END
-             w4_msgcode,
+          END*/
+          NVL (m.msgcode, p.w4_msgcode)   w4_msgcode,
           a.acc,
           bars_ow.get_nls(a.nls, a.nlsalt, a.kf) nls,
           a.kv,

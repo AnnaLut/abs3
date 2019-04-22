@@ -35,6 +35,9 @@ function openWindowAddress() {
                     .val(parent.obj_Parameters['fullADR'].type1.locality +
                     ', ' +
                     parent.obj_Parameters['fullADR'].type1.address);
+                // наступне для усунення глюку в IE
+                document.getElementById("ed_OKPO").removeAttribute("readonly").readOnly = false;
+                $('#ed_OKPO').prop("readonly", false).focus(); 
             }
         }
     });

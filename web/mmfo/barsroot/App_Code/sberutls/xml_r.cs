@@ -144,13 +144,14 @@ namespace bars.sberimport
         public override int ConvertBufferEx(String configFile,
                                    String settingsFile,
                                    String inputFileName,
-                                   String inputBuffer,
+                                   byte [] dataBuffer,
                                    out String outputBuffer,
                                    out String resMsg)
         {
             String t = String.Empty;
             String tm = String.Empty;
             String LastError = String.Empty;
+            String inputBuffer = Encoding.GetEncoding(1251).GetString(dataBuffer);
 
             TConfig C = LoadConfigFile(configFile);
             List<TSettingsItem> Settings = LoadSettingsFile(C.StructType, settingsFile);

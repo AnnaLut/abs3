@@ -24,8 +24,8 @@ PROMPT *** Create  table RANG ***
 begin 
   execute immediate '
   CREATE TABLE BARS.RANG 
-   (	RANG NUMBER(3,0), 
-	NAME VARCHAR2(35)
+   (RANG NUMBER(3,0), 
+	NAME VARCHAR2(64)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -35,7 +35,7 @@ exception when others then
 end; 
 /
 
-
+alter table rang modify name varchar2(64);
 
 
 PROMPT *** ALTER_POLICIES to RANG ***

@@ -774,4 +774,18 @@ public class SepLockDocsRepository : ISepLockDocsRepository
         }
         return false;
     }
+
+    public int HasEditorRights(decimal userId, string attrCode)
+    {
+        int result = 0;
+        const string query = @"select get_role_attr(:p_res_code,:p_user_id) from dual";
+        var parameters = new object[]
+        {
+            new OracleParameter("p_res_code", OracleDbType.Varchar2, attrCode, ParameterDirection.Input),
+            new OracleParameter("p_user_id", OracleDbType.Decimal, userId, ParameterDirection.Input),
+        };
+        result = _entities.ExecuteStoreQuery<int>(query, parameters).Single();
+
+        return result;
+    }
 }

@@ -170,10 +170,10 @@ mainApp.controller("PenaltyDeposit", function ($controller, $scope, $timeout, $h
                 $('#penaltyconditions').data('kendoGrid').dataSource.data([]);
                 $('#penaltyconditions').data('kendoGrid').refresh();
             }
-            enableDisableButtons(['#addConditionPenalty', '#penaltyoptionsEdit','#addOptionPenalty'], false);
+            enableDisableButtons(['#addConditionPenalty', '#penaltyoptionsEdit', '#addOptionPenalty'], false);
             enableDisableButtons(['#cancelConditionPenalty'], true);
 
-            
+
             var editRow = this.dataItem('tr.k-grid-edit-row');
 
             if (data == null || (data.Id != '' && data.SysTime != null && data.UserId != null)) {
@@ -340,7 +340,7 @@ mainApp.controller("PenaltyDeposit", function ($controller, $scope, $timeout, $h
     });
     $('#cancelOptionPenalty').click(function () {
         enableDisableButtons(['#cancelOptionPenalty', '#addConditionPenalty', '#saveConditionPenalty', '#cancelConditionPenalty', '#generalconditions'], true);
-        enableDisableButtons(['#addOptionPenalty', '#penaltyoptionsEdit','#exportToExcelPenalty'], false);
+        enableDisableButtons(['#addOptionPenalty', '#penaltyoptionsEdit', '#exportToExcelPenalty'], false);
         var grid = $("#penaltyoptions").data("kendoGrid");
         grid.cancelRow();
         grid.dataSource.read();
@@ -420,14 +420,14 @@ mainApp.controller("PenaltyDeposit", function ($controller, $scope, $timeout, $h
                 var gridOpt = $("#penaltyoptions").data("kendoGrid"),
                     item = gridOpt.dataItem(gridOpt.select());
                 if (item == null) {
-                    enableDisableButtons(['#penaltyoptionsEdit', '#saveOptionPenalty', '#addConditionPenalty','#penaltyconditionsEdit'], true);
+                    enableDisableButtons(['#penaltyoptionsEdit', '#saveOptionPenalty', '#addConditionPenalty', '#penaltyconditionsEdit'], true);
                     if (checkEdit('penaltyconditions', [], [], e) == true) {
                         disableTabsInEditMode('tabPenalty', true);
                     } else {
                         return;
                     }
                 } else {
-                    enableDisableButtons(['#penaltyoptionsEdit', '#saveOptionPenalty', '#addConditionPenalty', '#penaltyconditionsEdit','#addOptionPenalty'], true);
+                    enableDisableButtons(['#penaltyoptionsEdit', '#saveOptionPenalty', '#addConditionPenalty', '#penaltyconditionsEdit', '#addOptionPenalty'], true);
                     enableDisableButtons(['#cancelConditionPenalty', '#saveConditionPenalty'], false);
                 }
             }
@@ -441,7 +441,7 @@ mainApp.controller("PenaltyDeposit", function ($controller, $scope, $timeout, $h
                     CurrencyId: { type: 'string' },
                     Currency: { type: 'string' },
                     RateFrom: { type: 'number', validation: { min: 0 } },
-                    PenaltyRate: { type: 'number' }
+                    PenaltyRate: { type: 'number', validation: { min: 0 } }
                 }
             }
         },

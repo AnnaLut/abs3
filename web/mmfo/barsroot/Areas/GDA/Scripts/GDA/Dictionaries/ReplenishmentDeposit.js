@@ -129,7 +129,7 @@ mainApp.controller("ReplenishmentDeposit", function ($controller, $scope, $timeo
                     InterestOptionId: { type: 'string' },
                     CurrencyId: { type: 'string' },
                     Currency: { type: 'string' },
-                    InterestRate: { type: 'number' },
+                    InterestRate: { type: 'number', validation: { min: 0 } },
                     IsReplenishment: { type: 'number' },
                 }
             }

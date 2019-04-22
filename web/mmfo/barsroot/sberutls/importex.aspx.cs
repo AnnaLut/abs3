@@ -41,6 +41,9 @@ public partial class sberutls_importex : Bars.BarsPage
                     break;
                 case 7:
                     break;
+                case 8:
+                    xmlimp = new XmlExcelParser();
+                    break;
                 default:
                     throw new Exception("Невідомий тип імпорту");
             }
@@ -50,23 +53,30 @@ public partial class sberutls_importex : Bars.BarsPage
 
     private int getCurrType()
     {
-        if (Request["imptype"] == "lz")
-            return 1;
-        else if (Request["imptype"] == "kp")
-            return 2;
-        else if (Request["imptype"] == "zp")
-            return 3;
-        else if (Request["imptype"] == "ik")
-            return 4;
-        else if (Request["imptype"] == "bars")
-            return -1;
-        else if (Request["imptype"] == "hitz")
-            return 6;
-        else if (Request["imptype"] == "ukrrail")
-            return 7;
-        else
-            throw new Exception("Не коректнi параметри URL");
+        switch (Request["imptype"].ToString())
+        {
+            case "lz":
+                return 1;
+            case "kp":
+                return 2;
+            case "zp":
+                return 3;
+            case "ik":
+                return 4;
+            case "bars":
+                return -1;
+            case "hitz":
+                return 6;
+            case "ukrrail":
+                return 7;
+            case "cw":
+                return 8;
+            default:
+                throw new Exception("Не коректнi параметри URL");
+        }
+
     }
+
 
     private string getCurrConfig()
     {
@@ -83,7 +93,7 @@ public partial class sberutls_importex : Bars.BarsPage
         if (currType != 6)
         {
             string[] s = xmlimp.description().Split(new char[1] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-            return s[currType - 1];
+            return s.Length >= currType ? s[currType - 1] : s[0];
         }
         else
             return xmlimp.description();
@@ -97,7 +107,7 @@ public partial class sberutls_importex : Bars.BarsPage
     protected void Page_Load(object sender, EventArgs e)
     {
         createLoaderInstance();
-
+        this.xmlimp.ImpType =  Request["imptype"];
         if (getCurrType() == -1 || getCurrType() == 7)
         {
             divCaption.InnerHtml = "Iмпорт документiв - <b>BARS</b>";
@@ -133,7 +143,7 @@ public partial class sberutls_importex : Bars.BarsPage
         {
             String res = String.Empty;
 
-            String InputBuffer = Encoding.GetEncoding(1251).GetString(data);
+           
 
             String configFile = getCurrType() < 6 ?
                 String.Format("{0}\\file_a{1}.config", Server.MapPath("~/ExternalBin"), getCurrType()) :
@@ -143,7 +153,7 @@ public partial class sberutls_importex : Bars.BarsPage
                 configFile,
                 getCurrConfig(),
                 fileUpload.FileName,
-                InputBuffer, out buffer, out res);
+                data, out buffer, out res);
 
             if (r == -1)
             {
@@ -202,15 +212,14 @@ public partial class sberutls_importex : Bars.BarsPage
                     {
                         SetParameters("p_indoc", DB_TYPE.Clob, Encoding.GetEncoding(1251).GetString(data), DIRECTION.Input);
                     }
-
-                    SetParameters("p_packname", DB_TYPE.Clob, null, DIRECTION.Output);
-
+                    SetParameters("p_packname", DB_TYPE.Clob, null, DIRECTION.InputOutput);
+                    SetParameters("p_imptype", DB_TYPE.Varchar2, xmlimp.ImpType, DIRECTION.Input);
+                    SetParameters("p_config", DB_TYPE.Varchar2, xmlimp.SettingsFileName, DIRECTION.Input);
+                 
                     SQL_NONQUERY(@"
-                        begin 
-                            bars_xmlklb_imp.make_import(:p_indoc, :p_packname); 
+                         begin
+                            bars_xmlklb_imp.make_import(p_indoc => :p_indoc, p_packname=> :p_packname, p_imptype => :p_imptype, p_config => :p_config);
                         end;");
-
-
                     string clobText;
                     using (OracleClob clob = GetParameter("p_packname") as OracleClob)
                     {

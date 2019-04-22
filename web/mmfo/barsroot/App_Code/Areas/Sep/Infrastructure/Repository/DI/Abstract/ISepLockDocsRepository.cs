@@ -24,5 +24,6 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Abstract
         void UpdateDocPrty(decimal rec, decimal blk, decimal prty);
         List<SepBis> GetBIS(decimal rec);
         bool isSepAuto();
+        int HasEditorRights(decimal userId, string attrCode);
     }
 }

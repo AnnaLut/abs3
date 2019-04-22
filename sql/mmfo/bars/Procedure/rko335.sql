@@ -32,7 +32,7 @@ FOR k IN (SELECT ACC,  BRANCH,  NLS,  RNK
           FROM   ACCOUNTS
           WHERE  NLS like P_nls and KV=980 and DAZS is NULL
             and  ACC in (Select ACC from RKO_LST)
-            and branch like decode(p_branch,'Поточне',sys_context('bars_context','user_branch'), p_branch) ||p_flag
+            and branch like decode(p_branch, 'Поточне', sys_context('bars_context','user_branch'), p_branch) ||p_flag
           )
 
  LOOP
@@ -43,7 +43,7 @@ FOR k IN (SELECT ACC,  BRANCH,  NLS,  RNK
      Select KODK  Into  kkk_         
      From   RNKP_KOD 
      Where  RNK=k.RNK and rownum=1;
-   EXCEPTION  WHEN NO_DATA_FOUND THEN
+   EXCEPTION  WHEN  NO_DATA_FOUND  THEN
      kkk_:=0;
    END;  
 

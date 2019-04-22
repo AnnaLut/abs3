@@ -24,13 +24,15 @@ PROMPT *** Create  table XML_IMPFILES ***
 begin 
   execute immediate '
   CREATE TABLE BARS.XML_IMPFILES 
-   (	FN VARCHAR2(30), 
-	DAT DATE, 
-	USERID NUMBER, 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	DOCS_QTY NUMBER(5,0) DEFAULT 0, 
-	DOCS_SUM NUMBER(24,0) DEFAULT 0
+   (	FN        VARCHAR2(30), 
+	DAT       DATE, 
+	USERID    NUMBER, 
+	BRANCH    VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
+	KF        VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
+	DOCS_QTY  NUMBER(5,0) DEFAULT 0, 
+	DOCS_SUM  NUMBER(24,0) DEFAULT 0,
+        CONFIG    VARCHAR2(150),
+        IMPTYPE   VARCHAR2(100)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -167,6 +169,25 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
+
+
+begin   
+ execute immediate '  alter table xml_IMPFILES add (CONFIG  VARCHAR2(150))';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+end;
+/
+
+
+begin   
+ execute immediate '  alter table xml_IMPFILES add (imptype  VARCHAR2(100))';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+end;
+/
+
 
 
 

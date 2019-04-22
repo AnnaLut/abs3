@@ -62,104 +62,104 @@ begin
        d.dwdate as moun,
        to_number(d.sdog) as sum,
        d.pr,
-       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then  cck_app.Get_ND_TXT(d.nd,''SQBA4'')  
-             when cck_app.Get_ND_TXT(d.nd,''SQCA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' then  cck_app.Get_ND_TXT(d.nd,''SQCA4'') 
+       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then  cck_app.Get_ND_TXT(d.nd,''SQBA4'')
+             when cck_app.Get_ND_TXT(d.nd,''SQCA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' then  cck_app.Get_ND_TXT(d.nd,''SQCA4'')
              when cck_app.Get_ND_TXT(d.nd,''SQDA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'' then  cck_app.Get_ND_TXT(d.nd,''SQDA4'') end countcom,
-       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then       
-                                          ( select fost ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then
+                                          ( select fost ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SS''
-                                           and na.nd = d.nd 
-                                           and na.acc = a.acc), trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/-100 from dual) 
+                                           and na.nd = d.nd
+                                           and na.acc = a.acc), trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/-100 from dual)
              when cck_app.Get_ND_TXT(d.nd,''SQCA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' then
-                                          ( select fost ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+                                          ( select fost ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SS''
-                                           and na.nd = d.nd 
-                                           and na.acc = a.acc), trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/-100 from dual) 
+                                           and na.nd = d.nd
+                                           and na.acc = a.acc), trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/-100 from dual)
              when cck_app.Get_ND_TXT(d.nd,''SQDA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'' then
-                                          ( select fost ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+                                          ( select fost ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SS''
-                                           and na.nd = d.nd 
+                                           and na.nd = d.nd
                                            and na.acc = a.acc), trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/-100 from dual)  end sumost,
-       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then       
-                                          ( select fdos ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then
+                                          ( select fdos ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SN''
-                                           and na.nd = d.nd 
+                                           and na.nd = d.nd
                                            and na.acc = a.acc),
                                            case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
                                                then d.DSDATE
                                                else
-                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end, 
+                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end,
                                            trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual) * to_number(cck_app.Get_ND_TXT(d.nd,''SQBA4''))/to_number(d.pr)
              when cck_app.Get_ND_TXT(d.nd,''SQCA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' then
-                                          ( select fdos ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+                                          ( select fdos ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SN''
-                                           and na.nd = d.nd 
+                                           and na.nd = d.nd
                                            and na.acc = a.acc),
                                            case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
                                                then d.DSDATE
                                                else
-                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end, 
-                                           trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual) * to_number(cck_app.Get_ND_TXT(d.nd,''SQCA4''))/to_number(d.pr) 
+                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end,
+                                           trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual) * to_number(cck_app.Get_ND_TXT(d.nd,''SQCA4''))/to_number(d.pr)
              when cck_app.Get_ND_TXT(d.nd,''SQDA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'' then
-                                          ( select fdos ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+                                          ( select fdos ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SN''
-                                           and na.nd = d.nd 
+                                           and na.nd = d.nd
                                            and na.acc = a.acc),
                                            case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
                                                then d.DSDATE
                                                else
-                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end, 
+                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end,
                                            trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual) * to_number(cck_app.Get_ND_TXT(d.nd,''SQCA4''))/to_number(d.pr) end sumproc,
-       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then  (select fdos ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+       case  when cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' then  (select fdos ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SN''
-                                           and na.nd = d.nd 
+                                           and na.nd = d.nd
                                            and na.acc = a.acc),
                                            case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
                                                then d.DSDATE
                                                else
-                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end, 
-                                           trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual) 
-             when cck_app.Get_ND_TXT(d.nd,''SQCA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' then (select fdos ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
-                                            a.tip = ''SN''
-                                           and na.nd = d.nd 
-                                           and na.acc = a.acc),
-                                           case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
-                                               then d.DSDATE
-                                               else
-                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end, 
+                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end,
                                            trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual)
-             when cck_app.Get_ND_TXT(d.nd,''SQDA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'' then  (select fdos ((select na.acc 
-                                         from nd_acc na, accounts a 
-                                           where 
+             when cck_app.Get_ND_TXT(d.nd,''SQCA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' then (select fdos ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
                                             a.tip = ''SN''
-                                           and na.nd = d.nd 
+                                           and na.nd = d.nd
                                            and na.acc = a.acc),
                                            case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
                                                then d.DSDATE
                                                else
-                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end, 
+                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end,
+                                           trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual)
+             when cck_app.Get_ND_TXT(d.nd,''SQDA3'') = 1 and cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'' then  (select fdos ((select na.acc
+                                         from nd_acc na, accounts a
+                                           where
+                                            a.tip = ''SN''
+                                           and na.nd = d.nd
+                                           and na.acc = a.acc),
+                                           case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
+                                               then d.DSDATE
+                                               else
+                                           TRUNC(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''MM'') end,
                                            trunc(LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))))/100 from dual) end sumprocmou,
          case when d.DSDATE  BETWEEN trunc(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1), ''mon'') and LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))
                 then LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1)) - d.DSDATE
                 else
-                extract(DAY from LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))) end days,      
-       (select a.nls 
+                extract(DAY from LAST_DAY(add_months(to_date(:sFdat1,''dd/MM/yyyy''),-1))) end days,
+       (select a.nls
                     from nd_acc na, accounts a
                     where a.nbs in (''2620'',''2625'')
                     and a.dazs is null
@@ -178,32 +178,28 @@ begin
             when  cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' then cck_app.Get_ND_TXT(d.nd,''SQCA2'')
             when  cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'' then cck_app.Get_ND_TXT(d.nd,''SQDA2'')
             end LOCALITY,
-       (select ob22.txt 
-                    from nd_acc na, accounts a, sb_ob22 ob22 
-                    where a.nbs =''2620''
+       (select a.ob22
+                    from nd_acc na, accounts a
+                    where a.nbs in (''2620'',''2625'')
                     and a.dazs is null
                     and na.nd = d.nd
                     and na.acc = a.acc
-                    and a.ob22 = ob22.ob22
-                    and ob22.r020 = ''2620''
-                    and ob22.d_close is null
                     and rownum = 1) as ob22_2620
- from cc_v d, customer c 
- where 
+ from cc_v d, customer c
+ where
         substr(d.prod,1,6) in (''220256'',''220257'',''220258'',''220346'',''220347'',''220348'')
         and d.sos in (10,11,13,15)
         and d.rnk = c.rnk
         and (cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'' or
              cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'' or
-             cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'') 
+             cck_app.Get_ND_TXT(d.nd,''SQDA1'') = ''Району'')
         and (cck_app.Get_ND_TXT(d.nd,''SQBA3'') = 1 or
              cck_app.Get_ND_TXT(d.nd,''SQCA3'') = 1 or
              cck_app.Get_ND_TXT(d.nd,''SQDA3'') = 1 )
         and cck_app.Get_ND_TXT(d.nd,''SQAPR'') = 1
         and (select nullif((select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQBA3'') and cck_app.Get_ND_TXT(d.nd,''SQBA3'')=1 and  cck_app.Get_ND_TXT(d.nd,''SQBA1'') = ''Району'')||chr(13)||chr(10), chr(13)||chr(10))||
              nullif((select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQCA3'')and cck_app.Get_ND_TXT(d.nd,''SQCA3'')=1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'')||chr(13)||chr(10), chr(13)||chr(10))||
-            (select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQDA3'')and cck_app.Get_ND_TXT(d.nd,''SQDA3'')=1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'') from dual)  is not null    
- ORDER BY locality           
+            (select NAME from V_STTYPE where id = cck_app.Get_ND_TXT(d.nd,''SQDA3'')and cck_app.Get_ND_TXT(d.nd,''SQDA3'')=1 and cck_app.Get_ND_TXT(d.nd,''SQCA1'') = ''Району'') from dual)  is not null
              ';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
@@ -235,7 +231,7 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Фактичний реєстр клієнтів із залученням місцевих компенсаційних програм (%)(район) за період';
+    l_rep.description :='Фактичний реєстр клієнтів із залученням компенсаційних програм';
     l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;

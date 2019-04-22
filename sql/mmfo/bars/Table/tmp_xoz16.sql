@@ -3,6 +3,10 @@ exception when others then   if SQLCODE = - 00955 then null;   else raise; end i
 --ORA-00955: name is already used by an existing object
 end;
 /
+begin    execute immediate ' alter TABLE BARS.TMP_XOZ16 add (NPP int ) ' ;
+exception when others then   if SQLCODE = - 01430  then null;   else raise; end if; --ORA-01430: column being added already exists in table
+end;
+/
 
 COMMENT ON TABLE  BARS.TMP_XOZ16     IS 'тимчасова табл для збереження СУМ ДЛЯ ПРОВОДОК ПО МСФЗ-16 ';
 
@@ -25,3 +29,4 @@ begin    execute immediate '  ALTER TABLE BARS.TMP_XOZ16 ADD (  CONSTRAINT PK_tm
 exception when others then   if SQLCODE = - 02260 then null;   else raise; end if; --ORA-02260: table can have only one primary key
 end;
 /
+

@@ -452,7 +452,7 @@ mainApp.controller("ProlongationDeposit", function ($controller, $scope, $timeou
                     CurrencyId: { type: 'string' },
                     Currency: { type: 'string' },
                     AmountFrom: { type: 'number', validation: { min: 0 } },
-                    InterestRate: { type: 'number' },
+                    InterestRate: { type: 'number', validation: { min: 0 } },
                     ApplyToFirst: { type: 'string' },
                     ApplyToFirstName: { type: 'string' }
                 }

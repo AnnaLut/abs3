@@ -103,7 +103,8 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
   g_chkid2_hex  varchar2(2);
 
   -- Код операции гашения КД с карточки
-  g_tt_asg      varchar2(3);
+  --- COBUMMFO-10037  g_tt_asg      varchar2(3);
+
   -- Код бранча для Way4
   g_w4_branch   varchar2(4);
   -- Количество счетов в файле IIC
@@ -141,7 +142,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
     g_chkid_hex  := lpad(chk.to_hex(g_chkid),2,'0');
     g_chkid2_hex := lpad(chk.to_hex(g_chkid2),2,'0');
 
-    g_tt_asg := nvl(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+    ---COBUMMFO-10037 g_tt_asg := nvl(getglobaloption('ASG_FOR_BPK'), 'W4Y');
 
     select branch, nls
       bulk collect
@@ -2117,7 +2118,10 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
                 -- сторнируем документ
                 begin
                   savepoint sp_back;
-                  if l_tt = g_tt_asg then
+
+                  --- дополнительніе действия для сторно погашения кредитов (операции из w4_kd_tts)
+                  if bars_ow.get_exists_in_kd_tts (l_tt) /*l_tt = g_tt_asg*/ then
+ 
                     declare
                       l_asg_nd  number;
                       l_asg_dat date;
@@ -2160,7 +2164,9 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
                                     dbms_utility.format_error_backtrace());
                 end;
               end if;
-              if l_tt = g_tt_asg then
+
+              --- запись событий для сторно погашения кредитов (операции из w4_kd_tts)
+              if bars_ow.get_exists_in_kd_tts (l_tt) /*l_tt = g_tt_asg*/  then
                 bars_ow.set_cck_sob(l_srn, l_dk, l_acc, 2, b_kvt);
               end if;
             end if;
@@ -3482,9 +3488,9 @@ savepoint bef_pars;
 	-- Отбор доступных операций для представления V_OW_IICFILES_STO
 	function check_w4_form_sto_oper return T_ow_iicfiles_oper_lst as
 		l_oper T_ow_iicfiles_oper_lst := T_ow_iicfiles_oper_lst();
-		l_tt   oper.tt%type;
+		--l_tt   oper.tt%type;
 	begin
-		l_tt := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+		--- COBUMMFO-10037 l_tt := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
 		-- документы на пополнение/списание
 		SELECT T_ow_iicfiles_oper(ref,
 										  dk,
@@ -3510,12 +3516,14 @@ savepoint bef_pars;
 								FROM oper
 							  WHERE nlsa = o1.nlsa
 								 AND pdat >= bankdate - 30
-								 AND tt != l_tt
+								 --- исключаем tt документов погашения КД
+                                                                 AND tt not in ( select td.tt from w4_kd_tts td ) -- != l_tt
 								 and ref in (select ref from ow_pkk_que)
 								 AND sos BETWEEN 2 AND 4)
 					  AND sos > 0
 					  AND pdat >= bankdate - 30
-					  AND tt != l_tt
+					   --- исключаем tt документов погашения КД
+                                        AND tt not in ( select td.tt from w4_kd_tts td ) --!= l_tt
 					  AND EXISTS
 					(SELECT 1 FROM ow_pkk_que WHERE REF = o1.REF)
 					  and not exists (select 1
@@ -3534,9 +3542,9 @@ savepoint bef_pars;
 	-- Отбор доступных операций для представления V_OW_IICFILES
 	function check_w4_form_oper return T_ow_iicfiles_oper_lst as
 		l_oper T_ow_iicfiles_oper_lst := T_ow_iicfiles_oper_lst();
-		l_tt   oper.tt%type;
+		---l_tt   oper.tt%type;
 	begin
-		l_tt := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+		--- COBUMMFO-10037 l_tt := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
 
 		-- документы на пополнение/списание
 		SELECT T_ow_iicfiles_oper(ref,
@@ -3568,10 +3576,11 @@ savepoint bef_pars;
 								 AND dk = 1
 								 AND tt NOT IN (SELECT tt FROM w4_sto_tts)
 								 and ref in (select ref from ow_pkk_que)
-								 AND tt != l_tt
+                                                                 AND tt not in ( select td.tt from w4_kd_tts td ) ---!= l_tt  
 								 AND sos BETWEEN 2 AND 4)
 					  AND sos > 0
-					  AND tt != l_tt
+                                           --- исключаем tt документов погашения КД
+                                          AND tt not in ( select td.tt from w4_kd_tts td ) ---!= l_tt
 					  AND pdat >= bankdate - 30
 					  and ref in (select ref from ow_pkk_que)
 					  and not exists (select 1
@@ -3601,12 +3610,12 @@ savepoint bef_pars;
 	-- Подготовка данных для представления V_OW_IICFILES_FORM_STO
 	function w4_form_sto return T_ow_iicfiles_form_lst as
 		l_oper     T_ow_iicfiles_form_lst := T_ow_iicfiles_form_lst();
-		l_tt       oper.tt%type;
+		--l_tt       oper.tt%type;
 		l_bpk_chk  oper.nextvisagrp%type;
 		l_bpk_chk2 oper.nextvisagrp%type;
 		l_mfo      oper.mfob%type;
 	begin
-		l_tt       := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+		---COBUMMFO-10037 l_tt       := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
 		l_bpk_chk  := LPAD(chk.to_hex(TO_NUMBER(getglobaloption('BPK_CHK'))),
 								 2,
 								 '0');
@@ -3642,7 +3651,7 @@ savepoint bef_pars;
 							d.vdat,
 							d.nazn,
 							NVL(w.VALUE, t.w4_msgcode) w4_msgcode,
-							l_tt tt_asg,
+							null tt_asg,
 							d.kv
 					 FROM ow_pkk_que q,
 							table(OW_FILES_PROC.check_w4_form_sto_oper()) d,
@@ -3678,7 +3687,7 @@ savepoint bef_pars;
 							d.vdat,
 							d.nazn,
 							t.w4_msgcode,
-							l_tt tt_asg,
+							null tt_asg,
 							d.kv
 					 FROM ow_pkk_que q,
 							table(OW_FILES_PROC.check_w4_form_sto_oper()) d,
@@ -3715,12 +3724,12 @@ savepoint bef_pars;
 	-- Подготовка данных для представления V_OW_IICFILES_FORM
 	function w4_form return T_ow_iicfiles_form_lst as
 		l_oper     T_ow_iicfiles_form_lst := T_ow_iicfiles_form_lst();
-		l_tt       oper.tt%type;
+		--l_tt       oper.tt%type;
 		l_bpk_chk  oper.nextvisagrp%type;
 		l_bpk_chk2 oper.nextvisagrp%type;
 		l_mfo      oper.mfob%type;
 	begin
-		l_tt       := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+		---- COBUMMFO-10037l_tt       := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
 		l_bpk_chk  := LPAD(chk.to_hex(TO_NUMBER(getglobaloption('BPK_CHK'))),
 								 2,
 								 '0');
@@ -3756,7 +3765,7 @@ savepoint bef_pars;
 							d.vdat,
 							d.nazn,
 							NVL(w.VALUE, t.w4_msgcode) w4_msgcode,
-							l_tt tt_asg,
+							null tt_asg,
 							d.kv
 					 FROM ow_pkk_que q,
 							table(OW_FILES_PROC.check_w4_form_oper()) d,
@@ -3800,7 +3809,7 @@ savepoint bef_pars;
 							d.vdat,
 							d.nazn,
 							t.w4_msgcode,
-							l_tt tt_asg,
+							null tt_asg,
 							d.kv
 					 FROM ow_pkk_que q,
 							table(OW_FILES_PROC.check_w4_form_oper()) d,

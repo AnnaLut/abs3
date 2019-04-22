@@ -403,6 +403,13 @@ end;
 
     type tt_smb_data_for_print is table of t_smb_data_for_print;
 
+    type t_smb_prolongation is record(
+             deposit_id     number
+            ,start_date     date
+            ,expiry_date    date);
+
+    type tt_smb_prolongation is table of t_smb_prolongation;  
+
     function get_interest_rate(p_data in clob
                               ,p_date in date default null)
        return clob;
@@ -758,6 +765,10 @@ end;
     -- информация о текущей пролонгации
     function get_tranche_prolongation_xml(p_process_id in number)
              return clob;
+
+    -- список пролонгаций
+    function get_prolongation(p_deposit_id in number)
+             return tt_smb_prolongation pipelined;
 
 end smb_deposit_utl;
 /
@@ -2046,7 +2057,7 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 
     procedure set_interest_rate_log(p_object_id    in number
                                    ,p_process_data in clob
-                                   ,p_data         in date)
+                                   ,p_date         in date)
      is
         l_process_data       clob;
         l_process_id         number;
@@ -2057,7 +2068,7 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         -- добавим дату с которой действует
         l_process_data := update_value_in_xml(p_data         => l_process_data
                                               ,p_tag         => 'ActionDate'
-                                              ,p_value       => to_char(p_data, 'yyyy-mm-dd')
+                                              ,p_value       => to_char(p_date, 'yyyy-mm-dd')
                                               ,p_parent_node => PARENT_NODE_IR_TRANCHE);
         l_process_data := update_value_in_xml(p_data         => l_process_data
                                               ,p_tag         => 'ObjectId'
@@ -5036,7 +5047,7 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         -- даты в теле транша не меняем
         l_process_row       := process_utl.read_process(p_process_id => l_tranche_row.process_id);
         -- новая дата окончания
-        l_new_expiry_date   := l_tranche_row.expiry_date + (l_qty + 1) * (l_tranche_row.number_tranche_days + 1);
+        l_new_expiry_date   := l_tranche_row.expiry_date + (l_qty + 1) * (l_tranche_row.number_tranche_days);
         l_main_process_data := l_process_row.process_data;
         select nvl(d.expiry_date_prolongation, l_tranche_row.expiry_date)
           into l_prev_date
@@ -5044,9 +5055,9 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          where d.id = p_object_id;
 
         -- новая ставка
-        --  на дату окончания последней пролонгации + 1
+        --  на дату окончания последней пролонгации
         l_ir_process_data := get_interest_rate(p_data => l_main_process_data
-                                              ,p_date => l_prev_date + 1);
+                                              ,p_date => l_prev_date);
 
         select Interest_Rate, Interest_Rate_Prolongation
               into l_interest_rate, l_interest_rate_prolongation
@@ -5061,7 +5072,7 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                       ,p_node_list   => t_dictionary (
                                                           t_dictionary_item(
                                                               key   => 'StartDate'
-                                                             ,value => to_char(l_prev_date + 1, 'yyyy-mm-dd'))
+                                                             ,value => to_char(l_prev_date, 'yyyy-mm-dd'))
                                                           -- записываем дату окончания действия пролонгации, она же дата окончания действия транша
                                                          ,t_dictionary_item(
                                                               key   => 'ExpiryDate'
@@ -5146,12 +5157,12 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             set_interest_rate_tranche(
                                  p_object_id     => p_object_id
                                 ,p_interest_rate => nvl(l_interest_rate, 0)
-                                ,p_valid_from    => l_tranche_row.expiry_date + 1
+                                ,p_valid_from    => l_prev_date
                                 ,p_comment       => 'process prolongation : '||l_process_row.id);
             -- запишем новую % ставку
             set_interest_rate_log(p_object_id    => p_object_id
                                  ,p_process_data => l_ir_process_data
-                                 ,p_data         => gl.bdate);
+                                 ,p_date         => gl.bdate);
 
         end if;
     end;
@@ -5394,7 +5405,10 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               l_s180        varchar2(1);
               l_s181        varchar2(1);
           begin
-              l_s180 := f_srok(datb_ => p_start_date, date_ => p_end_date, type_ => 2);
+              -- для ДпТ ставим 1
+              l_s180 := case when p_end_date is null then '1'
+                            else f_srok(datb_ => p_start_date, date_ => p_end_date, type_ => 2)
+                        end;
               -- хардкод - письмо от Вікторія Семенова
               l_r011 := case when p_nbs_int is null
                           then
@@ -5412,7 +5426,9 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                when p_nbs_dpt = '2650' and p_nbs_int = '2658' then '3'
                             end
                         end;
-              l_r013 := case when p_nbs_int is null and p_nbs_dpt in ('2650', '2600') then '1' end;
+              -- письмо от Семеновой Виктории Mon 4/8/2019 5:09 PM          
+              -- подтверждаем для депозитов ММСБ на счетах 2600 и 2650 параметр R013=9  и R011=3          
+              l_r013 := case when p_nbs_int is null and p_nbs_dpt in ('2650', '2600') then '9' end;
               l_s181 := case when p_end_date - p_start_date + 1 <= 365 then '1' else '2' end;
               -- так как процедура вызывается 2-а раза для депозитного счета и счета начисленных %%,
               -- то использую nvl(p_int_account_id, p_dpt_account_id) чтобы 2-а раза не писать одно и то же (жесть)
@@ -6332,6 +6348,41 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 
         return l_data;
     end get_tranche_prolongation_xml;
+
+    -- список пролонгаций
+    function get_prolongation(p_deposit_id in number)
+             return tt_smb_prolongation pipelined
+     is
+        l_prolong_proc_type_id   number;
+        l_cursor                 sys_refcursor;
+        l_smb_prolongation       tt_smb_prolongation;
+    begin
+        l_prolong_proc_type_id := process_utl.get_proc_type_id(
+                                            p_proc_type_code => PROCESS_TRANCHE_PROLONGATION
+                                           ,p_module_code    => PROCESS_TRANCHE_MODULE);
+        open l_cursor for
+        select dpt.id
+              ,x.start_date
+              ,x.expiry_date 
+          from smb_deposit dpt
+              ,process p
+              ,xmltable ('/SMBDepositProlongation' passing xmltype(p.process_data) columns
+                     Start_Date                    date           path 'StartDate'
+                    ,Expiry_Date                   date           path 'ExpiryDate') x
+         where dpt.id = p_deposit_id
+           and dpt.is_prolongation = 1    
+           and p.object_id = dpt.id
+           and p.process_type_id = l_prolong_proc_type_id;
+        loop
+            fetch l_cursor bulk collect into l_smb_prolongation;
+            exit when l_smb_prolongation.count = 0;
+            for i in 1..l_smb_prolongation.count loop
+                 pipe row (l_smb_prolongation(i));
+            end loop;
+        end loop;
+        close l_cursor;
+        return;
+    end;
 
 end smb_deposit_utl;
 /

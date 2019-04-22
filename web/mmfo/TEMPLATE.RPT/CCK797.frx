@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="09/16/2014 10:45:29" ReportInfo.Modified="01/05/2016 17:12:06" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/16/2014 10:45:29" ReportInfo.Modified="01/23/2019 17:12:53" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,8 +32,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqs2Nt3ctySNf2eGDH7Fos4yGzaqsr3rtmexliRn5jR+Xo1sVvFSHlbeH5tBfRgo42GAtXlC1tGXTt07lcCP6RaQ==" CommandTimeout="4000">
-      <TableDataSource Name="Table1" Alias="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 RN, CHAR00 NMK, CHAR01 OKPO, CHAR02 OB22, CHAR03 NUM, NUM01 MOUN, NUM02 PR, CHAR04 COUNTCOM, NUM03 SUM, NUM04 SUMPROC, CHAR05 CUSTADRESS, CHAR06 RU, CHAR07 TYPECOM, CHAR08 ZALCOM, CHAR09 LOCALITY from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQGxKD2RoiQmJC17DR41tzGs=" CommandTimeout="4000">
+      <TableDataSource Name="Table1" Alias="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00  RN,&#13;&#10;       CHAR00 NMK,&#13;&#10;       CHAR01 OKPO,&#13;&#10;       CHAR02 OB22,&#13;&#10;       CHAR03 NUM,&#13;&#10;       NUM01  MOUN,&#13;&#10;       NUM02  PR,&#13;&#10;       CHAR04 COUNTCOM,&#13;&#10;       NUM03  SUM,&#13;&#10;       NUM04  SUMPROC,&#13;&#10;       CHAR05 CUSTADRESS,&#13;&#10;       CHAR06 RU,&#13;&#10;       CHAR07 TYPECOM,&#13;&#10;       CHAR08 ZALCOM,&#13;&#10;       CHAR09 LOCALITY,&#13;&#10;       CHAR10 OB22_2620&#13;&#10;  from rs_tmp_report_data&#13;&#10; where session_id = :SESSION_ID&#13;&#10; order by id">
         <Column Name="NMK" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
         <Column Name="LOCALITY" DataType="System.String"/>
@@ -49,6 +49,7 @@ namespace FastReport
         <Column Name="RU" DataType="System.String"/>
         <Column Name="TYPECOM" DataType="System.String"/>
         <Column Name="ZALCOM" DataType="System.String"/>
+        <Column Name="OB22_2620" DataType="System.String"/>
         <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="1"/>
       </TableDataSource>
       <TableDataSource Name="Table" Alias="t1" DataType="System.Int32" Enabled="true" SelectCommand="select substr(f_dat_lit(:sFdat1), 1, 25) from dual">
@@ -79,13 +80,14 @@ namespace FastReport
         <TableColumn Name="Column66" Width="94.5"/>
         <TableColumn Name="Column22" Width="94.5"/>
         <TableColumn Name="Column41" Width="132.3"/>
-        <TableColumn Name="Column25" Width="189"/>
-        <TableColumn Name="Column34" Width="189"/>
+        <TableColumn Name="Column25" Width="132.3"/>
+        <TableColumn Name="Column34" Width="141.75"/>
         <TableColumn Name="Column43" Width="85.05"/>
         <TableColumn Name="Column44" Width="113.4"/>
-        <TableColumn Name="Column45" Width="170.1"/>
+        <TableColumn Name="Column45" Width="132.3"/>
+        <TableColumn Name="Column67" Width="141.75"/>
         <TableRow Name="Row3" Height="113.4">
-          <TableCell Name="Cell69" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Зведений реєстр &#13;&#10;Позичальників, які отримали кредит  &#13;&#10;за Програмою часткового відшкодування відсоткових ставок за залученими кредитами, що надаються фізичним особам на заходи з підвищення енергоефективності 	&#13;&#10;за період з [t1.SUBSTR(F_DAT_LIT(:sFdat1),1,25)] по [t2.SUBSTR(F_DAT_LIT(:sFdat2),1,25)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="15">
+          <TableCell Name="Cell69" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Зведений реєстр &#13;&#10;Позичальників, які отримали кредит  &#13;&#10;за Програмою часткового відшкодування відсоткових ставок за залученими кредитами, що надаються фізичним особам на заходи з підвищення енергоефективності 	&#13;&#10;за період з [t1.SUBSTR(F_DAT_LIT(:sFdat1),1,25)] по [t2.SUBSTR(F_DAT_LIT(:sFdat2),1,25)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="16">
             <Formats>
               <GeneralFormat/>
               <GeneralFormat/>
@@ -106,6 +108,7 @@ namespace FastReport
           <TableCell Name="Cell164"/>
           <TableCell Name="Cell168"/>
           <TableCell Name="Cell172"/>
+          <TableCell Name="Cell272"/>
         </TableRow>
         <TableRow Name="Row2" Height="75.6">
           <TableCell Name="Cell57" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="3"/>
@@ -123,6 +126,7 @@ namespace FastReport
           <TableCell Name="Cell165" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Тип компенсації" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="3"/>
           <TableCell Name="Cell169" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Залученням &#13;&#10;компенсації" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="3"/>
           <TableCell Name="Cell173" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Назва  міста/області/району, яким здійснюється компенсація" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="3"/>
+          <TableCell Name="Cell273" Border.Lines="All" Text="Параметр ОБ 22 рахунку 2620/2625" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="3"/>
         </TableRow>
         <TableRow Name="Row7">
           <TableCell Name="Cell208" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
@@ -140,6 +144,7 @@ namespace FastReport
           <TableCell Name="Cell218" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           <TableCell Name="Cell219" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           <TableCell Name="Cell220" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell274" Border.Lines="All"/>
         </TableRow>
         <TableRow Name="Row5" Height="10.45">
           <TableCell Name="Cell144" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
@@ -157,6 +162,7 @@ namespace FastReport
           <TableCell Name="Cell166" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           <TableCell Name="Cell170" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           <TableCell Name="Cell174" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell275" Border.Lines="All"/>
         </TableRow>
         <TableRow Name="Row6" Height="28.35">
           <TableCell Name="Cell154" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
@@ -174,10 +180,11 @@ namespace FastReport
           <TableCell Name="Cell167" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="13" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           <TableCell Name="Cell171" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="14" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
           <TableCell Name="Cell175" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="15" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell276" Border.Lines="All" Text="16" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="Data3" Top="254.41" Width="1814.4" Height="33.06" CanGrow="true" CanShrink="true" DataSource="Table1">
+    <DataBand Name="Data3" Top="253.61" Width="1814.4" Height="33.06" CanGrow="true" CanShrink="true" DataSource="Table1">
       <TableObject Name="Table2" Width="1804.95" Height="33.06" Border.Lines="All" GrowToBottom="true">
         <TableColumn Name="Column1" Width="37.8"/>
         <TableColumn Name="Column2" Width="141.75"/>
@@ -189,11 +196,12 @@ namespace FastReport
         <TableColumn Name="Column42" Width="94.5"/>
         <TableColumn Name="Column40" Width="94.5"/>
         <TableColumn Name="Column35" Width="132.3"/>
-        <TableColumn Name="Column54" Width="189"/>
-        <TableColumn Name="Column55" Width="189"/>
+        <TableColumn Name="Column54" Width="132.3"/>
+        <TableColumn Name="Column55" Width="141.75"/>
         <TableColumn Name="Column56" Width="85.05"/>
         <TableColumn Name="Column57" Width="113.4"/>
-        <TableColumn Name="Column58" Width="170.1"/>
+        <TableColumn Name="Column58" Width="132.3"/>
+        <TableColumn Name="Column68" Width="141.75"/>
         <TableRow Name="Row4" Height="33.06" AutoSize="true">
           <TableCell Name="Cell90" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.RN]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
           <TableCell Name="Cell91" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.NMK]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
@@ -210,9 +218,10 @@ namespace FastReport
           <TableCell Name="Cell231" Border.Lines="All" Text="[Table.TYPECOM]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
           <TableCell Name="Cell232" Border.Lines="All" Text="[Table.ZALCOM]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
           <TableCell Name="Cell233" Border.Lines="All" Text="[Table.LOCALITY]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell277" Border.Lines="All" Text="[Table.OB22_2620]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataFooter1" Top="291.47" Width="1814.4" Height="37.8" CanShrink="true">
+      <DataFooterBand Name="DataFooter1" Top="289.87" Width="1814.4" Height="37.8" CanShrink="true">
         <TextObject Name="Text1" Left="633.15" Top="9.45" Width="113.4" Height="28.35" Text="Всього:" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
         <TextObject Name="Text2" Left="831.6" Top="9.45" Width="94.5" Height="18.9" Text="[Total_sum]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
         <TextObject Name="Text3" Left="963.9" Top="9.45" Width="94.5" Height="18.9" Text="[Total_X]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>

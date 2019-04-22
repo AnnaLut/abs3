@@ -3392,6 +3392,7 @@ end ;
          erm := 'Заборонено проведення операції по рахункам Мобільних заощаджень';
          RAISE err;
       END IF;
+
    ELSIF KOD_ = 9996 THEN
 	  begin
          select case ap.dk
@@ -3410,7 +3411,9 @@ end ;
          select count(*)
          into l_cnt
          from accounts t
-         where t.tip like 'W4%'
+         where ( t.tip like 'W4%'   OR
+                 t.NBS='2620' and t.OB22='36'     ---<-- COBUMMFO - 10626
+               )
               and t.nls = l_nlsb
               and t.kv = l_kv;
 
@@ -3419,10 +3422,11 @@ end ;
 			  l_cnt := 0;
       end;
       IF l_cnt > 0 THEN
-         bars_audit.info ('!f_stop#9999 Заборонено проведення операції по рахункам БПК');
-         erm := 'Заборонено проведення операції по рахункам БПК';
+         bars_audit.info ('!f_stop#9996 Заборонено проводити операції по рахункам БПК');
+         erm := '      Заборонено проводити операції по рахункам БПК';
          RAISE err;
       END IF;
+
    -- COBUMMFO - 7501 End
    ELSIF KOD_ = 9998 THEN
         begin

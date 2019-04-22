@@ -529,6 +529,11 @@ begin
 
     bars_error.add_message(l_mod, 242, l_exc, l_rus, 'Некорректный контрольный разряд для счета получателя %s', '', 1, 'NOTCORECT_CHECK_DIGIT_B');
     bars_error.add_message(l_mod, 242, l_exc, l_ukr, 'Некоректний контрольний розряд для рахунку отпримувача %s', '', 1, 'NOTCORECT_CHECK_DIGIT_B');
+
+    bars_error.add_message(l_mod, 242, l_exc, l_rus, 'В файле %s содержится платеж не с нашего МФО:  %s,  счет плательщика %s, сумма документа %s', '', 1, 'PAYEER_NOT_OUR_MFO');
+    bars_error.add_message(l_mod, 242, l_exc, l_ukr, 'У файлі %s знаходиться платіж не з нашого МФО:  %s,  рахунок платника %s, сума документу %s', '', 1, 'PAYEER_NOT_OUR_MFO');
+
+
   commit;
 end;
 /

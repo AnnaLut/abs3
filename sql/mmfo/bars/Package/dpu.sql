@@ -797,7 +797,7 @@ begin
   bars_audit.trace( '%s: entry, № %s/%s, dputype %s, customer № %s, acctype %s/%s (%s)',
                     title, to_char(p_dealid), p_dealnum, to_char(p_dputype),
                     to_char(p_custid), p_deptype, p_inttype, to_char(p_curcode));
-  bars_audit.trace( '%s: dpuline=%s, termtype=%s', title, to_char(p_dpuline), to_char(p_termtype));
+  bars_audit.trace( '%s: dpuline=%s, termtype=%s', title, to_char(p_dpuline));
 
   -- номер договора
   begin
@@ -1153,6 +1153,7 @@ begin
   p_depr013 := case
                when ( p_depnbs = '2600' ) then '1'
                when ( p_depnbs = '2650' ) then '1'
+               when ( p_depnbs = '2651' ) then '0'
                else null
                end;
 

@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/11/2013 17:00:06" ReportInfo.Modified="02/06/2019 17:17:54" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoUS6qvaX0ql313TsNWhQ15khyt+yFcannZfy/YeoAWt8w==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 RNK, CHAR00 NMK, CHAR01 OKPO, CHAR02 ST, CHAR03 DATEON, CHAR04 DATEOFF, CHAR05 KF from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="DATEON" DataType="System.String"/>
+        <Column Name="DATEOFF" DataType="System.String"/>
+        <Column Name="ST" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="103.95" CanShrink="true">
+      <TableObject Name="Table1" Top="47.25" Width="717.35" Height="56.7" Border.Lines="All">
+        <TableColumn Name="Column1" Width="64.26"/>
+        <TableColumn Name="Column2" Width="85.05"/>
+        <TableColumn Name="Column3" Width="130.41"/>
+        <TableColumn Name="Column4" Width="132.3"/>
+        <TableColumn Name="Column5" Width="85.05"/>
+        <TableColumn Name="Column16" Width="85.05"/>
+        <TableColumn Name="Column25" Width="85.05"/>
+        <TableColumn Name="Column17" Width="50.18"/>
+        <TableRow Name="Row1" Height="47.25">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="РНК" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="ПІБ" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="ідентифікаційний код " HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Тип статті  " HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="Дата встановлення ознаки" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell64" Border.Lines="All" Text="Дата зняття ознаки" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="МФО" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="9.45">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 5pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text2" Left="9.45" Top="9.45" Width="699.3" Height="37.8" CanBreak="false" Text="Звіт про відмову та/або зупинення фін. опер. клієнта&#13;&#10;" HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="107.15" Width="718.2" Height="18.9" CanGrow="true" DataSource="Table">
+      <TableObject Name="Table4" Width="717.44" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column18" Width="64.26"/>
+        <TableColumn Name="Column19" Width="85.05"/>
+        <TableColumn Name="Column20" Width="130.41"/>
+        <TableColumn Name="Column21" Width="132.3"/>
+        <TableColumn Name="Column22" Width="85.05"/>
+        <TableColumn Name="Column23" Width="85.05"/>
+        <TableColumn Name="Column26" Width="85.05"/>
+        <TableColumn Name="Column24" Width="50.27"/>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell57" Border.Lines="All" Text="[AbsRow#]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[Table.RNK]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[Table.NMK]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell60" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell61" Border.Lines="All" Text="[Table.ST]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell62" Border.Lines="All" Text="[Table.DATEON]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell66" Border.Lines="All" Text="[Table.DATEOFF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell63" Border.Lines="All" Text="[Table.KF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

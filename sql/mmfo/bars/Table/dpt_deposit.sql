@@ -421,8 +421,14 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
-
+PROMPT *** Create  index I_DPT_DEPOSIT_KF_ACCD ***
+begin   
+ execute immediate '
+create index I_DPT_DEPOSIT_KF_ACCD on dpt_deposit (kf, acc_d) local';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  grants  DPT_DEPOSIT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_DEPOSIT     to ABS_ADMIN;

@@ -26,7 +26,7 @@ BEGIN
            '[showDialogWindow=>false]'||
            '[NSIFUNCTION]'||
            '[EDIT_MODE=>MULTI_EDIT]'||
-           '[PROC=>PUl.PUT(''R020'',4600)]'||
+           '[PROC=>XOZ16.put]'||
            '[EXEC=>BEFORE]';
   ADD_fun  (lik_) ;
  --------------
