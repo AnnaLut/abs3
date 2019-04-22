@@ -86,7 +86,7 @@ begin
   If (l_rec.CHGACTION Is Not Null)
   then
 
-    l_rec.IDUPD      := bars_sqnc.get_nextval(S_CUSTOMER_ADDRESS_UPDATE.NextVal);
+    l_rec.IDUPD      := bars_sqnc.get_nextval('S_CUSTOMER_ADDRESS_UPDATE');
     l_rec.EFFECTDATE := glb_bankdate;
     l_rec.CHGDATE    := sysdate;
     l_rec.DONEBY     := gl.aUID;
@@ -100,4 +100,13 @@ begin
 
 
 end TAIUD_CUSTOMERADDRESS_UPDATE;
+
+
+
 /
+ALTER TRIGGER BARS.TAIUD_CUSTOMERADDRESS_UPDATE ENABLE;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAIUD_CUSTOMERADDRESS_UPDATE.sql ===
+PROMPT ===================================================================================== 
