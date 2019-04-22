@@ -415,18 +415,19 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
       end if;
     end if;
 
-  v_oper_st := case v_oper_type
-                 when 'IN' then 'IN'
-                 when 'OUT' then 'O0'
-                 when 'RIN' then 'RI'
-                 when 'ROUT' then'RO'
-               end;
-  update teller_opers
-    set state = nvl(v_oper_st,state)
-    where id = v_doc_ref
-      and state != nvl(v_oper_st,state)
-      and oper_ref != 'TOX';
-
+  if g_eq_type = 'A' then
+    v_oper_st := case v_oper_type
+                   when 'IN' then 'IN'
+                   when 'OUT' then 'O0'
+                   when 'RIN' then 'RI'
+                   when 'ROUT' then'RO'
+                 end;
+    update teller_opers
+      set state = nvl(v_oper_st,state)
+      where id = v_doc_ref
+        and state != nvl(v_oper_st,state)
+        and oper_ref != 'TOX';
+  end if;
   exception
     when others then
       bars_audit.info('save_cash_opers: '||dbms_utility.format_call_stack);
@@ -3071,7 +3072,6 @@ bars_audit.info(dbms_utility.format_call_stack);
                 where op.doc_ref = teller_utils.get_active_oper_ref()
              )
     loop
-logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r.active_cur);
       for rq in (select tr.oper_amount, tr.oper_amount_txt, tr.response
                      from teller_requests tr
                      where tr.oper_ref = r.id
@@ -3637,7 +3637,11 @@ logger.info('Teller: p_cur_code = '||p_cur_code);
 logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curcode = '||p_curcode);
     if p_non_atm_amount != 0 then
 
-      if p_non_atm_amount>get_user_amount() then
+      if round(p_non_atm_amount * case p_curcode  
+                                    when '980' then 1
+                                    when 'UAH' then 1
+                                    else rato(teller_utils.get_r030(p_curcode),g_bars_dt)
+                                  end,2)>get_user_amount() then
         p_errtxt := 'Внесення в темпокассу призведе до порушення ліміту теллера!';
         return 0;
       end if;

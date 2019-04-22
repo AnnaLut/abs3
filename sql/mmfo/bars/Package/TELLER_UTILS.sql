@@ -817,7 +817,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_UTILS is
     is
     v_ret integer;
   begin
-logger.info('Teller. get_tox_flag: user_id = '||g_user_id);
     if get_eq_type = 'M' then
       return 0;
     end if;
@@ -826,7 +825,10 @@ logger.info('Teller. get_tox_flag: user_id = '||g_user_id);
       from teller_users tu
       where tu.user_id = g_user_id
         and g_bars_dt between tu.valid_from and nvl(tu.valid_to,g_bars_dt);
-    return v_ret;
+    return case v_ret
+             when 0 then -1 
+             else 1
+            end;
   end get_tox_flag;
 end Teller_utils;
 /
