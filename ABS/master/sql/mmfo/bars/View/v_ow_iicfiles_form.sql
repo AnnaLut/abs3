@@ -7,12 +7,13 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_OW_IICFILES_FORM ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_OW_IICFILES_FORM ("REF", "DK", "TT", "MSGCODE", "ACC", "NLS", "KV", "OKPO", "S", "VDAT", "NAZN") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_OW_IICFILES_FORM ("REF", "DK", "TT", "W4_MSGCODE", "ACC", "NLS", "KV", "OKPO", "S", "VDAT", "NAZN") AS 
   SELECT UNIQUE
           p.REF,
           p.dk,
           p.tt,
-          CASE
+         /*     устаревший избыточный блок
+             CASE
              WHEN p.tt = p.tt_asg THEN OW_FILES_PROC.get_w4_msgcode(p.nlsb, p.kv)
              ELSE NVL ((select m.msgcode
                            from ow_iic_msgcode m
@@ -22,9 +23,19 @@ PROMPT *** Create  view V_OW_IICFILES_FORM ***
                                  (select 1
                                      from ow_iic_msgcode ooo
                                     where ooo.nlsa = p.nlsa)))
-                         ), p.w4_msgcode) 
-          END
-             w4_msgcode,
+                         ), p.w4_msgcode)
+          END*/
+
+           NVL ((select m.msgcode
+                           from ow_iic_msgcode m
+                          where p.tt = m.tt and p.mfoa = m.mfoa and
+                                (p.nlsa = m.nlsa or
+                                (p.nlsa like m.nlsa and not exists
+                                 (select 1
+                                     from ow_iic_msgcode ooo
+                                    where ooo.nlsa = p.nlsa)))
+                         ), p.w4_msgcode)   w4_msgcode,
+
           a.acc,
           bars_ow.get_nls(a.nls, a.nlsalt, a.kf) nls,
           a.kv,

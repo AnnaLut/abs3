@@ -130,7 +130,7 @@ mainApp.controller("BaseRateDeposit", function ($controller, $scope, $timeout, $
                     Currency: { type: 'string' },
                     TermFrom: { type: 'number', validation: { min: 0 } },
                     AmountFrom: { type: 'number', validation: { min: 0 } },
-                    InterestRate: { type: 'number' }
+                    InterestRate: { type: 'number', validation: { min: 0 } }
                 }
             }
         },

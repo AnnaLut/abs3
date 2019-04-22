@@ -11,7 +11,7 @@ is
   --
   -----------------------------------------------------------------
 
-   G_HEADER_VERSION  constant varchar2(64) := 'version 3.2 12.03.2016';
+   G_HEADER_VERSION  constant varchar2(64) := 'version 3.3 03.12.2018';
 
   -----------------------------------------------------------------
   --
@@ -54,25 +54,10 @@ is
    --    p_indoc     -  входящий clob документа
    --    p_packname  -  имя файла
    --
-   procedure make_import(p_indoc  clob, p_packname out varchar2);
-
-
-
-
-   -----------------------------------------------------------------
-   --    MAKE_IMPORT_CNT()
-   --
-   --    Для импорта док-тов из Centura (входящий пакет считывается пакетом  bars_lob.import_blob(l_blob))
-   --    из временной таблицы tmp_lob. Предполагается, что перед выполнением данной функи, выполнили вгрузку
-   --    входящего файла при помощи Centura функции - PutFileToTmpLob
-   --
-   --
-   --    p_packname  -  имя файла
-   --
-
-   procedure import_doc_cnt(p_packname   in out varchar2);
-
-
+  procedure make_import(p_indoc     in     clob                  ,
+                        p_packname  in out varchar2              ,
+                        p_imptype   in     varchar2  default null,
+                        p_config    in     varchar2  default null);
 
 
    -----------------------------------------------------------------
@@ -240,8 +225,14 @@ is
    --    p_indoc     -  входящий clob документа
    --    p_packname  -  имя файла
    --    p_outdoc    -  исходящий клоб с ответами
-   --
-   procedure make_import(p_indoc  clob, p_packname out varchar2, p_outdoc in out clob);
+  --    p_imptype   -  тип импорта (передается в строку вызова через GET параемтр:  /barsroot/sberutls/importex.aspx?imptype=cw,config=imp_4_2
+  --    p_config    -  конфиг файл импорта  (передается в строку вызова через GET параемтр: /barsroot/sberutls/importex.aspx?imptype=cw,config=imp_4_2
+  --
+  procedure make_import( p_indoc            clob                   ,
+                         p_packname  in out varchar2               ,
+                         p_outdoc    in out clob                   ,
+                         p_imptype   in     varchar2  default null ,
+                         p_config    in     varchar2  default null );
 
 
    -----------------------------------------------------------------
@@ -357,7 +348,7 @@ is
   ----------------------------------------------
   --  константы
   ----------------------------------------------
-  G_BODY_VERSION    constant varchar2(64) := 'version 13.6  03.12.2018';
+  G_BODY_VERSION    constant varchar2(64) := 'version 3.5  04.03.2019';
   G_MODULE          constant char(3)      := 'KLB';    -- код модуля
   G_TRACE           constant varchar2(50) := 'xmlklb_imp.';
 
@@ -1848,6 +1839,7 @@ is
       bars_audit.error(l_trace||sqlerrm);
       bars_xmlklb.get_process_error(sqlerrm, l_errcode, l_errmsg);
       -- если ошибка прикладная далее exception не выкидывается
+
       p_errcode := l_errcode;
       p_errmsg  := l_errmsg;
    end;
@@ -2072,18 +2064,18 @@ is
   ) is
     title    constant   varchar2(64)  := $$PLSQL_UNIT||'.CLEAR_IMPORT_JOURNALS';
     l_min_dt date;
-	l_date date;
+    l_date date;
   begin
     
     bars_audit.trace( '%s: Entry with ( p_date=%s ).', title, to_char(p_date,'dd/mm/yyyy') );
     
-	if p_date >= dat_next_u(gl.bd, - 5) then
-	      bars_audit.info(title||'Данные за последние 5 дней еще храним. Меняем дату '||to_char(p_date,'dd/mm/yyyy'));
-		  l_date := dat_next_u(gl.bd, - 5);
-	  else
-	      l_date := p_date;
-	  end if;
-	
+    if p_date >= dat_next_u(gl.bd, - 5) then
+          bars_audit.info(title||'Данные за последние 5 дней еще храним. Меняем дату '||to_char(p_date,'dd/mm/yyyy'));
+          l_date := dat_next_u(gl.bd, - 5);
+      else
+          l_date := p_date;
+      end if;
+    
     l_min_dt := trunc(sysdate) - 30;
     
     for c in ( select impref
@@ -2125,7 +2117,11 @@ is
          p_doc.nazn := 'Автозгенероване призначення платежу. Модуль імпорту із зовнішніх задач';
       end if;
       if p_doc.nd is null then
+        if length(p_impref) > 10 then -- Вышли за размер
+          p_doc.nd := substr( p_impref, -10);
+           else
          p_doc.nd :=  p_impref;
+      end if;
       end if;
 
       if p_doc.nam_a is null or
@@ -2183,6 +2179,92 @@ is
    end init_missing_fields;
 
    -----------------------------------------------------------------
+   --    GET_ACC_TIP
+   --    
+   --
+   function get_acc_tip (p_nls varchar2, p_kv number) return varchar2
+   is
+       l_tip accounts.tip%type;
+       l_trace        varchar2(1000)           := G_TRACE||'get_acc_tip: ';
+   begin 
+      select tip into l_tip from accounts where nls =  p_nls and kv  = p_kv;  
+      return l_tip;
+   exception when no_data_found then  
+       bars_audit.error(l_trace||'cчет '||p_nls||'('||p_kv||') в МФО '||gl.amfo ||' не найден') ;
+       return null; 
+   end; 
+
+      -----------------------------------------------------------------
+   --    GET_ACC_OB22
+   --    
+   --
+   function get_acc_ob22 (p_nls varchar2, p_kv number) return varchar2
+   is
+       l_ob22 accounts.ob22%type;
+       l_trace        varchar2(1000)           := G_TRACE||'get_acc_ob22: ';
+   begin 
+      select ob22 into l_ob22 from accounts where nls =  p_nls and kv  = p_kv;  
+      return l_ob22;
+   exception when no_data_found then  
+       bars_audit.error(l_trace||'cчет '||p_nls||'('||p_kv||') в МФО '||gl.amfo ||' не найден') ;
+       return null; 
+   end; 
+
+   -----------------------------------------------------------------
+   --    CHANGE_DOC_ATTRIBUTES
+   --    Переопределить параметры документа в зависимости от тиа импорта
+   --
+   --  
+   procedure change_doc_attributes(p_doc       in out oper%rowtype, 
+                                   p_imptype   xml_impfiles.imptype%type, 
+                                   p_config    xml_impfiles.config%type) 
+   is
+      l_trace        varchar2(1000)           := G_TRACE||'change_doc_attributes: ';
+      l_tip          accounts.tip%type;
+      l_nbs          accounts.nbs%type;
+      l_ob22         accounts.ob22%type;
+   begin 
+      -- COBUMMFO-9559
+      if p_imptype  = 'cw'  then -- импорт XLS - договырні списання,  файл настроект структуры - file_e3.config
+
+         if p_doc.mfoa <> gl.amfo then return; end if;
+
+         l_nbs := substr(p_doc.nlsa,1,4);
+
+         -- если карточный счет
+         l_tip := get_acc_tip (p_doc.nlsa, p_doc.kv );
+
+         if  l_nbs = '2625'  or  (l_nbs ='2620' and  l_tip like 'W4%')  then
+              p_doc.tt := case when p_doc.mfoa = p_doc.mfob then 'F4W' else 'G4W' end;
+         end if;
+
+         -- если текущий счет 
+         if  l_nbs = '2620' and  l_tip not like 'W4%' then 
+             if p_doc.mfoa = p_doc.mfob  then                
+                l_tip := get_acc_tip (p_doc.nlsb, p_doc.kv );
+                p_doc.tt := case when l_tip like 'W4%' then 'RKP' else '2PD' end; 
+             else
+                p_doc.tt :='3PD';  
+             end if; 
+         end if;
+         
+         p_doc.dk := 1; 
+
+         bars_audit.trace(l_trace||'измененная операция - '|| p_doc.tt );
+      elsif p_imptype  = 'kp' or p_imptype  = 'sbon' then
+        if p_doc.mfoa <> gl.amfo then return; end if;
+            l_nbs := substr(p_doc.nlsa,1,4);
+            if l_nbs = '2902' and p_doc.nlsb like '26%' and p_doc.mfoa = p_doc.mfob then
+              l_ob22 := get_acc_ob22 (p_doc.nlsb, p_doc.kv ); 
+              p_doc.tt := case 
+                             when l_ob22 = '14' and  substr(p_doc.nlsb,1,4) = '2600'  then 'OWS' 
+                             when l_ob22 = '36' and  substr(p_doc.nlsb,1,4) = '2620'  then 'OWS'
+                             else p_doc.tt end;
+            end if;
+      end if;
+
+   end;
+   -----------------------------------------------------------------
    --    INSERT_EXTERN_DOCS()
    --
    --    c проверкой на валидность
@@ -2210,6 +2292,8 @@ is
       l_impref       number                   := 0;
       l_trace        varchar2(1000)           := G_TRACE||'insert_ext_docs: ';
       l_docerr       varchar2(1000);
+      l_imptype      xml_impfiles.imptype%type;
+      l_config       xml_impfiles.config%type;
 
    begin
 
@@ -2264,6 +2348,18 @@ is
 
 
 
+       select imptype, config 
+         into l_imptype, l_config  
+         from xml_impfiles 
+        where fn = p_pack.hdr.pack_name  and dat = gl.bd; 
+
+       -- правила переопределения параметров платежа для различных типов импорта
+       change_doc_attributes(l_doc, l_imptype, l_config);
+
+       -- проверка на то, что документ будет порождаться в нашем ММФО (нельзя заимпортировтаь документ со счетом плательщика не равным текущему)
+       if l_doc.mfoa <> gl.kf then 
+          bars_error.raise_nerror(G_MODULE, 'PAYEER_NOT_OUR_MFO',  p_pack.hdr.pack_name,  l_doc.mfoa, l_doc.nlsa,  to_char(l_doc.s) );          
+       end if;
        insert into xml_impdocs(
               fn, dat, impref,
               mfoa, nlsa, id_a, nam_a,
@@ -2419,10 +2515,14 @@ is
   --    p_indoc     -  входящий clob документа
   --    p_packname  -  имя файла
   --    p_outdoc    -  исходящий клоб с ответами
+  --    p_imptype   -  тип импорта (передается в строку вызова через GET параемтр:  /barsroot/sberutls/importex.aspx?imptype=cw,config=imp_4_2
+  --    p_config    -  конфиг файл импорта  (передается в строку вызова через GET параемтр: /barsroot/sberutls/importex.aspx?imptype=cw,config=imp_4_2
   --
-  procedure MAKE_IMPORT( p_indoc          clob,
-                         p_packname   out varchar2,
-                         p_outdoc  in out clob)
+  procedure make_import( p_indoc            clob                  ,
+                         p_packname  in out varchar2              ,
+                         p_outdoc    in out clob                  ,
+                         p_imptype   in     varchar2  default null,
+                         p_config    in     varchar2  default null)
 
   is
     l_pack       bars_xmlklb.t_pack;
@@ -2453,9 +2553,9 @@ is
       
       insert
         into XML_IMPFILES
-           ( FN, DAT, USERID )
+           ( FN, DAT, USERID, imptype, config )
       values
-           ( l_file_nm , GL.BD, USER_ID );
+           ( l_file_nm , GL.BD, USER_ID, p_imptype, p_config );
       
     exception
       when DUP_VAL_ON_INDEX then
@@ -2562,8 +2662,34 @@ is
   --    p_indoc     -  входящий clob документа
   --    p_packname  -  имя файла
   --
+  procedure make_import(p_indoc     in     clob                  , 
+                        p_packname  in out varchar2            ,
+                        p_imptype   in     varchar2  default null,
+                        p_config    in     varchar2  default null)
+
+  is
+    l_clob clob;
+  begin
+      make_import(p_indoc     => p_indoc,
+                  p_packname  => p_packname,
+                  p_outdoc    => l_clob,
+                  p_imptype   => p_imptype,
+                  p_config    => p_config); 
+end make_import;
+
+  -----------------------------------------------------------------
+  --    MAKE_IMPORT()
+  --
+  --    Импорт докумнетов из внешних задач
+  --
+  --
+  --    p_indoc     -  входящий clob документа
+  --    p_packname  -  имя файла
+  --
   procedure make_import(p_indoc  clob, p_packname out varchar2
   ) is
+
+
     l_clob clob;
   begin
       make_import(p_indoc     => p_indoc,
@@ -2571,43 +2697,6 @@ is
           p_outdoc    => l_clob) ;
    end make_import;
 
-
-
-   -----------------------------------------------------------------
-   --    IMPORT_DOC_CNT()
-   --
-   --    Для импорта док-тов из Centura (входящий пакет считывается пакетом  bars_lob.import_blob(l_blob))
-   --    из временной таблицы tmp_lob. Предполагается, что перед выполнением данной функи, выполнили вгрузку
-   --    входящего файла при помощи Centura функции - PutFileToTmpLob
-   --
-   --
-   --    p_packname  -  имя файла (фиктивный параметр для совместимости с Centura)
-   --
-   procedure import_doc_cnt(p_packname  in out varchar2)
-
-   is
-      l_clob      clob;
-      l_indoc     clob;
-      l_packname  varchar2(30);
-   begin
-
-      if length(p_packname) > 30 then
-         bars_error.raise_nerror(G_MODULE, 'FILENAME_TOO_LONG', p_packname);
-      end if;
-
-      -- после вгрузки файла во временн. таблицу частями.
-      -- соберем эти части в единое целое.
-      bars_lob.import_clob(l_indoc);
-
-      if (l_indoc is null or dbms_lob.getlength(l_indoc) <=0) then
-         bars_error.raise_error(G_MODULE,66);
-      end if;
-
-      make_import(l_indoc, l_packname);
-
-      p_packname :=l_packname;
-
-   end;
 
 
   -----------------------------------------------------------------

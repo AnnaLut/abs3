@@ -287,7 +287,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                                                   from customerw
                                                  where rnk = c.rnk
                                                    and tag = 'SN_MN') as nameMiddle, --11
-                                               c.adr as address, --12
+                                               nvl(c.adr,(select locality||', '||address from customer_address where rnk = c.rnk and type_id = 1)) as address, --12
                                                nvl((select case
                                                          when regexp_like(substr(trim(regexp_replace(upper(value),
                                                                                                      '[ -]',
@@ -619,7 +619,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                                                   from customerw
                                                  where rnk = c.rnk
                                                    and tag = 'SN_MN') as nameMiddle, --11
-                                               c.adr as address, --12
+                                               nvl(c.adr,(select locality||', '||address from customer_address where rnk = c.rnk and type_id = 1)) as address, --12
                                                nvl((select case
                                                          when regexp_like(substr(trim(regexp_replace(upper(value),
                                                                                                      '[ -]',

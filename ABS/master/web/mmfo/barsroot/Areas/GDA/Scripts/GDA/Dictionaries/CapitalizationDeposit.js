@@ -453,7 +453,7 @@ mainApp.controller("CapitalizationDeposit", function ($controller, $scope, $time
                     Currency: { type: 'string' },
                     PaymentTermId: { type: 'number' },
                     PaymentTerm: { type: 'string' },
-                    InterestRate: { type: 'number' }
+                    InterestRate: { type: 'number', validation: { min: 0 } }
                 }
             }
         },

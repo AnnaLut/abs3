@@ -2561,7 +2561,17 @@ end nos_upd;
 
 -------------
 procedure nos_del (p_nd number) is
+  l_cnt integer;
 begin
+  select count(1)
+    into l_cnt
+    from table(user_utl.get_user_roles(p_user_id => user_id)), 
+         staff_role s
+    where column_value = id
+      and s.role_code in ('RHO048', 'RHO049');
+  if l_cnt = 0 then
+    raise_application_error(-20100,'Видалення заборонено для користувачів, в яких немає доступу до ролей  RHO048 та RHO049!');
+  end if;
   delete from nd_acc  where nd = p_nd and nd in (select nd from cc_deal where vidd = 150) ;
   delete from cc_deal where nd = p_nd and vidd = 150 ;
 end nos_del;

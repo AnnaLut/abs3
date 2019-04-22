@@ -167,11 +167,12 @@ namespace bars.sberimport
                 throw new Exception(LastError);
             }
         }
+        
 
         public override int ConvertBufferEx(String configFile,
                                    String settingsFile,
                                    String inputFileName,
-                                   String inputBuffer,
+                                   byte [] dataBuffer,
                                    out String outputBuffer,
                                    out String resMsg)
         {
@@ -181,6 +182,8 @@ namespace bars.sberimport
             String tm = String.Empty;
             Boolean IsServiceLinesFound = false;
             String LastError = String.Empty;
+            String inputBuffer = Encoding.GetEncoding(1251).GetString(dataBuffer);
+
 
             TConfig C = LoadConfigFile(configFile);
             List<TSettingsItem> Settings = LoadSettingsFile(C.StructType, settingsFile);

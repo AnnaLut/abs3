@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/10/2018 12:14:34" ReportInfo.Modified="08/13/2018 11:35:13" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQOHQu4yhGNZaURLmJMXbJfo=" CommandTimeout="1200">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 NUM, CHAR00 KF, CHAR01 BRANCH, CHAR02 NMK, CHAR03 NLS, CHAR04 VALUE, NUM01 OST from rs_tmp_report_data where session_id=:SESSION_ID order by id&#13;&#10;">
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="VALUE" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="NUM" DataType="System.Decimal"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text4" Left="170.1" Top="18.9" Width="387.45" Height="18.9" Text="Звіт по проблемним кредитам по БПК" Font="Arial, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="40.09" Width="718.2" Height="75.6">
+      <TextObject Name="Text10" Top="9.45" Width="47.25" Height="66.15" Border.Lines="All" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text11" Left="103.95" Top="9.45" Width="170.1" Height="66.15" Border.Lines="All" Text="№ТВБВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text12" Left="47.25" Top="9.45" Width="56.7" Height="66.15" Border.Lines="All" Text="KF" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text13" Left="274.05" Top="9.45" Width="170.1" Height="66.15" Border.Lines="All" Text="ПІБ" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text14" Left="444.15" Top="9.45" Width="94.5" Height="66.15" Border.Lines="All" Text="Рахунок 2620 (2625)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text15" Left="538.65" Top="9.45" Width="75.6" Height="66.15" Border.Lines="All" Text="Дата визнання кредиту проблемним" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text16" Left="614.25" Top="9.45" Width="103.95" Height="66.15" Border.Lines="All" Text="Загальна сума по кредиту (прост.%%+прост.кредит+осн.борг+поточн.заборг)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="117.97" Width="718.2" Height="18.9" DataSource="Table">
+      <TextObject Name="Text1" Width="47.25" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.NUM]" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text2" Left="47.25" Width="56.7" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.KF]" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text5" Left="274.05" Width="170.1" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.NMK]" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text6" Left="103.95" Width="170.1" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.BRANCH]" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text3" Left="444.15" Width="94.5" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.NLS]" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text7" Left="538.65" Width="75.6" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.VALUE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text8" Left="614.25" Width="103.95" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.OST]" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="139.16" Width="718.2" Height="18.9">
+      <TextObject Name="Text9" Left="670.95" Width="47.25" Height="18.9" CanGrow="true" GrowToBottom="true" Text="[Page]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

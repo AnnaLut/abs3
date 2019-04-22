@@ -16,7 +16,7 @@ begin
 	COL_TYPE VARCHAR2(10), 
 	COL_LENGTH NUMBER, 
 	COL_SCALE NUMBER, 
-	COL_FORMAT VARCHAR2(50), 
+	COL_FORMAT VARCHAR2(200), 
 	PK_CONSTR CHAR(1), 
 	NULLABLE CHAR(1) DEFAULT ''Y'', 
 	NULL_VALUES VARCHAR2(50), 
@@ -32,7 +32,6 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
 
 COMMENT ON TABLE BARSUPL.UPL_COLUMNS IS '';
 COMMENT ON COLUMN BARSUPL.UPL_COLUMNS.FILE_ID IS '';
@@ -52,7 +51,13 @@ COMMENT ON COLUMN BARSUPL.UPL_COLUMNS.PK_CONSTR_ID IS '';
 COMMENT ON COLUMN BARSUPL.UPL_COLUMNS.PREFUN IS '';
 
 
-
+PROMPT *** MODIFY COLUMN COL_FORMAT VARCHAR2(200) ***
+begin   
+ execute immediate 'ALTER TABLE BARSUPL.UPL_COLUMNS MODIFY (COL_FORMAT VARCHAR2(200))';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  constraint CC_UPLCOLUMNS_COLFORMAT ***
 begin   

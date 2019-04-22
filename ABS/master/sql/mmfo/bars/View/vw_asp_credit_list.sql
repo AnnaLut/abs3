@@ -1,20 +1,11 @@
-CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST
-(
-   DPLAN,
-   FDAT,
-   NPP,
-   ACC,
-   TIP,
-   KV,
-   NLS,
-   NMS,
-   OSTB,
-   OSTC,
-   ND,
-   NDG
-)
-AS
-   SELECT DPLAN,
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/view/vw_asp_credit_list.sql =========*** Run
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST ("DPLAN", "FDAT", "NPP", "ACC", "TIP", "KV", "NLS", "NMS", "OSTB", "OSTC", "ND", "NDG") AS 
+  SELECT DPLAN,
           FDAT,
           NPP,
           ACC,
@@ -44,7 +35,7 @@ AS
                  a.acc = n.acc
                   AND d.nd = n.nd
                   AND d.rnk = a.rnk
-                  AND (   a.nbs < '4' AND a.ostb < 0
+                  AND ( (a.nbs < '4' AND a.ostb < 0 and a.tip != 'W4%')
                        OR a.tip IN ('ISG', 'SDI', 'SN8'))
                   AND NOT EXISTS
                          (SELECT 1
@@ -105,9 +96,18 @@ AS
                             FROM cc_trans
                            WHERE acc = a.acc)
                   AND a.acc = ct.acc
-                  AND (a.ostc / 100 + ct.ss / 100) > 0);
+                  AND (a.ostc / 100 + ct.ss / 100) > 0)
+;
+ show err;
+ 
+PROMPT *** Create  grants  VW_ASP_CREDIT_LIST ***
+grant SELECT                                                                 on VW_ASP_CREDIT_LIST to UPLD;
+grant SELECT                                                                 on VW_ASP_CREDIT_LIST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ASP_CREDIT_LIST to BARSREADER_ROLE;
 
-
-GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST TO BARSREADER_ROLE;
-
-GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST TO BARS_ACCESS_DEFROLE;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/view/vw_asp_credit_list.sql =========*** End
+ PROMPT ===================================================================================== 
+ 

@@ -1664,7 +1664,8 @@ begin
   If l_cd_row.vidd in (11,12,13) then
 
     If CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PARTN') is null  then
-      raise_application_error(  -20203, 'НЕ заповнно параметр «Наявність партнера» (обов"язкове поле відповідно до SV-0848497)' );
+      cck_app.raise_cck_error('НЕ заповнено параметр «Наявність партнера» (обов"язкове поле відповідно до SV-0848497)');
+--      raise_application_error(  -20203, 'НЕ заповнно параметр «Наявність партнера» (обов"язкове поле відповідно до SV-0848497)' );
     end if;
 
      -- 3.1. Для кредитів ФО, забезпечити контроль обов’язковості заповнення додаткового параметру кредитного договору «Наявність партнера»
@@ -1681,7 +1682,8 @@ begin
               where to_char (id) = trim(l_PAR_N);
           exception
             when no_data_found then
-              raise_application_error(-20201,'Не знайдено партнера з ID = '||l_par_n);
+              cck_app.raise_cck_error('Не знайдено партнера з ID = '||l_par_n);
+--              raise_application_error(-20201,'Не знайдено партнера з ID = '||l_par_n);
           end;
         end if;
 
@@ -1710,7 +1712,8 @@ begin
            end;
 
           if v_err_text is not null then
-            raise_application_error(-20203,v_err_text);
+            cck_app.raise_cck_error(v_err_text);
+--            raise_application_error(-20203,v_err_text);
           end if;
 
           select count(1)
@@ -1718,7 +1721,8 @@ begin
             from customer c
               where c.okpo = ww.ptn_okpo;
           if v_num = 0 then
-            raise_application_error(  -20203, 'Клієнта з ОКПО ['||ww.ptn_okpo||']не знайдено' );
+            cck_app.raise_cck_error('Клієнта з ОКПО ['||ww.ptn_okpo||']не знайдено' );
+--            raise_application_error(  -20203, 'Клієнта з ОКПО ['||ww.ptn_okpo||']не знайдено' );
           end if;
 
         EXCEPTION WHEN NO_DATA_FOUND THEN  l_RomStal  := 0;
@@ -1751,7 +1755,8 @@ begin
     end if;
   end loop;
   if v_err_text is not null then
-    raise_application_error(-20203,'Рахунки застави мають не заповнений параметр R013! Авторизація неможлива. ('||v_err_text||')');
+    cck_app.raise_cck_error('Рахунки застави мають не заповнений параметр R013! Авторизація неможлива. ('||v_err_text||')');
+--    raise_application_error(-20203,'Рахунки застави мають не заповнений параметр R013! Авторизація неможлива. ('||v_err_text||')');
   end if;
 /*  -- Если это дог гарантий выходим (защита от дурака)
   if substr (l_cd_row.prod,1,1)='9' then    return;  end if;*/
@@ -1871,7 +1876,8 @@ COBUMMFO-7118
                  update int_accn
                    set acrb = v_acrb
                    where acc = r.acc;
-                 raise_application_error(-20210,'Не вдалось знайти рахунок доходів 6511 для процентної картки рахунка комісії!');
+                 cck_app.raise_cck_error('Не вдалось знайти рахунок доходів 6511 для процентної картки рахунка комісії!');
+--                 raise_application_error(-20210,'Не вдалось знайти рахунок доходів 6511 для процентної картки рахунка комісії!');
                end if;
 
               update int_accn i
@@ -2041,7 +2047,8 @@ COBUMMFO-7118
 
            if l_mes is not null then
             l_mes := 'Увага :'||l_mes||' заповніть у параметрах договору!';
-            raise_application_error(-20203,l_mes);
+            cck_app.raise_cck_error(l_mes);
+--            raise_application_error(-20203,l_mes);
            end if;
        end;
        -- открываем счет обеспечения

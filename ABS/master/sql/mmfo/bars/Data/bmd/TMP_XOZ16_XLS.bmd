@@ -190,6 +190,10 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 11, 'Переглянути створені документи,<br>
 та сформувати тікет', '', '', 'ONCE', '', '', '', '', 'sPar=OPER_MON[ACCESSCODE=>1][CONDITIONS=>OPER_MON.tt in (''PS1'',''IF0'')][showDialogWindow=>false][EXEC=>BEFORE]', 51, '' );
 
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 12, 'WACC:Переглянути всі рахунки угод <br>
+портфелю ХОЗ-16(оренда)', '', '', 'ONCE', '', '', '', '', '/barsroot/customerlist/custacc.aspx?type=7', 98, '' );
+
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 1, null, 'ND is null', 2, 'COLOR_Gray ');
 

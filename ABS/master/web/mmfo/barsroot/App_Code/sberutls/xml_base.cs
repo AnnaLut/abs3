@@ -57,7 +57,8 @@ namespace bars.sberimport
     {
         public const int X_ERROR = -1;
         public const int X_OK = 0;
-
+        public string SettingsFileName { get; set; }
+        public string ImpType { get; set; }
         public abstract String version();// { return String.Empty; }
         public abstract String semantic();// { return String.Empty; }
         public abstract String description();// { return String.Empty; }
@@ -102,6 +103,7 @@ namespace bars.sberimport
         public List<TSettingsItem> LoadSettingsFile(String StructType, String SettingsFile)
         {
             TSettingsItem sl;
+            this.SettingsFileName = SettingsFile;
             string fname = String.Format("{0}\\{1}.ini", HttpContext.Current.Server.MapPath("~/ExternalBin"), SettingsFile);
             if (!File.Exists(fname))
             {
@@ -307,10 +309,11 @@ namespace bars.sberimport
 
         protected abstract String getField(TConfig Config, String Line, String Name);
 
+        
         public abstract int ConvertBufferEx(String configFile,
                                 String settingsFile,
                                 String inputFileName,
-                                String inputBuffer,
+                                byte[] dataBuffer,
                                 out String outputBuffer,
                                 out String resMsg);
     }

@@ -14,7 +14,7 @@
 
 ******************************************************************************/
 
- G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 3 04/08/2014';
+ G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 10 03/01/2019';
 
  -- ===============================================================================================
  -- Public types declarations
@@ -211,6 +211,10 @@ procedure Set_ND_TXT_CHECK (p_ND number);
 
 -----------------------------------------------------------------------------------------------
 
+procedure raise_cck_error (p_errtxt in varchar2) ;
+
+
+
  -- header_version - возвращает версию заголовка пакета
 
  function header_version return varchar2;
@@ -227,11 +231,13 @@ END CCK_APP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_APP AS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 8 30/03/2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 10.4 04/02/2019';
 
 --------------------------------------------------------------
 
   g_pack_name varchar2(20) := 'CCK_APP.';
+  g_dt_format varchar2(10) := 'dd/mm/yyyy';
+  g_bd        date         := gl.bDATE;
 
 --------------------------------------------------------------
 
@@ -630,18 +636,60 @@ procedure Set_ND_TXT (p_ND number ,p_TAG varchar2 ,p_TXT varchar2)
 is
  l_col number:=-1;
  l_proc_name varchar2(40) := 'Set_nd_txt ';
- l_cc_deal cc_deal%rowtype;
- l_cprod nd_txt.txt%type;
- l_eibis fm_yesno.id%type;
- l_nd_txt nd_txt.nd%type;
- l_tag nd_txt.tag%type;
- l_liz_sum number;
+ v_code     cc_tag.code%type;
+ v_err_text varchar2(2000);
+ v_ndg      cc_deal.ndg%type;
+ v_vidd     cc_deal.vidd%type;
+ v_value    nd_txt.txt%type;
+ l_liz_sum  accounts.ostc%type;
 begin
   bars_audit.trace(g_pack_name || l_proc_name ||
                    'Start. Params: ND=%s, tag=%s, TXT=%s',
                                 to_char(p_ND), p_tag, p_txt
                   );
 
+  if  p_tag = 'NOHOP' then -- cobummfo-10192, портфель ёќ, дл€ субдоговоров параметр должен дублироватьс€ с основного договора
+    select ndg, vidd
+      into v_ndg, v_vidd
+      from cc_deal 
+      where nd = p_nd;
+    if v_vidd <5 then
+      if v_ndg is null then -- не субдоговор, нет генерального, проходим дальше
+        null;
+      elsif v_ndg = p_nd then -- это генеральный
+        merge into nd_txt n
+          using (select nd as s_nd
+                   from cc_deal 
+                   where ndg = v_ndg 
+                     and nd != p_nd) sub
+        on (n.nd = sub.s_nd and n.tag = 'NOHOP')
+        when matched then update  -- если найден параметр дл€ субдоговора, то он устанавливаетс€ из пришедшего по генеральному
+          set n.txt = p_TXT
+        when not matched then insert
+          (nd,tag,txt)
+          values (sub.s_nd, 'NOHOP',p_txt);
+      elsif v_ndg != p_nd then
+        v_value := Get_ND_TXT(v_ndg,'NOHOP');
+        merge into nd_txt n
+          using (select nd as s_nd
+                   from cc_deal 
+                   where nd = p_nd) sub
+        on (n.nd = sub.s_nd and n.tag = 'NOHOP')
+        when matched then update  -- если найден параметр дл€ субдоговора, то он устанавливаетс€ из вычитанного по генеральному
+          set n.txt = v_value
+        when not matched then insert
+          (nd,tag,txt)
+          values (sub.s_nd, 'NOHOP',v_value);
+      end if;
+      return;
+    end if;
+  end if;
+  
+  
+
+  select code into v_code
+    from cc_tag 
+    where tag = p_tag;
   if p_ND is null then
     raise_application_error(-20203,'\    CCK_APP.Set_ND_TXT :Ќе вказан реф договору! TAG='||p_TAG||' «наченн€='||p_txt,TRUE);
   end if;
@@ -862,6 +910,12 @@ end;
  end;
 
 
+procedure raise_cck_error (p_errtxt in varchar2) 
+  is
+begin
+  raise_application_error(-20001,'<br/><b>'||p_errtxt||'</b><br/>');
+end raise_cck_error;
+
 --------------------------------------------------------------
  /*
   header_version - возвращает версию заголовка пакета CCK
@@ -890,6 +944,7 @@ END CCK_APP;
  show err;
  
 PROMPT *** Create  grants  CCK_APP ***
+grant EXECUTE                                                                on CCK_APP         to APPSERVER;
 grant EXECUTE                                                                on CCK_APP         to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on CCK_APP         to RCC_DEAL;
 

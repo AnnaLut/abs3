@@ -53,7 +53,7 @@ $(document).ready(function () {
               width: 80,
               nullable: true,
               field: "RNK",
-              template: "<a href='/barsroot/clientregister/registration.aspx?readonly=1&rnk=${RNK}' onclick='window.open(this.href); return false;'>${RNK}</a>"
+              template: "<a href='/barsroot/clientregister/registration.aspx?readonly=0&rnk=${RNK}' onclick='window.open(this.href); return false;'>${RNK}</a>"
           },
           {
               title: "Найм. контрагента",

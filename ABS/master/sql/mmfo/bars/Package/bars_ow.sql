@@ -415,8 +415,27 @@ procedure confirm_acc(p_acc     in number_list,
 procedure web_out_files(p_mode in number,
                         p_filename out varchar2,
                         p_filebody out clob,
+                        p_msg out varchar2,
+                        p_dk  in number default null -- COBUMMFO-10660
+                        );
+
+-- COBUMMFO-10660 begin
+-- Процедура формирования файла списаний IIC_Documents_XXXX_D_YYYYMMDD_N.xml
+procedure web_out_files_debet(
+                                p_mode in number,
+                                p_filename out varchar2,
+                                p_filebody out clob,
                         p_msg out varchar2
                         );
+
+-- Процедура формирования файла зачислений IIC_Documents_XXXX_C_YYYYMMDD_N.xml
+procedure web_out_files_credit(
+                                 p_mode in number,
+                                 p_filename out varchar2,
+                                 p_filebody out clob,
+                        p_msg out varchar2
+                        );
+-- COBUMMFO-10660 End
 
 function check_available(p_nls in varchar2, p_kv in number, p_s in number)
   return boolean;
@@ -436,6 +455,11 @@ procedure set_cck_sob (
   p_acc           number,
   p_transfer_flag number,
   p_sucs_flag     boolean );
+
+--- код операции есть в таблице w4_kd_tts
+FUNCTION get_exists_in_kd_tts (pi_tt w4_kd_tts.tt%TYPE)
+    RETURN BOOLEAN
+    RESULT_CACHE;
 
   procedure set_account_rate (  p_acc number, p_trmask  t_trmask);
 -------------------------------------------------------------------------------
@@ -527,7 +551,7 @@ g_chkid2      number;
 g_chkid2_hex  varchar2(2);
 
 -- Код операции гашения КД с карточки
-g_tt_asg      varchar2(3);
+---COBUMMFO-10037 g_tt_asg      varchar2(3);
 
 -- Код бранча для Way4
 g_w4_branch   varchar2(4);
@@ -896,7 +920,7 @@ begin
   g_chkid_hex  := lpad(chk.to_hex(g_chkid),2,'0');
   g_chkid2_hex := lpad(chk.to_hex(g_chkid2),2,'0');
 
-  g_tt_asg := nvl(getglobaloption('ASG_FOR_BPK'), 'W4Y');
+  ---COBUMMFO-10037 g_tt_asg := nvl(getglobaloption('ASG_FOR_BPK'), 'W4Y');
 
   select branch, nls
     bulk collect
@@ -2019,6 +2043,23 @@ begin
   end if;
 
 end set_cck_sob;
+
+
+--- есть или нет код операции в w4_kd_tts
+FUNCTION get_exists_in_kd_tts (pi_tt w4_kd_tts.tt%TYPE)
+    RETURN BOOLEAN
+    RESULT_CACHE
+AS
+l_count number(1);
+BEGIN
+    SELECT COUNT (1)
+    INTO   l_count
+    FROM   w4_kd_tts kdt
+    WHERE  kdt.tt = pi_tt AND ROWNUM = 1;
+
+    RETURN l_count = 1;
+END get_exists_in_kd_tts;
+
 
 -------------------------------------------------------------------------------
 -- iparse_oic_atransfers_file
@@ -3952,7 +3993,7 @@ begin
                  -- сторнируем документ
                  begin
                     savepoint sp_back;
-                    if l_tt = g_tt_asg then
+                    if get_exists_in_kd_tts (l_tt) then
                        declare
                           l_asg_nd  number;
                           l_asg_dat date;
@@ -3988,7 +4029,7 @@ begin
                                     dbms_utility.format_error_backtrace());
                  end;
               end if;
-              if l_tt = g_tt_asg then
+              if get_exists_in_kd_tts(l_tt)  /*l_tt = g_tt_asg*/ then
                  set_cck_sob(l_srn, l_dk, l_acc, 2, b_kvt);
               end if;
            end if;
@@ -10288,7 +10329,7 @@ begin
      -- добавление доп. реквизита "Код транзакции"
      set_operw (p_ref, 'W4MSG', p_msgcode);
 
-     if p_tt = g_tt_asg then
+     if get_exists_in_kd_tts (p_tt)  /*l_tt p_tt = g_tt_asg*/ then
         set_cck_sob (p_ref, p_dk, p_acc, 1, true);
      end if;
 
@@ -10307,14 +10348,35 @@ begin
 
 end set_form_flag;
 
+-- COBUMMFO-10660 Begin
+-- Получение признака D/C ждя имени файла
+function get_dk(p_dk in number)
+return varchar2
+is
+  l_dk varchar2(1);
+begin
+   l_dk := case p_dk
+                when 0 then 'D'
+                when 1 then 'C'
+                else ''
+           end;
+   return l_dk;
+end get_dk;
+-- COBUMMFO-10660 End
+
 -------------------------------------------------------------------------------
 -- get_iicfile_num - возвращает
 --
-function get_iicfile_num return number
+function get_iicfile_num(p_dk in number default null /*COBUMMFO-10660*/) return number
 is
   l_filename ow_iicfiles.file_name%type;
   l_counter number;
+  l_dk      varchar2(1); -- COBUMMFO-10660
 begin
+
+  -- COBUMMFO-10660 Begin
+  l_dk := get_dk(p_dk);
+  -- COBUMMFO-10660 End
 
   begin
      select file_name into l_filename
@@ -10327,7 +10389,7 @@ begin
   select nvl(max(to_number(substr(replace(lower(file_name),'.xml',''),instr(lower(file_name),'_',-1)+1))),0)+1
     into l_counter
     from ow_iicfiles
-   where trunc(file_date) = trunc(sysdate);
+   where trunc(file_date) = trunc(sysdate) and file_name like '%_'||l_dk||'_%';
 
   return l_counter;
 
@@ -10336,13 +10398,20 @@ end get_iicfile_num;
 -------------------------------------------------------------------------------
 -- get_iicfile_header - возвращает заголовок файла IIC*
 --
-function get_iicfile_header ( p_filename out varchar2 ) return xmltype
+function get_iicfile_header ( p_filename out varchar2 
+                               , p_dk in number default null -- COBUMMFO-10660
+) return xmltype
 is
   l_counter number;
   l_header  xmltype;
+  l_dk      varchar2(1); -- COBUMMFO-10660
 begin
 
-  l_counter := get_iicfile_num;
+  -- COBUMMFO-10660 Begin
+  l_dk := get_dk(p_dk);
+  -- COBUMMFO-10660 End
+
+  l_counter := get_iicfile_num(p_dk /*COBUMMFO-10660*/);
 
   select
      XmlElement("FileHeader",
@@ -10358,7 +10427,8 @@ begin
      )
   into l_header from dual;
 
-  p_filename := 'IIC_Documents_' || rpad(g_w4_branch,4,'0') || '__' || to_char(sysdate,'yyyymmdd') || '_' || to_char(l_counter) || '.xml' ;
+  p_filename := 'IIC_Documents_' || rpad(g_w4_branch,4,'0') || '_'||l_dk/*COBUMMFO-10660*/||
+                 '_' || to_char(sysdate,'yyyymmdd') || '_' || to_char(l_counter) || '.xml' ;
 
   return l_header;
 
@@ -10456,7 +10526,7 @@ begin
            XmlElement("Doc",
               XmlElement("TransType",
                  XmlElement("TransCode",
-                    XmlElement("MsgCode", p_doc_tbl(i).msgcode)
+                    XmlElement("MsgCode", p_doc_tbl(i).w4_msgcode)
                  ) -- TransCode
               ), -- TransType
               XmlElement("DocRefSet",
@@ -10485,7 +10555,7 @@ begin
 
         select XmlConcat(l_data, l_xml_tmp) into l_data from dual;
 
-        set_form_flag(p_doc_tbl(i).ref, p_doc_tbl(i).dk, l_acc, p_file_name, p_doc_tbl(i).tt, p_doc_tbl(i).msgcode);
+        set_form_flag(p_doc_tbl(i).ref, p_doc_tbl(i).dk, l_acc, p_file_name, p_doc_tbl(i).tt, p_doc_tbl(i).w4_msgcode);
 
      exception when no_data_found then null;
      end get_line;
@@ -10510,7 +10580,9 @@ function get_iicfile_data (
   p_mode       in number,
   p_file_name  in varchar2,
   p_count     out number,
-  p_summ      out number ) return xmltype
+  p_summ      out number
+  , p_dk in number default null -- COBUMMFO-10660
+ ) return xmltype
 is
   l_doc_tbl t_iicdoc_tbl := t_iicdoc_tbl();
   l_count   number := 0;
@@ -10526,11 +10598,27 @@ begin
   if p_mode = 1 then
      select * bulk collect into l_doc_tbl from v_ow_iicfiles_form_kd where rownum <= g_iicnum;
   -- документы регулярных платежей по БПК
-  elsif p_mode = 2 then
-     select * bulk collect into l_doc_tbl from v_ow_iicfiles_form_sto where rownum <= g_iicnum;
+  elsif p_mode in (2, 12) then
+     -- COBUMMFO-10660 Comment select * bulk collect into l_doc_tbl select * from v_ow_iicfiles_form_sto where rownum <= g_iicnum;
+     -- COBUMMFO-10660 begin
+     select * bulk collect into l_doc_tbl
+     from (
+             select * from v_ow_iicfiles_form_sto v
+             where v.dk = p_dk or p_dk is null
+          )
+     where rownum <= g_iicnum;
+     -- COBUMMFO-10660 end
   -- все документы
   else
-     select * bulk collect into l_doc_tbl from v_ow_iicfiles_form where rownum <= g_iicnum;
+     -- COBUMMFO-10660 Comment select * bulk collect into l_doc_tbl from v_ow_iicfiles_form where rownum <= g_iicnum;
+     -- COBUMMFO-10660 begin
+     select * bulk collect into l_doc_tbl
+     from (
+             select * from v_ow_iicfiles_form v
+             where (v.dk = p_dk or (p_dk = 0 and v.dk is null)) or p_dk is null
+          )
+     where rownum <= g_iicnum;
+     -- COBUMMFO-10660 end
   end if;
 
   l_data := get_iicfile_data(l_doc_tbl, p_file_name, l_count, l_summ);
@@ -10663,7 +10751,12 @@ begin
 
 end get_oicrevfile_data;
 -------------------------------------------------------------------------------
-procedure get_iicfilebody (p_mode number, p_filename out varchar2, p_filebody out clob)
+procedure get_iicfilebody (
+                             p_mode number
+                             , p_filename out varchar2
+                             , p_filebody out clob
+                             , p_dk in number default null -- COBUMMFO-10660
+                          )
 is
   l_file_name    varchar2(100);
   l_file_header  xmltype;
@@ -10736,9 +10829,9 @@ begin
        where t.revflag in(1, 2) and (t.state = 0 or (t.state = 10 AND t.revfile_name IS NULL));
 
     end if;
-  elsif p_mode in(0, 1, 2) or p_mode is null then
+  elsif p_mode in(0, 1, 2, 10, 12 /*COBUMMFO-10660*/) or p_mode is null then
     -- FileHeader
-    l_file_header := get_iicfile_header(l_file_name);
+    l_file_header := get_iicfile_header(l_file_name, p_dk /*COBUMMFO-10660*/);
     bars_audit.info(h || 'File header formed');
 
     -- резервируем имя файла, если будет работать несколько пользователей
@@ -10747,7 +10840,7 @@ begin
     commit;
 
     -- FileData
-    l_file_data := get_iicfile_data(p_mode, l_file_name, l_count, l_summ);
+    l_file_data := get_iicfile_data(p_mode, l_file_name, l_count, l_summ, p_dk /*COBUMMFO-10660*/);
     bars_audit.info(h || 'File data formed. l_count=>' || to_char(l_count));
 
     if l_count = 0 then
@@ -18209,10 +18302,12 @@ begin
   end if;
 end;
 
-procedure web_out_files(p_mode in number,
+procedure web_out_files(
+                          p_mode in number,
                         p_filename out varchar2,
                         p_filebody out clob,
-                        p_msg out varchar2
+                          p_msg out varchar2,
+                          p_dk  in number default null -- COBUMMFO-10660
                         ) is
   l_id number := null;
   l_msg varchar2(4000);
@@ -18222,11 +18317,35 @@ begin
   bars_audit.info(h || 'Start.');
 
   execute immediate 'alter session set  NLS_NUMERIC_CHARACTERS=''.,''';
-  get_iicfilebody (p_mode, p_filename, p_filebody);
+  get_iicfilebody (p_mode, p_filename, p_filebody, p_dk /*COBUMMFO-10660*/);
 
   bars_audit.info(h || 'Finish.' || 'p_msg=>' || l_msg);
 
 end;
+
+-- COBUMMFO-10660 begin
+-- Процедура формирования файла списаний IIC_Documents_XXXX_D_YYYYMMDD_N.xml
+procedure web_out_files_debet(
+                                p_mode in number,
+                                p_filename out varchar2,
+                                p_filebody out clob,
+                                p_msg out varchar2
+                             ) is
+begin
+   web_out_files(p_mode, p_filename, p_filebody, p_msg, 0);
+end;
+
+-- Процедура формирования файла зачислений IIC_Documents_XXXX_C_YYYYMMDD_N.xml
+procedure web_out_files_credit(
+                                 p_mode in number,
+                                 p_filename out varchar2,
+                                 p_filebody out clob,
+                                 p_msg out varchar2
+                              ) is
+begin
+   web_out_files(p_mode, p_filename, p_filebody, p_msg, 1);
+end;
+-- COBUMMFO-10660 End
 
 begin
   ow_init;

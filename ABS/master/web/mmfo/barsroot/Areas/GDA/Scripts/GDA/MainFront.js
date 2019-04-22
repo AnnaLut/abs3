@@ -464,10 +464,10 @@ mainApp.controller("GDACtrlTest", function ($controller, $scope, $timeout, $http
                         $('[ng-model="replacementTranche.IndividualInterestRate"]').data('kendoNumericTextBox').value($scope.replacementTranche.IndividualInterestRate);
                     }
 
-                    if ($scope.requestObj.InterestRate == null) {
+                    if ($scope.requestObj.InterestRate == null && $scope.requestObj.IndividualInterestRate != 0) {
                         $scope.requestObj.InterestRate = $scope.requestObj.IndividualInterestRate;
                         $('[ng-model="replacementTranche.interestRate"]').data('kendoNumericTextBox').value($scope.requestObj.InterestRate);
-                    } else {
+                    } else if ($scope.requestObj.InterestRate != null && $scope.requestObj.IndividualInterestRate == 0) {
                         $scope.replacementTranche.interestRate = $scope.requestObj.InterestRate;
                         $('[ng-model="replacementTranche.interestRate"]').data('kendoNumericTextBox').value($scope.requestObj.InterestRate);
                     }
@@ -492,6 +492,9 @@ mainApp.controller("GDACtrlTest", function ($controller, $scope, $timeout, $http
                     $("#ReturnAccReplacement").data("kendoDropDownList").dataSource.read();
                     $("#DebitAccReplacement").data("kendoDropDownList").dataSource.read();
                     $("[ng-model ='replacementTranche.IsSigned']").data("kendoDropDownList").value($scope.requestObj.IsSigned);
+
+                    //
+
 
 
                 }, function (error) {
@@ -1863,25 +1866,23 @@ mainApp.controller("GDACtrlTest", function ($controller, $scope, $timeout, $http
                 $("#NumberProlongationListReplace").data("kendoDropDownList").enable(false);
                 $("[ng-model='replacementTranche.NumberProlongation']").data("kendoDropDownList").value('');
                 $("#applyprologFieldReplace").val('');
-                //выполняем перерасчёт ставки
-                $http.post(bars.config.urlContent("/api/gda/gda/countplacementTranche"), $scope.replacementTranche).success(function (request) {
-                    $scope.replacementTranche.interestRate = request.InterestRate;
-                    $('[ng-model="replacementTranche.interestRate"]').data('kendoNumericTextBox').value($scope.replacementTranche.interestRate);
-                });
-                //
             }
             if ($("[ng-model='replacementTranche.IsProlongation']").data("kendoDropDownList").value() == 1) {
                 $("#NumberProlongationListReplace").data("kendoDropDownList").dataSource.read();
                 $("#NumberProlongationListReplace").data("kendoDropDownList").refresh();
                 $("#NumberProlongationListReplace").data("kendoDropDownList").enable(true);
-                //выполняем перерасчёт ставки
-                $http.post(bars.config.urlContent("/api/gda/gda/countplacementTranche"), $scope.replacementTranche).success(function (request) {
-                    $scope.replacementTranche.interestRate = request.InterestRate;
-                    $('[ng-model="replacementTranche.interestRate"]').data('kendoNumericTextBox').value($scope.replacementTranche.interestRate);
-                });
-                //
             }
-        }
+
+                $http.post(bars.config.urlContent("/api/gda/gda/countplacementTranche"), $scope.replacementTranche).success(function (request) {
+                var showRate;
+                if (request.InterestRate == null) {
+                    showRate = $scope.replacementTranche.interestRate = request.IndividualInterestRate;
+                } else {
+                    showRate = $scope.replacementTranche.interestRate = request.InterestRate;
+                }
+                    $('[ng-model="replacementTranche.interestRate"]').data('kendoNumericTextBox').value(showRate);
+                });
+            }
     };
     //
 

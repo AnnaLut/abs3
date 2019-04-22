@@ -15,8 +15,7 @@ using System.Data;
 using Oracle.DataAccess.Client;
 using System.Web.Services;
 using Oracle.DataAccess.Types;
-using Kendo.Mvc.Extensions;
-using System.Text.RegularExpressions;
+using BarsWeb.Infrastructure.Repository.DI.Abstract;
 
 namespace BarsWeb.Areas.Sep.Controllers
 {
@@ -26,13 +25,14 @@ namespace BarsWeb.Areas.Sep.Controllers
     {
         private readonly ISepLockDocsRepository _repo;
         private IParamsRepository _kernelParams;
+        private IHomeRepository _homeRepo;
         private readonly IKendoRequestTransformer _requestTransformer;
-        public SepLockDocsController(ISepLockDocsRepository repo, IParamsRepository kernelParams, IKendoRequestTransformer requestTransformer)
+        public SepLockDocsController(ISepLockDocsRepository repo, IParamsRepository kernelParams, IHomeRepository homeRepo, IKendoRequestTransformer requestTransformer)
         {
             _requestTransformer = requestTransformer;
             _kernelParams = kernelParams;
             _repo = repo;
-            
+            _homeRepo = homeRepo;
         }
 
         public ActionResult Index()
@@ -470,6 +470,23 @@ namespace BarsWeb.Areas.Sep.Controllers
         {
             bool isSepAuto = _repo.isSepAuto();
             return Json(new { Data = isSepAuto }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult HasEditorRights()
+        {
+            var result = new JsonResponse(JsonResponseStatus.Ok);
+            try
+            {
+                var userInfo = _homeRepo.GetUserParam();
+                int hasRights = _repo.HasEditorRights(userInfo.USER_ID.Value, "SEP_BP_RRP");
+                result.data = hasRights;
+            }
+            catch (Exception ex)
+            {
+                result.status = JsonResponseStatus.Error;
+                result.message = "Помилка в методі HasEditorRights: " + ex.Message;
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }

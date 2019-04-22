@@ -1,35 +1,35 @@
 var mainApp = angular.module(globalSettings.modulesAreas);
 
 mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeout, $http,
-                                        saveDataService, settingsService, modelService, validationService) {
+    saveDataService, settingsService, modelService, validationService) {
     $controller('GdaBaseController', { $scope: $scope });     // Расширяем контроллер
 
     $scope.placementTranche = modelService.initFormData("placementTranche");
 
-	var activeOptions = [{ value: 1, text: "Активна" }, { value: 0, text: "Не активна" }];
+    var activeOptions = [{ value: 1, text: "Активна" }, { value: 0, text: "Не активна" }];
 
-	var saveAction = {
-		type: "POST",
+    var saveAction = {
+        type: "POST",
         url: bars.config.urlContent("/api/gda/gda/setdepositdemandcalctype"),
-		data: function (data) {
+        data: function (data) {
             data.ValidFrom = kendo.toString(data.ValidFrom, "yyyy-MM-dd");
 
-			return data;
-		}	
-	};
+            return data;
+        }
+    };
 
 
-	var saveCondition = {
-		type: "POST",
+    var saveCondition = {
+        type: "POST",
         url: bars.config.urlContent("/api/gda/gda/setdepositdemandcalctypecondition"),
-		data: function (data) {
+        data: function (data) {
             var grid = $("#depositondemandcalcoptions").data().kendoGrid;
-			var selectedRow = grid.select();
-			var selectedDataItem = grid.dataItem(selectedRow);
-			data.InterestOptionId = selectedDataItem.Id;
-			return data;
-		}
-	};
+            var selectedRow = grid.select();
+            var selectedDataItem = grid.dataItem(selectedRow);
+            data.InterestOptionId = selectedDataItem.Id;
+            return data;
+        }
+    };
 
     var DepositOnDemandCalcDataSource = $scope.createDataSource({
         type: "webapi",
@@ -37,9 +37,9 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
         transport: {
             read: {
                 url: bars.config.urlContent("/api/gda/gda/getdepositdemandtypeinfo"),
-			},
-			create: saveAction,
-			update: saveAction
+            },
+            create: saveAction,
+            update: saveAction
         },
         requestStart: function (e) {
             bars.ui.loader("body", false);
@@ -58,15 +58,15 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
             total: "Total",
             model: {
                 id: "Id",
-				fields: {
-					Conditions: [],
-					Id: { type: 'string' },
+                fields: {
+                    Conditions: [],
+                    Id: { type: 'string' },
                     ValidFrom: { type: 'date' },
-					IsActive: { type: 'number', validation: { required: true, min: 0, max: 1 } },
-					UserId: { type: 'string' },
+                    IsActive: { type: 'number', validation: { required: true, min: 0, max: 1 } },
+                    UserId: { type: 'string' },
                     SysTime: { type: 'string' },
                     CalculationTypeId: { type: 'string' },
-                    CalculationTypeName: {type: 'string'}
+                    CalculationTypeName: { type: 'string' }
                 }
             }
 
@@ -105,12 +105,23 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
             for (var i = 0; i < sheet.columns.length; i++) {
                 sheet.columns[i].width = 150;
             }
-                e.workbook.fileName = "Метод нарахування %%.xlsx";
+            for (var j = 0; j < sheet.rows.length; j++) {
+                if (sheet.rows[j].cells[1].value == 0) {
+                    sheet.rows[j].cells[1].value = 'Довільний метод нарахування'
+                } else if (sheet.rows[j].cells[1].value == 1) {
+                    sheet.rows[j].cells[1].value = 'Залишок на кінець дня'
+                } else if (sheet.rows[j].cells[1].value == 2) {
+                    sheet.rows[j].cells[1].value = 'Середньоденні залишки'
+                } else if (sheet.rows[j].cells[1].value != "Метод нарахування") { //пропускаем первый row
+                    sheet.rows[j].cells[1].value = 'Дані відсутні(можливо неправильно обрали метод)'
+                }
+            }
+            e.workbook.fileName = "Метод нарахування %%.xlsx";
         },
-		columns: [
-			{
-				field: "ValidFrom",
-				title: "Дата початку",
+        columns: [
+            {
+                field: "ValidFrom",
+                title: "Дата початку",
                 format: "{0:dd-MM-yyyy}",
                 width: 150
             },
@@ -179,19 +190,19 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
                     });
                 }
             }
-            
-		],
+
+        ],
         change: function (e) {
             var data = this.dataItem(this.select());
 
-           
 
-			if (data && data.Conditions != null) {
-				var dataArray = $.map(data.Conditions, function (value, index) {
-					return [value];
-				});
+
+            if (data && data.Conditions != null) {
+                var dataArray = $.map(data.Conditions, function (value, index) {
+                    return [value];
+                });
                 //$('#depositondemandcalcconditions').data('kendoGrid').dataSource.data(dataArray);
-			} else {
+            } else {
                 //$('#depositondemandcalcconditions').data('kendoGrid').dataSource.data([]);
                 //$('#depositondemandcalcconditions').data('kendoGrid').refresh();
             }
@@ -221,11 +232,11 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
                 } else {
                     return;
                 }
-            } 
-		}
+            }
+        }
     });
 
-	function Cancel() {
+    function Cancel() {
         var grid = $("#depositondemandcalcoptions").data("kendoGrid");
 
         var data = grid.dataItem(grid.select());
@@ -243,16 +254,16 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
     });
 
     $('#addOptionDepositOnDemandCalc').click(function () {
-        enableDisableButtons(['#cancelOptionDepositOnDemandCalc','#saveOptionDepositOnDemandCalc'], false);
-        enableDisableButtons(['#optionsdepositondemandcalcEdit', '#addConditionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#exportToExcelDepositOnDemandCalc','#addOptionDepositOnDemandCalc'], true);
+        enableDisableButtons(['#cancelOptionDepositOnDemandCalc', '#saveOptionDepositOnDemandCalc'], false);
+        enableDisableButtons(['#optionsdepositondemandcalcEdit', '#addConditionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#exportToExcelDepositOnDemandCalc', '#addOptionDepositOnDemandCalc'], true);
         var grid = $("#depositondemandcalcoptions").data("kendoGrid");
         grid.addRow();
         disableTabsInEditMode('tabDemandCalc', true);
     });
 
     $('#depositondemandcalcoptionsEdit,#depositondemandcalcconditionsEdit').click(function (event) {
-		var id = event.currentTarget.id.slice(0, -4);
-		var grid = $("#" + id).data("kendoGrid");
+        var id = event.currentTarget.id.slice(0, -4);
+        var grid = $("#" + id).data("kendoGrid");
         var selected = grid.select();
         var isDepositOptions = id === 'depositondemandcalcoptions';
         if (selected.length == 0) {
@@ -260,12 +271,12 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
             var toEnableIds = isDepositOptions ? ['#addOptionDepositOnDemandCalc'] : ['#addConditionDepositOnDemandCalc'];
             enableDisableButtons(toDisableIds, true);
             enableDisableButtons(toEnableIds, false);
-			return;
+            return;
         } else {
             var classList = selected[0].classList ? selected[0].classList : selected[0].className.split(' ');
             var inEdit = classList[classList.length - 1] === 'k-grid-edit-row';
-            var toDisableIds = isDepositOptions ? ['#cancelOptionDepositOnDemandCalc','#saveOptionDepositOnDemandCalc'] : ['#addConditionDepositOnDemandCalc', '#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#saveOptionDepositOnDemandCalc', , '#cancelOptionDepositOnDemandCalc'];
-            var toEnableIds = isDepositOptions ? ['#addOptionDepositOnDemandCalc', '#depositondemandcalcconditionsEdit', '#saveConditionDepositOnDemandCalc', '#addConditionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit','#exportToExcelDepositOnDemandCalc'] : ['#cancelConditionDepositOnDemandCalc'];
+            var toDisableIds = isDepositOptions ? ['#cancelOptionDepositOnDemandCalc', '#saveOptionDepositOnDemandCalc'] : ['#addConditionDepositOnDemandCalc', '#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#saveOptionDepositOnDemandCalc', , '#cancelOptionDepositOnDemandCalc'];
+            var toEnableIds = isDepositOptions ? ['#addOptionDepositOnDemandCalc', '#depositondemandcalcconditionsEdit', '#saveConditionDepositOnDemandCalc', '#addConditionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#exportToExcelDepositOnDemandCalc'] : ['#cancelConditionDepositOnDemandCalc'];
 
             if (isDepositOptions) {
                 enableDisableButtons(toDisableIds, inEdit);
@@ -277,37 +288,37 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
                 enableDisableButtons(toEnableIds, inEdit);
                 disableTabsInEditMode('tabDemandCalc', true);
             }
-			grid.editRow(selected);
-		}
+            grid.editRow(selected);
+        }
     });
 
     $('#saveOptionDepositOnDemandCalc').click(function () {
-        enableDisableButtons(['#cancelOptionDepositOnDemandCalc', '#saveOptionDepositOnDemandCalc','#depositondemandcalcoptionsEdit'], true);
-        enableDisableButtons(['#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#addConditionDepositOnDemandCalc', '#depositondemandcalcconditionsEdit', '#saveConditionDepositOnDemandCalc','#exportToExcelDepositOnDemandCalc'], false);
+        enableDisableButtons(['#cancelOptionDepositOnDemandCalc', '#saveOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit'], true);
+        enableDisableButtons(['#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#addConditionDepositOnDemandCalc', '#depositondemandcalcconditionsEdit', '#saveConditionDepositOnDemandCalc', '#exportToExcelDepositOnDemandCalc'], false);
         var grid = $("#depositondemandcalcoptions").data("kendoGrid");
-		grid.saveRow();
+        grid.saveRow();
         $('#depositondemandcalcoptions').data('kendoGrid').dataSource.read();
         $('#depositondemandcalcoptions').data('kendoGrid').refresh();
-        disableTabsInEditMode('tabDemandCalc',false );
+        disableTabsInEditMode('tabDemandCalc', false);
     });
 
     $('#cancelOptionDepositOnDemandCalc').click(function () {
         var grid = $("#depositondemandcalcoptions").data("kendoGrid");
         grid.cancelRow();
         grid.dataSource.read();
-        enableDisableButtons(['#cancelOptionDepositOnDemandCalc', '#addConditionDepositOnDemandCalc', '#saveConditionDepositOnDemandCalc', '#cancelConditionDepositOnDemandCalc','#saveOptionDepositOnDemandCalc'], true);
-        enableDisableButtons(['#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#addConditionDepositOnDemandCalc', '#saveConditionDepositOnDemandCalc','#exportToExcelDepositOnDemandCalc'], false);
+        enableDisableButtons(['#cancelOptionDepositOnDemandCalc', '#addConditionDepositOnDemandCalc', '#saveConditionDepositOnDemandCalc', '#cancelConditionDepositOnDemandCalc', '#saveOptionDepositOnDemandCalc'], true);
+        enableDisableButtons(['#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#addConditionDepositOnDemandCalc', '#saveConditionDepositOnDemandCalc', '#exportToExcelDepositOnDemandCalc'], false);
         disableTabsInEditMode('tabDemandCalc', false);
     });
 
-   
+
     $('#addConditionDepositOnDemandCalc').click(function () {
         enableDisableButtons(['#depositondemandcalcconditionsEdit', '#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#saveOptionDepositOnDemandCalc', '#cancelOptionDepositOnDemandCalc'], true);
         enableDisableButtons(['#cancelConditionDepositOnDemandCalc'], false);
         var grid = $("#depositondemandcalcconditions").data("kendoGrid");
         grid.addRow();
         disableTabsInEditMode('tabDemandCalc', true);
-	});
+    });
 
     $('#saveConditionDepositOnDemandCalc').click(function () {
         enableDisableButtons(['#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#saveOptionDepositOnDemandCalc', '#addConditionDepositOnDemandCalc', '#depositondemandcalcconditionsEdit'], false);
@@ -316,16 +327,16 @@ mainApp.controller("DepositOnDemandCalc", function ($controller, $scope, $timeou
         var grid = $("#depositondemandcalcconditions").data("kendoGrid");
         grid.saveRow();
         disableTabsInEditMode('tabDemandCalc', false);
-	});
+    });
 
     $('#cancelConditionDepositOnDemandCalc').click(function () {
         enableDisableButtons(['#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#addOptionDepositOnDemandCalc', '#depositondemandcalcoptionsEdit', '#saveOptionDepositOnDemandCalc', '#addConditionDepositOnDemandCalc', '#depositondemandcalcconditionsEdit'], false);
         enableDisableButtons(['#cancelConditionDepositOnDemandCalc'], true);
         var grid = $("#depositondemandcalcconditions").data("kendoGrid");
-		grid.cancelRow();
+        grid.cancelRow();
         Cancel();
         disableTabsInEditMode('tabDemandCalc', false);
-	});
+    });
 
 
 });

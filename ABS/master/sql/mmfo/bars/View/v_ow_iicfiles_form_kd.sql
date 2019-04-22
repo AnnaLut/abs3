@@ -35,8 +35,9 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_KD ***
                   (SELECT *
                      FROM oper
                     WHERE (REF, nlsa) IN (SELECT REF, nlsa
-                                            FROM oper o1
-                                           WHERE tt NOT IN (SELECT tt FROM w4_sto_tts)
+                                            FROM oper o1, w4_kd_tts kdtt
+                                           WHERE o1.tt NOT IN (SELECT tt FROM w4_sto_tts)
+                                             and o1.tt = kdtt.tt
                                              AND pdat >= bankdate - 30
                                              AND REF IN (SELECT REF FROM ow_pkk_que)))
                   d,
@@ -44,7 +45,7 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_KD ***
             WHERE     q.sos = 0
                   AND q.f_n IS NULL
                   AND q.REF = d.REF
-                  AND d.tt = NVL (getglobaloption ('ASG_FOR_BPK'), 'W4Y')
+                  --- устарело AND d.tt = NVL (getglobaloption ('ASG_FOR_BPK'), 'W4Y'). условие вынесено в d
                   AND d.tt = t.tt
                   AND q.dk = t.dk
                   -- оплачен

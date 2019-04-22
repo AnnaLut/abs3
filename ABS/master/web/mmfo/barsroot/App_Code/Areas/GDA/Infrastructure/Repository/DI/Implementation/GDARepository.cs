@@ -1724,7 +1724,7 @@ namespace BarsWeb.Areas.GDA.Infrastructure.DI.Implementation
             string dateStringMinus = dateMinusDays.ToString("yyyy-MM-dd");
 
 
-            if (option.ValidFrom == null || option.ValidThough != null && (DateTime.Parse(option.ValidFrom) > DateTime.Parse(option.ValidThough) || DateTime.Parse(option.ValidFrom) == DateTime.Parse(option.ValidThough)))
+            if (option.ValidFrom == null)
             {
                 string text = "Дати вказані невірно";
 
@@ -1756,7 +1756,6 @@ namespace BarsWeb.Areas.GDA.Infrastructure.DI.Implementation
                 {
                     var xmlOption = xmlOptions.Option.FirstOrDefault(c => c.Id == option.Id);
                     xmlOption.ValidFrom = option.ValidFrom;
-                    xmlOption.ValidThrough = option.ValidThough;
                     xmlOption.IsActive = option.IsActive;
                 }
                 else
@@ -1764,7 +1763,6 @@ namespace BarsWeb.Areas.GDA.Infrastructure.DI.Implementation
                     xmlOptions.Option.Add(new OPTION()
                     {
                         ValidFrom = option.ValidFrom,
-                        ValidThrough = option.ValidThough,
                         IsActive = option.IsActive,
                         SysTime = option.SysTime,
                         UserId = option.UserId,

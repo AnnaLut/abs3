@@ -13,7 +13,6 @@ mainApp.controller("BlockRateDeposit", function ($controller, $scope, $timeout, 
         url: bars.config.urlContent("/api/gda/gda/setblockrateoption"),
         data: function (data) {
             data.ValidFrom = kendo.toString(data.ValidFrom, "yyyy-MM-dd");
-            data.ValidThough = kendo.toString(data.ValidThough, "yyyy-MM-dd");
             var grid = $("#blockratedepositoptions").data().kendoGrid;
 
             var selectedRow = grid.select();
@@ -70,7 +69,6 @@ mainApp.controller("BlockRateDeposit", function ($controller, $scope, $timeout, 
                 fields: {
                     Conditions: [],
                     ValidFrom: { type: 'date' },
-                    ValidThough: { type: 'date', validation: { nullable: true } },
                     IsActive: { type: 'number', validation: { required: true, min: 0, max: 1 } },
                     UserId: { type: 'string' },
                     SysTime: { type: 'string' },
@@ -127,11 +125,6 @@ mainApp.controller("BlockRateDeposit", function ($controller, $scope, $timeout, 
             {
                 field: "ValidFrom",
                 title: "Дата від",
-                format: "{0:dd-MM-yyyy}"
-            },
-            {
-                field: "ValidThough",
-                title: "Дата до",
                 format: "{0:dd-MM-yyyy}"
             },
             {
@@ -223,7 +216,6 @@ mainApp.controller("BlockRateDeposit", function ($controller, $scope, $timeout, 
                 rowsOpt.push({
                     cells: [
                         { value: grid.dataItem(grid.select()).ValidFrom },
-                        { value: grid.dataItem(grid.select()).ValidThough },
                         { value: grid.dataItem(grid.select()).IsActive ? 'Активна' : 'Неактивна' }
                     ]
                 });
@@ -241,7 +233,6 @@ mainApp.controller("BlockRateDeposit", function ($controller, $scope, $timeout, 
                 rowsOpt.push({
                     cells: [
                         { value: grid.dataItem(grid.select()).ValidFrom },
-                        { value: grid.dataItem(grid.select()).ValidThough },
                         { value: grid.dataItem(grid.select()).IsActive ? 'Активна' : 'Неактивна' }
                     ]
                 });
@@ -446,7 +437,7 @@ mainApp.controller("BlockRateDeposit", function ($controller, $scope, $timeout, 
                     Currency: { type: 'string' },
                     TermFrom: { type: 'number', validation: { min: 0 } },
                     AmountFrom: { type: 'number', validation: { min: 0 } },
-                    InterestRate: { type: 'number' }
+                    InterestRate: { type: 'number', validation: { min: 0 } }
                 }
             }
         },

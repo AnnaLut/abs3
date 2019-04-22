@@ -1218,7 +1218,10 @@ BEGIN
 ---   Для счетов ММСБ (bussl_ = '2'):  операции 001,002,PKR,MM2 - 14:00
 ---                                    операции IB%, CL%        - 17:00
 
- IF gl.amfo in ('353553','325796') and trunc(PDAT_) >= to_date('01/03/2019','dd/mm/yyyy') Then     ---  Львов, Чернигов
+ IF (  gl.amfo in ('353553','325796') and trunc(PDAT_) >= to_date('01/03/2019','dd/mm/yyyy') 
+                           OR
+       trunc(PDAT_) >= to_date('01/06/2019','dd/mm/yyyy')
+    )   Then     
   
     Begin
        Select trim(c.VALUE) Into bussl_
