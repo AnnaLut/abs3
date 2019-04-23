@@ -117,4 +117,11 @@ exception
 end;
 /
 
+begin   
+   execute immediate 'alter table NBU_CREDIT add vidd INTEGER';
+     exception when others then 
+       if sqlcode=-955 then null; end if; 
+end;
+/
+
 grant all on NBU_CREDIT to BARS_ACCESS_DEFROLE;

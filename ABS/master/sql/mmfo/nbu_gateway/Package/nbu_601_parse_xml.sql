@@ -1589,6 +1589,9 @@ procedure p_parse_credit (p_id in  VARCHAR2)
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
              l_NBU_CREDIT (l_NBU_CREDIT.last).KF:= to_number(l_str);
 
+             dbms_xslprocessor.valueof(l_row, 'VIDD/text()', l_str);
+             l_NBU_CREDIT (l_NBU_CREDIT.last).VIDD:= to_number(l_str);
+
          END LOOP;
 
             begin
@@ -1628,7 +1631,8 @@ procedure p_parse_credit (p_id in  VARCHAR2)
                                             klass,
                                             risk,
                                             flaginsurance,
-                                            kf)
+                                            kf,
+											vidd)
                     VALUES ( l_check_id,
                              l_NBU_CREDIT(j).rnk,
                              l_NBU_CREDIT(j).nd,
@@ -1654,7 +1658,8 @@ procedure p_parse_credit (p_id in  VARCHAR2)
                              l_NBU_CREDIT(j).klass,
                              l_NBU_CREDIT(j).risk,
                              l_NBU_CREDIT(j).flaginsurance,
-                             l_NBU_CREDIT(j).kf
+                             l_NBU_CREDIT(j).kf,
+							 l_NBU_CREDIT(j).vidd
                      );
                       EXCEPTION WHEN DUP_VAL_ON_INDEX  THEN NULL;
                END;

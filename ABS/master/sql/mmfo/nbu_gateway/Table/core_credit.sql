@@ -94,3 +94,13 @@ exception
          null;
 end;
 /
+
+begin   
+   execute immediate 'alter table core_credit add vidd INTEGER';
+     exception when others then 
+       if sqlcode=-955 then null; end if; 
+end;
+/
+
+
+
