@@ -31,5 +31,16 @@ exception
          null;
 end;
 /
+
+declare
+name_already_used exception;
+pragma exception_init(name_already_used, -955);
+begin
+    execute immediate 'create unique index I_NBU_REPORTED_LOAN_ID on nbu_reported_loan (id) tablespace brsmdli';
+exception
+    when name_already_used then
+     null;
+end;
+/
 alter table nbu_reported_loan modify loan_number varchar2(50 char);
 /

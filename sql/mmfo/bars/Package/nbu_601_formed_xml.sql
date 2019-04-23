@@ -417,7 +417,8 @@ function get_xml_credit return clob
                                xmlelement("RISK",c.risk),
                                xmlelement("FLAGINSURANCE",c.flaginsurance),
                                xmlelement("STATUS",c.status),
-                               xmlelement("KF",c.kf)
+                               xmlelement("KF",c.kf),
+                               xmlelement("VIDD",c.vidd)
                              )))
                  )
    into l_xml_credit
