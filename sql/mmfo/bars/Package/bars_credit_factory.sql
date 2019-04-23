@@ -218,7 +218,7 @@ FUNCTION get_crd_response_new (p_okpo     IN bars.customer.okpo%TYPE,
          WHEN NO_DATA_FOUND THEN
            RETURN '<Client>No list</Client>';
          when TOO_MANY_ROWS then
-           RETURN '<ERROR>для МФО '||gl.aMFO||' є декілька записів по вказаним параметрам пошуку. Необхідно виконати об"єднання клієнтів!</ERROR>';
+           RETURN '<ERROR>для МФО '||gl.aMFO||' є декілька записів по вказаним параметрам пошуку. Необхідно виконати об"єднання клієнтів!</ERROR><Client>No list</Client>';
       END;
 
       select xmlelement("Client",
