@@ -782,7 +782,7 @@ is
    --  Currency Inspection Module - Модуль валютного контролю
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.05 28/02/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.06 02/04/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -4229,26 +4229,39 @@ function val_convert(p_dat in date , -- Дата конмертації
 is
   l_kurs_a number;
   l_kurs_b number;
+  l_res    number   := null;
 begin
   bars_audit.debug(g_module_name||' val_convert() - p_dat:'||p_dat||' p_s:'||p_s||' p_kv_a:'||p_kv_a||' p_kv_b:'||p_kv_b||' g_root_branch:'||g_root_branch);
   if p_dat<to_date('26/12/2008', 'dd/mm/yyyy') then return null; end if;
-  if p_kv_a=980 then l_kurs_a:=1;
-  else
-    select /*+ index(b pk_currate$base) */ rate_o/bsum into l_kurs_a
-      from cur_rates$base b
-     where b.branch=g_root_branch and b.kv=p_kv_a and
-           b.vdate=(select /*+ index(a pk_currate$base) */ max(vdate) from cur_rates$base a where a.branch=g_root_branch and a.kv=p_kv_a and a.vdate<=p_dat);
+  if p_kv_b=980 then
+    begin 
+      l_res := gl.p_icurval(p_kv_a, p_s, p_dat);
+      exception
+        when others then --підем по старому
+          l_res := null;
+    end;  
   end if;
-  --bars_audit.debug(g_module_name||' val_convert() - l_kurs_a:'||l_kurs_a);
-  if p_kv_b=980 then l_kurs_b:=1;
-  else
-    select /*+ index(b pk_currate$base) */ rate_o/bsum into l_kurs_b
-      from cur_rates$base b
-     where b.branch=g_root_branch and b.kv=p_kv_b and
-           b.vdate=(select /*+ index(a pk_currate$base) */ max(vdate) from cur_rates$base a where a.branch=g_root_branch and a.kv=p_kv_b and a.vdate<=p_dat);
-  end if;
-  --bars_audit.debug(g_module_name||' val_convert() - l_kurs_a:'||l_kurs_b||' round(p_s*l_kurs_a/l_kurs_b ,0):'||round(p_s*l_kurs_a/l_kurs_b ,0));
-  return round(p_s*l_kurs_a/l_kurs_b ,0);
+  if l_res is null then   
+    if p_kv_a=980 then l_kurs_a:=1;
+    else
+      select /*+ index(b pk_currate$base) */ rate_o/bsum into l_kurs_a
+        from cur_rates$base b
+       where b.branch=g_root_branch and b.kv=p_kv_a and
+             b.vdate=(select /*+ index(a pk_currate$base) */ max(vdate) from cur_rates$base a where a.branch=g_root_branch and a.kv=p_kv_a and a.vdate<=p_dat);
+    end if;
+    --bars_audit.debug(g_module_name||' val_convert() - l_kurs_a:'||l_kurs_a);
+    if p_kv_b=980 then l_kurs_b:=1;
+    else
+      select /*+ index(b pk_currate$base) */ rate_o/bsum into l_kurs_b
+        from cur_rates$base b
+       where b.branch=g_root_branch and b.kv=p_kv_b and
+             b.vdate=(select /*+ index(a pk_currate$base) */ max(vdate) from cur_rates$base a where a.branch=g_root_branch and a.kv=p_kv_b and a.vdate<=p_dat);
+    end if;
+    --bars_audit.debug(g_module_name||' val_convert() - l_kurs_a:'||l_kurs_b||' round(p_s*l_kurs_a/l_kurs_b ,0):'||round(p_s*l_kurs_a/l_kurs_b ,0));
+    l_res := round(p_s*l_kurs_a/l_kurs_b ,0);
+  end if;  
+
+  return l_res;
 end val_convert;
 
 --------------------------------------------------------------------------------
