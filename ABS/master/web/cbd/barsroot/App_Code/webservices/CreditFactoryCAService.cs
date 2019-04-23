@@ -370,8 +370,8 @@ public class CreditFactoryCAService : Bars.BarsWebService
                 XmlElement mfoNum = doc.CreateElement("MFONUM");
                 mfoXml.AppendChild(mfoNum);
 
-                XmlElement error = doc.CreateElement("ERROR");
-                mfoXml.AppendChild(error);
+                // XmlElement error = doc.CreateElement("ERROR");
+                // mfoXml.AppendChild(error);
 
                 CreditFactoryService factoryRU = new CreditFactoryService();
 
