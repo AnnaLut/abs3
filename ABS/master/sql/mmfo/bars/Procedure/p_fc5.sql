@@ -4,8 +4,8 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.010  12/04/2019 (08/04/2019)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% VERSION : v.19.012  22/04/2019 (18/04/2019)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
  Структура показателя D BBBB Z P VVV Й Q WWW E K
@@ -380,10 +380,6 @@ BEGIN
  EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 
  EXECUTE IMMEDIATE 'TRUNCATE TABLE otcn_fa7_temp';
-
- EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_FA7_REZ1';
-
- EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_FA7_REZ2';
 
  EXECUTE IMMEDIATE 'truncate table otcn_f42_zalog';
 
@@ -1325,6 +1321,8 @@ BEGIN
 
       nbs_ := substr(nbs_r013_, 1, 4);
       r013_ := substr(nbs_r013_, 5, 1);
+      
+      r011_ := substr(k.kodp,6,1);
 
       s580a_ := substr(k.kodp, 11, 1);
 
@@ -1354,7 +1352,7 @@ BEGIN
              if nbs_ in ('2609','2629','2659') then
                 kodp_ := k.sign_rez||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              else
-                kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
+                kodp_ := k.sign_rez||nbs_||r011_||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              end if;
 
              if k.rnum = 1 then
@@ -1387,7 +1385,7 @@ BEGIN
              elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
                 kodp_ := k.sign_rez||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              else
-                kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
+                kodp_ := k.sign_rez||nbs_||r011_||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              end if;
 
              if k.rnum = 1 then
@@ -1437,6 +1435,53 @@ BEGIN
           end if;
 
           if srezp_ <> 0 and k.cnt = k.rnum then
+            -- превышение резерва при наличии только одной строки проц.счета
+             if k.cnt =1 and k.nls like '3118%' then
+                if r013_30 = 1 then
+                   --   rez_30 нужно показать с R013=B
+                   --        оставшийся нераспределенный резерв:  R013=r013_,R012=B
+                   nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr_30);
+                   sum_ := least (k.szq_30, srezp_ );
+
+                   kodp_ := k.sign_rez||nbs_||r011_||substr(nbs_r013_, 5,1)||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+
+                   znap_ := to_char(sign(k.szq) * sum_);
+
+                   INSERT INTO rnbu_trace
+                           ( recid, userid,
+                             nls, kv, odate, kodp,
+                             znap, acc, rnk, isp, mdate,
+                             comm, nd, nbuc, tobo )
+                   VALUES ( s_rnbu_record.NEXTVAL, userid_,
+                             k.nls, k.kv, data_, kodp_,
+                             znap_, k.acc, k.rnk, k.isp, k.mdate,
+                             comm_, k.nd, nbuc_, k.tobo );
+
+                   srezp_ := srezp_ - sum_;
+                else
+                   --   (rez_-rez_30) нужно показать с R013=A,R012=B
+                   --        оствшийся нераспределенный резерв с R013=r013_,R012=B
+                   nbs_r013_ := f_ret_nbsr_rez(k.nls, k.r013, k.s080, k.id, k.kv, k.ob22, k.custtype, k.accr);
+                   sum_ := least (abs(k.szq-k.szq_30), srezp_ );
+
+                   kodp_ := k.sign_rez||nbs_||r011_||substr(nbs_r013_, 5, 1)||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+
+                   znap_ := to_char(sign(k.szq) * sum_);
+
+                   insert into rnbu_trace
+                           ( recid, userid,
+                             nls, kv, odate, kodp,
+                             znap, acc, rnk, isp, mdate,
+                             comm, nd, nbuc, tobo )
+                   values ( s_rnbu_record.NEXTVAL, userid_,
+                             k.nls, k.kv, data_, kodp_,
+                             znap_, k.acc, k.rnk, k.isp, k.mdate,
+                             comm_, k.nd, nbuc_, k.tobo );
+
+                   srezp_ := srezp_ - sum_;
+                end if;
+             end if;
+                       
              if srezp_ <> 0  then
                 r012_:='B';
 
@@ -1445,7 +1490,7 @@ BEGIN
                  elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
                     kodp_ := k.sign_rez||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
                 else
-                    kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
+                    kodp_ := k.sign_rez||nbs_||r011_||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
                     if nbs_ = '1419'
                     then
                        BEGIN
@@ -1497,7 +1542,7 @@ BEGIN
 
           -- нарах. в_дсотки (тип рахунку SNA)
           if k.kodp not like '2___9%' and k.proc_SNA <> 0 then
-             kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8);
+             kodp_ := '2'||nbs_||r011_||r013_||substr(k.kodp,8);
              znap_ := to_char(gl.p_icurval(k.kv, round(k.proc_SNA  * k.koef), dat_));
 
              comm_ := SUBSTR(' нарах. в_дсотки SNA c1', 1,100);
@@ -1942,7 +1987,7 @@ BEGIN
                                            where fdat between datb_+1 and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
                         o.acc = a.acc
-                        and a.tip in ('REZ', 'SNA')
+                        and a.tip = 'REZ' 
                         and o.tt not like 'AR%'
                         and o.tt not like 'IF%'
                         and o.ref = z.ref
@@ -2032,29 +2077,31 @@ BEGIN
    -- вир_внювання з А7 по рахунках резерву на декадну дату
    if dat_ = dat_end_ then
         -- по резервах
-       for k in (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
+       for k in (select a.acc, a.s245, a.nbs, a.t020, nvl(a.ost,0)-nvl(b.ost,0) rizn
                  from (
-                    select acc_id acc, s245, nbs, ost
+                    select acc_id acc, s245, nbs, ost, 
+                        (case when nbs = '2049' and ost<0 then '1' else '2' end) t020  
                     from nbur_tmp_a7_s245
                     where report_date = dat_ and
                           nbs like '___9') a
                         join
                     (select acc, substr(kodp, 16, 1) s245,
-                            substr(kodp, 2, 4) nbs, sum(znap) ost
+                            substr(kodp, 2, 4) nbs, sum(znap) ost, substr(kodp, 1, 1) t020
                     from rnbu_trace
-                    where kodp like '____9%'
-                    group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
+                    where kodp like '____9%' 
+                    group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4), substr(kodp, 1, 1)) b
                     on (a.acc = b.acc and
                         a.s245 = b.s245 and
-                        a.nbs = b.nbs)
+                        a.nbs = b.nbs and
+                        a.t020 = b.t020)
                     where nvl(a.ost,0)<>nvl(b.ost,0)
-                    order by nvl(a.nbs, b.nbs))
+                    order by a.nbs, a.t020)
        loop
            update rnbu_trace
            set znap = znap + k.rizn,
                comm = comm || ' *=' || to_char(k.rizn)
            where acc = k.acc and
-                 kodp like '_'||k.nbs||'__________'||k.s245||'%' and
+                 kodp like k.t020||k.nbs||'__________'||k.s245||'%' and
                  rownum = 1;
        end loop;
 
@@ -2220,7 +2267,7 @@ BEGIN
                         '2319','2329','2339','2349','2359','2369','2379',
                         '2409','2419','2429','2439','2609','2629','2659',
                         '2890','3119','3219','3569','3590','3599','3690',
-                        '3692','1426','2206','2236') and
+                        '3692','1426','2206','2236','2396') and
               k.t020 = '2' and
               k.rizn > 0
              then

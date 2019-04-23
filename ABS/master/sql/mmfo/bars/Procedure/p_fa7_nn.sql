@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.11 12/04/2019 (11/04/2019)
+% VERSION     :  v.19.12    22/04/2019 (18/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -131,6 +131,8 @@ IS
    typ_            NUMBER;
    nbuc1_          accounts.tobo%TYPE;
    nbuc_           accounts.tobo%TYPE;
+   
+   cp_id_          varchar2(20) := null;
 
    -- наличие дополнительных модулей
    -- наличие графика погашения субординированного долга
@@ -576,9 +578,9 @@ IS
       cnt_   NUMBER;
    BEGIN
       sql_ := 'select count(*) ' ||
-              'from cp_deal d, cp_dat c, cp_kod k '||
-              'where d.acc = :acc_ and d.id = c.id and d.id = k.id and'||
-                    ' c.nom <> 0 and c.dok >= :dat_ and k.cena <> k.cena_start ';
+              'from cp_deal d '||
+              'where d.acc = :acc_ and 
+                     nvl(d.dat_ug, d.dat_bay) <= :dat_ ';
 
       EXECUTE IMMEDIATE sql_
                    INTO cnt_
@@ -1028,7 +1030,9 @@ BEGIN
           s#_     :=    l_rec_t(i).s#;
           apl_dat#_ :=  l_rec_t(i).apl_dat#;
           ndg_      :=  l_rec_t(i).ndg_;
-
+          
+          cp_id_ := null;
+          
           -- для @77 потрібно брати дату з архіву
           if pmode_ = 2 then
              mdate_ := nvl(f_mdate_hist(acc_, dat_), mdate_);
@@ -1044,6 +1048,10 @@ BEGIN
           end if;
 
           r013_ := NVL (TRIM (r013_), '0');
+          
+          if nls_ like '2909%' then
+             r013_ := '0';
+          end if;          
 
           r030_ := LPAD(r030_, 3, '0');
 
@@ -1262,10 +1270,26 @@ BEGIN
              end if;
 
              if exist_cp = 1 and
-                SUBSTR (nls_, 1, 4) IN ('3110','3111','3112','3113','3114',
-                        '3210','3211','3212','3213','3214','3315')
+                SUBSTR (nls_, 1, 3) IN ('140', '141', '142', '143', '144', '145', 
+                          '301', '311', '321', '330',  '331', '332',  '333', '338')
              then
-                exist_cp_acc := f_exist_cp_acc (acc_, dat_);
+                IF SUBSTR (nls_, 1, 4) IN ('3110','3111','3112','3113','3114',
+                        '3210','3211','3212','3213','3214','3315') 
+                THEN
+                    exist_cp_acc := f_exist_cp_acc (acc_, dat_);
+                ELSE
+                    exist_cp_acc := 0;
+                END IF;
+                
+                select  NVL(max(ck.cp_id), 'YYYYYYYYYY')
+                into cp_id_
+                from cp_deal cd, cp_kod ck
+                where acc_ in (cd.acc, cd.accd, cd.accp, cd.accr, cd.accr2, cd.accr3,
+                               cd.accs, cd.accexpn, cd.accexpr, cd.accunrec)
+                  and cd.id = ck.id
+                  and cd.active in (1, -1);
+                  
+                comm_ := comm_ || (case when cp_id_ <> 'YYYYYYYYYY' then ' CPID=' || cp_id_ || ' ' else '' end);
              else
                 exist_cp_acc := 0;
              end if;
@@ -3893,7 +3917,7 @@ BEGIN
       rizn_    number := 0;
    begin
       -- розбиваємо дисконти/премії на коди C та D в залежності від активу
-      for k in (select /* PARALLEL(8) */ s.*,
+      for k in (select s.*,
                    s.znap sumdp_k,
                    s.suma / s.suma_all koef,
                    nvl((count(*) over (partition by s.acc, s.nd, s.kv)), 0) cnt,
@@ -3922,15 +3946,17 @@ BEGIN
                                        where pr = 2)
                        ) a
                    join
-                       (select ND, ACC, NLS, KV, KODP,
-                           to_number(ZNAP) suma,
-                           SUMA sumk, SUMD, SUMP
-                        from OTCN_FA7_REZ1
+                       (select nd, acc, nls, kv, kodp,
+                           to_number(znap) suma,
+                           suma sumk, sumd, sump
+                        from otcn_fa7_rez1
                         where suma <> 0 and
                            substr(nls, 4, 1) not in ('7','9')) b
                     on (a.nd = b.nd and
                         substr(a.nls,1,3) = substr(b.nls,1,3) and
-                        a.kv = b.kv)) s)
+                        a.kv = b.kv)) s
+                where substr(s.nls, 1, 3) not in ('140', '141', '142', '143', '144', '145', 
+                          '301', '311', '321', '330',  '331', '332',  '333', '338'))
       loop
          if k.rnum = 1 then
             if k.znap > k.suma_all then
@@ -4220,7 +4246,7 @@ BEGIN
                                            where fdat between datb_+1 and dat_
                                              and fdat !=to_date('20171218','yyyymmdd')  ) and
                         o.acc = a.acc
-                        and a.tip in ('REZ', 'SNA')
+                        and a.tip = 'REZ'
                         and o.tt not like 'AR%'
                         and o.ref = z.ref
                         and o.fdat = z.fdat
@@ -4629,8 +4655,7 @@ BEGIN
                 and a.tip in ('ISS','IKN','IK0')
                 and a.nbs in ('2203','2208','3570')
             )
-     loop
-
+   loop
          znap_ := k.znap;
          nbs_ := substr(k.nls, 1, 4);
 
@@ -4644,43 +4669,41 @@ BEGIN
                       and w2.code = decode(nbs_, '2203','PRINCIPAL','2208','INT','FEE')
                     order by w1.chain_idt, w1.seq_number
                   )
-            loop
+       loop
+           if znap_ > z.total_amount
+           then
+              s240_ := F_SROK(dat_, z.rep_date, 2);
+              s181_ := substr(k.kodp,8,1);
 
-               if znap_ > z.total_amount
-               then
-                  s240_ := F_SROK(dat_, z.rep_date, 2);
-                  s181_ := substr(k.kodp,8,1);
+              if s240_ > 'B' and s181_ = '1' then
+                 s181_ :='2';
+              end if;
+              if s240_ <= 'B' and s181_ = '2' then
+                 s181_ :='1';
+              end if;
 
-                  if s240_ > 'B' and s181_ = '1' then
-                     s181_ :='2';
-                  end if;
-                  if s240_ <= 'B' and s181_ = '2' then
-                     s181_ :='1';
-                  end if;
+              kodp_ := substr(k.kodp,1,7)||s181_||s240_||substr(k.kodp,10);
 
-                  kodp_ := substr(k.kodp,1,7)||s181_||s240_||substr(k.kodp,10);
+              INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
+              VALUES (s_rnbu_record.nextval, userid_, k.nls, k.kv, k.odate, kodp_, to_char(z.total_amount), k.rnk, k.acc,
+                 'Инстолмент N = '|| to_char(z.seq_number), k.nbuc, k.isp, k.tobo, k.nd);
 
-                  INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
-                  VALUES (s_rnbu_record.nextval, userid_, k.nls, k.kv, k.odate, kodp_, to_char(z.total_amount), k.rnk, k.acc,
-                     'Инстолмент N = '|| to_char(z.seq_number), k.nbuc, k.isp, k.tobo, k.nd);
+              znap_ := znap_ - z.total_amount;
+           end if;
 
-                  znap_ := znap_ - z.total_amount;
-               end if;
+       end loop;
 
-         end loop;
-
-            if znap_ <> 0
-            then
-               kodp_ := substr(k.kodp,1,7)||'1'||'1'||substr(k.kodp,10);
-               update rnbu_trace set kodp = kodp_, znap = znap_, comm = substr('Коригування Инстолмент'|| k.comm,1,200)
-               where recid = k.recid;
-            end if;
-
+       if znap_ <> 0
+       then
+           kodp_ := substr(k.kodp,1,7)||'1'||'1'||substr(k.kodp,10);
+           update rnbu_trace set kodp = kodp_, znap = znap_, comm = substr('Коригування Инстолмент'|| k.comm,1,200)
+           where recid = k.recid;
+       end if;
    end loop;
    --------------------------------------------------
    if dat_ <to_date('20171226','yyyymmdd')  then
-       delete from rnbu_trace
-        where substr(kodp, 2,4) not in (select r020 from TMP_KOD_R020 ) ;
+      delete from rnbu_trace
+      where substr(kodp, 2,4) not in (select r020 from TMP_KOD_R020 ) ;
    end if;
 
     update rnbu_trace
@@ -4798,7 +4821,8 @@ BEGIN
                          from NBUR_TMP_A7_S245
                          where report_date = dat_ and
                                kf = mfo_) --and comm not like 'Вир_в-ня з балансом%'
-      group by acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end), substr(kodp, 2, 4);
+      group by acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end), substr(kodp, 2, 4), 
+        (case when substr(kodp, 2, 4) = '2049' then sign(znap) else 1 end);
    end if;
 
    logger.info ('P_FA7_NN: END ');
