@@ -295,7 +295,7 @@ END cck_ui;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.94 21.02.2019';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.95 21.02.2019';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK_UI:';
 
