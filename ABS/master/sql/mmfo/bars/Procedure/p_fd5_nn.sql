@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :    v.18.023  22/02/2019 (20/02/2019)
+% VERSION     :    v.19.005    18.04.2019     (12.04.2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -20,19 +20,24 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
   7     Z          R011
   8     LL         K111 вид економiчноi дiяльностi
  10     YY         K072 код сектора економiки
- 11     9          (K081)     с 30.06.2017 параметр K140
- 12     Ц          S183 код початкового строку погашення
- 13     R          K030 код резидентностi
- 14     QQ         K051 код организац.правовой формы хоз-ия
- 16     Ч          S032 код виду забезпечення кредиту
- 17     VVV        R030 код валюти
- 20     MMM        K040 код краiни
- 23     T          S080 категорiя ризику
- 24     ГГ         S260 код iндивiдуального споживання по цiлях
- 26     N          2/3/4 (залишок/середн.залишок/проц.доходи)
- 27     I          S190 код строку прострочення погашення боргу
+ 12     O          K140 код розміру суб'єкта підпр.діяльності
+ 13     Ц          S183 код початкового строку погашення
+ 14     R          K030 код резидентностi
+ 15     QQ         K051 код организац.правовой формы хоз-ия
+ 17     Ч          S032 код виду забезпечення кредиту
+ 18     VVV        R030 код валюти
+ 21     MMM        K040 код краiни
+ 24     T          S080 категорiя ризику
+ 25     ГГ         S260 код iндивiдуального споживання по цiлях
+ 27     N          2/3/4 (залишок/середн.залишок/проц.доходи)
+ 28     I          S190 код строку прострочення погашення боргу
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 03/04/2019 - показник середніх залишків для рахунків дисконту будемо 
+              формувати при наявності показника середнього залишку по 
+              основному рахунку (тип 'SS', 'SP') 
+ 12/03/2019 - резервы разбиваются в разрезе R013 при наличии соответствующей
+              разбивки по связанным счетам
  22/02/2019 - тип залишку для рахунків типу "SDF" буде формуватися "2"
               і параметр R013 буде вибиратися із NBUR_LOG_FD5X а не із 
               SPECPARAM
@@ -221,6 +226,7 @@ l_r013_2               varchar2(1);
 l_se_2                 number;
 l_comm_2               varchar2(250);
 l_mdate                date;
+l_mdate_a              date;
 l_txt                  varchar2(100);
 l_ekp                  varchar2(6);
 l_fa7p                 number;
@@ -432,6 +438,9 @@ BEGIN
           end;
        end if;
    else -- все остальные
+             nd_ := NULL;
+             vidd_ := NULL;
+
        if acc_type_ not like 'RZ%'
        then
           BEGIN
@@ -446,9 +455,17 @@ BEGIN
                                         AND a.nd = p.nd
                                         AND p.sdate <= dat_);
           EXCEPTION WHEN NO_DATA_FOUND THEN
-             nd_ := NULL;
-             vidd_ := NULL;
+               begin
+                   select nd    into nd_
+                     from w4_acc
+                    where acc_ in (acc_ovr, acc_2207,acc_2208,acc_2209, acc_9129);
+
+               exception when no_data_found then
+                     nd_ := NULL;
+                     vidd_ := NULL;
+               end;
           END;
+
        end if;
    end if;
 
@@ -917,6 +934,25 @@ BEGIN
       k140_ := '9';
    end if;
 
+---   обработка нулевых значений S183 (-в основном лимиты овердрафтов 9129)
+   if s183_ is null or s183_ ='0'  then
+
+       select  f_srok( nvl( (select nvl(dapp,daos) dapp
+                               from accounts  where acc = acc_), null )
+                      , nvl( (select wdate from cc_deal where nd =nd_), null )
+                      , 2)
+            into s180_    from dual;
+
+       begin
+          select nvl(s183,'1')
+            into s183_
+            from kl_s180
+           where s180 = s180_;
+       exception
+          when others  then  s183_ :='1';
+       end;
+   end if;
+-------------------------------------
    --- c 30.06.2017 вместо кода '9'(K081) будет формироваться доп.параметр K140
    if Dat_ >= dat_Izm5 then
       kodp_:= dk_ || nbs_ || r011_ || k111_ || k072_ || k140_ ||
@@ -1020,7 +1056,24 @@ BEGIN
         when no_data_found then 
            l_f074 := '000';
       end;
-      
+
+      if l_mdate < dat_  and  nd_ is not null  and  nbs_ in ('2046','2066')
+      then
+          begin
+           select a.mdate   into l_mdate_a 
+             from accounts a, nd_acc n
+            where a.acc = n.acc
+              and n.nd = nd_
+              and a.nbs in ('2063','2040','2041','2042','2043','2044','2045')
+              and rownum =1;
+
+              l_mdate := l_mdate_a;
+          exception
+             when others then null;
+          end;
+
+      end if;
+
       l_s241 := (case
                      when l_mdate is null then '1'
                      when l_mdate - dat_ < 365 and l_mdate > dat_ then '1'
@@ -1028,7 +1081,7 @@ BEGIN
                      when l_mdate < dat_ then 'Z'
                      else '1'
                  end);
-                 
+
       begin
          begin         
              select metr
@@ -1142,7 +1195,7 @@ BEGIN
              values (dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_1, 
                        coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
                       k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_1)),
-                      comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
+                      comm_, acc_r_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
           end if;
           
           -- більше 30 днів
@@ -1153,7 +1206,7 @@ BEGIN
              values (dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_2, 
                        coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
                       k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_2)),
-                      comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
+                      comm_, acc_r_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
           end if;
 
        else
@@ -1168,7 +1221,7 @@ BEGIN
           values (dat_, l_kod_filii, nbuc_, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013, 
                    coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
                   k140_, l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(znap_)),
-                  comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
+                  comm_, acc_r_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
        end if;
    end if;
 END;
@@ -1322,7 +1375,7 @@ BEGIN
 
        if ( (nbs_ not in ('1590', '1592', '2400', '2401', '3690', '3692') and
              acc_type_ not like 'RZ%') OR 
-            (acc_type_ like 'RZ%' and tips_ = 'SNA')
+            (acc_type_ like 'RZ%' and tips_ in ('SNA','ODB'))
           )
        then
 
@@ -1389,7 +1442,9 @@ BEGIN
           for k in (select /*+ leading(r) */
                            t.nls, t.kv, t.dat, t.szq, t.sz, gl.p_icurval(t.kv, t.sz, dat_) sz1,
                            t.s080, t.rnk, t.nd nd, t.tobo,
-                           r.acc, r.odate, r.kodp, r.comm, r.nd ndr, t.id, nvl(s.r013, '0') r013,
+                           r.acc, r.odate, r.kodp, r.comm, r.nd ndr, t.id,
+                           nvl(sum(s.t070) over (partition by s.acc_id),0) t070_all,
+                           nvl(s.t070,0) t070,  nvl(s.r013, '0') r013, s.f074,
                            substr(r.kodp,7,1) r011, t.accr, t.accr_30,
                            t.nbs, t.ob22, t.okpo, t.custtype, t.mdate, a.tip, t.zpr discont_SDF
                     from v_tmp_rez_risk t, accounts a, rnbu_trace r, nbur_log_fd5x s, agg_monbals m  -- вместо specparam будем использовать nbur_log_fd5 
@@ -1411,7 +1466,9 @@ BEGIN
                      select /*+ leading(r) */
                             t.nls, t.kv, t.dat, t.szq, t.sz, gl.p_icurval(t.kv, t.sz, dat_) sz1,
                             t.s080, t.rnk, t.nd nd, t.tobo,
-                           r.acc, r.odate, r.kodp, r.comm, r.nd ndr, t.id, nvl(s.r013, '0') r013,
+                           r.acc, r.odate, r.kodp, r.comm, r.nd ndr, t.id, 
+                           nvl(sum(s.t070) over (partition by s.acc_id),0) t070_all,
+                           nvl(s.t070,0) t070,  nvl(s.r013, '0') r013, s.f074,
                            substr(r.kodp,7,1) r011, t.accr, t.accr_30,
                            t.nbs, t.ob22, t.okpo, t.custtype, t.mdate, a.tip, t.zpr discont_SDF
                     from v_tmp_rez_risk t, accounts a, rnbu_trace r, nbur_log_fd5x s  -- вместо specparam будем использовать nbur_log_fd5
@@ -1426,6 +1483,10 @@ BEGIN
                    )
           loop
              se_ := NVL(k.sz1, k.szq);
+--                                         разбивка резерва по "разбитым" в разрезе R013 основным счетам
+             if k.t070_all !=0  and  k.t070_all != k.t070  then
+                   se_ := round(se_ * (k.t070 / k.t070_all));
+             end if;
              r011_ := k.r011;
              k111_ := substr(k.kodp,8,2);
              k072_ := substr(k.kodp,10,2);
@@ -1497,29 +1558,33 @@ BEGIN
                    (nls_, kv_, data_, kodp_, znap_, nbuc_, isp_, rnk_, acc_, comm_, nd_);
                 
                 -- для D5X
-                begin
-                   select max(trim(replace(replace(kol24, '[', ''), ']', ''))) as kol24
-                   into l_kol24
-                   from  rez_cr t
-                   where t.kf = l_kod_filii and
-                         t.fdat = l_next_mnth_frst_dt and
-                         t.acc = acc_;
-                             
-                   select max(g.link_group)
-                   into l_link_group 
-                   from d8_cust_link_groups g
-                   where g.okpo = l_okpo or re_ = 0 and g.okpo = rnk_;
-               
-                   l_f074 := (case when l_link_group is not null then '001'
-                                   when l_kol24 = '101' then '100'
-                                   when l_kol24 = '010' then '000'
-                                   else nvl(lpad(l_kol24,3,'0'), '000')
-                              end);
-                exception 
-                   when no_data_found then 
-                        l_f074 := '000';
-                end;
-                  
+                if k.f074 is null  then
+                      begin
+                         select max(trim(replace(replace(kol24, '[', ''), ']', ''))) as kol24
+                         into l_kol24
+                         from  rez_cr t
+                         where t.kf = l_kod_filii and
+                               t.fdat = l_next_mnth_frst_dt and
+                               t.acc = acc_;
+                                   
+                         select max(g.link_group)
+                         into l_link_group 
+                         from d8_cust_link_groups g
+                         where g.okpo = l_okpo or re_ = 0 and g.okpo = rnk_;
+                     
+                         l_f074 := (case when l_link_group is not null then '001'
+                                         when l_kol24 = '101' then '100'
+                                         when l_kol24 = '010' then '000'
+                                         else nvl(lpad(l_kol24,3,'0'), '000')
+                                    end);
+                      exception 
+                         when no_data_found then 
+                              l_f074 := '000';
+                      end;
+                else
+                        l_f074 := k.f074;
+                end if;
+
                 l_s241 := (case
                               when l_mdate is null then '1'
                               when l_mdate - dat_ < 365 and l_mdate > dat_ then '1'
@@ -1607,8 +1672,103 @@ BEGIN
 
                 znap_ := to_char(round(gl.p_icurval(k.kv, k.discont_SDF, dat_)));
 
-                comm_ := SUBSTR(' дисконт SDF ', 1,100);
+                comm_ := SUBSTR('SDF '||comm_, 1,200);
+-------------------------------------------------           12.03.2019 + 12.04.2019
 
+                      if k.f074 is null  then
+                         begin
+                            select max(trim(replace(replace(kol24, '[', ''), ']', ''))) as kol24
+                            into l_kol24
+                            from  rez_cr t
+                            where t.kf = l_kod_filii and
+                                  t.fdat = l_next_mnth_frst_dt and
+                                  t.acc = acc_;
+                                      
+                            select max(g.link_group)
+                            into l_link_group 
+                            from d8_cust_link_groups g
+                            where g.okpo = l_okpo or re_ = 0 and g.okpo = rnk_;
+                        
+                            l_f074 := (case when l_link_group is not null then '001'
+                                            when l_kol24 = '101' then '100'
+                                            when l_kol24 = '010' then '000'
+                                            else nvl(lpad(l_kol24,3,'0'), '000')
+                                       end);
+                         exception 
+                            when no_data_found then 
+                                 l_f074 := '000';
+                         end;
+                      else
+                              l_f074 := k.f074;
+                      end if;
+
+                      l_s241 := (case
+                                    when l_mdate is null then '1'
+                                    when l_mdate - dat_ < 365 and l_mdate > dat_ then '1'
+                                    when l_mdate - dat_ > 365 and l_mdate > dat_ then '2'
+                                    when l_mdate < dat_ then 'Z'
+                                    else '1'
+                                end);
+                                   
+                      begin
+                         begin         
+                           select metr
+                           into l_metr
+                           from int_accn
+                           where kf = l_kod_filii and
+                                 acc = acc_ and 
+                                 id = 2; 
+                         exception  
+                            when no_data_found then
+                               l_metr := null;            
+                         end ;  
+                                   
+                         begin 
+                            select trim(txt)
+                            into l_txt
+                            from nd_txt n
+                            where kf = l_kod_filii and
+                                  nd = nd_ and
+                                  tag = 'FLR';
+                         exception  
+                            when no_data_found then
+                                 l_txt := null;            
+                         end ;
+                                    
+                         l_f048 := (case
+                                      when l_metr is null and not (substr(nbs_, 4, 1) in ('6', '8', '9') or 
+                                           nbs_ in ('1607', '2607', '2627', '2657', '3570')) then '0'
+                                      when l_metr in (7, 9) or -- для овердрафтів ЮО
+                                           trim(l_txt) = 'Так' -- для МБДК
+                                      then '2'
+                                         else '3'
+                                      end);
+                      exception
+                         when no_data_found then
+                              l_f048 := '0';
+                      end;   
+                
+                      if l_f048 ='0' and nbs_ in ('2203','2233')  then  l_f048 :='3';  end if;
+                
+                      begin
+                         select nvl(max(trim(ekp)), c_XXXXXX)
+                         into l_ekp
+                         from nbur_tmp_desc_ekp p 
+                         left join (select r020, max(I010) I010
+                                    from   kl_r020
+                                    where  dat_ between d_open and coalesce(d_close, date '4000-01-01')
+                                       and r020 = substr(k.nls,1,3)||'6' 
+                                    group by r020
+                                   ) kl 
+                         on (p.I010 = kl.I010 and
+                             p.r020 = kl.r020)
+                         where   p.t020 = '2' and
+                                 p.r020 = substr(k.nls,1,3)||'6';                     
+                      exception
+                         when no_data_found then
+                              l_ekp := c_XXXXXX;
+                      end;
+-----------------------------------
                 INSERT INTO rnbu_trace
                    (nls, kv, odate, kodp, znap, nbuc, isp, rnk, acc, comm, nd)
                 VALUES
@@ -2307,7 +2467,13 @@ BEGIN
                             a.acc = c.acc(+) and
                             nvl(c.kodp(+), '__'||substr(a.nls,1,4)||'2') like '__'||substr(a.nls,1,4)||'%2' and
                             b.nd = d.nd and
-                            d.cnt <> 0) z
+                            d.cnt <> 0 and 
+                            exists ( select 1 from rnbu_trace r 
+                                     where r.nd = d.nd 
+                                       and d.tip in ('SS', 'SP')
+                                       and r.kodp like '__'||substr(b.nls,1,3)||'_'||'%3'
+                                   ) 
+                          ) z
                      )
            loop
                if k.nbuc is null then
