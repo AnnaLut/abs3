@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="10/18/2018 09:46:50" ReportInfo.Modified="12/21/2018 12:13:57" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="10/18/2018 09:46:50" ReportInfo.Modified="12/29/2018 11:52:10" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQMZZn3HbDX+K05BLCcClGVs=" CommandTimeout="7000">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQFuS5xWctgTIg7RZ3xIsjuA=" CommandTimeout="7000">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 DATA_TYPE_NAME, CHAR00 NUMDOG, DAT00 DOGDAY, DAT01 ENDDAY, NUM01 SUMZAGAL, CHAR01 R030, NUM02 PROCCREDIT, NUM03 SUMPAY, NUM04 PERIODBASE, NUM05 PERIODPROC, NUM06 SUMARREARS, NUM07 ARREARBASE, NUM08 ARREARPROC, NUM09 DAYBASE, NUM10 DAYPROC, DAT02 FACTENDDAY, CHAR02 FLAGZ, CHAR03 KLASS, NUM11 RISK, CHAR04 STR_DAT1, CHAR05 STR_DAT2, CHAR06 BRANCH, CHAR07 BRANCHNAME from rs_tmp_report_data where session_id=:SESSION_ID order by id">
         <Column Name="STR_DAT1" DataType="System.String"/>
         <Column Name="STR_DAT2" DataType="System.String"/>
@@ -169,7 +169,7 @@
             <TableCell Name="Cell55" Border.Lines="All" Text="Дата фактичного погашення" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
             <TableCell Name="Cell56" Border.Lines="All" Text="Примусове стягнення боргу" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
             <TableCell Name="Cell57" Border.Lines="All" Text="Клас боржника" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
-            <TableCell Name="Cell115" Border.Lines="Bottom" Text="Вели чина кредитного ризику" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+            <TableCell Name="Cell115" Border.Lines="Bottom" Text="Величина кредитного ризику" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
           </TableRow>
           <TableRow Name="Row4" Height="47.25">
             <TableCell Name="Cell20" Border.Lines="Left, Right, Bottom" HorzAlign="Center" VertAlign="Center"/>
