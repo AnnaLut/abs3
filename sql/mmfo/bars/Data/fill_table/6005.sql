@@ -77,44 +77,58 @@ begin
                            '       sys_context(''bars_context'',''user_branch'') branch,'||nlchr||
                            '       b.name branchname'||nlchr||
                            'from '||nlchr||
-                           '(select * from nbu_gateway.CORE_CREDIT cr where cr.REQUEST_ID in ( (select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where '||nlchr||
-                           '       DATA_TYPE_ID =15'||nlchr||
-                           '       and dat.KF=(trim( both ''/'' from sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '(select * from  nbu_gateway.CORE_CREDIT cr where REQUEST_ID in ('||nlchr||
+                           '       (select id from'||nlchr||
+                           '       (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=15'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
                            '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2)))  cr,'||nlchr||
-                           '(select * from nbu_gateway.core_person_fo c where c.REQUEST_ID in ((select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where '||nlchr||
-                           '       DATA_TYPE_ID =1'||nlchr||
-                           '       and dat.KF=(trim( both ''/'' from sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) cr,'||nlchr||
+                           '(select * from  nbu_gateway.core_person_fo c where REQUEST_ID in('||nlchr||
+                           '       (select id from'||nlchr||
+                           '       (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=1'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
                            '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2))) c,'||nlchr||
-                           '(select * from nbu_gateway.core_document_fo d where d.REQUEST_ID in (  (select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where '||nlchr||
-                           '       DATA_TYPE_ID =2'||nlchr||
-                           '       and dat.KF=(trim( both ''/'' from sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) c,'||nlchr||
+                           '(select * from  nbu_gateway.core_document_fo d  where REQUEST_ID in('||nlchr||
+                           '       (select id from'||nlchr||
+                           '       (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=2'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
                            '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2))) d,'||nlchr||
-                           '(select * from nbu_gateway.core_address_fo f where f.REQUEST_ID in ( (select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where '||nlchr||
-                           '       DATA_TYPE_ID =3'||nlchr||
-                           '       and dat.KF=(trim( both ''/'' from sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) d,'||nlchr||
+                           '(select * from  nbu_gateway.core_address_fo f where REQUEST_ID in('||nlchr||
+                           '       (select id from'||nlchr||
+                           '       (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=3'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
                            '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2))) f,'||nlchr||
-                           '(select * from nbu_gateway.core_profit_fo p where p.REQUEST_ID in ( (select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where '||nlchr||
-                           '       DATA_TYPE_ID =4'||nlchr||
-                           '       and dat.KF=(trim( both ''/'' from sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) f,'||nlchr||
+                           '(select * from  nbu_gateway.core_profit_fo p where REQUEST_ID in('||nlchr||
+                           '       (select id from'||nlchr||
+                           '       (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=4'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
                            '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2))) p,'||nlchr||
-                           '(select * from nbu_gateway.core_family_fo fam where fam.REQUEST_ID in ((select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where '||nlchr||
-                           '       DATA_TYPE_ID =5'||nlchr||
-                           '       and dat.KF=(trim( both ''/'' from sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) p,'||nlchr||
+                           '(select * from nbu_gateway.core_family_fo fam where REQUEST_ID in('||nlchr||
+                           '       (select id from'||nlchr||
+                           '       (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=5'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
                            '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2))) fam,'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) fam,'||nlchr||
                            'branch b,'||nlchr||
-                           'nbu_gateway.core_organization_fo o'||nlchr||
+                           'nbu_gateway.core_organization_fo o,'||nlchr||
+                           '(select * from  nbu_gateway.NBU_SESSION n where trunc(CAST(n.CREATED_AT AS DATE)) >= :sFdat1'||nlchr||
+                           'and trunc(CAST(n.CREATED_AT AS DATE)) <= :sFdat2) n'||nlchr||
                            'where'||nlchr||
                            'b.branch = sys_context(''bars_context'',''user_branch'')'||nlchr||
                            'and c.rnk(+) = cr.rnk'||nlchr||
@@ -123,7 +137,8 @@ begin
                            'and p.rnk(+) = cr.rnk'||nlchr||
                            'and fam.rnk(+) = cr.rnk'||nlchr||
                            'and d.rnk(+) = cr.rnk'||nlchr||
-                           '';
+                           'and n.OBJECT_ID=cr.LOAN_OBJECT_ID'||nlchr||
+                           'and n.STATE_ID=9';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -202,7 +217,6 @@ end;
                                             
 commit;                                     
 
-exec umu.add_report2arm(6005,'$RM_DRU1');
 exec umu.add_report2arm(6005,'$RM_F601');
 commit;
 

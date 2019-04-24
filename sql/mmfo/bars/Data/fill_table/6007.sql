@@ -46,12 +46,12 @@ begin
     l_zpr.id           := 1;
     l_zpr.name         := 'Ф601 Частина 3 Інформація щодо забезпечення за КО з боржником-ФО';
     l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1=''Останній сформований звіт в період з'',:sFdat2=''По'',:B=''Відділення''';
+    l_zpr.bindvars     := ':sFdat1=''Останній сформований звіт в період з'',:sFdat2=''По''';
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep6007.frx';
     l_zpr.form_proc    := '';
     l_zpr.default_vars := '';
-    l_zpr.bind_sql     := ':B=''OUR_BRANCH|BRANCH|NAME|WHERE length(branch)<16 and length(branch)>7 ORDER BY BRANCH ''';
+    l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select'||nlchr||
                            '  P.NUMBERPLEDGE NUMBERPLEDGE,'||nlchr||
@@ -68,34 +68,46 @@ begin
                            '  P.REAL6INCOME REAL6INCOME,'||nlchr||
                            '  P.NOREAL6INCOME NOREAL6INCOME,'||nlchr||
                            '  P.FLAGINSURANCEPLEDGE FLAGINSURANCEPLEDGE,'||nlchr||
-                           '  P.SUMBAIL,'||nlchr||
+                           '  P.SUMBAIL SUMBAIL,'||nlchr||
                            '  P.SUMGUARANTEE SUMGUARANTEE,'||nlchr||
                            '  c.FLAGINSURANCE scredit,'||nlchr||
                            '  f_dat_lit(:sFdat1) STR_DAT1,'||nlchr||
                            '  f_dat_lit(:sFdat2) STR_DAT2,'||nlchr||
-                           '  substr(bars_report.get_branch(:B,0),1, 24 ) branch'||nlchr||
+                           '  sys_context(''bars_context'',''user_branch'') branch'||nlchr||
                            'from'||nlchr||
                            'branch b,'||nlchr||
-                           '(select * from  nbu_gateway.NBU_CORE_DATA_REQUEST dat where ID ='||nlchr||
-                           '      (select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where DATA_TYPE_ID=14 '||nlchr||
-                           '       and ((RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')) = :B)'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) >=:sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <=:sFdat2)) dat,'||nlchr||
-                           '(select * from  nbu_gateway.core_person_fo pf where REQUEST_ID ='||nlchr||
-                           '      (select max(ID) from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
-                           '       where DATA_TYPE_ID=1'||nlchr||
-                           '       and ((RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')) = :B)'||nlchr||
+                           '(select * from  nbu_gateway.CORE_PLEDGE_DEP p where REQUEST_ID in('||nlchr||
+                           ' (select id from'||nlchr||
+                           ' (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=14'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
                            '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
-                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2)) pf,'||nlchr||
-                           'nbu_gateway.CORE_PLEDGE_DEP p,'||nlchr||
-                           'nbu_gateway.CORE_CREDIT c'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) p,'||nlchr||
+                           '(select * from  nbu_gateway.core_person_fo pf where REQUEST_ID in('||nlchr||
+                           ' (select id from'||nlchr||
+                           ' (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=1'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) pf,'||nlchr||
+                           '(select * from  nbu_gateway.CORE_CREDIT c where REQUEST_ID in('||nlchr||
+                           ' (select id from'||nlchr||
+                           ' (select dat.KF, max(ID) id from nbu_gateway.NBU_CORE_DATA_REQUEST dat '||nlchr||
+                           '       where DATA_TYPE_ID=15'||nlchr||
+                           '       and (RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/''))=DECODE ((sys_context(''bars_context'',''user_branch'')),''/'',(RPAD(LPAD(dat.KF, 7, ''/''), 8, ''/'')),(sys_context(''bars_context'',''user_branch'')))'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) >= :sFdat1'||nlchr||
+                           '       and trunc(CAST(dat.REPORTING_time AS DATE)) <= :sFdat2'||nlchr||
+                           '       group by dat.KF)))) c,'||nlchr||
+                           '       (select * from  nbu_gateway.NBU_SESSION n where trunc(CAST(n.CREATED_AT AS DATE)) >= :sFdat1'||nlchr||
+                           '       and trunc(CAST(n.CREATED_AT AS DATE)) <= :sFdat2) n'||nlchr||
                            'where'||nlchr||
-                           'b.branch = substr(bars_report.get_branch(:B,0),1, 24 )'||nlchr||
-                           '   and dat.id=p.REQUEST_ID'||nlchr||
+                           'b.branch = (sys_context(''bars_context'',''user_branch''))'||nlchr||
                            '   and p.rnk=pf.rnk'||nlchr||
                            '   and P.RNK=c.RNK(+)'||nlchr||
-                           '';
+                           '   and n.OBJECT_ID=p.PLEDGE_OBJECT_ID'||nlchr||
+                           '   and n.STATE_ID=9';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -174,7 +186,6 @@ end;
                                             
 commit;                                     
 
-exec umu.add_report2arm(6007,'$RM_DRU1');
 exec umu.add_report2arm(6007,'$RM_F601');
 commit;
 
