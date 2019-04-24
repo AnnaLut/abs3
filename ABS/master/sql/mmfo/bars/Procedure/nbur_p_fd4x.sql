@@ -15,9 +15,9 @@ is
 % DESCRIPTION : Процедура формирования D4X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.001    28.03.2019
+% VERSION     :  v.19.002    22.04.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := '  v.19.001  28.03.2019';
+  ver_              char(30)  := '  v.19.002  22.04.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';  
   c_AD4001          constant varchar2(100 char) := 'AD4001';
@@ -90,11 +90,11 @@ BEGIN
                     'XXXXXX'
                   end /*ekp*/
                 , lpad(kv, 3, '0') /*r030*/
-                , dd /*f025*/
-                , kb /*b010*/
-                , comm /*q006*/
-                , t071 /*t071*/ 
-                , ' ' /*description*/
+                , dd     /*f025*/
+                , kb     /*b010*/
+                , comm   /*q006*/
+                , t071   /*t071*/ 
+                , ' '  /*description*/
                 , null /*acc_id*/
                 , null /*acc_num*/
                 , null /*kv*/
@@ -128,25 +128,25 @@ BEGIN
                 , p_kod_filii /*nbuc*/
                 , l_version_id /*version_id*/
                 , case
-                    when dd in ('11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '32', '34') then c_AD4001
-                    when dd in ('21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '33', '35') then c_AD4002
+                    when u.dd in ('11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '32', '34') then c_AD4001
+                    when u.dd in ('21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '33', '35') then c_AD4002
                   else
                     'XXXXXX'
                   end /*ekp*/
-                , lpad(kv, 3, '0') /*r030*/
-                , dd /*f025*/
-                , kb /*b010*/
-                , comm /*q006*/
-                , t071 /*t071*/ 
-                , ' ' /*description*/
-                , null   /*acc_id*/
-                , acc_num /*acc_num*/
-                , kv      /*kv*/
-                , null    /*maturity_date*/
-                , cust_id /*cust_id*/
-                , ref     /*ref*/
-                , null    /*nd*/
-                , null    /*branch*/
+                , lpad(u.kv, 3, '0') /*r030*/
+                , u.dd      /*f025*/
+                , u.kb      /*b010*/
+                , u.comm    /*q006*/
+                , u.t071    /*t071*/ 
+                , p.nazn    /*description*/
+                , null      /*acc_id*/
+                , u.acc_num /*acc_num*/
+                , u.kv      /*kv*/
+                , null      /*maturity_date*/
+                , u.cust_id /*cust_id*/
+                , u.ref     /*ref*/
+                , null      /*nd*/
+                , null      /*branch*/
           from (select v1.pp, v1.dd, v1.kb, v1.kv, v1.t071, v1.ref, v2.comm, v1.acc_num, v1.cust_id 
                 from (select substr(field_code,2) kodp, seg_01 pp, seg_02 dd, seg_03 kb, seg_04 kv,
                              ref, cust_id, acc_num, field_value t071
@@ -163,7 +163,8 @@ BEGIN
                             seg_01 = '9'
                       ) v2
                       on (v1.kodp = v2.kodp and v1.ref = v2.ref )
-          );
+             ) u, oper p
+           where u.ref =p.ref (+);
 
   end if;
 
