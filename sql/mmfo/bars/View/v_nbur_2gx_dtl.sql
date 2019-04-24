@@ -9,6 +9,7 @@ select p.REPORT_DATE
          , p.KF
          , p.NBUC
          , p.VERSION_ID
+         , p.EKP||p.F091||p.D100||p.Q024  as field_code
          , p.EKP   
          , p.F091
          , p.D100
@@ -32,6 +33,7 @@ select p.REPORT_DATE
 comment on table  v_nbur_2GX_DTL is 'Детальний протокол файлу 2GX';
 comment on column v_nbur_2GX_DTL.REPORT_DATE is 'Звітна дата';
 comment on column v_nbur_2GX_DTL.KF is 'Код фiлiалу (МФО)';
+comment on column v_nbur_2GX_DTL.NBUC is 'Код розрізу даних';
 comment on column v_nbur_2GX_DTL.VERSION_ID is 'Ід. версії файлу';
 comment on column v_nbur_2GX_DTL.EKP     is 'Код показника';
 comment on column v_nbur_2GX_DTL.F091    is 'Код операції';

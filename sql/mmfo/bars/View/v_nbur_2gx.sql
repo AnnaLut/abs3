@@ -6,8 +6,9 @@ CREATE OR REPLACE VIEW BARS.V_NBUR_2GX
 AS
 select   p.REPORT_DATE
        , p.KF
+       , p.KF    as NBUC
        , p.VERSION_ID
-       , null  as field_code
+       , p.EKP||p.F091||p.D100||p.Q024  as field_code
        , p.EKP   
        , p.F091
        , p.D100
@@ -34,6 +35,7 @@ from   (select   v.REPORT_DATE
 comment on table  v_nbur_2GX is 'Файл 2GX -Інформація за операціями з купівлі/продажу іноземної валюти';
 comment on column v_nbur_2GX.REPORT_DATE is 'Звiтна дата';
 comment on column v_nbur_2GX.KF is 'Фiлiя';
+comment on column v_nbur_2GX.NBUC is 'Код розрізу даних';
 comment on column v_nbur_2GX.VERSION_ID is 'Номер версії файлу';
 comment on column v_nbur_2GX.EKP    is 'Код показника';                           
 comment on column v_nbur_2GX.F091   is 'Код операції';

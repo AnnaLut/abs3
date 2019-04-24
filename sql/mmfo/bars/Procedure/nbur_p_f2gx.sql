@@ -13,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F2GX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 2GX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.19.001    14.01.2019
+ VERSION     :    v.19.002    22.04.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  l_p_version       char(30)  := ' v.19.001  14.01.2019';
+  l_p_version       char(30)  := ' v.19.002  22.04.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -30,6 +30,9 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F2GX (p_kod_filii  varchar2
 
      l_d100    varchar2(2);
      l_days    number;
+
+  l_sql_z      varchar2(2000);
+  is_zay_exist       integer;
 
   --Exception
   e_ptsn_not_exsts exception;
@@ -193,6 +196,43 @@ begin
                where c.rnk = u.rnk;
       
       end loop;
+
+-- определение наличия поля POSTINGDATE табл.zay_w4_transfer_data
+   SELECT COUNT( * )      into is_zay_exist
+     FROM all_tab_columns
+    WHERE owner = 'BARS' AND table_name = 'ZAY_W4_TRANSFER_DATA' AND column_name = 'POSTINGDATE';
+
+   if is_zay_exist >=1  then
+
+      l_sql_z :=
+         ' insert into NBUR_LOG_F2GX
+                    ( REPORT_DATE, KF, NBUC, VERSION_ID,
+                      EKP, F091, D100, Q024, T070,
+                      REF, CUST_ID, CUST_NAME, KV, DESCRIPTION )
+               select  :p_rpt_dt1, :p_kf1, :p_kf2, :l_vers
+                     , ''A2G001''                as EKP
+                     , decode(currency_a, ''980'', ''3'',''4'')          as F091
+                     , ''01''                    as D100
+                     , ''1''                     as Q024
+                     , (case
+                           when currency_a =''980''  then
+                                  gl.p_icurval (currency_b, amount_b, postingdate)
+                           else   gl.p_icurval (currency_a, amount_a, postingdate)
+                         end)                  as T070
+                     , (select nvl(z.ref,z.ref_sps) from zayavka z where z.id =d.zay_id)
+                                               as REF
+                     , rnk                     as CUST_ID
+                     , (select c.nmk from customer c where c.rnk =d.rnk)   as CUST_NAME
+                     , currency_b              as KV
+                     , ''покупка/продажа через Ощад 24/7''  as DESCRIPTION
+                 from zay_w4_transfer_data d
+                where to_date(postingdate) = dat_next_u(:p_rpt_dt1,-1)
+                  and work_status =2 ';
+
+      execute immediate l_sql_z using  p_report_date, p_kod_filii, p_kod_filii, l_version, p_report_date;
+
+   end if;
+
 
     commit;
 
