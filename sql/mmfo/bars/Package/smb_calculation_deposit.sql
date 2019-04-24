@@ -384,9 +384,14 @@ as
                                     ,o.object_type_id
                                     ,case when p_mode = 1 
                                                    -- если реальное начисление - берем дату последнего начисления + 1 или дату начала (если это 1-ый расчет )
-                                              then nvl(t.last_accrual_date + 1, d.start_date)
+                                              then nvl(t.last_accrual_date + 
+                                                       case when d.expiry_date is null then 1 
+                                                            -- дату окончания не включаем
+                                                            when t.last_accrual_date + 1 = nvl(t.expiry_date_prolongation, d.expiry_date) then 2 
+                                                            else 1 end
+                                                       ,d.start_date + 1)
                                                    -- для остальных случаев берем большее 
-                                              else greatest(nvl(p_start_date, d.start_date), d.start_date)
+                                              else greatest(nvl(p_start_date, d.start_date + 1), d.start_date + 1)
                                      end start_date_ 
                                     ,least(coalesce(d.close_date
                                                     -- если транш заблокирован и срок действия закончился, то начисления продолжаем делать согласно ТЗ
@@ -476,7 +481,7 @@ as
                                ,o.tail_amount  
                                ,o.account_id
                                ,o.object_type_id
-                               ,o.expiry_date start_date_
+                               ,o.expiry_date + 1 start_date_
                                ,o.end_date_
                                ,o.is_capitalization
                                ,o.is_individual_rate
@@ -506,7 +511,7 @@ as
                                ,table(smb_deposit_utl.get_prolongation(p_deposit_id => o.id)) x
                           where o.is_prolongation = 1
                             and x.start_date < o.end_date_
-                            and x.expiry_date >= o.start_date_)
+                            and x.expiry_date > o.start_date_)
                  -- % ставки       
                  , ir_ as(
                       -- выбираем процентные ставки
@@ -581,8 +586,7 @@ as
                         and h.is_planned = 'N' -- берем только не плановые суммы и активные
                      group by h.value_date
                              ,v.object_id
-                             ,o.end_date_
-                   )           
+                             ,o.end_date_)           
                  , bln as(
                      -- берем суммы по траншу
                      select o.*
@@ -1255,7 +1259,7 @@ as
         tax(          
                       p_tax_amount         => l_tax_amount_mil
                      ,p_tax_account        => l_tax_account_mil                      
-                     ,p_tax_oper_type      => c_military_tax_oper_type -- податок на прибуток з ФО 
+                     ,p_tax_oper_type      => c_military_tax_oper_type -- військовий збір з ФО 
                      ,p_register_type_code => register_utl.COMMON_MILITARY_TAX_CODE
                      ,p_purpose            => l_purpose);
         return l_tax_amount_inc + l_tax_amount_mil;             
@@ -1484,6 +1488,12 @@ as
         end loop;
     end;
 
+    -- закрытие депозита
+    procedure deposit_closing (p_id            in number
+                              ,p_accrual_date  in date     
+                              ,p_close_date    in date
+                              ,p_silent_mode   in number default 1);
+
     -- начисление % на дату
     -- p_deposit_list - договора. если указаны, то расчет только по ним
     procedure auto_accrual_interest(
@@ -1494,6 +1504,8 @@ as
         l_accrual_date     date;
         l_deposits         number_list;
         l_is_last_day      number := 0;
+        l_is_flag          number;
+        l_expiry_date      date;
     begin
         -- если передаваемая дата не последний день месяца
         -- то нужно сделать расчет процентов для депозитов, у которых завтра истекает срок депозита (??)
@@ -1506,6 +1518,9 @@ as
             -- дату расчета % устанавливаем в последний день месяца
             l_accrual_date := last_day(l_calc_date);
             l_is_last_day := 1;
+        -- если пятница (расчет за субботу, воскресенье, выходной)    
+        elsif l_calc_date <> dat_next_u(l_calc_date, 1) - 1 then
+            l_accrual_date := dat_next_u(l_calc_date, 1) - 1;
         else 
             l_accrual_date := l_calc_date;
         end if;
@@ -1514,66 +1529,177 @@ as
                                                         'bank date    : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||                                   
                                                         'date         : ' || to_char(p_date, 'yyyy-mm-dd') || chr(10) ||
                                                         'accrual date : ' || to_char(l_accrual_date, 'yyyy-mm-dd')); 
-        with dpt$ as(
-              select --.+ 99988880003333 
-                     o.id
-                    ,t.last_accrual_date
-                    ,d.start_date
-                    ,nvl(t.expiry_date_prolongation, d.expiry_date) expiry_date
-                    ,d.close_date
-                    ,o.object_type_id
-                    ,t.number_prolongation
-                    ,t.current_prolongation_number
-                    ,t.is_prolongation
-                from object o
-                    ,deal d
-                    ,smb_deposit t
-                    ,deal_account da
-                    ,int_accn ic
-                    ,customer c -- + policy
-               where 1 = 1
-                 and o.object_type_id in (g_tranche_object_type_id, g_dod_object_type_id)
-                 and o.state_id in (g_object_active_state_id, g_object_blocked_state_id) -- trigger tiu_blkd11 - занятное чтиво (???)
-                 and o.id = d.id 
-                 and o.id = t.id
-                 and o.id = da.deal_id 
-                 and da.account_type_id = g_main_account_type_id
-                 and da.account_id = ic.acc
-                 and ic.id = interest_utl.INTEREST_KIND_LIABILITIES
-                 and d.close_date is null -- убирать ли это ограничени (что делать при перерасчете закрытого ??)
-                 and d.customer_id = c.rnk
-                 )
-        select id
-          bulk collect into l_deposits
-          from(          
-              select d.id
-                from dpt$ d
-               where l_is_last_day = 1
-                 and l_accrual_date > nvl(d.last_accrual_date, d.start_date) 
-                 and (p_deposit_list is null or p_deposit_list is empty)
-              union all   
-              select d.id
-                from dpt$ d
-               where l_is_last_day = 0
-                 -- обработка для закрытия депозита
-                 -- начисление выполняется на день раньше
-                 and (l_accrual_date = d.expiry_date - 1
-                     --  без пролонгации
-                     and (d.is_prolongation = 0 
-                      -- или все пролонгации закончились   
-                      or (d.current_prolongation_number = d.number_prolongation))    
+        for i in(                                                
+            with dpt$ as(
+                  select o.id
+                        ,t.last_accrual_date
+                        ,d.start_date
+                        ,nvl(t.expiry_date_prolongation, d.expiry_date) expiry_date
+                        ,d.close_date
+                        ,o.object_type_id
+                        ,t.number_prolongation
+                        ,t.current_prolongation_number
+                        ,t.is_prolongation
+                        ,case when o.state_id = g_object_blocked_state_id or
+                                   a.blkd <> 0 
+                              then 1 
+                              else 0     
+                         end is_blocked
+                    from object o
+                        ,deal d
+                        ,smb_deposit t
+                        ,deal_account da
+                        ,int_accn ic
+                        ,customer c -- + policy
+                        ,accounts a
+                   where 1 = 1
+                     and o.object_type_id in (g_tranche_object_type_id, g_dod_object_type_id)
+                     and o.state_id in (g_object_active_state_id, g_object_blocked_state_id) -- trigger tiu_blkd11 - занятное чтиво (???)
+                     and o.id = d.id 
+                     and o.id = t.id
+                     and o.id = da.deal_id 
+                     and da.account_type_id = g_main_account_type_id
+                     and da.account_id = ic.acc
+                     and ic.id = interest_utl.INTEREST_KIND_LIABILITIES
+                     and d.close_date is null -- убирать ли это ограничени (что делать при перерасчете закрытого ??)
+                     and d.customer_id = c.rnk
+                     and ic.acc = a.acc 
                      )
-                 and l_accrual_date > nvl(d.last_accrual_date, d.start_date) 
-                 and (p_deposit_list is null or p_deposit_list is empty)
-              union all
-              -- по списку
-              select d.id
-                from dpt$ d
-                    ,table(p_deposit_list)  x
-               where 1 = 1
-                 and l_accrual_date > nvl(d.last_accrual_date, d.start_date) 
-                 and d.id = x.column_value
-                 );
+                  select d.id
+                        ,d.last_accrual_date
+                        ,d.expiry_date
+                        ,d.is_blocked
+                        ,d.is_prolongation
+                        ,d.current_prolongation_number
+                    from dpt$ d
+                   where l_is_last_day = 1
+                     and l_accrual_date > nvl(d.last_accrual_date, d.start_date) 
+                     and (p_deposit_list is null or p_deposit_list is empty)
+                  union all   
+                  select d.id
+                        ,d.last_accrual_date
+                        ,d.expiry_date
+                        ,d.is_blocked 
+                        ,d.is_prolongation
+                        ,d.current_prolongation_number
+                    from dpt$ d
+                   where l_is_last_day = 0
+                     -- обработка для закрытия депозита
+                     -- начисление выполняется на день раньше
+                     and l_accrual_date >= d.expiry_date - 1
+                     and l_accrual_date > nvl(d.last_accrual_date, d.start_date) 
+                     and (p_deposit_list is null or p_deposit_list is empty)
+                  union all
+                  -- по списку
+                  select d.id
+                        ,d.last_accrual_date
+                        ,d.expiry_date
+                        ,d.is_blocked
+                        ,d.is_prolongation
+                        ,d.current_prolongation_number
+                    from dpt$ d
+                        ,table(p_deposit_list)  x
+                   where 1 = 1
+                     and l_accrual_date > nvl(d.last_accrual_date, d.start_date) 
+                     and d.id = x.column_value
+                    )
+        loop
+            logger.log_info(p_procedure_name => $$plsql_unit||'.auto_accrual_interest'
+                           ,p_log_message    => null
+                           ,p_object_id      => i.id
+                                    ); 
+            -- должен закрыться или есть пролонгации
+            if l_accrual_date >= i.expiry_date then
+                logger.log_info(p_procedure_name => $$plsql_unit||'.auto_accrual_interest expiry'
+                               ,p_log_message    => 'l_accrual_date    : '|| to_char(l_accrual_date, 'yyyy-mm-dd') || chr(10) ||
+                                                    'expiry_date       : '|| to_char(i.expiry_date, 'yyyy-mm-dd') || chr(10) ||
+                                                    'last_accrual_date : '|| to_char(i.last_accrual_date, 'yyyy-mm-dd') || chr(10) ||
+                                                    'l_is_last_day     : '|| l_is_last_day || chr(10) ||
+                                                    'is_blocked        : '|| i.is_blocked
+                               ,p_object_id      => i.id
+                                        );
+                -- обработка пролонгаций которые стартуюют в выходные
+                if i.is_prolongation = 1 then
+                    -- первая
+                    if i.current_prolongation_number is null then 
+                        smb_deposit_utl.set_deposit_prolongation(p_object_id => i.id);
+                    end if;                  
+                    loop
+                        l_expiry_date := null;
+                        select max(dpt.expiry_date_prolongation)
+                          into l_expiry_date
+                          from smb_deposit dpt
+                         where dpt.id = i.id
+                           and dpt.number_prolongation > nvl(dpt.current_prolongation_number, 0)    
+                           and dpt.expiry_date_prolongation <= l_accrual_date;
+                         if l_expiry_date is null then exit; end if;
+                         smb_deposit_utl.set_deposit_prolongation(p_object_id => i.id);
+                    end loop;
+                    -- меняем дату окончания
+                    select least(dpt.expiry_date_prolongation - 1, l_accrual_date)
+                      into l_expiry_date
+                      from smb_deposit dpt
+                     where dpt.id = i.id;
+                else 
+                    l_expiry_date := i.expiry_date - 1;
+                end if;
+                -- конец месяца                  
+                if i.is_blocked = 1 and l_is_last_day = 1 then 
+                    -- делаем начисление  
+                    accrual_interest(
+                                   p_deposit_list => number_list(i.id)
+                                  ,p_start_date   => null
+                                  ,p_end_date     => l_accrual_date
+                                  ,p_mode         => 1);
+                -- если заблокирован и не конец месяца
+                elsif i.is_blocked = 1 and l_is_last_day = 0 and i.last_accrual_date <= l_expiry_date then
+                    accrual_interest(
+                                   p_deposit_list => number_list(i.id)
+                                  ,p_start_date   => null
+                                  ,p_end_date     => l_expiry_date
+                                  ,p_mode         => 1);
+                elsif i.last_accrual_date is null then
+                    accrual_interest(
+                                   p_deposit_list => number_list(i.id)
+                                  ,p_start_date   => null
+                                  ,p_end_date     => l_expiry_date
+                                  ,p_mode         => 1);
+                -- рабочий день не понятна причина не закрытия (может лимит установлен)                  
+                elsif l_is_last_day = 0 and i.last_accrual_date is not null  then
+                    -- проверим возможность закрыть депозит  
+                    begin 
+                        -- с пролонгациями нужно разобраться !!!
+                        savepoint sp_check_deposit_closing;
+                        l_is_flag := 1;
+                        deposit_closing (
+                                   p_id            => i.id
+                                  ,p_accrual_date  => l_accrual_date
+                                  ,p_close_date    => l_accrual_date
+                                  ,p_silent_mode   => 0);
+                        rollback to sp_check_deposit_closing;          
+                        exception
+                          when others then 
+                            rollback to sp_check_deposit_closing;
+                            l_is_flag := 0;
+                    end;  
+                    -- возможно закрытие депозита
+                    if l_is_flag = 1 then
+                        accrual_interest(
+                                       p_deposit_list => number_list(i.id)
+                                      ,p_start_date   => null
+                                      ,p_end_date     => l_accrual_date
+                                      ,p_mode         => 1);
+                    end if;
+                end if;
+            else -- начислить % 
+                accrual_interest(
+                               p_deposit_list => number_list(i.id)
+                              ,p_start_date   => null
+                              ,p_end_date     => l_accrual_date
+                              ,p_mode         => 1);
+            end if;                  
+        end loop;
+        /*
         if l_deposits.count() <> 0 then 
             logger.log_info(p_procedure_name => $$plsql_unit||'.auto_accrual_interest'
                                    ,p_log_message    => 'kf           : ' || bc.current_mfo || chr(10) ||
@@ -1592,7 +1718,7 @@ as
                                    ,p_log_message    => 'kf           : ' || bc.current_mfo || chr(10) ||
                                                         'no data for accrual {' || to_char(l_accrual_date, 'yyyy-mm-dd') ||' } '
                                     ); 
-        end if;
+        end if;*/
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_accrual_interest end'
                                    ,p_log_message    => 'kf           : ' || bc.current_mfo
                                     ); 
@@ -2107,8 +2233,7 @@ as
                                ,p_auxiliary_info => null);
         -- штраф может быть только у траншей при досрочном закрытии
         -- как бы 2-а раза не применить штраф (???) close_date учитывать ?
-        for i in (select dpt.penalty_interest_rate
-                        ,p.object_id
+        for i in (select p.object_id
                         ,t.start_date
                         ,least(nvl(t.action_date, gl.bdate), gl.bdate) end_date
                         ,dpt.last_payment_date
@@ -2128,14 +2253,18 @@ as
                         ,deal d
                    where p.object_id = p_id
                      and p.process_type_id = l_process_type_id
-                     -- and p.state_id = process_utl.GC_PROCESS_STATE_SUCCESS
-                     and nvl(dpt.penalty_interest_rate, 0) <> 0  
                      and p.object_id = dpt.id
                      and p.object_id = da.deal_id
                      and da.account_type_id = g_main_account_type_id 
                      and da.account_id = ic.acc
                      and ic.id = interest_utl.INTEREST_KIND_LIABILITIES
                      and dpt.id = d.id
+                     and exists (
+                          select null
+                            from attribute_value_by_date a    
+                           where a.attribute_id = g_trn_attribute_penalty_id
+                             and a.object_id = p.object_id
+                             and nvl(a.number_value, 0) > 0)
                      ) loop
             logger.log_info(p_procedure_name => $$plsql_unit||'.payment_penalty step 0',
                                 p_log_message    => ''
@@ -2489,7 +2618,7 @@ as
             accrual_interest(
                            p_deposit_list => number_list(p_object_id)
                           ,p_start_date   => null
-                          ,p_end_date     => p_expiry_date
+                          ,p_end_date     => p_expiry_date - 1
                           ,p_mode         => 1
                           ,p_silent_mode  => 0);
             -- перевести со счета начисленных на депозитный / для возврата
@@ -2522,10 +2651,12 @@ as
         end;
     begin
         l_end_date := trunc(nvl(p_date, gl.bdate));
+        -- не нужно устанавливать дату в последний день месяца
+        /*
         if (l_end_date = dat_next_u( last_day(l_end_date) + 1, -1)) then
             -- дату устанавливаем в последний день месяца
             l_end_date := last_day(l_end_date);
-        end if;    
+        end if; */   
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_deposit_closing'
                                    ,p_log_message    => 'kf        : ' || bc.current_mfo || chr(10) ||
                                                         'bank date : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||
@@ -2678,13 +2809,16 @@ as
     procedure auto_deposit_prolongation(p_date in date)
      is
         l_date        date;
+        l_expiry_date date;
     begin
         -- выбираем все не закрытые договора с пролонгацией
         l_date := trunc(nvl(p_date, gl.bdate));
+        -- не нужно устанавливать дату в последний день месяца
+        /*
         if (l_date = dat_next_u( last_day(l_date) + 1, -1)) then
             -- дату устанавливаем в последний день месяца
             l_date := last_day(l_date);
-        end if;    
+        end if;   */ 
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_deposit_prolongation start'
                                    ,p_log_message    => 'kf        : ' || bc.current_mfo || chr(10) ||
                                                         'bank date : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||
@@ -2694,6 +2828,7 @@ as
         for i in (select t.id
                         ,d.deal_number 
                         ,nvl(t.expiry_date_prolongation, d.expiry_date) expiry_date
+                        ,t.last_accrual_date
                     from smb_deposit t
                         ,deal d
                         ,object o
@@ -2716,14 +2851,36 @@ as
                                ,p_auxiliary_info => null
                                     );
                 smb_deposit_utl.set_deposit_prolongation(p_object_id => i.id);
+                -- если за выходные накопилось несколько 2 пролонгации
+                loop
+                    l_expiry_date := null;
+                    select max(dpt.expiry_date_prolongation)
+                      into l_expiry_date
+                      from smb_deposit dpt
+                     where dpt.id = i.id
+                       and dpt.number_prolongation > nvl(dpt.current_prolongation_number, 0)    
+                       and dpt.expiry_date_prolongation <= l_date;
+                     if l_expiry_date is null then exit; end if;
+                     smb_deposit_utl.set_deposit_prolongation(p_object_id => i.id);
+                end loop;       
                 -- начисление + выплата %%
                 -- начислить %
+                    select max(dpt.expiry_date_prolongation)
+                      into l_expiry_date
+                      from smb_deposit dpt
+                     where dpt.id = i.id
+                       and dpt.expiry_date_prolongation <= l_date;
+                select max(expiry_date)
+                  into l_expiry_date
+                  from table(smb_deposit_utl.get_prolongation(p_deposit_id => i.id)) x
+                 where expiry_date <= l_date; 
                 accrual_interest(
-                               p_deposit_list => number_list(i.id)   
-                              ,p_start_date   => null
-                              ,p_end_date     => i.expiry_date
-                              ,p_mode         => 1
-                              ,p_silent_mode  => 0);
+                                 p_deposit_list => number_list(i.id)   
+                                ,p_start_date   => null
+                                ,p_end_date     => l_expiry_date - 1
+                                ,p_mode         => 1
+                                ,p_silent_mode  => 0);
+                -- end if;                                                
                 -- перевести со счета начисленных на депозитный
                 payment_interest(p_deposit_list => number_list(i.id)
                                 ,p_silent_mode  => 0);
@@ -2759,23 +2916,55 @@ as
         l_end_date     date;
         l_deposit_list tt_deposit_calculator;
         l_dep_ids_list number_list;
+        l_is_first_day number;
     begin
         logger.log_info(p_procedure_name => $$plsql_unit||'.auto_payment_accrued_interest start'
                                    ,p_log_message    => 'kf        : ' || bc.current_mfo || chr(10) ||
                                                         'bank date : ' || to_char(gl.bdate, 'yyyy-mm-dd') || chr(10) ||
                                                         'date      : ' || to_char(p_date, 'yyyy-mm-dd')); 
         l_end_date := trunc(case when p_date is null then gl.bdate else p_date end);
-        if (l_end_date = dat_next_u( last_day(l_end_date) + 1, -1)) then
-            -- дату устанавливаем в последний день месяца
-            l_end_date := last_day(l_end_date);
-        else 
-            -- выйти (?)
-            return;
+        -- 
+        --  ищем предыдущую банковскую дату, если она в прошлом месяце, то это то что нужно
+        if last_day(dat_next_u(l_end_date, -1)) + 1 <> trunc(l_end_date, 'month') then
+           l_is_first_day := 0;
+        else
+           -- ежемесячно/ежеквартально
+           l_is_first_day := 1;
         end if;
          -- определяем для каких депозитов нужна капитализация / стандартная выплата
+        with tObj as(
+                  select o.id
+                        ,t.is_capitalization
+                        ,t.last_accrual_date 
+                        ,t.last_payment_date
+                        ,d.start_date
+                        ,t.frequency_payment
+                        ,case when (t.is_capitalization = 1 -- капитализация
+                                    or t.frequency_payment <> 3) -- стандартная выплата (1 - месяц / 2 - квартал
+                              then 1      
+                              else 0
+                         end is_payment
+                        ,t.is_prolongation 
+                        ,da.account_id
+                    from object o
+                        ,smb_deposit t
+                        ,deal d
+                        ,deal_account da
+                        ,customer c -- + policy
+                   where 1 = 1
+                     and t.id = o.id  
+                     and o.object_type_id in (g_tranche_object_type_id, g_main_account_type_id)
+                     and o.id = d.id 
+                     and o.state_id in (g_object_active_state_id, g_object_blocked_state_id) 
+                     and o.id = d.id
+                     and d.id = da.deal_id
+                     and da.account_type_id = g_main_account_type_id
+                     and d.close_date is null
+                     and t.last_accrual_date is not null
+                     and d.customer_id = c.rnk)
             select t_deposit_calculator(
                             id                 => t.id
-                           ,account_id         => da.account_id 
+                           ,account_id         => t.account_id 
                            ,start_date         => null
                            ,end_date           => null
                            ,amount_deposit     => null
@@ -2787,29 +2976,32 @@ as
                            ,currency_id        => null
                            ,comment_           => case when t.is_capitalization = 1 then '1' else '0' end)
               bulk collect into l_deposit_list
-              from object o
-                  ,smb_deposit t
-                  ,deal d
-                  ,deal_account da
-                  ,customer c -- + policy
-             where (t.is_capitalization = 1 -- капитализация
-                 or t.frequency_payment <> 3) -- стандартная выплата (1 - месяц / 2 - квартал
-               and o.object_type_id in (g_tranche_object_type_id, g_main_account_type_id)
-               and o.id = d.id 
-               and o.state_id in (g_object_active_state_id, g_object_blocked_state_id) 
-               and o.id = d.id
-               and d.id = da.deal_id
-               and da.account_type_id = g_main_account_type_id
-               and d.close_date is null
-               and d.customer_id = c.rnk
-               -- ответ от банкак (??) - в конце месяца, если пришел срок
-               --    для первой оплаты берем последний день предыдущего месяца от даты начала действия депозита
-               --    ( trunc(d.start_date, 'month') - 1)
-               and trunc(months_between(l_end_date, nvl(t.last_payment_date, trunc(d.start_date, 'month') - 1))) = 
-                                  case when t.frequency_payment = 2 then 3 else 1 end;
+              from(
+                   select id
+                         ,is_capitalization
+                         ,account_id
+                     from tObj t
+                    where 1 = 1       
+                       -- ответ от банкак (??) - в конце месяца, если пришел срок
+                       --    для первой оплаты берем последний день предыдущего месяца от даты начала действия депозита
+                      and (-- ежемесячно/ежеквартально
+                          (   l_is_first_day = 1 
+                          and is_payment = 1
+                          and ceil(months_between(l_end_date, nvl(t.last_payment_date, trunc(t.start_date, 'month') - 1)))
+                              >= case when t.frequency_payment = 2 then 3 else 1 end)
+                        or (  t.is_prolongation = 1
+                            -- была пролонгация на выходных (???)
+                          and exists(
+                                     select null
+                                       from table(smb_deposit_utl.get_prolongation(p_deposit_id => t.id)) x
+                                      where t.last_accrual_date between x.start_date and x.expiry_date
+                                        and t.last_accrual_date > nvl(t.last_payment_date, t.start_date))
+                           ))) t   
+               ;
 
-        logger.log_info(p_procedure_name => $$plsql_unit||'.auto_payment_accrued_interest',
-                                p_log_message    => 'кол-во документов на выплату : '||l_deposit_list.count()
+        logger.log_info(p_procedure_name => $$plsql_unit||'.auto_payment_accrued_interest'
+                       ,p_log_message    => 'кол-во документов на выплату : '||l_deposit_list.count() || chr(10) ||
+                                            'is_first_day : '|| l_is_first_day    
                                 );
         -- проверить когда начислялись %, если нужно то доначислить  
         -- TODO (?)
