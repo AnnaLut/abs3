@@ -172,26 +172,26 @@ FROM customer c,
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_XOZREF[NSIFUNCTION][PROC=>PUL.PUT(''PROD'',:PROD);PUL.PUT(''XOZ_NLS'',:NLS);PUL.PUT(''XOZ_ACC'',:ACC);PUL.PUT(''XOZ_KV'',:KV)][EXEC=>BEFORE][ACCESSCODE=>2][CONDITIONS=>V_XOZREF.ACC=:ACC][showDialogWindow=>false]', 55);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_XOZREF[NSIFUNCTION][PROC=>PUL.PUT(''PROD'',:PROD);PUL.PUT(''XOZ_NLS'',:NLS);PUL.PUT(''XOZ_ACC'',:ACC);PUL.PUT(''XOZ_KV'',:KV)][EXEC=>BEFORE][ACCESSCODE=>2][CONDITIONS=>V_XOZREF.ACC=:ACC][showDialogWindow=>false]', 55 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Протокол закриття ДЗ за день', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZKWT[NSIFUNCTION][PROC=>PUL.PUT(''DATZ'',to_char( :D, ''dd.mm.yyyy'' ))][PAR=>:D(SEM=Дата_закриття,TYPE=D)][EXEC=>BEFORE][ACCESSCODE=>1][showDialogWindow=>false]', 22);
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Протокол закриття ДЗ за день', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZKWT[NSIFUNCTION][PROC=>PUL.PUT(''DATZ'',to_char( :D, ''dd.mm.yyyy'' ))][PAR=>:D(SEM=Дата_закриття,TYPE=D)][EXEC=>BEFORE][ACCESSCODE=>1][showDialogWindow=>false]', 22  );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 13, 'Дебетові запити до ЦА, що знаходяться на контролі', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZ_RU_CA[ACCESSCODE=>1][showDialogWindow=>false]', 71);
+  bars_metabase.add_nsifunction(l_tabid, 13, 'Дебетові запити до ЦА, що знаходяться на контролі', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZ_RU_CA[ACCESSCODE=>1][showDialogWindow=>false]', 71 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 15, 'АРХІВ відшкодувань госп.ДЗ, що виникла в РУ', '', '', 'ONCE', '', '', '', '', 'sPar=V_XOZ_RU_CA[showDialogWindow=>false][ACCESSCODE=>1][CONDITIONS=>V_XOZ_RU_CA.REC NOT in (1,2)]', 36);
+  bars_metabase.add_nsifunction(l_tabid, 15, 'АРХІВ відшкодувань госп.ДЗ, що виникла в РУ', '', '', 'ONCE', '', '', '', '', 'sPar=V_XOZ_RU_CA[showDialogWindow=>false][ACCESSCODE=>1][CONDITIONS=>V_XOZ_RU_CA.REC NOT in (1,2)]', 36  );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 16, 'Інвентаризаційна відомість станом на дату :D  ', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZREF_INV[ACCESSCODE=>1][PROC=>PUL.PUT(''DATZ'',to_char(:D,''dd.mm.yyyy''))][PAR=>:D(SEM=Звітна_дата,TYPE=D)][EXEC=>BEFORE]', 51);
+  bars_metabase.add_nsifunction(l_tabid, 16, 'Інвентаризаційна відомість станом на дату :D  ', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZREF_INV[ACCESSCODE=>1][PROC=>PUL.PUT(''DATZ'',to_char(:D,''dd.mm.yyyy''))][PAR=>:D(SEM=Звітна_дата,TYPE=D)][EXEC=>BEFORE]', 51 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 25, '---X Закрити заборг коштами з ЦА, що надійшли по ВПС', '------XOZ.OPL_CA (0)', '', 'ONCE', '', 'ОК', '', '', '', 78);
+  bars_metabase.add_nsifunction(l_tabid, 25, '---X Закрити заборг коштами з ЦА, що надійшли по ВПС', '------XOZ.OPL_CA (0)', '', 'ONCE', '', 'ОК', '', '', '', 78 );
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 30, 'Авто-Закриття по закритим рахункам', 'XOZ.CLS (0)', '', 'ONCE', 'Закрити автоматично всю картотеку по рахункам, які закрито ?
-', 'ОК', '', '', '', 61);
+', 'ОК', '', '', '', 61 );
 
   -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'DEL');
