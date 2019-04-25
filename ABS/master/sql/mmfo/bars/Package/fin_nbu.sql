@@ -4910,39 +4910,12 @@ begin
     -- < 1  дата реестрації < 1 року
     when  add_months(sysdate,-12) < datea_
          then   sTmp0 := 0; -- Ні
-    -- річна звітність
-    when zDAT_ = trunc(zDAT_,'YYYY')
-         then
-              if  (
-                   ZN_P(1495,1) < 0 and
-                   ZN_P(1495,1, add_months(zDAT_,-12)) < 0 and
-                   ZN_P(1495,1, add_months(zDAT_,-24)) < 0
-                   ) or
-                  (
-                   ZN_P(1495,1) < 0 and
-                   LOGK_read (add_months(zDAT_,-12),OKPO_,1,1) = 1 and
-                   LOGK_read (add_months(zDAT_,-24),OKPO_,1,1) = 0
-                   )
-                then  sTmp1:= 1 ; -- Так
-              end if;
     else
             if  (
-                 ZN_P(1495,1) < 0 and
+                 ZN_P(1495,1, trunc(zDAT_,'YYYY') ) < 0 and
                  ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-12)) < 0 and
                  ZN_P(1495,1, add_months(trunc(zDAT_,'YYYY'),-24)) < 0
-                 )  or
-                (
-                 ZN_P(1495,1) < 0 and
-                 LOGK_read (add_months(trunc(zDAT_,'YYYY'),0),OKPO_,1,1)   = 1 and
-                 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-12),OKPO_,1,1) = 0 and
-                 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-24),OKPO_,1,1) = 0
-                ) or
-                (
-                 ZN_P(1495,1) < 0 and
-                 LOGK_read (add_months(trunc(zDAT_,'YYYY'),0),OKPO_,1,1)   = 0 and  -- заповнена
-                 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-12),OKPO_,1,1) = 1 and  --не заповнена
-                 LOGK_read (add_months(trunc(zDAT_,'YYYY'),-24),OKPO_,1,1) = 0
-                )
+                 ) 
             then sTmp2:= 1 ; -- Так
             end if;
   end case;
@@ -6197,16 +6170,9 @@ begin
 
    --Контрагент має від`ємне значення капіталу протягом 3 останніх років'
 
-         if  (
-                       ZN_P(1495,1) < 0 and
-                       ZN_P(1495,1, add_months(DAT_,-12)) < 0 and
-                       ZN_P(1495,1, add_months(DAT_,-24)) < 0
-                       ) or
-                      (
-                        LOGK_read (DAT_,aOKPO_,1,1) > 0 or
-                        LOGK_read (add_months(DAT_,-12),aOKPO_,1,1) > 0 or
-                        LOGK_read (add_months(DAT_,-24),aOKPO_,1,1) > 0
-                       )
+         if   ZN_P(1495,1) < 0 and
+              ZN_P(1495,1, add_months(DAT_,-12)) < 0 and
+              ZN_P(1495,1, add_months(DAT_,-24)) < 0
                     then  fin_nbu.record_fp_nd('RG1', 1, 59, DAT_); -- Так
                     else  fin_nbu.record_fp_nd('RG1', 0, 59, DAT_); -- No
         end if;

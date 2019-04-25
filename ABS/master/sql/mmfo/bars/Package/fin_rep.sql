@@ -2606,7 +2606,7 @@ as
   l_rep_null t_col_rep_nbu_351_1;
   l_okpo     varchar2(12);
   l_dat      date;
-
+  l_kl_m    number := p_kl_m;
 PRAGMA AUTONOMOUS_TRANSACTION;
 begin
 
@@ -2615,11 +2615,14 @@ begin
      from fin_customer
     where rnk = p_rnk;
 
+  -- для тестових розрахунків выдображаэмо тільки сам розрахунок (оди період)
+  If  p_nd = 0 
+    then l_kl_m := 1;
+  end if;
 
-
- for x in (    select min(add_months(p_sFdat1,-num+1)) fdat , FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, add_months(p_sFdat1,-num+1), p_nd, p_rnk) zdat
+ for x in (    select  min(add_months(p_sFdat1,-num+1)) fdat , FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, add_months(p_sFdat1,-num+1), p_nd, p_rnk) zdat
                  from conductor
-                where num <= p_kl_m
+                where num <= l_kl_m
 				  and FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, add_months(p_sFdat1,-num+1), p_nd, p_rnk) is not null
 				  group by FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, add_months(p_sFdat1,-num+1), p_nd, p_rnk)
 		  )
