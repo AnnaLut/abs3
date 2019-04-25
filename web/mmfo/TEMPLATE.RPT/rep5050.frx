@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="02/23/2017 11:16:20" ReportInfo.Modified="03/25/2019 13:23:24" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/23/2017 11:16:20" ReportInfo.Modified="04/24/2019 11:53:03" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQBmbOYQcU9d0BSyb8RZIg1w=">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQDNXiK5JP+YANZICfdRHBWE=">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select a.kf, r.CORPORATION_NAME,&#13;&#10;       m.name,&#13;&#10;       to_char(a.kod_ustan) as kod_ustan,&#13;&#10;       a.okpo,&#13;&#10;       a.namk,&#13;&#10;       a.nbs as nbs,&#13;&#10;       count(a.acc) as cnt,&#13;&#10;       case when :in_trkk='Так' then a.kod_analyt else null end as kod_analyt,&#13;&#10;       sum( case when a.fdat=:sFdat1 then nvl(ostq,0)- nvl(obkrq,0)+nvl(obdbq,0) else 0 end)/100 as in_ost,&#13;&#10;       sum( case when a.fdat=:sFdat2 then a.ostq else 0 end)/100 as out_ost,&#13;&#10;       round(sum(nvl(ostq,0)- nvl(obkrq,0)+nvl(obdbq,0))/count(distinct (a.fdat)), 2) as sred,&#13;&#10;       sum((select sum(d.sq) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id))/100 as dbq,&#13;&#10;       sum((select sum(d.sq) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 0 and mfob in (select kf from clim_mfo)))/100 as dbqobu,&#13;&#10;       sum((select sum(d.sq) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 0 and mfob not in (select kf from clim_mfo)))/100 as dbqnotobu,&#13;&#10;       sum((select sum(d.sq) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 1))/100 as dkq,&#13;&#10;       sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id))  as cnt_doc,&#13;&#10;       sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 0)) as cnt_doc_db,&#13;&#10;       sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 1)) as cnt_doc_cr,&#13;&#10;       to_char(:sFdat1, 'dd.mm.yyyy') as sFdat1,&#13;&#10;       to_char(:sFdat2, 'dd.mm.yyyy') as sFdat2, &#13;&#10;       case when :nbs='%' then 'по всім рахунках' else 'по рахунках:'||:nbs end as nbss&#13;&#10;   from ob_corp_data_acc a&#13;&#10;   join v_ob_corp_rep_nbs q on q.rep_id = 5050 and q.nbs = a.nbs and q.corp_id = a.corp_id&#13;&#10;   left join v_root_corporation r on to_char(a.corp_id)=r.external_id&#13;&#10;   left join clim_mfo m on a.KF = m.mfo&#13;&#10;where a.corp_id= :corporation_id&#13;&#10;and a.is_last = 1&#13;&#10;and a.fdat between :sFdat1 and :sFdat2&#13;&#10;and instr(decode(:okpo,'%',a.okpo,:okpo),a.okpo)&gt;0&#13;&#10;and instr(decode(:nbs,'%',a.nbs,:nbs),a.nbs)&gt;0&#13;&#10;and instr(decode(:kod_analyt,'%',nvl(a.kod_analyt,'null'),:kod_analyt),nvl(a.kod_analyt,'null'))&gt;0&#13;&#10;group by (a.kf,m.name,a.kod_ustan,a.okpo,namk, r.CORPORATION_NAME, a.nbs,case when :in_trkk='Так' then a.kod_analyt else null end)&#13;&#10;order by decode(:SRT,'ЕДРПОУ',okpo,kod_ustan), decode(:SRT,'Код установи',kod_ustan,okpo), nbs, kod_analyt">
         <Column Name="KF" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
@@ -67,15 +67,15 @@
     <Total Name="TotalALL_IN_OST" Expression="[Table.IN_OST]" Evaluator="Data1" PrintOn="ReportSummary1"/>
   </Dictionary>
   <ReportPage Name="Page1" PaperWidth="450" Guides="349.65,472.5,595.35,812.7,1077.3,1436.4,945,1209.6,1341.9,1530.9,699.3,812.7,812.7,812.7">
-    <ReportTitleBand Name="ReportTitle1" Width="1625.4" Height="141.75">
-      <TextObject Name="Text1" Width="1625.4" Height="66.15" Text="Показники діяльності&#13;&#10;Клієнта: [Table.CORPORATION_NAME]&#13;&#10;[Table.NBSS]&#13;&#10;з [Table.SFDAT1] по [Table.SFDAT2]&#13;&#10;" HorzAlign="Center">
+    <ReportTitleBand Name="ReportTitle1" Width="1625.4" Height="151.2">
+      <TextObject Name="Text1" Width="1625.4" Height="18.9" Text="Показники діяльності&#13;&#10;&#13;&#10;" HorzAlign="Center">
         <Formats>
           <GeneralFormat/>
           <DateFormat/>
           <DateFormat/>
         </Formats>
       </TextObject>
-      <TableObject Name="Table1" Top="66.15" Width="1625.4" Height="75.6">
+      <TableObject Name="Table1" Top="75.6" Width="1625.4" Height="75.6">
         <TableColumn Name="Column1"/>
         <TableColumn Name="Column2"/>
         <TableColumn Name="Column3" Width="75.6"/>
@@ -132,126 +132,141 @@
           <TableCell Name="Cell37" Border.Lines="All" Fill.Color="Gray" Text="17" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
         </TableRow>
       </TableObject>
+      <TextObject Name="Text4" Top="18.9" Width="1625.4" Height="18.9" Text="Клієнта: [Table.CORPORATION_NAME]&#13;&#10;&#13;&#10;" HorzAlign="Center">
+        <Formats>
+          <GeneralFormat/>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text5" Top="37.8" Width="1625.4" Height="18.9" Text="[Table.NBSS]&#13;&#10;&#13;&#10;" HorzAlign="Center">
+        <Formats>
+          <GeneralFormat/>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text6" Top="56.7" Width="1625.4" Height="18.9" Text="з [Table.SFDAT1] по [Table.SFDAT2]&#13;&#10;&#13;&#10;" HorzAlign="Center">
+        <Formats>
+          <GeneralFormat/>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="144.95" Width="1625.4"/>
-    <ColumnHeaderBand Name="ColumnHeader1" Top="148.15" Width="1625.4"/>
-    <GroupHeaderBand Name="GroupHeader1" Top="151.35" Width="1625.4" Height="18.9" Condition="[Table.NAME]" SortOrder="None">
-      <TextObject Name="Text2" Width="1625.4" Height="18.9" Fill.Color="PapayaWhip" Text="[Table.NAME]" Font="Arial, 10pt, style=Bold"/>
-      <DataBand Name="Data1" Top="173.45" Width="1625.4" Height="37.8" DataSource="Table">
-        <TableObject Name="Table1" Width="1625.4" Height="37.8">
-          <TableColumn Name="Column18"/>
-          <TableColumn Name="Column19"/>
-          <TableColumn Name="Column20" Width="75.6"/>
-          <TableColumn Name="Column21"/>
-          <TableColumn Name="Column22" Width="75.6"/>
-          <TableColumn Name="Column23"/>
-          <TableColumn Name="Column24" Width="56.7"/>
-          <TableColumn Name="Column25" Width="122.85"/>
-          <TableColumn Name="Column26" Width="103.95"/>
-          <TableColumn Name="Column27" Width="113.4"/>
-          <TableColumn Name="Column28" Width="132.3"/>
-          <TableColumn Name="Column29" Width="132.3"/>
-          <TableColumn Name="Column30" Width="132.3"/>
-          <TableColumn Name="Column31" Width="132.3"/>
-          <TableColumn Name="Column32" Width="94.5"/>
-          <TableColumn Name="Column33" Width="94.5"/>
-          <TableColumn Name="Column34" Width="94.5"/>
-          <TableRow Name="Row3" Height="37.8">
-            <TableCell Name="Cell38" Border.Lines="All" Text="[Table.KF]" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell39" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell40" Border.Lines="All" Text="[Table.KOD_USTAN]" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell41" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell42" Border.Lines="All" Text="[Table.NAMK]" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell43" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell44" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell45" Border.Lines="All" Text="[Table.IN_OST]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell46" Border.Lines="All" Text="[Table.OUT_OST]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell47" Border.Lines="All" Text="[Table.SRED]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell48" Border.Lines="All" Text="[Table.DBQ]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell49" Border.Lines="All" Text="[Table.DBQOBU]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell50" Border.Lines="All" Text="[Table.DBQNOTOBU]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell51" Border.Lines="All" Text="[Table.DKQ]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell52" Border.Lines="All" Text="[Table.CNT_DOC]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell53" Border.Lines="All" Text="[Table.CNT_DOC_DB]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-            <TableCell Name="Cell54" Border.Lines="All" Text="[Table.CNT_DOC_CR]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center">
-              <Highlight>
-                <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
-              </Highlight>
-            </TableCell>
-          </TableRow>
-        </TableObject>
-        <Sort>
-          <Sort Expression="[Table.NAMK]"/>
-        </Sort>
-      </DataBand>
-      <GroupFooterBand Name="GroupFooter1" Top="214.45" Width="1625.4"/>
-    </GroupHeaderBand>
-    <GroupHeaderBand Name="GroupHeader2" Top="296.45" Width="1625.4" Condition="[Table.NBS]" SortOrder="None">
-      <DataHeaderBand Name="DataHeader1" Top="217.65" Width="1625.4" Height="75.6">
+    <DataBand Name="Data1" Top="156.53" Width="1625.4" Height="37.8" DataSource="Table">
+      <TableObject Name="Table1" Width="1625.4" Height="37.8">
+        <TableColumn Name="Column18"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column20" Width="75.6"/>
+        <TableColumn Name="Column21"/>
+        <TableColumn Name="Column22" Width="75.6"/>
+        <TableColumn Name="Column23"/>
+        <TableColumn Name="Column24" Width="56.7"/>
+        <TableColumn Name="Column25" Width="122.85"/>
+        <TableColumn Name="Column26" Width="103.95"/>
+        <TableColumn Name="Column27" Width="113.4"/>
+        <TableColumn Name="Column28" Width="132.3"/>
+        <TableColumn Name="Column29" Width="132.3"/>
+        <TableColumn Name="Column30" Width="132.3"/>
+        <TableColumn Name="Column31" Width="132.3"/>
+        <TableColumn Name="Column32" Width="94.5"/>
+        <TableColumn Name="Column33" Width="94.5"/>
+        <TableColumn Name="Column34" Width="94.5"/>
+        <TableRow Name="Row3" Height="37.8">
+          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.KF]" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[Table.KOD_USTAN]" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell42" Border.Lines="All" Text="[Table.NAMK]" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell43" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell45" Border.Lines="All" Text="[Table.IN_OST]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell46" Border.Lines="All" Text="[Table.OUT_OST]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[Table.SRED]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[Table.DBQ]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Table.DBQOBU]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[Table.DBQNOTOBU]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[Table.DKQ]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[Table.CNT_DOC]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell53" Border.Lines="All" Text="[Table.CNT_DOC_DB]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[Table.CNT_DOC_CR]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center">
+            <Highlight>
+              <Condition Expression="[Table.NBS] == &quot;Всього:&quot;" Fill.Color="Aquamarine" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+        </TableRow>
+      </TableObject>
+      <Sort>
+        <Sort Expression="[Table.NAME]"/>
+      </Sort>
+    </DataBand>
+    <GroupHeaderBand Name="GroupHeader2" Top="280.6" Width="1625.4" Condition="[Table.NBS]" SortOrder="None">
+      <DataHeaderBand Name="DataHeader1" Top="199.67" Width="1625.4" Height="75.6">
         <TextObject Name="Text3" Width="1625.4" Height="18.9" Fill.Color="LightBlue" Text="Загалом по аналітичним рахункам" Font="Arial, 10pt, style=Bold"/>
         <TableObject Name="Table3" Left="349.65" Top="18.9" Width="1275.75" Height="56.7" Border.Lines="All" Fill.Color="White">
           <TableColumn Name="Column52"/>
@@ -282,14 +297,14 @@
           </TableRow>
         </TableObject>
       </DataHeaderBand>
-      <GroupHeaderBand Name="GroupHeader3" Top="299.65" Width="1625.4" Condition="[Table.KOD_ANALYT]" SortOrder="None">
-        <DataBand Name="Data2" Top="302.85" Width="1625.4" DataSource="Table">
+      <GroupHeaderBand Name="GroupHeader3" Top="285.93" Width="1625.4" Condition="[Table.KOD_ANALYT]" SortOrder="None">
+        <DataBand Name="Data2" Top="291.27" Width="1625.4" DataSource="Table">
           <Sort>
             <Sort Expression="[Table.NBS]"/>
             <Sort Expression="[Table.KOD_ANALYT]"/>
           </Sort>
         </DataBand>
-        <GroupFooterBand Name="GroupFooter3" Top="306.05" Width="1625.4" Height="18.9">
+        <GroupFooterBand Name="GroupFooter3" Top="296.6" Width="1625.4" Height="18.9">
           <TableObject Name="Table2" Left="349.65" Width="1275.75" Height="18.9" Fill.Color="Silver">
             <TableColumn Name="Column39"/>
             <TableColumn Name="Column40" Width="56.7"/>
@@ -320,9 +335,9 @@
           </TableObject>
         </GroupFooterBand>
       </GroupHeaderBand>
-      <GroupFooterBand Name="GroupFooter2" Top="328.15" Width="1625.4"/>
+      <GroupFooterBand Name="GroupFooter2" Top="320.83" Width="1625.4"/>
     </GroupHeaderBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="331.35" Width="1625.4" Height="18.9">
+    <ReportSummaryBand Name="ReportSummary1" Top="326.17" Width="1625.4" Height="18.9">
       <TableObject Name="Table4" Width="1625.4" Height="18.9" Border.Lines="All">
         <TableColumn Name="Column64" Width="349.65"/>
         <TableColumn Name="Column65" Width="122.85"/>
