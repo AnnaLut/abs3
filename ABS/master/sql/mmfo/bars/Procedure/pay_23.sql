@@ -55,6 +55,7 @@ oo           oper%rowtype  ;
 l_finevare   NUMBER ;  l_row_id14   NUMBER ;  l_row_id13   NUMBER ;  l_row_id18   NUMBER ;  l_user       NUMBER ;  l_user_id    NUMBER ;
 l_user_err   NUMBER ;  l_kat        NUMBER ;  l_rez        NUMBER ;  l_fl         NUMBER ;  l_rez_pay    NUMBER ;  l_pay        NUMBER ;
 l_rnk        NUMBER ;  l_ref        INT    ;  l_kf     varchar2(6);
+l_cnt        NUMBER ; 
 
 dat31_       date   ;  dat01_       date   ;  l_dat        date   ;
 
@@ -240,11 +241,15 @@ begin
    -- заполнение счетов резерва
    P_2400_23(dat01_);
 
-   if mode_ = 0 and l_kf = '300465' THEN
-      z23.to_log_rez (user_id , 35 , dat01_ ,'Начало Переоцінка ЦП ');
-      pereocenka_cp(dat01_,0);
-      pereocenka_cp(dat01_,1);
+   if mode_ = 0 and l_kf = '300465'  THEN
+      select count(*) into l_cnt from oper where tt ='RXP' and vdat=dat31_ and sos=5;
+      if l_cnt = 0 THEN  
+         z23.to_log_rez (user_id , 35 , dat01_ ,'Начало Переоцінка ЦП ');
+         pereocenka_cp(dat01_,0);
+         pereocenka_cp(dat01_,1);
+      end if;   
    end if; 
+
 
    if mode_ = 0 THEN
       l_ref := bars_sqnc.get_nextval('s_REZ_OTCN');

@@ -1,8 +1,9 @@
 CREATE OR REPLACE FUNCTION BARS.F_FIN_MAX (p_dat01 date, p_nd integer, p_fin integer, p_tipa integer) RETURN date is
 
-/* ¬ерси€ 1.1   14-03-2019  10-04-2018
+/* ¬ерси€ 1.2   04-03-2019  14-03-2019  10-04-2018
    ƒата возникновени€ максимального значени€ фин.класса
-14-03-2019(1.1) -дату определ€ть с учетом ген.договора    
+03-04-2019(1.2) - NVL(l_fdat,p_dat01) если не удалось определить, то отчетна€ текуща€ дата
+14-03-2019(1.1) - дату определ€ть с учетом ген.договора    
 */
 
 l_fdat    nbu23_rez.fdat%type;
@@ -22,10 +23,10 @@ begin
    loop
       if k.fin = p_fin THEN   l_fdat := k.fdat;
       else
-      return least(l_fdat,p_dat01);
+      return least(NVL(l_fdat,p_dat01),p_dat01);
       end if;
    end loop;
-   return least(l_fdat,p_dat01);
+   return least(NVL(l_fdat,p_dat01),p_dat01);
 end;
 /
 
