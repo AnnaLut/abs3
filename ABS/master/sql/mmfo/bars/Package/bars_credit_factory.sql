@@ -48,7 +48,7 @@ END bars_credit_factory;
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_CREDIT_FACTORY 
 IS
    -- Private constant declarations
-   g_body_version    CONSTANT VARCHAR2 (64) := 'version 2.4 04/02/2019';
+   g_body_version    CONSTANT VARCHAR2 (64) := 'version 2.5 18/04/2019';
    g_awk_body_defs   CONSTANT VARCHAR2 (512) := '';
    g_dbgcode         CONSTANT VARCHAR2 (20) := 'bars_credit_factory.';
 
@@ -225,7 +225,8 @@ FUNCTION get_crd_response_new (p_okpo     IN bars.customer.okpo%TYPE,
                xmlelement("FIO",c.nmk),
                xmlelement("INSIDER",c.prinsider),
                xmlelement("PUBLIC",nvl((select case upper(cw.value)
-                                      when 'ТАК' THEN 'Y'
+                                      when 'ТАК' THEN 'Y' -- обработка проблемы со справочником FM_YESNO
+									  when 'TAК' THEN 'Y'
                                       else 'N'
                                     end
                                from  customerw cw
