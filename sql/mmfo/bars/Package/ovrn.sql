@@ -377,6 +377,19 @@ OVR_TERM_TRZ.TRZ = Код события:
 3 НЕпогашення нарах.проц.+ком.  15
 4 "Ручне" призупинення ОВР  30
 */
+
+
+/*  delete from OVR_TERM_TRZ t
+   where TRZ < 4 and ( DATSP < gl_bdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  OR OVRN.fost_sal(t.acc, gl_bdate) >= 0  )  ;*/
+   
+   delete from OVR_TERM_TRZ t
+   where TRZ < 4 and ( 
+                     DATSP < gl_bdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  ---вообще не понимаю зачем это делать тут, ведь это уже вынос на просрочку (может, вынос на просрочку произошел на открытии дня, а на следующий день мы подчищаем тормозной путь)
+                     OR 
+                     (exists (select 1 from accounts a, nd_acc n where n.nd = dd.nd and a.acc = n.acc and a.acc= t.acc and OVRN.fost_sal(a.acc, gl_bdate) >= 0 and  TRZ = 1)) 
+                     OR 
+                     (exists (select 1 from accounts a, nd_acc n where n.nd = dd.nd and a.acc = n.acc and a.acc= t.acc and OVRN.fost_sal(a.acc, gl_bdate) >= a.lim*(-1) and  TRZ = 2))
+                     );
   -- проверка на 13, 12, 11
 
   begin  ---- Просроченное тело -- абсолютный блок
@@ -392,16 +405,6 @@ OVR_TERM_TRZ.TRZ = Код события:
   EXCEPTION WHEN NO_DATA_FOUND THEN  null;
   end;
 
-/*  delete from OVR_TERM_TRZ t
-   where TRZ < 4 and ( DATSP < gl_bdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  OR OVRN.fost_sal(t.acc, gl_bdate) >= 0  )  ;*/
-   
-   delete from OVR_TERM_TRZ t
-   where TRZ < 4 and ( 
-                     DATSP < sysdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  
-                     OR 
-                     exists (select 1 from accounts a where a.acc= t.acc and OVRN.fost_sal(a.acc, sysdate) >= 0 )
-                     );
-
   begin -- Просроченные проценты несвоевременная оплата %/комиссии,
      select 11 into n_sos from accounts a, nd_acc n where n.nd = dd.ND and a.acc= n.acc and a.nbs = SB_2069.R020 and tip ='SPN' and a.ob22 = SB_2069.ob22 and OSTC < 0  and rownum = 1 ;
      goto ReT_;
@@ -413,6 +416,7 @@ OVR_TERM_TRZ.TRZ = Код события:
   EXCEPTION WHEN NO_DATA_FOUND THEN  null;
   end;
 
+  --(в теории, это блок вообще можно убрать)
   begin -- Просто в серой зоне
     select 11 into n_sos from accounts a, nd_acc n, OVR_TERM_TRZ t
     where n.nd=dd.ND and a.acc=n.acc and a.acc=t.acc and t.trz < 4 and rownum = 1 ;               goto ReT_;
@@ -1954,18 +1958,24 @@ begin
 
         select ostc into a26.ostc from accounts where acc = a26.acc;
 
-        If /*a26.ostc <= 0 and */ p_mode = 0 then -- COBUMMFO-10560  (деньги насчете есть, но запрещено договорное списание. Получается, что и не гасим и не выносим на просрочку)
+        If /*a26.ostc <= 0 and */ p_mode = 0 then -- COBUMMFO-10560  (деньги на счете есть, но запрещено договорное списание. Получается, что и не гасим и не выносим на просрочку)
 
            If a26.ostc < 0 then   --просроч тело
               l_mdat := Least ( dd.Wdate, OVRN.Get_mdat (a26.acc) );
+              if l_mdat < gl.bDATE then
+                   -- серая зона 15 дней по причине нарушения MDATE. т.е. угроза просрочки по телу
+                  -- 1  Порушено дог.кіл.днів в ОВР  15
+                  OVRN.ins_TRZ  (p_acc1  => a26.acc, -- счет-нарушитель (виновник)
+                                 p_datVZ => l_date ,
+                                 p_datSP => null   ,
+                                 p_trz   => 1    ) ;
+              end if;                   
+                 
               update accounts set mdate = l_mdat where acc = a26.acc and (mdate <> l_mdat or mdate is null) ;
-
-
               If dd.Wdate < gl.bDate then dTmp_ := gl.bDate ;
                  OVRN.OP_SP ( dd, a26   , a67, a69 ) ; -- Открытие сч просрочки
                  OVRN.BG1   ( p_ini,  2 , l_date,  dd, a26, a26 ) ; -- проводки по просрочке по телу
                  OVRN.isob  ( p_nd => dd.ND, p_sob => 'Винесено на прострочку '||a26.nls );
-
               else select max(datSP) into dTmp_ from OVR_TERM_TRZ where acc = a26.acc and datSP <= l_date ;    ----- 2) СТАРТ: вынос на просрочку
 
                  If dTmp_ is not null then
@@ -1975,11 +1985,7 @@ begin
                        OVRN.isob  ( p_nd => dd.ND, p_sob => 'Винесено на прострочку '||a26.nls );
                     end if ;
                  end if ;
-
               end if;
-
-
-
            end if;
 
            OVRN.BG1   ( p_ini, 3 , l_date,  dd, a26, a26 ) ; -- -- Проверить погашены ли % и ести нет - вынос на просточку
@@ -2066,10 +2072,10 @@ begin
 
                   -- серая зона 15 дней по причине нарушения MDATE. т.е. угроза просрочки по телу
                   -- 1  Порушено дог.кіл.днів в ОВР  15
-                  OVRN.ins_TRZ  (p_acc1  => aaa.acc, -- счет-нарушитель (виновник)
+/*                  OVRN.ins_TRZ  (p_acc1  => aaa.acc, -- счет-нарушитель (виновник)
                                  p_datVZ => l_date ,
                                  p_datSP => null   ,
-                                 p_trz   => 1    ) ;
+                                 p_trz   => 1    ) ;*/
                end if;
             end if ; ---
 
@@ -2839,7 +2845,7 @@ If p_mode = 1  then    --- Погашение
          If p_ini = 0 then   --вызов от технолога по списку старта/финиша (без свала)
             SAVEPOINT do_SP1 ;
             begin     OVRN.opl1(oo);    gl.pay (2, oo.ref, oo.vdat);   L_OST  := L_OST  - oo.s ;
-            EXCEPTION WHEN OTHERS THEN sTmp_ := 'OVRN:'||oo.nlsa||'->'|| oo.nlsb||'. НЕможливо виконати '||oo.s||'='||sTmp_; ROLLBACK TO do_SP1;   logger.error(sTmp_) ;
+            EXCEPTION WHEN OTHERS THEN sTmp_ := 'OVRN:'||oo.nlsa||'->'|| oo.nlsb||'. НЕможливо виконати '||oo.s||'='||sTmp_||'  OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000); ROLLBACK TO do_SP1;   logger.error(sTmp_) ;
             end ;
          else         OVRN.opl1(oo);   gl.pay (2, oo.ref, oo.vdat);   L_OST  := L_OST  - oo.s ;
          end if ;
