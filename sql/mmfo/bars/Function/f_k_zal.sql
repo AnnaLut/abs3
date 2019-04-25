@@ -24,7 +24,7 @@ begin
       else                       l_k := 0;
       end if;
    elsif p_kod_351 BETWEEN 12 AND 27 THEN
-      if p_kol_fin_max < 730 THEN l_k := 1; 
+      if p_kol_fin_max <= 730 THEN l_k := 1; 
       else
          if l_fin_restr = 1 THEN  l_k := 1; 
          else
