@@ -98,7 +98,7 @@
                     success: function (response) {
                         var compositeCode = response.d.CompositeCode;
                         if (compositeCode != "") {
-                            var message = "Увага! Виявлено збіг з переліком публічних діячів № в переліку = " + compositeCode + ", (" + nmk.value + "). \nЗверніться до підрозділу фінансового моніторингу!";
+                            var message = "Увага! Виявлено збіг з переліком публічних діячів № в переліку = " + compositeCode + ", (" + nmk.value + ").";
                             alert(message);
                         }
                     }
