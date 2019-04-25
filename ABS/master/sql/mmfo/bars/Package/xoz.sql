@@ -6,6 +6,7 @@
   g_header_version   CONSTANT VARCHAR2 (64) := 'version 4.2  24.09.2018';
 --============ контроль деб.зажолженности по хоз.деятельности банка  ===============----------------
 /*
+21.03.2019 Тарасенко OPL_REFD - добавлен параметр p_refd 
 17.10.2017 Sta ОДНА сума закриття призначена для закриття 2-х і більше виникнень,і тому вона більша кожної з них, перевірку на суму взагалі відмінити
 29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
 14.08.2017 СУХОВА. Добавлен протокол квитовки. Удаление установленной связи
@@ -99,7 +100,8 @@ procedure OPL_REFD( p_acc   XOZ_ref.acc%type   ,
                     p_KDZ1  varchar2           ,
                     p_SDZ1  varchar2           ,
                     p_OB40  varchar2           ,
-                    p_nlsa  oper.nlsa%type     ) ;
+                    p_nlsa  oper.nlsa%type     ,
+                    p_refd  XOZ_ref.Refd%type  ) ;
 
 ----------------------------------------------------
 --Стартовое формирование картотеки
@@ -124,6 +126,7 @@ CREATE OR REPLACE PACKAGE BODY XOZ IS
   11.01.2019 Sta В проводке по відшкодуванню(xoz.XOZ7) ид.коді ЦА + РУ.
                  В назн.пл добавлено название РУ
 
+  21.03.2019 Тарасенко OPL_REFD - добавлен параметр p_refd; проверка наличия значения p_refd 
   21.09.2018 Sta Контроль логики функции и уровня пользователя
   19.09.2018 Sta Отказываемся от деб.запрсов через ВПС
   20.04.2018 Sta Протоколирование закрытия хоз.деб вs sec_AUDIT c принзаком XOZ_AUDIT
@@ -751,7 +754,8 @@ procedure OPL_REFD( p_acc   XOZ_ref.acc%type   ,
                     p_KDZ1  varchar2           , -- резерв
                     p_SDZ1  varchar2           , -- резерв
                     p_OB40  varchar2           , -- резерв
-                    p_nlsa  oper.nlsa%type       -- резерв
+                    p_nlsa  oper.nlsa%type     , -- резерв
+                    p_refd  XOZ_ref.Refd%type
                ) is
   -- Формування деб.запиту до ЦА
 
@@ -760,6 +764,10 @@ procedure OPL_REFD( p_acc   XOZ_ref.acc%type   ,
   l_err  int               ;
   aa accounts%rowtype      ;
 begin
+
+  If p_refd is not null then
+     raise_application_error(-20000,'Документ Реф1 = '|| p_ref1 ||  'не допускається повторна відправка деб. запиту' );
+  end if;
 
   If gl.aMfo ='300465' or gl.aMfo  is null then
      raise_application_error(-20000,'Користувач з МФО = '|| gl.aMfo ||  'Не має права на деб.запити - тілки для ВПС' );

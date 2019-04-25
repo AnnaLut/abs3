@@ -163,29 +163,29 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Повне РУЧНЕзактиття  (обнулення) ', 'XOZ.OPL_REF_H2( :ACC, :REF1, :STMT1, :VDAT, :S0, :R ,:Z, :S0, null ) ', ':R(SEM=Реф.документу закриття (за наявності) ,TYPE=N),:Z(SEM=Корр=1,TYPE=N)', 'EACH', 'Всю суму документу :S0 буде закрито з введеним признаком корригуючих', 'ОК', '', '', '', 11);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Повне РУЧНЕзактиття  (обнулення) ', 'XOZ.OPL_REF_H2( :ACC, :REF1, :STMT1, :VDAT, :S0, :R ,:Z, :S0, null ) ', ':R(SEM=Реф.документу закриття (за наявності) ,TYPE=N),:Z(SEM=Корр=1,TYPE=N)', 'EACH', 'Всю суму документу :S0 буде закрито з введеним признаком корригуючих', 'ОК', '', '', '', 11 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Часткове Ручне закриття (зменшення) БЕЗ поновлення дати для залишку ', 'XOZ.OPL_REF_H2( :ACC, :REF1, :STMT1, :VDAT, :S0, :R, :Z, :P, null ) ', ':R(SEM=Реф.док закриття...,TYPE=N),:Z(SEM=Корр=1,TYPE=N),:P(SEM=Сума ЧАСТКИ закриття,TYPE=N)', 'EACH', 'Введену частку суми документу буде закрито з  введеним признаком корр.', 'ОК', '', '', '', 112);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Часткове Ручне закриття (зменшення) БЕЗ поновлення дати для залишку ', 'XOZ.OPL_REF_H2( :ACC, :REF1, :STMT1, :VDAT, :S0, :R, :Z, :P, null ) ', ':R(SEM=Реф.док закриття...,TYPE=N),:Z(SEM=Корр=1,TYPE=N),:P(SEM=Сума ЧАСТКИ закриття,TYPE=N)', 'EACH', 'Введену частку суми документу буде закрито з  введеним признаком корр.', 'ОК', '', '', '', 112 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 5, 'Часткове Ручне закриття (зменшення) З поновленням дати для залишку ', 'XOZ.OPL_REF_H2( :ACC, :REF1, :STMT1, :VDAT, :S0, :R, :Z, :P, gl.BD ) ', ':R(SEM=Реф.док закриття...,TYPE=N),:Z(SEM=Корр=1,TYPE=N),:P(SEM=Сума ЧАСТКИ закриття,TYPE=N)', 'EACH', 'Введену частку суми документу буде закрито з  введеним признаком корр.', 'ОК', '', '', '', 108);
+  bars_metabase.add_nsifunction(l_tabid, 5, 'Часткове Ручне закриття (зменшення) З поновленням дати для залишку ', 'XOZ.OPL_REF_H2( :ACC, :REF1, :STMT1, :VDAT, :S0, :R, :Z, :P, gl.BD ) ', ':R(SEM=Реф.док закриття...,TYPE=N),:Z(SEM=Корр=1,TYPE=N),:P(SEM=Сума ЧАСТКИ закриття,TYPE=N)', 'EACH', 'Введену частку суми документу буде закрито з  введеним признаком корр.', 'ОК', '', '', '', 108 );
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 10, 'Повне  АВТО закриття ( з ПРОВОДКОЮ ) ', 'XOZ.OPL_REF2(:ACC, :REF1, :STMT1, :VDAT, :S0, :Z, :S0, null, :T, :X, null, :O, :A )', ':A(SEM=Рах Деб,REF=V_XOZOB22_NLS),:Z(SEM=Корр=1,TYPE=N),:T(SEM=Підстава),:X(SEM=Код ДЗ,REF=KOD_DZ),:O(SEM=OB40 для ф40,REF=KF_OB40)
-', 'EACH', 'Всю суму документу :S0 буде закрито з введеним признаком корр.', 'ОК', '', '', '', 157);
+', 'EACH', 'Всю суму документу :S0 буде закрито з введеним признаком корр.', 'ОК', '', '', '', 157 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 12, 'Часткове  АВТО закриття ( з ПРОВОДКОЮ )   БЕЗ поновлення дати для залишку ', 'XOZ.OPL_REF2(:ACC, :REF1, :STMT1, :VDAT, :S0, :Z, :P, null, :T, :X, null, :O, :A )', ':P(SEM=Сума ЧАСТКИ закриття,TYPE=N),:A(SEM=Рах Деб,REF=V_XOZOB22_NLS),:Z(SEM=Корр=1,TYPE=N),:T(SEM=Підстава),:X(SEM=Код ДЗ,REF=KOD_DZ),:O(SEM=OB40 для ф40,REF=KF_OB40)', 'EACH', 'Введену частку суми документу буде закрито з  введеним признаком корр.', 'ОК', '', '', '', 85);
+  bars_metabase.add_nsifunction(l_tabid, 12, 'Часткове  АВТО закриття ( з ПРОВОДКОЮ )   БЕЗ поновлення дати для залишку ', 'XOZ.OPL_REF2(:ACC, :REF1, :STMT1, :VDAT, :S0, :Z, :P, null, :T, :X, null, :O, :A )', ':P(SEM=Сума ЧАСТКИ закриття,TYPE=N),:A(SEM=Рах Деб,REF=V_XOZOB22_NLS),:Z(SEM=Корр=1,TYPE=N),:T(SEM=Підстава),:X(SEM=Код ДЗ,REF=KOD_DZ),:O(SEM=OB40 для ф40,REF=KF_OB40)', 'EACH', 'Введену частку суми документу буде закрито з  введеним признаком корр.', 'ОК', '', '', '', 85 );
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 13, 'Часткове  АВТО закриття ( з ПРОВОДКОЮ )  З поновленням дати для залишку ', 'XOZ.OPL_REF2(:ACC, :REF1, :STMT1, :VDAT, :S0, :Z, :P, GL.BD, :T, :X,  NULL,  :O, :A )', ':P(SEM=Сума ЧАСТКИ закриття,TYPE=N),:A(SEM=Рах Деб,REF=V_XOZOB22_NLS),:Z(SEM=Корр=1,TYPE=N),:T(SEM=Підстава),:X(SEM=Код ДЗ,REF=KOD_DZ),:O(SEM=OB40 для ф40,REF=KF_OB40)', 'EACH', 'Введену частку суми документу буде закрито з  введеним признаком корр.', 'ОК', '', '', '', 84);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 14, 'Деб.запит до ЦА на  АВТО закриття ', 'XOZ.OPL_REFD( :ACC, :REF1, :STMT1, gl.bd, :S0, 0, 0, gl.bd, '''', '''', '''', '''', '''' )', '', 'EACH', '', 'ОК', '', '', '', 71);
+  bars_metabase.add_nsifunction(l_tabid, 14, 'Деб.запит до ЦА на  АВТО закриття ', 'XOZ.OPL_REFD( :ACC, :REF1, :STMT1, gl.bd, :S0, 0, 0, gl.bd, '''', '''', '''', '''', '''', :REFD )', '', 'EACH', '', 'ОК', '', '', '', 71 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 20, 'Деб.проводки, що ввдсутні в картотеці', '', '', 'ONCE', '', 'OK', '', '', 'sPar=V_XOZREF_ADD[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false]', 4);
+  bars_metabase.add_nsifunction(l_tabid, 20, 'Деб.проводки, що ввдсутні в картотеці', '', '', 'ONCE', '', 'OK', '', '', 'sPar=V_XOZREF_ADD[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false]', 4 );
 
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 1, null, 'REFD is not null', 1, 'COLOR_Red');
