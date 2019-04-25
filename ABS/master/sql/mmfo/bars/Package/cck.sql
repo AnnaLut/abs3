@@ -1167,10 +1167,10 @@
 END cck;
 
 /
-CREATE OR REPLACE PACKAGE BODY CCK IS
+CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.18  12.04.2019';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.19  11.04.2019';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
@@ -1187,6 +1187,7 @@ CREATE OR REPLACE PACKAGE BODY CCK IS
   */
 
   /*
+24-01-2019 VPogoda обновлена процедура разбора счета гашения (в части просроченных комиссий), обновлен график погашения  
 04-10-2018 VPogoda  в cc_asg логика обработки 2620 вейских сделана аналогично 2625
 01-08-2018 VPogoda  закрытие гендоговора с субдоговорами
 24.06.2018 LitvinSO   COBUMMFO-8388
@@ -3230,16 +3231,18 @@ CREATE OR REPLACE PACKAGE BODY CCK IS
     mdate_ accounts.mdate%TYPE;
     nls_   accounts.nls%TYPE;
   BEGIN
-    FOR k IN (SELECT d.nd, d.vidd, d.rnk
+    FOR k IN (SELECT d.nd, d.vidd, d.rnk, d.prod
                 FROM cc_deal d
                WHERE d.wdate > dat_ - 7
                  AND d.wdate < dat_
                  AND mode_ IN (0, d.nd)
                  AND (custtype_ = 0 OR
-                     (custtype_ <= 2 AND d.vidd IN (1, 2, 3) and not d.prod like '9000%') OR
-                     (custtype_ = 3 AND d.vidd IN (11, 12, 13))
+                     custtype_ <= 2 AND d.vidd IN (1, 2, 3) OR
+                     custtype_ = 3 AND d.vidd IN (11, 12, 13))
+-- COBUMMFO-10310 не включать в обработку договора, по которым нет остатков на счетах срочной задолженности
+                 and exists (select 1 from nd_acc n, accounts a where n.nd = d.nd and n.acc = a.acc and a.dazs is null and a.tip in ('SS ','SN ','SK0') and ostc!=0 ) 
                      )
-              ) LOOP
+    LOOP
       cck.cc_asp(k.nd, 0);
 
       IF k.vidd < 10 THEN
@@ -3256,8 +3259,10 @@ CREATE OR REPLACE PACKAGE BODY CCK IS
       FOR p IN (SELECT a.kv,
                        a.acc,
                        vkrzn(substr(gl.amfo, 1, 5),
-                             substr(a.nls, 1, 3) ||case when newnbs.get_state = 1 then '80' else '90' end ||
-                             substr(a.nls, 6, 9)) nls,
+                             CCK_UI.na_nls(x_nls => 'N/A', -- COBUMMFO-10310 счет определяем так же, как и в прогнозе
+                                           x_acc8 => a.acc,
+                                           x_tip => 'SPN',
+                                           x_prod => k.prod)) nls,
                        a.isp,
                        a.grp,
                        a.mdate,
