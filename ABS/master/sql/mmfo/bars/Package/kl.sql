@@ -586,7 +586,7 @@ is
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.3  03/10/2018';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.4  26/04/2019';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ   - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -2334,6 +2334,7 @@ procedure setFullCustomerAddress (
 IS
   NewId_ number;
   l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
+  l_address customer_address.address%type := p_address;
 BEGIN
   bars_audit.trace('%s 1.params:'
        || ' p_Rnk=>%s,'
@@ -2387,35 +2388,64 @@ BEGIN
 				where rnk = p_Rnk and type_id = p_TypeId;
 
 		else
+      -- формируем поле адрес, если оно зашло пустое.
+      if p_address is null then
+        select rtrim(substr(case p_street_type
+                 when null then null 
+                 else (select st.str_tp_nm||' '||p_street||', '
+                         from adr_street_types st
+                         where st.str_tp_id = p_street_type)
+               end ||
+               case p_home_type
+                 when null then null
+                 else (select ht.value||' '||p_home||', '
+                         from adr_home_type ht
+                         where ht.id = p_home_type)
+               end ||
+               case p_homepart_type
+                 when null then null
+                 else (select pt.value||' '||p_homepart||', '
+                         from adr_homepart_type pt
+                         where pt.id = p_homepart_type)
+               end ||
+               case p_room_type
+                 when null then null
+                 else (select rt.value||' '||p_room
+                         from adr_room_type rt
+                         where rt.id = p_room_type)
+               end,1,100),', ')
+           into l_address
+           from dual;
+       end if;
 
-			update customer_address
-				set country       = p_Country,
-					zip     	     = p_Zip,
-					domain  	     = p_Domain,
-					region        = p_Region,
-					locality      = p_Locality,
-					address       = p_Address,
-					territory_id  = p_TerritoryId,
-					locality_type = p_locality_type,
-					street_type   = p_street_type,
-					street        = p_street,
-					home_type     = p_home_type,
-					home          = p_home,
-					homepart_type = p_homepart_type,
-					homepart      = p_homepart,
-					room_type     = p_room_type,
-					room          = p_room,
-					comm          = p_comment
-				where rnk = p_Rnk and type_id = p_TypeId;
+       update customer_address
+         set country       = p_Country,
+             zip     	   = p_Zip,
+             domain  	   = p_Domain,
+             region        = p_Region,
+             locality      = p_Locality,
+             address       = l_Address,
+             territory_id  = p_TerritoryId,
+             locality_type = p_locality_type,
+             street_type   = p_street_type,
+             street        = p_street,
+             home_type     = p_home_type,
+             home          = p_home,
+             homepart_type = p_homepart_type,
+             homepart      = p_homepart,
+             room_type     = p_room_type,
+             room          = p_room,
+             comm          = p_comment
+         where rnk = p_Rnk 
+           and type_id = p_TypeId;
 
-		end if;
-
+     end if;
         if sql%rowcount = 0 then
            bars_audit.trace('%s 4. регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
            -- Добавление
            insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address, territory_id,
               locality_type, street_type, street, home_type, home, homepart_type, homepart, room_type, room, comm)
-           values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, p_Address, p_TerritoryId,
+           values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, l_Address, p_TerritoryId,
               p_locality_type, p_street_type, p_street, p_home_type, p_home, p_homepart_type, p_homepart,
               p_room_type, p_room, p_comment);
            bars_audit.trace('%s 5. завершена регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
@@ -2440,7 +2470,7 @@ $if KL_PARAMS.CLV $then
         l_clv.domain   	    := p_Domain;
         l_clv.region   	    := p_Region;
         l_clv.locality 	    := p_Locality;
-        l_clv.address  	    := p_Address;
+        l_clv.address  	    := l_Address;
         l_clv.territory_id  := p_TerritoryId;
         l_clv.locality_type := p_locality_type;
         l_clv.street_type   := p_street_type;
@@ -2493,6 +2523,7 @@ procedure setFullCustomerAddress (
 IS
   NewId_ number;
   l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
+  l_address customer_address.address%type := p_address;
 BEGIN
   bars_audit.trace('%s 1.params:'
        || ' p_Rnk=>%s,'
@@ -2546,13 +2577,41 @@ BEGIN
             where rnk = p_Rnk and type_id = p_TypeId;
 
         else
+          if p_address is null then
+            select rtrim(substr(case p_street_type
+                     when null then null 
+                     else (select st.str_tp_nm||' '||p_street||', '
+                             from adr_street_types st
+                             where st.str_tp_id = p_street_type)
+                   end ||
+                   case p_home_type
+                     when null then null
+                     else (select ht.value||' '||p_home||', '
+                             from adr_home_type ht
+                             where ht.id = p_home_type)
+                   end ||
+                   case p_homepart_type
+                     when null then null
+                     else (select pt.value||' '||p_homepart||', '
+                             from adr_homepart_type pt
+                             where pt.id = p_homepart_type)
+                   end ||
+                   case p_room_type
+                     when null then null
+                     else (select rt.value||' '||p_room
+                             from adr_room_type rt
+                             where rt.id = p_room_type)
+                   end,1,100),', ')
+               into l_address
+               from dual;
+           end if;
           update customer_address
             set country       = p_Country,
               zip            = p_Zip,
               domain         = p_Domain,
               region        = p_Region,
               locality      = p_Locality,
-              address       = p_Address,
+              address       = l_Address,
               territory_id  = p_TerritoryId,
               --locality_type = p_locality_type,
               --street_type   = p_street_type,
@@ -2581,7 +2640,7 @@ BEGIN
            insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address, territory_id,
               locality_type, street_type, street, home_type, home, homepart_type, homepart, room_type, room, comm,
               region_id, area_id, settlement_id, street_id, house_id, locality_type_n, street_type_n  )
-           values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, p_Address, p_TerritoryId,
+           values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, l_Address, p_TerritoryId,
               /*p_locality_type*/null, /*p_street_type*/null, p_street, p_home_type, p_home, p_homepart_type, p_homepart,p_room_type, p_room, p_comment,
               p_region_id, p_area_id, p_settlement_id, p_street_id,p_house_id, p_locality_type, p_street_type);
            bars_audit.trace('%s 5. завершена регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
@@ -2606,7 +2665,7 @@ $if KL_PARAMS.CLV $then
         l_clv.domain        := p_Domain;
         l_clv.region        := p_Region;
         l_clv.locality      := p_Locality;
-        l_clv.address       := p_Address;
+        l_clv.address       := l_Address;
         l_clv.territory_id  := p_TerritoryId;
         l_clv.locality_type := p_locality_type;
         l_clv.street_type   := p_street_type;
