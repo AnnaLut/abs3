@@ -917,7 +917,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                   from   (select distinct bpk.nd, bpk.kv, bpk.acc,
                                                  ost_korr(bpk.acc, add_months(trunc(sysdate, 'mm'), -1), null, null) sp
                                           from  nbu_w4_bpk bpk
-                                          where  bpk.tip='SP ')
+                                          where  bpk.tip in ('SP ','KSP'))
                                   group by nd, kv) sp on bpk.nd = sp.nd and
                                                          bpk.kv = sp.kv
                        -- spn
@@ -925,7 +925,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                   from   (select distinct bpk.nd, bpk.kv, bpk.acc,
                                                  ost_korr(bpk.acc, add_months(trunc(sysdate, 'mm'), -1), null, null) spn
                                           from   nbu_w4_bpk bpk
-                                          where  bpk.tip = 'SPN')
+                                          where  bpk.tip in ('SPN','KPN'))
                                   group by nd, kv) spn on bpk.nd = spn.nd and
                                                           bpk.kv=spn.kv
                        --залишок заборгованості за кредитною операцією
@@ -1130,13 +1130,13 @@ procedure  p_nbu_credit (kf_ in varchar2)
 												               end flagInsurance
 							          	             from nd_txt where tag='INSCC') ndt on ndt.nd=ad.nd
                      left join (select nd,kv, sum (sp) sp_sum  from (
-                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,add_months(trunc(sysdate,'mm'),-1)) sp
+                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,trunc(sysdate,'mm')) sp
                                         from  bars.nd_acc n,  bars.accounts a2
                                         where  n.acc = a2.acc and a2.tip='SP')
                                        group by nd,kv)  sp_cred  on sp_cred.nd=ad.nd 
                                                      
                       left join (select nd,kv, sum (spn) spn_sum  from (
-                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,add_months(trunc(sysdate,'mm'),-1)) spn
+                                        select distinct n.nd,a2.kv,a2.acc,bars.fost(a2.acc,trunc(sysdate,'mm')) spn
                                         from  bars.nd_acc n,  bars.accounts a2
                                         where  n.acc = a2.acc and a2.tip='SPN')
                                        group by nd,kv) spn_cred  on spn_cred.nd=ad.nd,                   
