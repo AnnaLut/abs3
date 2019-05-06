@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.012  22/04/2019 (18/04/2019)
+% VERSION : v.19.014  02/05/2019 (26/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -805,7 +805,6 @@ BEGIN
                 )
              OR mfou_ NOT IN (300205, 300465)
           THEN
-
               BEGIN
                  SELECT a.ost
                    INTO se1_
@@ -813,7 +812,8 @@ BEGIN
                   WHERE a.fdat = dat_
                     AND s.acc = acc_
                     AND s.accc = a.acc
-                    AND a.nbs IS NOT NULL;
+                    AND a.nbs IS NOT NULL
+                    and a.nbs <> '8999';
 
                  dk_k := iif_n (se1_, 0, '1', '2', '2');
               EXCEPTION
@@ -1323,6 +1323,39 @@ BEGIN
       r013_ := substr(nbs_r013_, 5, 1);
       
       r011_ := substr(k.kodp,6,1);
+      
+      if nbs_ in ('2609','2629','2659') then
+         r011_ :='0';
+      end if;
+
+      if      nbs_ in ('2029','2039','2079','2209','2219','2229')
+      then
+            r011_ :='1';
+      elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548')
+      then
+            r011_ :='2';
+      end if;
+
+      if r011_ ='0' then
+         if      nbs_ in ('2239','2249','3599')
+         then
+               r011_ :='1';
+         elsif   nbs_ in ('2019','2089','2119','2139')
+         then
+               r011_ :='2';
+         elsif   nbs_ in ('2069','2109','2129')
+         then
+               r011_ :='3';
+         elsif   nbs_ in ('3692')
+         then
+               r011_ :='4';
+         elsif   nbs_ in ('2890')
+         then
+               r011_ :='6';
+         else
+               NULL;
+         end if;
+      end if;      
 
       s580a_ := substr(k.kodp, 11, 1);
 
