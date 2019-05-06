@@ -11,16 +11,28 @@ SELECT c.rnk AS rnk,
        
        bars.list_utl.get_item_name('CUSTOMER_SEGMENT_FINANCIAL', bars.attribute_utl.get_number_value(c.rnk, 'CUSTOMER_SEGMENT_FINANCIAL', bankdate)) AS customer_segment_financial,
        /*to_char(sysdate,'dd.mm.yyyy')*/
-       (SELECT TO_CHAR(MAX(valid_from), 'dd.mm.yyyy')
+       (SELECT TO_CHAR(valid_from, 'dd.mm.yyyy')
           FROM bars.attribute_history
          WHERE attribute_id = bars.attribute_utl.get_attribute_id('CUSTOMER_SEGMENT_FINANCIAL')
            AND object_id = c.rnk
-           AND valid_from <= bankdate) AS csf_date_start,
-       (SELECT TO_CHAR(MAX(valid_through), 'dd.mm.yyyy')
+           AND valid_from <= bankdate
+		   -- Пошук актуального запису
+		   AND id = (SELECT MAX(id) 
+					    FROM bars.attribute_history 
+		               WHERE  attribute_id = bars.attribute_utl.get_attribute_id('CUSTOMER_SEGMENT_FINANCIAL') 
+					     AND object_id = c.rnk 
+						 AND valid_from <= bankdate) ) AS csf_date_start,
+       (SELECT TO_CHAR(valid_through, 'dd.mm.yyyy')
           FROM bars.attribute_history 
          WHERE attribute_id = bars.attribute_utl.get_attribute_id('CUSTOMER_SEGMENT_FINANCIAL')
            AND object_id = c.rnk
-           AND valid_through > bankdate) AS csf_date_stop,
+           AND valid_through > bankdate
+		   -- Пошук актуального запису
+		   AND id = (SELECT MAX(id) 
+					    FROM bars.attribute_history 
+		               WHERE  attribute_id = bars.attribute_utl.get_attribute_id('CUSTOMER_SEGMENT_FINANCIAL') 
+					     AND object_id = c.rnk 
+						 AND valid_through > bankdate) ) AS csf_date_stop,
        
        bars.list_utl.get_item_name('CUSTOMER_SEGMENT_BEHAVIOR', bars.attribute_utl.get_number_value(c.rnk, 'CUSTOMER_SEGMENT_BEHAVIOR', bankdate)) AS customer_segment_behavior,
        /*to_char(sysdate,'dd.mm.yyyy')*/
@@ -93,6 +105,6 @@ SELECT c.rnk AS rnk,
        null AS CUSTOMER_SEGMENT_MANAGER_START -- ПІБ менеджера Дата встановлення
   FROM customer c
   LEFT JOIN vip_flags f ON f.rnk = c.rnk
-  LEFT JOIN customerw w ON w.rnk = c.rnk AND w.tag = 'VIP_K'
+  LEFT JOIN customerw w ON w.rnk = c.rnk AND w.tag = 'VIP_K';
 /
 show errors
