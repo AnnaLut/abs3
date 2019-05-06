@@ -4,16 +4,19 @@ CREATE OR REPLACE PROCEDURE BARS.P_F07_NN (Dat_ DATE,
 % DESCRIPTION :    Процедура формирование файла #07 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :   v.19.007     12.02.2019
+% VERSION     :   v.19.009     26.04.2019 (12.03.2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-    l_ver    varchar2(24)      := 'v.19.007  12.02.2019'; 
+    l_ver    varchar2(24)      := 'v.19.009  26.04.2019'; 
 /*
-11.02.2019  S240 по #A7: з урахуванням можливої розбивки по S240 у файлі #A7
-31.01.2019  розбивка ЦП обтяженi/необтяженi -уточнення по знаках
-25.01.2019 резервы: добавлена разбивка в разрезе R011 (по основным счетам)
+26.04.2019 - блок по перезаповненню параметра S240 із v_nbur_#A7_dtl
+             перемістив (після формування показників по залишкам перед 
+             формуванням показників по резервам)  
+11.02.2019 - S240 по #A7: з урахуванням можливої розбивки по S240 у файлі #A7
+31.01.2019 - розбивка ЦП обтяженi/необтяженi -уточнення по знаках
+25.01.2019 - резервы: добавлена разбивка в разрезе R011 (по основным счетам)
 09.01.2019 - з 10/01/2019 для код_в S240 in ('6','7','8','A','B') не буде 
              виконуватися зам_на на значення "J" 
              з 10/01/2019 введено нов_ значення S240 ("O","N","P") 
@@ -526,6 +529,67 @@ LOOP
 END LOOP;
 CLOSE SALDO;
 --------------------------------------------------------------------------
+-- блок для коригування параметру S240 для бал.рахункiв ЦП 
+-- по данних файлу #A7 (пiсля звiтної дати змiнюється дата погашення (MDATE)
+if mfo_ = 300465 then
+   for k in ( select recid, acc, substr(kodp,3,4) nbs, substr(kodp, 19, 1) s240,
+                            to_number(znap) s_cp
+              from rnbu_trace
+              where substr(kodp,3,3) in ('140', '141', '142', '143', '144', '300', '301', 
+                                         '310', '311', '312', '313', '320', '321')
+                and substr(kodp,3,4) not like '___9%'
+            )
+
+       loop
+       
+            se_ := k.s_cp;
+            s240_ := k.s240;
+            rnum_ := 1;
+
+            for u in ( select * from (
+                           select substr(field_code, 9,1) s240_a7, to_number(field_value) s_a7,
+                                  dense_rank() over (order by substr(field_code, 9,1)) rnum
+                             from v_nbur_#A7_dtl
+                            where report_date = dat_
+                              and field_value !=0
+                              and acc_id = k.acc
+                              and seg_02 = k.nbs
+                      ) order by rnum desc
+            ) loop
+
+              if u.rnum >1  then
+
+                 insert into rnbu_trace
+                           ( nls, kv, odate, kodp, znap, nbuc, acc, rnk, comm, ref )
+                     select nls, kv, odate,
+                             substr(kodp, 1, 18) || u.s240_a7 || substr(kodp, 20),
+                              u.s_a7, nbuc, acc, rnk, comm, ref
+                       from rnbu_trace
+                      where recid =k.recid;
+
+                 se_ := se_ - u.s_a7;
+                 rnum_ := 2;
+              elsif u.rnum =1 and rnum_ =1 and s240_ <> u.s240_a7  then
+
+                update rnbu_trace r1
+                   set r1.kodp = substr(r1.kodp, 1, 18) || u.s240_a7 || substr(r1.kodp, 20)
+                 where r1.recid = k.recid;
+
+              elsif u.rnum =1 and rnum_ <>1  then
+
+                update rnbu_trace r1
+                   set r1.kodp = substr(r1.kodp, 1, 18) || u.s240_a7 || substr(r1.kodp, 20),  
+                       r1.znap = se_
+                 where r1.recid = k.recid;
+
+              end if;
+
+            end loop;
+
+   end loop;
+
+end if;
+--------------------------------------------------------------------------
 -- перекодування параметру S240
 
     update rnbu_trace
@@ -830,67 +894,6 @@ for k in ( select comm, ref, substr(kodp,20,4) NOMCP,
        end if;
 
      end loop;
----------------------------------------------------
--- блок для коригування параметру S240 для бал.рахункiв ЦП 
--- по данних файлу #A7 (пiсля звiтної дати змiнюється дата погашення (MDATE)
-if mfo_ = 300465 then
-
-   for k in ( select recid, acc, substr(kodp, 19, 1) s240,
-                            to_number(znap) s_cp
-              from rnbu_trace
-              where substr(kodp,3,3) in ('140', '141', '142', '143', '144', '300', '301', 
-                                         '310', '311', '312', '313', '320', '321')
-                and substr(kodp,3,4) not like '___9%'
-            )
-
-       loop
-       
-            se_ := k.s_cp;
-            s240_ := k.s240;
-            rnum_ := 1;
-
-            for u in ( select * from (
-                           select substr(field_code, 9,1) s240_a7, to_number(field_value) s_a7,
-                                  dense_rank() over (order by substr(field_code, 9,1)) rnum
-                             from v_nbur_#A7_dtl
-                            where report_date = dat_
-                              and field_value !=0
-                              and acc_id = k.acc
-                      ) order by rnum desc
-            ) loop
-
-              if u.rnum >1  then
-
-                 insert into rnbu_trace
-                           ( nls, kv, odate, kodp, znap, nbuc, acc, rnk, comm, ref )
-                     select nls, kv, odate,
-                             substr(kodp, 1, 18) || u.s240_a7 || substr(kodp, 20),
-                              u.s_a7, nbuc, acc, rnk, comm, ref
-                       from rnbu_trace
-                      where recid =k.recid;
-
-                 se_ := se_ - u.s_a7;
-                 rnum_ := 2;
-              elsif u.rnum =1 and rnum_ =1 and s240_ <> u.s240_a7  then
-
-                update rnbu_trace r1
-                   set r1.kodp = substr(r1.kodp, 1, 18) || u.s240_a7 || substr(r1.kodp, 20)
-                 where r1.recid = k.recid;
-
-              elsif u.rnum =1 and rnum_ <>1  then
-
-                update rnbu_trace r1
-                   set r1.kodp = substr(r1.kodp, 1, 18) || u.s240_a7 || substr(r1.kodp, 20),  
-                       r1.znap = se_
-                 where r1.recid = k.recid;
-
-              end if;
-
-            end loop;
-
-   end loop;
-
-end if;
 ---------------------------------------------------
 DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
 ---------------------------------------------------
