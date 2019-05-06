@@ -164,7 +164,7 @@ public partial class corp2_export_docs : System.Web.UI.Page
                                 string parCiMfo = "";
                                 string parCiBranchCode = "";
                                 string parCiBranchName = "";
-                                command.CommandText = "select to_char(dat, 'DD.MM.YYYY'), to_char(dat, 'HH24:MI'), s.fio, substr(s.branch, 2, 6), b.branch, b.name  from bars.oper_visa o, staff$base s, branch b where o.userid=s.id and  s.branch=b.branch and o.ref=:ref and o.status in (1,2) and o.groupid in (7, 37) order by o.groupid";
+                                command.CommandText = "select to_char(dat, 'DD.MM.YYYY'), to_char(dat, 'HH24:MI'), s.fio, nvl(substr(s.branch, 2, 6), o.kf), b.branch, b.name  from bars.oper_visa o, staff$base s, branch b where o.userid=s.id and  s.branch=b.branch and o.ref=:ref and o.status in (1,2) and o.groupid in (7, 37) order by o.groupid";
                                 using (rdrDetail = command.ExecuteReader())
                                 {
                                     if (rdrDetail.Read())
