@@ -7,159 +7,217 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure IMP_XML_SWIFT_BIC ***
 
-  CREATE OR REPLACE PROCEDURE BARS.IMP_XML_SWIFT_BIC 
-  (p_filename   varchar2,
-   p_par        int  default 0
-  )
 
+CREATE OR REPLACE 
+PROCEDURE imp_xml_swift_bic (p_filename VARCHAR2, p_par INT DEFAULT 0)
 IS
+    l_parser               DBMS_XMLPARSER.parser;
+    l_doc                  DBMS_XMLDOM.domdocument;
+    l_analyticlist         DBMS_XMLDOM.domnodelist;
+    l_analytic             DBMS_XMLDOM.domnode;
+    i                      INT;
+    j                      INT;
+    l_filename             imp_file.file_name%TYPE;
+    l_clob                 CLOB;
+    l_mod_flag             CHAR (1);
+    l_bic_code             VARCHAR2 (254);
+    l_branch_code          VARCHAR2 (254);
+    l_institution_name     VARCHAR2 (254);
+    l_city_heading         VARCHAR2 (254);
+    l_physical_address_1   VARCHAR2 (254);
+    l_physical_address_2   VARCHAR2 (254);
+    l_physical_address_3   VARCHAR2 (254);
+    l_physical_address_4   VARCHAR2 (254);
+    l_location             VARCHAR2 (254);
+    l_country_name         VARCHAR2 (254);
+    l_count_a              NUMBER DEFAULT 0;
+    l_count_m              NUMBER DEFAULT 0;
+    l_count_d              NUMBER DEFAULT 0;
+    l_count_u              NUMBER DEFAULT 0;
+    l_count_zz             NUMBER DEFAULT 0;
+    l_count_total number;
+BEGIN
+    bars_audit.info (
+           'GET_XML_SWIFT: start load file '
+        || l_filename
+        || ' timestamp = '
+        || TO_CHAR (SYSDATE, 'dd/mm/yyyy hh24:mi:ss'));
 
-  l_parser                dbms_xmlparser.parser;
-  l_doc                   dbms_xmldom.domdocument;
-  l_analyticlist          dbms_xmldom.DOMNodeList;
-  l_analytic              dbms_xmldom.DOMNode;
-  i                       int          ;
-  j                       int          ;
-  l_clob                  clob         ;
-  l_bic_code              varchar2(254);
-  l_branch_code           varchar2(254);
-  l_institution_name      varchar2(254);
-  l_city_heading          varchar2(254);
-  l_physical_address_1    varchar2(254);
-  l_physical_address_2    varchar2(254);
-  l_physical_address_3    varchar2(254);
-  l_physical_address_4    varchar2(254);
-  l_location              varchar2(254);
-  l_country_name          varchar2(254);
+    BEGIN
+        SELECT file_clob, file_name
+        INTO   l_clob, l_filename
+        FROM   imp_file
+        WHERE  file_name = p_filename;
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            raise_application_error (
+                -20001,
+                'Файл XML не был загружен в CLOB для обработки...',
+                FALSE);
+            RETURN;
+    END;
 
-begin
+    bars_audit.info (
+           'GET_XML_SWIFT: load clob '
+        || TO_CHAR (SYSDATE, 'dd/mm/yyyy hh24:mi:ss'));
 
-  bars_audit.info('GET_XML_SWIFT: start '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss'));
+    l_parser := DBMS_XMLPARSER.newparser;
 
-  begin
-    select file_clob into l_clob from imp_file where file_name = p_filename;
-  exception when no_data_found then
-    raise_application_error(-20001,
-                            'Файл XML не был загружен в CLOB для обработки...',
-                            false);
-    return;
-  end;
+    DBMS_XMLPARSER.parseclob (l_parser, l_clob);
 
-  bars_audit.info('GET_XML_SWIFT: load clob '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss'));
+    l_doc := DBMS_XMLPARSER.getdocument (l_parser);
 
-  l_parser := dbms_xmlparser.newparser;
+    l_analyticlist :=
+        DBMS_XMLDOM.getelementsbytagname (l_doc, 'bicdir2018_v1');
 
-  dbms_xmlparser.parseclob(l_parser,l_clob);
+    j := 0;
+    l_count_total := DBMS_XMLDOM.getlength (l_analyticlist) - 1;
 
-  l_doc := dbms_xmlparser.getdocument(l_parser);
+    FOR i IN 0 .. l_count_total
+    LOOP
+        l_analytic := DBMS_XMLDOM.item (l_analyticlist, i);
 
-  l_analyticlist := dbms_xmldom.getelementsbytagname(l_doc,'fi');
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'modification_flag/text()',
+                                   l_mod_flag);
+        DBMS_XSLPROCESSOR.valueof (l_analytic, 'bic_code/text()', l_bic_code);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'branch_code/text()',
+                                   l_branch_code);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'institution_name/text()',
+                                   l_institution_name);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'city_heading/text()',
+                                   l_city_heading);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'physical_address_1/text()',
+                                   l_physical_address_1);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'physical_address_2/text()',
+                                   l_physical_address_2);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'physical_address_3/text()',
+                                   l_physical_address_3);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'physical_address_4/text()',
+                                   l_physical_address_4);
+        DBMS_XSLPROCESSOR.valueof (l_analytic, 'location/text()', l_location);
+        DBMS_XSLPROCESSOR.valueof (l_analytic,
+                                   'country_name/text()',
+                                   l_country_name);
 
-  j := 0;
-  begin
-    savepoint sp_before;
-    for i in 0 .. dbms_xmldom.getlength(l_analyticlist)-1
-    loop
 
-      l_analytic := dbms_xmldom.item(l_analyticlist,i);
+        CONTINUE WHEN l_bic_code IS NULL OR l_branch_code IS NULL;
 
-      dbms_xslprocessor.valueof(l_analytic,'bic_code/text()'          ,l_bic_code          );
-      dbms_xslprocessor.valueof(l_analytic,'branch_code/text()'       ,l_branch_code       );
-      dbms_xslprocessor.valueof(l_analytic,'institution_name/text()'  ,l_institution_name  );
-      dbms_xslprocessor.valueof(l_analytic,'city_heading/text()'      ,l_city_heading      );
-      dbms_xslprocessor.valueof(l_analytic,'physical_address_1/text()',l_physical_address_1);
-      dbms_xslprocessor.valueof(l_analytic,'physical_address_2/text()',l_physical_address_2);
-      dbms_xslprocessor.valueof(l_analytic,'physical_address_3/text()',l_physical_address_3);
-      dbms_xslprocessor.valueof(l_analytic,'physical_address_4/text()',l_physical_address_4);
-      dbms_xslprocessor.valueof(l_analytic,'location/text()'          ,l_location          );
-      dbms_xslprocessor.valueof(l_analytic,'country_name/text()'      ,l_country_name      );
+        CASE l_mod_flag
+            WHEN 'A'
+            THEN                                                   -- addition
+                BEGIN
+                    INSERT INTO sw_banks (bic,
+                                          name,
+                                          office,
+                                          city,
+                                          country,
+                                          transback)
+                    VALUES      (
+                                    l_bic_code || l_branch_code,
+                                    l_institution_name,
+                                    REPLACE (
+                                        TRIM (
+                                               l_physical_address_1
+                                            || ' '
+                                            || l_physical_address_2
+                                            || ' '
+                                            || l_physical_address_3
+                                            || ' '
+                                            || l_physical_address_4
+                                            || ' '
+                                            || l_location),
+                                        '  ',
+                                        ' '),
+                                    TRIM (SUBSTR (l_city_heading, 1, 35)),
+                                    l_country_name,
+                                    0);
 
-      if l_bic_code is not null and l_branch_code is not null then
-        if p_par=0 then
+                    l_count_a := l_count_a + SQL%ROWCOUNT;
+                EXCEPTION
+                    WHEN DUP_VAL_ON_INDEX
+                    THEN
+                        bars_audit.info (
+                               'GET_XML_SWIFT:  DUP_VAL_ON_INDEX on '
+                            || l_bic_code
+                            || l_branch_code);
+                END;
+            WHEN 'M'
+            THEN                                              --- modification
+                UPDATE sw_banks
+                SET    name = l_institution_name,
+                       office =
+                           REPLACE (
+                               TRIM (
+                                      l_physical_address_1
+                                   || ' '
+                                   || l_physical_address_2
+                                   || ' '
+                                   || l_physical_address_3
+                                   || ' '
+                                   || l_physical_address_4
+                                   || ' '
+                                   || l_location),
+                               '  ',
+                               ' '),
+                       city = TRIM (SUBSTR (l_city_heading, 1, 35)),
+                       country = l_country_name
+                WHERE  bic = l_bic_code || l_branch_code;
 
-          begin
-            update SW_BANKS
-            set    NAME=l_institution_name                  ,
-                   OFFICE=replace(trim(l_physical_address_1||' '||
-                                       l_physical_address_2||' '||
-                                       l_physical_address_3||' '||
-                                       l_physical_address_4||' '||
-                                       l_location),'  ',' '),
-                   CITY=trim(substr(l_city_heading,1,35))   ,
-                   COUNTRY=l_country_name
-            where  bic=l_bic_code||l_branch_code;
-            if sql%rowcount=0 then
-              insert
-              into   SW_BANKS (BIC    ,
-                               NAME   ,
-                               OFFICE ,
-                               CITY   ,
-                               COUNTRY,
-                               TRANSBACK)
-                       values (l_bic_code||l_branch_code         ,
-                               l_institution_name                ,
-                               replace(trim(l_physical_address_1||' '||
-                                            l_physical_address_2||' '||
-                                            l_physical_address_3||' '||
-                                            l_physical_address_4||' '||
-                                            l_location),'  ',' '),
-                               trim(substr(l_city_heading,1,35)) ,
-                               l_country_name                    ,
-                               0);
-            end if;
-          end;
+                l_count_m := l_count_m + SQL%ROWCOUNT;
+            WHEN 'D'
+            THEN    -- deletion
+                -- существуют foreign key. но заявки от банка не реализуем
+                ----DELETE FROM sw_banks  WHERE       bic = l_bic_code || l_branch_code;
 
-        else
+                --- l_count_d := l_count_d + SQL%ROWCOUNT;
+                null;
+            WHEN 'U'
+            THEN                                                 --- unchanged
+                NULL;
+                l_count_u := l_count_u + 1;
+            ELSE
+                bars_audit.info (
+                       'GET_XML_SWIFT: неописанный modification_flag'
+                    || l_mod_flag);
+                l_count_zz := l_count_zz + 1;
+        END CASE;
 
-          begin
-            insert
-            into   SW_BANKS (BIC    ,
-                             NAME   ,
-                             OFFICE ,
-                             CITY   ,
-                             COUNTRY,
-                             TRANSBACK)
-                     values (l_bic_code||l_branch_code         ,
-                             l_institution_name                ,
-                             replace(trim(l_physical_address_1||' '||
-                                          l_physical_address_2||' '||
-                                          l_physical_address_3||' '||
-                                          l_physical_address_4||' '||
-                                          l_location),'  ',' '),
-                             trim(substr(l_city_heading,1,35)) ,
-                             l_country_name                    ,
-                             0);
-          exception when dup_val_on_index then
-            update SW_BANKS
-            set    NAME=l_institution_name                  ,
-                   OFFICE=replace(trim(l_physical_address_1||' '||
-                                       l_physical_address_2||' '||
-                                       l_physical_address_3||' '||
-                                       l_physical_address_4||' '||
-                                       l_location),'  ',' '),
-                   CITY=trim(substr(l_city_heading,1,35))   ,
-                   COUNTRY=l_country_name
-            where  bic=l_bic_code||l_branch_code;
-          end;
-
-        end if;
---      счетчик записей
+        --- total count
         j := j + 1;
-        dbms_application_info.set_client_info(to_char(j+1)||' records were already loaded...');
-      end if;
+        DBMS_APPLICATION_INFO.set_client_info (
+            TO_CHAR (j + 1) || ' records were already loaded...');
+    END LOOP;
 
-    end loop;
- -- exception when others then
-   -- rollback to sp_before;
-    --dbms_application_info.set_client_info(' ');
-   -- bars_audit.info('GET_XML_SWIFT: end (error) '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss'));
-  --  RETURN;
-  end;
 
-  dbms_application_info.set_client_info('In all '||to_char(j+1)||' records loaded.');
-  bars_audit.info('GET_XML_SWIFT: end '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss'));
-  RETURN;
-end IMP_XML_SWIFT_BIC;
+    DBMS_APPLICATION_INFO.set_client_info (
+        'In all ' || TO_CHAR (j + 1) || ' records loaded.');
+    bars_audit.info (
+           'GET_XML_SWIFT: end '
+        || TO_CHAR (SYSDATE, 'dd/mm/yyyy hh24:mi:ss')
+        || ' A = '
+        || l_count_a
+        || ' M = '
+        || l_count_m
+        || ' D = '
+        || l_count_d
+        || ' U = '
+        || l_count_u
+        || ' others = '
+        || l_count_zz
+        || ' Total = '
+        || l_count_total);
+    RETURN;
+END imp_xml_swift_bic;
+
 /
 show err;
 
