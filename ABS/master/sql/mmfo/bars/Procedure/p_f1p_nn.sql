@@ -13,11 +13,22 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    10/01/2019 (14/12/2018, 03/12/2018)
+% VERSION     :   03/05/2019  (21/03/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+21/03/2019 - для DECL_ = 1 змінена сума для декларування з 2000000 тис на
+             600000 тис доларів
+05/03/2019 - змінено формування показника 80
+04/03/2019 - для недекларованих операцій і коду операції 2303 будемо 
+             формувати показник 04 із значенням 'B'
+28/02/2019 - для малих сум для яких формувався код показника 04 частина
+             показника "NNN" формувалась як "000" а показники з кодами 
+             07, 10, 71, 99 формувались із ненульовим значенням.
+             Виправлено. 
+25/02/2019 - код показника 04 (тип клієнта) формується для всіх сум операцій
+             декларування (DECL=1, DECL=2 в KL_R040)
 10/01/2019 - для проводок  Дт 1500  Кт 292460003717,2924430003718 та 
                            Дт 292460003717,2924430003718  Кт - 1500
                            в показник (DD=04) буде формуватися значення "В"  
@@ -81,6 +92,7 @@ IS
    b010_       VARCHAR2 (10);
    nnn_        NUMBER;
    nnn1_       NUMBER;
+   nnn2_       NUMBER;
    kol_        NUMBER;
    Dat1_       DATE;
    Dat2_       DATE;
@@ -243,188 +255,172 @@ BEGIN
    IF mfou_ = 300465 AND mfou_ != mfo_g
    THEN
       FOR k
-         IN (SELECT /*+ leading(p.ad) */
-                      p.pdat pdat,
-                      p.fdat fdat,
-                      p.REF REF,
-                      p.tt tt,
-                      p.accd accd,
-                      p.nam_a name_a,
-                      p.nlsd nlsd,
-                      p.kv kv,
-                      p.acck acck,
-                      p.nam_b name_b,
-                      p.nlsk nlsk,
-                      p.nazn nazn,
-                      p.ptt tt1
-                 FROM provodki_otc p
-                WHERE     p.fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ AND Dat_)
-                      AND p.kv <> 980
-                      AND (p.nlsd LIKE '100%' OR p.nlsk LIKE '100%')
-             ORDER BY 1, 2, 3)
+         IN (select unique o.ref
+             from opldok o, accounts a
+             where o.fdat =  any(select fdat from fdat where fdat BETWEEN Dat1_ AND Dat_)
+                and o.acc = a.acc 
+                AND a.nls LIKE '100%'
+                AND a.kv NOT IN (959, 961, 962, 964, 980)
+                and o.sos = 5
+             ORDER BY 1)
       LOOP
-         if k.kv NOT IN (959, 961, 962, 964, 980) then
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                 VALUES (k.REF, 'KOD_N', '0000000');
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   NULL;
-             END;
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+             VALUES (k.REF, 'KOD_N', '0000000');
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               NULL;
+         END;
 
-             kod_g_ := NULL;
-             kod_g_pb1 := NULL;
+         kod_g_ := NULL;
+         kod_g_pb1 := NULL;
 
-             FOR z IN (SELECT *
-                         FROM operw
-                        WHERE REF = k.REF)
-             LOOP
-                -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
-                IF     z.tag LIKE 'n%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+         FOR z IN (SELECT *
+                     FROM operw
+                    WHERE REF = k.REF)
+         LOOP
+            -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
+            IF     z.tag LIKE 'n%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'n%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'n%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#70%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#70%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#70%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#70%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#E2%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#E2%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#E2%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#E2%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D1#E9%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D1#E9%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
 
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D1#E9%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D1#E9%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
 
-                IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
-                END IF;
+            IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
+            END IF;
 
-                IF kod_g_ IS NULL AND z.tag = 'KOD_G'
-                THEN
-                   kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
-             END LOOP;
+            IF kod_g_ IS NULL AND z.tag = 'KOD_G'
+            THEN
+               kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
+         END LOOP;
 
-             IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
-             THEN
-                kod_g_ := kod_g_pb1;
-             END IF;
+         IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
+         THEN
+            kod_g_ := kod_g_pb1;
+         END IF;
 
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_G', kod_g_);
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   UPDATE operw a
-                      SET a.VALUE = kod_g_
-                    WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
-             END;
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_G', kod_g_);
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               UPDATE operw a
+                  SET a.VALUE = kod_g_
+                WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
+         END;
 
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_B', '000');
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   NULL;
-             END;
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_B', '000');
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               NULL;
+         END;
 
-             UPDATE operw a
-                SET a.VALUE = '804'
-              WHERE     a.tag = 'KOD_G'
-                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
-                    AND a.REF = k.REF;
+         UPDATE operw a
+            SET a.VALUE = '804'
+          WHERE     a.tag = 'KOD_G'
+                AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
+                AND a.REF = k.REF;
 
-             UPDATE operw a
-                SET a.VALUE = '6'
-              WHERE     a.tag = 'KOD_B'
-                    AND (   TRIM (a.VALUE) IS NULL
-                         OR TRIM (a.VALUE) = '000'
-                         OR TRIM (a.VALUE) = '4'
-                         OR TRIM (a.VALUE) = '25')
-                    AND a.REF = k.REF;
-         end if;
+         UPDATE operw a
+            SET a.VALUE = '6'
+          WHERE     a.tag = 'KOD_B'
+                AND (   TRIM (a.VALUE) IS NULL
+                     OR TRIM (a.VALUE) = '000'
+                     OR TRIM (a.VALUE) = '4'
+                     OR TRIM (a.VALUE) = '25')
+                AND a.REF = k.REF;
       END LOOP;
 
       FOR k
-         IN (  SELECT /*+parallel (8) */
+         IN (  SELECT /*+ leading(a1) */ 
                       p.pdat pdat,
-                      od.fdat fdat,
-                      od.REF REF,
-                      decode(od.dk, 0, od.tt, ok.tt) tt,
-                      od.acc accd,
+                      o1.fdat fdat,
+                      o1.REF REF,
+                      decode(o1.dk, 0, o1.tt, o2.tt) tt,
+                      decode (o1.dk , 0, o1.acc, o2.acc) accd,
                       p.nam_a name_a,
-                      ad.nls nlsd,
+                      decode (o1.dk , 0, a1.nls, a2.nls) nlsd,
                       p.kv kv,
-                      ak.acc acck,
+                      decode (o1.dk , 1, a1.acc, a2.acc)  acck,
                       p.nam_b name_b,
-                      ak.nls nlsk,
+                      decode (o1.dk , 1, a1.nls, a2.nls) nlsk,
                       p.nazn nazn,
                       p.tt tt1,
                       p.s s
-               from opldok od, accounts ad, opldok ok, accounts ak, oper p
-               where od.fdat between dat1_ and dat_ and
-                     od.acc = ad.acc and
-                     od.DK = 0 and
-                     ( regexp_like(ad.NLS,'^(100)') OR regexp_like(ak.NLS,'^(100)') ) and
-                     --(ad.nls LIKE '100%' OR ak.nls LIKE '100%')and
-                     ad.kv not like '980%' and
-                     od.ref = ok.ref and
-                     od.stmt = ok.stmt and
-                     ok.fdat between dat1_ and dat_ and
-                     ok.acc = ak.acc and
-                     ok.DK = 1 and
-                     od.ref = p.ref and
+               from opldok o1, accounts a1, opldok o2, accounts a2, oper p
+               where o1.fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ AND Dat_) and
+                     o1.sos = 5 and
+                     o1.acc = a1.acc and
+                     regexp_like(a1.NLS,'^(100)') and
+                     a1.kv <> 980 and
+                     o1.ref = o2.ref and
+                     o1.stmt = o2.stmt and
+                     o2.acc = a2.acc and
+                     o1.DK <> o2.DK and
+                     o1.ref = p.ref and
                      p.sos = 5
             )
-
       LOOP
 
          BEGIN
@@ -2255,7 +2251,7 @@ BEGIN
                 AND SUBSTR (g.NLS, 1, 2) <> '10')
             OR (    decl_r040 = '1'
                 AND gl.p_icurval (g.KV, k.S, Datp_) >=
-                       gl.p_icurval (840, 1, Datp_)  -- gl.p_icurval (840, 2000000, Datp_)
+                       gl.p_icurval (840, 1, Datp_)  -- gl.p_icurval (840, 600000, Datp_)
                 AND SUBSTR (g.NLS, 1, 2) <> '10')
             OR (    gl.p_icurval (g.KV, k.S, k.fdat) >=
                        gl.p_icurval (840, 100000000, k.fdat)
@@ -2265,12 +2261,11 @@ BEGIN
 
             IF  ( decl_r040 = '2'  AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 5000000, Datp_)
                  AND SUBSTR (g.NLS, 1, 2) <> '10')
-             OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 2000000, Datp_)
+             OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 600000, Datp_)
                  AND SUBSTR (g.NLS, 1, 2) <> '10')
             OR (    gl.p_icurval (g.KV, k.S, k.fdat) >=
                        gl.p_icurval (840, 100000000, k.fdat)
                 AND SUBSTR (g.NLS, 1, 2) = '10')
-
             THEN 
 
                nnn1_ := nnn1_ + 1;
@@ -2592,8 +2587,11 @@ BEGIN
 
                IF  ( decl_r040 = '2'  AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 5000000, Datp_)
                     AND SUBSTR (g.NLS, 1, 2) <> '10')
-                OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 2000000, Datp_)
+                OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 600000, Datp_)
                     AND SUBSTR (g.NLS, 1, 2) <> '10')
+                OR (    gl.p_icurval (g.KV, k.S, k.fdat) >=
+                       gl.p_icurval (840, 100000000, k.fdat)
+                   AND SUBSTR (g.NLS, 1, 2) = '10')
                THEN 
 
                   kodp_ :=
@@ -2606,36 +2604,29 @@ BEGIN
                      || kod_
                      || LPAD (coun_, 3, '0')
                      || LPAD (TO_CHAR (nnn1_), 3, '0');
-
+   
                   if g.nls like '1600%'
                   then
                      p_ins (kodp_, LPAD (TO_CHAR (bank_), 3, ' '));
                   else
                      p_ins (kodp_, LPAD (TO_CHAR (glb_), 3, ' '));
                   end if;
-               END IF;
-
-               -- код DD=04 код типу-кл_єнта
-               kodp_ :=
-                     '04'
-                  || k.kod_e
-                  || country_
-                  || b010_
-                  || SUBSTR (g.nls, 1, 4)
-                  || LPAD (TO_CHAR (g.kv), 3, '0')
-                  || kod_
-                  || LPAD (coun_, 3, '0')
-                  || LPAD (TO_CHAR (nnn1_), 3, '0');
-
-               p_ins (kodp_, asp_S_);
-
-               -- код DD=05 код за ЄДРПОУ (ДРФО) умовний номер
-               IF  ( decl_r040 = '2'  AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 5000000, Datp_)
-                    AND SUBSTR (g.NLS, 1, 2) <> '10')
-                OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 2000000, Datp_)
-                    AND SUBSTR (g.NLS, 1, 2) <> '10')
-               THEN 
-
+   
+                  -- код DD=04 код типу-кл_єнта
+                  kodp_ :=
+                        '04'
+                     || k.kod_e
+                     || country_
+                     || b010_
+                     || SUBSTR (g.nls, 1, 4)
+                     || LPAD (TO_CHAR (g.kv), 3, '0')
+                     || kod_
+                     || LPAD (coun_, 3, '0')
+                     || LPAD (TO_CHAR (nnn1_), 3, '0');
+   
+                  p_ins (kodp_, asp_S_);
+   
+                  -- код DD=05 код за ЄДРПОУ (ДРФО) умовний номер
                   kodp_ :=
                         '05'
                      || k.kod_e
@@ -2646,9 +2637,9 @@ BEGIN
                      || kod_
                      || LPAD (coun_, 3, '0')
                      || LPAD (TO_CHAR (nnn1_), 3, '0');
-
+   
                   p_ins (kodp_, LPAD (TRIM (asp_K_), 10, '0'));
-
+   
                   -- код DD=06 назва кл_єнта
                   if asp_S_ in ('F','S')
                   then
@@ -2664,11 +2655,32 @@ BEGIN
                      || kod_
                      || LPAD (coun_, 3, '0')
                      || LPAD (TO_CHAR (nnn1_), 3, '0');
-
+   
                   p_ins (kodp_, asp_N_);
+                  nnn2_ := nnn1_;
                END IF;
-            END IF;
 
+               IF  ( decl_r040 = '2'  AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 1, Datp_) and gl.p_icurval (g.KV, k.S, Datp_) < gl.p_icurval (840, 5000000, Datp_)
+                    AND SUBSTR (g.NLS, 1, 2) <> '10')
+                OR ( decl_r040 = '1' AND gl.p_icurval (g.KV, k.S, Datp_) >= gl.p_icurval (840, 1, Datp_) and gl.p_icurval (g.KV, k.S, Datp_) < gl.p_icurval (840, 600000, Datp_)
+                    AND SUBSTR (g.NLS, 1, 2) <> '10')
+               THEN
+                  -- код DD=04 код типу-кл_єнта
+                  kodp_ :=
+                        '04'
+                     || k.kod_e
+                     || country_
+                     || b010_
+                     || SUBSTR (g.nls, 1, 4)
+                     || LPAD (TO_CHAR (g.kv), 3, '0')
+                     || kod_
+                     || LPAD (coun_, 3, '0')
+                     || LPAD (TO_CHAR (nnn_), 3, '0');
+
+                  p_ins (kodp_, asp_S_);
+                  nnn2_ := nnn_;
+               END IF;
+            END IF; 
             -- код DD=10 назва банка-кореспондента
             kodp_ :=
                   '10'
@@ -2679,7 +2691,7 @@ BEGIN
                || LPAD (TO_CHAR (g.kv), 3, '0')
                || kod_
                || LPAD (coun_, 3, '0')
-               || LPAD (TO_CHAR (nnn1_), 3, '0');
+               || LPAD (TO_CHAR (nnn2_), 3, '0');
 
             p_ins (kodp_, g.nmk);
 
@@ -2724,7 +2736,7 @@ BEGIN
                   || LPAD (TO_CHAR (g.kv), 3, '0')
                   || kod_
                   || LPAD (coun_, 3, '0')
-                  || LPAD (TO_CHAR (nnn1_), 3, '0');
+                  || LPAD (TO_CHAR (nnn2_), 3, '0');
 
                IF TRIM (bank_) IS NULL
                THEN
@@ -2744,7 +2756,7 @@ BEGIN
                || LPAD (TO_CHAR (g.kv), 3, '0')
                || kod_
                || LPAD (coun_, 3, '0')
-               || LPAD (TO_CHAR (nnn1_), 3, '0');
+               || LPAD (TO_CHAR (nnn2_), 3, '0');
 
             p_ins (kodp_, TO_CHAR (k.s));
 
@@ -2758,10 +2770,27 @@ BEGIN
                || LPAD (TO_CHAR (g.kv), 3, '0')
                || kod_
                || LPAD (coun_, 3, '0')
-               || LPAD (TO_CHAR (nnn1_), 3, '0');
+               || LPAD (TO_CHAR (nnn2_), 3, '0');
 
             p_ins (kodp_, SUBSTR (oper_99, 1, 125));
          ELSE
+            if kod_ = '2303'
+            then
+               -- код DD=04 код типу-кл_єнта
+               kodp_ :=
+                     '04'
+                  || k.kod_e
+                  || country_
+                  || b010_
+                  || SUBSTR (g.nls, 1, 4)
+                  || LPAD (TO_CHAR (g.kv), 3, '0')
+                  || kod_
+                  || LPAD (coun_, 3, '0')
+                  || LPAD (TO_CHAR (nnn_), 3, '0');
+
+               p_ins (kodp_, 'B');
+            end if;
+
             -- код DD=10 назва банка-кореспондента
             kodp_ :=
                   '10'
@@ -3153,13 +3182,10 @@ BEGIN
       BEGIN
          IF k.p80 IS NOT NULL
          THEN
-            SELECT COUNT (*)
-              INTO kol_
-              FROM tmp_nbu
-             WHERE kodf = kodf_ AND datf = dat_ AND kodp = kodp_;
+            update tmp_nbu set znap = znap + k.p80
+            WHERE kodf = kodf_ AND datf = dat_ AND kodp = kodp_;
 
-            IF kol_ = 0
-            THEN
+            IF sql%rowcount = 0 then
                INSERT INTO tmp_nbu (kodf,
                                     datf,
                                     kodp,
@@ -3171,6 +3197,25 @@ BEGIN
                             k.p80,
                             nbuc_);
             END IF;
+
+            --SELECT COUNT (*)
+            --  INTO kol_
+            --  FROM tmp_nbu
+            -- WHERE kodf = kodf_ AND datf = dat_ AND kodp = kodp_;
+
+            --IF kol_ = 0
+            --THEN
+            --   INSERT INTO tmp_nbu (kodf,
+            --                        datf,
+            --                        kodp,
+            --                        znap,
+            --                        nbuc)
+            --        VALUES (kodf_,
+            --                dat_,
+            --                kodp_,
+            --                k.p80,
+            --                nbuc_);
+            --END IF;
          END IF;
       EXCEPTION
          WHEN OTHERS
