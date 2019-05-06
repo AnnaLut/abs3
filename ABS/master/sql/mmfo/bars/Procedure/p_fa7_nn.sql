@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.19.12    22/04/2019 (18/04/2019)
+% VERSION     :  v.19.43   02/05/2019 (26/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -1183,7 +1183,8 @@ BEGIN
                  WHERE a.fdat = dat_
                    AND s.acc = acc_
                    AND s.accc = a.acc
-                   AND a.nbs IS NOT NULL;
+                   AND a.nbs IS NOT NULL
+				   and a.nbs <> '8999';
                    
                 dk_k := iif_n (se1_, 0, '1', '2', '2');
              EXCEPTION
@@ -1283,9 +1284,9 @@ BEGIN
                 
                 select  NVL(max(ck.cp_id), 'YYYYYYYYYY')
                 into cp_id_
-                from cp_deal cd, cp_kod ck
-                where acc_ in (cd.acc, cd.accd, cd.accp, cd.accr, cd.accr2, cd.accr3,
-                               cd.accs, cd.accexpn, cd.accexpr, cd.accunrec)
+                from cp_accounts a, cp_deal cd, cp_kod ck
+                where a.cp_acc = acc_ 
+                  and a.cp_ref = cd.ref
                   and cd.id = ck.id
                   and cd.active in (1, -1);
                   
@@ -4654,6 +4655,7 @@ BEGIN
               where r.acc = a.acc
                 and a.tip in ('ISS','IKN','IK0')
                 and a.nbs in ('2203','2208','3570')
+                and r.comm not like '%перевищення%'
             )
    loop
          znap_ := k.znap;
@@ -4747,10 +4749,6 @@ BEGIN
     update rnbu_trace
        set kodp =substr(kodp,1,8)||'I'||substr(kodp,10)
      where substr(kodp,9,1) in ('J');
-
---    update rnbu_trace
---       set kodp =substr(kodp,1,8)||'I'||substr(kodp,10)
---     where substr(kodp,9,1) = 'Z' and substr(kodp,2,4) = '2236' and znap < 0;
 
 --------------------------------------------------
    IF pmode_ = 0
