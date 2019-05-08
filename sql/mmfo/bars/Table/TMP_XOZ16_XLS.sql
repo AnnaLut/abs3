@@ -38,3 +38,15 @@ COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S32  IS '3.2)ВСІ.Закриття Нар.Витрат на ДЕБ
 COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.s33  IS '3.3)ВСІ.Закриття ДЕБ заборг. з ПДВ: 7410*09 => 3519/26     ' ;
 
 GRANT  SELECT on BARS.tmp_XOZ16_XLS TO BARS_ACCESS_DEFROLE;
+----------------------------------------------------------
+
+begin    execute immediate ' alter TABLE BARS.TMP_XOZ16_XLS add (S_BH number, S_BI number, S_BJ number, S_BK number, S_BL number) ' ;
+exception when others then   if SQLCODE = - 01430  then null;   else raise; end if; --ORA-01430: column being added already exists in table
+end;
+/
+
+COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BH  IS 'BH.Закриття зобовязань з оренди:3615->3739';
+COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BI  IS 'BI.Закриття нарахованих процентів:3618->3739';
+COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BJ  IS 'BJ.Закриття активів у формі права користування:3739->4600';
+COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BK  IS 'BK.Закриття накопиченої амортизації:4609->3739';
+COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BL  IS 'BL.Результат від припинення визнання модифікованих договорів:7499<->3739' ;

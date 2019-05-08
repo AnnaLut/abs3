@@ -1,7 +1,9 @@
-CREATE OR REPLACE PACKAGE XOZ16 IS g_header_version   CONSTANT VARCHAR2 (64) := 'version 1  16.04.2019';
+CREATE OR REPLACE PACKAGE XOZ16 IS g_header_version   CONSTANT VARCHAR2 (64) := 'version 2  02.05.2019';
 -----------------------------------------------
 procedure put ;
+procedure KROK19 ; --   = opr  p_Mode in (61, 62, 63, 64,65 ) 
 procedure Get_XLS(p_MODE int, p_file_name varchar2, p_Zdate date, p_clob clob ) ;
+procedure VISA   (p_MODE int) ;
 procedure CHK1   ( oo IN OUT oper%rowtype, p_sideA  varchar2, p_sideB  varchar2) ;  -- Проверка перед оплатой на счета
 procedure OPL1   ( oo IN OUT oper%rowtype) ;  -- опрлата
 procedure UPD1   ( p_ND cc_deal.ND%type, p_CC_ID cc_deal.CC_ID%type, p_SDATE date,  p_PROD cc_deal.PROD%type, p_ACC accounts.ACC%type )   ;
@@ -17,7 +19,9 @@ END XOZ16;
 GRANT execute on XOZ16 TO BARS_ACCESS_DEFROLE;
 
 
-CREATE OR REPLACE PACKAGE BODY XOZ16 IS   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2  16ё.04.2019';
+CREATE OR REPLACE PACKAGE BODY XOZ16 IS   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2  02.05.2019';
+--26.04.2019 Работа с 3739. Импорт полпнок Крок-19.
+
 -------------------------------------
   nlchr char(2) := chr(13)||chr(10) ;
   p4_ int ;
@@ -28,6 +32,15 @@ begin
 ---PUL.put('WACC',' a.nbs=''4600'' '); 
    PUL.put('WACC','a.nbs=''4600'' OR A.acc in (select n.acc from nd_acc n , cc_deal d where d.vidd=351 and d.nd= n.nd)'); 
 end put;
+
+procedure KROK19 is 
+begin 
+    XOZ16.OPR ( 0, 61, null, null ) ;
+    XOZ16.OPR ( 0, 62, null, null ) ;
+    XOZ16.OPR ( 0, 63, null, null ) ;
+    XOZ16.OPR ( 0, 64, null, null ) ;
+    XOZ16.OPR ( 0, 65, null, null ) ;
+end KROK19 ;
 
 procedure Get_XLS (p_MODE int, p_file_name varchar2, p_Zdate date, p_clob clob )  IS 
     g_numb_mask varchar2(100) := '9999999999999999999999999D99999999';
@@ -43,6 +56,25 @@ procedure Get_XLS (p_MODE int, p_file_name varchar2, p_Zdate date, p_clob clob )
     n_ int := 0 ;
     D_ date ;
     Dubl_ int ;
+
+  ---- Вычитка колонки с суммой
+  Procedure Get_COLS(x_Col IN varchar2, x_Val OUT number ) is
+  begin
+     I_ := INSTR(L_CLOB,'<Column><Tag>'||x_Col||'</Tag><Value>',1); 
+     If I_ > 0 then 
+        i_ := I_ +28 ;
+        l_clob :=  Substr(l_clob, i_);
+        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
+        sTmp_  := Substr(l_clob, 1, i_) ;
+        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
+        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
+
+        Begin  x_Val := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
+        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "'||x_Col||'" НЕ ЧИСЛО :'||sTmp_ );
+        end;
+     end if;
+  end ;
+
 begin
    If p_MODE = 0  then
       delete from TMP_RI_CLOB where namef = gl.aMfo ;
@@ -113,122 +145,30 @@ begin
 
      End If;
 
-
-     ---1.1) BW = Визнання зобов`язань з оренди та права користування активу:4600/**=>3615/*КРЕД.заборг -----------------------
-     I_ := INSTR(L_CLOB,'<Column><Tag>BW</Tag><Value>',1); 
-     If I_ > 0 then 
-        i_ := I_ +28 ;
-        l_clob :=  Substr(l_clob, i_);
-        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
-        sTmp_  := Substr(l_clob, 1, i_) ;
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
-
-        Begin  MX.S11 := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
-        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "BW" НЕ ЧИСЛО :'||sTmp_ );
-        end;
-     end if;
-
-     ---1.2) CB = Визнання активу з права користування на суму гарантійного платежу :4600/**=>3500/04  --- ,3519/26*ДЕБІТ.заборг
-     I_ := INSTR(L_CLOB,'<Column><Tag>CB</Tag><Value>',1); 
-     If I_ > 0 then 
-        i_ := I_ +28 ;
-        l_clob :=  Substr(l_clob, i_);
-        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
-        sTmp_  := Substr(l_clob, 1, i_) ;
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
-        begin MX.S12 := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
-        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "CB" НЕ ЧИСЛО :'||sTmp_ );
-        end;
-
-     end if;
-
-     ---2.1) CG = Нарахування % витрат за зобов`язанням з оренди  за місяць:7028/01=>3618/01
-     I_ := INSTR(L_CLOB,'<Column><Tag>CG</Tag><Value>',1); 
-     If I_ > 0 then 
-        i_ := I_ +28 ;
-        l_clob :=  Substr(l_clob, i_);
-        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
-        sTmp_  := Substr(l_clob, 1, i_) ;
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
-        Begin MX.S21 := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
-        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "CG" НЕ ЧИСЛО :'||sTmp_ );
-        end;
-
-     end if;
-
-     ---3.3) CM = Закриття ДЕБ заборг на суму  ПДВ: 7399*67__ => 3519/26
-     I_ := INSTR(L_CLOB,'<Column><Tag>CM</Tag><Value>',1); 
-     If I_ > 0 then 
-        i_ := I_ +28 ;
-        l_clob :=  Substr(l_clob, i_);
-        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
-        sTmp_  := Substr(l_clob, 1, i_) ;
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
-        Begin MX.S33 := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
-        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "CM" НЕ ЧИСЛО :'||sTmp_ );
-        end;
-     end if;
-
-     ---3.1) CO = Закриття нарахованих витрат на ДЕБ заборг.:3618/01=>3519/26
-     I_ := INSTR(L_CLOB,'<Column><Tag>CO</Tag><Value>',1); 
-     If I_ > 0 then 
-        i_ := I_ +28 ;
-        l_clob :=  Substr(l_clob, i_);
-        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
-        sTmp_  := Substr(l_clob, 1, i_) ;
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
-        Begin MX.S31 := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
-        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "CO" НЕ ЧИСЛО :'||sTmp_ );
-        end;
-
-     end if;
-
-     ---3.2) CP = Закриття ДЕБ заборг.:3615=>3519/26
-     I_ := INSTR(L_CLOB,'<Column><Tag>CP</Tag><Value>',1); 
-     If I_ > 0 then 
-        i_ := I_ +28 ;
-        l_clob :=  Substr(l_clob, i_);
-        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
-        sTmp_  := Substr(l_clob, 1, i_) ;
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
-        Begin MX.S32 := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
-        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "CP" НЕ ЧИСЛО :'||sTmp_ );
-        end;
-
-     end if;
-
-     ---2.2) CY = Переоцінка активу з права користування та зобов`язань з оренди за місяць:3615<=>4600 
-     I_ := INSTR(L_CLOB,'<Column><Tag>CY</Tag><Value>',1); 
-     If I_ > 0 then 
-        i_ := I_ +28 ;
-        l_clob :=  Substr(l_clob, i_);
-        I_     := LEAST( 40, INSTR(L_CLOB, '</Value>', 1 ) ) - 1 ; 
-        sTmp_  := Substr(l_clob, 1, i_) ;
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ' ','') ;  
-        sTmp_  := REPLACE ( Substr(L_CLOB,1,I_ ), ',','') ;  
-        Begin MX.S22 := to_number(sTmp_, g_numb_mask, g_nls_mask) ;
-        exception when others then  raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка "CY" НЕ ЧИСЛО :'||sTmp_ );
-        end;
-
-     end if;
+     Get_COLS('BH', MX.S_BH ) ;  --COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BH  IS 'BH.Закриття зобовязань з оренди:3615->3739';
+     Get_COLS('BI', MX.S_BI ) ;  --COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BI  IS 'BI.Закриття нарахованих процентів:3618->3739';
+     Get_COLS('BJ', MX.S_BJ ) ;  --COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BJ  IS 'BJ.Закриття активів у формі права користування:3739->4600';
+     Get_COLS('BK', MX.S_BK ) ;  --COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BK  IS 'BK.Закриття накопиченої амортизації:4609->3739';
+     Get_COLS('BL', MX.S_BL ) ;  --COMMENT ON COLUMN BARS.TMP_XOZ16_XLS.S_BL  IS 'BL.Результат від припинення визнання модифікованих договорів:7499<->3739' ;
+     --------------------------
+     Get_COLS('BW', MX.S11 )  ;  --1.1) BW = Визнання зобов`язань з оренди та права користування активу:4600/**=>3615/*КРЕД.заборг -----------------------
+     Get_COLS('CB', MX.S12 )  ;  --1.2) CB = Визнання активу з права користування на суму гарантійного платежу :4600/**=>3500/04  --- ,3519/26*ДЕБІТ.заборг
+     Get_COLS('CG', MX.S21 )  ;  --2.1) CG = Нарахування % витрат за зобов`язанням з оренди  за місяць:7028/01=>3618/01
+     Get_COLS('CM', MX.S33 )  ;  --3.3) CM = Закриття ДЕБ заборг на суму  ПДВ: 7399*67__ => 3519/26
+     Get_COLS('CO', MX.S31 )  ;  --3.1) CO = Закриття нарахованих витрат на ДЕБ заборг.:3618/01=>3519/26
+     Get_COLS('CP', MX.S32 )  ;  --3.2) CP = Закриття ДЕБ заборг.:3615=>3519/26
+     Get_COLS('CY', MX.S22 )  ;  --2.2) CY = Переоцінка активу з права користування та зобов`язань з оренди за місяць:3615<=>4600 
 
      MX.KF := sys_context('bars_context','user_mfo') ;
      MX.DAT01 := TRUNC( gl.BDATE, 'MM');
+
+--logger.info('XXX-1*'|| MX.npp||'*'||  MX.S_BH ||'*'|| MX.S_BI||'*'|| MX.S_BJ||'*'||MX.S_BK ||'*'||  MX.S_BL ||'*') ; 
+ 
      begin select a.* into aa FROM accounts a where a.kv = gl.baseval and a.nls = MX.NLS_3519 ;
-
-           If aa.ob22 <> '26' then
-              raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка G, рах.'||MX.NLS_3519|| ' ob22='||aa.ob22 || ' HE 26 !' );
-           end if ;
-
+           If aa.ob22 <> '26' then raise_application_error(-20000,'Рядок № '|| n_ || ' , колонка G, рах.'||MX.NLS_3519|| ' ob22='||aa.ob22 || ' HE 26 !' );   end if ;
            MX.RNKA := aa.RNK ;        
 
-           begin select d.ND into mx.ND from cc_deal d, nd_acc n where n.acc = aa.acc and n.nd = d.nd and d.vidd =351 ;     
+           begin select d.ND into mx.ND from cc_deal d, nd_acc n where n.acc = aa.acc and n.nd = d.nd and d.vidd =351 and rownum = 1;     
                  ---счет уже привязан к договору -------------------------------------------------------------------------------------------------------
 
                  -- А был ли он уже в этом XLS ?
@@ -245,7 +185,6 @@ begin
                           MX.NLS_3519     := Get_NLS( aa.kv, aa.nbs );
                           aa.NLS          := MX.NLS_3519 ;
                           op_reg( mod_=> 99, p1_=> 0, p2_=>0, p3_=>aa.GRP, p4_=>p4_, rnk_=>aa.RNK, nls_=>MX.NLS_3519, kv_=> aa.KV, nms_=> aa.NMS,  tip_=> 'XOZ',  isp_=> gl.aUid, accR_=> aa.acc );
-
                           Accreg.setAccountSParam(aa.ACC, 'OB22', '26' ) ;
                           XOZ16.UPD1 ( p_ND => null, p_CC_ID => mx.cc_id,  p_SDATE => NVL(mx.SDATE, aa.daos),  p_PROD  => mx.PROD, p_ACC => aa.ACC ) ;   
                        else
@@ -263,10 +202,20 @@ begin
 
            select d.ND into mx.ND from cc_deal d, nd_acc n where n.acc = aa.acc and n.nd = d.nd and d.vidd =351 ;    
 
+           If MX.S_BH <>0 or  MX.S_BI <>0 or MX.S_BJ <>0  or MX.S_BK <>0 or MX.S_BL <>0 then
+              --Проверить/Открыть 3739
+
+              begin select * into aa from accounts where rnk=rnk and nbs='3739' and ob22='17' and dazs is null and kv=980 and acc in (select acc from nd_acc where nd = MX.nd);
+              EXCEPTION WHEN NO_DATA_FOUND THEN  
+                 aa.NLS := Get_NLS( gl.baseval, '3739' );
+                 op_reg( mod_=> 99, p1_=> 0, p2_=>0, p3_=>29, p4_=>p4_, rnk_=>aa.RNK, nls_=>aa.nls, kv_=> aa.KV, nms_=> aa.NMS,  tip_=> 'ODB', isp_=> aa.isp, accR_=> aa.acc );
+                 Accreg.setAccountSParam(aa.ACC, 'OB22', '17' ) ;
+                 insert into nd_acc( nd,acc) values ( MX.nd, aa.acc) ;  --3615
+              end ;
+           end if;   
+
      EXCEPTION WHEN NO_DATA_FOUND THEN  null ;
    end  ;
-
-
 
      insert into TMP_XOZ16_XLS  values MX ;
    end loop ;
@@ -274,6 +223,14 @@ begin
    commit;
    return;
 end Get_XLS ;  
+
+procedure VISA   (p_MODE int) is 
+begin
+  If p_mode = 0 then 
+     for k in (select REF from oper where OPER.ref>=to_number(Pul.Get('X1'))  and OPER.REF<=to_number(Pul.Get('X2'))  and OPER.USERID = gl.aUid and sos = 1)
+     loop  gl.pay( 2, k.REF, gl.bdate); end loop;
+  end if ;
+end visa;
 
 procedure CHK1   ( oo IN OUT oper%rowtype, p_sideA  varchar2, p_sideB  varchar2) is
  -- Проверка перед оплатой на счета
@@ -434,24 +391,30 @@ procedure OPR  ( p_ND cc_deal.ND%type, p_Mode int , p_S number, p_Txt varchar2 )
   END ;
  
 begin 
- If p_Mode = 0  then   
+  If p_Mode = 0  then   
      If p_ND > 0 then
         delete from TMP_XOZ16 where isp= gl.aUid and nd = p_ND ;
         insert into TMP_XOZ16( isp, nd, S ) values ( gl.aUid, p_nd, p_S*100);
      end if;
+
      Return ;
+
   End if ;
   -----------
   oo.DK := 1;
   oo.tt := 'PS1'; 
 
   If p_ND = 0 then
-     pul.Put('X1', Null ) ; 
-     pul.Put('X2', Null ) ;   
+     If p_Mode in ( 11, 12, 21, 22, 31, 32, 33, 61)  then
+        pul.Put('X1', Null ) ; 
+        pul.Put('X2', Null ) ;   
+     end if ;
 
      delete from TMP_XOZ16 where isp= gl.aUid ;
      insert into TMP_XOZ16( isp, nd, S , npp ) 
-                select  gl.aUid, nd, decode ( p_mode, 11,S11,  12,S12,  21,S21,  22,S22,  31,S31,  32,S32,  33, S33, 0) *100, npp
+                select  gl.aUid, nd, decode ( p_mode, 11,S11 ,  12,S12 ,  21,S21 ,  22,S22 ,  31,S31 ,   32,S32,  33, S33, 
+                                                      61,S_BH,  62,S_BI,  63,S_BJ,  64,S_BK,  65,S_BL, 
+                                                         0   ) *100, npp
                 from TMP_XOZ16_XLS 
                 where kf = gl.aMFO and nd > 0 ;
      commit;
@@ -475,7 +438,57 @@ begin
 
      l_Side := Substr(dd.prod,1,4) ||'*'|| Substr(dd.prod,5,2) ;
 ----------------------------------------------------------------------------------------------------------------
-     If p_Mode in (11,12)   then   
+     If p_Mode in (61, 62, 63, 64,65 )  then   
+        oo.nlsB := XOZ16.NLS( dd.ND, dd.rnk, '3739', null ) ; 
+
+        If p_Mode = 61 then   
+           oo.dk := 1 ;
+           oo.nazn := Substr( 'Закриття зобовязань з оренди згідно дог. №'  ||dd.cc_id||'. '||p_Txt ,1,160) ;
+           oo.nlsA := XOZ16.NLS( dd.ND, dd.rnk, '3615', null ) ;       
+           XOZ16.CHK1( oo, '3615*04', '3739*17' ) ;  
+        
+        ElsIf p_Mode = 62 then
+           oo.dk := 1 ;
+           oo.nazn := Substr( 'Закриття нарахованих процентів згідно дог. №'  ||dd.cc_id||'. '||p_Txt ,1,160) ;
+           oo.nlsA := XOZ16.NLS( dd.ND, dd.rnk, '3618', null ) ; 
+           XOZ16.CHK1( oo, '3618*01', '3739*17' ) ;  
+
+        ElsIf p_Mode = 63 then  
+           oo.dk := 0 ;
+           oo.nazn := Substr( 'Закриття активів у формі права користування згідно дог. №'  ||dd.cc_id||'. '||p_Txt ,1,160) ;
+           oo.nlsa := nbs_ob22_NULL (Substr(dd.prod,1,4),  Substr(dd.prod,5,2), l_Branch );       -- найти 4600
+           XOZ16.CHK1( oo, l_Side, '3739*17' ) ;  
+
+        ElsIf p_Mode = 64 then  
+           oo.dk := 1 ;
+           oo.nazn := Substr( 'Закриття накопиченої амортизації згідно дог. №'  ||dd.cc_id||'. '||p_Txt ,1,160) ;
+           aa.nbs  := Substr(dd.prod,1,3)||'9';
+           aa.ob22 := Substr(dd.prod,5,2) ;
+           oo.nlsa := nbs_ob22_NULL (aa.nbs, aa.ob22, l_Branch );       -- найти 4609
+           If oo.nlsa is null then  
+              OP_BS_OB1( PP_BRANCH => l_Branch, P_BBBOO => aa.nbs||aa.ob22 ) ;  
+              oo.nlsa := nbs_ob22_NULL ( aa.nbs,  aa.ob22, l_Branch );     
+           end if;
+           l_Side  := aa.nbs||'*'||aa.ob22  ;
+           XOZ16.CHK1( oo, l_Side, '3739*17' ) ;  
+
+        ElsIf p_Mode = 65 then             
+           oo.nazn := Substr( 'Результат від припинення визнання модифікованих договорів згідно дог. №' ||dd.cc_id||'. '||p_Txt ,1,160) ;
+           If oo.S > 0 then        oo.DK := 0 ; aa.nbs := '6360' ; aa.ob22 := '01' ;  
+           Else  oo.s := - oo.S ;  oo.DK := 1 ; aa.nbs := '7360' ; aa.ob22 := '01' ;
+           End if; 
+           oo.nlsa := nbs_ob22_NULL ( aa.nbs,  aa.ob22, l_Branch );       -- найти 6360.7360
+           l_Side := aa.nbs||'*'|| aa.ob22 ;
+           If oo.nlsa is null then  
+              OP_BS_OB1( PP_BRANCH => l_Branch, P_BBBOO => aa.nbs||aa.ob22 ) ;  
+              oo.nlsa := nbs_ob22_NULL ( aa.nbs,  aa.ob22, l_Branch );       -- найти 6360.7360
+           end if;
+           XOZ16.CHK1( oo, l_Side, '3739*17' ) ;  
+        end if ;
+
+---------------------------------------------------------------------------------------------------------------
+
+     ElsIf p_Mode in (11,12)   then   
 
         oo.nlsa := nbs_ob22_NULL (Substr(dd.prod,1,4),  Substr(dd.prod,5,2), l_Branch );       -- найти 4600
 
