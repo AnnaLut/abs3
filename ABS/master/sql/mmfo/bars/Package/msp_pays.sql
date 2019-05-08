@@ -41,7 +41,7 @@ end msp_pays;
 CREATE OR REPLACE package body BARS.msp_pays is
 
   -- Версiя пакету
-  g_body_version constant varchar2(64) := 'version 1.02 11/01/2018';
+  g_body_version constant varchar2(64) := 'version 1.03 08/05/2019';
 
   g_errmsg varchar2(4000);
 
@@ -97,7 +97,7 @@ CREATE OR REPLACE package body BARS.msp_pays is
 
     l_sos number;
     l_rec number;
-
+    l_tip accounts.tip%type;
   begin
     bc.go(300465);
     --Вичитаєм рядок з таблиці реєстру
@@ -113,23 +113,34 @@ CREATE OR REPLACE package body BARS.msp_pays is
      where f.id = l_rec_row.file_id;
 
  
-  begin 
-   select p.okpo, p.rnk into l_okpo, l_rnk
-      from pfu.pfu_pensioner p, pfu.pfu_pensacc pa
+  begin
+   select p.okpo, p.rnk, a.tip into l_okpo, l_rnk, l_tip
+      from pfu.pfu_pensioner p, pfu.pfu_pensacc pa, accounts a
      where p.rnk = pa.rnk and  p.kf = pa.kf
           and pa.kf = l_mfo
           and pa.nls = to_char(l_rec_row.deposit_acc)
-          and pa.dazs is null;
-  exception  when no_data_found then  
-       select p.okpo, p.rnk into l_okpo, l_rnk
-      from pfu.pfu_pensioner p
-     where (p.rnk,p.kf) = (
-						   select pa.rnk,pa.kf
+          and pa.dazs is null
+          and a.kf = pa.kf
+          and a.nls = pa.nls
+          and a.kv = pa.kv;
+  exception  when no_data_found then
+       select p.okpo, p.rnk, a.tip into l_okpo, l_rnk, l_tip
+      from pfu.pfu_pensioner p, pfu.pfu_pensacc pa, accounts a
+       where p.rnk = pa.rnk and  p.kf = pa.kf
+            and pa.kf = l_mfo
+            and pa.nlsalt = to_char(l_rec_row.deposit_acc)
+            and pa.dazs is null
+            and a.kf = pa.kf
+            and a.nlsalt = pa.nlsalt
+            and a.kv = pa.kv;
+
+     /*where (p.rnk,p.kf) = (
+               select pa.rnk,pa.kf
                              from pfu.pfu_pensacc pa
                             where pa.kf = l_mfo
                               and pa.nlsalt = to_char(l_rec_row.deposit_acc) -- COBUMMFO-7501
-						   and pa.dazs is null);
-   end;						   
+               and pa.dazs is null);*/
+   end;
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
       l_okpo := '0000000000';
@@ -148,11 +159,19 @@ CREATE OR REPLACE package body BARS.msp_pays is
     end;
 
 
-     if (l_mfo = '300465') and substr(l_rec_row.deposit_acc, 1, 4) = '2620' then
+    if (l_mfo = '300465') then
+      if l_tip like 'W4%' then
+        l_tt := 'PKX';
+      else
+        l_tt := '024';
+      end if;
+    end if;
+
+     /*if (l_mfo = '300465') and substr(l_rec_row.deposit_acc, 1, 4) = '2620' then
        l_tt := '024';
      elsif (l_mfo = '300465') and substr(l_rec_row.deposit_acc, 1, 4) = '2625' then
        l_tt := 'PKX';
-     end if;
+     end if;*/
 
 
  --    bars_audit.info(l_rec_row.full_rec);

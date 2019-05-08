@@ -38,7 +38,7 @@ end pfu_pays;
 CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
 
   -- Версiя пакету
-  g_body_version constant varchar2(64) := 'version 1.01 08/07/2016';
+  g_body_version constant varchar2(64) := 'version 1.02 08/05/2019';
 
   g_errmsg varchar2(4000);
 
@@ -93,7 +93,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
 
     l_sos number;
     l_rec number;
-
+    l_tip accounts.tip%type;
   begin
     bc.go(300465);
     --Вичитаєм рядок з таблиці реєстру
@@ -108,7 +108,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
       from pfu.pfu_file pf
      where pf.id = l_rec_row.file_id;
 
-    select p.okpo, p.rnk into l_okpo, l_rnk
+    /*select p.okpo, p.rnk into l_okpo, l_rnk
       from pfu.pfu_pensioner p
      where (p.rnk,p.kf) = (select pa.rnk,pa.kf
                              from pfu.pfu_pensacc pa
@@ -120,7 +120,27 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
                              from pfu.pfu_pensacc pa
                             where pa.kf = l_rec_row.mfo
                               and pa.nlsalt = l_rec_row.num_acc -- COBUMMFO-7501
-                              and pa.dazs is null);
+                              and pa.dazs is null);*/
+
+    select p.okpo, p.rnk, a.tip into l_okpo, l_rnk, l_tip
+      from pfu.pfu_pensioner p, pfu.pfu_pensacc pa, accounts a
+     where p.rnk = pa.rnk and p.kf = pa.kf 
+       and pa.kf = l_rec_row.mfo
+       and pa.nls = l_rec_row.num_acc
+       and pa.dazs is null
+       and a.nls = pa.nls
+       and a.kf = pa.kf
+       and a.kv = pa.kv
+    union
+    select p.okpo, p.rnk, a.tip
+      from pfu.pfu_pensioner p, pfu.pfu_pensacc pa, accounts a
+     where p.rnk = pa.rnk and p.kf = pa.kf 
+       and pa.kf = l_rec_row.mfo
+       and pa.nlsalt = l_rec_row.num_acc
+       and pa.dazs is null
+       and a.nls = pa.nls
+       and a.kf = pa.kf
+       and a.kv = pa.kv;
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
       l_okpo := '0000000000';
@@ -139,11 +159,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
     end;
 
 
-     if (l_rec_row.mfo = '300465') and substr(l_rec_row.num_acc, 1, 4) = '2620' then
+    if l_rec_row.mfo = '300465' then
+      if l_tip like 'W4%' then
+        l_tt := 'PKX';
+      else
+        l_tt := '024';
+      end if;
+    end if;
+
+     /*if (l_rec_row.mfo = '300465') and substr(l_rec_row.num_acc, 1, 4) = '2620' then
        l_tt := '024';
      elsif (l_rec_row.mfo = '300465') and substr(l_rec_row.num_acc, 1, 4) = '2625' then
        l_tt := 'PKX';
-     end if;
+     end if;*/
 
 
      bars_audit.info(l_rec_row.full_rec);
