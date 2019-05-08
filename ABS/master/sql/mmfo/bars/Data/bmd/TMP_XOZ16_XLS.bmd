@@ -127,8 +127,8 @@ begin
   bars_metabase.add_column(l_tabid, 0, 'NPP', 'N', '№ рядка~в XLS-табл', '', null, 0, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 1, 'PROD', 'C', '4600.XX', '', null, 4, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', 'Номер~договору~B
-', '', null, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT01', 'D', 'Звітна~дата', '', null, 51, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+', '', null, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=3'||chr(38)||'nd=:ND', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT01', 'D', 'Звітна~дата', '', null, 71, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'SDATE', 'D', 'Дата~договору~C
 ', '', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 5, 'NLS_3519', 'C', 'Рахунок~3519*26~Дог.
@@ -136,7 +136,7 @@ begin
   bars_metabase.add_column(l_tabid, 6, 'NLS_3519_OLD', 'C', 'Рахунок~3519*26~XLS(G)
 ', '', null, 9, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 11, 'RNKA', 'N', 'РНК(АБС)~Клієнта', '', null, 1, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ND', 'N', 'Реф.дог~в АБС', '', null, 50, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ND', 'N', 'Реф.дог~в АБС', '', null, 70, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'S11', 'N', '1.1)Визнання зобов`язань~4600/**=>3615/04~BW', '', null, 11, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S11)', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 25, 'S12', 'N', '1.2)Визнання активу~4600/**=>3500/04~CB', '', null, 12, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S12)', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 30, 'S21', 'N', '2.1)Нарахування витрат~7028/01=>3618/01~CG', '', null, 21, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S21)', 0, 0, 1, '', '', 0);
@@ -144,6 +144,11 @@ begin
   bars_metabase.add_column(l_tabid, 40, 'S31', 'N', '3.1)Закриття нар/витрат~3618/01=>3519/26~CO', '', null, 31, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S31)', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 45, 'S32', 'N', '3.2)Закриття ДЗ~3615/04=>3519/26~CP', '', null, 32, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S32)', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 50, 'S33', 'N', '3.3)Закриття ДЗ(ПДВ)~7399/67=>3519/26~CM', '', null, 33, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S33)', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 61, 'S_BH', 'N', 'Закт.зобовяз.~3615->3739~Крок-19.BH', '', null, 61, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S_BH)', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 62, 'S_BI', 'N', 'Закр.нарах.%%~3618->3739~Крок-19.BI', '', null, 62, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S_BI)', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 63, 'S_BJ', 'N', 'Закр.активів~3739->4600~Крок-19.BJ', '', null, 63, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S_BJ)', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 64, 'S_BK', 'N', 'Закр.накоп.амор.~4609->3739~Крок-19.BK', '', null, 64, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S_BK)', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 65, 'S_BL', 'N', 'Результат~7360,6360<->3739~Крок-19.BL', '', null, 65, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S_BL)', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');
@@ -187,11 +192,13 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 10, 'CM=3.3)Закриття ДЗ(ПДВ)<br>7399/67=>3519/26', 'XOZ16.OPR ( 0, 33, null, :X ) ', ':X(SEM=Деталі,TYPE=S)', 'ONCE', 'Виконати проводки <br>CM=3.3)Закриття ДЗ(ПДВ)<br>7399/67=>3519/26<br> ?', 'Виконано !', '', '', '', 33, '' );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 11, 'Переглянути створені документи,<br>
-та сформувати тікет', '', '', 'ONCE', '', '', '', '', 'sPar=OPER_MON[ACCESSCODE=>1][CONDITIONS=>OPER_MON.tt in (''PS1'',''IF0'')][showDialogWindow=>false][EXEC=>BEFORE]', 51, '' );
+  bars_metabase.add_nsifunction(l_tabid, 11, 'Крок-19. Закриття дог<br>Кол.BH,BI,BJ,BK,BL,', 'XOZ16.KROK19', '', 'ONCE', 'Виконати проводки "Крок-19" = Закриття дог<br>Колонки BH,BI,BJ,BK,BL ?', 'Виконано !', '', '', '', 11, '' );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 12, 'WACC:Переглянути всі рахунки угод <br>
+  bars_metabase.add_nsifunction(l_tabid, 12, 'Переглянути створені документи', '', '', 'ONCE', '', '', '', '', 'sPar=OPER_MON[ACCESSCODES=>1][NSIFUNCTION][CONDITIONS=>OPER_MON.tt in (''PS1'',''IF0'')][showDialogWindow=>false][EXEC=>BEFORE]', 51, '' );
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 13, 'WACC:Переглянути всі рахунки угод <br>
 портфелю ХОЗ-16(оренда)', '', '', 'ONCE', '', '', '', '', '/barsroot/customerlist/custacc.aspx?type=7', 98, '' );
 
   -- добавляем описание раскраски
