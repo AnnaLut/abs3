@@ -38,7 +38,7 @@ end pfu_pays;
 CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
 
   -- Версiя пакету
-  g_body_version constant varchar2(64) := 'version 1.02 08/05/2019';
+  g_body_version constant varchar2(64) := 'version 1.03 08/05/2019';
 
   g_errmsg varchar2(4000);
 
@@ -95,7 +95,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
     l_rec number;
     l_tip accounts.tip%type;
   begin
-    bc.go(300465);
+    bc.go('/');
     --Вичитаєм рядок з таблиці реєстру
     select d.*
       into l_rec_row
@@ -122,6 +122,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
                               and pa.nlsalt = l_rec_row.num_acc -- COBUMMFO-7501
                               and pa.dazs is null);*/
 
+    -- так як ми використовуєм політизовану таблицю accounts 
+    -- а рахунки можуть бути різних РУ то ми повинні бути на верхньому рівні
     select p.okpo, p.rnk, a.tip into l_okpo, l_rnk, l_tip
       from pfu.pfu_pensioner p, pfu.pfu_pensacc pa, accounts a
      where p.rnk = pa.rnk and p.kf = pa.kf 
@@ -141,6 +143,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
        and a.nls = pa.nls
        and a.kf = pa.kf
        and a.kv = pa.kv;
+
+    bc.go('300465');
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
       l_okpo := '0000000000';

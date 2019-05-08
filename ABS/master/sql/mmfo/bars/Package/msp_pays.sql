@@ -41,7 +41,7 @@ end msp_pays;
 CREATE OR REPLACE package body BARS.msp_pays is
 
   -- Версiя пакету
-  g_body_version constant varchar2(64) := 'version 1.03 08/05/2019';
+  g_body_version constant varchar2(64) := 'version 1.04 08/05/2019';
 
   g_errmsg varchar2(4000);
 
@@ -99,7 +99,7 @@ CREATE OR REPLACE package body BARS.msp_pays is
     l_rec number;
     l_tip accounts.tip%type;
   begin
-    bc.go(300465);
+    bc.go('/');
     --Вичитаєм рядок з таблиці реєстру
     select d.*
       into l_rec_row
@@ -113,6 +113,8 @@ CREATE OR REPLACE package body BARS.msp_pays is
      where f.id = l_rec_row.file_id;
 
  
+  -- так як ми використовуєм політизовану таблицю accounts 
+  -- а рахунки можуть бути різних РУ то ми повинні бути на верхньому рівні
   begin
    select p.okpo, p.rnk, a.tip into l_okpo, l_rnk, l_tip
       from pfu.pfu_pensioner p, pfu.pfu_pensacc pa, accounts a
@@ -133,6 +135,8 @@ CREATE OR REPLACE package body BARS.msp_pays is
             and a.kf = pa.kf
             and a.nlsalt = pa.nlsalt
             and a.kv = pa.kv;
+
+  bc.go('300465');
 
      /*where (p.rnk,p.kf) = (
                select pa.rnk,pa.kf
