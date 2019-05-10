@@ -4,6 +4,8 @@ using Oracle.DataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.SessionState;
 
@@ -14,18 +16,29 @@ namespace Bars.WebServices.Glory
     /// </summary>
     public class GloryDBExecutor
     {
-
+        //CancellationTokenSource cancellationToken;
         /// <summary>
         /// Отправка уведомления об отсутствии связи с АТМ
         /// </summary>
         /// <param name="message"></param>
-        public void ExecuteATMDisconnect(String message, HttpSessionState session, String userLogin)
+        public void ExecuteATMDisconnect(String message, String userLogin)
         {
-            if(session["UserLoggedIn"] == null)
-                this.LoginUser(userLogin, session);
+            Task.Factory.StartNew(() => ExecureErrorLog(userLogin))
+                .ContinueWith(tsk => OnThreadComplete(tsk),
+                TaskContinuationOptions.None);
+        }
+
+        public void ExecureErrorLog(String userLogin)
+        {
             String query = "bars.teller_tools.set_atm_fault";
             List<OracleParameter> parameters = new List<OracleParameter>();
+            parameters.Add(new OracleParameter("p_user", OracleDbType.Varchar2, userLogin, ParameterDirection.Input));
             ExecuteProcedure(query, parameters);
+        }
+
+        public void OnThreadComplete(Task tsk)
+        {
+
         }
 
         /// <summary>
@@ -47,35 +60,6 @@ namespace Bars.WebServices.Glory
                     cmd.ExecuteNonQuery();
                 }
             }
-        }
-
-        /// <summary>
-        /// Логирование пользователя
-        /// </summary>
-        /// <param name="_userName">Имя пользователя</param>
-        /// <param name="session">HttpSession</param>
-        /// <param name="sessionId">ИД Сессии</param>
-        private void LoginUser(String _userName, HttpSessionState session)
-        {
-            // Інформація про поточного користувача
-            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(_userName);
-            using (OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection())
-            {
-                OracleCommand cmd = con.CreateCommand();
-                using (con)
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "bars.bars_login.login_user";
-
-                    cmd.Parameters.Add("p_session_id", OracleDbType.Varchar2, session.SessionID, ParameterDirection.Input);
-                    cmd.Parameters.Add("p_user_id", OracleDbType.Varchar2, userMap.user_id, ParameterDirection.Input);
-                    cmd.Parameters.Add("p_hostname", OracleDbType.Varchar2, RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), ParameterDirection.Input);
-                    cmd.Parameters.Add("p_appname", OracleDbType.Varchar2, "barsroot", ParameterDirection.Input);
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            session["UserLoggedIn"] = true;
         }
     }
 }
