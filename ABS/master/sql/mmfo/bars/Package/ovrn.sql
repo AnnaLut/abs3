@@ -2650,7 +2650,7 @@ procedure BG1 ( p_ini int, p_mode int, p_dat date, dd cc_deal%rowtype, a26 accou
   a68 accounts%rowtype ;
   a69 accounts%rowtype ;
   l_term_DAy int ;
-  l_donor int    ;  l_ir8 number ; l_kol int ; sTmp_ varchar2(500);
+  l_donor int    ;  l_ir8 number ; l_kol int ; sTmp_ varchar2(1000);
   l_OST number   ;
   ----------------
   Dat0_ date   ;
