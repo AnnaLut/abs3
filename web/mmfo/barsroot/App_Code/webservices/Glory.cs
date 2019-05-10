@@ -27,7 +27,7 @@ public class Glory : WebService
     [ScriptMethod(UseHttpGet = false)]
     public XmlDocument CallProxy()
     {
-        GloryRequestWorker worker = new GloryRequestWorker(Context.Request.Headers, Context.Request.InputStream, Session);
+        GloryRequestWorker worker = new GloryRequestWorker(Context.Request.Headers, Context.Request.InputStream);
         return worker.InitModels()
             .TestConnection()
             .MakeRequest()

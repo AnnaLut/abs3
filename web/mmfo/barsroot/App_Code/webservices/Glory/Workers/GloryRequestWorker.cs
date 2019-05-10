@@ -29,14 +29,13 @@ namespace Bars.WebServices.Glory
         GloryWebRequestService requestService; // Сервис для отправки/получения данных к АТМ
         GloryDBExecutor dBExecutor; // Сервис для общения с БД
         String[] errorList; // Список ошибок полученных от АТМ
-        HttpSessionState session; // ИД Сессии
 
         /// <summary>
         /// Работяга для отправки запросов/получения статусов от АТМ
         /// </summary>
         /// <param name="headers">Заголовки входящего запроса</param>
         /// <param name="requestInputStream">Тело входящего запроса</param>
-        public GloryRequestWorker(NameValueCollection headers, Stream requestInputStream, HttpSessionState session)
+        public GloryRequestWorker(NameValueCollection headers, Stream requestInputStream)
         {
             this.headers = headers;
             this.requestInputStream = requestInputStream;
@@ -44,7 +43,6 @@ namespace Bars.WebServices.Glory
             this.response = new XmlDocument();
             this.dBExecutor = new GloryDBExecutor();
             this.errorList = new String[] { "COM ERROR" };
-            this.session = session;
         }
 
         /// <summary>
@@ -84,11 +82,11 @@ namespace Bars.WebServices.Glory
             }
             catch (WebException e)
             {
-                dBExecutor.ExecuteATMDisconnect(e.Message, session, requestModel.User);
+                dBExecutor.ExecuteATMDisconnect(e.Message, requestModel.User);
             }
             catch (System.Exception e)
             {
-                dBExecutor.ExecuteATMDisconnect(e.Message, session, requestModel.User);
+                dBExecutor.ExecuteATMDisconnect(e.Message, requestModel.User);
                 OnException(e);
             }
             return this;
@@ -109,7 +107,7 @@ namespace Bars.WebServices.Glory
             }
             catch(System.Exception e)
             {
-                dBExecutor.ExecuteATMDisconnect(e.Message, session, requestModel.User);
+                dBExecutor.ExecuteATMDisconnect(e.Message, requestModel.User);
                 OnException(e);
             }
             return this;

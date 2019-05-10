@@ -164,7 +164,7 @@ namespace Bars.WebServices.Glory
             cancellationToken = new CancellationTokenSource();
             CancellationToken token = cancellationToken.Token;
             webRequest.ConnectionGroupName = action;
-            Task.Factory.StartNew(() => GetStatusChange())
+            Task.Factory.StartNew(() => GetStatusChange(), token)
                 .ContinueWith(tsk => OnThreadComplete(tsk),
                 TaskContinuationOptions.None);
         }
