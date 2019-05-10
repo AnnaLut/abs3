@@ -5,11 +5,12 @@
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE TRIGGER BARS.TAUR_TELLER_ATM_STATUS 
-  after update  of AMOUNT on TELLER_ATM_STATUS
+  before update  of AMOUNT on TELLER_ATM_STATUS
   for each row
 declare
 begin
-  for r in (select prev.cur_code, sum(prev.nominal * (curr.pieces-prev.pieces))  amn
+  for r in (select prev.cur_code, sum(prev.nominal * (curr.pieces-prev.pieces))  amn, sum(prev.nominal * prev.pieces) old_amn,
+                                  sum(prev.nominal * curr.pieces) new_amn
               from xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",
                                           'http://www.glory.co.jp/gsr.xsd' as "n"),
                            'soapenv:Envelope/soapenv:Body/n:InventoryResponse/Cash[@n:type=3]/Denomination' passing :old.amount
@@ -29,6 +30,7 @@ begin
                 and prev.pieces != curr.pieces
               group by prev.cur_code)
   loop
+    logger.info('Teller ATM old = '||r.old_amn||', new = '||r.new_amn);
     teller_soap_api.save_atm_oper(r.cur_code, r.amn);
   end loop;
 

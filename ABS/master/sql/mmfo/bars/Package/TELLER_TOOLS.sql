@@ -305,8 +305,9 @@ function check_doc (p_opercode in  varchar2
 
 
   procedure set_atm_fault (p_flag in number default 1
-                          ,p_atm in varchar2 default null);
-
+                          ,p_atm in varchar2 default null
+                          ,p_user in varchar2 default null);
+                          
   procedure resolve_atm_fault (p_atm_id in varchar2
                               ,p_tel_id in number);
 
@@ -3054,6 +3055,7 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
       end if;
     end if;
 --    get_type_operation(v_op_tt);
+Logger.info('Teller v_state = '||v_state);
     for r in (select *
                     from (select * from teller_ws_define where op_type = v_op_type) wd
                     connect by prior oper_end_state = oper_start_state
@@ -3061,7 +3063,9 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
                     order by wd.ws_id
             )
     loop
+logger.info('Teller ws_name = '||r.funcname||' starting');
       execute immediate 'begin :1 := teller_soap_api.'||r.funcname||'; end;' using out v_res;
+logger.info('Teller ws_name = '||r.funcname||' result = '||v_res);
       if v_res = 1 or r.ws_name in ('ReleaseRequest','CloseRequest') then
         update teller_opers
           set state = r.oper_end_state
@@ -4531,17 +4535,39 @@ function check_doc (p_opercode in  varchar2
     return 1;
   end;
   procedure set_atm_fault (p_flag in number default 1
-                          ,p_atm in varchar2 default null)
+                          ,p_atm in varchar2 default null
+                          ,p_user in varchar2 default null)
   is
     v_atm_url  varchar2(20) := nvl(p_atm,g_eq_url);
     v_oper_ref number       := teller_utils.get_active_oper;
+    v_userid   number;
+    v_bars_dt  date := g_bars_dt;
   begin
-    
+logger.info('Teller1. p_flag = '||p_flag||', p_atm = '||p_atm||', p_user = '||p_user);
+    if check_atm = p_flag then
+      logger.info('Teller ничего не делаем!');
+      return;
+    end if;
+    if p_user is not null then
+      select s.id into v_userid
+        from staff$base s
+        where s.logname = p_user;
+      bars_login.login_user(sys_guid,v_userid, sys_context('userenv','host'),'Teller');
+      bc.home;
+      v_bars_dt := gl.bd;
+      select ts.eq_ip, ts.active_oper
+        into v_atm_url, v_oper_ref
+        from teller_state ts
+        where ts.user_ref =  v_userid
+          and ts.work_date = v_bars_dt;
+---      v_atm_url :=  teller_utils.get_device_url();
+logger.info('Teller2. v_userid = '||v_userid||', v_atm_url = '||v_atm_url);
+    end if;
     if p_flag = 0 then
       update teller_atm_status t
         set blocked = 0
         where t.equip_ip = v_atm_url
-          and t.work_date = g_bars_dt;
+          and t.work_date = v_bars_dt;
     end if;
     -- установка признака блокировки по ј“ћ
     logger.info('v_atm_url = '||v_atm_url);
@@ -4549,8 +4575,8 @@ function check_doc (p_opercode in  varchar2
     update teller_atm_status t
       set t.blocked = p_flag
       where t.equip_ip = v_atm_url
-        and t.work_date = g_bars_dt
-        and v_oper_ref is not null;
+        and t.work_date = v_bars_dt
+        and nvl(v_oper_ref,0)!= 0;
     logger.info('rows = '||sql%rowcount);
     -- дл€ текущей кассовой операции выставл€ем признак "оборванной" дл€ последующего ручногоразбора
     update teller_cash_opers c
@@ -4558,6 +4584,10 @@ function check_doc (p_opercode in  varchar2
       where c.doc_ref = v_oper_ref
         and c.atm_status = 1;
     logger.info('rows2 = '||sql%rowcount);
+    update teller_state ts
+    set active_oper = null
+    where ts.user_ref = v_userid 
+      and ts.work_date = v_bars_dt;
     null;
   end set_atm_fault;
 
