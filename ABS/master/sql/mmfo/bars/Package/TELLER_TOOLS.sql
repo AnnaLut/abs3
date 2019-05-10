@@ -300,6 +300,10 @@ function check_doc (p_opercode in  varchar2
   function check_teller_status (p_errtxt out varchar2)
     return integer;
 
+  function reset_atm_fault (p_errtxt out varchar2)
+    return number;
+
+
   procedure set_atm_fault (p_flag in number default 1
                           ,p_atm in varchar2 default null);
 
@@ -4519,19 +4523,34 @@ function check_doc (p_opercode in  varchar2
 -- если процедура вызывается без параметров, то АТМ текущего пользователя будет заблокирован для операций
 -- для того, чтобы снять блокировку надо вызвать процедуру с указанием в параметре p_flag значения 0
 */
+  function reset_atm_fault (p_errtxt out varchar2)
+    return number
+    is
+  begin
+    set_atm_fault(p_flag => 0);
+    return 1;
+  end;
   procedure set_atm_fault (p_flag in number default 1
                           ,p_atm in varchar2 default null)
   is
     v_atm_url  varchar2(20) := nvl(p_atm,g_eq_url);
     v_oper_ref number       := teller_utils.get_active_oper;
   begin
+    
+    if p_flag = 0 then
+      update teller_atm_status t
+        set blocked = 0
+        where t.equip_ip = v_atm_url
+          and t.work_date = g_bars_dt;
+    end if;
     -- установка признака блокировки по АТМ
     logger.info('v_atm_url = '||v_atm_url);
     logger.info('v_oper_ref = '||v_oper_ref);
     update teller_atm_status t
       set t.blocked = p_flag
       where t.equip_ip = v_atm_url
-        and t.work_date = g_bars_dt;
+        and t.work_date = g_bars_dt
+        and v_oper_ref is not null;
     logger.info('rows = '||sql%rowcount);
     -- для текущей кассовой операции выставляем признак "оборванной" для последующего ручногоразбора
     update teller_cash_opers c
