@@ -32,6 +32,11 @@ namespace BarsWeb.Areas.Teller.Controllers
             return View(windStatus);
         }
 
+        public ActionResult IncompleteOpers()
+        {
+            return View();
+        }
+
         public ActionResult EncashmentForm()
         {
             return View();
@@ -79,6 +84,12 @@ namespace BarsWeb.Areas.Teller.Controllers
         public JsonResult EncashmentList_Read([DataSourceRequest]DataSourceRequest request)
         {
             DataSourceResult result = repository.EncashmentList().ToDataSourceResult(request);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult IncompleteOpers_Read([DataSourceRequest]DataSourceRequest request)
+        {
+            DataSourceResult result = repository.GetIncompleteOpers().ToDataSourceResult(request);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
     }

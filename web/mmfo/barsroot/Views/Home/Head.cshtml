@@ -103,8 +103,8 @@ else
 @if (Model.TELLER_USER_PARAM.HAS_TELLER_ROLE == 1)
 {
     <link rel="stylesheet" href="@Url.Content("~/Areas/Teller/Css/atm.min.css")" />
-    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerScript.js?v.01")"></script>
-    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerEncashment.js?v.01")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerScript.js?v.02")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Areas/Teller/Scripts/TellerEncashment.js?v.02")"></script>
     <script>
         function Restore(currentSum, status) {
             if (currentSum === '-1')
@@ -461,28 +461,33 @@ else
                     </tr>
                 </table>
             </div><br />
-            <div class="teller-toolbar-block" id="teller-main-buttons">
-                <a id="btnSbon" class="btn_sbon teller-btn" href="#" onclick="showATMWindow();return false; ">
-                    <div>
-                        <span class="label">SBON</span>
-                    </div>
-                </a>
-                <a class="btn_sbon teller-btn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showEncashmentWindow('list');return false; ">
-                    <div>
-                        <span class="label">Проведення</span>
-                    </div>
-                </a>
-                <a class="btn_sbon teller-btn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showEncashmentWindow('form');return false; ">
-                    <div>
-                        <span class="label">Інкасація</span>
-                    </div>
-                </a>
-                <a class="btn_sbon teller-btn" id="technicalBtn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showTechnicalButtons();return false; ">
-                    <div>
-                        <span class="label">Технічні</span>
-                    </div>
-                </a>
-            </div><br />
+                  <div class="teller-toolbar-block" id="teller-main-buttons">
+                      <a id="btnSbon" class="btn_sbon teller-btn" href="#" onclick="showATMWindow();return false; ">
+                          <div>
+                              <span class="label">SBON</span>
+                          </div>
+                      </a>
+                      <a id="btnResolveFault" class="btn_sbon teller-btn" href="#" onclick="showIncompleteOpers();return false; ">
+                          <div>
+                              <span class="label">Завершити операцію</span>
+                          </div>
+                      </a>
+                      <a class="btn_sbon teller-btn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showEncashmentWindow('list');return false; ">
+                          <div>
+                              <span class="label">Проведення</span>
+                          </div>
+                      </a>
+                      <a class="btn_sbon teller-btn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showEncashmentWindow('form');return false; ">
+                          <div>
+                              <span class="label">Інкасація</span>
+                          </div>
+                      </a>
+                      <a class="btn_sbon teller-btn" id="technicalBtn" href="#" style="left: auto; margin-right: 5px; float: right;" onclick="showTechnicalButtons();return false; ">
+                          <div>
+                              <span class="label">Технічні</span>
+                          </div>
+                      </a>
+                  </div><br />
             <div class="teller-toolbar-block">
                 <div><span class="bf_w">Теллер інформація:</span></div>
                 <div><span><pre class="info-style" id="teller-info"></pre></span></div>

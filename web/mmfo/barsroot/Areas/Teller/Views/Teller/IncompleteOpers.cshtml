@@ -1,0 +1,37 @@
+﻿@using BarsWeb.Areas.Teller.Model
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<div style="width: 100%">
+    @(Html.Kendo()
+    .Grid<IncompleteOper>("incomplete-opers")
+    .Name("incomplete-opers")
+    .HtmlAttributes(new { id = "incomplete-opers" })
+    .Columns(column => {
+        column.Bound(x => x.ATM_ID).Hidden(true);
+        column.Bound(x => x.TEL_ID).Hidden(true);
+        column.Bound(x => x.ATM_OP_TYPE).Width(60).Title("Тип операції АТМ");
+        column.Bound(x => x.ATM_CUR).Width(60).Title("Валюта операції АТМ");
+        column.Bound(x => x.ATM_AMN).Width(80).Title("Сума операції АТМ");
+        column.Bound(x => x.ATM_TIME).Width(60).Title("Час проведення операції").Format("{0:hh:mm:ss}");
+        column.Bound(x => x.ATM_USER).Width(100).Title("Користувач АТМ");
+        column.Bound(x => x.TEL_OP_TYPE).Width(60).Title("Тип операції Теллера");
+        column.Bound(x => x.TEL_CUR).Width(60).Title("Валюта операції Теллера");
+        column.Bound(x => x.TEL_AMN).Width(80).Title("Сума операції Теллера");
+        column.Bound(x => x.TEL_TIME).Width(60).Title("Час проведення операції Теллера").Format("{0:hh:mm:ss}");
+        column.Bound(x => x.TEL_USER).Width(100).Title("Користувач Теллера");
+        column.Bound(x => x).Width(100).Title("Прив'язати операцію").ClientTemplate("<a class='k-button' onclick='resolveATMFault(#=data.ATM_ID#,#=data.TEL_ID#)'>Пив'язати</a>");
+    })
+    .Scrollable()
+    .Resizable(x => x.Columns(true))
+    .Pageable(page => page
+        .Refresh(true)
+        .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+        .ButtonCount(10))
+    .DataSource(dataSource => {
+        dataSource.Ajax()
+        .Read(read => read.Action("IncompleteOpers_Read", "Teller"));
+    })
+    )
+</div>

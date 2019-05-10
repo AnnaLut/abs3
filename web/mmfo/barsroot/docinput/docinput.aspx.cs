@@ -2335,7 +2335,7 @@ namespace DocInput
                     }
                 }
             }
-            if (TELLER_USER_PARAM.HAS_TELLER_ROLE == 1 && TELLER_USER_PARAM.IS_TELLER_ON == 1 && IS_TELLER_BUTTON_VISIBLE == 1)
+            if (TELLER_USER_PARAM.HAS_TELLER_ROLE == 1 && TELLER_USER_PARAM.IS_TELLER_ON == 1 && IS_TELLER_BUTTON_VISIBLE != 0)
                 return true;
             return false;
         }

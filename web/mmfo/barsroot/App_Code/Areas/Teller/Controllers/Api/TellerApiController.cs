@@ -168,6 +168,19 @@ namespace BarsWeb.Areas.Teller.Controllers.Api
         }
 
         /// <summary>
+        /// Привязка операции АТМ
+        /// </summary>
+        /// <param name="atmId"></param>
+        /// <param name="tellerId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage ResolveATMFault(String atmId, String tellerId)
+        {
+            TellerResponseModel model = _repo.ResolveATMFault(atmId, tellerId);
+            return Request.CreateResponse(HttpStatusCode.OK, model);
+        }
+
+        /// <summary>
         /// Отримання статусу операції
         /// </summary>
         /// <returns></returns>

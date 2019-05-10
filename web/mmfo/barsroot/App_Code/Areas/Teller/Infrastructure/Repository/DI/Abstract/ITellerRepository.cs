@@ -181,6 +181,20 @@ namespace BarsWeb.Areas.Teller.Infrastructure.DI.Abstract
         /// 0 - скрыть
         /// </summary>
         /// <returns></returns>
-        Int32 GetToxFlag();   
+        Int32 GetToxFlag();
+
+        /// <summary>
+        /// Получение списка незавершенных операций АТМ
+        /// </summary>
+        /// <returns></returns>
+        List<IncompleteOper> GetIncompleteOpers();
+
+        /// <summary>
+        /// Привязка незаконченной операции с АТМ
+        /// </summary>
+        /// <param name="atmId">ИД операции АТМ</param>
+        /// <param name="tellerId">ИД операции Теллер</param>
+        /// <returns></returns>
+        TellerResponseModel ResolveATMFault(String atmId, String tellerId);
     }
 }
