@@ -1,3 +1,4 @@
+
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/view/v_teller_add_func.sql =========*** Run 
@@ -30,10 +31,19 @@ from dual
 union
 select '9.Оновити дані лічильників АТМ','teller_soap_api.InventoryCount'
 from dual
+/*union
+select '98.Операция СБОН+','teller_tools.Reg_sbon'
+from dual*/
+union
+select '98.Разблокировать АТМ','teller_tools.reset_atm_fault'
+from dual
 order by 1
 ;
  show err;
  
+PROMPT *** Create  grants  V_TELLER_ADD_FUNC ***
+grant SELECT                                                                 on V_TELLER_ADD_FUNC to IBMESB;
+
  
  
  PROMPT ===================================================================================== 
