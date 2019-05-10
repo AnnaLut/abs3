@@ -12,7 +12,7 @@
   -- Purpose : Пакет для обслуговування операцій з теллерами
 
   g_package_name    constant varchar2(20)  := 'Teller_Tools';
-  g_header_version  constant varchar2(64)  := 'version 3.4 19/03/2018';
+  g_header_version  constant varchar2(64)  := 'version 3.6 10/05/2019';
 
   g_user_id      constant  number        := user_id;
   g_bars_dt      constant  date          := gl.bd;
@@ -300,13 +300,18 @@ function check_doc (p_opercode in  varchar2
   function check_teller_status (p_errtxt out varchar2)
     return integer;
 
+  procedure set_atm_fault (p_flag in number default 1
+                          ,p_atm in varchar2 default null);
+
+  procedure resolve_atm_fault (p_atm_id in varchar2
+                              ,p_tel_id in number);
 
 end teller_tools;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
 
   g_min_banknote constant  number := 10;
-  g_body_version constant  varchar2(64)  := 'version 3.5 08/04/2019';
+  g_body_version constant  varchar2(64)  := 'version 3.6 10/05/2019';
   g_ws_name      varchar2(100) := sys_context('bars_global', 'host_name');
   g_eq_url       constant  varchar2(100) := case get_teller
                                               when 0 then null
@@ -331,6 +336,25 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
   end;
 
 
+
+  function check_atm 
+    return integer
+    is
+    v_ret integer;
+  begin
+    select nvl(t.blocked,0) 
+      into v_ret
+      from teller_atm_status t
+      where t.equip_ip = g_eq_url
+        and t.work_date = g_bars_dt;
+    return v_ret;
+  exception
+    when no_data_found then 
+      return 0;
+    when others then
+      logger.error('Teller. Check_ATM. Error: '||sqlerrm);
+      raise;
+  end check_atm;
 
 --
 
@@ -415,19 +439,18 @@ logger.info('v_final = '||v_final||', g_eq_type = '||g_eq_type);
       end if;
     end if;
 
-  if g_eq_type = 'A' then
-    v_oper_st := case v_oper_type
-                   when 'IN' then 'IN'
-                   when 'OUT' then 'O0'
-                   when 'RIN' then 'RI'
-                   when 'ROUT' then'RO'
-                 end;
-    update teller_opers
-      set state = nvl(v_oper_st,state)
-      where id = v_doc_ref
-        and state != nvl(v_oper_st,state)
-        and oper_ref != 'TOX';
-  end if;
+  v_oper_st := case v_oper_type
+                 when 'IN' then 'IN'
+                 when 'OUT' then 'O0'
+                 when 'RIN' then 'RI'
+                 when 'ROUT' then'RO'
+               end;
+  update teller_opers
+    set state = nvl(v_oper_st,state)
+    where id = v_doc_ref
+      and state != nvl(v_oper_st,state)
+      and oper_ref != 'TOX';
+
   exception
     when others then
       bars_audit.info('save_cash_opers: '||dbms_utility.format_call_stack);
@@ -1884,8 +1907,11 @@ logger.info('teller step1. v_in_flag= '||v_in_flag||', v_out_flag = '||v_out_fla
     v_ret      number;
   begin
     if get_teller() = 1 and (p_op_code is null or is_cash_operation(p_op_code) = 1) and teller_utils.get_equip_type = 'A' then
-
-      return 1;
+      if check_atm = 1 then
+        return -1;
+      else
+        return 1;
+      end if;
     end if;
     return 0;
   end;
@@ -2087,6 +2113,11 @@ logger.info('teller step1. v_in_flag= '||v_in_flag||', v_out_flag = '||v_out_fla
     v_req_id      number;
     v_oper_id     number;
   begin
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
 
 logger.info('End_request: p_doc_ref = '||p_docref||', p_atm = '||p_atm_amount||', p_nonatm = '||p_non_atm_amount||', v_doc_ref = '||v_doc_ref);
     refresh_cash;
@@ -2600,6 +2631,10 @@ logger.info('Teller.change_request p_docref = '||p_docref||', p_curcode = '||p_c
       p_oper_desc := 'Операцію СБОН+ оброблено успішно';
       return 'OK';
     end if;
+    if check_atm = 1 then
+      p_oper_desc := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 'ER';
+    end if;
     refresh_cash;
     begin
       select tt into v_oper_code
@@ -2789,6 +2824,10 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
     v_doc_ref number := teller_utils.get_active_oper_ref();
     v_req_id  number;
   begin
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
 
     for r in (select *
                 from teller_requests tr
@@ -2973,6 +3012,11 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
      end if;
 */  --bars_audit.info('Teller.Confirm_request');
 
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
+
     v_req_id := teller_soap_api.StatusOperation;
     if teller_soap_api.get_current_dev_status() not in (1000,1500,9200,2003) then
       p_errtxt := 'АТМ працює. Поточний статус: '||teller_soap_api.get_current_dev_status_desc();
@@ -3072,6 +3116,7 @@ bars_audit.info(dbms_utility.format_call_stack);
                 where op.doc_ref = teller_utils.get_active_oper_ref()
              )
     loop
+logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r.active_cur);
       for rq in (select tr.oper_amount, tr.oper_amount_txt, tr.response
                      from teller_requests tr
                      where tr.oper_ref = r.id
@@ -3547,6 +3592,12 @@ bars_audit.info(dbms_utility.format_call_stack);
     v_id  number;
   begin
 logger.info('Teller: p_cur_code = '||p_cur_code);
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
+
     v_ret := teller_soap_api.get_current_dev_status();
     if v_ret not in (1000,1500,9200) then
       p_errtxt := teller_soap_api.get_current_dev_status_desc();
@@ -3599,6 +3650,12 @@ logger.info('Teller: p_cur_code = '||p_cur_code);
     v_ret number;
     v_num number := teller_utils.get_active_oper();
   begin
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
+
     v_ret := teller_soap_api.StatusOperation;
     if teller_soap_api.get_current_dev_status() not in (1000,1500,9200,2003) then
       p_errtxt := 'АТМ працює. Поточний статус: '||teller_soap_api.get_current_dev_status_desc();
@@ -3635,6 +3692,12 @@ logger.info('Teller: p_cur_code = '||p_cur_code);
     v_cur_code varchar2(3) := p_curcode;--teller_utils.get_active_curcode();
   begin
 logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curcode = '||p_curcode);
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
+
     if p_non_atm_amount != 0 then
 
       if round(p_non_atm_amount * case p_curcode  
@@ -3771,6 +3834,12 @@ logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curco
     is
     v_ret number;
   begin
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
+
     v_ret := Teller_Soap_Api.CancelCashinOperation;
     if v_ret = 1 then
       if not (teller_soap_api.ReleaseOperation = 1 and teller_soap_api.CloseOperation = 1) then
@@ -3794,6 +3863,11 @@ logger.info('Teller endcashin p_non_atm_amount = '||p_non_atm_amount||', p_curco
     v_curr_oper number;
     v_cur_code  number;
   begin
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
 
       v_curr_oper := teller_utils.get_active_oper();
       v_cur_code  := teller_utils.get_r030(p_curcode);
@@ -3895,6 +3969,11 @@ bars_audit.info('Teller: cash_oper after end cashout (3) request');
     v_collection_box varchar2(2000);
     v_num            number;
   begin
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
 
     for r in (select * from v_teller_state where user_ref = g_user_id and nvl(non_atm_amount,0) !=0)
     loop
@@ -4278,14 +4357,12 @@ function check_doc (p_opercode in  varchar2
       return -3;
     end if;
     v_num := 0;
-dbms_output.put_line('teller_utils.get_eq_id = '||teller_utils.get_eq_id);
     for r in (select max_amount, sw_flag
                 from teller_oper_define
                 where oper_code = p_opercode
                   and equip_ref = teller_utils.get_eq_id)
     loop
       v_sw_flag := nvl(r.sw_flag,0);
-dbms_output.put_line(v_sw_flag);
       if r.max_amount<v_amn and v_sw_flag = 0 then
         p_errtxt := 'Для операції встановлений ліміт '||r.max_amount||'грн, який менше суми операції '||v_amn||'грн';
         return -1;
@@ -4436,6 +4513,64 @@ dbms_output.put_line(v_sw_flag);
       return 1;
     end if;
   end check_teller_status;
+
+/* процедура установки статуса АТМ
+-- АТМ, который надо проаллертить определяется из настроек пользователя, для которого выполняется операция, либо можно будет указать вручную в параметре p_atm
+-- если процедура вызывается без параметров, то АТМ текущего пользователя будет заблокирован для операций
+-- для того, чтобы снять блокировку надо вызвать процедуру с указанием в параметре p_flag значения 0
+*/
+  procedure set_atm_fault (p_flag in number default 1
+                          ,p_atm in varchar2 default null)
+  is
+    v_atm_url  varchar2(20) := nvl(p_atm,g_eq_url);
+    v_oper_ref number       := teller_utils.get_active_oper;
+  begin
+    -- установка признака блокировки по АТМ
+    logger.info('v_atm_url = '||v_atm_url);
+    logger.info('v_oper_ref = '||v_oper_ref);
+    update teller_atm_status t
+      set t.blocked = p_flag
+      where t.equip_ip = v_atm_url
+        and t.work_date = g_bars_dt;
+    logger.info('rows = '||sql%rowcount);
+    -- для текущей кассовой операции выставляем признак "оборванной" для последующего ручногоразбора
+    update teller_cash_opers c
+      set c.atm_status = -1 
+      where c.doc_ref = v_oper_ref
+        and c.atm_status = 1;
+    logger.info('rows2 = '||sql%rowcount);
+    null;
+  end set_atm_fault;
+
+  procedure resolve_atm_fault (p_atm_id in varchar2
+                              ,p_tel_id in number)
+  is
+    v_num number;
+  begin
+    update teller_atm_opers
+      set oper_ref = p_tel_id
+      where rowid = CHARTOROWID(p_atm_id);
+    
+    update teller_cash_opers o
+      set o.atm_status = 2
+      where o.doc_ref = p_tel_id
+        and o.atm_status = 1;
+
+    select count(1) into v_num
+      from teller_atm_opers ta
+      where ta.eq_ip = g_eq_url
+        and trunc(ta.oper_time)>g_bars_dt
+        and ta.oper_ref is null
+        and ta.amount != 0;
+    if v_num = 0 then
+      update teller_atm_status ts
+        set ts.blocked = 0
+        where ts.equip_ip = g_eq_url  
+          and ts.work_date = g_bars_dt;
+    end if;
+  end resolve_atm_fault;
+
+
 
 end teller_tools;
 /

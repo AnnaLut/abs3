@@ -187,7 +187,7 @@ end teller_soap_api;
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_SOAP_API is
 
   g_glory_ns      constant varchar2(100) := 'http://www.glory.co.jp/gsr.xsd';
-  g_body_version constant varchar2(64)  := 'version 3.0 08/11/2018';
+  g_body_version constant varchar2(64)  := 'version 3.1 10/05/2019';
   g_local_ns      varchar2(100) := 'http://tempuri.org/';
 -- я
   g_local_url     varchar2(100);
@@ -208,7 +208,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.TELLER_SOAP_API is
     is
 --    pragma autonomous_transaction;
   begin
-logger.info('Teller. p_sessID = '||p_sessID);
     update teller_state ts
       set ts.session_id = p_sessID
       where ts.user_ref = user_id
@@ -465,7 +464,6 @@ logger.info('Teller. p_sessID = '||p_sessID);
     $else
       v_userid :=user_id
     $end;
-logger.info(v_userid);
     select session_id
       into v_ret
       from teller_state
@@ -567,7 +565,7 @@ logger.info(v_userid);
     select xmlelement("gsr:METHOD",
 --                      xmlattributes(g_glory_ns as "xmlns:gsr"),
                       xmlconcat(xmlelement("gsr:Id",g_gloryname),
-                                             xmlelement("gsr:SeqNo", user_name),
+                                             xmlelement("gsr:SeqNo", user_name||to_char(sysdate, 'sssss')),
                                              xmlelement("gsr:SessionID",ts.session_id),
                                p_body
                                )
@@ -576,7 +574,6 @@ logger.info(v_userid);
       from teller_state ts
       where ts.user_ref = user_id
         and ts.work_date = g_bars_dt;
-logger.info('Teller. p_meth = '||p_meth||', v_req_body = '||v_req_body.getstringval());
     v_record.url       := g_eq_url;
     v_record.namespace := g_glory_ns;
     v_record.method    := p_meth;
@@ -732,7 +729,6 @@ commit;
       from teller_requests tr
       where tr.req_id = v_req_id;
 
-logger.info('Teller. v_req_id = '||v_req_id||', v_session_id = '||v_session_id);
     Write_session_id(v_session_id);
     if get_req_status(v_req_id) = 0 then
       return 1;
@@ -741,6 +737,7 @@ logger.info('Teller. v_req_id = '||v_req_id||', v_session_id = '||v_session_id);
     end if;
   exception
     when no_data_found then
+      logger.info('Teller error: '||sqlerrm);
       return 0;
   end OpenOperation;
 
@@ -944,7 +941,6 @@ logger.info('Teller. v_req_id = '||v_req_id||', v_session_id = '||v_session_id);
     v_sendback varchar2(1000);
   begin
     v_req_id := SimpleOperation('EndCashinOperation','EndCashin', null);
-logger.info('v_curcode = '||v_curcode||', v_req_id = '||v_req_id);
 
     for r in (select cur_code, sum(nominal * pieces) amn
                 from teller_requests r,
@@ -959,16 +955,13 @@ logger.info('v_curcode = '||v_curcode||', v_req_id = '||v_req_id);
                 group by cur_code
              )
     loop
-logger.info('v_curcode = '||v_curcode||', r.cur_code = '||r.cur_code);
       if teller_utils.get_cur_code(v_curcode) != r.cur_code then  -- надо вытолкнуть другую валюту
         v_tmp_req := CashOutOperation(p_curcode => r.cur_code, p_amount => r.amn);
-logger.info('Sendback cur = '||r.cur_code||', amn = '||r.amn);
         if v_sendback is not null then
           v_sendback := v_sendback || '<br/>';
         end if;
         v_sendback := r.cur_code||': '||r.amn;
       else
-logger.info('Good cashin cur = '||r.cur_code||', amn = '||r.amn);
         v_amount := r.amn;
         v_response := r.cur_code||': '||r.amn;
       end if;
@@ -1143,7 +1136,6 @@ logger.info('Good cashin cur = '||r.cur_code||', amn = '||r.amn);
     v_denomination t_arr_nom;
     v_result integer;
   begin
-    logger.info('Teller.CashOutOperation:  p_curcode = '||p_curcode||', p_amount = '||p_amount);
 --    if get_user_sessionID is not null then
 --      v_num := ReleaseOperation;
 --    end if;
@@ -1279,7 +1271,6 @@ logger.info('Good cashin cur = '||r.cur_code||', amn = '||r.amn);
   begin
     loop
       v_session_id := get_session_id;
-logger.info('Teller. v_cnt = '||v_cnt||', v_session_id = '||v_session_id);
       exit when v_session_id is not null or v_cnt>2;
 
       if v_session_id is null then
@@ -1287,6 +1278,9 @@ logger.info('Teller. v_cnt = '||v_cnt||', v_session_id = '||v_session_id);
       end if;
       v_cnt := v_cnt + 1;
     end loop;
+    if v_session_id is null then
+      return 0;
+    end if;
     v_req_body := create_req_body(p_option);
     v_req_id   := SimpleOperation('InventoryOperation','Inventory',v_req_body);
 
@@ -1488,6 +1482,9 @@ logger.info('Teller. v_cnt = '||v_cnt||', v_session_id = '||v_session_id);
                         'GloryUrl',
                         nvl(v_protocol,'http')||'://'||v_req.url||'/axis2/services/GSRService');
 
+    utl_http.set_header(l_http_req,
+                        'User',
+                        user_name);
 
 
 /*    utl_http.set_header(l_http_req,
@@ -1714,7 +1711,7 @@ logger.info('Teller. v_cnt = '||v_cnt||', v_session_id = '||v_session_id);
               teller_utils.get_active_oper,
               'NEW',
               p_cur,
-              p_amn,
+              abs(p_amn),
               user_id,
               g_hostname);
     commit;
@@ -2583,6 +2580,14 @@ begin
     g_local_url := 'http://10.10.17.42:8080/barsroot/webservices/Glory.asmx';
   end if;
 */
+if g_hostname like '%10.10.10.75%' then
+  g_local_url := 'http://10.10.10.75:5/barsroot/webservices/Glory.asmx';
+elsif g_hostname like '%10.10.10.108%' then
+  g_local_url := 'http://10.10.10.108:1240/barsroot/webservices/Glory.asmx';
+elsif g_hostname like '%10.10.10.29%' then
+  g_local_url := 'http://10.10.10.29:8090/barsroot/webservices/Glory.asmx';
+end if;
+bars_audit.info(g_hostname||' - '||g_local_url);
 
 end teller_soap_api;
 /
