@@ -20,7 +20,7 @@
     <script language="javascript" type="text/javascript" src="JScript/Script_Documents.js?v=1.10"></script>
     <script language="JavaScript" type="text/javascript" src="/Common/Script/Sign.js?v=1.1"></script>
     <script type="text/javascript" src="/barsroot/Scripts/json3.min.js"></script>
-    <script type="text/javascript" src="/barsroot/Areas/Teller/Scripts/TellerScript.js?v.01"></script>
+    <script type="text/javascript" src="/barsroot/Areas/Teller/Scripts/TellerScript.js?v.02"></script>
     <script type="text/javascript" src="/Common/Script/BarsIe.js?v1.2"></script>
 
     <link type="text/css" rel="stylesheet" href="/Common/CSS/jquery/jquery.css" />

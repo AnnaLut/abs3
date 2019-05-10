@@ -675,5 +675,45 @@ namespace BarsWeb.Areas.Teller.Infrastructure.DI.Implementation
                 }
             }
         }
+
+        /// <summary>
+        /// Получение списка незавершенных операций АТМ
+        /// </summary>
+        /// <returns></returns>
+        public List<IncompleteOper> GetIncompleteOpers()
+        {
+            String sql = "select * from bars.v_teller_incomplete_opers t";
+            return _entities.ExecuteStoreQuery<IncompleteOper>(sql).ToList();
+        }
+
+        /// <summary>
+        /// Привязка незаконченной операции с АТМ
+        /// </summary>
+        /// <param name="atmId">ИД операции АТМ</param>
+        /// <param name="tellerId">ИД операции Теллер</param>
+        /// <returns></returns>
+        public TellerResponseModel ResolveATMFault(String atmId, String tellerId)
+        {
+            TellerResponseModel model = new TellerResponseModel();
+            String sql = "bars.teller_tools.resolve_atm_fault";
+            OracleParameter[] parameters = new OracleParameter[]
+            {
+                new OracleParameter("p_atm_id", OracleDbType.Varchar2, atmId, ParameterDirection.Input),
+                new OracleParameter("p_tel_id", OracleDbType.Int32, tellerId, ParameterDirection.Input)
+            };
+            try
+            {
+                OracleRequest(sql, parameters);
+                model.Result = 0;
+            }
+            catch(Exception e)
+            {
+                model.P_errtxt = e.Message;
+                model.Result = 1;
+            }
+            return model;
+        }
+
+
     }
 }

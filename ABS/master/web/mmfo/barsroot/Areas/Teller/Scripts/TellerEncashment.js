@@ -16,6 +16,70 @@ function showEncashmentWindow(action) {
     });
 }
 
+/// Показ окна с перечнем не привязанніх операций
+function showIncompleteOpers() {
+    showHide.showPreloaderItems();
+    closePopUp();
+    $.ajax({
+        type: "POST",
+        url: '/barsroot/teller/teller/IncompleteOpers',
+        success: function (result) {
+            showKendoWindow("Завершення операцій", result);
+        },
+        error: DefaultError
+    });
+}
+
+/// Показ всплывающего окна Kendo
+function showKendoWindow(title, content) {
+    showHide.hidePreloaderItems();
+    if (!$("#incomplete-container").length) {
+        $('body').append("<div id='incomplete-container'></div>");
+    }
+    $("#incomplete-container").html(content);
+    $("#incomplete-container").kendoWindow({
+        width: "80%",
+        height: '80%',
+        title: title,
+        visible: false,
+        actions: ["Close"],
+        close: function (e) {
+            $("#incomplete-container").empty();
+            if ($('#atm-window').length || $('#encashment-window').length || $('#technical-buttons-window').length) {
+                $('#preloader').css('z-index', zElementIndex.down);
+                showHide.hidePreloaderItems();
+            }
+            else
+                showHide.hidePreloader();
+        }
+    }).data("kendoWindow").center().open();
+}
+
+/// Привязка данных с АТМ к операции
+function resolveATMFault(atmId, tellerId) {
+    var url = '/barsroot/api/teller/teller/ResolveATMFault?atmId=' + atmId + '&tellerId=' + tellerId;
+    $.ajax({
+        type: "POST",
+        url: url,
+        success: function (result) {
+            if (result.Result == 0) {
+                bars.ui.alert({
+                    text: 'Виконано успішно!',
+                    close: function (e) {
+                        $("#incomplete-opers").data("kendoGrid").dataSource.read();
+                    }
+                });
+            }
+            else if (result.Result == 1) {
+                bars.ui.error({
+                    text: result.P_errtxt
+                });
+            }
+        },
+        error: DefaultError
+    });
+}
+
 /// Показ окна для инкассации
 function EncashmentWindow(encashmentType) {
     $('#preloader').css('z-index', zElementIndex.up);

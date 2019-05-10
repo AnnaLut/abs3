@@ -605,8 +605,10 @@ function showTeller() {
                 if (data.TellerInfo && data.tellerStatus) {
                     $('#teller-info').html(data.TellerInfo);
                     $('#teller-status').html(data.tellerStatus);
-                    var toHide = data.IsButtonVisible === 0 ? 'none' : 'block';
+                    var toHide = data.IsButtonVisible === 0 ? 'none' : 'block'; // показ кнопки Сбон и Технических кнопок
+                    var toShow = data.IsButtonVisible === -1 ? 'block' : 'none'; // показ кнопки "Ай-яй-яй, пропала связь"
                     showHide.showHideElements(['#btnSbon', '#technicalBtn'], toHide);
+                    showHide.showHideElements(['#btnResolveFault'], toShow);
                 }
                 showTellerWindow();
             },

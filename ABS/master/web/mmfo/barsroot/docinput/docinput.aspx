@@ -23,7 +23,7 @@
 	<script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
     <script type="text/javascript" src="/barsroot/Scripts/json3.min.js"></script>
     <script type="text/javascript" src="/Common/WebEdit/RadInput.js?v.10"></script>
-    <script type="text/javascript" src="/barsroot/Areas/Teller/Scripts/TellerScript.js?v.01"></script>
+    <script type="text/javascript" src="/barsroot/Areas/Teller/Scripts/TellerScript.js?v.02"></script>
     <script type="text/javascript">
         var key = false;
         var intervalObj = false;
