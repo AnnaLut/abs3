@@ -133,6 +133,26 @@ exception when others then
  end;
 /
 
+begin   
+ execute immediate ' alter table TMS_TASK_RUN_TRACKING      drop constraint FK_TASK_RUN_TRACK_REF_TASK_RUN ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+begin   
+ execute immediate '  alter table TMS_TASK_RUN_TRACKING
+     add constraint FK_TASK_RUN_TRACK_REF_TASK_RUN foreign key (TASK_RUN_ID)
+     references TMS_TASK_RUN (ID) on delete cascade  
+     novalidate
+ ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
 
 
 PROMPT *** Create  grants  TMS_TASK_RUN_TRACKING ***
