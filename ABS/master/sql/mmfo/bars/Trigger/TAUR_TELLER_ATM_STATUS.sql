@@ -5,10 +5,34 @@
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE TRIGGER BARS.TAUR_TELLER_ATM_STATUS 
-  before update  of AMOUNT on TELLER_ATM_STATUS
+  before update on TELLER_ATM_STATUS
   for each row
 declare
+  v_num number;
 begin
+logger.info('Teller : '||:new.amount_time||', old=  '||:old.amount_time);
+  select sum(t.nominal * t.pieces) 
+    into v_num
+    from xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",
+                                          'http://www.glory.co.jp/gsr.xsd' as "n"),
+                           'soapenv:Envelope/soapenv:Body/n:InventoryResponse/Cash[@n:type=3]/Denomination' passing :old.amount
+                           columns
+                             cur_code varchar2(3) path '@n:cc',
+                             nominal  number      path '@n:fv',
+                             pieces   number      path 'n:Piece') t;
+logger.info('Teller.atm.old = '||v_num);
+  select sum(t.nominal * t.pieces) 
+    into v_num
+    from xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",
+                                          'http://www.glory.co.jp/gsr.xsd' as "n"),
+                           'soapenv:Envelope/soapenv:Body/n:InventoryResponse/Cash[@n:type=3]/Denomination' passing :new.amount
+                           columns
+                             cur_code varchar2(3) path '@n:cc',
+                             nominal  number      path '@n:fv',
+                             pieces   number      path 'n:Piece') t;
+
+logger.info('Teller.atm.new = '||v_num);
+                             
   for r in (select prev.cur_code, sum(prev.nominal * (curr.pieces-prev.pieces))  amn, sum(prev.nominal * prev.pieces) old_amn,
                                   sum(prev.nominal * curr.pieces) new_amn
               from xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",

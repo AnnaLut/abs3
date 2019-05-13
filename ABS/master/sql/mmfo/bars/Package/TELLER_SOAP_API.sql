@@ -1291,6 +1291,10 @@ commit;
       from teller_requests r
       where r.req_id = v_req_id;
     if substr(v_resp_code,1,2) in (21,11) then -- invalidSession
+      if v_resp_code = 11 then
+        v_req_id := ReleaseOperation;
+        v_req_id := CloseOperation;
+      end if;
       if OpenOperation = 1 then
 --        if OccupyOperation = 1 then
           v_req_id := SimpleOperation('InventoryOperation','Inventory',create_req_body(p_option));
@@ -1320,7 +1324,10 @@ commit;
                 where tr.req_id = v_req_id
              )
     loop
-      update_atm(p_url => g_eq_url , p_amount => v_req_body, p_status => null, p_status_desc => null, p_user => r.curr_user);
+      update_atm(p_url => g_eq_url , p_amount => case p_option
+                                                   when 2 then null
+                                                   else v_req_body
+                                                 end, p_status => null, p_status_desc => null, p_user => r.curr_user);
     end loop;
 /*    merge into teller_atm_status tas
     using (select  tst.equip_ref eq_ref, tst.url eq_ip, g_bars_dt w_dt, v_req_body eq_amn
@@ -1726,7 +1733,84 @@ commit;
 --  pragma autonomous_transaction;
     v_amount number;
   begin
+/*        if get_req_status = 0 then
+--      if p_amount is not null then  -- зашло что-то...
+        begin
+logger.info('Start select');
+        declare 
+          v_tmp number := 1;
+          v_str varchar2(1000);
+        begin
+        loop
+          v_str := substr(p_amount.getClobVal,v_tmp,1000);
+          logger.info(v_str);
+          v_tmp := v_tmp + 1000;
+          exit when length(v_str)<1000;
+        end loop;
+        end;
+        for q in (select * from xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",
+                                      'http://www.glory.co.jp/gsr.xsd' as "n"),
+                       'soapenv:Envelope/soapenv:Body/n:InventoryResponse/Cash[@n:type=3]/Denomination' passing p_amount
+                       columns
+                         cur_code varchar2(3) path '@n:cc',
+                         nominal  number      path '@n:fv',
+                         pieces   number      path 'n:Piece') curr
+                     where pieces != 0)
+        loop
+          logger.info('Teller ATM new : '||q.cur_code||'.'||q.nominal||'.'||q.pieces);
+        end loop;
 
+        for q in (select * 
+                    from teller_atm_status s,
+                        xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",
+                                      'http://www.glory.co.jp/gsr.xsd' as "n"),
+                       'soapenv:Envelope/soapenv:Body/n:InventoryResponse/Cash[@n:type=3]/Denomination' passing s.amount
+                       columns
+                         cur_code varchar2(3) path '@n:cc',
+                         nominal  number      path '@n:fv',
+                         pieces   number      path 'n:Piece') curr
+                     where s.equip_ip = g_eq_url 
+                       and pieces != 0)
+        loop
+          logger.info('Teller ATM old : '||q.cur_code||'.'||q.nominal||'.'||q.pieces);
+        end loop;
+
+
+        for r in (
+                  select curr.cur_code, sum(prev.nominal * prev.pieces) prev_amn, 
+                                        sum(curr.nominal * curr.pieces) curr_amn
+                    from teller_atm_status s, 
+                       xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",
+                                      'http://www.glory.co.jp/gsr.xsd' as "n"),
+                       'soapenv:Envelope/soapenv:Body/n:InventoryResponse/Cash[@n:type=3]/Denomination' passing s.amount
+                       columns
+                         cur_code varchar2(3) path '@n:cc',
+                         nominal  number      path '@n:fv',
+                         pieces   number      path 'n:Piece') prev,
+                      xmltable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' as "soapenv",
+                                      'http://www.glory.co.jp/gsr.xsd' as "n"),
+                       'soapenv:Envelope/soapenv:Body/n:InventoryResponse/Cash[@n:type=3]/Denomination' passing p_amount
+                       columns
+                         cur_code varchar2(3) path '@n:cc',
+                         nominal  number      path '@n:fv',
+                         pieces   number      path 'n:Piece') curr
+                   where s.equip_ip = g_eq_url
+                     and s.work_date = g_bars_dt
+                     and prev.cur_code = curr.cur_code
+                     and prev.nominal = curr.nominal
+                     and (prev.pieces !=  curr.pieces) 
+                   group by curr.cur_code
+                     )
+        loop
+          logger.info('Teller ATM old = '||r.prev_amn||', new = '||r.curr_amn);
+          teller_soap_api.save_atm_oper(r.cur_code, r.prev_amn - r.curr_amn);
+        end loop;
+
+      exception
+        when others then 
+          logger.info('Teller.Upd_atm_status error : '||sqlerrm);
+      end;
+      end if;*/
       update teller_atm_status
         set amount = nvl(p_amount,amount)
            ,last_user = g_hostname
