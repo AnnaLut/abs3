@@ -136,8 +136,6 @@ CREATE OR REPLACE package body BARS.msp_pays is
             and a.nlsalt = pa.nlsalt
             and a.kv = pa.kv;
 
-  bc.go('300465');
-
      /*where (p.rnk,p.kf) = (
                select pa.rnk,pa.kf
                              from pfu.pfu_pensacc pa
@@ -145,6 +143,8 @@ CREATE OR REPLACE package body BARS.msp_pays is
                               and pa.nlsalt = to_char(l_rec_row.deposit_acc) -- COBUMMFO-7501
                and pa.dazs is null);*/
    end;
+
+   bc.go('300465');
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
       l_okpo := '0000000000';
