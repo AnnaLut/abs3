@@ -191,10 +191,7 @@ function StartCashin(btn) {
     var curr = $('#currency-dropdown').val();
     $('#currency-dropdown').prop('disabled', 'disabled');
     showHide.showPreloaderItems();
-    $('#cashin-btn').text('Підтвердити внесення');
-    $('#end-cashin-btn').hide();
-    $('#disabled-btn').text('Підтвердити');
-    $('#disabled-btn').show();
+    
     $.ajax({
         type: "POST",
         contentType: "application/json",
@@ -202,12 +199,16 @@ function StartCashin(btn) {
         data: JSON.stringify({ Currency: curr, Method: 'Start_Cashin' }),
         success: function (result) {
             if (result.model) {
-                if (result.model.Result === OK) {
+                if (result.model.Result == 1) {
                     $('#start-cashin-btn').removeClass(colorBlue).addClass(colorGray);
                     $('#store-cashin-btn').removeClass(colorGray).addClass(colorBlue);
                     $('#end-cashin-btn').removeClass(colorGray).addClass(colorBlue);
                     $('#cancel-cashin-btn').removeClass(colorGray).addClass(colorRed);
                     $('#in-cashin-started').val("1");
+                    $('#cashin-btn').text('Підтвердити внесення');
+                    $('#end-cashin-btn').hide();
+                    $('#disabled-btn').text('Підтвердити');
+                    $('#disabled-btn').show();
                 }
                 $('#encash-info').html(result.model.P_errtxt);
                 showNotification(result.model.P_errtxt);
