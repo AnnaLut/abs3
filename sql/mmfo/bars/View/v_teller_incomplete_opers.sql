@@ -1,5 +1,4 @@
 
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/view/v_teller_incomplete_opers.sql =========
  PROMPT ===================================================================================== 
@@ -14,16 +13,7 @@ from TELLER_ATM_OPERS t,  teller_opers o, teller_cash_opers co
     and o.work_date = gl.bD
     and o.user_ref = user_id
     and o.id = co.doc_ref
-    and co.atm_status = -1
-/*where oper_ref is null
-union all
-select null, null,null,null,null,null, co.op_type, co.oper_amount, co.cur_code, co.last_user, co.last_dt, co.doc_ref
-  from teller_opers o, teller_cash_opers co
-  where o.work_date = gl.bD
-    and o.id = co.doc_ref
-    and co.atm_status = -1);
-*/
-;
+    and co.atm_status = -1;
  show err;
  
  

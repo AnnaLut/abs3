@@ -3135,7 +3135,9 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
       loop
         v_ret := v_ret + rq.oper_amount;
         p_amount_txt := p_amount_txt||'<br/>'||nvl(rq.oper_amount_txt, rq.response);
---        exit;
+        if r.rq_name = 'CashoutRequest' then
+          exit;
+        end if;
       end loop;
     end loop;
     return v_ret;
@@ -3599,7 +3601,6 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
     v_ret number;
     v_id  number;
   begin
-logger.info('Teller: p_cur_code = '||p_cur_code);
 
     if check_atm = 1 then
       p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
@@ -3658,7 +3659,6 @@ logger.info('Teller: p_cur_code = '||p_cur_code);
     v_ret number;
     v_num number := teller_utils.get_active_oper();
   begin
-
     if check_atm = 1 then
       p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
       return 0;
