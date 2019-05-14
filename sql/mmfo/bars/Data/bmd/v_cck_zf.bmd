@@ -235,21 +235,6 @@ begin
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 99, 'КП: Архів закритих КД ', '', '', 'ONCE', '', '', '', '', '', null);
 
-  -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 1, null, ':DWDATE < GL.BD +30', 2, 'COLOR_LightGray');
-
-  -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 2, null, ':DWDATE < GL.BD +7', 2, 'COLOR_LightAqua');
-
-  -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 3, null, ':DWDATE = GL.BD', 2, 'COLOR_LightGreen');
-
-  -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 4, null, ':DWDATE < GL.BD ', 2, 'COLOR_Salmon');
-
-  -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 5, null, ':DWDATE > GL.BD and :SOS > 10 ', 2, 'COLOR_Orchid');
-
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);

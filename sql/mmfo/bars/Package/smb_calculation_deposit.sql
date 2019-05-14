@@ -315,6 +315,9 @@ as
     g_object_closed_state_id        number(38);
     g_object_deleted_state_id       number(38);
 
+    -- использовать накопление остатка (разница реально расчитанная - округленная)
+    C_USE_TAIL   constant           number := 0;
+
     -- вернуть только сумму рассчитанных % по 1-ому депозиту
     function get_calc_interest_only_sum(
                  p_id            in number
@@ -761,7 +764,7 @@ as
         loop
             -- init new object
             if l_current_object_id <> i.object_id then
-                l_tail_amount         := nvl(i.tail_amount, 0);
+                l_tail_amount         := case when C_USE_TAIL = 0 then 0 else nvl(i.tail_amount, 0) end;
                 l_current_object_id   := i.object_id;
                 l_capitalization_date := null;
                 l_accumulated := 0;
@@ -802,7 +805,7 @@ as
             -- расчет
             l_calc        := i.accrual_amount * (i.calc_end_date - i.calc_start_date + 1) / l_base_year * i.interest_rate_calc / 100 + l_tail_amount;
             -- остаток для следующего расчета
-            l_tail_amount := nvl(l_calc - round(l_calc), 0); 
+            l_tail_amount := case when C_USE_TAIL = 0 then 0 else nvl(l_calc - round(l_calc), 0) end; 
             l_accumulated := l_accumulated + nvl(round(l_calc), 0);
             l_result.extend();
             l_result(l_result.last)  := 
@@ -1545,6 +1548,7 @@ as
                               then 1 
                               else 0     
                          end is_blocked
+                        ,o.state_id 
                     from object o
                         ,deal d
                         ,smb_deposit t
@@ -1589,6 +1593,8 @@ as
                      and l_accrual_date >= d.expiry_date - 1
                      and l_accrual_date > nvl(d.last_accrual_date, d.start_date) 
                      and (p_deposit_list is null or p_deposit_list is empty)
+                     -- транш не заблокирован или еще не было начислений
+                     and (is_blocked = 0 or d.last_accrual_date is null)
                   union all
                   -- по списку
                   select d.id
@@ -1605,19 +1611,89 @@ as
                     )
         loop
             logger.log_info(p_procedure_name => $$plsql_unit||'.auto_accrual_interest'
-                           ,p_log_message    => null
-                           ,p_object_id      => i.id
-                                    ); 
-            -- должен закрыться или есть пролонгации
+                           ,p_log_message    => 'l_accrual_date    : '|| to_char(l_accrual_date, 'yyyy-mm-dd') || chr(10) ||
+                                                'expiry_date       : '|| to_char(i.expiry_date, 'yyyy-mm-dd') || chr(10) ||
+                                                'last_accrual_date : '|| to_char(i.last_accrual_date, 'yyyy-mm-dd') || chr(10) ||
+                                                'l_is_last_day     : '|| l_is_last_day || chr(10) ||
+                                                'is_blocked        : '|| i.is_blocked
+                           ,p_object_id      => i.id);
             if l_accrual_date >= i.expiry_date then
-                logger.log_info(p_procedure_name => $$plsql_unit||'.auto_accrual_interest expiry'
-                               ,p_log_message    => 'l_accrual_date    : '|| to_char(l_accrual_date, 'yyyy-mm-dd') || chr(10) ||
-                                                    'expiry_date       : '|| to_char(i.expiry_date, 'yyyy-mm-dd') || chr(10) ||
-                                                    'last_accrual_date : '|| to_char(i.last_accrual_date, 'yyyy-mm-dd') || chr(10) ||
-                                                    'l_is_last_day     : '|| l_is_last_day || chr(10) ||
-                                                    'is_blocked        : '|| i.is_blocked
-                               ,p_object_id      => i.id
-                                        );
+             -- дата расчета больше даты закрытия   
+                -- обработка пролонгаций которые стартуюют в выходные
+                if i.is_prolongation = 1 then
+                    -- первая
+                    if i.current_prolongation_number is null then 
+                        smb_deposit_utl.set_deposit_prolongation(p_object_id => i.id);
+                    end if;                  
+                    loop
+                        l_expiry_date := null;
+                        select max(dpt.expiry_date_prolongation)
+                          into l_expiry_date
+                          from smb_deposit dpt
+                         where dpt.id = i.id
+                           and dpt.number_prolongation > nvl(dpt.current_prolongation_number, 0)    
+                           and dpt.expiry_date_prolongation <= l_accrual_date;
+                         if l_expiry_date is null then exit; end if;
+                         smb_deposit_utl.set_deposit_prolongation(p_object_id => i.id);
+                    end loop;
+                    -- меняем дату окончания
+                    select least(dpt.expiry_date_prolongation - 1, l_accrual_date)
+                      into l_expiry_date
+                      from smb_deposit dpt
+                     where dpt.id = i.id;
+                else 
+                    l_expiry_date := i.expiry_date - 1;
+                end if;
+                -- конец месяца                  
+                if l_is_last_day = 1 then
+                    -- делаем начисление  
+                    accrual_interest(
+                                   p_deposit_list => number_list(i.id)
+                                  ,p_start_date   => null
+                                  ,p_end_date     => l_accrual_date
+                                  ,p_mode         => 1);
+                -- еще не было начислений, но пора закрывать
+                elsif i.last_accrual_date is null then
+                    accrual_interest(
+                                   p_deposit_list => number_list(i.id)
+                                  ,p_start_date   => null
+                                  ,p_end_date     => l_expiry_date
+                                  ,p_mode         => 1);
+                -- рабочий день не понятна причина не закрытия (может лимит установлен)                  
+                elsif l_is_last_day = 0 and i.last_accrual_date is not null  then
+                    -- проверим возможность закрыть депозит  
+                    begin 
+                        savepoint sp_check_deposit_closing;
+                        l_is_flag := 1;
+                        deposit_closing (
+                                   p_id            => i.id
+                                  ,p_accrual_date  => l_accrual_date
+                                  ,p_close_date    => l_accrual_date
+                                  ,p_silent_mode   => 0);
+                        rollback to sp_check_deposit_closing;          
+                        exception
+                          when others then 
+                            rollback to sp_check_deposit_closing;
+                            l_is_flag := 0;
+                    end;  
+                    -- возможно закрытие депозита
+                    if l_is_flag = 1 then
+                        accrual_interest(
+                                       p_deposit_list => number_list(i.id)
+                                      ,p_start_date   => null
+                                      ,p_end_date     => l_accrual_date
+                                      ,p_mode         => 1);
+                    end if;
+                end if;
+            else -- начислить % 
+                accrual_interest(
+                               p_deposit_list => number_list(i.id)
+                              ,p_start_date   => null
+                              ,p_end_date     => l_accrual_date
+                              ,p_mode         => 1);
+            end if;                  
+        end loop;
+        /*
                 -- обработка пролонгаций которые стартуюют в выходные
                 if i.is_prolongation = 1 then
                     -- первая
@@ -2628,16 +2704,14 @@ as
             -- новая ставка                
             l_interest_rate := smb_deposit_utl.get_interest_rate_blocked(
                                         p_object_id   => p_object_id 
-                                       ,p_date        => p_expiry_date + 1
+                                       ,p_date        => p_expiry_date
                                        ,p_currency_id => p_currency_id);
             if l_interest_rate is not null then                           
-                -- устанавливаем с "завтра"
-                -- может нужно начиная с даты закрытия, а не +1
-                --   потому что на последний день будет начислено по обычной ставке
+                -- устанавливаем с даты закрытия
                 smb_deposit_utl.set_interest_rate_tranche(
                                      p_object_id     => p_object_id
                                     ,p_interest_rate => l_interest_rate
-                                    ,p_valid_from    => p_expiry_date + 1
+                                    ,p_valid_from    => p_expiry_date
                                     ,p_comment       => 'closing blocked deposit : '||p_object_id);
             end if;
             tools.hide_hint(

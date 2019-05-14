@@ -1102,8 +1102,9 @@ CIM.contract_state_module = function () {
 
     //#region Oзнакa наявності документів
 
-    function editIsDoc(boundId, docType) {
+    function editIsDoc(boundType, boundId, docType) {
         refObj = {};
+        refObj.boundType = boundType;
         refObj.boundId = boundId;
         refObj.docType = docType;
 
@@ -1112,7 +1113,7 @@ CIM.contract_state_module = function () {
         dialogIsDoc.dialog({ autoOpen: true, resizable: false, modal: false, width: 400, title: "Редагувати ознаку наявності документів",
             buttons: {
                 "Зберегти": function () {
-                    PageMethods.SaveIsDoc(refObj.boundId, refObj.docType, ctrlIsDoc.val(), CIM.reloadPage, CIM.onPMFailed);
+                    PageMethods.SaveIsDoc(refObj.boundType, refObj.boundId, refObj.docType, ctrlIsDoc.val(), CIM.reloadPage, CIM.onPMFailed);
                     $(this).dialog("close");
                 },
                 "Відміна": function () { $(this).dialog("close"); }

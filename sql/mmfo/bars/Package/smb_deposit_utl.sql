@@ -5429,7 +5429,9 @@ q'#<SMBDepositProlongation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               -- письмо от Семеновой Виктории Mon 4/8/2019 5:09 PM          
               -- подтверждаем для депозитов ММСБ на счетах 2600 и 2650 параметр R013=9  и R011=3          
               l_r013 := case when p_nbs_int is null and p_nbs_dpt in ('2650', '2600') then '9' end;
-              l_s181 := case when p_end_date - p_start_date + 1 <= 365 then '1' else '2' end;
+              l_s181 := case when p_end_date is null then '1' 
+                             else case when p_end_date - p_start_date + 1 <= 365 then '1' else '2' end 
+                        end;
               -- так как процедура вызывается 2-а раза для депозитного счета и счета начисленных %%,
               -- то использую nvl(p_int_account_id, p_dpt_account_id) чтобы 2-а раза не писать одно и то же (жесть)
               --- Для ДпТ устанавливаем s240 = 'I'

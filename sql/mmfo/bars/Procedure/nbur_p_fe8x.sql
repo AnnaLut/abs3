@@ -1,8 +1,6 @@
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_FE8X.sql =========*** Run *** =
+PROMPT *** Run *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FE8X.sql ======== *** Run ***
 PROMPT ===================================================================================== 
-
-PROMPT *** Create  procedure NBUR_P_FE8X ***
 
 CREATE OR REPLACE PROCEDURE NBUR_P_FE8X (
                                            p_kod_filii  varchar2
@@ -16,9 +14,9 @@ is
 % DESCRIPTION : Процедура формирования E8X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.005  22/11/2018 (09/11/2018)
+% VERSION     :  v.19.001   03.05.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.005    22/11/2018';
+  ver_                     char(30)  := 'v.19.001    03.05.2019';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -34,6 +32,9 @@ is
   l_file_id       nbur_ref_files.id%type := nbur_files.GET_FILE_ID(p_file_code => p_file_code);
   l_version_id    nbur_lst_files.version_id%type;  
   
+  l_last_q0_1     number          := 0;
+  l_last_q0_12    number          := 0;
+
   --Exception
   e_ptsn_not_exsts exception;
 
@@ -75,7 +76,7 @@ BEGIN
                                           , p_report_date => p_report_date
                                         );
 
-  logger.trace(c_title || ' Version_id is ' || l_version_id);
+  logger.trace(c_title || ' version is ' || l_version_id);
 
   -- очікуємо формування старого файлу
   nbur_waiting_form(p_kod_filii, p_report_date, c_old_file_code, c_title);
@@ -88,7 +89,7 @@ BEGIN
              CUST_ID, BRANCH)
     select REPORT_DATE, KF, VERSION_ID, NBUC, KU, EKP, Q001, Q029, K074, K110, 
            K040, KU_1, Q020, K020, 
-           -- робимл перекодування, бо довідник відрізняєтьмя
+           -- робимо перекодування, бо довідник відрізняєтьмя
            (case K014 when '1' then '3' when '2' then '1' when '3' then '2' else K014 end) as K014, 
            R020, R030, Q003_1, Q003_2, Q007_1, Q007_2, 
            T070_1, T070_2, T070_3, T070_4, T090, 
@@ -175,11 +176,87 @@ BEGIN
         c.R030 = d.R030)    
     );
 
-  --Агрегированный нам не нужен, так как агрегированные данные будут поступать из XML-формата
+    select to_number(nvl(max(Q003_1),'0'))
+      into l_last_q0_1
+      from nbur_log_fe8x
+     where report_date = p_report_date
+       and kf = p_kod_filii;
+
+    select to_number(nvl(max(Q003_1),'0'))
+      into l_last_q0_12
+      from nbur_log_fe8x
+     where report_date = p_report_date
+       and kf = p_kod_filii;
+
+--   депозиты ММСБ
+
+  insert into nbur_log_fE8X
+            (REPORT_DATE, KF, VERSION_ID, NBUC, KU,
+             EKP, Q003_12, Q001, K020, K021, Q029, Q020, K040, KU_1, K014,
+             K110, K074, Q003_1, Q003_2, Q007_1, Q007_2, R030, T090, R020, 
+             T070_1, T070_2, T070_3, T070_4, ACC_ID, ACC_NUM, KV, CUST_ID, BRANCH)
+select p_report_date, p_kod_filii, l_version_id, p_kod_filii, f_get_ku_by_nbuc(p_kod_filii) ku, 
+       'AE8001'  as EKP,
+       (row_number() over (order by k020_21, currency_id))+l_last_q0_12     as Q003_12, 
+       nmk       as Q001,
+       substr(k020_21,2,10)   as K020,
+       substr(k020_21,1,1)    as K021,
+       (case when length(substr(k020_21,2))>10  then substr(k020_21,2) 
+             else null
+         end)                 as Q029,
+       lpad(to_char(prinsider),2,'0')              as Q020,
+       lpad(to_char(country),3,'0')                as K040,
+       lpad(to_char(obl),2,'0')                    as KU_1,
+       (case custtype when 1 then '3'
+                      when 2 then '1'
+                      when 3 then '2' else to_char(custtype)
+         end)                 as K014,
+       ved                    as K110,
+       K074,
+       lpad(to_char(Q003_1),4,'0')    as Q003_1,
+       to_char(contract_number)       as Q003_2,
+       (case  when start_date  is null  then null
+              else   to_char(start_date, c_date_fmt)
+         end)                as Q007_1,
+       (case  when end_date  is null  then null
+              else   to_char(end_date, c_date_fmt)
+         end)                as Q007_2,
+       lpad(to_char(currency_id),3,'0')                as R030,
+       to_char(T090,'99990.0000') as T090,  nbs   as R020,
+       T070_1,   0   as T070_2,   0   as T070_3,   0   as T070_4,
+       acc, nls, kv, rnk, 'депозит ММСБ'
+from (
+select c.nmk, f_nbur_get_k020_by_rnk(c.rnk) k020_21, c.prinsider, c.country,
+       b.obl, c.custtype, c.ved, k.k074, a.contract_number, a.start_date,
+       a.end_date, a.currency_id, round(int_rate, 4)  as T090,
+       e.nbs, a.deposit_amount as T070_1,
+       e.acc, e.nls, e.kv, c.rnk, c.branch,
+       (row_number() over (order by a.contract_number, e.acc))+l_last_q0_1   as Q003_1
+  from (
+        select   account_id                     
+               , account_number                 
+               , currency_id                    
+               , currency_name                  
+               , contract_number                
+               , start_date                     
+               , end_date                       
+               , deposit_amount                 
+               , round(interest_rate, 4)   int_rate     
+               , customer_id                    
+               , report_date                    
+          from table(smb_calculation_deposit.get_report_e8(p_date => p_report_date))
+       ) a, customer c, branch b, kl_k070 k, accounts e
+ where a.customer_id = c.rnk
+   and c.branch = b.branch
+   and c.ise = k.k070
+   and a.account_id = e.acc
+     );
 
   logger.info (c_title || ' end for date = '||to_char(p_report_date, c_date_fmt));
 END NBUR_P_FE8X;
 /
+
+
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_FE8X.sql =========*** End *** =
+PROMPT *** End *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FE8X.sql ======== *** End ***
 PROMPT ===================================================================================== 

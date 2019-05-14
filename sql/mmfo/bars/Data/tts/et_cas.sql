@@ -440,12 +440,12 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('SWRCV', 'CAS', 'O', 1, 16, null, null);
+    values ('SWRCV', 'CAS', 'M', 1, 16, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''SWRCV'', ''CAS'', ''O'', 1, 16, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''SWRCV'', ''CAS'', ''M'', 1, 16, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

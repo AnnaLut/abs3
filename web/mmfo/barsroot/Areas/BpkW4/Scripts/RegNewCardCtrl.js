@@ -31,6 +31,7 @@ angular.module("BarsWeb.Areas")
                     bars.ui.error({ text: request.data.ERROR_MSG });
                     return;
                 }
+
                 $scope.params.isIns = request.data.haveins;
                 $scope.params.insUkrId = request.data.insUkrId;
                 $scope.params.insWrdId = request.data.insWrdId;
@@ -53,6 +54,15 @@ angular.module("BarsWeb.Areas")
                             $scope.model.DELIVERY_BRANCH = $scope.model.CURRENTBRANCH;
                             $scope.model.DELIVERY_BRANCH_NAME = $scope.model.CURBRANCHNAME;
                         }
+
+                        if ($scope.params.insWrdId) {
+                            $scope.model.TYPE_INS = 0; // type 0 - means insurance all over the world
+                        }
+
+                        if (request.data.insUkrId) {
+                            $scope.model.TYPE_INS = 1; // type 1 - means insurance in Ukraine and its default in case both are possible
+                        }
+                        
                     });
             });
 
@@ -104,12 +114,13 @@ angular.module("BarsWeb.Areas")
             $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetExternal?rnk=' + rnk))
                 .then(function (request) {
                     $scope.ext = request.data;
-                    if (!$scope.ext.IS_EXT && $scope.model.TYPE_INS !== null && Number($scope.model.TYPE_INS) === 0) {
+                    /*if (!$scope.ext.IS_EXT && $scope.model.TYPE_INS !== null && Number($scope.model.TYPE_INS) === 0) {
                         bars.ui.error({
                             text: 'Обрано Страхування подорожі за кордон.<br />У клієнта не зареєстровано закордонний паспорт.'
                         });
-                    }
-                    else if ($scope.validator.validate()) {
+                    }*/
+                    /*else*/
+                    if ($scope.validator.validate()) {
                         bars.ui.loader('body', true);
                         $http.post(bars.config.urlContent('/bpkw4/RegisteringNewCard/OpenCard'), $scope.model)
                             .then(function (request) {
@@ -137,14 +148,14 @@ angular.module("BarsWeb.Areas")
                                 }
                                 else {
                                     var newCardData = null;
-                                    if($scope.params.isIns && $scope.params.insUkrId){
+                                    if ($scope.params.isIns) {
                                         if ($scope.params.insWrdId){
                                             var typeIns = Number($scope.model.TYPE_INS);
                                             newCardData = { nd: data.ND,
                                                 ins_id: typeIns === 0 ? $scope.params.insWrdId : $scope.params.insUkrId,
                                                 tmp_id: typeIns === 0 ? $scope.params.tmpWrdId : $scope.params.tmpUkrId };
                                         }
-                                        else{
+                                        else {
                                             newCardData = { nd: data.ND, ins_id: $scope.params.insUkrId, tmp_id: $scope.params.tmpUkrId };
                                         }
                                     }

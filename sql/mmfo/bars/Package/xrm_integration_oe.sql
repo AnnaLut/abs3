@@ -665,7 +665,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.XRM_INTEGRATION_OE
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.64 10.10.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.65 26.04.2019';
    g_null_date      CONSTANT DATE := null;
 
    FUNCTION body_version
@@ -1683,9 +1683,10 @@ IS
       if p_ClientType is not null and p_ClientType in (1, 2) then 
           raise_application_error(-20000, 'Робота з банками / юр. особами в поточній версії не реалізована');
       end if;
-      IF nvl(Isp_, 0) <> 0 THEN
+      -- COBUMMFO-10901
+      /*IF nvl(Isp_, 0) <> 0 THEN
         Isp_ := bars_sqnc.rukey(Isp_);
-      end if;
+      end if;*/
       IF nvl(RnkP_, 0) <> 0 THEN
         RnkP_ := bars_sqnc.rukey(RnkP_);
       end if;

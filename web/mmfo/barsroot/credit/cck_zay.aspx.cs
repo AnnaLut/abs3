@@ -469,7 +469,8 @@ where c.rnk = :p_rnk";
         cbFPROC2.Visible = FPROC2Title.Visible = FPROC2.Visible = FPROC2_DATETitle.Visible = 
             FPROC2_DATE.Visible = Request.Params.Get("CUSTTYPE") == "3" && IsManyRatesActive();//декілька ставок тільки для ФО
 
-        Panel_SumComObsl.Visible = Request.Params.Get("CUSTTYPE") == "3";                               //Комісія за обслуговування кредиту тільки для ФО також
+        Panel_SumComObsl.Visible =                                                                                  //Комісія за обслуговування кредиту тільки для ФО також
+                    lblINT_R.Visible = INTRT.Visible = Request.Params.Get("CUSTTYPE") == "3";                     //ну і ринкова туди ж
         attrSDI.GroupingText = Request.Params.Get("CUSTTYPE") == "3" ? "Разова комісія за надання кредиту" : "Одноразова комісія";
 
         base.OnPreRender(e);
@@ -985,7 +986,8 @@ where c.rnk = :p_rnk";
                 {
                     var list_params = new[] { new { Tag = "S_S36", Value = SumComObsl.Value.ToString() },
                         new { Tag = "BUS_MOD", Value = DDL_BUS_MOD.Value.ToString() },  new { Tag = "SPPI", Value = DDL_SPPI.Value.ToString() },
-                        new { Tag = "IFRS", Value = IFRS.Value }, new { Tag = "POCI", Value = DDL_POCI.Value.ToString() }
+                        new { Tag = "IFRS", Value = IFRS.Value }, new { Tag = "POCI", Value = DDL_POCI.Value.ToString() },
+                        new { Tag = "INTRT", Value = INTRT.Value.ToString() }
                     };
 
                     cmd.CommandText = @"bars.cck_app.set_nd_txt";

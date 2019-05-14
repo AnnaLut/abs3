@@ -19,7 +19,7 @@ IS
                                      2 - не разбиваются по графикам только некоторые
                                          счета (только для Демарка), НП: счета ФЛ
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   Структура показателя    D BBBB P X L R Щ VVV
+   Структура показателя    D BBBB Z P X L R I VVV
 
  1     D          1/2  (остаток ДТ/КТ)
  2     BBBB       R020 балансовый счет
@@ -4831,7 +4831,5 @@ CREATE OR REPLACE PUBLIC SYNONYM P_FA7_NN FOR BARS.P_FA7_NN;
 
 
 GRANT EXECUTE ON BARS.P_FA7_NN TO BARS_ACCESS_DEFROLE;
-
 GRANT EXECUTE ON BARS.P_FA7_NN TO RPBN002;
-
 GRANT EXECUTE ON BARS.P_FA7_NN TO WR_ALL_RIGHTS;

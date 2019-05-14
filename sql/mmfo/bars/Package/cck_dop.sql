@@ -1662,6 +1662,10 @@ begin
 
   -- COBUSUPABS-4863
   If l_cd_row.vidd in (11,12,13) then
+    --COBUMMFO-9260
+    if cck_app.Get_ND_TXT(l_cd_row.nd, 'INTRT') is null then
+      cck_app.raise_cck_error('НЕ заповнено обов’язковий  параметр «Відсоткова ставка (ринкова)!');
+    end if;
 
     If CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PARTN') is null  then
       cck_app.raise_cck_error('НЕ заповнено параметр «Наявність партнера» (обов"язкове поле відповідно до SV-0848497)');

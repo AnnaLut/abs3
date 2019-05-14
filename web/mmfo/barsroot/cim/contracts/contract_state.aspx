@@ -336,6 +336,9 @@
                                 DataFormatString="{0:N}">
                                 <ItemStyle HorizontalAlign="Right" />
                             </asp:BoundField>
+
+                            <asp:BoundField DataField="IS_DOC" HeaderText="Документи наявні?" SortExpression="IS_DOC"><ItemStyle HorizontalAlign="Center" /></asp:BoundField>
+
                             <asp:BoundField DataField="NAZN" HeaderText="Призначення" SortExpression="NAZN"></asp:BoundField>
                             <asp:BoundField DataField="ACCOUNT" HeaderText="Рахунок" SortExpression="ACCOUNT"></asp:BoundField>
                             <asp:BoundField DataField="REF" HeaderText="Реф. платежу" SortExpression="REF">
@@ -1027,6 +1030,7 @@
                             <asp:BoundField DataField="s_pd_after" HeaderText="Сума МД\актів після контрольної дати" SortExpression="s_pd_after" DataFormatString="{0:N}">
                                 <ItemStyle HorizontalAlign="Right" />
                             </asp:BoundField>
+                            <asp:BoundField DataField="IS_DOC" HeaderText="Документи наявні?" SortExpression="IS_DOC"><ItemStyle HorizontalAlign="Center" /></asp:BoundField>
                             <asp:BoundField DataField="service_code" HeaderText="Код послуг" SortExpression="service_code">
                                 <ItemStyle HorizontalAlign="Left" />
                             </asp:BoundField>
@@ -1217,6 +1221,9 @@
                                     <asp:BoundField DataField="REF" HeaderText="Референс" SortExpression="REF">
                                         <ItemStyle HorizontalAlign="Right" />
                                     </asp:BoundField>
+
+                                    <asp:BoundField DataField="IS_DOC" HeaderText="Документи наявні?" SortExpression="IS_DOC"><ItemStyle HorizontalAlign="Center" /></asp:BoundField>
+
                                     <asp:BoundField DataField="CREATE_DATE" HeaderText="Дата реестр. в журналі" SortExpression="CREATE_DATE" DataFormatString="{0:dd/MM/yyyy}"></asp:BoundField>
                                 </Columns>
                             </bars:BarsGridViewEx>
@@ -1297,6 +1304,9 @@
                                     <asp:BoundField DataField="vmd_id" HeaderText="Референс" SortExpression="vmd_id">
                                         <ItemStyle HorizontalAlign="Right" />
                                     </asp:BoundField>
+
+                                    <asp:BoundField DataField="IS_DOC" HeaderText="Документи наявні?" SortExpression="IS_DOC"><ItemStyle HorizontalAlign="Center" /></asp:BoundField>
+
                                     <asp:BoundField DataField="CREATE_DATE" HeaderText="Дата реестр. в журналі" SortExpression="CREATE_DATE" DataFormatString="{0:dd/MM/yyyy}"></asp:BoundField>
                                 </Columns>
                             </bars:BarsGridViewEx>

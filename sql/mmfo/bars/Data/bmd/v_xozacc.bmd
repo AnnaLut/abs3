@@ -178,7 +178,7 @@ FROM customer c,
   bars_metabase.add_nsifunction(l_tabid, 2, 'Протокол закриття ДЗ за день', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZKWT[NSIFUNCTION][PROC=>PUL.PUT(''DATZ'',to_char( :D, ''dd.mm.yyyy'' ))][PAR=>:D(SEM=Дата_закриття,TYPE=D)][EXEC=>BEFORE][ACCESSCODE=>1][showDialogWindow=>false]', 22  );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 13, 'Дебетові запити до ЦА, що знаходяться на контролі', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZ_RU_CA[ACCESSCODE=>1][showDialogWindow=>false]', 71 );
+  bars_metabase.add_nsifunction(l_tabid, 13, 'Дебетові запити до ЦА, що знаходяться на контролі', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZ_RU_CA[ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>V_XOZ_RU_CA.REC IN (1)]', 71 );
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 15, 'АРХІВ відшкодувань госп.ДЗ, що виникла в РУ', '', '', 'ONCE', '', '', '', '', 'sPar=V_XOZ_RU_CA[showDialogWindow=>false][ACCESSCODE=>1][CONDITIONS=>V_XOZ_RU_CA.REC NOT in (1,2)]', 36  );

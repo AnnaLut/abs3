@@ -45,15 +45,19 @@
                                 <td>СМС інформування</td>
                                 <td><input type="checkbox" ng-model="model.CHBOXSMS" /></td>
                             </tr>
-                            <tr ng-show="params.isIns && params.insWrdId">
+                            <tr ng-show="params.isIns && params.insWrdId && params.insUkrId">
                                 <td>Тип страхування</td>
                                 <td>
-                                    <label><input name="cssPre" value="0" type="radio" ng-model="model.TYPE_INS" /> Страхування подорожі за кордон</label><br />
-                                    <label><input name="cssPre" value="1" type="radio" ng-model="model.TYPE_INS" /> Страхування подорожі по Україні</label>
+                                    <label><input name="cssPre" @*value="0"*@ type="radio" ng-model="model.TYPE_INS" /> Страхування подорожі за кордон</label><br />
+                                    <label><input name="cssPre" @*value="1"*@ type="radio" ng-model="model.TYPE_INS" /> Страхування подорожі по Україні</label>
                                 </td>
                             </tr>
-                            <tr ng-show="params.isIns && !params.insWrdId && params.insUkrId">
-                                <td>Страхування</td>
+                            <tr ng-show="params.isIns && params.insUkrId && !(params.insWrdId && params.insUkrId)">
+                                <td>Страхування подорожі по Україні</td>
+                                <td><label><input name="chbxIns" type="checkbox" ng-checked="true" ng-disabled="true" /></label></td>
+                            </tr>
+                            <tr ng-show="params.isIns && params.insWrdId && !(params.insWrdId && params.insUkrId)">
+                                <td>Страхування подорожі за кордон</td>
                                 <td><label><input name="chbxIns" type="checkbox" ng-checked="true" ng-disabled="true" /></label></td>
                             </tr>
                         </table>
