@@ -27,7 +27,7 @@ namespace cim
             fillFields();
         }
         public VCimTradePaymentsRecord(BbDataSource Parent, OracleDecimal RowScn, Decimal? BOUND_ID, Decimal? CONTR_ID, Decimal? PAY_FLAG, Decimal? REF, Decimal? DIRECT, Decimal? TYPE_ID, String TYPE, DateTime? VDAT, String ACCOUNT, String NAZN, Decimal? V_PL, Decimal? S_VPL, Decimal? SK_VPL, Decimal? RATE, Decimal? S_VK, Decimal? S_PD, Decimal? ZS_VP, Decimal? ZS_VK, DateTime? CONTROL_DATE, Decimal? OVERDUE, Decimal? S_PD_AFTER, String SERVICE_CODE, DateTime? CREATE_DATE, DateTime? MODIFY_DATE, Decimal? BORG_REASON, String EA_URL
-            , Decimal? DEADLINE_DOC, Decimal? ZSQ_VP)
+            , Decimal? DEADLINE_DOC, Decimal? ZSQ_VP,DateTime? DATE_MAX_BOUND_DOC, String IS_DOC)
             : this(Parent)
         {
             this.BOUND_ID = BOUND_ID;
@@ -58,6 +58,9 @@ namespace cim
             this.EA_URL = EA_URL;
             this.DEADLINE_DOC = DEADLINE_DOC;
             this.ZSQ_VP = ZSQ_VP;
+
+            this.DATE_MAX_BOUND_DOC = DATE_MAX_BOUND_DOC;
+            this.IS_DOC = IS_DOC;
 
             this.RowScn = RowScn;
             this.IsRowscnSupported = false;
@@ -94,6 +97,9 @@ namespace cim
 
             Fields.Add(new BbField("DEADLINE_DOC", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.04", "Контрольний строк по документу"));
             Fields.Add(new BbField("ZSQ_VP", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.04", "Грн.екв.останньої події незавершеного розрахунку"));
+
+            Fields.Add(new BbField("DATE_MAX_BOUND_DOC", OracleDbType.Date, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.06", "Дата привязки останньої події"));
+            Fields.Add(new BbField("IS_DOC", OracleDbType.Varchar2, true, false, false, false, false, "V_CIM_TRADE_PAYMENTS", ObjectTypes.View, "Прив`язані платежі торгових контрактів 1.00.06", "Наявність документів у Банку"));
         }
         public Decimal? BOUND_ID { get { return (Decimal?)FindField("BOUND_ID").Value; } set {SetField("BOUND_ID", value);} }
         public Decimal? CONTR_ID { get { return (Decimal?)FindField("CONTR_ID").Value; } set {SetField("CONTR_ID", value);} }
@@ -123,6 +129,8 @@ namespace cim
         public String EA_URL { get { return (String)FindField("EA_URL").Value; } set {SetField("EA_URL", value);} }
         public Decimal? DEADLINE_DOC { get { return (Decimal?)FindField("DEADLINE_DOC").Value; } set { SetField("DEADLINE_DOC", value); } }
         public Decimal? ZSQ_VP { get { return (Decimal?)FindField("ZSQ_VP").Value; } set { SetField("ZSQ_VP", value); } }
+        public DateTime? DATE_MAX_BOUND_DOC { get { return (DateTime?)FindField("DATE_MAX_BOUND_DOC").Value; } set {SetField("DATE_MAX_BOUND_DOC", value);} }
+        public String IS_DOC { get { return (String)FindField("IS_DOC").Value; } set {SetField("IS_DOC", value);} }
     }
 
     public sealed class VCimTradePaymentsFilters : BbFilters
@@ -157,6 +165,9 @@ namespace cim
             EA_URL = new BBVarchar2Filter(this, "EA_URL");
             DEADLINE_DOC = new BBDecimalFilter(this, "DEADLINE_DOC");
             ZSQ_VP = new BBDecimalFilter(this, "ZSQ_VP");
+
+            DATE_MAX_BOUND_DOC = new BBDateFilter(this, "DATE_MAX_BOUND_DOC");
+            IS_DOC = new BBVarchar2Filter(this, "IS_DOC");
         }
         public BBDecimalFilter BOUND_ID;
         public BBDecimalFilter CONTR_ID;
@@ -186,6 +197,9 @@ namespace cim
         public BBVarchar2Filter EA_URL;
         public BBDecimalFilter DEADLINE_DOC;
         public BBDecimalFilter ZSQ_VP;
+
+        public BBDateFilter DATE_MAX_BOUND_DOC;
+        public BBVarchar2Filter IS_DOC;
     }
 
     public partial class VCimTradePayments : BbTable<VCimTradePaymentsRecord, VCimTradePaymentsFilters>
@@ -238,7 +252,9 @@ namespace cim
                         rdr.IsDBNull(25) ?  (Decimal?)null : Convert.ToDecimal(rdr[25]),        // "BORG_REASON", OracleDbType.Decimal
                         rdr.IsDBNull(26) ?  (String)null : Convert.ToString(rdr[26]),           // "EA_URL", OracleDbType.Varchar2
                         rdr.IsDBNull(27) ? (Decimal?)null : Convert.ToDecimal(rdr[27]),         // "DEADLINE_DOC", OracleDbType.Decimal
-                        rdr.IsDBNull(28) ? (Decimal?)null : Convert.ToDecimal(rdr[28])          // "ZSQ_VP", OracleDbType.Decimal
+                        rdr.IsDBNull(28) ? (Decimal?)null : Convert.ToDecimal(rdr[28]),         // "ZSQ_VP", OracleDbType.Decimal
+                        rdr.IsDBNull(29) ? (DateTime?)null : Convert.ToDateTime(rdr[29]),       // "DATE_MAX_BOUND_DOC", OracleDbType.Date
+                        rdr.IsDBNull(30) ? (String)null : Convert.ToString(rdr[30])             // "IS_DOC", OracleDbType.Varchar2
                     ));                                                                         
                 }
             }

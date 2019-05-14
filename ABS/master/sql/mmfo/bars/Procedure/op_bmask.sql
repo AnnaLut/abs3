@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/OP_BMASK.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure OP_BMASK ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/op_bmask.sql =========*** Run *** 
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.OP_BMASK 
   ( P_BRANCH IN branch.branch%type,
     p_NBS    IN sb_ob22.R020%type ,
@@ -74,30 +71,49 @@ A - (обычно - 1, но если несколько инших - то 2, 3,)
 --------------------
 BEGIN
 
-  If p_NBS like '11%' then l_KV := nvl ( to_number( pul.get_mas_ini_val ('OP_BSOB_KV') ), 959        );
-  else                     l_kv := nvl ( to_number( pul.get_mas_ini_val ('OP_BSOB_KV') ), gl.baseval );
+  If p_NBS like '11%' then 
+    l_KV := nvl ( to_number( pul.get_mas_ini_val ('OP_BSOB_KV') ), 959);
+  else                     
+    l_kv := nvl ( to_number( pul.get_mas_ini_val ('OP_BSOB_KV') ), gl.baseval );
   end if;
 
-  If p_NBS like '60__' then  l_tip := 'SD '; end if;
+  If p_NBS like '60__' then  
+    l_tip := 'SD '; 
+  end if;
 
   -- название счета
   begin
-     select NVL( P_NMS, substr( P_ob22||' '|| replace (txt,'у','i'), 1, 50 ) ) into l_nms
-     from sb_ob22 where r020 = P_NBS and ob22= P_OB22 and d_close is null;
-  EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20100,    '     : Недопустима пара ' || P_NBS || '/' || P_OB22  );
+     select NVL( P_NMS, substr( P_ob22||' '|| replace (txt,'у','i'), 1, 50 ) ) 
+       into l_nms
+       from sb_ob22 
+       where r020 = P_NBS 
+         and ob22= P_OB22 
+         and d_close is null;
+  EXCEPTION 
+    WHEN NO_DATA_FOUND THEN    
+      raise_application_error(-20100,    '     : Недопустима пара ' || P_NBS || '/' || P_OB22  );
   end;
 
 
    -- найти РНК бранча
-         begin
-         select ru into l_ru from kf_ru
-        where kf=sys_context('bars_context','user_mfo');
-        exception when no_data_found then l_ru:='01';
-        end;
-        l_rnk:=1||l_ru;
    begin
-      If GetGlobalOption('HAVETOBO') = '2' then     EXECUTE IMMEDIATE
-        'select to_number(val) from BRANCH_PARAMETERS where tag=''RNK'' and branch='''|| P_BRANCH||'''' into L_RNK ;
+     select ru into l_ru 
+       from kf_ru
+       where kf=sys_context('bars_context','user_mfo');
+   exception 
+     when no_data_found then 
+       l_ru:='01';
+   end;
+
+   l_rnk:='1'||l_ru;
+
+   begin
+      If GetGlobalOption('HAVETOBO') = '2' then     
+        select to_number(val) 
+          into L_RNK 
+          from BRANCH_PARAMETERS 
+          where tag='RNK' 
+            and branch=P_BRANCH;
       end if;
    EXCEPTION WHEN NO_DATA_FOUND THEN null ;
    end;
@@ -106,8 +122,12 @@ BEGIN
       -- найти исполнителя для сч
       L_ISP := gl.aUid;
       begin
-         If GetGlobalOption('HAVETOBO') = '2' then  EXECUTE IMMEDIATE
-           'select to_number(val) from BRANCH_PARAMETERS where tag=''AVTO_ISP'' and branch='''||P_BRANCH||'''' into L_ISP;
+         If GetGlobalOption('HAVETOBO') = '2' then  
+           select to_number(val) 
+             into L_ISP
+             from BRANCH_PARAMETERS 
+             where tag='AVTO_ISP' 
+               and branch=P_BRANCH;
          end if;
       EXCEPTION WHEN NO_DATA_FOUND THEN null ;
       end;
@@ -117,10 +137,17 @@ BEGIN
    If P_GRP is null then
       -- найти группу дост для бал.сч
       begin
-        select id into L_GRP from  groups_nbs where nbs=P_NBS and rownum=1;
-      EXCEPTION WHEN NO_DATA_FOUND  THEN L_grp := null;
+        select id 
+          into L_GRP 
+          from  groups_nbs 
+          where nbs=P_NBS 
+            and rownum=1;
+      EXCEPTION 
+        WHEN NO_DATA_FOUND  THEN 
+          L_grp := null;
       end;
-   else      l_GRP := p_GRP;
+   else      
+     l_GRP := p_GRP;
    end if;
 
   -- Превращение 2-х знач ОБ22 (симв) в 3-хнач цифровой
@@ -164,14 +191,14 @@ NLSMASK       BR2 = Для авто-вiдкр внутр.рах Бранч-2
               BR3 = Для авто-вiдкр внутр.рах Бранч-3
 */
 
-  PUL.Set_Mas_Ini( 'BRANCH', substr( substr(P_BRANCH,-4),1,3), 'Branch' );
+/*  PUL.Set_Mas_Ini( 'BRANCH', substr( substr(P_BRANCH,-4),1,3), 'Branch' );
   PUL.Set_Mas_Ini( 'OB22'  , l_ob3                           , 'ob22'   );
-
-  If length (p_BRANCH)>15 then l_ZZ:='00'; p_NLS:= f_newnls2(null,'BR3',p_NBS,L_RNK,null,null);
+*/
+/*  If length (p_BRANCH)>15 then l_ZZ:='00'; p_NLS:= f_newnls2(null,'BR3',p_NBS,L_RNK,null,null);
   else                         l_ZZ:='01'; p_NLS:= f_newnls2(null,'BR2',p_NBS,L_RNK,null,null);
-  end if;
+  end if;*/
 
-  -- если не получилось. то по-старому:
+/*  -- если не получилось. то по-старому:
   If p_NLS is null then
 
      If gl.aMfo in ('313957') then
@@ -207,10 +234,10 @@ NLSMASK       BR2 = Для авто-вiдкр внутр.рах Бранч-2
 
      end if;
 
-  end if;
+  end if;*/
 
 
-  begin
+/*  begin
      -- это НАДРА
      select 1 into nTmp_ from USER_TAB_COLUMNS  where TABLE_NAME = 'SB_OB22' AND COLUMN_NAME = 'KOD_B';
      begin
@@ -221,11 +248,12 @@ NLSMASK       BR2 = Для авто-вiдкр внутр.рах Бранч-2
   EXCEPTION WHEN NO_DATA_FOUND THEN null;
      -- Это Сбербанк или что-то другое
   end;
-
-  P_NLS  := vkrzn ( substr(gl.aMFO,1,5), p_NLS );
+*/
+/*  P_NLS  := vkrzn ( substr(gl.aMFO,1,5), p_NLS );*/
 
   -- 28-02-2011   Если маска счета = все 14 знаков - ничего не добавлять.
-  If length(P_NLS) =14    then
+--  If length(P_NLS) =14    then
+    /*
      declare
        l_dazs accounts.dazs%type;
      Begin
@@ -244,14 +272,24 @@ NLSMASK       BR2 = Для авто-вiдкр внутр.рах Бранч-2
        --  1.если счет возможно открыть по заданым параметрам- открыть счет
        null;
      end;
-
+*/
+     declare
+       v_cnt integer;
+     begin
+       loop
+         p_nls := vkrzn(substr(gl.aMFO,1,5),p_nbs||'0'||lpad(round(dbms_random.value(0,1000000000)),9,'0'));
+         select count(1) into v_cnt
+           from accounts where nls = p_nls and kv = l_kv;
+         exit when v_cnt = 0;
+       end loop;
+     end;
      --4.если счет открыт не правильно - выдает сообщение об ошибке
      op_reg (99,0,0,L_GRP,L_p4,L_RNK, p_NLS, l_kv, l_NMS, l_tip,L_isp,p_ACC);
      insert into CCK_AN_TMP(acc) values (p_acc);
 
      RETURN;
 
-  end if;
+--  end if;
   -------------------------
 
   -- такой счет  уже есть, наращиваем NNNNNNN
@@ -285,10 +323,11 @@ NLSMASK       BR2 = Для авто-вiдкр внутр.рах Бранч-2
 
 end OP_BMASK  ;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/OP_BMASK.sql =========*** End *** 
-PROMPT ===================================================================================== 
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/op_bmask.sql =========*** End *** 
+ PROMPT ===================================================================================== 
+ 

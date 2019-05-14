@@ -70,7 +70,7 @@
         showReportWithParams: function () {
             $('#paramsModal').modal('hide');
             var newParams = this.getDataFromForm();
-            if (this._reportType == "DBF") {
+            if (this._reportType == "DBF"||this._reportType == "XLS") {
                 $.post(bars.config.urlContent("/dwh/report/enqueue?id=") + this._reportId + "&moduleId=@ViewBag.Module",
                     newParams,
                     function () {

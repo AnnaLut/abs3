@@ -3607,6 +3607,12 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
       return 0;
     end if;
 
+
+    if check_atm = 1 then
+      p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
+      return 0;
+    end if;
+
     v_ret := teller_soap_api.get_current_dev_status();
     if v_ret not in (1000,1500,9200) then
       p_errtxt := teller_soap_api.get_current_dev_status_desc();
@@ -3659,6 +3665,7 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
     v_ret number;
     v_num number := teller_utils.get_active_oper();
   begin
+
     if check_atm = 1 then
       p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
       return 0;

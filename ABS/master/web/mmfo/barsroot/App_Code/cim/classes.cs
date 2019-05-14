@@ -2464,7 +2464,7 @@ namespace barsroot.cim
             }
         }
 
-        public void SaveIsDoc(decimal boundId, int docType, string isDoc)
+        public void SaveIsDoc(int boundType, decimal boundId, int docType, string isDoc)
         {
             InitConnection();
             try
@@ -2474,11 +2474,20 @@ namespace barsroot.cim
                 oraCmd.Parameters.Add("p_boundId", OracleDbType.Decimal, boundId, ParameterDirection.Input);
 
                 string tabName = "";
-
+                if (boundType == 0)
+                {
+                    if (docType == 0)
+                        tabName = "cim_payments_bound";
+                    else
+                        tabName = "cim_fantoms_bound";
+                }
+                else if (boundType == 1)
+                {
                 if (docType == 0)
                     tabName = "cim_vmd_bound";
                 else
                     tabName = "cim_act_bound";
+                }
 
                 oraCmd.CommandText = "update " + tabName + " set IS_DOC = :p_isDoc where bound_id=:p_boundId";
                 oraCmd.ExecuteNonQuery();
@@ -2496,7 +2505,7 @@ namespace barsroot.cim
             }
         }
 
-        public string SaveRegDate(int contrType, int boundType, decimal boundId, int docType, int docId, string regDate)
+        public string SaveRegDate(int contrType, int boundType, decimal boundId, int docType, decimal docId, string regDate)
         {
             InitConnection();
             try

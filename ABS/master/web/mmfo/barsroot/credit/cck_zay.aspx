@@ -294,6 +294,14 @@
                                 </tr>
                                 <tr>
                                     <td>
+                                        <asp:Label ID="lblINT_R" runat="server" Text="% ставка (Ринкова) : "></asp:Label>
+                                    </td>
+                                    <td>
+                                        <bec:TextBoxDecimal ID="INTRT" runat="server" MaxValue="100" IsRequired="true" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         <asp:CheckBox ID="cbFPROC2" runat="server" Checked="false" Text="Застосувати ставку №2"
                                             OnCheckedChanged="cbFPROC2_CheckedChanged" AutoPostBack="true"/>
                                     </td>

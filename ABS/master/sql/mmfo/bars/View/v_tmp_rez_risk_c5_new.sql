@@ -1,33 +1,9 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5_NEW
-(
-   DAT,
-   ACC,
-   NLS,
-   KV,
-   RNK,
-   ND,
-   ID,
-   S080,
-   SZ,
-   SZQ,
-   REZ_30,
-   REZQ_30,
-   RZ,
-   DISCONT,
-   PREM,
-   R013,
-   REZNQ,
-   BVQ,
-   TOBO,
-   ACCR,
-   ACCR_30,
-   DAT_MI,
-   ZPR,
-   PV, 
-   NBS
+ 
+CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5_NEW (
+ DAT, ACC, NLS, KV, RNK, ND, ID, S080, SZ, SZQ, REZ_30, REZQ_30, RZ, DISCONT, PREM, R013, REZNQ, BVQ, TOBO, ACCR, ACCR_30, DAT_MI, ZPR, PV, NBS
 )
-AS
-     SELECT fdat dat,
+ AS 
+  SELECT fdat dat,
             acc,
             nls,
             kv,
@@ -77,8 +53,15 @@ AS
             NVL (NVL (acc_rez, acc_rezn), acc_rez_30),
             NVL (acc_rez_30, NVL (acc_rez, acc_rezn)),
             dat_mi;
+ show err;
+ 
+grant SELECT              on V_TMP_REZ_RISK_C5_NEW   to IBMESB;
+grant SELECT              on V_TMP_REZ_RISK_C5_NEW   to BARSREADER_ROLE;
+grant SELECT              on V_TMP_REZ_RISK_C5_NEW   to UPLD;
 
-
-GRANT SELECT ON BARS.V_TMP_REZ_RISK_C5_NEW TO BARSREADER_ROLE;
-
-GRANT SELECT ON BARS.V_TMP_REZ_RISK_C5_NEW TO UPLD;
+ 
+ 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ===== Scripts /Sql/BARS/view/v_tmp_rez_risk_c5_new.sql ====== *** End ***
+PROMPT ===================================================================================== 
+ 

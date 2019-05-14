@@ -89,39 +89,39 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 
                 while (reader.Read())
                 {
-                    card.RNK = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (decimal?)null : reader.GetDecimal(0);
-                    card.OKPO = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
-                    card.CTYPE = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                    card.NMK = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
-                    card.ADR = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
-                    card.DOC = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
-                    card.BDAYPLACE = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
-                    card.NMKV_FIRST = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? String.Empty : reader.GetString(7);
-                    card.NMKV_LAST = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                    card.CARD_CODE = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                    card.SUB_NAME = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                    card.PRODUCT_NAME = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
-                    card.PROECT_ID = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (decimal?)null : decimal.Parse(reader.GetValue(12).ToString());
-                    card.PROECT_NAME = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
-                    card.SH_NAME = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
-                    card.NBS = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? String.Empty : reader.GetString(15);
-                    card.OB22 = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? String.Empty : reader.GetString(16);
-                    card.KV = String.IsNullOrEmpty(reader.GetValue(17).ToString()) ? (decimal?)null : reader.GetDecimal(17);
-                    card.ACC_RATE = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? (decimal?)null : reader.GetDecimal(18);
-                    card.MOBI_RATE = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? (decimal?)null : reader.GetDecimal(19);
-                    card.CRED_RATE = String.IsNullOrEmpty(reader.GetValue(20).ToString()) ? (decimal?)null : reader.GetDecimal(20);
-                    card.OVR_RATE = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? (decimal?)null : reader.GetDecimal(21);
-                    card.MM_MAX = String.IsNullOrEmpty(reader.GetValue(22).ToString()) ? (decimal?)null : reader.GetDecimal(22);
-                    card.WORK = String.IsNullOrEmpty(reader.GetValue(23).ToString()) ? String.Empty : reader.GetString(23);
-                    card.ISMFO = String.IsNullOrEmpty(reader.GetValue(24).ToString()) ? false : reader.GetDecimal(24) == 1 ? true : false;
-                    card.CURRENTBRANCH = String.IsNullOrEmpty(reader.GetValue(25).ToString()) ? String.Empty : reader.GetString(25);
-                    card.CURBRANCHNAME = String.IsNullOrEmpty(reader.GetValue(26).ToString()) ? String.Empty : reader.GetString(26);
+                    card.RNK = reader.IsDBNull(0) ? (decimal?)null : reader.GetDecimal(0);
+                    card.OKPO = reader.IsDBNull(1) ? String.Empty : reader.GetString(1);
+                    card.CTYPE = reader.IsDBNull(2) ? String.Empty : reader.GetString(2);
+                    card.NMK = reader.IsDBNull(3) ? String.Empty : reader.GetString(3);
+                    card.ADR = reader.IsDBNull(4) ? String.Empty : reader.GetString(4);
+                    card.DOC = reader.IsDBNull(5) ? String.Empty : reader.GetString(5);
+                    card.BDAYPLACE = reader.IsDBNull(6) ? String.Empty : reader.GetString(6);
+                    card.NMKV_FIRST = reader.IsDBNull(7) ? String.Empty : reader.GetString(7);
+                    card.NMKV_LAST = reader.IsDBNull(8) ? String.Empty : reader.GetString(8);
+                    card.CARD_CODE = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
+                    card.SUB_NAME = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
+                    card.PRODUCT_NAME = reader.IsDBNull(11) ? String.Empty : reader.GetString(11);
+                    card.PROECT_ID = reader.IsDBNull(12) ? (decimal?)null : reader.GetDecimal(12);
+                    card.PROECT_NAME = reader.IsDBNull(13) ? String.Empty : reader.GetString(13);
+                    card.SH_NAME = reader.IsDBNull(14) ? String.Empty : reader.GetString(14);
+                    card.NBS = reader.IsDBNull(15) ? String.Empty : reader.GetString(15);
+                    card.OB22 = reader.IsDBNull(16) ? String.Empty : reader.GetString(16);
+                    card.KV = reader.IsDBNull(17) ? (decimal?)null : reader.GetDecimal(17);
+                    card.ACC_RATE = reader.IsDBNull(18) ? (decimal?)null : reader.GetDecimal(18);
+                    card.MOBI_RATE = reader.IsDBNull(19) ? (decimal?)null : reader.GetDecimal(19);
+                    card.CRED_RATE = reader.IsDBNull(20) ? (decimal?)null : reader.GetDecimal(20);
+                    card.OVR_RATE = reader.IsDBNull(21) ? (decimal?)null : reader.GetDecimal(21);
+                    card.MM_MAX = reader.IsDBNull(22) ? (decimal?)null : reader.GetDecimal(22);
+                    card.WORK = reader.IsDBNull(23) ? String.Empty : reader.GetString(23);
+                    card.ISMFO = reader.IsDBNull(24) ? false : reader.GetDecimal(24) == 1 ? true : false;
+                    card.CURRENTBRANCH = reader.IsDBNull(25) ? String.Empty : reader.GetString(25);
+                    card.CURBRANCHNAME = reader.IsDBNull(26) ? String.Empty : reader.GetString(26);
                     card.CHBOXSMS = true;
                     if (isIns)
                         card.TYPE_INS = 1;
                     else
                         card.TYPE_INS = (decimal?)null;
-                    //card.IS_EXT = String.IsNullOrEmpty(reader.GetValue(24).ToString()) ? (bool?)null : (reader.GetDecimal(24) == 1 ? true : false);
+                    //card.IS_EXT = reader.IsDBNull(24) ? (bool?)null : (reader.GetDecimal(24) == 1 ? true : false);
                 }
             }
             catch (Exception e)
@@ -182,7 +182,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 
                 while (reader.Read())
                 {
-                    passp.IS_EXT = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (bool?)null : (reader.GetDecimal(0) == 1 ? true : false);
+                    passp.IS_EXT = reader.IsDBNull(0) ? (bool?)null : (reader.GetDecimal(0) == 1 ? true : false);
                 }
             }
             finally
@@ -239,24 +239,24 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 
                     cmd.ExecuteNonQuery();
 
-                    string doc = (Convert.ToInt16(par.TYPE_INS.ToString()) == 1 ?
-                                               @"'PASSPORT' as docType, --15
-                                               p.ser as docSeries, --16
-                                               p.numdoc as docNumber, --17
-                                               to_char(p.pdate, 'yyyy-mm-dd') as docDate, /*18*/" :
-                                               @"'EXTERNAL_PASSPORT' as docType, --15
-                                               (select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'PC_Z1') as docSeries, --16
-                                               (select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'PC_Z2') as docNumber, --17
-                                               to_char(to_date((select value
-                                                  from customerw
-                                                 where rnk = c.rnk
-                                                   and tag = 'PC_Z5'), 'dd-mm-yyyy'), 'yyyy-mm-dd') as docDate, /*18*/");
+                    //string doc = (convert.toint16(par.type_ins.tostring()) == 1 ?
+                    //                           @"'passport' as doctype, --15
+                    //                           p.ser as docseries, --16
+                    //                           p.numdoc as docnumber, --17
+                    //                           to_char(p.pdate, 'yyyy-mm-dd') as docdate, /*18*/" :
+                    //                           @"'external_passport' as doctype, --15
+                    //                           (select value
+                    //                              from customerw
+                    //                             where rnk = c.rnk
+                    //                               and tag = 'pc_z1') as docseries, --16
+                    //                           (select value
+                    //                              from customerw
+                    //                             where rnk = c.rnk
+                    //                               and tag = 'pc_z2') as docnumber, --17
+                    //                           to_char(to_date((select value
+                    //                              from customerw
+                    //                             where rnk = c.rnk
+                    //                               and tag = 'pc_z5'), 'dd-mm-yyyy'), 'yyyy-mm-dd') as docdate, /*18*/");
 
                     ParamsEwa p = new ParamsEwa();
                     cmd.CommandType = System.Data.CommandType.Text;
@@ -301,8 +301,12 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                                                        end
                                                   from customerw
                                                  where tag = 'MPNO' and rnk = c.rnk), '+380000000000') as phone, --13
-                                               to_char(p.bday, 'yyyy-mm-dd') as birthDate, /*14*/ " + doc +
-                                               @" 'person' as insType, --19
+                                               to_char(p.bday, 'yyyy-mm-dd') as birthDate, /*14*/ 
+                                               'PASSPORT' as docType, --15
+                                               p.ser as docSeries, --16
+                                               p.numdoc as docNumber, --17
+                                               to_char(p.pdate, 'yyyy-mm-dd') as docDate, --18
+                                               'person' as insType, --19
                                                decode(c.custtype, 3, 'false', 'true') as legal, --20
                                                'DRAFT' as state, --21
                                                wp.ins_ukr_id as tariffUkr, --22
@@ -314,7 +318,20 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                                                trim(substr(c.nmkv,instr(c.nmkv, ' '),instr(c.nmkv, ' ',1,1))) as n, --28
                                                a.dat_end - a.dat_begin as coverage_days, --29
                                           case when cr.rezid=1 then 'rez' when cr.rezid=2 then   'notrez' end resident, --30
-                                                substr(case when cc.name is null then 'Україна' else  c.country||' '||cc.name  end,1,400) citizenship --31
+                                                substr(case when cc.name is null then 'Україна' else  c.country||' '||cc.name  end,1,400) citizenship, --31
+                                               'EXTERNAL_PASSPORT' as docType_e, --32
+                                               (select value
+                                                  from customerw
+                                                 where rnk = c.rnk
+                                                   and tag = 'PC_Z1') as docSeries_e, --33
+                                               (select value
+                                                  from customerw
+                                                 where rnk = c.rnk
+                                                   and tag = 'PC_Z2') as docNumber_e, --34
+                                               to_char(to_date((select value
+                                                  from customerw
+                                                 where rnk = c.rnk
+                                                   and tag = 'PC_Z5'), 'dd-mm-yyyy'), 'yyyy-mm-dd') as docDate_e --35
                                           from w4_deal_web dw, w4_acc a, customer c, person p, w4_card wp, country cc, codcagent cr
                                          where dw.nd = a.nd
                                            and dw.cust_rnk = c.rnk
@@ -332,11 +349,11 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                     while (reader.Read())
                     {
                         p.nd = reader.GetDecimal(0);
-                        p.branch = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                        p.branch = reader.IsDBNull(1) ? String.Empty : reader.GetString(1);
                         DealEwa param = new DealEwa();
-                        param.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                        param.date = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
-                        param.dateFrom = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
+                        param.type = reader.IsDBNull(2) ? String.Empty : reader.GetString(2);
+                        param.date = reader.IsDBNull(3) ? String.Empty : reader.GetString(3);
+                        param.dateFrom = reader.IsDBNull(4) ? String.Empty : reader.GetString(4);
 
                         if (Convert.ToDateTime(param.dateFrom) < Convert.ToDateTime(param.date)) 
                         {
@@ -346,7 +363,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                             return resp;
                         }
 
-                        param.dateTo = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
+                        param.dateTo = reader.IsDBNull(5) ? String.Empty : reader.GetString(5);
 
 			            if (param.dateTo != String.Empty)
                         {
@@ -372,91 +389,114 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                         }
 
                         CustomerEwa customer = new CustomerEwa();
-                        customer.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
+                        customer.code = reader.IsDBNull(6) ? String.Empty : reader.GetString(6);
                         customer.dontHaveCode = reader.GetString(7) == "true" ? true : false;
-                        customer.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                        //customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                        //customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                        //customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        customer.name = reader.IsDBNull(8) ? String.Empty : reader.GetString(8);
+                        //customer.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
+                        //customer.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
+                        //customer.nameMiddle = reader.IsDBNull(11)? String.Empty : reader.GetString(11);
                         if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1)
                         {
-                        customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                        customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                        customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        customer.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
+                        customer.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
+                        customer.nameMiddle = reader.IsDBNull(11) ? String.Empty : reader.GetString(11);
                         }
                         else
                         {
-                            customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
-                            customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
+                            customer.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(27);
+                            customer.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(28);
                             customer.nameMiddle = String.Empty;
                         }
-                        customer.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
-                        customer.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
-                        customer.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
+                        customer.address = reader.IsDBNull(12) ? String.Empty : reader.GetString(12);
+                        customer.phone = reader.IsDBNull(13) ? String.Empty : reader.GetString(13);
+                        customer.birthDate = reader.IsDBNull(14) ? String.Empty : reader.GetString(14);
                         DocumentEwa document = new DocumentEwa();
-                        document.type = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? String.Empty : reader.GetString(15);
-                        document.series = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? String.Empty : reader.GetString(16);
-                        document.number = String.IsNullOrEmpty(reader.GetValue(17).ToString()) ? String.Empty : reader.GetString(17);
-                        document.date = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? String.Empty : reader.GetString(18);
+
+                        document.type = reader.IsDBNull(15) ? String.Empty : reader.GetString(15);
+                        document.series = reader.IsDBNull(16) ? String.Empty : reader.GetString(16);
+                        document.number = reader.IsDBNull(17) ? String.Empty : reader.GetString(17);
+                        document.date = reader.IsDBNull(18) ? String.Empty : reader.GetString(18);
+                        
                         customer.legal = reader.GetString(20) == "true" ? true : false;
                         customer.document = document;
                         param.customer = customer;
                         InsuranceObjEwa insuranceObject = new InsuranceObjEwa();
-                        insuranceObject.type = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? String.Empty : reader.GetString(19);
-                        insuranceObject.document = document;
-                        insuranceObject.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
-                        insuranceObject.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
-                        insuranceObject.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
-                        if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1)
+                        insuranceObject.type = reader.IsDBNull(19) ? String.Empty : reader.GetString(19);
+                        if (Convert.ToInt16(par.TYPE_INS.ToString()) == 0 && !String.IsNullOrEmpty(reader.GetValue(34).ToString()))
                         {
-                            insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                            insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                            insuranceObject.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                            if (reader.IsDBNull(35))
+                            {
+                                resp.ERR_CODE = -99;
+                                resp.ERR_MSG = "Дата видачі закордонного паспорта не заповнена в картці клієнта!";
+                                if (!txCommited) tx.Rollback();
+                                return resp;
+                            }
+
+                            DocumentEwa insuranceDocument = new DocumentEwa();
+                            insuranceDocument.type = reader.IsDBNull(32)? String.Empty : reader.GetString(32);
+                            insuranceDocument.series = reader.IsDBNull(33) ? String.Empty : reader.GetString(33);
+                            insuranceDocument.number = reader.IsDBNull(34) ? String.Empty : reader.GetString(34);
+                            insuranceDocument.date = reader.GetString(35);
+                            insuranceObject.document = insuranceDocument;
                         }
                         else
                         {
-                            insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
-                            insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
+                            insuranceObject.document = document;
+                        }
+                            
+                        insuranceObject.code = reader.IsDBNull(6) ? String.Empty : reader.GetString(6);
+                        insuranceObject.phone = reader.IsDBNull(13) ? String.Empty : reader.GetString(13);
+                        insuranceObject.birthDate = reader.IsDBNull(14) ? String.Empty : reader.GetString(14);
+                        if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1)
+                        {
+                            insuranceObject.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
+                            insuranceObject.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
+                            insuranceObject.nameMiddle = reader.IsDBNull(11) ? String.Empty : reader.GetString(11);
+                        }
+                        else
+                        {
+                            insuranceObject.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(27);
+                            insuranceObject.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(28);
                             insuranceObject.nameMiddle = String.Empty;
                         }
                         insuranceObject.dontHaveCode = reader.GetString(7) == "true" ? true : false;
-                        insuranceObject.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                        insuranceObject.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
+                        insuranceObject.name = reader.IsDBNull(8) ? String.Empty : reader.GetString(8);
+                        insuranceObject.address = reader.IsDBNull(12) ? String.Empty : reader.GetString(12);
                         param.insuranceObject = insuranceObject;
-                        param.state = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? String.Empty : reader.GetString(21);
+                        param.state = reader.IsDBNull(21) ? String.Empty : reader.GetString(21);
                         UserEwa user = new UserEwa();
                         user.id = Convert.ToDecimal(_insRepo.GetParameter("EWAID"));
                         param.user = user;
                         TariffEwa tariff = new TariffEwa();
-                        tariff.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
+                        tariff.type = reader.IsDBNull(2) ? String.Empty : reader.GetString(2);
                         tariff.id = Convert.ToInt16(par.TYPE_INS.ToString()) == 1 ? reader.GetDecimal(22) : reader.GetDecimal(23);
                         param.tariff = tariff;
                         List<CustomFields> customFields = new List<CustomFields>();
                         CustomFields customField = new CustomFields();
-                        if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1 && String.IsNullOrEmpty(reader.GetValue(23).ToString()))
+                        if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1 && reader.IsDBNull(23))
                         {
                             customField.code = "card_doc";
-                            customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(25);
+                            customField.value = reader.IsDBNull(8) ? String.Empty : reader.GetString(25);
                             customFields.Add(customField);
                             customField = new CustomFields();
                             customField.code = "card_number";
-                            customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(24);
+                            customField.value = reader.IsDBNull(8) ? String.Empty : reader.GetString(24);
                             customFields.Add(customField);
                         }
-                        else if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1 && !String.IsNullOrEmpty(reader.GetValue(23).ToString()))
+                        else if (Convert.ToInt16(par.TYPE_INS.ToString()) == 1 && !reader.IsDBNull(23))
                         {
-                            param.coverageDays = String.IsNullOrEmpty(reader.GetValue(29).ToString()) ? (decimal?)null : reader.GetDecimal(29);
+                            param.coverageDays = reader.IsDBNull(29) ? (decimal?)null : reader.GetDecimal(29);
                         }
 
                         if (reader.GetValue(2).ToString() == "custom")
                         {
                             customField = new CustomFields();
                             customField.code = "resident";
-                            customField.value = String.IsNullOrEmpty(reader.GetValue(30).ToString()) ? String.Empty : reader.GetString(30);
+                            customField.value = reader.IsDBNull(30) ? String.Empty : reader.GetString(30);
                             customFields.Add(customField);
                             customField = new CustomFields();
                             customField.code = "citizenship";
-                            customField.value = String.IsNullOrEmpty(reader.GetValue(31).ToString()) ? "Україна" : reader.GetString(31);
+                            customField.value = reader.IsDBNull(31) ? "Україна" : reader.GetString(31);
                             customFields.Add(customField);
                         }
                         param.customFields = customFields;
@@ -530,7 +570,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                     {
                         while (reader.Read())
                         {
-                            request = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
+                            request = reader.IsDBNull(0) ? String.Empty : reader.GetString(0);
                         }
                     }
                 }
@@ -659,11 +699,11 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                     while (reader.Read())
                     {
                         p.nd = reader.GetDecimal(0);
-                        p.branch = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                        p.branch = reader.IsDBNull(1) ? String.Empty : reader.GetString(1);
                         DealEwa param = new DealEwa();
-                        param.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                        param.date = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
-                        param.dateFrom = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
+                        param.type = reader.IsDBNull(2) ? String.Empty : reader.GetString(2);
+                        param.date = reader.IsDBNull(3) ? String.Empty : reader.GetString(3);
+                        param.dateFrom = reader.IsDBNull(4) ? String.Empty : reader.GetString(4);
 
                         /*if (Convert.ToDateTime(param.dateFrom) < Convert.ToDateTime(param.date))
                         {
@@ -673,84 +713,84 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                             return resp;
                         }*/
 
-                        param.dateTo = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
+                        param.dateTo = reader.IsDBNull(5) ? String.Empty : reader.GetString(5);
                         CustomerEwa customer = new CustomerEwa();
-                        customer.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
+                        customer.code = reader.IsDBNull(6) ? String.Empty : reader.GetString(6);
                         customer.dontHaveCode = reader.GetString(7) == "true" ? true : false;
-                        customer.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                        //customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                        //customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                        //customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                        customer.name = reader.IsDBNull(8) ? String.Empty : reader.GetString(8);
+                        //customer.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
+                        //customer.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
+                        //customer.nameMiddle = reader.IsDBNull(11) ? String.Empty : reader.GetString(11);
                         if (typeIns == 1)
                         {
-                           customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                           customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                           customer.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                           customer.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
+                           customer.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
+                           customer.nameMiddle = reader.IsDBNull(11) ? String.Empty : reader.GetString(11);
                         } 
                         else
                         {
-                           customer.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
-                           customer.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
+                           customer.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(27);
+                           customer.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(28);
                            customer.nameMiddle = String.Empty;
                         }
-                        customer.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
-                        customer.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
-                        customer.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
+                        customer.address = reader.IsDBNull(12) ? String.Empty : reader.GetString(12);
+                        customer.phone = reader.IsDBNull(13) ? String.Empty : reader.GetString(13);
+                        customer.birthDate = reader.IsDBNull(14) ? String.Empty : reader.GetString(14);
                         DocumentEwa document = new DocumentEwa();
-                        document.type = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? String.Empty : reader.GetString(15);
-                        document.series = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? String.Empty : reader.GetString(16);
-                        document.number = String.IsNullOrEmpty(reader.GetValue(17).ToString()) ? String.Empty : reader.GetString(17);
-                        document.date = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? String.Empty : reader.GetString(18);
+                        document.type = reader.IsDBNull(15) ? String.Empty : reader.GetString(15);
+                        document.series = reader.IsDBNull(16) ? String.Empty : reader.GetString(16);
+                        document.number = reader.IsDBNull(17) ? String.Empty : reader.GetString(17);
+                        document.date = reader.IsDBNull(18) ? String.Empty : reader.GetString(18);
                         customer.legal = reader.GetString(20) == "true" ? true : false;
                         customer.document = document;
                         param.customer = customer;
                         InsuranceObjEwa insuranceObject = new InsuranceObjEwa();
-                        insuranceObject.type = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? String.Empty : reader.GetString(19);
+                        insuranceObject.type = reader.IsDBNull(19) ? String.Empty : reader.GetString(19);
                         insuranceObject.document = document;
-                        insuranceObject.code = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : reader.GetString(6);
-                        insuranceObject.phone = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? String.Empty : reader.GetString(13);
-                        insuranceObject.birthDate = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
+                        insuranceObject.code = reader.IsDBNull(6) ? String.Empty : reader.GetString(6);
+                        insuranceObject.phone = reader.IsDBNull(13) ? String.Empty : reader.GetString(13);
+                        insuranceObject.birthDate = reader.IsDBNull(14) ? String.Empty : reader.GetString(14);
                         if (typeIns == 1)
                         {
-                            insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                            insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
-                            insuranceObject.nameMiddle = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                            insuranceObject.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
+                            insuranceObject.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
+                            insuranceObject.nameMiddle = reader.IsDBNull(11) ? String.Empty : reader.GetString(11);
                         }
                         else
                         {
-                            insuranceObject.nameLast = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(27);
-                            insuranceObject.nameFirst = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(28);
+                            insuranceObject.nameLast = reader.IsDBNull(9) ? String.Empty : reader.GetString(27);
+                            insuranceObject.nameFirst = reader.IsDBNull(10) ? String.Empty : reader.GetString(28);
                             insuranceObject.nameMiddle = String.Empty;
                         }
                         insuranceObject.dontHaveCode = reader.GetString(7) == "true" ? true : false;
-                        insuranceObject.name = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                        insuranceObject.address = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? String.Empty : reader.GetString(12);
+                        insuranceObject.name = reader.IsDBNull(8) ? String.Empty : reader.GetString(8);
+                        insuranceObject.address = reader.IsDBNull(12) ? String.Empty : reader.GetString(12);
                         param.insuranceObject = insuranceObject;
-                        param.state = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? String.Empty : reader.GetString(21);
+                        param.state = reader.IsDBNull(21) ? String.Empty : reader.GetString(21);
                         UserEwa user = new UserEwa();
                         user.id = Convert.ToDecimal(_insRepo.GetParameter("EWAID"));
                         param.user = user;
                         TariffEwa tariff = new TariffEwa();
-                        tariff.type = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
+                        tariff.type = reader.IsDBNull(2) ? String.Empty : reader.GetString(2);
                         tariff.id = typeIns == 1 ? reader.GetDecimal(22) : reader.GetDecimal(23);
                         param.tariff = tariff;
-                        if (typeIns == 1 && String.IsNullOrEmpty(reader.GetValue(23).ToString()))
+                        if (typeIns == 1 && reader.IsDBNull(23))
                         {
                             List<CustomFields> customFields = new List<CustomFields>();
                             CustomFields customField = new CustomFields();
                             customField.code = "card_doc";
-                            customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(25);
+                            customField.value = reader.IsDBNull(8) ? String.Empty : reader.GetString(25);
                             customFields.Add(customField);
                             customField = new CustomFields();
                             customField.code = "card_number";
-                            customField.value = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(24);
+                            customField.value = reader.IsDBNull(8) ? String.Empty : reader.GetString(24);
                             customFields.Add(customField);
                             param.customFields = customFields;
 
                         }
-                        else if (typeIns == 1 && !String.IsNullOrEmpty(reader.GetValue(23).ToString()))
+                        else if (typeIns == 1 && !reader.IsDBNull(23))
                         {
-                            param.coverageDays = String.IsNullOrEmpty(reader.GetValue(29).ToString()) ? (decimal?)null : reader.GetDecimal(29);
+                            param.coverageDays = reader.IsDBNull(29) ? (decimal?)null : reader.GetDecimal(29);
                         }
                         p.param = param;
                     }
@@ -780,11 +820,11 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 
                 if (reader.Read())
                 {
-                    res.haveins = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? false : (reader.GetDecimal(0) == 1 ? true : false);
-                    res.insUkrId = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (decimal?)null : reader.GetDecimal(1);
-                    res.insWrdId = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
-                    res.tmpUkrId = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (decimal?)null : reader.GetDecimal(3);
-                    res.tmpWrdId = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (decimal?)null : reader.GetDecimal(4);
+                    res.haveins = reader.IsDBNull(0) ? false : (reader.GetDecimal(0) == 1 ? true : false);
+                    res.insUkrId = reader.IsDBNull(1) ? (decimal?)null : reader.GetDecimal(1);
+                    res.insWrdId = reader.IsDBNull(2) ? (decimal?)null : reader.GetDecimal(2);
+                    res.tmpUkrId = reader.IsDBNull(3) ? (decimal?)null : reader.GetDecimal(3);
+                    res.tmpWrdId = reader.IsDBNull(4) ? (decimal?)null : reader.GetDecimal(4);
                 }
             }
             catch (Exception ex)
@@ -843,11 +883,11 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 
                 if (reader.Read())
                 {
-                    res.nd = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (decimal?)null : reader.GetDecimal(0);
-                    res.request = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
-                    res.response = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                    res.insextid = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (decimal?)null : reader.GetDecimal(3);
-                    res.insexttmp = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (decimal?)null : reader.GetDecimal(4);
+                    res.nd = reader.IsDBNull(0) ? (decimal?)null : reader.GetDecimal(0);
+                    res.request = reader.IsDBNull(1) ? String.Empty : reader.GetString(1);
+                    res.response = reader.IsDBNull(2) ? String.Empty : reader.GetString(2);
+                    res.insextid = reader.IsDBNull(3) ? (decimal?)null : reader.GetDecimal(3);
+                    res.insexttmp = reader.IsDBNull(4) ? (decimal?)null : reader.GetDecimal(4);
                 }
             }
             finally

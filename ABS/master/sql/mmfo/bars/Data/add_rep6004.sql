@@ -53,22 +53,22 @@ begin
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'SELECT :sFdat1 dat1, :sFdat2 DAT2, X.*,
+    l_zpr.txt          := 'SELECT :sFdat1 dat1, :sFdat2 DAT2, X.*, 
 (SELECT NAME FROM REGIONS WHERE KF = X.kf ) NAME_ru,
-(SELECT TXT FROM SB_OB22 WHERE R020= X.nbs AND OB22=X.OB22) TXT
+(SELECT TXT FROM SB_OB22 WHERE R020= X.nbs AND OB22=X.OB22) TXT 
 FROM (
-SELECT a.kf, A.NBS, A.OB22,
+SELECT a.kf, A.NBS, A.OB22, 
 SUM (CASE WHEN o.dk=0 and P.MFOA = a.KF THEN 1 ELSE 0 END ) KOL ,
 SUM (CASE WHEN o.dk=0 and P.MFOA = a.KF THEN P.S ELSE 0 END ) /100 s,
 SUM (CASE WHEN o.dk=1 and P.MFOB = a.KF THEN 1 ELSE 0 END ) KOL1,
 SUM (CASE WHEN o.dk=1 and P.MFOB = a.KF THEN P.S ELSE 0 END ) /100 s1
-from accounts a, saldoa s , opldok o, OPER P
-where p.SOS = 5
-and o.TT in (''PS2'', ''R01'')
-and a.nbs in (''3622'',''3653'',''3522'')
-and s.acc = a.acc and s.fdat >= :sFdat1 and s.fdat <= :sFdat2
+from accounts a, saldoa s , opldok o, OPER P 
+where p.SOS = 5 
+and o.TT in (''PS2'', ''R01'',''I01'',''060'') 
+and a.nbs in (''3622'',''3653'',''3522'') 
+and s.acc = a.acc and s.fdat >= :sFdat1 and s.fdat <= :sFdat2 
 and o.acc = s.acc and o.fdat = s.fdat AND P.REF = O.REF AND ( P.MFOA like ''8%'' or P.MFOb like ''8%'' ) 
-GROUP BY A.NBS, A.OB22, A.KF
+GROUP BY A.NBS, A.OB22, A.KF 
 ) X
 ORDER BY NBS, OB22, KF';
     l_zpr.xsl_data     := '';

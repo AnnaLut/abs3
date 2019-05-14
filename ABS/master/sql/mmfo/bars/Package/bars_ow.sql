@@ -731,7 +731,7 @@ begin
   --відсутня заборгованність ?
     begin
      select l_err+1 into l_err from accounts acc
-     where tip in ( 'SK9', 'SP', 'SPN') and ostc != 0 and acc.rnk=p_rnk;
+     where tip in ( 'SK9', 'SP', 'SPN', 'KK9', 'KSP', 'KPN') and ostc != 0 and acc.rnk=p_rnk;
      if l_err>0 then
        logger.info('BARS_OW.check_cust_dk:присутня прострочена заборгованість');
        return l_err;

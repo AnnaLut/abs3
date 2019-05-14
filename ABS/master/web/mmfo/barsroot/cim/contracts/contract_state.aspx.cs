@@ -264,6 +264,9 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
             if (sender is BarsGridViewEx)
             {
                 string gridId = ((BarsGridViewEx)sender).ID;
+                string bi = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "BOUND_ID"));
+                string ti = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "TYPE_ID"));
+                string di = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "REF"));
                 if (gridId == "gvCimTradeSecondPayments" || gridId == "gvCimTradePrimPayments")
                 {
                     int colIndex = 9;
@@ -286,9 +289,6 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
                     else
                         e.Row.Cells[colIndex].ForeColor = Color.Black;
 
-                    string bi = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "BOUND_ID"));
-                    string ti = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "TYPE_ID"));
-                    string di = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "REF"));
                     // borg reason 
                     if (gridId == "gvCimTradePrimPayments")
                     {
@@ -310,6 +310,14 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
                                 bi + "," + ti + "," + di + ",\"" + Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "CREATE_DATE")).ToString("dd/MM/yyyy") + "\")'></img>&nbsp;&nbsp;" + e.Row.Cells[e.Row.Cells.Count - 1].Text;
 
                 }
+                // IS_DOC
+                if (gridId == "gvVCimInBoundPayments" || gridId == "gvCimTradeSecondPayments" || gridId == "gvCimTradePrimPayments")
+                {
+                    int iOffset = (gridId == "gvCimTradeSecondPayments") ? 2 : (gridId == "gvCimTradePrimPayments")? 7 : 4 ;
+                    e.Row.Cells[e.Row.Cells.Count - iOffset].Text = "<img src='/Common/Images/default/16/document.png' title='Редагувати ознаку наявності документів' onclick='curr_module.EditIsDoc(0," + bi + "," + ti + ")'></img>&nbsp;&nbsp;"
+                  + e.Row.Cells[e.Row.Cells.Count - iOffset].Text;
+                }
+
             }
         }
     }
@@ -365,7 +373,7 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
               + e.Row.Cells[e.Row.Cells.Count - 12].Text;
                 
                 // IS_DOC
-                e.Row.Cells[e.Row.Cells.Count - 9].Text = "<img src='/Common/Images/default/16/document.png' title='Редагувати ознаку наявності документів' onclick='curr_module.EditIsDoc(" + bi + "," + ti + ")'></img>&nbsp;&nbsp;" 
+                e.Row.Cells[e.Row.Cells.Count - 9].Text = "<img src='/Common/Images/default/16/document.png' title='Редагувати ознаку наявності документів' onclick='curr_module.EditIsDoc(1," + bi + "," + ti + ")'></img>&nbsp;&nbsp;" 
               + e.Row.Cells[e.Row.Cells.Count - 9].Text;
 
                 decimal overdue = Convert.ToDecimal(DataBinder.Eval(e.Row.DataItem, "OVERDUE"));
@@ -378,6 +386,12 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
             }
             e.Row.Cells[e.Row.Cells.Count - 1].Text = "<img src='/Common/Images/default/16/document.png' title='Змінити дату реєстрації в журналі' onclick='curr_module.EditRegDate(1, " + bi + "," + ti + "," + di + ",\"" + Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "CREATE_DATE")).ToString("dd/MM/yyyy") + "\")'></img>&nbsp;&nbsp;"
           + e.Row.Cells[e.Row.Cells.Count - 1].Text;
+            if (gridId == "gvCimBoundSecondVmd")
+            {
+                // IS_DOC
+                e.Row.Cells[e.Row.Cells.Count - 2].Text = "<img src='/Common/Images/default/16/document.png' title='Редагувати ознаку наявності документів' onclick='curr_module.EditIsDoc(1," + bi + "," + ti + ")'></img>&nbsp;&nbsp;"
+              + e.Row.Cells[e.Row.Cells.Count - 2].Text;
+            }
         }
     }
 
@@ -540,10 +554,10 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
     }
 
     [WebMethod(EnableSession = true)]
-    public static void SaveIsDoc(decimal boundId, int docType, string isDoc) // isDoc - "0"|"1"
+    public static void SaveIsDoc(int boundType, decimal boundId, int docType, string isDoc) // isDoc - "0"|"1"
     {
         Contract contractInfo = new Contract();
-        contractInfo.SaveIsDoc(boundId, docType, isDoc);
+        contractInfo.SaveIsDoc(boundType, boundId, docType, isDoc);
     }
 
     [WebMethod(EnableSession = true)]
@@ -553,7 +567,7 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
         contractInfo.SaveBorgReason(boundType, boundId, docType, borgReason);
     }
     [WebMethod(EnableSession = true)]
-    public static string SaveRegDate(int contrType, int boundType, decimal boundId, int docType, int docId, string date)
+    public static string SaveRegDate(int contrType, int boundType, decimal boundId, int docType, decimal docId, string date)
     {
         Contract contractInfo = new Contract();
         return contractInfo.SaveRegDate(contrType, boundType, boundId, docType, docId, date);
