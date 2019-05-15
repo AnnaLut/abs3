@@ -101,7 +101,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                     card.CARD_CODE = reader.IsDBNull(9) ? String.Empty : reader.GetString(9);
                     card.SUB_NAME = reader.IsDBNull(10) ? String.Empty : reader.GetString(10);
                     card.PRODUCT_NAME = reader.IsDBNull(11) ? String.Empty : reader.GetString(11);
-                    card.PROECT_ID = reader.IsDBNull(12) ? (decimal?)null : reader.GetDecimal(12);
+                    card.PROECT_ID = reader.IsDBNull(12) ? (decimal?)null : decimal.Parse(reader.GetValue(12).ToString());
                     card.PROECT_NAME = reader.IsDBNull(13) ? String.Empty : reader.GetString(13);
                     card.SH_NAME = reader.IsDBNull(14) ? String.Empty : reader.GetString(14);
                     card.NBS = reader.IsDBNull(15) ? String.Empty : reader.GetString(15);
