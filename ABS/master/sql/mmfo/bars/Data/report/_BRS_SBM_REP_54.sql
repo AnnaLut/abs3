@@ -1,3 +1,8 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBM_REP_54.sql =========*** Run **
+PROMPT ===================================================================================== 
 prompt ===================================== 
 prompt == Реєстр купленої іноземної валюти(Ощадбанк)
 prompt ===================================== 
@@ -48,327 +53,178 @@ begin
     l_zpr.default_vars := ':Param0=''0'',:BRANCH=''%''';
     l_zpr.bind_sql     := ':BRANCH=''V_BRANCH_OWN|BRANCH|NAME''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'SELECT :sFdat1 DAT,'||nlchr||
-                           '       (SELECT TO_CHAR (ov1.dat, ''hh24:mi:ss'') FROM oper_visa ov1 WHERE ov1.REF = o.REF AND ov1.status = 2) TIME_OP,'||nlchr||
-                           '       v.lcv NAME,'||nlchr||
-                           '       0 REF,'||nlchr||
-                           '       DECODE (o.dk, 1, o.kv, o.kv2) KV,'||nlchr||
-                           '       NVL (DECODE (o.dk, 1, o.s, o.s2), 0) / 100 SUM_N,'||nlchr||
-                           '       NVL (DECODE (o.dk, 1, o.s2, o.s), 0) / 100 SUM_G,'||nlchr||
-                           '       NVL (TO_NUMBER (w.VALUE), 0) KURS,'||nlchr||
-                           '       o.pdat PDAT,'||nlchr||
-                           '       TRIM (o.nd) ND1,'||nlchr||
-                           '       (CASE WHEN TRIM (n.VALUE) = ''1'' THEN TO_CHAR (o.REF) ELSE NULL END)  AS ND2,'||nlchr||
-                           '       o.sos SOS,'||nlchr||
-                           '       o.userid,'||nlchr||
-                           '       SUBSTR (bp.VAL, 1, 80) BRANCH,'||nlchr||
-                           '       p.val ADRESS,'||nlchr||
-                           '       NULL DATS'||nlchr||
-                           '  FROM oper o,'||nlchr||
-                           '       tabval v,'||nlchr||
-                           '       branch b,'||nlchr||
-                           '       branch_parameters p,'||nlchr||
-                           '       branch_parameters bp,'||nlchr||
-                           '       operw w,'||nlchr||
-                           '       operw n'||nlchr||
-                           ' WHERE     o.sos = 5'||nlchr||
-                           '       AND o.pdat >= TO_DATE ( :sFdat1, ''dd/MM/yyyy'')'||nlchr||
-                           '       AND o.pdat < TO_DATE ( :sFdat1, ''dd/MM/yyyy'') + 0.99999'||nlchr||
-                           '       AND DECODE (o.dk, 1, o.kv, o.kv2) = v.kv'||nlchr||
-                           '       AND ( (       o.kv <> 980'||nlchr||
-                           '                 AND o.kv2 = 980'||nlchr||
-                           '                 AND o.dk = 1'||nlchr||
-                           '                 AND SUBSTR (o.nlsa, 1, 3) = ''100'''||nlchr||
-                           '              OR     o.kv = 980'||nlchr||
-                           '                 AND o.kv2 <> 980'||nlchr||
-                           '                 AND o.dk = 0'||nlchr||
-                           '                 AND SUBSTR (o.nlsb, 1, 3) = ''100''))'||nlchr||
-                           '       AND o.branch LIKE :BRANCH || ''%'''||nlchr||
-                           '       AND o.userid = DECODE ( :Param0, ''0'', o.userid, TO_NUMBER ( :Param0))'||nlchr||
-                           '       AND o.branch = b.branch'||nlchr||
-                           '       AND o.branch = p.branch'||nlchr||
-                           '       and o.TT <> ''202'''||nlchr||
-                           '       AND p.tag = ''ADR_BRANCH'''||nlchr||
-                           '       AND o.branch = bp.branch'||nlchr||
-                           '       AND bp.tag = ''NAME_BRANCH'''||nlchr||
-                           '       AND w.REF = o.REF'||nlchr||
-                           '       AND TRIM (w.tag) = ''KURS'''||nlchr||
-                           '       AND o.REF = n.REF(+)'||nlchr||
-                           '       AND n.tag(+) = ''RE377'''||nlchr||
-                           '       '||nlchr||
-                           'UNION ALL'||nlchr||
-                           ''||nlchr||
-                           'SELECT :sFdat1 DAT,'||nlchr||
-                           '       (SELECT TO_CHAR (ov1.dat, ''hh24:mi:ss'') FROM oper_visa ov1 WHERE ov1.REF = o.REF AND ov1.status = 2) TIME_OP,'||nlchr||
-                           '       v.lcv NAME,'||nlchr||
-                           '       0 REF,'||nlchr||
-                           '       DECODE (o.dk, 1, o.kv, o.kv2) KV,'||nlchr||
-                           '       NVL (DECODE (o.dk, 1, o.s, o.s2), 0) / 100 SUM_N,'||nlchr||
-                           '       NVL (DECODE (o.dk, 1, o.s2, o.s), 0) / 100 SUM_G,'||nlchr||
-                           '       NVL (TO_NUMBER (w.VALUE), 0) KURS,'||nlchr||
-                           '       o.pdat PDAT,'||nlchr||
-                           '       TRIM (o.nd) ND1,'||nlchr||
-                           '       (CASE WHEN TRIM (n.VALUE) = ''1'' THEN TO_CHAR (o.REF) ELSE NULL END) AS ND2,'||nlchr||
-                           '       o.sos SOS,'||nlchr||
-                           '       o.userid,'||nlchr||
-                           '       SUBSTR (bp.VAL, 1, 80) BRANCH,'||nlchr||
-                           '       p.val ADRESS,'||nlchr||
-                           '       DECODE (o.sos, -2, ov.backtime, NULL) DATS'||nlchr||
-                           '  FROM oper o,'||nlchr||
-                           '       tabval v,'||nlchr||
-                           '       branch b,'||nlchr||
-                           '       branch_parameters p,'||nlchr||
-                           '       branch_parameters bp,'||nlchr||
-                           '       (SELECT TO_CHAR (dat, ''HH24:MI:SS'') backtime, REF FROM oper_visa WHERE status = 3 AND groupid IS NULL) ov,'||nlchr||
-                           '       operw w,'||nlchr||
-                           '       operw n'||nlchr||
-                           ' WHERE     o.sos < 0'||nlchr||
-                           '       AND o.pdat >= TO_DATE ( :sFdat1, ''dd/MM/yyyy'')'||nlchr||
-                           '       AND o.pdat < TO_DATE ( :sFdat1, ''dd/MM/yyyy'') + 0.99999'||nlchr||
-                           '       AND DECODE (o.dk, 1, o.kv, o.kv2) = v.kv'||nlchr||
-                           '       AND ( (       o.kv <> 980'||nlchr||
-                           '                 AND o.kv2 = 980'||nlchr||
-                           '                 AND o.dk = 1'||nlchr||
-                           '                 AND SUBSTR (o.nlsa, 1, 3) = ''100'''||nlchr||
-                           '              OR     o.kv = 980'||nlchr||
-                           '                 AND o.kv2 <> 980'||nlchr||
-                           '                 AND o.dk = 0'||nlchr||
-                           '                 AND SUBSTR (o.nlsb, 1, 3) = ''100''))'||nlchr||
-                           '       AND o.branch LIKE :BRANCH || ''%'''||nlchr||
-                           '       AND o.userid = DECODE ( :Param0, ''0'', o.userid, TO_NUMBER ( :Param0))'||nlchr||
-                           '       AND o.branch = b.branch'||nlchr||
-                           '       and o.TT <>''202'''||nlchr||
-                           '       AND o.branch = p.branch'||nlchr||
-                           '       AND p.tag = ''ADR_BRANCH'''||nlchr||
-                           '       AND o.branch = bp.branch'||nlchr||
-                           '       AND bp.tag = ''NAME_BRANCH'''||nlchr||
-                           '       AND o.REF = ov.REF'||nlchr||
-                           '       AND o.REF = w.REF'||nlchr||
-                           '       AND TRIM (w.tag) = ''KURS'''||nlchr||
-                           '       AND o.REF = n.REF(+)'||nlchr||
-                           '       AND n.tag(+) = ''RE377'''||nlchr||
-                           '       '||nlchr||
-                           'UNION ALL'||nlchr||
-                           ''||nlchr||
-                           'SELECT :sFdat1 DAT,'||nlchr||
-                           '       (SELECT TO_CHAR (ov1.dat, ''hh24:mi:ss'') FROM oper_visa ov1 WHERE ov1.REF = o.REF AND ov1.status = 2) TIME_OP,'||nlchr||
-                           '       v.lcv NAME,'||nlchr||
-                           '       0 REF,'||nlchr||
-                           '       a1.kv KV,'||nlchr||
-                           '       op1.s / 100 SUM_N,'||nlchr||
-                           '       op2.s / 100 SUM_G,'||nlchr||
-                           '       c.rate_b / c.bsum KURS,'||nlchr||
-                           '       o.pdat PDAT,'||nlchr||
-                           '       TRIM (o.nd) ND1,'||nlchr||
-                           '       (CASE WHEN TRIM (n.VALUE) = ''1'' THEN TO_CHAR (o.REF) ELSE NULL END)'||nlchr||
-                           '          AS ND2,'||nlchr||
-                           '       o.sos SOS,'||nlchr||
-                           '       o.userid,'||nlchr||
-                           '       SUBSTR (bp.VAL, 1, 80) BRANCH,'||nlchr||
-                           '       p.val ADRESS,'||nlchr||
-                           '       DECODE (o.sos, -2, ov.backtime, NULL) DATS'||nlchr||
-                           '  FROM oper o,'||nlchr||
-                           '       tabval v,'||nlchr||
-                           '       opldok op1,'||nlchr||
-                           '       opldok op2,'||nlchr||
-                           '       v_gl a1,'||nlchr||
-                           '       v_gl a2,'||nlchr||
-                           '       cur_rates$base c,'||nlchr||
-                           '       branch b,'||nlchr||
-                           '       branch_parameters p,'||nlchr||
-                           '       branch_parameters bp,'||nlchr||
-                           '       operw n,'||nlchr||
-                           '       (SELECT TO_CHAR (dat, ''HH24:MI:SS'') backtime, REF  FROM oper_visa WHERE status = 3 AND groupid IS NULL) ov'||nlchr||
-                           ' WHERE     o.sos = -2'||nlchr||
-                           '       AND o.pdat >= TO_DATE ( :sFdat1, ''dd/MM/yyyy'')'||nlchr||
-                           '       AND o.pdat < TO_DATE ( :sFdat1, ''dd/MM/yyyy'') + 0.99999'||nlchr||
-                           '       AND o.REF = op1.REF'||nlchr||
-                           '       AND o.REF = op2.REF'||nlchr||
-                           '       AND op1.tt IN (''VPF'',''VPJ'',''VPI'',''046'',''MUQ'',''MVQ'')'||nlchr||
-                           '       AND op1.tt = op2.tt'||nlchr||
-                           '       AND (op1.dk = 0 AND op1.acc = a1.acc AND SUBSTR (a1.nls, 1, 3) = ''100'')'||nlchr||
-                           '       AND (op2.dk = 1 AND op2.acc = a2.acc AND SUBSTR (a2.nls, 1, 3) = ''100'')'||nlchr||
-                           '       AND ( (a1.kv = 980 AND a2.kv <> 980) OR (a1.kv <> 980 AND a2.kv = 980))'||nlchr||
-                           '       AND a1.kv = v.kv'||nlchr||
-                           '       AND a1.kv = c.kv'||nlchr||
-                           '       AND o.branch = c.branch'||nlchr||
-                           '       AND o.vdat = c.vdate'||nlchr||
-                           '       AND o.branch LIKE :BRANCH || ''%'''||nlchr||
-                           '       AND o.userid = DECODE ( :Param0, ''0'', o.userid, TO_NUMBER ( :Param0))'||nlchr||
-                           '       AND o.branch = b.branch'||nlchr||
-                           '       AND o.REF = ov.REF'||nlchr||
-                           '       AND o.branch = p.branch'||nlchr||
-                           '       AND p.tag = ''ADR_BRANCH'''||nlchr||
-                           '       AND o.branch = bp.branch'||nlchr||
-                           '       AND bp.tag = ''NAME_BRANCH'''||nlchr||
-                           '       AND o.REF = n.REF(+)'||nlchr||
-                           '       AND n.tag(+) = ''RE377'''||nlchr||
-                           '       '||nlchr||
-                           'UNION ALL'||nlchr||
-                           ''||nlchr||
-                           'SELECT :sFdat1 DAT,'||nlchr||
-                           '       (SELECT TO_CHAR (ov1.dat, ''hh24:mi:ss'') FROM oper_visa ov1 WHERE ov1.REF = o.REF AND ov1.status = 2) TIME_OP,'||nlchr||
-                           '       v.lcv NAME,'||nlchr||
-                           '       0 REF,'||nlchr||
-                           '       a1.kv KV,'||nlchr||
-                           '       op1.s / 100 SUM_N,'||nlchr||
-                           '       op2.s / 100 SUM_G,'||nlchr||
-                           '       c.rate_b / c.bsum KURS,'||nlchr||
-                           '       o.pdat PDAT,'||nlchr||
-                           '       TRIM (o.nd) ND1,'||nlchr||
-                           '       (CASE WHEN TRIM (n.VALUE) = ''1'' THEN TO_CHAR (o.REF) ELSE NULL END) AS ND2,'||nlchr||
-                           '       o.sos SOS,'||nlchr||
-                           '       o.userid,'||nlchr||
-                           '       SUBSTR (bp.VAL, 1, 80) BRANCH,'||nlchr||
-                           '       p.val ADRESS,'||nlchr||
-                           '       NULL'||nlchr||
-                           '  FROM oper o,'||nlchr||
-                           '       tabval v,'||nlchr||
-                           '       opldok op1,'||nlchr||
-                           '       opldok op2,'||nlchr||
-                           '       v_gl a1,'||nlchr||
-                           '       v_gl a2,'||nlchr||
-                           '       cur_rates$base c,'||nlchr||
-                           '       branch b,'||nlchr||
-                           '       branch_parameters p,'||nlchr||
-                           '       branch_parameters bp,'||nlchr||
-                           '       operw n'||nlchr||
-                           ' WHERE     o.sos = 5'||nlchr||
-                           '       AND o.pdat >= TO_DATE ( :sFdat1, ''dd/MM/yyyy'')'||nlchr||
-                           '       AND o.pdat < TO_DATE ( :sFdat1, ''dd/MM/yyyy'') + 0.99999'||nlchr||
-                           '       AND o.REF = op1.REF'||nlchr||
-                           '       AND o.REF = op2.REF'||nlchr||
-                           '       AND op1.tt IN (''VPF'', ''VPJ'', ''VPI'', ''046'', ''MUQ'', ''MVQ'')'||nlchr||
-                           '       AND op1.tt = op2.tt'||nlchr||
-                           '       AND (op1.dk = 0 AND op1.acc = a1.acc AND SUBSTR (a1.nls, 1, 3) = ''100'')'||nlchr||
-                           '       AND (op2.dk = 1 AND op2.acc = a2.acc AND SUBSTR (a2.nls, 1, 3) = ''100'')'||nlchr||
-                           '       AND ( (a1.kv = 980 AND a2.kv <> 980) OR (a1.kv <> 980 AND a2.kv = 980))'||nlchr||
-                           '       AND a1.kv = v.kv'||nlchr||
-                           '       AND a1.kv = c.kv'||nlchr||
-                           '       AND o.branch = c.branch'||nlchr||
-                           '       AND o.vdat = c.vdate'||nlchr||
-                           '       AND o.branch LIKE :BRANCH || ''%'''||nlchr||
-                           '       AND o.userid = DECODE ( :Param0, ''0'', o.userid, TO_NUMBER ( :Param0))'||nlchr||
-                           '       AND o.branch = b.branch'||nlchr||
-                           '       AND o.branch = p.branch'||nlchr||
-                           '       AND p.tag = ''ADR_BRANCH'''||nlchr||
-                           '       AND o.branch = bp.branch'||nlchr||
-                           '       AND bp.tag = ''NAME_BRANCH'''||nlchr||
-                           '       AND o.REF = n.REF(+)'||nlchr||
-                           '       AND n.tag(+) = ''RE377'''||nlchr||
-                           '       '||nlchr||
-                           'UNION ALL'||nlchr||
-                           ''||nlchr||
-                           '  SELECT :sFdat1,NULL,NAME,-1,KV,SUM (SUM_N),SUM (SUM_G),KURS,bankdate,NULL,NULL,0,0,NULL, '''', '''''||nlchr||
-                           '    FROM (  SELECT :sFdat1 DAT,'||nlchr||
-                           '                   ''Всього:'' || v.lcv NAME,'||nlchr||
-                           '                   -1 REF,'||nlchr||
-                           '                   DECODE (o.dk, 1, o.kv, o.kv2) KV,'||nlchr||
-                           '                   SUM (NVL (DECODE (o.dk, 1, o.s, o.s2), 0)) / 100 SUM_N,'||nlchr||
-                           '                   SUM (NVL (DECODE (o.dk, 1, o.s2, o.s), 0)) / 100 SUM_G,'||nlchr||
-                           '                   NVL (TO_NUMBER (VALUE), 0) KURS,'||nlchr||
-                           '                   NULL,                       ---substr(bp.VAL,1,80) BRANCH ,'||nlchr||
-                           '                   NULL                                    ----, p.val  ADRESS'||nlchr||
-                           '              FROM oper o,'||nlchr||
-                           '                   tabval v,'||nlchr||
-                           '                   branch b,'||nlchr||
-                           '                   branch_parameters p,'||nlchr||
-                           '                   branch_parameters bp,'||nlchr||
-                           '                   operw w'||nlchr||
-                           '             WHERE     o.sos = 5'||nlchr||
-                           '                   AND o.pdat >= TO_DATE ( :sFdat1, ''dd/MM/yyyy'')'||nlchr||
-                           '                   AND o.pdat < TO_DATE ( :sFdat1, ''dd/MM/yyyy'') + 0.99999'||nlchr||
-                           '                   AND DECODE (o.dk, 1, o.kv, o.kv2) = v.kv'||nlchr||
-                           '                   AND ( (       o.kv <> 980'||nlchr||
-                           '                             AND o.kv2 = 980'||nlchr||
-                           '                             AND o.dk = 1'||nlchr||
-                           '                             AND SUBSTR (o.nlsa, 1, 3) = ''100'''||nlchr||
-                           '                          OR     o.kv = 980'||nlchr||
-                           '                             AND o.kv2 <> 980'||nlchr||
-                           '                             AND o.dk = 0'||nlchr||
-                           '                             AND SUBSTR (o.nlsb, 1, 3) = ''100''))'||nlchr||
-                           '                   AND o.branch LIKE :BRANCH || ''%'''||nlchr||
-                           '                   AND o.userid ='||nlchr||
-                           '                          DECODE ( :Param0, ''0'', o.userid, TO_NUMBER ( :Param0))'||nlchr||
-                           '                   AND o.branch = b.branch'||nlchr||
-                           '                   AND o.branch = p.branch'||nlchr||
-                           '                   AND p.tag = ''ADR_BRANCH'''||nlchr||
-                           '                   AND o.branch = bp.branch'||nlchr||
-                           '                   AND bp.tag = ''NAME_BRANCH'''||nlchr||
-                           '                   and o.tt <> ''202'''||nlchr||
-                           '                   AND o.REF = w.REF'||nlchr||
-                           '                   AND TRIM (w.tag) = ''KURS'''||nlchr||
-                           '          GROUP BY DECODE (o.dk, 1, o.kv, o.kv2),'||nlchr||
-                           '                   ''Всього:'' || v.lcv,'||nlchr||
-                           '                   NVL (TO_NUMBER (w.VALUE), 0),'||nlchr||
-                           '                   NVL (TO_NUMBER (w.VALUE), 0),'||nlchr||
-                           '                   NULL,'||nlchr||
-                           '                   NULL,'||nlchr||
-                           '                   NULL'||nlchr||
-                           '          -----substr(bp.VAL,1,80),  p.val'||nlchr||
-                           '          UNION ALL'||nlchr||
-                           '            SELECT :sFdat1,'||nlchr||
-                           '                   ''Всього:'' || v.lcv,'||nlchr||
-                           '                   -1,'||nlchr||
-                           '                   a1.kv,'||nlchr||
-                           '                   SUM (op1.s / 100),'||nlchr||
-                           '                   SUM (op2.s / 100), --round(sum(op2.s/100)/sum(op1.s/100),4)'||nlchr||
-                           '                   c.rate_b / c.bsum,'||nlchr||
-                           '                   NULL,                       ---substr(bp.VAL,1,80) BRANCH ,'||nlchr||
-                           '                   NULL                                            ----, p.val'||nlchr||
-                           '              FROM oper o,'||nlchr||
-                           '                   tabval v,'||nlchr||
-                           '                   opldok op1,'||nlchr||
-                           '                   opldok op2,'||nlchr||
-                           '                   v_gl a1,'||nlchr||
-                           '                   v_gl a2,'||nlchr||
-                           '                   cur_rates$base c,'||nlchr||
-                           '                   branch b,'||nlchr||
-                           '                   branch_parameters p,'||nlchr||
-                           '                   branch_parameters bp'||nlchr||
-                           '             WHERE     o.sos = 5'||nlchr||
-                           '                   AND o.pdat >= TO_DATE ( :sFdat1, ''dd/MM/yyyy'')'||nlchr||
-                           '                   AND o.pdat < TO_DATE ( :sFdat1, ''dd/MM/yyyy'') + 0.99999'||nlchr||
-                           '                   --o.vdat=:sFdat1 AND'||nlchr||
-                           '                   AND o.REF = op1.REF'||nlchr||
-                           '                   AND o.REF = op2.REF'||nlchr||
-                           '                   AND op1.tt IN (''VPF'',''VPJ'',''VPI'',''046'',''MUQ'',''MVQ'')'||nlchr||
-                           '                   AND op1.tt = op2.tt'||nlchr||
-                           '                   AND (    op1.dk = 0'||nlchr||
-                           '                        AND op1.acc = a1.acc'||nlchr||
-                           '                        AND SUBSTR (a1.nls, 1, 3) = ''100'')'||nlchr||
-                           '                   AND (    op2.dk = 1'||nlchr||
-                           '                        AND op2.acc = a2.acc'||nlchr||
-                           '                        AND SUBSTR (a2.nls, 1, 3) = ''100'')'||nlchr||
-                           '                   AND (   (a1.kv = 980 AND a2.kv <> 980)'||nlchr||
-                           '                        OR (a1.kv <> 980 AND a2.kv = 980))'||nlchr||
-                           '                   AND a1.kv = v.kv'||nlchr||
-                           '                   AND a1.kv = c.kv'||nlchr||
-                           '                   AND o.branch = c.branch'||nlchr||
-                           '                   AND o.vdat = c.vdate'||nlchr||
-                           '                   AND o.branch LIKE :BRANCH || ''%'''||nlchr||
-                           '                   AND o.userid ='||nlchr||
-                           '                          DECODE ( :Param0, ''0'', o.userid, TO_NUMBER ( :Param0))'||nlchr||
-                           '                   AND o.branch = b.branch'||nlchr||
-                           '                   AND o.branch = p.branch'||nlchr||
-                           '                   AND p.tag = ''ADR_BRANCH'''||nlchr||
-                           '                   AND o.branch = bp.branch'||nlchr||
-                           '                   AND bp.tag = ''NAME_BRANCH'''||nlchr||
-                           '          GROUP BY a1.kv,'||nlchr||
-                           '                   ''Всього:'' || v.lcv,'||nlchr||
-                           '                   c.rate_b / c.bsum,'||nlchr||
-                           '                   NULL,'||nlchr||
-                           '                   NULL)'||nlchr||
-                           'GROUP BY name,'||nlchr||
-                           '         kv,'||nlchr||
-                           '         KURS,'||nlchr||
-                           '         NULL,'||nlchr||
-                           '         NULL,'||nlchr||
-                           '         NULL'||nlchr||
-                           'ORDER BY 3 DESC,'||nlchr||
-                           '         4,'||nlchr||
-                           '         7,'||nlchr||
-                           '         8';
+    l_zpr.txt          := 'with toper_main as (
+  select o.ref, o.dk, o.kv, o.kv2, o.s, o.s2, o.pdat, o.nd, o.sos, o.userid, w.value, v.lcv, substr(bp.val, 1, 80) as branch, p.val as adress
+    from oper              o
+    join operw             w  on w.ref     = o.ref and w.tag = ''KURS''
+    join tabval            v  on v.kv      = decode(o.dk, 1, o.kv, o.kv2)
+    join branch_parameters p  on p.branch  = o.branch and p.tag = ''ADR_BRANCH''
+    join branch_parameters bp on bp.branch = o.branch and bp.tag = ''NAME_BRANCH''
+   where (o.sos = 5 or o.sos < 0)
+     and o.pdat >= to_date(:sFdat1, ''DD/MM/YYYY'')
+     and o.pdat < to_date(:sFdat1, ''DD/MM/YYYY'') + 1
+     and o.branch like :BRANCH||''%''
+     and o.userid = decode(:Param0, ''0'', o.userid, to_number(:Param0 /*було ''0''*/))
+     and ((o.dk = 1 and o.kv <> 980 and o.kv2 = 980 and substr(o.nlsa, 1, 3) = ''100'')
+          or
+          (o.dk = 0 and o.kv = 980 and o.kv2 <> 980 and substr(o.nlsb, 1, 3) = ''100''))
+     and o.tt <> ''202''),
+toper_opldok as (
+  select o.ref, v.lcv, a1.kv, op1.s as s_n, op2.s as s_g, c.rate_b, c.bsum, o.pdat, o.nd, o.sos, o.userid, SUBSTR(bp.val, 1, 80) as BRANCH, p.val as ADRESS
+    from oper              o
+    join opldok            op1 on op1.ref   = o.ref
+    join opldok            op2 on op2.ref   = o.ref    and op1.tt  = op2.tt
+    join v_gl              a1  on op1.dk    = 0        and op1.acc = a1.acc and substr(a1.nls, 1, 3) = ''100''
+    join v_gl              a2  on op2.dk    = 1        and op2.acc = a2.acc and substr(a2.nls, 1, 3) = ''100''
+    join cur_rates$base    c   on c.branch  = o.branch and c.vdate = o.vdat and c.kv                 = a1.kv
+    join branch_parameters p   on p.branch  = o.branch and p.tag   = ''ADR_BRANCH''
+    join branch_parameters bp  on bp.branch = o.branch and bp.tag  = ''NAME_BRANCH''
+    join tabval            v   on v.kv = a1.kv
+   where (o.sos = -2 or o.sos = 5)
+     and o.pdat >= to_date(:sFdat1, ''DD/MM/YYYY'')
+     and o.pdat < to_date(:sFdat1, ''DD/MM/YYYY'') + 1
+     and o.branch like :BRANCH||''%''
+     and o.userid = decode(:Param0, ''0'', o.userid, to_number(:Param0/*було ''0''*/))
+     and op1.tt in (''VPF'', ''VPJ'', ''VPI'', ''046'', ''MUQ'', ''MVQ'')
+     and ((a1.kv = 980 and a2.kv <> 980) or (a1.kv <> 980 and a2.kv = 980)))
+select :sFdat1 as DAT,
+       (select to_char(ov1.dat, ''HH24:MI:SS'') from oper_visa ov1 where ov1.ref = o.ref and ov1.status = 2) as TIME_OP,
+       o.lcv as NAME,
+       0 as REF,
+       decode(o.dk, 1, o.kv, o.kv2) as KV,
+       nvl(decode(o.dk, 1, o.s, o.s2), 0)/100 as SUM_N,
+       nvl(decode(o.dk, 1, o.s2, o.s), 0)/100 as SUM_G,
+       nvl(to_number(o.value, regexp_replace(o.value, ''\d'', ''9'')), 0) as KURS,
+       o.pdat as PDAT,
+       trim(o.nd) as ND1,
+       case when trim(n.value) = ''1'' then to_char(o.ref) else null end AS ND2,
+       o.sos as SOS,
+       o.userid as USERID,
+       o.branch as BRANCH,
+       o.adress as ADRESS,
+       null as DATS,
+       null as NAME2, null as SUM_N2, ''0'' as IS_SAL, null as UNDERLINE
+  from      toper_main o
+  left join operw      n on n.ref = o.ref and n.tag = ''RE377''
+ where o.sos = 5
+ union all
+select :sFdat1 as DAT,
+       (select to_char(ov1.dat, ''HH24:MI:SS'') from oper_visa ov1 where ov1.ref = o.ref and ov1.status = 2) as TIME_OP,
+       o.lcv as NAME,
+       0 as REF,
+       decode(o.dk, 1, o.kv, o.kv2) as KV,
+       nvl(decode(o.dk, 1, o.s, o.s2), 0)/100 as SUM_N,
+       nvl(decode(o.dk, 1, o.s2, o.s), 0)/100 as SUM_G,
+       nvl(to_number(o.value, regexp_replace(o.value, ''\d'', ''9'')), 0) as KURS,
+       o.pdat as PDAT,
+       trim(o.nd) as ND1,
+       case when trim(n.value) = ''1'' then to_char(o.ref) else null end AS ND2,
+       o.sos as SOS,
+       o.userid as USERID,
+       o.branch as BRANCH,
+       o.adress as ADRESS,
+       decode(o.sos, -2, ov.backtime, null) as DATS,
+       null as NAME2, null as SUM_N2, ''0'' as IS_SAL, null as UNDERLINE
+  from      toper_main          o
+  join (select to_char(dat, ''HH24:MI:SS'') backtime, ref
+          from oper_visa
+         where status = 3
+           and groupid is null) ov on ov.ref = o.ref
+  left join operw               n  on n.ref  = o.ref and n.tag = ''RE377''
+ where o.sos < 0 
+ union all
+select :sFdat1 as DAT,
+       (select to_char(ov1.dat, ''HH24:MI:SS'') from oper_visa ov1 where ov1.ref = o.ref and ov1.status = 2) as TIME_OP,
+       o.lcv as NAME,
+       0 as REF,
+       o.kv as KV,
+       o.s_n/100 as SUM_N,
+       o.s_g/100 as SUM_G,
+       o.rate_b/o.bsum as KURS,
+       o.pdat as PDAT,
+       trim(o.nd) as ND1,
+       (case when trim(n.value) = ''1'' then to_char(o.ref) else null end) as ND2,
+       o.sos as SOS,
+       o.userid as USERID,
+       o.branch as BRANCH,
+       o.adress as ADRESS,
+       decode(o.sos, -2, ov.backtime, null) as DATS,
+       null as NAME2, null as SUM_N2, ''0'' as IS_SAL, null as UNDERLINE
+  from      toper_opldok        o
+  join (select to_char(dat, ''HH24:MI:SS'') backtime, ref 
+          from oper_visa
+         where status = 3
+           and groupid is null) ov on ov.ref = o.ref
+  left join operw               n  on n.ref  = o.ref and n.tag = ''RE377''
+ where o.sos = -2
+ union all
+select :sFdat1 as DAT,
+       (select to_char(ov1.dat, ''HH24:MI:SS'') from oper_visa ov1 where ov1.ref = o.ref and ov1.status = 2) as TIME_OP,
+       o.lcv as NAME,
+       0 as REF,
+       o.kv as KV,
+       o.s_n/100 as SUM_N,
+       o.s_g/100 as SUM_G,
+       o.rate_b/o.bsum as KURS,
+       o.pdat as PDAT,
+       trim(o.nd) as ND1,
+       (case when trim(n.value) = ''1'' then to_char(o.ref) else null end) as ND2,
+       o.sos as SOS,
+       o.userid as USERID,
+       o.branch as BRANCH,
+       o.adress as ADRESS,
+       null as DATS,
+       null as NAME2, null as SUM_N2, ''0'' as IS_SAL, null as UNDERLINE
+  from      toper_opldok o
+  left join operw        n on n.ref = o.ref and n.tag = ''RE377''
+ where o.sos = 5
+ union all
+select :sFdat1 as DAT, null as TIME_OP, ''Усього:''||lcv as NAME, -1 as REF, KV, sum(sum_n) as SUM_N, sum(sum_g) as SUM_G, KURS,
+       bankdate as PDAT, null as ND1, null as ND2, 0 as SOS, 0 as USERID, null as BRANCH, '''' as ADRESS, '''' as DATS,
+       null as NAME2, null as SUM_N2, ''0'' as IS_SAL, null as UNDERLINE
+  from (select o.lcv,
+               decode(o.dk, 1, o.kv, o.kv2) as KV,
+               sum(nvl(decode(o.dk, 1, o.s, o.s2), 0))/100 as SUM_N,
+               sum(nvl(decode(o.dk, 1, o.s2, o.s), 0))/100 as SUM_G,
+               nvl(to_number(o.value, regexp_replace(o.value, ''\d'', ''9'')), 0) KURS
+              from toper_main o
+             where o.sos = 5
+          group by decode(o.dk, 1, o.kv, o.kv2), o.lcv, nvl(to_number(o.value, regexp_replace(o.value, ''\d'', ''9'')), 0)
+           union all
+          select o.lcv,
+                 o.kv,
+                 sum(o.s_n/100) as SUM_N,
+                 sum(o.s_g/100) as SUM_G,
+                 o.rate_b/o.bsum as KURS
+            from toper_opldok o
+           where o.sos = 5
+           group by o.kv, o.lcv, o.rate_b/o.bsum)
+group by LCV, KV, KURS
+ union all --COBUMMFO-10857 MDom т.я. банк користується тільки шаблоном QRP, довелося робити додаткові рядки
+select :sFdat1 as DAT, null as TIME_OP, null as NAME, -2 as REF, KV, null as SUM_N, null as SUM_G, null as KURS, null as PDAT,
+       null as ND1, null as ND2, null as SOS, null as USERID, null as BRANCH, '''' as ADRESS, '''' as DATS,
+       ''Усього куплено/продано за валютою ''||kv||'': '' as NAME2,
+       f_sumpr(nsum_      => sum(sum_n)*100,
+               nccycode_  => kv,
+               strgender_ => (select tv.gender from tabval tv where tv.kv = t.kv)) as SUM_N2,
+       null as IS_SAL, ''-------'' as UNDERLINE
+  from (select decode(o.dk, 1, o.kv, o.kv2) as KV,
+               sum(nvl(decode(o.dk, 1, o.s, o.s2), 0))/100 as SUM_N,
+               sum(nvl(decode(o.dk, 1, o.s2, o.s), 0))/100 as SUM_G,
+               nvl(to_number(o.value, regexp_replace(o.value, ''\d'', ''9'')), 0) KURS
+              from toper_main o
+             where o.sos = 5
+          group by decode(o.dk, 1, o.kv, o.kv2), nvl(to_number(o.value, regexp_replace(o.value, ''\d'', ''9'')), 0)
+           union all
+          select o.kv as KV,
+                 sum(o.s_n/100) as SUM_N,
+                 sum(o.s_g/100) as SUM_G,
+                 o.rate_b/o.bsum as KURS
+            from toper_opldok o
+           where o.sos = 5
+           group by o.kv, o.rate_b/o.bsum) t
+group by KV, KURS
+order by REF, KV, SUM_G, KURS';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -446,3 +302,14 @@ end;
 /                                           
                                             
 commit;                                     
+
+exec umu.add_report2arm(54,'$RM_WCAS');
+exec umu.add_report2arm(54,'$RM_WDOC');
+exec umu.add_report2arm(54,'$RM_DRU1');
+exec umu.add_report2arm(54,'$RM_MAIN');
+commit;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBM_REP_54.sql =========*** End **
+PROMPT ===================================================================================== 
