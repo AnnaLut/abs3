@@ -226,3 +226,6 @@ COMMIT;
 exception when others then null;
 end;
 /
+
+update TICKETS_PAR SET txt='SELECT trim(to_char(to_number(w.value),''999990D99'')) FROM operw w WHERE w.ref=:nRecID AND w.tag in(''BM__R'')' where PAR='USL_BM';
+COMMIT;
