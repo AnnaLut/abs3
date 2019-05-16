@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2017 16:12:27" ReportInfo.Modified="12/11/2018 12:19:30" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2017 16:12:27" ReportInfo.Modified="05/15/2019 11:05:00" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,8 +38,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJrNv91+CXQS5t+cl7ST7gM=">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select name_cli,&#13;&#10;       nls,&#13;&#10;       okpo,&#13;&#10;       name,&#13;&#10;       nvl(sum (nvl(sdb,0)),0) sdb,&#13;&#10;       nvl(sum (nvl(skr,0)),0) skr&#13;&#10; from (select case when d.dk = 1 then d.namb else d.nama end name_cli,&#13;&#10;              a.nls,&#13;&#10;              case when d.dk = 1 then d.okpoa else d.okpob end okpo,&#13;&#10;              case when d.dk = 1 then d.nama else d.namb end name,&#13;&#10;              case when d.dk = 0 then d.sq / 100 else 0 end sdb,&#13;&#10;              case when d.dk = 1 then d.sq / 100 else 0 end skr&#13;&#10;         from ob_corp_data_acc a&#13;&#10;         join ob_corp_data_doc d on a.sess_id = d.sess_id and a.acc = d.acc&#13;&#10;         join v_ob_corp_rep_nbs q on q.rep_id = 5042 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;        where a.corp_id = 5&#13;&#10;          and a.fdat between :sFdat1 and :sFdat2&#13;&#10;          and case when d.dk = 1 then d.okpob else d.okpoa end = :okpo&#13;&#10;          and a.kf = :kf&#13;&#10;          and a.nls = :nls)&#13;&#10;     group by name_cli, nls, okpo, name">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQPNXHo/0/Pg4uHBxvGqg6h4=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select name_cli,&#13;&#10;       nls,&#13;&#10;       okpo,&#13;&#10;       name,&#13;&#10;       nvl(sum (nvl(sdb,0)),0) sdb,&#13;&#10;       nvl(sum (nvl(skr,0)),0) skr&#13;&#10; from (select case when d.dk = 1 then d.namb else d.nama end name_cli,&#13;&#10;              a.nls,&#13;&#10;              case when d.dk = 1 then d.okpoa else d.okpob end okpo,&#13;&#10;              case when d.dk = 1 then d.nama else d.namb end name,&#13;&#10;              case when d.dk = 0 then d.sq / 100 else 0 end sdb,&#13;&#10;              case when d.dk = 1 then d.sq / 100 else 0 end skr&#13;&#10;         from ob_corp_data_acc a&#13;&#10;         join ob_corp_data_doc d on a.sess_id = d.sess_id and a.acc = d.acc&#13;&#10;         join v_ob_corp_rep_nbs q on q.rep_id = 5042 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;        where a.corp_id = 5&#13;&#10;          and a.fdat between :sFdat1 and :sFdat2&#13;&#10;          and (d.okpob = :okpo or d.okpoa = :okpo)&#13;&#10;          and instr(decode(:kf,'%',a.kf,:kf),a.kf)&gt;0&#13;&#10;          and instr(decode(:nls,'%',a.nls,:nls),a.nls)&gt;0&#13;&#10;       )   &#13;&#10;     group by name_cli, nls, okpo, name">
         <Column Name="NAME_CLI" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
@@ -71,7 +71,7 @@ namespace FastReport
       </TextObject>
       <TextObject Name="Text3" Left="455.87" Top="75.6" Width="151.2" Height="18.9" Text="грн." HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="168.65" Width="604.8" Height="18.9" DataSource="Table">
+    <DataBand Name="Data1" Top="171.32" Width="604.8" Height="18.9" DataSource="Table">
       <TableObject Name="Table3" Width="604.81" Height="18.9" Border.Lines="All">
         <TableColumn Name="Column9" Width="139.39"/>
         <TableColumn Name="Column10" Width="177.19"/>
@@ -84,7 +84,7 @@ namespace FastReport
           <TableCell Name="Cell26" Border.Lines="All" Text="[Table.SKR]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader3" Top="98.5" Width="604.8" Height="66.15">
+      <DataHeaderBand Name="DataHeader3" Top="99.83" Width="604.8" Height="66.15">
         <TableObject Name="Table1" Width="604.81" Height="47.25" Border.Lines="All" Border.Width="2">
           <TableColumn Name="Column1" Width="139.39"/>
           <TableColumn Name="Column2" Width="177.19"/>

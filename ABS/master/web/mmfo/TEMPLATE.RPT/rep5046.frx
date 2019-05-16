@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="02/14/2017 12:43:32" ReportInfo.Modified="12/11/2018 12:25:36" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/14/2017 12:43:32" ReportInfo.Modified="04/23/2019 15:47:42" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQEQkUwc4eLJelhcgKoiGo+0=">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select corporation_name, &#13;&#10;       case when corporation_name is null then null else ustan end as ustan,&#13;&#10;       nbs,&#13;&#10;       kod_analyt,&#13;&#10;       cnt,&#13;&#10;       in_ost,&#13;&#10;       obdbq,&#13;&#10;       obkrq,&#13;&#10;       out_ost,&#13;&#10;       cnt_doc,&#13;&#10;       cnt_doc_db,&#13;&#10;       cnt_doc_cr, &#13;&#10;       sFdat1,&#13;&#10;       sFdat2,&#13;&#10;       case when corporation_name is null then null else namk end as namk,&#13;&#10;       case when corporation_name is null then null else kod_ustan end as kod_ustan &#13;&#10;     from (select r.corporation_name, &#13;&#10;                  max(ro.corporation_name) as ustan,&#13;&#10;                  a.nbs,&#13;&#10;                  a.kod_analyt,&#13;&#10;                  count(a.acc) as cnt,&#13;&#10;                  sum(case when a.fdat=:sFdat1 then nvl(a.ostq,0)- nvl(a.obkrq,0)+nvl(a.obdbq,0) else 0 end)/100 as in_ost,&#13;&#10;                  sum(a.obdbq)/100 obdbq,&#13;&#10;                  sum(a.obkrq)/100 obkrq,&#13;&#10;                  sum(case when a.fdat=:sFdat2 then a.ostq else 0 end)/100 as out_ost,&#13;&#10;                  sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id))  as cnt_doc,&#13;&#10;                  sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 0)) as cnt_doc_db,&#13;&#10;                  sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 1)) as cnt_doc_cr, &#13;&#10;                  to_char(:sFdat1, 'dd.mm.yyyy') as sFdat1,&#13;&#10;                  to_char(:sFdat2, 'dd.mm.yyyy') as sFdat2,&#13;&#10;                  ': '||a.namk as namk,&#13;&#10;                  'Код установи - '||to_char(a.kod_ustan) as kod_ustan&#13;&#10;               from ob_corp_data_acc a&#13;&#10;               join v_ob_corp_rep_nbs q on q.rep_id = 5046 and q.nbs = a.nbs and q.corp_id = a.corp_id&#13;&#10;               left join v_root_corporation r on to_char(a.corp_id)=r.external_id&#13;&#10;               left join ob_corporation ro on ro.base_corp=a.corp_id and ro.external_id = a.kod_ustan           &#13;&#10;               where a.corp_id=:corporation_id&#13;&#10;               and a.is_last = 1&#13;&#10;               and a.fdat between :sFdat1 and :sFdat2               &#13;&#10;               and instr(decode(:name,'%',a.kf,:name),a.kf)&gt;0&#13;&#10;               and instr(decode(:nbs,'%',a.nbs,:nbs),a.nbs)&gt;0&#13;&#10;               and instr(decode(:kod_analyt,'%',nvl(a.kod_analyt,' '),:kod_analyt),nvl(a.kod_analyt,' '))&gt;0&#13;&#10;               and instr(decode(:kod_ustan,'%',nvl(a.kod_ustan, -1),:kod_ustan),nvl(a.kod_ustan, -1))&gt;0&#13;&#10;               group by grouping sets((r.corporation_name, a.namk, a.kod_ustan, a.nbs, a.kod_analyt),(a.nbs,a.kod_analyt)))&#13;&#10;               order by corporation_name nulls last, ustan, nbs, kod_analyt nulls last, namk">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIMv7wQ7bf8iFVxOCDcAJeQ=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select corporation_name, &#13;&#10;       case when corporation_name is null then null else ustan end as ustan,&#13;&#10;       nbs,&#13;&#10;       kod_analyt,&#13;&#10;       cnt,&#13;&#10;       in_ost,&#13;&#10;       obdbq,&#13;&#10;       obkrq,&#13;&#10;       out_ost,&#13;&#10;       cnt_doc,&#13;&#10;       cnt_doc_db,&#13;&#10;       cnt_doc_cr, &#13;&#10;       sFdat1,&#13;&#10;       sFdat2,&#13;&#10;&#13;&#10;       case when corporation_name is null then null else kod_ustan end as kod_ustan &#13;&#10;     from (select r.corporation_name, &#13;&#10;                  max(ro.corporation_name) as ustan,&#13;&#10;                  a.nbs,&#13;&#10;                  a.kod_analyt,&#13;&#10;                  count(a.acc) as cnt,&#13;&#10;                  sum(case when a.fdat=:sFdat1 then nvl(a.ostq,0)- nvl(a.obkrq,0)+nvl(a.obdbq,0) else 0 end)/100 as in_ost,&#13;&#10;                  sum(a.obdbq)/100 obdbq,&#13;&#10;                  sum(a.obkrq)/100 obkrq,&#13;&#10;                  sum(case when a.fdat=:sFdat2 then a.ostq else 0 end)/100 as out_ost,&#13;&#10;                  sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id))  as cnt_doc,&#13;&#10;                  sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 0)) as cnt_doc_db,&#13;&#10;                  sum((select count(d.ref) from ob_corp_data_doc d where a.acc = d.acc and a.sess_id = d.sess_id and d.dk = 1)) as cnt_doc_cr, &#13;&#10;                  to_char(:sFdat1, 'dd.mm.yyyy') as sFdat1,&#13;&#10;                  to_char(:sFdat2, 'dd.mm.yyyy') as sFdat2,&#13;&#10;                 z.parent_id_corp||': '||z.parent_corporation_name as kod_ustan&#13;&#10;               from ob_corp_data_acc a&#13;&#10;               join v_ob_corp_rep_nbs q on q.rep_id = 5046 and q.nbs = a.nbs and q.corp_id = a.corp_id&#13;&#10;               left join v_root_corporation r on to_char(a.corp_id)=r.external_id&#13;&#10;               left join ob_corporation ro on ro.base_corp=a.corp_id and ro.external_id = a.kod_ustan&#13;&#10;               left join&#13;&#10;               (&#13;&#10;               select nvl (c.parent_id, 0) parent_id_corp, &#13;&#10;                      c.external_id as external_id_corp, &#13;&#10;                      prior c.corporation_name as parent_corporation_name&#13;&#10;               from ob_corporation c&#13;&#10;               connect by prior c.id = c.parent_id&#13;&#10;               start with c.external_id = :corporation_id&#13;&#10;               )  z on a.kod_ustan =  z.external_id_corp            &#13;&#10;               where a.corp_id=:corporation_id&#13;&#10;               and a.is_last = 1&#13;&#10;               and a.fdat between :sFdat1 and :sFdat2               &#13;&#10;               and instr(decode(:name,'%',a.kf,:name),a.kf)&gt;0&#13;&#10;               and instr(decode(:nbs,'%',a.nbs,:nbs),a.nbs)&gt;0&#13;&#10;               and instr(decode(:kod_analyt,'%',nvl(a.kod_analyt,' '),:kod_analyt),nvl(a.kod_analyt,' '))&gt;0&#13;&#10;               and instr(decode(:kod_ustan,'%',nvl(a.kod_ustan, -1),:kod_ustan),nvl(a.kod_ustan, -1))&gt;0&#13;&#10;               group by grouping sets((r.corporation_name, z.parent_id_corp, z.parent_corporation_name, a.nbs, a.kod_analyt),(a.nbs,a.kod_analyt)))&#13;&#10;               order by corporation_name nulls last, ustan, nbs, kod_analyt nulls last">
         <Column Name="NBS" DataType="System.String"/>
         <Column Name="KOD_ANALYT" DataType="System.String"/>
-        <Column Name="NAMK" DataType="System.String"/>
         <Column Name="CORPORATION_NAME" DataType="System.String"/>
         <Column Name="USTAN" DataType="System.String"/>
         <Column Name="CNT" DataType="System.Decimal"/>
@@ -46,10 +45,11 @@
   </Dictionary>
   <ReportPage Name="Page1" PaperWidth="280">
     <ReportTitleBand Name="ReportTitle1" Width="982.8" Height="66.15">
-      <TextObject Name="Text1" Left="198.45" Width="491.4" Height="56.7" Text="Звіт про рух коштів в розрізі підрозділів&#13;&#10;корпоративного клієнта [Table.CORPORATION_NAME]&#13;&#10;з [Table.SFDAT1] по [Table.SFDAT2]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text1" Width="982.8" Height="18.9" Text="Звіт про рух коштів в розрізі підрозділів" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Top="18.9" Width="982.8" Height="18.9" Text="корпоративного клієнта [Table.CORPORATION_NAME]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Top="37.8" Width="982.8" Height="18.9" Text="з [Table.SFDAT1] по [Table.SFDAT2]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="70.15" Width="982.8"/>
-    <ColumnHeaderBand Name="ColumnHeader1" Top="74.15" Width="982.8" Height="66.15">
+    <ColumnHeaderBand Name="ColumnHeader1" Top="70.15" Width="982.8" Height="66.15" PrintOn="FirstPage">
       <TableObject Name="Table1" Width="989.4" Height="66.15" Border.Lines="All">
         <TableColumn Name="Column1" Width="98.94"/>
         <TableColumn Name="Column2" Width="98.94"/>
@@ -87,16 +87,16 @@
         </TableRow>
       </TableObject>
     </ColumnHeaderBand>
-    <GroupHeaderBand Name="GroupHeader1" Top="144.3" Width="982.8" Height="18.9" Condition="[Table.NAMK]" SortOrder="Descending">
+    <GroupHeaderBand Name="GroupHeader1" Top="140.3" Width="982.8" Height="18.9" Condition="[Table.USTAN]" SortOrder="Descending">
       <TableObject Name="Table2" Width="989.22" Height="18.9">
         <TableColumn Name="Column21" Width="494.61"/>
         <TableColumn Name="Column22" Width="494.61"/>
         <TableRow Name="Row4">
-          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="Gray" Text="[Table.KOD_USTAN] [Table.NAMK] Всього:" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="Gray" Text="[Table.KOD_USTAN] [Table.USTAN] Всього:" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
           <TableCell Name="Cell49" Border.Lines="All"/>
         </TableRow>
       </TableObject>
-      <DataBand Name="Data1" Top="167.2" Width="982.8" Height="18.9" DataSource="Table">
+      <DataBand Name="Data1" Top="163.2" Width="982.8" Height="18.9" DataSource="Table">
         <TableObject Name="Table1" Width="989.4" Height="18.9" Border.Lines="All">
           <TableColumn Name="Column11" Width="98.94"/>
           <TableColumn Name="Column12" Width="98.94"/>
@@ -122,11 +122,10 @@
           </TableRow>
         </TableObject>
         <Sort>
-          <Sort Expression="[Table.NBS]"/>
-          <Sort Expression="[Table.KOD_ANALYT]"/>
+          <Sort Expression="[Table.KOD_USTAN]"/>
         </Sort>
       </DataBand>
-      <GroupFooterBand Name="GroupFooter1" Top="190.1" Width="982.8" Height="18.9">
+      <GroupFooterBand Name="GroupFooter1" Top="186.1" Width="982.8" Height="18.9">
         <TableObject Name="Table1" Width="989.4" Height="18.9" Border.Lines="All">
           <TableColumn Name="Column23" Width="98.94"/>
           <TableColumn Name="Column24" Width="98.94"/>
@@ -153,6 +152,6 @@
         </TableObject>
       </GroupFooterBand>
     </GroupHeaderBand>
-    <PageFooterBand Name="PageFooter1" Top="213" Width="982.8" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="209" Width="982.8" Height="18.9"/>
   </ReportPage>
 </Report>
