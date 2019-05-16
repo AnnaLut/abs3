@@ -50,7 +50,7 @@ begin
     l_zpr.create_stmt  := '';
     l_zpr.rpt_template := 'rep5042.frx';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := '';
+    l_zpr.default_vars := ':okpo=''%'',:nls=''%'',:kf=''%''';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select 1 from dual';
@@ -127,13 +127,12 @@ end;
                                             
 commit;                                     
 
+exec umu.add_report2arm(5042,'$RM_CRPC');
 exec umu.add_report2arm(5042,'$RM_DRU1');
 exec umu.add_report2arm(5042,'$RM_WCRC');
-exec umu.add_report2arm(5042,'$RM_CRPC');
 commit;
 
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBM_***_5042.sql =========*** End 
 PROMPT ===================================================================================== 
-
