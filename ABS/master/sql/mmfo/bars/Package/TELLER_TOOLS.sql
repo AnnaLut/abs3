@@ -316,7 +316,7 @@ end teller_tools;
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_TOOLS is
 
   g_min_banknote constant  number := 10;
-  g_body_version constant  varchar2(64)  := 'version 3.6 10/05/2019';
+  g_body_version constant  varchar2(64)  := 'version 3.7 16/05/2019';
   g_ws_name      varchar2(100) := sys_context('bars_global', 'host_name');
   g_eq_url       constant  varchar2(100) := case get_teller
                                               when 0 then null
@@ -2010,7 +2010,10 @@ logger.info('teller step1. v_in_flag= '||v_in_flag||', v_out_flag = '||v_out_fla
       values(v_ret,'IN',980,0,0,p_op_amount,sysdate,g_user_id);
     update teller_opers
       set doc_ref = 0-v_ret
-         ,state = 'S0'
+         ,state = case g_eq_type
+                    when 'M' then 'OK'
+                    else 'S0'
+                   end
       where id = v_ret;
     teller_utils.set_active_oper(0-v_ret);
 /*    v_num := update_oper(p_id     => v_ret,
@@ -3028,14 +3031,14 @@ logger.info('get_window_status: p_amount = '||p_amount||', p_currency = '||p_cur
       return 0;
     end if;
 
-    select op.state, op.oper_ref, id, case
-                                        when v_state like 'I%' then
+    select op.state, op.oper_ref, id, case 
+                                        when op.state like 'I%' then
                                           'IN'
-                                        when v_state in ('RI','RD') then
+                                        when op.state in ('RI','RD') then
                                           'RIN'
-                                        when v_state like 'O%' and v_state != 'OK' then
+                                        when op.state like 'O%' and v_state != 'OK' then
                                           'OUT'
-                                        when v_state = 'RO' then
+                                        when op.state in ('RO','RX') then
                                           'ROUT'
                                       end case
       into v_state, v_op_tt, v_oper_ref, v_curr_oper
@@ -3082,7 +3085,7 @@ logger.info('Teller ws_name = '||r.funcname||' result = '||v_res);
       end if;
     end loop;
     p_atm_amount := get_atm_amount(p_errtxt);
-logger.info('tell v_oper_ref = '||v_oper_ref||', v_op_type = '||v_op_type||', p_atm_amount = '||p_atm_amount);
+logger.info('tell v_oper_ref = '||v_oper_ref||', v_op_type = '||v_op_type||', p_atm_amount = '||p_atm_amount||', v_curr_oper= '||v_curr_oper);
     update teller_cash_opers
       set atm_amount = p_atm_amount/*,
           non_atm_amount = nvl(non_atm_amount,0) - p_atm_amount*/
@@ -3601,6 +3604,8 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
     v_ret number;
     v_id  number;
   begin
+logger.info('Teller: StartCashin start');
+logger.info('Teller: p_cur_code = '||p_cur_code);
 
     if check_atm = 1 then
       p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
@@ -3665,7 +3670,7 @@ logger.info('r.id = '||r.id||', r.rq_name = '||r.rq_name||', r.active_cur = '||r
     v_ret number;
     v_num number := teller_utils.get_active_oper();
   begin
-
+logger.info('Teller StoreCashin start');
     if check_atm = 1 then
       p_errtxt := 'АТМ заблоковано в зв"язку з помилкою мережі. Необхідно виконати ручне врегулювання в меню теллера!';
       return 0;

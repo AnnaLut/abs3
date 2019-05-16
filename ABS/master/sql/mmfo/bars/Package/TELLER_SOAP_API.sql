@@ -187,7 +187,7 @@ end teller_soap_api;
 CREATE OR REPLACE PACKAGE BODY BARS.TELLER_SOAP_API is
 
   g_glory_ns      constant varchar2(100) := 'http://www.glory.co.jp/gsr.xsd';
-  g_body_version constant varchar2(64)  := 'version 3.1 10/05/2019';
+  g_body_version constant varchar2(64)  := 'version 3.2 16/05/2019';
   g_local_ns      varchar2(100) := 'http://tempuri.org/';
 -- ÿ
   g_local_url     varchar2(100);
