@@ -131,7 +131,8 @@ namespace Bars.SalaryBagSrv
             {
                 Corp2Intr.ZPIntrWebService ws = new Corp2Intr.ZPIntrWebService()
                 {
-                    Url = url
+                    Url = url,
+                    Timeout = 30 * 60 * 1000
                 };
 
                 Corp2Intr.SimpleResponse response = ws.SavePayrollInfoFromAbs(data);
