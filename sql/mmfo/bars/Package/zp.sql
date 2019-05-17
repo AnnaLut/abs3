@@ -166,7 +166,7 @@ end;
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.32 25.02.2019';
+g_body_version   constant varchar2(64)   := 'version 1.33 17.05.2019';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -1869,7 +1869,7 @@ begin
         reject_user=user_id
     where id=p_id;
 
-    if l_zp_payroll.corp2_id is not null
+    if l_zp_payroll.corp2_id is not null and l_zp_payroll.source = 5
        then
         insert into zp_payroll_log  values (l_zp_payroll.corp2_id, l_zp_payroll.id, -1,p_comm,sysdate,0);
     end if;
@@ -2380,7 +2380,7 @@ begin
 
      --для ведомостей корпа пишем лог для ответа
 
-     if l_zp_payroll.corp2_id is not null
+     if l_zp_payroll.corp2_id is not null and l_zp_payroll.source = 5
        then
         insert into zp_payroll_log  values (l_zp_payroll.corp2_id, l_zp_payroll.id, 1,null,sysdate,0);
      end if;
