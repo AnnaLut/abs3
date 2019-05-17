@@ -139,8 +139,37 @@ begin
 end;
 / 
 
+begin
+    execute immediate 'alter table SUBSIDY_DATA add feeamount number(23)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+begin
+    execute immediate 'alter table SUBSIDY_DATA add feebankcode varchar2(6)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+begin
+    execute immediate 'alter table SUBSIDY_DATA add feepurpose VARCHAR2(160)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 -- Add comments to the columns 
+comment on column SUBSIDY_DATA.feeamount
+  is 'Сума комісії';
+comment on column SUBSIDY_DATA.feebankcode
+  is 'МФО банку отримувача комісії';
+comment on column SUBSIDY_DATA.feepurpose
+  is 'Призначення платежу комісії';
 comment on column SUBSIDY_DATA.payeraccnum
   is 'Номер рахунку відправника';
 comment on column SUBSIDY_DATA.payerbankcode
