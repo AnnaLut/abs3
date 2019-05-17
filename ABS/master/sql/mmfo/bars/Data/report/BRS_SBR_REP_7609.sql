@@ -1,5 +1,7 @@
+
+
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/BRS_SBR_REP_7609.sql =========*** Run 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBR_REP_7609.sql =========*** Run 
 PROMPT ===================================================================================== 
 prompt ===================================== 
 prompt == Отчет по 3720 платежей по монетизации 2
@@ -51,7 +53,26 @@ begin
     l_zpr.default_vars := ':Param0=''25608100000001''';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select 1 from dual';
+    l_zpr.txt          := 'select o.ref
+      ,o.pdat
+      ,o.s
+      ,o.kv
+      ,o.nlsa
+      ,o.mfoa
+      ,o.id_a
+      ,o.nlsb
+      ,o.mfob
+	  ,o.id_b
+  from bars.oper o
+     , bars.opldok od
+     , bars.accounts a
+ where o.pdat between to_date(:sFdat1,''dd/mm/yyyy'')+0.00001 and to_date(:sFdat2,''dd/mm/yyyy'')+0.99999
+   and o.tt = ''R01''
+   and o.nlsa = :Param0
+   and o.ref = od.ref
+   and od.dk = 1
+   and od.acc = a.acc
+   and a.nls like ''3720%''';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -84,7 +105,7 @@ begin
     l_rep.name        :='Empty';
     l_rep.description :='Отчет по 3720 платежей по монетизации 2';
     l_rep.form        :='frm_FastReport';
-    l_rep.param       :=l_zpr.kodz||',9,sFdat,sFdat2,"",FALSE,FALSE';
+    l_rep.param       :=l_zpr.kodz||',9,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
@@ -120,16 +141,16 @@ begin
        end;                                  
     end if;                                  
     bars_report.print_message(l_message);   
-    
-    BARS.UMU.ADD_REPORT2ARM(l_rep.id, '$RM_BVBB', 1);
-    BARS.UMU.ADD_REPORT2ARM(l_rep.id, '$RM_DRU1', 1);
 end;                                        
 /                                           
                                             
 commit;                                     
 
+exec umu.add_report2arm(7609,'$RM_BVBB');
+exec umu.add_report2arm(7609,'$RM_DRU1');
+commit;
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/Bars/Data/BRS_SBR_REP_7609.sql =========*** End 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBR_REP_7609.sql =========*** End 
 PROMPT ===================================================================================== 

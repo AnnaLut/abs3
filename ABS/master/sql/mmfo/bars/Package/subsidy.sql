@@ -55,13 +55,13 @@ CREATE OR REPLACE PACKAGE "BARS"."SUBSIDY" is
   function parse_data(p_id in varchar2, p_file_data in clob)
     return t_sybsidy_list;
   function form_ticket(p_id in varchar2) return clob;
-  
+
   function pay_data(p_sybsidy_list in t_sybsidy_list) return t_sybsidy_list;
 
   procedure processing_payments;
-  
+
   procedure start_job;
-  
+
   -- получение буферов для подписи
   procedure get_doc_buffers(p_ref in integer, p_key in varchar2, p_int_buf out varchar2, p_sep_buf out varchar2);
 
@@ -161,7 +161,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                      g_sub_tip || ')для виплати субсидій';
         return;
       when too_many_rows then
-        p_errcode := 2; 
+        p_errcode := 2;
         p_errmsg  := 'Знайдено більше ніж один відкритий рахунок(' ||
                      p_nls || '/' || g_sub_tip ||
                      ')для виплати субсидій';
@@ -226,16 +226,16 @@ function utf8todeflang(p_clob in    clob) return clob is
       select count(*)
         into l_cnt
         from subsidy_data sd, oper o
-       where o.ref = sd.ref 
+       where o.ref = sd.ref
          and o.ref is not null
          and sd.extreqid = l_transport_unit_row.external_file_id
          and sos not in (5,-1);
-      if l_cnt = 0 then 
+      if l_cnt = 0 then
         p_state := 0;
         p_msg   := 'Успішно оброблено';
-      else 
+      else
         p_state := 3;
-        p_msg   := 'Частина платежів оплачено';        
+        p_msg   := 'Частина платежів оплачено';
       end if;
     else
       p_state := 10;
@@ -284,7 +284,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                                                      38);
       l_sybsidy_list(i).RECEIVERRNK := to_number(dbms_xslprocessor.valueof(l_row,
                                                                       'RECEIVERRNK/text()'));
-                                                                      
+
       l_sybsidy_list(i).PAYTYPE := to_number(dbms_xslprocessor.valueof(l_row,
                                                                       'PAYTYPE/text()'));
 
@@ -308,18 +308,29 @@ function utf8todeflang(p_clob in    clob) return clob is
                                                                             'SIGNATURE/text()'),
                                                   1,
                                                   64);
+      l_sybsidy_list(i).feeamount := to_number(dbms_xslprocessor.valueof(l_row,
+                                                                      'FEEAMOUNT/text()'));
+      l_sybsidy_list(i).feebankcode := substr(dbms_xslprocessor.valueof(l_row,
+                                                                      'FEEBANKCODE/text()'),
+                                                     1,
+                                                     12);                                                                       
+      l_sybsidy_list(i).feepurpose := substr(dbms_xslprocessor.valueof(l_row,
+                                                                      'FEEPURPOSE/text()'),
+                                                1,
+                                                160);
       l_sybsidy_list(i).extrowid := to_number(dbms_xslprocessor.valueof(l_row,
                                                                         'EXTID/text()'));
     end loop;
 
     forall x in indices of l_sybsidy_list
       insert into subsidy_data(EXTREQID,RECEIVERACCNUM,RECEIVERNAME,RECEIVERIDENTCODE,RECEIVERBANKCODE,AMOUNT,PURPOSE,
-                               SIGNATURE,EXTROWID,FEERATE,RECEIVERRNK,PAYERACCNUM,PAYERBANKCODE,PAYTYPE) 
+                               SIGNATURE,EXTROWID,FEERATE,RECEIVERRNK,PAYERACCNUM,PAYERBANKCODE,PAYTYPE,FEEAMOUNT,FEEBANKCODE,
+                               FEEPURPOSE)
       values (l_sybsidy_list(x).EXTREQID,l_sybsidy_list(x).RECEIVERACCNUM,l_sybsidy_list(x).RECEIVERNAME,
               l_sybsidy_list(x).RECEIVERIDENTCODE,l_sybsidy_list(x).RECEIVERBANKCODE, l_sybsidy_list(x).AMOUNT,
               l_sybsidy_list(x).PURPOSE,l_sybsidy_list(x).SIGNATURE,l_sybsidy_list(x).EXTROWID,l_sybsidy_list(x).FEERATE,
               l_sybsidy_list(x).RECEIVERRNK,l_sybsidy_list(x).PAYERACCNUM,l_sybsidy_list(x).PAYERBANKCODE,
-              l_sybsidy_list(x).PAYTYPE);
+              l_sybsidy_list(x).PAYTYPE,l_sybsidy_list(x).FEEAMOUNT,l_sybsidy_list(x).FEEBANKCODE,l_sybsidy_list(x).FEEPURPOSE);
     dbms_xmlparser.freeparser(l_parser);
     DBMS_XMLDOM.freeDocument(l_doc);
     return l_sybsidy_list;
@@ -343,7 +354,7 @@ function utf8todeflang(p_clob in    clob) return clob is
     l_acc_line_6510 accounts%rowtype;
     l_acc_ben_line  accounts%rowtype;
     l_branch        accounts.branch%type;
-    l_branchk       customer.branch%type; 
+    l_branchk       customer.branch%type;
     l_okpo          customer.okpo%type;
     l_okpo_3570     customer.okpo%type;
     l_okpo_6510     customer.okpo%type;
@@ -357,19 +368,19 @@ function utf8todeflang(p_clob in    clob) return clob is
     l_erramsg       varchar2(1000);
     l_buf           varchar2(32000);
   begin
-    
-    
+
+
     if p_sybsidy_list.count > 0 then
       l_sybsidy_list  := p_sybsidy_list;
-      
+
       l_bdate         := gl.bdate;
-      
-      
-    
+
+
+
       for i in l_sybsidy_list.first .. l_sybsidy_list.last loop
         begin
           savepoint before_pay;
-          
+
           l_nls           := l_sybsidy_list(i).payeraccnum;
           l_mfo           := l_sybsidy_list(i).payerbankcode;
           l_accounts_line := account_utl.read_account(p_account_number => l_nls,
@@ -377,15 +388,15 @@ function utf8todeflang(p_clob in    clob) return clob is
                                                   p_mfo            => l_mfo);
           l_okpo          := customer_utl.get_customer_okpo(l_accounts_line.rnk);
           l_branch        := l_accounts_line.branch;
-          
+
           if (substr(l_mfo,1,6) = l_sybsidy_list(i).receiverbankcode) then
             l_acc_rec_line := account_utl.read_account(p_account_number => l_sybsidy_list(i).receiveraccnum,
                                                   p_currency_id    => 980,
                                                   p_mfo            => l_mfo);
-          end if; 
-          
+          end if;
+
           bc.subst_branch(l_branch);
-          
+
           if l_sybsidy_list(i).paytype = 1 then
             if substr(l_sybsidy_list(i).receiveraccnum, 1, 4) = '2603' and substr(l_mfo,1,6) != l_sybsidy_list(i).receiverbankcode then
               l_tt := 'SM3';
@@ -405,23 +416,24 @@ function utf8todeflang(p_clob in    clob) return clob is
             else
               l_tt := 'PXS';
             end if;
-          else 
+          else
             raise_application_error(-20000, 'Типу виплат '||l_sybsidy_list(i).paytype|| 'не знайдено!');
           end if;
 
           l_buf := convert(
-                   (l_sybsidy_list(i).payeraccnum || l_sybsidy_list(i).payerbankcode || l_sybsidy_list(i).receiveraccnum || 
-                   l_sybsidy_list(i).receivername || l_sybsidy_list(i).receiverrnk || l_sybsidy_list(i).receiveridentcode || 
-                   l_sybsidy_list(i).receiverbankcode || l_sybsidy_list(i).amount || l_sybsidy_list(i).purpose), 'UTF8','CL8MSWIN1251') /*|| 
+                   (l_sybsidy_list(i).payeraccnum || l_sybsidy_list(i).payerbankcode || l_sybsidy_list(i).receiveraccnum ||
+                    l_sybsidy_list(i).receivername || l_sybsidy_list(i).receiveridentcode ||l_sybsidy_list(i).receiverbankcode || 
+                    l_sybsidy_list(i).amount || l_sybsidy_list(i).purpose || l_sybsidy_list(i).feeamount || 
+                    l_sybsidy_list(i).feebankcode || l_sybsidy_list(i).feepurpose ), 'UTF8','CL8MSWIN1251') /*||
                    to_char(l_sybsidy_list(i).feerate/100)*/;
           --Перевіряємо макпідпис, можливо прийдеть добавити кодування, за замовчуванням Win1251
           if crypto_utl.check_mac_sh1(p_src     => l_buf,
                                       p_key     => crypto_utl.get_key_value(sysdate, 'SUBSIDY'),
                                                    p_sign => l_sybsidy_list(i).signature,
                                       p_charset => null) then
-          
+
             gl.ref(l_ref);
-            
+
             gl.in_doc3(ref_   => l_ref,
                        tt_    => l_tt,
                        vob_   => 6,
@@ -452,7 +464,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                        prty_  => 0,
                        uid_   => user_id);
 
-               
+
                       paytt(null,
                       l_ref,
                       l_bdate,
@@ -465,14 +477,19 @@ function utf8todeflang(p_clob in    clob) return clob is
                       l_sybsidy_list(i).receiveraccnum,
                       l_sybsidy_list(i).amount);
 
-                    
+
             -- комиссия
-            if nvl(l_sybsidy_list(i).feerate,0) > 0 and l_sybsidy_list(i).paytype = 1 then
-              l_ttk      := 'SM2';
-              
-              bc.go('/');
-			  
-			  begin 
+            if nvl(l_sybsidy_list(i).feeamount,0) > 0 and l_sybsidy_list(i).paytype = 1 then
+     
+                if (l_mfo = l_sybsidy_list(i).feebankcode) then
+                   l_ttk      := 'SM7';
+                else 
+                   l_ttk      := 'SM8';
+                end if;
+
+/*
+      			  begin
+          
                 select c.rnk
                   into l_sybsidy_list(i).receiverrnk
                   from customer c
@@ -487,28 +504,31 @@ function utf8todeflang(p_clob in    clob) return clob is
                      okpo
                 into l_branchk,
                      l_okpo_3570
-                from customer 
-               where rnk = l_sybsidy_list(i).receiverrnk;
-
-              if length(l_branchk) = 8 then
-                l_branchk := l_branchk||'000000/';
-              end if;
+                from customer
+               where rnk = l_sybsidy_list(i).receiverrnk;*/
+              
+              l_branchk := '/'||l_sybsidy_list(i).feebankcode||'/000000/';
+              
 
               bc.subst_branch(l_branchk);
+              
               l_mfok := gl.amfo;
-              l_nls_3570 := get_acc_3570_subsidy(l_sybsidy_list(i).receiverrnk);
+              /*l_nls_3570 := get_acc_3570_subsidy(l_sybsidy_list(i).receiverrnk);
               l_acc_line_3570 := account_utl.read_account(p_account_number => l_nls_3570,
-                                                          p_currency_id    => l_kv);
+                                                          p_currency_id    => l_kv);*/
               l_acc_6510 := nbs_ob22_null('6510', 'H7', l_branchk);
               if l_acc_6510 is null then
-                OP_BS_OB1(l_branchk, '6510H7');
+                raise_application_error(-20000, 'Не знайдено рахунок 6510 у бранчі №'||l_branchk);
+                /*OP_BS_OB1(l_branchk, '6510H7');*/
               end if;
-              l_acc_6510 := nbs_ob22_null('6510', 'H7',l_branchk);
+              --l_acc_6510 := nbs_ob22_null('6510', 'H7',l_branchk);
               l_acc_line_6510 := account_utl.read_account(p_account_number => l_acc_6510, p_currency_id => 980);
               l_okpo_6510 := customer_utl.get_customer_okpo(l_acc_line_6510.rnk);
               
+              bc.subst_branch(l_branch);
+
               gl.ref(l_refk);
-            
+
               gl.in_doc3(ref_   => l_refk,
                          tt_    => l_ttk,
                          vob_   => 6,
@@ -517,40 +537,40 @@ function utf8todeflang(p_clob in    clob) return clob is
                          vdat_  => l_bdate,
                          dk_    => l_dk,
                          kv_    => l_kv,
-                         s_     => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
+                         s_     => l_sybsidy_list(i).feeamount,
                          kv2_   => l_kv,
-                         s2_    => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
+                         s2_    => l_sybsidy_list(i).feeamount,
                          sk_    => null,
                          data_  => l_bdate,
                          datp_  => l_bdate,
-                         nam_a_ => substr(l_acc_line_3570.nms,1,38),
-                         nlsa_  => l_nls_3570,
-                         mfoa_  => l_mfok,
+                         nam_a_ => substr(l_accounts_line.nms,1,38),
+                         nlsa_  => l_nls,
+                         mfoa_  => l_mfo,
                          nam_b_ => substr(l_acc_line_6510.nms,1,38),
                          nlsb_  => l_acc_line_6510.nls,
                          mfob_  => l_mfok,
-                         nazn_  => 'Нарахування комісії за надання послуги переказу платежів згідно реєстру',
+                         nazn_  => l_sybsidy_list(i).feepurpose,
                          d_rec_ => null,
-                         id_a_  => l_okpo_3570,
+                         id_a_  => l_okpo,
                          id_b_  => l_okpo_6510,
                          id_o_  => null,
                          sign_  => null,
                          sos_   => 1,
                          prty_  => 0,
                          uid_   => user_id);
-                         
+
                 paytt(null,
                       l_refk,
                       l_bdate,
                       l_ttk,
                       l_dk,
                       l_kv,
-                      l_nls_3570,
-                      l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100,
+                      l_nls,
+                      l_sybsidy_list(i).feeamount,
                       l_kv,
                       l_acc_line_6510.nls,
-                      l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);
-            
+                      l_sybsidy_list(i).feeamount);
+
               /*gl.payv(flg_  => 0,
                       ref_  => l_refk,
                       dat_  => l_bdate,
@@ -562,38 +582,38 @@ function utf8todeflang(p_clob in    clob) return clob is
                       kv2_  => l_kv,
                       nls2_ => l_acc_line_6510.nls,
                       sum2_ => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);*/
-               gl.pay(2,
+              /* gl.pay(2,
                       l_refk,
-                      l_bdate);
+                      l_bdate);*/
                insert into operw (ref,tag,value,kf)
                values (l_refk, 'REF92', l_ref, gl.aMFO);
-               
-               if l_mfok = l_sybsidy_list(i).receiverbankcode and substr(l_sybsidy_list(i).receiveraccnum,1,4) = '2600' then
+
+              /* if l_mfok = l_sybsidy_list(i).receiverbankcode and substr(l_sybsidy_list(i).receiveraccnum,1,4) = '2600' then
                   if l_acc_rec_line.Tip like 'W4%' then
                      l_ttkp := 'SM6';
-                  else 
+                  else
                      l_ttkp := 'SM5';
                   end if;
-                  
-                  begin  
+
+                  begin
                       commit;
-                      
-                      begin 
-                        select * 
+
+                      begin
+                        select *
                           into l_acc_ben_line
-                          from accounts 
+                          from accounts
                          where nls = l_sybsidy_list(i).receiveraccnum
                            and dazs is null;
-                      exception when no_data_found then 
+                      exception when no_data_found then
                          raise_application_error(-20000, 'Рахунок отримувача не знайдено - '||l_sybsidy_list(i).receiveraccnum);
                       end;
-                      
+
                       if l_acc_ben_line.blkd != 0 then
                          raise_application_error(-20000, 'Рахунок заблоковано по дебету - '||l_sybsidy_list(i).receiveraccnum);
                       end if;
-                      
+
                       gl.ref(l_refkp);
-                        
+
                       gl.in_doc3(ref_   => l_refkp,
                                  tt_    => l_ttkp,
                                  vob_   => 6,
@@ -623,7 +643,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                                  sos_   => 1,
                                  prty_  => 0,
                                  uid_   => user_id);
-                         
+
                      paytt(null,
                           l_refkp,
                           l_bdate,
@@ -636,10 +656,11 @@ function utf8todeflang(p_clob in    clob) return clob is
                           l_nls_3570,
                           l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);
 
-                  exception when others then 
+                  exception when others then
                     logger.info('SUBSIDY: Помилка при створенні документу на оплату комісіі для рахунку :' ||l_sybsidy_list(i).receiveraccnum);
-                  end;               
-                
+                    raise; 
+                  end;*/
+
                  /* gl.payv(flg_  => 0,
                           ref_  => l_refkp,
                           dat_  => l_bdate,
@@ -651,12 +672,12 @@ function utf8todeflang(p_clob in    clob) return clob is
                           kv2_  => l_kv,
                           nls2_ => l_nls_3570,
                           sum2_ => l_sybsidy_list(i).feerate/100 * l_sybsidy_list(i).amount/100);*/
-               end if;       
+        --       end if;
             end if;
-            
-                     
-            bc.subst_branch(l_branch);
-            
+
+
+          --  bc.subst_branch(l_branch);
+
             if l_refk is not null then
               insert into operw (ref,tag,value,kf)
               values (l_ref, 'REF92', l_refk, gl.aMFO);
@@ -687,7 +708,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                t.err = l_sybsidy_list(x).err
          where t.extreqid = l_sybsidy_list(x).extreqid
            and t.extrowid = l_sybsidy_list(x).extrowid;
-    
+
     end if;
     return l_sybsidy_list;
   end;
@@ -732,7 +753,7 @@ function utf8todeflang(p_clob in    clob) return clob is
               'Очікує оплати'
            end,
            t.ref,
-           o.nd, 
+           o.nd,
            o2.nlsa,
            o2.s,
            case
@@ -826,7 +847,7 @@ function utf8todeflang(p_clob in    clob) return clob is
                                                      l_ticket_list(i).MFOK);
         l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
 
-                                                  dbms_xmldom.makenode(l_supp_text));                                          
+                                                  dbms_xmldom.makenode(l_supp_text));
          --Номер рахунку комісії
         l_supp_element := dbms_xmldom.createelement(l_domdoc, 'FEEACCNUM');
         l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
@@ -845,7 +866,7 @@ function utf8todeflang(p_clob in    clob) return clob is
         l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
 
                                                   dbms_xmldom.makenode(l_supp_text));
-        
+
         --Дата проведения платежа
         l_supp_element := dbms_xmldom.createelement(l_domdoc, 'BDAT');
         l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
@@ -895,10 +916,10 @@ function utf8todeflang(p_clob in    clob) return clob is
         if i.compressed = 1 then
           l_request_data_tmp := utl_compress.lz_uncompress(l_request_data_tmp);
         end if;
-        
+
         --перетворюємо blob в clob, щоб почати парсити
         l_request_data := lob_utl.blob_to_clob(l_request_data_tmp);
-        
+
         --конвертация
         l_request_data := utf8todeflang(l_request_data);
 
@@ -930,12 +951,12 @@ function utf8todeflang(p_clob in    clob) return clob is
     end loop;
 
   end;
-  
+
   procedure start_job is
   begin
      dbms_scheduler.run_job('BARS.SUBSIDY_PAYMENT_JOB',false);
   end;
-  
+
   procedure get_doc_buffers(p_ref     in integer,
                             p_key     in varchar2,
                             p_int_buf out varchar2,
@@ -990,7 +1011,7 @@ function utf8todeflang(p_clob in    clob) return clob is
     sign_  OPER.SIGN%TYPE; -- Signature
     datA_  DATE;           -- Input file date/time
     d_rec_ VARCHAR2(80);   -- Additional parameters
-    
+
     l_cnt number;
 
 
@@ -1002,7 +1023,7 @@ function utf8todeflang(p_clob in    clob) return clob is
          into l_cnt
          from oper_visa ov
         where ov.ref = p_ref;
-       
+
        if (l_cnt = 0) then
            chk.put_visa(p_ref, l_tt, null, 0, p_key, p_int_sign, p_sep_sign);
 
@@ -1013,8 +1034,8 @@ function utf8todeflang(p_clob in    clob) return clob is
            p_fm_intdoccheck(p_ref);
 
            chk.put_visa(p_ref, l_tt, 5, 2, p_key, p_int_sign, p_sep_sign);
-       end if;    
-           
+       end if;
+
 
        gl.pay( 2,p_ref,datp_);
 
