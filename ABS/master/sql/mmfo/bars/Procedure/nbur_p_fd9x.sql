@@ -1,6 +1,6 @@
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FD9X.sql =========*** Run ***
+PROMPT *** Run *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FD9X.sql ======== *** Run ***
 PROMPT ===================================================================================== 
 
 CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FD9X (p_kod_filii  varchar2
@@ -13,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FD9X (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования D9X
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.19.001    12.02.2019
+ VERSION     :    v.19.002    17.05.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := ' v.19.001  12.02.2019';
+  ver_              char(30)  := ' v.19.002  17.05.2019';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -68,7 +68,7 @@ begin
          ,          rownum            Q003_1
          ,          u.k020_1          K020_1
          ,          u.k021_1          K021_1
-         ,          u.nmk             Q001_1
+         ,          p.nmk             Q001_1                    -- по сегменту ddd=010
          ,          null              Q029_1
          ,          u.k020_2          K020_2
          ,          u.k021_2          K021_2
@@ -101,20 +101,26 @@ begin
                            group by cust_code, seg_02, seg_03, seg_04, seg_05 
                                      )
                     select d.K020_1, d.K021_1, d.K020_2, d.K021_2, d.code_cnt,
-                           d.code_rnk, 0 new_rnk, c.nmk, c.branch
+                           d.code_rnk, 0 new_rnk, c.branch
                       from cust_data d, customer c
                      where code_cnt =1
                        and d.code_rnk = c.rnk
                        and c.kf =p_kod_filii
                     union
                     select d.K020_1, d.K021_1, d.K020_2, d.K021_2, code_cnt,
-                           0 code_rnk, c.rnk new_rnk, c.nmk, c.branch
+                           0 code_rnk, c.rnk new_rnk, c.branch
                       from cust_data d, customer c
                      where d.code_cnt >1
                        and c.rnk =( select min(rnk)
                                       from customer
                                      where okpo=d.cust_code and kf =p_kod_filii )
                    ) u,
+                   (   select seg_02 K020_1, seg_04 K021_1, min(field_value) nmk
+                         from v_nbur_#d9_dtl
+                        where report_date = p_report_date
+                          and kf =p_kod_filii
+                          and seg_01 ='010'
+                        group by seg_02, seg_04  ) p,
                    (          select *
                                 from ( select seg_01 ekp_1,
                                               seg_02 K020_1,  seg_03 K020_2,
@@ -131,7 +137,8 @@ begin
                                                         '219' as Q029_2, '225' as K110,   '250' as K040,   '255' as KU_1 )
                                       )
                    ) c
-             where u.k020_1 = c.k020_1 and u.k020_2 = c.k020_2;
+             where u.k020_1 = c.k020_1 and u.k020_2 = c.k020_2
+               and u.k020_1 = p.k020_1 and u.k021_1 = p.k021_1;
 
     commit;
 
@@ -141,6 +148,6 @@ end;
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FD9X.sql =========*** End ***
+PROMPT *** End *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FD9X.sql ======== *** End ***
 PROMPT ===================================================================================== 
 
