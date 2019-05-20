@@ -110,6 +110,8 @@ IS
    erm            VARCHAR2 (1024);
    l_nlsa         oper.nlsa%type;
    l_nlsb         oper.nlsb%type;
+   l_mfob         oper.mfob%type;
+   l_mfoa         oper.mfoa%type;
 --
 BEGIN
    bars_audit.trace (
@@ -3339,8 +3341,8 @@ end ;
     end; -- end of 9995 
  
    ELSIF KOD_ = 9999 THEN
-      select t.nlsa, t.nlsb, t.kv2
-        into l_nlsa, l_nlsb, l_kv
+      select t.nlsa, t.nlsb, t.kv2, t.mfoa, t.mfob
+        into l_nlsa, l_nlsb, l_kv,  l_mfoa, l_mfob
         from oper t
        where t.ref = p_ref;
 
@@ -3349,8 +3351,8 @@ end ;
         into l_cnt
         from accounts t
        where t.tip like 'W4%'
-         and t.nls in (l_nlsa, l_nlsb)
-         and kv in(kv_, l_kv);
+          and ((t.nls = l_nlsa and t.kf=l_mfoa) or (t.nls = l_nlsb and t.kf=l_mfob))
+          and kv in(kv_, l_kv);
 
       IF l_cnt > 0
       THEN
