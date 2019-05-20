@@ -1,0 +1,261 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/08/2019 13:42:07" ReportInfo.Modified="05/20/2019 12:31:36" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHzPfbhMU3HSoU5H4mPft3vzmhYQRGiSEGLvPYrIDIZuUw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 DOC, NUM00 S, DAT00 CDAT, NUM01 ISNULL, DAT01 NDAT, DAT02 MDAT, CHAR01 CTYPE, CHAR02 CNUM_CST, CHAR03 CNUM_YEAR, CHAR04 CNUM_NUM, CHAR05 MVM_FEAT, CHAR06 S_OKPO, CHAR07 S_NAME, CHAR08 S_ADRES, NUM02 S_TYPE, CHAR09 S_TAXID, CHAR10 R_OKPO, CHAR11 R_NAME, CHAR12 R_ADRES, NUM03 R_TYPE, CHAR13 R_TAXID, CHAR14 F_OKPO, CHAR15 F_NAME, CHAR16 F_ADRES, NUM04 F_TYPE, CHAR17 F_TAXID, CHAR18 F_COUNTRY, CHAR19 UAH_NLS, CHAR20 CCY_NLS, NUM05 KV, NUM06 KURS, DAT03 ALLOW_DAT, NUM07 CMODE_CODE, DAT04 BEG_DATE, DAT05 END_DATE, DAT06 DAT, NUM08 CHARACTER, CHAR21 FN_MM, CHAR22 UAH_MFO_NEW, CHAR23 CCY_MFO_NEW, CHAR24 NEW_MFO, CHAR25 OLD_MFO from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="DOC" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="CDAT" DataType="System.DateTime"/>
+        <Column Name="ISNULL" DataType="System.Decimal"/>
+        <Column Name="NDAT" DataType="System.DateTime"/>
+        <Column Name="MDAT" DataType="System.DateTime"/>
+        <Column Name="CTYPE" DataType="System.String"/>
+        <Column Name="CNUM_CST" DataType="System.String"/>
+        <Column Name="CNUM_YEAR" DataType="System.String"/>
+        <Column Name="CNUM_NUM" DataType="System.String"/>
+        <Column Name="MVM_FEAT" DataType="System.String"/>
+        <Column Name="S_OKPO" DataType="System.String"/>
+        <Column Name="S_NAME" DataType="System.String"/>
+        <Column Name="S_ADRES" DataType="System.String"/>
+        <Column Name="S_TYPE" DataType="System.Decimal"/>
+        <Column Name="S_TAXID" DataType="System.String"/>
+        <Column Name="R_OKPO" DataType="System.String"/>
+        <Column Name="R_NAME" DataType="System.String"/>
+        <Column Name="R_ADRES" DataType="System.String"/>
+        <Column Name="R_TYPE" DataType="System.Decimal"/>
+        <Column Name="R_TAXID" DataType="System.String"/>
+        <Column Name="F_OKPO" DataType="System.String"/>
+        <Column Name="F_NAME" DataType="System.String"/>
+        <Column Name="F_ADRES" DataType="System.String"/>
+        <Column Name="F_TYPE" DataType="System.Decimal"/>
+        <Column Name="F_TAXID" DataType="System.String"/>
+        <Column Name="F_COUNTRY" DataType="System.String"/>
+        <Column Name="UAH_NLS" DataType="System.String"/>
+        <Column Name="CCY_NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="KURS" DataType="System.Decimal"/>
+        <Column Name="ALLOW_DAT" DataType="System.DateTime"/>
+        <Column Name="CMODE_CODE" DataType="System.Decimal"/>
+        <Column Name="BEG_DATE" DataType="System.DateTime"/>
+        <Column Name="END_DATE" DataType="System.DateTime"/>
+        <Column Name="DAT" DataType="System.DateTime"/>
+        <Column Name="CHARACTER" DataType="System.Decimal"/>
+        <Column Name="FN_MM" DataType="System.String"/>
+        <Column Name="UAH_MFO_NEW" DataType="System.String"/>
+        <Column Name="CCY_MFO_NEW" DataType="System.String"/>
+        <Column Name="NEW_MFO" DataType="System.String"/>
+        <Column Name="OLD_MFO" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="963.9" CanGrow="true" DataSource="Table">
+      <TableObject Name="Table1" Left="9.45" Width="642.6" Height="963.9">
+        <TableColumn Name="Column3" Width="255.15"/>
+        <TableColumn Name="Column4" Width="387.45"/>
+        <TableRow Name="Row55">
+          <TableCell Name="Cell121" Text="Назва файлу"/>
+          <TableCell Name="Cell122" Text="[Table.FN_MM]"/>
+        </TableRow>
+        <TableRow Name="Row56">
+          <TableCell Name="Cell123" Text="Дата файл реєстру МД"/>
+          <TableCell Name="Cell124" Text="[Table.DAT]"/>
+        </TableRow>
+        <TableRow Name="Row57">
+          <TableCell Name="Cell125" Text="Дата створення МД      "/>
+          <TableCell Name="Cell126" Text="[Table.CDAT]"/>
+        </TableRow>
+        <TableRow Name="Row58">
+          <TableCell Name="Cell127" Text="Ознака анулювання"/>
+          <TableCell Name="Cell128" Text="[Table.NDAT]"/>
+        </TableRow>
+        <TableRow Name="Row59">
+          <TableCell Name="Cell129" Text="Дата модифiкацiї       "/>
+          <TableCell Name="Cell130" Text="[Table.MDAT]"/>
+        </TableRow>
+        <TableRow Name="Row60">
+          <TableCell Name="Cell131" Text="Тип ВМД                "/>
+          <TableCell Name="Cell132" Text="[Table.CTYPE]"/>
+        </TableRow>
+        <TableRow Name="Row61">
+          <TableCell Name="Cell133" Text="Номер ВМД (митниця)    "/>
+          <TableCell Name="Cell134" Text="[Table.CNUM_CST]"/>
+        </TableRow>
+        <TableRow Name="Row62">
+          <TableCell Name="Cell135" Text="Номер ВМД (рік)        "/>
+          <TableCell Name="Cell136" Text="[Table.CNUM_YEAR]"/>
+        </TableRow>
+        <TableRow Name="Row63">
+          <TableCell Name="Cell137" Text="Номер ВМД (номер)      "/>
+          <TableCell Name="Cell138" Text="[Table.CNUM_NUM]"/>
+        </TableRow>
+        <TableRow Name="Row64">
+          <TableCell Name="Cell139" Text="Особливiсть  перемiщення"/>
+          <TableCell Name="Cell140" Text="[Table.MVM_FEAT]"/>
+        </TableRow>
+        <TableRow Name="Row65">
+          <TableCell Name="Cell141" Text="МФО уповноваженого банку (старий)"/>
+          <TableCell Name="Cell142" Text="[Table.OLD_MFO]"/>
+        </TableRow>
+        <TableRow Name="Row66">
+          <TableCell Name="Cell143" Text="МФО уповноваженого банку (новий)"/>
+          <TableCell Name="Cell144" Text="[Table.NEW_MFO]"/>
+        </TableRow>
+        <TableRow Name="Row67">
+          <TableCell Name="Cell145"/>
+          <TableCell Name="Cell146"/>
+        </TableRow>
+        <TableRow Name="Row68">
+          <TableCell Name="Cell147" Text="РЕКВІЗИТИ ВІДПРАВНИКА:"/>
+          <TableCell Name="Cell148"/>
+        </TableRow>
+        <TableRow Name="Row69">
+          <TableCell Name="Cell149" Text="Код ЕДРПОУ або код ДРФО"/>
+          <TableCell Name="Cell150" Text="[Table.S_OKPO]"/>
+        </TableRow>
+        <TableRow Name="Row70">
+          <TableCell Name="Cell151" Text="Назва"/>
+          <TableCell Name="Cell152" Text="[Table.S_NAME]"/>
+        </TableRow>
+        <TableRow Name="Row71">
+          <TableCell Name="Cell153" Text="Адреса"/>
+          <TableCell Name="Cell154" Text="[Table.S_ADRES]"/>
+        </TableRow>
+        <TableRow Name="Row72">
+          <TableCell Name="Cell155" Text="Код типу підприємства            "/>
+          <TableCell Name="Cell156" Text="[Table.S_TYPE]"/>
+        </TableRow>
+        <TableRow Name="Row73">
+          <TableCell Name="Cell157" Text="Код платника податків&#13;&#10;"/>
+          <TableCell Name="Cell158" Text="[Table.S_TAXID]"/>
+        </TableRow>
+        <TableRow Name="Row74">
+          <TableCell Name="Cell159"/>
+          <TableCell Name="Cell160"/>
+        </TableRow>
+        <TableRow Name="Row75">
+          <TableCell Name="Cell161" Text="РЕКВІЗИТИ ОДЕРЖУВАЧА:&#13;&#10;&#13;&#10;"/>
+          <TableCell Name="Cell162"/>
+        </TableRow>
+        <TableRow Name="Row76">
+          <TableCell Name="Cell163" Text="Код ЕДРПОУ або код ДРФО&#13;&#10;"/>
+          <TableCell Name="Cell164" Text="[Table.R_OKPO]"/>
+        </TableRow>
+        <TableRow Name="Row77">
+          <TableCell Name="Cell165" Text="Назва"/>
+          <TableCell Name="Cell166" Text="[Table.R_NAME]"/>
+        </TableRow>
+        <TableRow Name="Row78">
+          <TableCell Name="Cell167" Text="Адреса"/>
+          <TableCell Name="Cell168" Text="[Table.R_ADRES]"/>
+        </TableRow>
+        <TableRow Name="Row79">
+          <TableCell Name="Cell169" Text="Код типу підприємства&#13;&#10;"/>
+          <TableCell Name="Cell170" Text="[Table.R_TYPE]"/>
+        </TableRow>
+        <TableRow Name="Row80">
+          <TableCell Name="Cell171" Text="Код платника податків&#13;&#10;"/>
+          <TableCell Name="Cell172" Text="[Table.R_TAXID]"/>
+        </TableRow>
+        <TableRow Name="Row81">
+          <TableCell Name="Cell173"/>
+          <TableCell Name="Cell174"/>
+        </TableRow>
+        <TableRow Name="Row82" Height="37.8">
+          <TableCell Name="Cell175" Text="РЕКВІЗИТИ ОСОБИ, ЩО ВІДПОВІДАЛЬНА ЗА ФІНАНСОВЕ ВРЕГУЛЮВАННЯ:" ColSpan="2"/>
+          <TableCell Name="Cell176"/>
+        </TableRow>
+        <TableRow Name="Row83">
+          <TableCell Name="Cell177" Text="Код ЕДРПОУ або код  ДРФО&#13;&#10;"/>
+          <TableCell Name="Cell178" Text="[Table.F_OKPO]"/>
+        </TableRow>
+        <TableRow Name="Row84">
+          <TableCell Name="Cell179" Text="Назва"/>
+          <TableCell Name="Cell180" Text="[Table.F_NAME]"/>
+        </TableRow>
+        <TableRow Name="Row85">
+          <TableCell Name="Cell181" Text="Адреса"/>
+          <TableCell Name="Cell182" Text="[Table.F_ADRES]"/>
+        </TableRow>
+        <TableRow Name="Row86">
+          <TableCell Name="Cell183" Text="Код типу підприємства"/>
+          <TableCell Name="Cell184" Text="[Table.F_TYPE]"/>
+        </TableRow>
+        <TableRow Name="Row87">
+          <TableCell Name="Cell185" Text="Код платника податків&#13;&#10;"/>
+          <TableCell Name="Cell186" Text="[Table.F_TAXID]"/>
+        </TableRow>
+        <TableRow Name="Row88">
+          <TableCell Name="Cell187" Text="Код країни нерезидента&#13;&#10;"/>
+          <TableCell Name="Cell188" Text="[Table.F_COUNTRY]"/>
+        </TableRow>
+        <TableRow Name="Row89">
+          <TableCell Name="Cell189"/>
+          <TableCell Name="Cell190"/>
+        </TableRow>
+        <TableRow Name="Row90">
+          <TableCell Name="Cell191" Text="ФІНАНСОВІ ВІДОМОСТІ:"/>
+          <TableCell Name="Cell192"/>
+        </TableRow>
+        <TableRow Name="Row91">
+          <TableCell Name="Cell193" Text="Номер р/р (гривня)&#13;&#10;"/>
+          <TableCell Name="Cell194" Text="[Table.UAH_NLS]"/>
+        </TableRow>
+        <TableRow Name="Row92">
+          <TableCell Name="Cell195" Text="МФО уповн. банку (грн)&#13;&#10;"/>
+          <TableCell Name="Cell196" Text="[Table.UAH_MFO_NEW]"/>
+        </TableRow>
+        <TableRow Name="Row93">
+          <TableCell Name="Cell197" Text="Номер р/р (валюта)"/>
+          <TableCell Name="Cell198" Text="[Table.CCY_NLS]"/>
+        </TableRow>
+        <TableRow Name="Row94">
+          <TableCell Name="Cell199" Text="МФО уповн. банку  (вал)&#13;&#10;"/>
+          <TableCell Name="Cell200" Text="[Table.CCY_MFO_NEW]"/>
+        </TableRow>
+        <TableRow Name="Row95">
+          <TableCell Name="Cell201" Text="Код валюти           "/>
+          <TableCell Name="Cell202" Text="[Table.KV]"/>
+        </TableRow>
+        <TableRow Name="Row96">
+          <TableCell Name="Cell203" Text="Курс валюти          "/>
+          <TableCell Name="Cell204" Text="[Table.KURS]"/>
+        </TableRow>
+        <TableRow Name="Row97">
+          <TableCell Name="Cell205" Text="Загальна фактурна вартiсть:&#13;&#10;"/>
+          <TableCell Name="Cell206" Text="[Table.S]/100"/>
+        </TableRow>
+        <TableRow Name="Row98">
+          <TableCell Name="Cell207" Text="Дата дозволу         "/>
+          <TableCell Name="Cell208" Text="[Table.ALLOW_DAT]"/>
+        </TableRow>
+        <TableRow Name="Row99">
+          <TableCell Name="Cell209" Text="Код митного режиму   "/>
+          <TableCell Name="Cell210" Text="[Table.CMODE_CODE]"/>
+        </TableRow>
+        <TableRow Name="Row100">
+          <TableCell Name="Cell211" Text="Характер угоди       "/>
+          <TableCell Name="Cell212" Text="[Table.CHARACTER]"/>
+        </TableRow>
+        <TableRow Name="Row101">
+          <TableCell Name="Cell213" Text="Документ (контракт)  "/>
+          <TableCell Name="Cell214" Text="[Table.DOC]"/>
+        </TableRow>
+        <TableRow Name="Row102">
+          <TableCell Name="Cell215" Text="Дата початку дії документа&#13;&#10;"/>
+          <TableCell Name="Cell216" Text="[Table.BEG_DATE]"/>
+        </TableRow>
+        <TableRow Name="Row103">
+          <TableCell Name="Cell217" Text="Дата кінця дії документа&#13;&#10;"/>
+          <TableCell Name="Cell218" Text="[Table.END_DATE]"/>
+        </TableRow>
+        <TableRow Name="Row104">
+          <TableCell Name="Cell219" Border.Lines="Bottom" Border.Style="Dash"/>
+          <TableCell Name="Cell220" Border.Lines="Bottom" Border.Style="Dash"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>
