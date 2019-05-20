@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VMD.sql =========*** Run *** ==========
 PROMPT ===================================================================================== 
@@ -7,8 +5,57 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view VMD ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.VMD ("DAT", "FN", "N", "CDAT", "ISNULL", "NDAT", "MDAT", "CTYPE", "CNUM_CST", "CNUM_YEAR", "CNUM_NUM", "MVM_FEAT", "S_OKPO", "S_NAME", "S_ADRES", "S_TYPE", "S_TAXID", "R_OKPO", "R_NAME", "R_ADRES", "R_TYPE", "R_TAXID", "F_OKPO", "F_NAME", "F_ADRES", "F_TYPE", "F_TAXID", "F_COUNTRY", "UAH_NLS", "UAH_MFO", "CCY_NLS", "CCY_MFO", "KV", "KURS", "S", "ALLOW_DAT", "CMODE_CODE", "DOC", "BEG_DATE", "END_DATE", "CHARACTER") AS 
-  SELECT dat,
+  CREATE OR REPLACE FORCE VIEW BARS.VMD
+(
+   DAT,
+   FN,
+   N,
+   CDAT,
+   ISNULL,
+   NDAT,
+   MDAT,
+   CTYPE,
+   CNUM_CST,
+   CNUM_YEAR,
+   CNUM_NUM,
+   MVM_FEAT,
+   S_OKPO,
+   S_NAME,
+   S_ADRES,
+   S_TYPE,
+   S_TAXID,
+   R_OKPO,
+   R_NAME,
+   R_ADRES,
+   R_TYPE,
+   R_TAXID,
+   F_OKPO,
+   F_NAME,
+   F_ADRES,
+   F_TYPE,
+   F_TAXID,
+   F_COUNTRY,
+   UAH_NLS,
+   UAH_MFO,
+   CCY_NLS,
+   CCY_MFO,
+   KV,
+   KURS,
+   S,
+   ALLOW_DAT,
+   CMODE_CODE,
+   DOC,
+   BEG_DATE,
+   END_DATE,
+   CHARACTER,
+   UAH_MFO_NEW,
+   CCY_MFO_NEW,
+   FN_MM,
+   MDAT_NEW,
+   CIM_ID 
+ )
+AS
+   SELECT dat,
           fn,
           n,
           cdat,
@@ -48,9 +95,14 @@ PROMPT *** Create  view VMD ***
           doc,
           sdate,
           fdate,
-          character
+          character,
+          UAH_MFO_NEW,
+          CCY_MFO_NEW,
+          FN_MM,
+          MDAT_NEW,
+          CIM_ID
      FROM customs_decl;
-
+	 
 PROMPT *** Create  grants  VMD ***
 grant SELECT                                                                 on VMD             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VMD             to BARS_ACCESS_DEFROLE;
