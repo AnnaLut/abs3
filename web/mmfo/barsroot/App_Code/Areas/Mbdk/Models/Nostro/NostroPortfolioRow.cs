@@ -32,5 +32,7 @@ namespace BarsWeb.Areas.Mbdk.Models
         public string PROD { get; set; }
         public byte? FIN_351 { get; set; }
         public decimal? PD { get; set; }
+        public string NKD { get; set; }
+        public string DKD { get; set; }
     }
 }

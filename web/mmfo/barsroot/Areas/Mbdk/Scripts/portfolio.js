@@ -112,7 +112,19 @@ $(document).ready(function () {
               field: "WDATE",
               nullable: true,
               format: "{0:dd.MM.yyyy}"
-          },
+            },
+            {
+                title: "Номер договору",
+                width: 120,
+                nullable: true,
+                field: "NKD"
+            },
+            {
+                title: "Дата договору",
+                width: 90,
+                field: "DKD",
+                nullable: true
+            },
            {
                title: "Клас боржника\n(пост.351)",
                width: 80,
@@ -453,7 +465,9 @@ function createNostroList() {
                     FIN_NAME: { type: "string", editable: false },
                     OBS_NAME: { type: "string", editable: false },
                     KAT_NAME: { type: "string", editable: false },
-                    NMK: { type: "string" }
+                    NMK: { type: "string" },
+                    NKD: { type: "string", editable: false },
+                    DKD: { type: "string", editable: false }
                 }
             }
         },
