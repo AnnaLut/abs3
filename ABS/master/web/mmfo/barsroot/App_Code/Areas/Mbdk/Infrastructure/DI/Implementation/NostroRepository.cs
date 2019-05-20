@@ -56,6 +56,22 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
                             nostro.PROD = String.IsNullOrEmpty(reader.GetValue(25).ToString()) ? String.Empty : reader.GetString(25);
                             nostro.FIN_351 = String.IsNullOrEmpty(reader.GetValue(26).ToString()) ? (byte?)null : reader.GetByte(26);
                             nostro.PD = String.IsNullOrEmpty(reader.GetValue(27).ToString()) ? (decimal?)null : reader.GetDecimal(27);
+                            if (nostro.NLS.StartsWith("1500"))
+                            {
+                                using (OracleCommand command = conn.CreateCommand())
+                                {
+                                    command.CommandText = @"select s.nkd, f_acc_tag(p_acc => :acc, p_tag  => 'DKD') from specparam s where s.acc = :acc";
+                                    command.Parameters.Add("acc", OracleDbType.Int64, nostro.ACC, ParameterDirection.Input);
+                                    using (OracleDataReader rdr = command.ExecuteReader())
+                                    {
+                                        if (rdr.Read())
+                                        {
+                                            nostro.NKD = (rdr.GetValue(0) ?? String.Empty).ToString();
+                                            nostro.DKD = (rdr.GetValue(1) ?? String.Empty).ToString();
+                                        }
+                                    }
+                                }
+                            }
 
                             rows.Add(nostro);
                         }
