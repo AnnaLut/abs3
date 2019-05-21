@@ -2297,7 +2297,7 @@ is
   begin
     bars_audit.info (g_p_name || l_act || ' start.');
 
-    select send_payroll_id, status, err, corp2_id
+    select id, status, err, corp2_id
     bulk collect into l_payroll_tb
     from zp_payroll_log log
     where log.send_status = 0
