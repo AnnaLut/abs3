@@ -145,7 +145,7 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
             // COBUMMFO-10916 - просимо видалити вказані колонки на Імпортному контракті
             if (contract.ContrType == 1) //Імпортний контракт
             {
-                gvCimTradePrimPayments.Columns[16].Visible = false; // «Документи наявні?»
+                gvCimTradePrimPayments.Columns[19].Visible = false; // «Документи наявні?»
                 gvCimBoundSecondVmd.Columns[19].Visible = false;    //
             }
 
