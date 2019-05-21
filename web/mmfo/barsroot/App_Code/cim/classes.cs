@@ -1348,13 +1348,13 @@ namespace barsroot.cim
                         oraCmd.Parameters.Add("p_percent_nbu", OracleDbType.Decimal, CreditContractInfo.NbuPercent, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_s_limit", OracleDbType.Decimal, CreditContractInfo.CrdLimit, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_creditor_type", OracleDbType.Decimal, CreditContractInfo.CreditorType, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_credit_borrower", OracleDbType.Decimal, CreditContractInfo.CreditorBorrower, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_credit_borrower", OracleDbType.Varchar2, CreditContractInfo.CreditorBorrower, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_credit_type", OracleDbType.Decimal, CreditContractInfo.CreditType, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_credit_term", OracleDbType.Decimal, CreditContractInfo.CreditTerm, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_credit_prepay", OracleDbType.Decimal, CreditContractInfo.CreditPrepay, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_name", OracleDbType.Varchar2, CreditContractInfo.CreditName, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_add_agree", OracleDbType.Varchar2, CreditContractInfo.CreditAddAgree, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_percent_nbu_type", OracleDbType.Decimal, CreditContractInfo.CreditPercent, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_percent_nbu_type", OracleDbType.Varchar2, CreditContractInfo.CreditPercent, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_percent_nbu_info", OracleDbType.Varchar2, CreditContractInfo.CreditNbuInfo, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_r_agree_date", OracleDbType.Date, CreditContractInfo.CreditAgreeDate, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_r_agree_no", OracleDbType.Varchar2, CreditContractInfo.CreditAgreeNum, ParameterDirection.Input);
@@ -1368,11 +1368,11 @@ namespace barsroot.cim
                         oraCmd.Parameters.Add("p_f503_note", OracleDbType.Varchar2, CreditContractInfo.F503_Note, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f504_reason", OracleDbType.Decimal, CreditContractInfo.F504_Reason, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f504_note", OracleDbType.Varchar2, CreditContractInfo.F504_Note, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_f503_percent_type", OracleDbType.Decimal, CreditContractInfo.F503_PercentType, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_f503_percent_type", OracleDbType.Varchar2, CreditContractInfo.F503_PercentType, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_base", OracleDbType.Varchar2, CreditContractInfo.F503_Base, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_margin", OracleDbType.Decimal, CreditContractInfo.F503_Margin, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent", OracleDbType.Decimal, CreditContractInfo.F503_Percent, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_f503_purpose", OracleDbType.Decimal, CreditContractInfo.F503_Purpose, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_f503_purpose", OracleDbType.Varchar2, CreditContractInfo.F503_Purpose, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_base_t", OracleDbType.Varchar2, CreditContractInfo.F503_Base_Term, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_change_info", OracleDbType.Varchar2, CreditContractInfo.F503_Change_Info, ParameterDirection.Input);
                     }
@@ -1430,14 +1430,14 @@ namespace barsroot.cim
                         oraCmd.Parameters.Add("p_percent_nbu", OracleDbType.Decimal, CreditContractInfo.NbuPercent, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_s_limit", OracleDbType.Decimal, CreditContractInfo.CrdLimit, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_creditor_type", OracleDbType.Decimal, CreditContractInfo.CreditorType, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_credit_borrower", OracleDbType.Decimal, CreditContractInfo.CreditorBorrower, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_credit_borrower", OracleDbType.Varchar2, CreditContractInfo.CreditorBorrower, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_credit_type", OracleDbType.Decimal, CreditContractInfo.CreditType, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_credit_term", OracleDbType.Decimal, CreditContractInfo.CreditTerm, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_credit_prepay", OracleDbType.Decimal, CreditContractInfo.CreditPrepay, ParameterDirection.Input);
 
                         oraCmd.Parameters.Add("p_name", OracleDbType.Varchar2, CreditContractInfo.CreditName, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_add_agree", OracleDbType.Varchar2, CreditContractInfo.CreditAddAgree, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_percent_nbu_type", OracleDbType.Decimal, CreditContractInfo.CreditPercent, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_percent_nbu_type", OracleDbType.Varchar2, CreditContractInfo.CreditPercent, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_percent_nbu_info", OracleDbType.Varchar2, CreditContractInfo.CreditNbuInfo, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_r_agree_date", OracleDbType.Date, CreditContractInfo.CreditAgreeDate, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_r_agree_no", OracleDbType.Varchar2, CreditContractInfo.CreditAgreeNum, ParameterDirection.Input);
@@ -1451,11 +1451,11 @@ namespace barsroot.cim
                         oraCmd.Parameters.Add("p_f503_note", OracleDbType.Varchar2, CreditContractInfo.F503_Note, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f504_reason", OracleDbType.Decimal, CreditContractInfo.F504_Reason, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f504_note", OracleDbType.Varchar2, CreditContractInfo.F504_Note, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_f503_percent_type", OracleDbType.Decimal, CreditContractInfo.F503_PercentType, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_f503_percent_type", OracleDbType.Varchar2, CreditContractInfo.F503_PercentType, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_base", OracleDbType.Varchar2, CreditContractInfo.F503_Base, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_margin", OracleDbType.Decimal, CreditContractInfo.F503_Margin, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent", OracleDbType.Decimal, CreditContractInfo.F503_Percent, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_f503_purpose", OracleDbType.Decimal, CreditContractInfo.F503_Purpose, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_f503_purpose", OracleDbType.Varchar2, CreditContractInfo.F503_Purpose, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_base_t", OracleDbType.Varchar2, CreditContractInfo.F503_Base_Term, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_change_info", OracleDbType.Varchar2, CreditContractInfo.F503_Change_Info, ParameterDirection.Input);
                     }
@@ -2749,14 +2749,14 @@ namespace barsroot.cim
         public decimal? CreditorType { get; set; }
         public decimal? CreditType { get; set; }
         //public decimal CreditPeriod { get; set; }
-        public decimal? CreditorBorrower { get; set; }
+        public string CreditorBorrower { get; set; }
 
         public decimal CreditTerm { get; set; }
         //public decimal CreditMethod { get; set; }
         public decimal? CreditPrepay { get; set; }
         public string CreditName { get; set; }
         public string CreditAddAgree { get; set; }
-        public decimal CreditPercent { get; set; }
+        public string CreditPercent { get; set; }
         public string CreditNbuInfo { get; set; }
         public DateTime? CreditAgreeDate;
         public string CreditAgreeDateS
@@ -2837,7 +2837,7 @@ namespace barsroot.cim
         public decimal? F503_State { get; set; }
         public string F503_Note { get; set; }
 
-        public decimal? F503_PercentType { get; set; }
+        public string F503_PercentType { get; set; }
 
         public string F503_Base { get; set; }
 
@@ -2845,7 +2845,7 @@ namespace barsroot.cim
 
         public decimal? F503_Percent { get; set; }
 
-        public decimal? F503_Purpose { get; set; }
+        public string F503_Purpose { get; set; }
 
         public string F503_Base_Term { get; set; }
 
@@ -2906,7 +2906,7 @@ namespace barsroot.cim
 
                         CreditName = oraRdr["name"].ToString();
                         CreditAddAgree = oraRdr["add_agree"].ToString();
-                        CreditPercent = (decimal)(oraRdr["percent_nbu_type"]);
+                        CreditPercent = oraRdr["percent_nbu_type"].ToString();
                         CreditNbuInfo = oraRdr["percent_nbu_info"].ToString();
                         if (oraRdr["r_agree_date"].ToString() != "")
                             CreditAgreeDate = Convert.ToDateTime(oraRdr["r_agree_date"]);
@@ -2944,21 +2944,19 @@ namespace barsroot.cim
                         if (!oraRdr.IsDBNull(29))
                             FutureRevenue = Convert.ToDecimal(oraRdr.GetValue(29)); // s - s_in_pl
                         if (!oraRdr.IsDBNull(30))
-                            CreditorBorrower = Convert.ToDecimal(oraRdr.GetValue(30)); // borrower
+                            CreditorBorrower = oraRdr.GetValue(30).ToString(); // borrower
                         if (oraRdr["f504_reason"].ToString() != "")
                             F504_Reason = Convert.ToDecimal(oraRdr["f504_reason"]);
                         if (oraRdr["f504_note"].ToString() != "")
                             F504_Note = oraRdr["f504_note"].ToString();
-                        if (oraRdr["f503_percent_type"].ToString() != "")
-                            F503_PercentType = (decimal?)(oraRdr["f503_percent_type"]);
+                        F503_PercentType = oraRdr["f503_percent_type"].ToString();
                         if (oraRdr["f503_percent_base"].ToString() != "")
                             F503_Base = oraRdr["f503_percent_base"].ToString();
                         if (oraRdr["f503_percent_margin"].ToString() != "")
                             F503_Margin = (decimal?)(oraRdr["f503_percent_margin"]);
                         if (oraRdr["f503_percent"].ToString() != "")
                             F503_Percent = (decimal?)(oraRdr["f503_percent"]);
-                        if (oraRdr["f503_purpose"].ToString() != "")
-                            F503_Purpose = (decimal?)(oraRdr["f503_purpose"]);
+                        F503_Purpose = oraRdr["f503_purpose"].ToString();
                         if (oraRdr["f503_percent_base_t"].ToString() != "")
                             F503_Base_Term = oraRdr["f503_percent_base_t"].ToString();
                         if (oraRdr["f503_change_info"].ToString() != "")
