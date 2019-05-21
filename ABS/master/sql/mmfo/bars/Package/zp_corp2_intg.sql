@@ -52,7 +52,7 @@ end;
 
 create or replace package body bars.zp_corp2_intg
 is
-   g_body_version   constant varchar2 (64) := 'version 2.0 31.10.2018';
+   g_body_version   constant varchar2 (64) := 'version 2.12 21.05.2019';
 
    g_p_name         constant varchar2 (13) := 'zp_corp2_intg';
 
@@ -2283,63 +2283,77 @@ is
             || dbms_utility.format_error_backtrace ());
    end;
 
-   function form_payrolls_result return clob
-   is
-      l_xml_tmp     xmltype := null;
-      l_clob_data   clob;
-      l_act         varchar2 (100) := '.form_payrolls_result.';
-   begin
-      bars_audit.info (g_p_name || l_act || ' start.');
+  function form_payrolls_result return clob
+  is
+    l_xml_tmp     xmltype := null;
+    l_clob_data   clob;
+    l_act         varchar2 (100) := '.form_payrolls_result.';
+    type t_payroll_row is record(id       zp_payroll.id%type,
+                                 status   zp_payroll_log.status%type,
+                                 err      zp_payroll_log.err%type,
+                                 corp2_id zp_payroll_log.corp2_id%type);
+    type t_payroll     is table of t_payroll_row;
+    l_payroll_tb       t_payroll := t_payroll();
+  begin
+    bars_audit.info (g_p_name || l_act || ' start.');
 
-      dbms_lob.createtemporary (l_clob_data, false);
-      dbms_lob.append (l_clob_data, '<rowset>');
+    select send_payroll_id, status, err, corp2_id
+    bulk collect into l_payroll_tb
+    from zp_payroll_log log
+    where log.send_status = 0
+          and rownum < 2001;
 
-       for l in (select log.*
-                   from zp_payroll_log log
-                  where send_status = 0)
-       loop
+    bars_audit.info (g_p_name || l_act || ' payroll.count='||to_char(l_payroll_tb.count));
 
+    -- якщо даних нема, повертаєм пусто
+    if l_payroll_tb.count = 0 then
+      return empty_clob();
+    end if;
 
-          dbms_lob.append (l_clob_data, '<row>');
-          dbms_lob.append (l_clob_data, '<payroll_id>' || l.corp2_id || '</payroll_id>');
-          dbms_lob.append (l_clob_data, '<payroll_status>' || l.status || '</payroll_status>');
-          dbms_lob.append (l_clob_data, '<payroll_err>' || l.err || '</payroll_err>');
-          dbms_lob.append (l_clob_data, '<docs>');
+    dbms_lob.createtemporary (l_clob_data, false);
+    dbms_lob.append (l_clob_data, '<rowset>');
 
-          for c
-             in (select d.corp2_id,
-                        log.status,
-                        log.err,
-                        o.ref,
-                        o.sos,
-                        d.doc_comment
-                   from zp_payroll_log log, zp_payroll_doc d, oper o
-                  where     send_status = 0
-                        and d.id_pr = log.id
-                        and d.ref = o.ref(+)
-                        and log.corp2_id = l.corp2_id)
-          loop
-             dbms_lob.append (l_clob_data, '<doc>');
-             dbms_lob.append (l_clob_data, '<doc_id>' || c.corp2_id || '</doc_id>');
-             dbms_lob.append (l_clob_data, '<ref>' || c.ref || '</ref>');
-             dbms_lob.append (l_clob_data, '<doc_sos>' || c.sos || '</doc_sos>');
-             dbms_lob.append (l_clob_data, '<doc_comm>' || c.doc_comment || '</doc_comm>');
-             dbms_lob.append (l_clob_data, '</doc>');
-          end loop;
+    for i in l_payroll_tb.first..l_payroll_tb.last loop
+      dbms_lob.append (l_clob_data, '<row>');
+      dbms_lob.append (l_clob_data, '<payroll_id>' || l_payroll_tb(i).corp2_id || '</payroll_id>');
+      dbms_lob.append (l_clob_data, '<payroll_status>' || l_payroll_tb(i).status || '</payroll_status>');
+      dbms_lob.append (l_clob_data, '<payroll_err>' || l_payroll_tb(i).err || '</payroll_err>');
+      dbms_lob.append (l_clob_data, '<docs>');
 
-          dbms_lob.append (l_clob_data, '</docs>');
-          dbms_lob.append (l_clob_data, '</row>');
-       end loop;
+      for c
+         in (select d.corp2_id,
+                    log.status,
+                    log.err,
+                    o.ref,
+                    o.sos,
+                    d.doc_comment
+               from zp_payroll_log log, zp_payroll_doc d, oper o
+              where     send_status = 0
+                    and d.id_pr = log.id
+                    and d.ref = o.ref(+)
+                    and log.corp2_id = l_payroll_tb(i).corp2_id)
+      loop
+         dbms_lob.append (l_clob_data, '<doc>');
+         dbms_lob.append (l_clob_data, '<doc_id>' || c.corp2_id || '</doc_id>');
+         dbms_lob.append (l_clob_data, '<ref>' || c.ref || '</ref>');
+         dbms_lob.append (l_clob_data, '<doc_sos>' || c.sos || '</doc_sos>');
+         dbms_lob.append (l_clob_data, '<doc_comm>' || case when c.sos = 5 then null else c.doc_comment end || '</doc_comm>');
+         dbms_lob.append (l_clob_data, '</doc>');
+      end loop;
 
-      dbms_lob.append (l_clob_data, '</rowset>');
+      dbms_lob.append (l_clob_data, '</docs>');
+      dbms_lob.append (l_clob_data, '</row>');
+     end loop;
 
-      if dbms_lob.getlength (l_clob_data) > 0
-      then
-         return encodebase64(l_clob_data);
-      else
-         return empty_clob ();
-      end if;
-   end;
+    dbms_lob.append (l_clob_data, '</rowset>');
+
+    if dbms_lob.getlength (l_clob_data) > 0
+    then
+       return encodebase64(l_clob_data);
+    else
+       return empty_clob ();
+    end if;
+  end form_payrolls_result;
   
   -- Запис результатів обробки статусів відомостей та документів в Corp2
   procedure set_payroll_log_result(p_result in clob)
@@ -2457,6 +2471,12 @@ is
       end if;
 
       l_buff := form_payrolls_result();
+
+      if l_buff = empty_clob() then
+        -- нема даних, виходим із методу
+        bars_audit.info (g_p_name || l_act || ' finish - no data to send');
+        return;
+      end if;
 
       l_request :=
          soap_rpc.new_request (p_url           => l_url,
