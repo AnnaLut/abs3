@@ -142,6 +142,13 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
             lbTradeZVMD.Text = CimManager.NumberFormat(tcc.ZVmd);
             lbTradeSVMD.Text = CimManager.NumberFormat(tcc.SumVmd);
             
+            // COBUMMFO-10916 - просимо видалити вказані колонки на Імпортному контракті
+            if (contract.ContrType == 1) //Імпортний контракт
+            {
+                gvCimTradePrimPayments.Columns[16].Visible = false; // «Документи наявні?»
+                gvCimBoundSecondVmd.Columns[19].Visible = false;    //
+            }
+
             // прячем колонки, если не мультивалютные
             if (!tcc.HasMultiValutsPayments)
             {
