@@ -1,6 +1,6 @@
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql =========*** Run ***
+PROMPT *** Run *** ========= Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql ========= *** Run ***
 PROMPT ===================================================================================== 
 
 
@@ -13,12 +13,12 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.19.008          18.03.2019
+% VERSION     :   v.19.010d          21.05.2019
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-    ver_           varchar2(30)        := ' v.19.008    18.03.2019';
+    ver_           varchar2(30)        := ' v.19.010d    21.05.2019';
 /*
    Структура показателя    DDDD NNN
 
@@ -26,7 +26,7 @@ IS
   5   NNN           условный номер операции
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+21.05.2019  -добавлены операции с банк.металлами                  [11705]
 14.03.2019  -добавлены операции ч-з транзитный счет 2924          [11063]
 09.11.2018  -mfo 336503, добавлено дт2900-кт26035306015772        [9664]
             -forex                                                [9924]
@@ -217,6 +217,19 @@ IS
            l_znap := substr(p_znap,1,2)||'.'||substr(p_znap,3,2)||'.'||substr(p_znap,5,4);
       end if;
 
+      if  l_kodp like 'F092%'    then
+           if     ko_ =1  and  kv_ in (959, 961, 962, 964)  then 
+                l_znap :='140';
+           end if;
+           if     ko_ =2  and  kv_ in (959, 961, 962, 964)  then
+                l_znap :='216';
+           end if;
+      end if;
+      if  l_kodp like 'T071%'  and  kv_ in (959, 961, 962, 964)
+                               and l_znap not like '%.0%'    then 
+                l_znap :=trim(l_znap)||'.0';
+      end if;
+
           insert
             into NBUR_DETAIL_PROTOCOLS
                ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, DESCRIPTION
@@ -250,17 +263,21 @@ IS
                p_value_ := '216';
                d1#D3_ := '16';
             end if;
-            if nls_ like '2625%' and nlsk_ like '3800%' or
-               nls_ like '2620%' and nlsk_ like '3800%'
+
+            if ( nls_ like '2610%'  or  nls_ like '2620%'  or  nls_ like '2630%'
+               ) and nlsk_ like '3800%'
             then
-               p_value_ := '215';
-               d1#D3_ := '15';
+               if  gl.p_icurval(kv_, sum0_, dat_) <15000000   and  dat_ >= date '2019-04-01'  then
+                 p_value_ := '239';
+                 d1#D3_ := null;
+               else
+                 p_value_ := '215';
+                 d1#D3_ := '15';
+               end if;
             end if;
 
-            if ( nls_ like '2610%'  or  nls_ like '2615%'  or
-                 nls_ like '2630%'  or  nls_ like '2635%'  or
-                 nls_ like '2525%'  or  nls_ like '2546%' )
-               and nlsk_ like '3800%'
+            if ( nls_ like '2525%'  or  nls_ like '2546%'
+               ) and nlsk_ like '3800%'
             then
                p_value_ := '238';
                d1#D3_ := '38';
@@ -391,72 +408,38 @@ IS
            p_kodp_ := 'Q006';
         --для продажу валюти i надходження вiд нерезидентiв новий показник
 
-        IF dat_ >= TO_DATE('13082007','ddmmyyyy') AND ko_ = 2 then
---           p_kodp_ := 'Q006';
+        IF  ko_ = 2  then
+
            p_value_ :=NVL (SUBSTR (TRIM (p_value_), 1, 70), '');
 
-/*           if trim(p_value_) is null then
-              BEGIN
-                 select DECODE(substr(lower(txt),1,13), 'продано вир.в', 'продаж валютної виручки',txt)
-                    into p_value_
-                 from kod_d3_1
-                 where p40 = d1#D3_;
-              EXCEPTION WHEN NO_DATA_FOUND THEN
-                 null;
-              END;
-
-           end if;
-*/
         END IF;
 
-/*        if mfo_ = 300465 and nlsk_ like '2900%' and nls_ like '2909%'
-        then
-           p_value_ := '555';
-        end if;
+           a2_ := '';
+               BEGIN
+                 select decode(aims_code, 9, 'Куплено для повернення за торговою операцією','')    into a2_
+                   from zayavka  
+                  where ref_ in (ref, ref_sps);
 
-        if nls_ like '2900205%' and nlsk_ like '29003%'
-        then
-           p_value_ := 'вiльний продаж';
-        end if;
-*/
-/*        IF mfou_ = 300465 and ko_ = 2
-        THEN
-           case
-              when d1#D3_ = '11' then p_value_ := 'Виручка';
-              when d1#D3_ = '12' then p_value_ := 'Інвестиційні кошти';
-              when d1#D3_ = '13' then p_value_ := 'Кредит банку';
-              when d1#D3_ = '14' then p_value_ := 'Продаж ІВ, раніше купленої на МВРУ';
-              when d1#D3_ = '15' then p_value_ := 'Власні кошти банку';
-              when d1#D3_ = '16' then p_value_ := 'Продано з Іншою метою';
-              when d1#D3_ = '18' then p_value_ := 'Кредитні кошти отримані банком від нерезидента';
-              when d1#D3_ = '19' then p_value_ := 'Кредит клієнта банку від нерезидента';
-              when d1#D3_ = '20' then p_value_ := 'Продаж повернутої передоплати';
-              when d1#D3_ = '37' then p_value_ := 'Продаж переказів';
-              when d1#D3_ = '38' then p_value_ := 'Повернен.вкладів/погаш.сертифiкатiв в iн.валютi,здiйснене в нац.валютi';
-            else
-               p_value_ := null;
-               d1#D3_ := null;
-            end case;
-        END IF;
-*/
+               EXCEPTION WHEN NO_DATA_FOUND THEN
+                    if refd_ is not null  then
+
+                         BEGIN
+                           select decode(aims_code, 9, 'Куплено для повернення за торговою операцією','')    into a2_
+                             from zayavka  
+                            where refd_ in (ref, ref_sps);
+                     
+                         EXCEPTION WHEN NO_DATA_FOUND THEN
+                            a2_ := '';
+                         END;
+
+                    else
+                       a2_ := '';
+                    end if;
+               END;
+           if a2_ is not null then  p_value_ := a2_;  end if;
+
       ELSE
          p_kodp_ := 'NN';
-      END IF;
-
-      IF p_kodp_ IN ('52', '60') AND length(trim(p_value_))=9
-      THEN
-         p_value_ :=
-               SUBSTR (p_value_, 1, 1)
-            || SUBSTR (p_value_, 3, 2)
-            || SUBSTR (p_value_, 6, 4);
-      END IF;
-
-      IF p_kodp_ IN ('52', '60') AND length(trim(p_value_))=10
-      THEN
-         p_value_ :=
-               SUBSTR (p_value_, 1, 2)
-            || SUBSTR (p_value_, 4, 2)
-            || SUBSTR (p_value_, 7, 4);
       END IF;
 
    END;
@@ -524,11 +507,12 @@ BEGIN
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
-                   AND o.kv not in (959, 961, 962, 964, 980)
+                   AND o.kv not in (980)
+--                   AND o.kv not in (959, 961, 962, 964, 980)
                    AND (   (    substr (o.nlsd, 1,4) = '2900'
                             AND SUBSTR (o.nlsk, 1,4) IN
                                      ('1600', '1602', '2520', '2530', '2531',
-                                      '2541', '2542', '2544', '2545',
+                                      '2541', '2542', '2544', '2545', '2555',
                                       '2600', '2602', '2620', '2650','2924')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
@@ -544,7 +528,8 @@ BEGIN
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
-                   AND o.kv not in (959, 961, 962, 964, 980)
+                   AND o.kv not in (980)
+--                   AND o.kv not in (959, 961, 962, 964, 980)
                    AND (   (    substr (o.nlsd, 1,4) ='2903'
                             AND substr (o.nlsk, 1,4) ='2900'  )
                         OR (     o.nlsd like '29003%'
@@ -575,7 +560,8 @@ BEGIN
                              o.s * 100 as s_nom,  gl.p_icurval (o.kv, o.s * 100, dat_) as s_eqv
                         FROM provodki_otc o
                        WHERE o.fdat = dat_
-                         AND o.kv not in (959, 961, 962, 964, 980)
+                         AND o.kv not in (980)
+--                         AND o.kv not in (959, 961, 962, 964, 980)
                          AND (   (     ( substr (o.nlsk, 1,4) ='2900'  and  o.ob22k !='05'  or
                                          substr (o.nlsk, 1,4) ='3739'  and  substr (o.nlsb, 1,4) ='2900' )
                                   AND
@@ -1064,7 +1050,11 @@ BEGIN
                f089_ :='1';
                p_ins (nnnn_, 'F091', '4');
                p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
-               p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               if kv_ in (959, 961, 962, 964)  then
+                   p_ins (nnnn_, 'T071', trim(to_char(sum0_,'9999999990.0')) );
+               else
+                   p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               end if;
                p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
                p_ins (nnnn_, 'K021', k021_);
                p_ins (nnnn_, 'K030', k030_);
@@ -1072,7 +1062,11 @@ BEGIN
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
                p_ins (nnnn_, 'F089', f089_);
-               p_ins (nnnn_, 'F092', '215');
+               if kv_ in (959, 961, 962, 964)  then
+                  p_ins (nnnn_, 'F092', '216');
+               else
+                  p_ins (nnnn_, 'F092', '215');
+               end if;
 
                f089_ :='2';
 
@@ -1094,12 +1088,16 @@ BEGIN
 
                f089_ :='2';
 
-         elsif ko_='2' and nlsk_ like '3739%' and d1#3K_ in ('215','216') and sum1_< kons_sum_ 
+         elsif ko_='2' and nlsk_ like '3739%' and nls_ like '2900%'  and ob22_ ='05' 
          then
                f089_ :='1';
                p_ins (nnnn_, 'F091', '4');
                p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
-               p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               if kv_ in (959, 961, 962, 964)  then
+                   p_ins (nnnn_, 'T071', trim(to_char(sum0_,'9999999990.0')) );
+               else
+                   p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               end if;
                p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
                p_ins (nnnn_, 'K021', k021_);
                p_ins (nnnn_, 'K030', k030_);
@@ -1107,8 +1105,34 @@ BEGIN
                p_ins (nnnn_, 'D100', '00');
                p_ins (nnnn_, 'S180', '#');
                p_ins (nnnn_, 'F089', f089_);
-               if nls_ like '2900%'  and ob22_ ='05'  then
+               if     kv_ in (959, 961, 962, 964)  then
+                  p_ins (nnnn_, 'F092', '216');
+               elsif  gl.p_icurval(kv_, sum0_, dat_) <15000000   and  dat_ >= date '2019-04-01'  then
+                  p_ins (nnnn_, 'F092', '239');
+               else
                   p_ins (nnnn_, 'F092', '215');
+               end if;
+               f089_ :='2';
+
+         elsif ko_='2' and nlsk_ like '3739%' and d1#3K_ in ('215','216') and sum1_< kons_sum_ 
+         then
+               f089_ :='1';
+               p_ins (nnnn_, 'F091', '4');
+               p_ins (nnnn_, 'R030', LPAD (kv_, 3,'0'));
+               if kv_ in (959, 961, 962, 964)  then
+                   p_ins (nnnn_, 'T071', trim(to_char(sum0_,'9999999990.0')) );
+               else
+                   p_ins (nnnn_, 'T071', TO_CHAR (sum0_));
+               end if;
+               p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
+               p_ins (nnnn_, 'K021', k021_);
+               p_ins (nnnn_, 'K030', k030_);
+               p_ins (nnnn_, 'Q024', '2');
+               p_ins (nnnn_, 'D100', '00');
+               p_ins (nnnn_, 'S180', '#');
+               p_ins (nnnn_, 'F089', f089_);
+               if     kv_ in (959, 961, 962, 964)  then
+                  p_ins (nnnn_, 'F092', '216');
                else
                   p_ins (nnnn_, 'F092', d1#3K_);
                end if;
@@ -1322,6 +1346,7 @@ BEGIN
 ------------------------------------------------------------
 --                                    зеркальные операции для 2620, 2625, 2630
    if mfou_ =300465  then             --and mfo_ !=300465  then
+     ko_ :='1';
 
      for u in ( SELECT kv, sum(s_nom-nvl(s_kom,0)) sum0
                   FROM OTCN_PROV_TEMP 
@@ -1355,7 +1380,7 @@ BEGIN
 
    f089_ :='1';
 --   консолидация  операций  по detail_protocols    операция 216 для клиентов
-   for u in ( select f091, r030, f092, sum(t071) t071
+   for u in ( select f091, k030, r030, f092, q024, sum(t071) t071
                 from ( select *
                          from ( select substr(field_code,5,3) ekp_2,
                                        substr(field_code,1,4) ekp_1, field_value 
@@ -1372,10 +1397,10 @@ BEGIN
                                                  'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 in ('216','215')
+                        where  f091 ='4' and f092 in ('216','215','239')
                            and ( f089 ='1' or f089 ='2' and t071<kons_sum_/f_cur(dat_,r030) )
                      )
-               group by f091, r030, f092
+               group by f091, k030, r030, f092, q024
    ) loop
           nnnn_ := nnnn_+1;
           kodp_ := LPAD (TO_CHAR (nnnn_), 3, '0');
@@ -1385,9 +1410,15 @@ BEGIN
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
            values ( mfo_, dat_, '#3K', nbuc_, 'R030'||kodp_, lpad (u.r030, 3,'0') );
-          insert into nbur_agg_protocols
-              ( kf, report_date, report_code, nbuc, field_code, field_value )
-           values ( mfo_, dat_, '#3K', nbuc_, 'T071'||kodp_, to_char (u.t071) );
+          if u.r030 in (959, 961, 962, 964)  then
+               insert into nbur_agg_protocols
+                   ( kf, report_date, report_code, nbuc, field_code, field_value )
+                values ( mfo_, dat_, '#3K', nbuc_, 'T071'||kodp_, to_char (u.t071)||'.0' );
+          else
+               insert into nbur_agg_protocols
+                   ( kf, report_date, report_code, nbuc, field_code, field_value )
+                values ( mfo_, dat_, '#3K', nbuc_, 'T071'||kodp_, to_char (u.t071) );
+          end if;
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
            values ( mfo_, dat_, '#3K', nbuc_, 'K020'||kodp_, '0' );
@@ -1396,10 +1427,10 @@ BEGIN
            values ( mfo_, dat_, '#3K', nbuc_, 'K021'||kodp_,  '#' );
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
-           values ( mfo_, dat_, '#3K', nbuc_, 'K030'||kodp_,  '1' );
+           values ( mfo_, dat_, '#3K', nbuc_, 'K030'||kodp_,  u.k030 );
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
-           values ( mfo_, dat_, '#3K', nbuc_, 'Q024'||kodp_,  '2' );
+           values ( mfo_, dat_, '#3K', nbuc_, 'Q024'||kodp_,  u.q024 );
           insert into nbur_agg_protocols
               ( kf, report_date, report_code, nbuc, field_code, field_value )
            values ( mfo_, dat_, '#3K', nbuc_, 'D100'||kodp_,  '00' );
@@ -1437,7 +1468,8 @@ BEGIN
                                                  'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 =u.f092 and r030 =u.r030
+                        where  f091 ='4'  and f092 =u.f092  and r030 =u.r030
+                           and k030 =u.k030  and q024 =u.q024
                            and ( f089 ='1' or f089 ='2' and t071<kons_sum_/f_cur(dat_,r030) )
                                       ) );
                                     
@@ -1514,6 +1546,10 @@ BEGIN
          kv_ := r030_;
          refd_ := null;
 
+         if   f091_ ='3'   then    ko_ :='1';
+         else                      ko_ :='2';
+         end if;
+
          p_ins (nnnn_, 'F091', f091_);
          p_ins (nnnn_, 'R030', LPAD (r030_, 3,'0'));
          p_ins (nnnn_, 'T071', TO_CHAR (t071_ ));
@@ -1552,7 +1588,8 @@ BEGIN
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
-                   AND o.kv not in (959, 961, 962, 964, 980)
+                   AND o.kv not in (980)
+--                   AND o.kv not in (959, 961, 962, 964, 980)
                    AND o.tt ='FXE'
                    and o.nlsd ='29003'
                    and o.nlsk like '3800%'
@@ -1565,7 +1602,8 @@ BEGIN
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
-                   AND o.kv not in (959, 961, 962, 964, 980)
+                   AND o.kv not in (980)
+--                   AND o.kv not in (959, 961, 962, 964, 980)
                    AND o.tt ='FXE'
                    and o.nlsk ='29003'
                    and o.nlsd like '3800%'
@@ -1586,18 +1624,23 @@ BEGIN
               nls_ := u.nlsk;
               rnk_ := u.rnk;
               comm_ := comm_ ||u.nlsd;
+              ko_ :='1';
          else
               acc_ := u.accd;
               nls_ := u.nlsd;
               rnk_ := u.rnk;
               comm_ := comm_ ||u.nlsk;
+              ko_ :='2';
          end if;
          ref_ := u.ref;
 
          p_ins (nnnn_, 'F091', f091_);
          p_ins (nnnn_, 'R030', LPAD (r030_, 3,'0'));
-         p_ins (nnnn_, 'T071', TO_CHAR (u.s_nom));
---         p_ins (nnnn_, 'T071', TO_CHAR (ROUND (u.s_nom / dig_, 0)));
+         if     r030_ in (959, 961, 962, 964)  then
+             p_ins (nnnn_, 'T071', trim(to_char(u.s_nom,'9999999990.0')) );
+         else
+             p_ins (nnnn_, 'T071', TO_CHAR (u.s_nom));
+         end if;
 	 p_ins (nnnn_, 'K020', '0000000006');
 	 p_ins (nnnn_, 'K021', '3');
 	 p_ins (nnnn_, 'K030', '1');
@@ -1606,11 +1649,22 @@ BEGIN
          p_ins (nnnn_, 'D100', '01');
          p_ins (nnnn_, 'S180', '#');
          p_ins (nnnn_, 'F089', f089_);
-         if f091_ ='3'  then
-            p_ins (nnnn_, 'F092', '130');             --164
+
+         if     f091_ ='3'  and  r030_ in (959, 961, 962, 964)  then
+           
+            d1#3K_ := '140';
+         elsif  f091_ ='3'  then
+           
+            d1#3K_ := '130';
+         elsif  f091_ ='4'  and  r030_ in (959, 961, 962, 964)  then
+           
+            d1#3K_ := '216';
          else
-            p_ins (nnnn_, 'F092', '215');
+           
+            d1#3K_ := '215';
          end if;
+
+         p_ins (nnnn_, 'F092', d1#3K_);
     end loop;
 
 --   logger.info ('P_F3KX etap 5 after FXE');
@@ -1639,7 +1693,7 @@ BEGIN
                                                  'S180' as S180, 'F089' as F089, 'F092' as F092, 
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
-                        where  f091 ='4' and f092 in ('215','216') and f089 ='1') );
+                        where  f091 ='4' and f092 in ('215','216','239') and f089 ='1') );
 ----------------------------------------
 --   logger.info ('P_F3KX etap 6 after consolidation 2');
 
@@ -1657,8 +1711,8 @@ insert into OTCN_TRACE_70
 
    commit;
 END;
-/         
+/
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql =========*** End ***
+PROMPT *** End *** ========= Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql ========= *** End ***
 PROMPT ===================================================================================== 
