@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.19.014  02/05/2019 (26/04/2019)
+% VERSION : v.19.015  21/05/2019 (02/05/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -1847,8 +1847,13 @@ BEGIN
 
       if k.szq <> 0 then
           if TP_SND then
-
              r012_:='B';
+             
+             if k.tip in ('SK9','SP ','SPN','XPN','OFR','KSP','KK9','KPN', 'SNA') or
+                sakt_ = 0
+             then
+                s245_ := '2';
+             end if;             
 
              kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
              znap_ := to_char(k.szq);
@@ -2285,7 +2290,21 @@ BEGIN
                                          rownum = 1;
                               exception
                                  when no_data_found then
-                                   recid_ := null;
+                                   begin 
+                                        select /*+ leading(r)*/ r.recid
+                                        into recid_
+                                        from rnbu_trace r, customer c
+                                        where r.nbuc = k.nbuc and
+                                              r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                              substr(kodp, 6, 2) <> substr(k.R013_s580,2,2) and
+                                              sign(k.rizn) = -1 and to_number(r.znap) > abs(k.rizn) and
+                                              r.rnk = c.rnk and
+                                              2-MOD(c.codcagent,2) = k.rez and
+                                              rownum = 1;
+                                   exception
+                                      when no_data_found then
+                                      recid_ := null;
+                                   end;  
                               end;
                        end;
                  end;
