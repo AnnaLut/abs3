@@ -50,6 +50,10 @@ begin
 , ACC_NUM         VARCHAR2(20)
 , KV              NUMBER(3)
 , CUST_ID         number(38)
+, ND              number(38)
+, LINK_GROUP      NUMBER(38)
+, LINK_CODE       VARCHAR2(3 BYTE)
+, COMM            VARCHAR2(200 BYTE)
 , BRANCH          VARCHAR2(30)     
 ) tablespace BRSBIGD
 COMPRESS BASIC
@@ -142,6 +146,11 @@ comment on column NBUR_LOG_FX2X.ACC_ID      is 'Iдентифiкатор рахунку';
 comment on column NBUR_LOG_FX2X.ACC_NUM     is 'Номер рахунку';
 comment on column NBUR_LOG_FX2X.KV          is 'Код валюти рахунку';
 comment on column NBUR_LOG_FX2X.CUST_ID     is 'Iдентифiкатор контрагента';
+comment on column NBUR_LOG_FX2X.ND          is 'РЕФ КД';
+comment on column NBUR_LOG_FX2X.LINK_GROUP  is 'Порядковий код групи контрагентів';
+comment on column NBUR_LOG_FX2X.LINK_CODE   is 'Зашифрований код групи контрагентів';
+comment on column NBUR_LOG_FX2X.COMM        is 'Опис/коментар';
+comment on column NBUR_LOG_FX2X.BRANCH      is 'Код філії/бранчу';
 
 prompt -- ======================================================
 prompt -- Grants

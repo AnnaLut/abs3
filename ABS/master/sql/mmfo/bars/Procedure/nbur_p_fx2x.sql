@@ -18,7 +18,7 @@ is
 %
 % VERSION     :  v.18.001  29/03/2019 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.001    29/03/2019 ';
+  ver_                     char(30)  := 'v.18.001    23/05/2019 ';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -86,14 +86,15 @@ BEGIN
   -- детальний протокол
   insert into nbur_log_fX2X
       (REPORT_DATE, KF, VERSION_ID, NBUC, KU, EKP, F099, Q003_4, T070, 
-       ACC_ID, ACC_NUM, KV, CUST_ID, BRANCH)
-  select REPORT_DATE, KF, l_version_id, NBUC, KU, EKP, F099, Q003_4, T070, 
-       ACC_ID, ACC_NUM, KV, CUST_ID, BRANCH
+       ACC_ID, ACC_NUM, KV, CUST_ID, ND, LINK_GROUP, LINK_CODE, COMM, BRANCH)
+  select REPORT_DATE, KF, l_version_id, KF, KU, EKP, F099, Q003_4, T070, 
+       ACC_ID, ACC_NUM, KV, CUST_ID, ND, LINK_GROUP, LINK_CODE, DESCRIPTION, BRANCH
   from (select REPORT_DATE, KF, VERSION_ID, kf as NBUC, 
            f_get_ku_by_nbuc(kf) as KU, 
            (case when seg_02 = '0000' then c_EKPOK2 else c_EKPOK1 end) as EKP, 
            seg_01 as F099, seg_02 as Q003_4, field_value as T070, 
-           ACC_ID, ACC_NUM, KV, CUST_ID, kf as BRANCH          
+           ACC_ID, ACC_NUM, KV, CUST_ID, ND, REF as LINK_GROUP, 
+           NBUC as LINK_CODE, DESCRIPTION, kf as BRANCH          
         from v_nbur_#X2_dtl p
         where p.report_date = p_report_date and
               p.kf = p_kod_filii and    

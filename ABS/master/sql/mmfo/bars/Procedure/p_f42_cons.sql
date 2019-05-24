@@ -16,7 +16,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формування консолідованого #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :  05/04/2019 (15/02/2019)
+% VERSION     :  21/05/2019 (22/04/2019)
 %------------------------------------------------------------------------
 % 17/01/2019 - із показників 01, 02, 04 видаляємо банки нерезиденти
 %              у яких ALT_BIC=('8260000013', '8400000053', '8400000054')
@@ -184,6 +184,7 @@ IS
    link_code_     d8_cust_link_groups.link_code%type;
    link_codepp_   d8_cust_link_groups.link_code%type;
    link_codep1_   d8_cust_link_groups.link_code%type;
+   link_code72_   d8_cust_link_groups.link_code%type;
 
    link_name_     d8_cust_link_groups.groupname%type;
    
@@ -199,8 +200,13 @@ IS
                 o.link_name,
                 o.fl_prins prins,
                 abs(sum(decode(substr(o.kodp, 1, 1), '1', -1, 1)*o.znap)) znap
-        from otc_c5_proc o
-        where o.datf = dat_
+        from otc_c5_proc o, customer c
+        where o.datf = dat_ and
+              o.rnk = c.rnk and
+              (c.rnk <> our_rnk_ and
+               nvl(ltrim(c.okpo, '0'),'X') <> our_okpo_ 
+                  or 
+               regexp_like(o.nls, '^(3|4)'))
         group by NVL(o.link_group, o.rnk),
                 o.link_code,
                 o.link_name,
@@ -214,9 +220,14 @@ IS
         from (
            SELECT  a.ddd, a.link_group as rnk, a.link_code, a.link_name,
                    a.fl_prins as prins, NVL(ABS (SUM (a.ost_eqv)), 0) znap
-           FROM NBUR_TMP_42_DATA a
+           FROM nbur_tmp_42_data a, customer c
            WHERE a.report_date = dat_ and
-                 a.ddd='006'
+                 a.ddd='006' and
+                 a.rnk = c.rnk and
+                 (c.rnk <> our_rnk_ and
+                  nvl(ltrim(c.okpo, '0'),'X') <> our_okpo_ 
+                  or 
+                  regexp_like(a.nls, '^(3|4)')) 
            GROUP BY a.ddd, a.link_group, a.link_code, a.link_name,
                     a.fl_prins) a
     ) s
@@ -381,7 +392,7 @@ BEGIN
    our_rnk_ := F_Get_Params ('OUR_RNK', -1);
    our_okpo_ := nvl(to_char(F_Get_Params ('OKPO', 0)), '0');
 
-  -- новий варіант функціі де вибирається сума регулятивного капіталу і сума для Н9 (ОК+ДК-И1)
+   -- Сума регулятивного капiталу банку
    ret_ := Rkapital_f42 (dat_next_u(dat_, 1), kodf_, userid_, 1, sum_k_, sum_H9_);
    rgk_ := sum_k_;
    
@@ -394,11 +405,18 @@ BEGIN
 
    -- статутний капiтал
    BEGIN
-     SELECT SUM(ost)
+     SELECT SUM(s.ost)
      INTO   sum_SK_
-     FROM   sal
-     WHERE  fdat=Dat_ AND
-            nbs IN ('5000','5001', '5002');
+     FROM   snap_balances s
+     join accounts a
+     on (s.acc = a.acc)
+     left outer join specparam p
+     on (s.acc = p.acc)
+     WHERE  s.fdat=Dat_ AND
+            s.acc = a.acc and
+            s.acc = p.acc and 
+            (a.nbs IN ('5000', '5002') or
+             a.nbs = '5004' and nvl(p.r013, '0') in ('1', '2', '3'));
    EXCEPTION WHEN NO_DATA_FOUND THEN
      sum_SK_:=0 ;
    END ;
@@ -858,6 +876,7 @@ BEGIN
                    THEN
                       znapu_72 := TO_CHAR (abs(se_));
                       nlsu_72 := (case when link_code_='000' then 'RNK =' else 'LINK_CODE =' end) || TO_CHAR (rnk_);
+                      link_code72_ := link_code_;
                       rnku_72 := rnk_;
                       spp_72 := se_;
                    END IF;
@@ -946,12 +965,12 @@ BEGIN
 
        IF TO_NUMBER (znapu_72) > 0
        THEN
-          kodpp_ := '720001';
+          kodpp_ := '720001' || '000';
 
           INSERT INTO RNBU_TRACE
-                      (nls, kv, odate, kodp, znap, rnk, ref
+                      (nls, kv, odate, kodp, znap, rnk, ref, nbuc
                       )
-               VALUES (nlsu_72, 0, dat_, kodpp_, znapu_72, rnku_72, rnku_72
+               VALUES (nlsu_72, 0, dat_, kodpp_, znapu_72, rnku_72, rnku_72, link_code72_
                       );
        END IF;
 
@@ -991,12 +1010,13 @@ BEGIN
           -- формирование нового кода A90000000 з 03.08.2018
           if dat_ >= dat_Zm7_
           then
-             insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, acc, mdate)
-             select d.nls, d.kv, report_date, 'A90000000', -1 * d.ost_eqv, d.rnk, d.acc, a.mdate
-             from NBUR_TMP_42_DATA d, accounts a
+             insert into rnbu_trace(acc, nls, kv, odate, kodp, znap, rnk, mdate, tobo, nbuc, ref)
+             select d.acc, d.nls, d.kv, report_date, 'A90000000', -1 * d.ost_eqv, d.rnk, a.mdate, d.kf, '000', d.rnk
+             from NBUR_TMP_42_DATA d, accounts a, customer c
              where d.report_date = dat_ and
                 d.ddd like 'A9%' and
-                d.acc = a.acc;
+                d.acc = a.acc and
+                d.rnk = c.rnk;
           end if;
           -----------------------------------------------------------------------
        end if;
@@ -1033,7 +1053,7 @@ BEGIN
 
         for k in (select kodp, rnk, ref, trim(comm) comm
                   from rnbu_trace
-                  where substr(kodp,1,2) not in ('05','R1', 'R2')
+                  where substr(kodp,1,2) not in ('05', '72', 'A1', 'A9','R1', 'R2')
                   order by substr(kodp,1,2), to_number(znap) DESC, rnk )
         loop
             -- в поле COMM (комментарий) заполняем название клиента
@@ -1108,8 +1128,8 @@ BEGIN
            where kodp like '04%';
 
            if s04_ > ROUND (sum_H9_ * k1_, 0) then
-              insert into rnbu_trace(nls, odate, kodp, znap )
-              VALUES ('показник B4', dat_, 'B400000', to_char(s04_ - ROUND (sum_k_ * k1_, 0)));
+              insert into rnbu_trace(nls, odate, kodp, znap, nbuc)
+              VALUES ('показник B4', dat_, 'B40000000', to_char(s04_ - ROUND (sum_k_ * k1_, 0)), '000');
            end if;
         END IF;
 
@@ -1204,7 +1224,7 @@ BEGIN
 
        -- детальная расшифровка показателей 01 и 02 в разрезе лицевых счетов
        -- остатки по счетам и резерв
-       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm)
+       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm, tobo)
         select /*+ leading(o) */
              dat_ odate, o.nls, o.kv, b.kodp,
              decode(substr(o.kodp,1,1),'1', -1, 1) * o.znap znap,
@@ -1218,21 +1238,21 @@ BEGIN
               end) || substr(o.kodp,2,4) ||
               ' / R011=' || substr(o.kodp,6,1) ||
               ' / R013=' || substr(o.kodp,7,1) ||
-              ' / S245=' || substr(o.kodp,16,1) comm
+              ' / S245=' || substr(o.kodp,16,1) comm, o.kf
         from otc_c5_proc o
         join (select distinct k.rnk, k.nbuc link_code,
                             (case when k.kodp like '01%' then 'R1'
                                  when k.kodp like '02%' then 'R2'
-                                 else 'R4'
+                                 else 'R5'
                             end)||substr(k.kodp,3) kodp,
                             k.ref group_num
             from rnbu_trace k
             where (kodp like '01%' or kodp like '02%')
             order by substr(kodp,3,4), rnk, k.nbuc) b
         on (NVL(o.link_code, '000') = b.link_code)
-        where o.datf = dat_;
+        where o.datf = dat_ and o.fl_prins <> 1;
         
-       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm)
+       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm, tobo)
         select /*+ leading(o) */
              dat_ odate, o.nls, o.kv, b.kodp,
              decode(substr(o.kodp,1,1),'1', -1, 1) * o.znap znap,
@@ -1246,13 +1266,10 @@ BEGIN
               end) || substr(o.kodp,2,4) ||
               ' / R011=' || substr(o.kodp,6,1) ||
               ' / R013=' || substr(o.kodp,7,1) ||
-              ' / S245=' || substr(o.kodp,16,1) comm
+              ' / S245=' || substr(o.kodp,16,1) comm, o.kf
         from otc_c5_proc o
         join (select distinct k.rnk, k.nbuc link_code,
-                            (case when k.kodp like '01%' then 'R1'
-                                 when k.kodp like '02%' then 'R2'
-                                 else 'R4'
-                            end)||substr(k.kodp,3) kodp,
+                            'R4'||substr(k.kodp,3) kodp,
                             k.ref group_num
             from rnbu_trace k
             where (kodp like '04%')
@@ -1260,11 +1277,65 @@ BEGIN
         on (o.rnk = b.rnk)
         where o.datf = dat_;        
 
-       delete  from rnbu_trace where kodp like '01%' or kodp like '02%' or kodp like '04%';
+       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm, tobo)
+        select /*+ leading(o) */
+             dat_ odate, o.nls, o.kv, b.kodp, o.ost_eqv znap,
+             o.rnk, nvl(o.link_code, '000'), null nd, b.group_num ref, o.acc,
+             'KF = '||o.kf||' '||
+             '(Залишок з файлу #01) ' comm, o.kf
+        from NBUR_TMP_42_DATA o
+        join (select distinct k.rnk, k.nbuc link_code, 
+                            'R5'||substr(k.kodp,3) kodp,
+                            k.ref group_num
+            from rnbu_trace k
+            where (kodp like '05%')
+            order by substr(kodp,3,4), rnk, k.nbuc) b
+        on (NVL(o.link_code, '000') = b.link_code)
+       where o.report_date = dat_ and
+            (o.ddd like '47%' or o.ddd like '51%');
+            
+       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm, tobo)
+        select /*+ leading(o) */
+             dat_ odate, o.nls, o.kv, b.kodp, o.ost_eqv znap,
+             o.rnk, nvl(o.link_code, '000'), null nd, b.group_num ref, o.acc,
+             'KF = '||o.kf||' '||
+             '(Залишок з файлу #01) ' comm, o.kf
+        from NBUR_TMP_42_DATA o
+        join (select distinct k.rnk, k.nbuc link_code, 
+                            'RB'||substr(k.kodp,3) kodp,
+                            k.ref group_num
+            from rnbu_trace k
+            where (kodp like '72%')
+            order by substr(kodp,3,4), rnk, k.nbuc) b
+        on (NVL(o.link_code, '000') = b.link_code)
+       where o.report_date = dat_ and
+             o.ddd like '006%';              
+            
+       insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nbuc, nd, ref, acc, comm, tobo)
+        select /*+ leading(o) */
+             dat_ odate, o.nls, o.kv, b.kodp, o.ost_eqv znap,
+             o.rnk, nvl(o.link_code, '000'), null nd, b.group_num ref, o.acc,
+             'KF = '||o.kf||' '||
+             '(Залишок з файлу #01) ' comm, o.kf
+        from NBUR_TMP_42_DATA o
+        join (select distinct k.rnk, k.nbuc link_code, 
+                            'RA'||substr(k.kodp,3) kodp,
+                            k.ref group_num
+            from rnbu_trace k
+            where (kodp like 'A1%')
+            order by substr(kodp,3,4), rnk, k.nbuc) b
+        on (NVL(o.link_code, '000') = b.link_code)
+       where o.report_date = dat_ and
+            (o.ddd like '47%' or o.ddd like '51%');            
+        
+       delete  from rnbu_trace 
+       where regexp_like(kodp, '^(01|02|04|05|72|A1)');
 
        update rnbu_trace
-       set kodp = replace(kodp, 'R', '0')
-       where kodp like 'R1%' or kodp like 'R2%' or kodp like 'R4%';
+       set kodp = (case when kodp like 'RA%' then replace(kodp, 'RA', 'A1') 
+                        when kodp like 'RB%' then replace(kodp, 'RB', '72') 
+                        else replace(kodp, 'R', '0') end)
+       where kodp like 'R%';
    end if;
 
    bc.subst_mfo(mfo_);

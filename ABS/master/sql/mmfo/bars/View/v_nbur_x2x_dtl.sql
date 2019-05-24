@@ -15,11 +15,19 @@ select p.REPORT_DATE
      , p.Q003_4
      , p.T070
      , p.ACC_ID
+     , substr(p.ACC_NUM, 1, 4) AS NBS     
      , p.ACC_NUM
      , p.KV
      , p.CUST_ID
      , c.OKPO CUST_CODE
      , c.NMK  CUST_NAME
+     , p.ND
+     , a.CC_ID AGRM_NUM
+     , a.SDATE BEG_DT
+     , a.WDATE END_DT
+     , p.LINK_GROUP
+     , p.LINK_CODE
+     , p.COMM
      , p.BRANCH
   from NBUR_LOG_FX2X p
        join NBUR_REF_FILES f on (f.FILE_CODE = 'X2X')
@@ -27,8 +35,8 @@ select p.REPORT_DATE
                                 and (v.KF = p.KF)
                                 and (v.VERSION_ID = p.VERSION_ID)
                                 and (v.FILE_ID = f.ID )
-       LEFT JOIN CUSTOMER c on (p.KF = c.KF)
-                               and (p.CUST_ID = c.RNK )
+       LEFT JOIN CUSTOMER c on (p.KF = c.KF and p.CUST_ID = c.RNK )
+       LEFT OUTER JOIN CC_DEAL a ON (p.branch = a.KF AND p.nd = a.ND)                               
  where v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' )
  order by F099, Q003_4, acc_num, kv;
    
@@ -43,11 +51,19 @@ comment on column V_NBUR_X2X_DTL.F099   is 'Код даних для розрахунку економічних
 comment on column V_NBUR_X2X_DTL.Q003_4 is 'Умовний порядковий номер контрагента';
 comment on column V_NBUR_X2X_DTL.T070   is 'Сума';
 comment on column V_NBUR_X2X_DTL.ACC_ID is 'Ід. рахунка';
+comment on column V_NBUR_X2X_DTL.NBS is 'Номер балансового рахунку';
 comment on column V_NBUR_X2X_DTL.ACC_NUM is 'Номер рахунка';
 comment on column V_NBUR_X2X_DTL.KV is 'Ід. валюти';
 comment on column V_NBUR_X2X_DTL.CUST_ID is 'Ід. клієнта';
 comment on column V_NBUR_X2X_DTL.CUST_CODE is 'Код клієнта';
 comment on column V_NBUR_X2X_DTL.CUST_NAME is 'Назва клієнта';
+COMMENT ON COLUMN V_NBUR_X2X_DTL.ND IS 'Ід. договору';
+COMMENT ON COLUMN V_NBUR_X2X_DTL.AGRM_NUM IS 'Номер договору';
+COMMENT ON COLUMN V_NBUR_X2X_DTL.BEG_DT IS 'Дата початку договору';
+COMMENT ON COLUMN V_NBUR_X2X_DTL.END_DT IS 'Дата закінчення договору';
+COMMENT ON COLUMN V_NBUR_X2X_DTL.LINK_GROUP IS 'Номер групи контрагентів';
+COMMENT ON COLUMN V_NBUR_X2X_DTL.LINK_CODE IS 'Номер групи контрагентів  (для #D8)';
+COMMENT ON COLUMN V_NBUR_X2X_DTL.COMM IS 'Коментар';
 comment on column V_NBUR_X2X_DTL.BRANCH is 'Код підрозділу';
 
 PROMPT ===================================================================================== 

@@ -27,6 +27,17 @@ PROMPT *** Create  view V_NBUR_#X2 ***
          v.FILE_ID     = f.ID )           
  where p.REPORT_CODE = '#X2'
    and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
+   
+comment on table V_NBUR_#X2 is 'Файл #X2 - Дані про концетрацію ризиків за пасивними операціями банку';
+comment on column V_NBUR_#X2.REPORT_DATE is 'Звiтна дата';
+comment on column V_NBUR_#X2.KF is 'Фiлiя';
+comment on column V_NBUR_#X2.VERSION_ID is 'Номер версії файлу';
+comment on column V_NBUR_#X2.NBUC is 'Код МФО/області';
+comment on column V_NBUR_#X2.FIELD_CODE    is 'Код показника';
+comment on column V_NBUR_#X2.SEG_01   is 'Сегмент DD';
+comment on column V_NBUR_#X2.SEG_02 is 'Сегмент NNNN';
+comment on column V_NBUR_#X2.SEG_03 is 'Сегмент 000';
+comment on column V_NBUR_#X2.FIELD_VALUE   is 'Значення показника';   
 
 PROMPT *** Create  grants  V_NBUR_#X2 ***
 grant SELECT                                                                 on V_NBUR_#X2      to BARSREADER_ROLE;
