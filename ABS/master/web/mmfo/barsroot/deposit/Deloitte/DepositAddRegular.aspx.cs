@@ -283,6 +283,31 @@ public partial class DepositAddRegular : Bars.BarsPage
             _dbLogger.Info("Идентификатор договора по регулярным платежам = " + Convert.ToString(contract.IDS));
             DateTime p_DatBegin = DateTime.ParseExact(StartDate.Text, "dd/MM/yyyy", null);
             DateTime p_DatEnd = DateTime.ParseExact(EndDate.Text, "dd/MM/yyyy", null);
+			
+			 string tip;
+            using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            {
+                using (OracleCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = "select BARS.get_nls_tip (:ptextBankAccount, :pcur_id) from dual";
+                    cmd.Parameters.Add(new OracleParameter
+                                            { ParameterName = "ptextBankAccount",
+                                              OracleDbType = OracleDbType.Varchar2,
+                                              Value = textBankAccount.Text,
+                                              Direction = ParameterDirection.Input
+                                            });
+                    cmd.Parameters.Add(new OracleParameter
+                                            {
+                                              ParameterName = "pcur_id",
+                                               OracleDbType = OracleDbType.Decimal,
+                                               Value = Convert.ToDecimal(cur_id.Value),
+                                               Direction = ParameterDirection.Input
+                                               });
+                    tip = cmd.ExecuteScalar().ToString();
+                }
+            }
+            _dbLogger.Info("Тип рахунку = " + tip);
+			
             // Начало заполнения макета платежа
             payment payment = new payment()
             {
@@ -292,7 +317,7 @@ public partial class DepositAddRegular : Bars.BarsPage
                 nlsa = textBankAccount.Text,
                 kva = Convert.ToDecimal(cur_id.Value),
                 nlsb = textDPTAccount.Text,
-                tt = ((textBankAccount.Text.Substring(0, 4) == "2625") || (textBankAccount.Text.Substring(0, 4) == "2620")) ? "PK!" : "191",
+                tt = (tip.Substring(0, 2) == "W4")  ? "PK!" : "191",
                 WEND = -1,
                 kvb = Convert.ToDecimal(cur_id.Value),
                 mfob = MFO.Value,
