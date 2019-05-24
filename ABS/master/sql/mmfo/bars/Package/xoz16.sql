@@ -19,9 +19,15 @@ END XOZ16;
 GRANT execute on XOZ16 TO BARS_ACCESS_DEFROLE;
 
 
-CREATE OR REPLACE PACKAGE BODY XOZ16 IS   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2  02.05.2019';
---26.04.2019 Работа с 3739. Импорт полпнок Крок-19.
+CREATE OR REPLACE PACKAGE BODY XOZ16 IS   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2.1  23.05.2019';
+/*
+23.05.2019 Sta  Демкович Марія Степанівна <DemkovichMS@oschadbank.ua> МСФЗ16_помилки наші
+   CY	3615/04 => 4600/4609**	2.2) Переоцінка активу з права користування та зобов`язань з оренди за місяць
+   Якщо >0, то Дт 4600  Кт 3615
+   Якщо <0, то Дт 3615  Кт 4609
 
+26.04.2019 Работа с 3739. Импорт полпнок Крок-19.
+*/
 -------------------------------------
   nlchr char(2) := chr(13)||chr(10) ;
   p4_ int ;
@@ -552,11 +558,13 @@ begin
      ----------------------------------------------------------------------------------
      ---Виконати проводки <br>CY=2.2)Переоцінка активу<br>3615/04<=>4600/**<br> ?
      ElsIf p_Mode = 22 then
+        --23.05.2019 Sta  Демкович Марія Степанівна <DemkovichMS@oschadbank.ua> МСФЗ16_помилки наші
         oo.nazn := Substr( 'Переоцінка активу з права користування та зобов`язань з оренди за місяць згідно дог. №' ||dd.cc_id||'. '||p_Txt ,1,160) ;
-        oo.nlsa := nbs_ob22_NULL (Substr(dd.prod,1,4),  Substr(dd.prod,5,2) );       -- найти 4600
-        oo.nlsB := XOZ16.NLS( dd.ND, dd.rnk, '3615', null ) ; 
-        If oo.S > 0 then        oo.DK := 1 ;    --  4600=>3615 , якщо колонка CY «+» 
-        Else  oo.s := - oo.S ;  oo.DK := 0 ;    --  3615=>4600 , якщо колонка CY «-»  
+         oo.nlsB := XOZ16.NLS( dd.ND, dd.rnk, '3615', null ) ; 
+        If oo.S > 0 then        oo.DK := 1 ;    --            Якщо >0, то Дт 4600  Кт 3615   
+           oo.nlsa := nbs_ob22_NULL (Substr(dd.prod,1,4),     Substr(dd.prod,5,2) );       -- найти 4600
+        Else  oo.s := - oo.S ;  oo.DK := 0 ;    --            Якщо <0, то Дт 3615  Кт 4609   
+           oo.nlsa := nbs_ob22_NULL (Substr(dd.prod,1,3)||'9',Substr(dd.prod,5,2) );       -- найти 4609   
         End if; 
         XOZ16.CHK1( oo, l_Side, '3615*04' ) ;  
 ---------------------------------------------------------------------------------------------------------------

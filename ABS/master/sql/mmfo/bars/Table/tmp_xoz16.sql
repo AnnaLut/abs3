@@ -2,7 +2,9 @@ begin    execute immediate ' CREATE TABLE BARS.TMP_XOZ16( isp int, nd number NOT
 exception when others then   if SQLCODE = - 00955 then null;   else raise; end if; 
 --ORA-00955: name is already used by an existing object
 end;
+
 /
+
 begin    execute immediate ' alter TABLE BARS.TMP_XOZ16 add (NPP int ) ' ;
 exception when others then   if SQLCODE = - 01430  then null;   else raise; end if; --ORA-01430: column being added already exists in table
 end;
