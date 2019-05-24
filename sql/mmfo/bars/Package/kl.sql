@@ -579,7 +579,7 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
 
 END KL;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.KL 
+CREATE OR REPLACE PACKAGE BODY KL
 is
 
 --***************************************************************************--
@@ -771,8 +771,8 @@ $if KL_PARAMS.SBER $then
 $end
 
 --***************************************************************************--
--- PROCEDURE 	: isCustomerTr
--- DESCRIPTION	: функция проверки наименование клиента на принадлежность к списку террористов
+-- PROCEDURE  : isCustomerTr
+-- DESCRIPTION  : функция проверки наименование клиента на принадлежность к списку террористов
 --***************************************************************************--
 function isCustomerTr (
   pNmk    customer.nmk%type,
@@ -807,8 +807,8 @@ $end
 end isCustomerTr;
 
 --***************************************************************************--
--- PROCEDURE 	: checkFM
--- DESCRIPTION	: процедура проверки наименование клиента на принадлежность к списку террористов
+-- PROCEDURE  : checkFM
+-- DESCRIPTION  : процедура проверки наименование клиента на принадлежность к списку террористов
 --***************************************************************************--
 procedure checkFM (
   pNmk   in customer.nmk%type,
@@ -942,7 +942,7 @@ begin
      -- неизв. тип контрагента
      bars_error.raise_nerror(g_modcode, 'INCORRECT_CUSTTYPE', to_char(p_custtype));
   end if;
-  
+
   --2018.09.25 для запобігання багу, коли після оновлення сектору економіки або ВЕД клієнт(ФОП) зникав із інтерфейсів
   if p_custtype = 3 and p_sed = 91 then
     if p_ise not in ('14200', '14100', '14201', '14101') then
@@ -984,8 +984,8 @@ $end
 end iopen_client;
 
 --***************************************************************************--
--- PROCEDURE 	: open_client
--- DESCRIPTION	: процедура регистрации клиента с указанным РНК
+-- PROCEDURE  : open_client
+-- DESCRIPTION  : процедура регистрации клиента с указанным РНК
 --***************************************************************************--
 PROCEDURE open_client (
   Rnk_        IN customer.rnk%type,         -- Customer number
@@ -1079,9 +1079,50 @@ begin
      p_nrezid_code => null );
 end open_client;
 
+function create_addr_str (p_street_type in number
+                         ,p_street      in varchar2
+                         ,p_home_type   in number
+                         ,p_home        in varchar2
+                         ,p_homepart_type in number
+                         ,p_homepart    in varchar2
+                         ,p_room_type   in number
+                         ,p_room        in varchar2)
+  return varchar2
+  is
+  v_ret customer.adr%type;
+begin
+  select rtrim(substr(case p_street_type
+         when null then null
+         else (select st.str_tp_nm||' '||p_street||', '
+                 from adr_street_types st
+                 where st.str_tp_id = p_street_type)
+       end ||
+       case p_home_type
+         when null then null
+         else (select ht.value||' '||p_home||', '
+                 from adr_home_type ht
+                 where ht.id = p_home_type)
+       end ||
+       case p_homepart_type
+         when null then null
+         else (select pt.value||' '||p_homepart||', '
+                 from adr_homepart_type pt
+                 where pt.id = p_homepart_type)
+       end ||
+       case p_room_type
+         when null then null
+         else (select rt.value||' '||p_room
+                 from adr_room_type rt
+                 where rt.id = p_room_type)
+       end,1,100),', ')
+   into v_ret
+   from dual;
+  return v_ret;
+end;
+
 --***************************************************************************--
--- PROCEDURE 	: setCustomerAttr
--- DESCRIPTION	: процедура регистрации клиента/обновления реквизитов клиента
+-- PROCEDURE  : setCustomerAttr
+-- DESCRIPTION  : процедура регистрации клиента/обновления реквизитов клиента
 --***************************************************************************--
 PROCEDURE setCustomerAttr (
   Rnk_    IN OUT customer.rnk%type,         -- Customer number
@@ -1215,7 +1256,7 @@ BEGIN
                nmk       = substr(Nmk_,1,70),
                nmkv      = Nmkv_,
                nmkk      = Nmkk_,
-               adr       = Adr_,
+               adr       = nvl(Adr_,adr),
                codcagent = Codcagent_,
                country   = Country_,
                prinsider = Prinsider_,
@@ -1387,8 +1428,8 @@ $end
 END setCustomerAttr;
 
 --***************************************************************************--
--- PROCEDURE 	: setCustomerEN
--- DESCRIPTION	: процедура установки экономических показателей клиента
+-- PROCEDURE  : setCustomerEN
+-- DESCRIPTION  : процедура установки экономических показателей клиента
 --***************************************************************************--
 procedure setCustomerEN (
   p_rnk   customer.rnk%type,
@@ -1441,8 +1482,8 @@ $end
 end setCustomerEN;
 
 --***************************************************************************--
--- PROCEDURE 	: setBankAttr
--- DESCRIPTION	: процедура регистрации клиента-банка/обновления реквизитов
+-- PROCEDURE  : setBankAttr
+-- DESCRIPTION  : процедура регистрации клиента-банка/обновления реквизитов
 --***************************************************************************--
 PROCEDURE setBankAttr (
   Rnk_      custbank.rnk%type,
@@ -1498,8 +1539,8 @@ BEGIN
 END setBankAttr;
 
 --***************************************************************************--
--- PROCEDURE 	: setCorpAttr
--- DESCRIPTION	: процедура регистрации клиента-юр.лица/обновления реквизитов
+-- PROCEDURE  : setCorpAttr
+-- DESCRIPTION  : процедура регистрации клиента-юр.лица/обновления реквизитов
 --***************************************************************************--
 PROCEDURE setCorpAttr (
   Rnk_      corps.rnk%type,
@@ -1612,8 +1653,8 @@ $end
 END setCorpAttr;
 
 --***************************************************************************--
--- PROCEDURE 	: setPersonAttr
--- DESCRIPTION	: процедура регистрации клиента-физ.лица/обновления реквизитов
+-- PROCEDURE  : setPersonAttr
+-- DESCRIPTION  : процедура регистрации клиента-физ.лица/обновления реквизитов
 --***************************************************************************--
 PROCEDURE setPersonAttr
 ( Rnk_          person.rnk%type,
@@ -1636,28 +1677,28 @@ PROCEDURE setPersonAttr
   l_fdate   date;
 BEGIN
 
-  If (Passp_ = 1) 
+  If (Passp_ = 1)
   Then
 
     l_fdate := Fdate_;
-	
-	if ( ( l_fdate is Null ) and (Bday_ is Not Null) And (Pdate_ is Not Null) ) 
+
+  if ( ( l_fdate is Null ) and (Bday_ is Not Null) And (Pdate_ is Not Null) )
     then -- Умови при яких дата вклеювання фото = даті видачі паспорту
-      
-	  If (add_months(Bday_,300) < trunc(sysdate))
-	  then -- клієнтові менше 25 років
+
+    If (add_months(Bday_,300) < trunc(sysdate))
+    then -- клієнтові менше 25 років
         l_fdate := Pdate_;
-      
+
       ElsIf ((add_months(Bday_,540) < trunc(sysdate)) And (Pdate_ > add_months(Bday_,300)))
-		then -- клієнтові менше 45 років і дата видачі більша за дату його 25 ліття
+    then -- клієнтові менше 45 років і дата видачі більша за дату його 25 ліття
         l_fdate := Pdate_;
-      
+
       ElsIf (Pdate_ > add_months(Bday_,540)) Then
       -- дата видачі більша за дату 45 ліття клієнта
         l_fdate := Pdate_;
-      
+
       End if;
-      
+
     End If;
 
   Else
@@ -1665,14 +1706,14 @@ BEGIN
   End If;
 
   if p_flag_visa = 0
-  or p_flag_visa = 1 and not is_customer_visa(Rnk_) 
+  or p_flag_visa = 1 and not is_customer_visa(Rnk_)
   then
-     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_, Pdate_/*case passp_ 
-                                                     when 1 then Pdate_ 
-						     when 7 then Pdate_ --якщо новий паспорт 9385
-                                                     else null 
+     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_, Pdate_/*case passp_
+                                                     when 1 then Pdate_
+                 when 7 then Pdate_ --якщо новий паспорт 9385
+                                                     else null
                                                     end*/
-						  ,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
+              ,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
 $if KL_PARAMS.CLV $then
   else
      declare
@@ -1689,7 +1730,7 @@ $if KL_PARAMS.CLV $then
         l_clv.bplace := Bplace_;
         l_clv.teld   := Teld_;
         l_clv.telw   := Telw_;
-		l_clv.cellphone   := Telm_;
+    l_clv.cellphone   := Telm_;
         l_clv.actual_date := actual_date_;
         l_clv.eddr_id     := eddr_id_;
         bars_clv.set_req_customerperson(l_clv);
@@ -1702,8 +1743,8 @@ $end
 END setPersonAttr;
 
 --***************************************************************************--
--- PROCEDURE 	: setPersonAttrEx
--- DESCRIPTION	: процедура регистрации клиента-физ.лица/обновления реквизитов
+-- PROCEDURE  : setPersonAttrEx
+-- DESCRIPTION  : процедура регистрации клиента-физ.лица/обновления реквизитов
 --***************************************************************************--
 PROCEDURE setPersonAttrEx
 ( Rnk_      person.rnk%type,
@@ -1713,7 +1754,7 @@ PROCEDURE setPersonAttrEx
   Numdoc_   person.numdoc%type,
   Pdate_    person.pdate%type,
   Organ_    person.organ%type,
-  Fdate_    person.date_photo%type,	-- Дата коли була вклеєна остання фотографія у паспорт
+  Fdate_    person.date_photo%type, -- Дата коли була вклеєна остання фотографія у паспорт
   Bday_     person.bday%type,
   Bplace_   person.bplace%type,
   TelD_     person.teld%type,       -- Домашній  телефон клієнта
@@ -1729,7 +1770,7 @@ $if KL_PARAMS.RI $then
   k060_     number;
 $end
 BEGIN
-  if eddr_id_ is not null 
+  if eddr_id_ is not null
   then
     bars_audit.trace('%s 1.params:'
          || ' Rnk_=>%s,'
@@ -1756,7 +1797,7 @@ BEGIN
        l_title, to_char(Rnk_), Sex_, to_char(Passp_), Ser_, Numdoc_,
        to_char(Pdate_,'dd/MM/yyyy'), Organ_, to_char(Bday_,'dd/MM/yyyy'));
   end if;
-  
+
   bars_audit.trace( '%s 2.params: Bplace_=>%s, Teld_=>%s, Telw_=>%s, TelM_=>%s.'
                   , l_title, Bplace_, Teld_, Telw_, TelM_ );
 
@@ -1780,7 +1821,7 @@ BEGIN
          eddr_id     = eddr_id_
    WHERE rnk = rnk_;
 
-  IF SQL%rowcount = 0 
+  IF SQL%rowcount = 0
   THEN
     bars_audit.trace('%s 3. регистрация параметров физ.лица РНК=%s', l_title, Rnk_);
     INSERT INTO Person (rnk, sex, passp, ser, numdoc, pdate, organ, bday, bplace, telD, telW, CellPhone, date_photo, actual_date, eddr_id)
@@ -1878,8 +1919,8 @@ $end
 END setPersonAttrEx;
 
 --***************************************************************************--
--- PROCEDURE 	: setCustomerRekv
--- DESCRIPTION	: процедура обновления реквизитов клиента
+-- PROCEDURE  : setCustomerRekv
+-- DESCRIPTION  : процедура обновления реквизитов клиента
 --***************************************************************************--
 PROCEDURE setCustomerRekv (
   Rnk_       rnk_rekv.rnk%type,
@@ -1919,8 +1960,8 @@ BEGIN
 END setCustomerRekv;
 
 --***************************************************************************--
--- PROCEDURE 	: setCustomerElement
--- DESCRIPTION	: процедура обновления реквизитов клиента
+-- PROCEDURE  : setCustomerElement
+-- DESCRIPTION  : процедура обновления реквизитов клиента
 --***************************************************************************--
 PROCEDURE setCustomerElement(
   Rnk_        customerw.rnk%type,
@@ -2000,8 +2041,8 @@ END setCustomerElement;
 $if KL_PARAMS.TREASURY $then
 $else
 --***************************************************************************--
--- PROCEDURE 	: setCustomerExtern
--- DESCRIPTION	: процедура обновления реквизитов НЕклиентов банка
+-- PROCEDURE  : setCustomerExtern
+-- DESCRIPTION  : процедура обновления реквизитов НЕклиентов банка
 --***************************************************************************--
 procedure setCustomerExtern (
   p_id         in out customer_extern.id%type,
@@ -2115,8 +2156,8 @@ begin
 end setCustomerExtern;
 
 --***************************************************************************--
--- PROCEDURE 	: setCustomerRel
--- DESCRIPTION	: процедура обновления реквизитов клиента "Связанные лица"
+-- PROCEDURE  : setCustomerRel
+-- DESCRIPTION  : процедура обновления реквизитов клиента "Связанные лица"
 --***************************************************************************--
 PROCEDURE setCustomerRel (
   p_rnk              customer_rel.rnk%type,
@@ -2219,8 +2260,8 @@ $end
 end setCustomerRel;
 
 --***************************************************************************--
--- PROCEDURE 	: delCustomerRel
--- DESCRIPTION	: процедура удаления реквизитов клиента "Связанные лица"
+-- PROCEDURE  : delCustomerRel
+-- DESCRIPTION  : процедура удаления реквизитов клиента "Связанные лица"
 --***************************************************************************--
 PROCEDURE delCustomerRel (
   p_rnk       customer_rel.rnk%type,
@@ -2266,8 +2307,8 @@ end delCustomerRel;
 $end
 
 --***************************************************************************--
--- PROCEDURE 	: setCustomerAddress
--- DESCRIPTION	: процедура обновления адресов клиента
+-- PROCEDURE  : setCustomerAddress
+-- DESCRIPTION  : процедура обновления адресов клиента
 --***************************************************************************--
 PROCEDURE setCustomerAddress (
   Rnk_         customer_address.rnk%type,
@@ -2285,8 +2326,8 @@ begin
 end setCustomerAddress;
 
 --***************************************************************************--
--- PROCEDURE 	: setCustomerAddressByTerritory
--- DESCRIPTION	: процедура обновления адресов клиента
+-- PROCEDURE  : setCustomerAddressByTerritory
+-- DESCRIPTION  : процедура обновления адресов клиента
 --***************************************************************************--
 PROCEDURE setCustomerAddressByTerritory (
   Rnk_         customer_address.rnk%type,
@@ -2307,34 +2348,35 @@ begin
 end setCustomerAddressByTerritory;
 
 --***************************************************************************--
--- PROCEDURE 	: setFullCustomerAddress
--- DESCRIPTION	: процедура обновления адресов клиента
+-- PROCEDURE  : setFullCustomerAddress
+-- DESCRIPTION  : процедура обновления адресов клиента
 --***************************************************************************--
 procedure setFullCustomerAddress (
-	p_rnk         	customer_address.rnk%type,
-	p_typeId    	customer_address.type_id%type,
-	p_country    	customer_address.country%type,
-	p_zip         	customer_address.zip%type,
-	p_domain     	customer_address.domain%type,
-	p_region    	customer_address.region%type,
-	p_locality   	customer_address.locality%type,
-	p_address    	customer_address.address%type,
-	p_territoryId 	customer_address.territory_id%type,
-	p_locality_type customer_address.locality_type%type,
-	p_street_type   customer_address.street_type%type,
-	p_street       	customer_address.street%type,
-	p_home_type    	customer_address.home_type%type,
-	p_home         	customer_address.home%type,
-	p_homepart_type	customer_address.homepart_type%type,
-	p_homepart     	customer_address.homepart%type,
-	p_room_type     customer_address.room_type%type,
-	p_room         	customer_address.room%type,
-	p_comment       customer_address.comm%type default null,
-	p_flag_visa     number default 0 )
+  p_rnk           customer_address.rnk%type,
+  p_typeId      customer_address.type_id%type,
+  p_country      customer_address.country%type,
+  p_zip           customer_address.zip%type,
+  p_domain       customer_address.domain%type,
+  p_region      customer_address.region%type,
+  p_locality     customer_address.locality%type,
+  p_address      customer_address.address%type,
+  p_territoryId   customer_address.territory_id%type,
+  p_locality_type customer_address.locality_type%type,
+  p_street_type   customer_address.street_type%type,
+  p_street         customer_address.street%type,
+  p_home_type      customer_address.home_type%type,
+  p_home           customer_address.home%type,
+  p_homepart_type  customer_address.homepart_type%type,
+  p_homepart       customer_address.homepart%type,
+  p_room_type     customer_address.room_type%type,
+  p_room           customer_address.room%type,
+  p_comment       customer_address.comm%type default null,
+  p_flag_visa     number default 0 )
 IS
   NewId_ number;
   l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
-  l_address customer_address.address%type := p_address;
+  l_address customer_address.address%type := coalesce(p_address,create_addr_str(p_street_type,p_street,p_home_type,p_home,p_homepart_type,p_homepart,p_room_type,p_room));
+
 BEGIN
   bars_audit.trace('%s 1.params:'
        || ' p_Rnk=>%s,'
@@ -2365,81 +2407,79 @@ BEGIN
         bars_audit.trace('%s 3. завершено удаление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
      else
         -- Обновление
-		-- для сумісності зі старою версією
-		if (p_locality_type is null
-		    and p_street_type is null
-		    and p_street is null
-		    and p_home_type is null
-		    and p_home is null
-		    and p_homepart_type is null
-		    and p_homepart is null
-		    and p_room_type is null
-		    and p_room is null
-			and p_comment is null ) then
+    -- для сумісності зі старою версією
+    if (p_locality_type is null
+        and p_street_type is null
+        and p_street is null
+        and p_home_type is null
+        and p_home is null
+        and p_homepart_type is null
+        and p_homepart is null
+        and p_room_type is null
+        and p_room is null
+      and p_comment is null ) then
 
-				update customer_address
-				set country       = p_Country,
-					zip     	     = p_Zip,
-					domain  	     = p_Domain,
-					region        = p_Region,
-					locality      = p_Locality,
-					address       = p_Address,
-					territory_id  = p_TerritoryId
-				where rnk = p_Rnk and type_id = p_TypeId;
+        update customer_address
+        set country       = p_Country,
+          zip            = p_Zip,
+          domain         = p_Domain,
+          region        = p_Region,
+          locality      = p_Locality,
+          address       = p_Address,
+          territory_id  = p_TerritoryId
+        where rnk = p_Rnk and type_id = p_TypeId;
 
-		else
+    else
       -- формируем поле адрес, если оно зашло пустое.
-      if p_address is null then
-        select rtrim(substr(case p_street_type
-                 when null then null 
-                 else (select st.str_tp_nm||' '||p_street||', '
-                         from adr_street_types st
-                         where st.str_tp_id = p_street_type)
-               end ||
-               case p_home_type
-                 when null then null
-                 else (select ht.value||' '||p_home||', '
-                         from adr_home_type ht
-                         where ht.id = p_home_type)
-               end ||
-               case p_homepart_type
-                 when null then null
-                 else (select pt.value||' '||p_homepart||', '
-                         from adr_homepart_type pt
-                         where pt.id = p_homepart_type)
-               end ||
-               case p_room_type
-                 when null then null
-                 else (select rt.value||' '||p_room
-                         from adr_room_type rt
-                         where rt.id = p_room_type)
-               end,1,100),', ')
-           into l_address
-           from dual;
-       end if;
+      select rtrim(substr(case p_street_type
+               when null then null
+               else (select st.str_tp_nm||' '||p_street||', '
+                       from adr_street_types st
+                       where st.str_tp_id = p_street_type)
+             end ||
+             case p_home_type
+               when null then null
+               else (select ht.value||' '||p_home||', '
+                       from adr_home_type ht
+                       where ht.id = p_home_type)
+             end ||
+             case p_homepart_type
+               when null then null
+               else (select pt.value||' '||p_homepart||', '
+                       from adr_homepart_type pt
+                       where pt.id = p_homepart_type)
+             end ||
+             case p_room_type
+               when null then null
+               else (select rt.value||' '||p_room
+                       from adr_room_type rt
+                       where rt.id = p_room_type)
+             end,1,100),', ')
+         into l_address
+         from dual;
 
-       update customer_address
-         set country       = p_Country,
-             zip     	   = p_Zip,
-             domain  	   = p_Domain,
-             region        = p_Region,
-             locality      = p_Locality,
-             address       = l_Address,
-             territory_id  = p_TerritoryId,
-             locality_type = p_locality_type,
-             street_type   = p_street_type,
-             street        = p_street,
-             home_type     = p_home_type,
-             home          = p_home,
-             homepart_type = p_homepart_type,
-             homepart      = p_homepart,
-             room_type     = p_room_type,
-             room          = p_room,
-             comm          = p_comment
-         where rnk = p_Rnk 
-           and type_id = p_TypeId;
+      update customer_address
+        set country       = p_Country,
+          zip            = p_Zip,
+          domain         = p_Domain,
+          region        = p_Region,
+          locality      = p_Locality,
+          address       = l_Address,
+          territory_id  = p_TerritoryId,
+          locality_type = p_locality_type,
+          street_type   = p_street_type,
+          street        = p_street,
+          home_type     = p_home_type,
+          home          = p_home,
+          homepart_type = p_homepart_type,
+          homepart      = p_homepart,
+          room_type     = p_room_type,
+          room          = p_room,
+          comm          = p_comment
+        where rnk = p_Rnk and type_id = p_TypeId;
 
-     end if;
+    end if;
+
         if sql%rowcount = 0 then
            bars_audit.trace('%s 4. регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
            -- Добавление
@@ -2453,6 +2493,13 @@ BEGIN
            bars_audit.trace('%s 6. завершено обновление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
         end if;
 
+   if p_typeId = 1 then
+     update customer
+       set adr = substr(l_address,1,70)
+       where rnk = p_rnk
+         and nvl(adr,'-') != l_address;
+   end if;
+
 $if KL_PARAMS.SBER $then
         ADD_EBK_QUEUE(p_rnk);
 
@@ -2463,14 +2510,14 @@ $if KL_PARAMS.CLV $then
      declare
         l_clv clv_customer_address%rowtype;
      begin
-        l_clv.rnk      	    := p_Rnk;
-        l_clv.type_id  	    := p_TypeId;
-        l_clv.country  	    := p_Country;
-        l_clv.zip      	    := p_Zip;
-        l_clv.domain   	    := p_Domain;
-        l_clv.region   	    := p_Region;
-        l_clv.locality 	    := p_Locality;
-        l_clv.address  	    := l_Address;
+        l_clv.rnk            := p_Rnk;
+        l_clv.type_id        := p_TypeId;
+        l_clv.country        := p_Country;
+        l_clv.zip            := p_Zip;
+        l_clv.domain         := p_Domain;
+        l_clv.region         := p_Region;
+        l_clv.locality       := p_Locality;
+        l_clv.address        := l_Address;
         l_clv.territory_id  := p_TerritoryId;
         l_clv.locality_type := p_locality_type;
         l_clv.street_type   := p_street_type;
@@ -2523,7 +2570,7 @@ procedure setFullCustomerAddress (
 IS
   NewId_ number;
   l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
-  l_address customer_address.address%type := p_address;
+  l_address customer_address.address%type := coalesce(p_address,create_addr_str(p_street_type,p_street,p_home_type,p_home,p_homepart_type,p_homepart,p_room_type,p_room));
 BEGIN
   bars_audit.trace('%s 1.params:'
        || ' p_Rnk=>%s,'
@@ -2572,39 +2619,11 @@ BEGIN
               domain         = p_Domain,
               region        = p_Region,
               locality      = p_Locality,
-              address       = p_Address,
+              address       = l_Address,
               territory_id  = p_TerritoryId
             where rnk = p_Rnk and type_id = p_TypeId;
 
         else
-          if p_address is null then
-            select rtrim(substr(case p_street_type
-                     when null then null 
-                     else (select st.str_tp_nm||' '||p_street||', '
-                             from adr_street_types st
-                             where st.str_tp_id = p_street_type)
-                   end ||
-                   case p_home_type
-                     when null then null
-                     else (select ht.value||' '||p_home||', '
-                             from adr_home_type ht
-                             where ht.id = p_home_type)
-                   end ||
-                   case p_homepart_type
-                     when null then null
-                     else (select pt.value||' '||p_homepart||', '
-                             from adr_homepart_type pt
-                             where pt.id = p_homepart_type)
-                   end ||
-                   case p_room_type
-                     when null then null
-                     else (select rt.value||' '||p_room
-                             from adr_room_type rt
-                             where rt.id = p_room_type)
-                   end,1,100),', ')
-               into l_address
-               from dual;
-           end if;
           update customer_address
             set country       = p_Country,
               zip            = p_Zip,
@@ -2648,6 +2667,14 @@ BEGIN
            bars_audit.trace('%s 6. завершено обновление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
         end if;
 
+   if p_typeId = 1 then
+     update customer
+       set adr = substr(l_address,1,70)
+       where rnk = p_rnk
+         and nvl(adr,'-') != l_address;
+   end if;
+
+
 $if KL_PARAMS.SBER $then
         ADD_EBK_QUEUE(p_rnk);
 
@@ -2687,8 +2714,8 @@ END;
 $if KL_PARAMS.TREASURY $then
 $else
 --***************************************************************************--
--- PROCEDURE 	: setCorpAcc
--- DESCRIPTION	: процедура обновления реквизитов счетов клиента в др. банках
+-- PROCEDURE  : setCorpAcc
+-- DESCRIPTION  : процедура обновления реквизитов счетов клиента в др. банках
 --***************************************************************************--
 PROCEDURE setCorpAcc (
   Rnk_    corps_acc.rnk%type,
@@ -2716,8 +2743,8 @@ BEGIN
 END setCorpAcc;
 
 --***************************************************************************--
--- PROCEDURE 	: setCorpAccEx
--- DESCRIPTION	: процедура обновления реквизитов счетов клиента в др. банках
+-- PROCEDURE  : setCorpAccEx
+-- DESCRIPTION  : процедура обновления реквизитов счетов клиента в др. банках
 --***************************************************************************--
 PROCEDURE setCorpAccEx (
   Rnk_    corps_acc.rnk%type,
@@ -2793,8 +2820,8 @@ $end
 end setCorpAccEx;
 
 --***************************************************************************--
--- PROCEDURE 	: delCorpAcc
--- DESCRIPTION	: процедура удаления реквизитов счетов клиента в др. банках
+-- PROCEDURE  : delCorpAcc
+-- DESCRIPTION  : процедура удаления реквизитов счетов клиента в др. банках
 --***************************************************************************--
 PROCEDURE delCorpAcc (
   Id_         corps_acc.id%type,
@@ -2820,8 +2847,8 @@ $end
 
 $if KL_PARAMS.SIGN $then
 --***************************************************************************--
--- PROCEDURE 	: setCustomerSeal
--- DESCRIPTION	: Процедура обновления подписи/печати
+-- PROCEDURE  : setCustomerSeal
+-- DESCRIPTION  : Процедура обновления подписи/печати
 --***************************************************************************--
 procedure setCustomerSeal (
   Id_   OUT customer_bin_data.id%type,
@@ -2848,8 +2875,8 @@ end setCustomerSeal;
 $end
 
 --***************************************************************************--
--- procedure 	: set_customer_risk
--- description	: процедура установки рисков клиентам
+-- procedure  : set_customer_risk
+-- description  : процедура установки рисков клиентам
 --***************************************************************************--
 procedure set_customer_risk (
   p_rnk       number,
@@ -2990,8 +3017,8 @@ $end
 end set_customer_risk;
 
 --***************************************************************************--
--- procedure 	: set_customer_rept
--- description	: процедура установки репутации клиента
+-- procedure  : set_customer_rept
+-- description  : процедура установки репутации клиента
 --***************************************************************************--
 procedure set_customer_rept (
   p_rnk       number,
@@ -3102,8 +3129,8 @@ begin
 end set_customer_category;
 
 --***************************************************************************--
--- procedure 	: approve_client_request
--- description	: процедура визирования изменений параметров клиента
+-- procedure  : approve_client_request
+-- description  : процедура визирования изменений параметров клиента
 --***************************************************************************--
 procedure approve_client_request (p_rnk number)
 is
@@ -3370,8 +3397,8 @@ $end
 end approve_client_request;
 
 --***************************************************************************--
--- function 	: get_customerw
--- description	: функция получения значения доп.реквизита клиента
+-- function   : get_customerw
+-- description  : функция получения значения доп.реквизита клиента
 --***************************************************************************--
 function get_customerw (
   p_rnk customerw.rnk%type,
@@ -3475,7 +3502,7 @@ begin
         check_attr(get_customerw(p_rnk, 'DJER '), 'Характеристика джерел надходжень коштiв');
         check_attr(get_customerw(p_rnk, 'CIGPO') ,'Статус зайнятості особи');
      -- ЮЛ-резидент
-     elsif mod(l_cust.codcagent, 2) = 1 
+     elsif mod(l_cust.codcagent, 2) = 1
  then
         check_attr(l_cust.adm,   'Адм. орган реєстрації');
         check_attr(l_cust.rgtax, 'Реєстр. номер у ПІ');
@@ -3494,8 +3521,8 @@ begin
 end get_empty_attr_foropenacc;
 
 --***************************************************************************--
--- procedure 	: check_attr_foropenacc
--- description	: процедура проверки заполнения реквизитов клиета для открытия счетов 2 кл.
+-- procedure  : check_attr_foropenacc
+-- description  : процедура проверки заполнения реквизитов клиета для открытия счетов 2 кл.
 --***************************************************************************--
 procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2)
 is
@@ -3521,48 +3548,48 @@ end check_attr_foropenacc;
     begin
         bars_audit.trace('%s: entry point', p);
 
-		l.ukr_num := '01'; l.ukr_let := chr(192);  l.eng_let := chr(65); g_let_table(0) := l;
-		l.ukr_num := '02'; l.ukr_let := chr(193);  l.eng_let := '';  	 g_let_table(1) := l;
-		l.ukr_num := '03'; l.ukr_let := chr(194);  l.eng_let := chr(66); g_let_table(39) := l;
-		l.ukr_num := '03'; l.ukr_let := chr(194);  l.eng_let := chr(86); g_let_table(2) := l;
-		l.ukr_num := '03'; l.ukr_let := chr(194);  l.eng_let := chr(87); g_let_table(3) := l;
-		l.ukr_num := '04'; l.ukr_let := chr(195);  l.eng_let := chr(71); g_let_table(4) := l;
-		l.ukr_num := '05'; l.ukr_let := chr(165);  l.eng_let := '';  	 g_let_table(5) := l;
-		l.ukr_num := '06'; l.ukr_let := chr(196);  l.eng_let := chr(68); g_let_table(6) := l;
-		l.ukr_num := '07'; l.ukr_let := chr(197);  l.eng_let := chr(69); g_let_table(7) := l;
-		l.ukr_num := '08'; l.ukr_let := chr(170);  l.eng_let := '';  	 g_let_table(8) := l;
-		l.ukr_num := '09'; l.ukr_let := chr(198);  l.eng_let := chr(74); g_let_table(9) := l;
-		l.ukr_num := '10'; l.ukr_let := chr(199);  l.eng_let := chr(90); g_let_table(10) := l;
-		l.ukr_num := '11'; l.ukr_let := chr(200);  l.eng_let := '';  	 g_let_table(11) := l;
-		l.ukr_num := '12'; l.ukr_let := chr(178);  l.eng_let := chr(73); g_let_table(12) := l;
-		l.ukr_num := '13'; l.ukr_let := chr(175);  l.eng_let := '';  	 g_let_table(13) := l;
-		l.ukr_num := '14'; l.ukr_let := chr(201);  l.eng_let := '';  	 g_let_table(14) := l;
-		l.ukr_num := '15'; l.ukr_let := chr(202);  l.eng_let := chr(75); g_let_table(15) := l;
-		l.ukr_num := '15'; l.ukr_let := chr(202);  l.eng_let := chr(81); g_let_table(16) := l;
-		l.ukr_num := '16'; l.ukr_let := chr(203);  l.eng_let := chr(76); g_let_table(17) := l;
-		l.ukr_num := '17'; l.ukr_let := chr(204);  l.eng_let := chr(77); g_let_table(18) := l;
-		l.ukr_num := '18'; l.ukr_let := chr(205);  l.eng_let := chr(72); g_let_table(19) := l;
-		l.ukr_num := '18'; l.ukr_let := chr(205);  l.eng_let := chr(78); g_let_table(20) := l;
-		l.ukr_num := '19'; l.ukr_let := chr(206);  l.eng_let := chr(79); g_let_table(21) := l;
-		l.ukr_num := '20'; l.ukr_let := chr(207);  l.eng_let := '';  	 g_let_table(22) := l;
-		l.ukr_num := '21'; l.ukr_let := chr(208);  l.eng_let := chr(80); g_let_table(23) := l;
-		l.ukr_num := '21'; l.ukr_let := chr(208);  l.eng_let := chr(82); g_let_table(24) := l;
-		l.ukr_num := '22'; l.ukr_let := chr(209);  l.eng_let := chr(67); g_let_table(25) := l;
-		l.ukr_num := '22'; l.ukr_let := chr(209);  l.eng_let := chr(83); g_let_table(26) := l;
-		l.ukr_num := '23'; l.ukr_let := chr(210);  l.eng_let := chr(84); g_let_table(27) := l;
-		l.ukr_num := '24'; l.ukr_let := chr(211);  l.eng_let := chr(85); g_let_table(28) := l;
-		l.ukr_num := '24'; l.ukr_let := chr(211);  l.eng_let := chr(89); g_let_table(29) := l;
-		l.ukr_num := '25'; l.ukr_let := chr(212);  l.eng_let := chr(70); g_let_table(30) := l;
-		l.ukr_num := '26'; l.ukr_let := chr(213);  l.eng_let := chr(88); g_let_table(31) := l;
-		l.ukr_num := '27'; l.ukr_let := chr(214);  l.eng_let := '';  	 g_let_table(32) := l;
-		l.ukr_num := '28'; l.ukr_let := chr(215);  l.eng_let := '';  	 g_let_table(33) := l;
-		l.ukr_num := '29'; l.ukr_let := chr(216);  l.eng_let := '';  	 g_let_table(34) := l;
-		l.ukr_num := '30'; l.ukr_let := chr(217);  l.eng_let := '';  	 g_let_table(35) := l;
-		l.ukr_num := '31'; l.ukr_let := chr(220);  l.eng_let := '';  	 g_let_table(36) := l;
-		l.ukr_num := '32'; l.ukr_let := chr(222);  l.eng_let := '';  	 g_let_table(37) := l;
-		l.ukr_num := '33'; l.ukr_let := chr(223);  l.eng_let := '';  	 g_let_table(38) := l;
+    l.ukr_num := '01'; l.ukr_let := chr(192);  l.eng_let := chr(65); g_let_table(0) := l;
+    l.ukr_num := '02'; l.ukr_let := chr(193);  l.eng_let := '';    g_let_table(1) := l;
+    l.ukr_num := '03'; l.ukr_let := chr(194);  l.eng_let := chr(66); g_let_table(39) := l;
+    l.ukr_num := '03'; l.ukr_let := chr(194);  l.eng_let := chr(86); g_let_table(2) := l;
+    l.ukr_num := '03'; l.ukr_let := chr(194);  l.eng_let := chr(87); g_let_table(3) := l;
+    l.ukr_num := '04'; l.ukr_let := chr(195);  l.eng_let := chr(71); g_let_table(4) := l;
+    l.ukr_num := '05'; l.ukr_let := chr(165);  l.eng_let := '';    g_let_table(5) := l;
+    l.ukr_num := '06'; l.ukr_let := chr(196);  l.eng_let := chr(68); g_let_table(6) := l;
+    l.ukr_num := '07'; l.ukr_let := chr(197);  l.eng_let := chr(69); g_let_table(7) := l;
+    l.ukr_num := '08'; l.ukr_let := chr(170);  l.eng_let := '';    g_let_table(8) := l;
+    l.ukr_num := '09'; l.ukr_let := chr(198);  l.eng_let := chr(74); g_let_table(9) := l;
+    l.ukr_num := '10'; l.ukr_let := chr(199);  l.eng_let := chr(90); g_let_table(10) := l;
+    l.ukr_num := '11'; l.ukr_let := chr(200);  l.eng_let := '';    g_let_table(11) := l;
+    l.ukr_num := '12'; l.ukr_let := chr(178);  l.eng_let := chr(73); g_let_table(12) := l;
+    l.ukr_num := '13'; l.ukr_let := chr(175);  l.eng_let := '';    g_let_table(13) := l;
+    l.ukr_num := '14'; l.ukr_let := chr(201);  l.eng_let := '';    g_let_table(14) := l;
+    l.ukr_num := '15'; l.ukr_let := chr(202);  l.eng_let := chr(75); g_let_table(15) := l;
+    l.ukr_num := '15'; l.ukr_let := chr(202);  l.eng_let := chr(81); g_let_table(16) := l;
+    l.ukr_num := '16'; l.ukr_let := chr(203);  l.eng_let := chr(76); g_let_table(17) := l;
+    l.ukr_num := '17'; l.ukr_let := chr(204);  l.eng_let := chr(77); g_let_table(18) := l;
+    l.ukr_num := '18'; l.ukr_let := chr(205);  l.eng_let := chr(72); g_let_table(19) := l;
+    l.ukr_num := '18'; l.ukr_let := chr(205);  l.eng_let := chr(78); g_let_table(20) := l;
+    l.ukr_num := '19'; l.ukr_let := chr(206);  l.eng_let := chr(79); g_let_table(21) := l;
+    l.ukr_num := '20'; l.ukr_let := chr(207);  l.eng_let := '';    g_let_table(22) := l;
+    l.ukr_num := '21'; l.ukr_let := chr(208);  l.eng_let := chr(80); g_let_table(23) := l;
+    l.ukr_num := '21'; l.ukr_let := chr(208);  l.eng_let := chr(82); g_let_table(24) := l;
+    l.ukr_num := '22'; l.ukr_let := chr(209);  l.eng_let := chr(67); g_let_table(25) := l;
+    l.ukr_num := '22'; l.ukr_let := chr(209);  l.eng_let := chr(83); g_let_table(26) := l;
+    l.ukr_num := '23'; l.ukr_let := chr(210);  l.eng_let := chr(84); g_let_table(27) := l;
+    l.ukr_num := '24'; l.ukr_let := chr(211);  l.eng_let := chr(85); g_let_table(28) := l;
+    l.ukr_num := '24'; l.ukr_let := chr(211);  l.eng_let := chr(89); g_let_table(29) := l;
+    l.ukr_num := '25'; l.ukr_let := chr(212);  l.eng_let := chr(70); g_let_table(30) := l;
+    l.ukr_num := '26'; l.ukr_let := chr(213);  l.eng_let := chr(88); g_let_table(31) := l;
+    l.ukr_num := '27'; l.ukr_let := chr(214);  l.eng_let := '';    g_let_table(32) := l;
+    l.ukr_num := '28'; l.ukr_let := chr(215);  l.eng_let := '';    g_let_table(33) := l;
+    l.ukr_num := '29'; l.ukr_let := chr(216);  l.eng_let := '';    g_let_table(34) := l;
+    l.ukr_num := '30'; l.ukr_let := chr(217);  l.eng_let := '';    g_let_table(35) := l;
+    l.ukr_num := '31'; l.ukr_let := chr(220);  l.eng_let := '';    g_let_table(36) := l;
+    l.ukr_num := '32'; l.ukr_let := chr(222);  l.eng_let := '';    g_let_table(37) := l;
+    l.ukr_num := '33'; l.ukr_let := chr(223);  l.eng_let := '';    g_let_table(38) := l;
 
-		bars_audit.trace('%s: succ end', p);
+    bars_audit.trace('%s: succ end', p);
     end;
 
     -----------------------------------------------------------
@@ -3573,31 +3600,31 @@ end check_attr_foropenacc;
     --     @p_errmsg - текст успеха или ошибки (SUCCESS, PASSPORT_SERIAL_NULL, PASSPORT_SERIAL_LENGTH, PASSPORT_SERIAL_ERROR)
     --
     procedure recode_passport_serial_silent(
-		p_serial     in  person.ser%type,
+    p_serial     in  person.ser%type,
         p_result     out person.ser%type,
         p_errmsg     out varchar2
-	)
+  )
     is
-    	p         constant varchar2(100)        := 'kl.recode_passport_serial_silent';
-    	l_serial  person.ser%type;
+      p         constant varchar2(100)        := 'kl.recode_passport_serial_silent';
+      l_serial  person.ser%type;
     begin
-		if logger.trace_enabled() then
-        	bars_audit.trace('%s: entry point par[0]=>%s', p, p_serial);
-		end if;
-		p_result := null;
+    if logger.trace_enabled() then
+          bars_audit.trace('%s: entry point par[0]=>%s', p, p_serial);
+    end if;
+    p_result := null;
         -- Проверяем входное значение
         if (p_serial is null) then
-			if logger.trace_enabled() then
-            	bars_audit.trace('%s: error detected - serial null', p);
-			end if;
-			p_errmsg := 'PASSPORT_SERIAL_NULL';
+      if logger.trace_enabled() then
+              bars_audit.trace('%s: error detected - serial null', p);
+      end if;
+      p_errmsg := 'PASSPORT_SERIAL_NULL';
             return;
         elsif (length(p_serial) != 2) then
-			if logger.trace_enabled() then
-            	bars_audit.trace('%s: error detected - serial length is invalid', p);
-			end if;
-			p_errmsg := 'PASSPORT_SERIAL_LENGTH';
-			return;
+      if logger.trace_enabled() then
+              bars_audit.trace('%s: error detected - serial length is invalid', p);
+      end if;
+      p_errmsg := 'PASSPORT_SERIAL_LENGTH';
+      return;
         else
             -- приводим в верхний регистр
             l_serial := upper(p_serial);
@@ -3606,11 +3633,11 @@ end check_attr_foropenacc;
             loop
                 if instr( chr(65)||chr(66)||chr(67)||chr(68)||chr(69)||chr(70)||chr(71)||chr(72)||chr(73)||chr(74)||chr(75)||chr(76)||chr(77)||chr(78)||chr(79)||chr(80)||chr(81)||chr(82)||chr(83)||chr(84)||chr(85)||chr(86)||chr(87)||chr(88)||chr(89)||chr(90)||
                           chr(192)||chr(193)||chr(194)||chr(195)||chr(165)||chr(196)||chr(197)||chr(170)||chr(198)||chr(199)||chr(200)||chr(178)||chr(175)||chr(201)||chr(202)||chr(203)||chr(204)||chr(205)||chr(206)||chr(207)||chr(208)||chr(209)||chr(210)||chr(211)||chr(212)||chr(213)||chr(214)||chr(215)||chr(216)||chr(217)||chr(222)||chr(223)||chr(220) , substr(l_serial, i, 1)) = 0 then
-					if logger.trace_enabled() then
-                    	bars_audit.trace('%s: error detected - invalid serial symbol pos: %s', p, to_char(i));
-					end if;
-					p_errmsg := 'PASSPORT_SERIAL_ERROR';
-					return;
+          if logger.trace_enabled() then
+                      bars_audit.trace('%s: error detected - invalid serial symbol pos: %s', p, to_char(i));
+          end if;
+          p_errmsg := 'PASSPORT_SERIAL_ERROR';
+          return;
                 end if;
             end loop;
             -- приводим в одну кодировку
@@ -3625,9 +3652,9 @@ end check_attr_foropenacc;
                     end if;
                 end loop;
             end loop;
-			if logger.trace_enabled() then
-            	bars_audit.trace('%s: succ end with result %s', p, p_result);
-			end if;
+      if logger.trace_enabled() then
+              bars_audit.trace('%s: succ end with result %s', p, p_result);
+      end if;
             p_errmsg := 'SUCCESS';
         end if;
     end recode_passport_serial_silent;
@@ -3639,16 +3666,16 @@ end check_attr_foropenacc;
     --
     function recode_passport_serial(p_serial in person.ser%type) return person.ser%type
     is
-		l_result	person.ser%type;
-		l_errmsg	varchar2(128);
+    l_result  person.ser%type;
+    l_errmsg  varchar2(128);
     begin
-		recode_passport_serial_silent(p_serial, l_result, l_errmsg);
-		if l_errmsg='SUCCESS'
+    recode_passport_serial_silent(p_serial, l_result, l_errmsg);
+    if l_errmsg='SUCCESS'
         then
-			return l_result;
-		else
-			bars_error.raise_nerror(g_modcode, l_errmsg);
-		end if;
+      return l_result;
+    else
+      bars_error.raise_nerror(g_modcode, l_errmsg);
+    end if;
     end recode_passport_serial;
 
     -----------------------------------------------------------
@@ -3718,9 +3745,9 @@ end check_attr_foropenacc;
   ) is
     title  constant  varchar2(64) := $$PLSQL_UNIT||'.RESURRECT_CUSTOMER';
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( p_rnk=%s ).', title, to_char(p_rnk) );
-    
+
     begin
 
       update CUSTOMER
