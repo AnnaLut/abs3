@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/16/2014 10:45:29" ReportInfo.Modified="05/11/2019 09:16:36" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void ListBox1_Click(object sender, EventArgs e)
+    {
+      
+    }
+
+    private void TextBox1_Click(object sender, EventArgs e)
+    {
+      
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="DEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoUbsGJ7D/ZXnGArokjaA1lI" CommandTimeout="4000">
+      <TableDataSource Name="Table1" Alias="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 COL, NUM01 DONEBY, CHAR00 FIO from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="COL" DataType="System.Decimal"/>
+        <Column Name="DONEBY" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="t1" DataType="System.Int32" Enabled="true" SelectCommand="select substr(f_dat_lit(:sFdat1), 1, 25) from dual">
+        <Column Name="SUBSTR(F_DAT_LIT(:SFDAT1),1,25)" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01/01/1900"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="t2" DataType="System.Int32" Enabled="true" SelectCommand="select substr(f_dat_lit(:sFdat2), 1, 25) from dual">
+        <Column Name="SUBSTR(F_DAT_LIT(:SFDAT2),1,25)" DataType="System.String"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01/01/1900"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime" Description="01/01/2010"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime" Description="01/08/2015"/>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15" Duplex="Simplex">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="160.65">
+      <TableObject Name="Table2" Width="529.2" Height="160.65" CanBreak="false" RepeatHeaders="false">
+        <TableColumn Name="Column13" Width="141.75"/>
+        <TableColumn Name="Column21" Width="236.25"/>
+        <TableColumn Name="Column22" Width="151.2"/>
+        <TableRow Name="Row3" Height="85.05">
+          <TableCell Name="Cell69" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Звіт про кількість авторизованих кредитних заявок&#13;&#10;у звітному періоді з  [t1.SUBSTR(F_DAT_LIT(:sFdat1),1,25)] по [t2.SUBSTR(F_DAT_LIT(:sFdat2),1,25)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="3">
+            <Formats>
+              <GeneralFormat/>
+              <GeneralFormat/>
+              <GeneralFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell78" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell80" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="75.6">
+          <TableCell Name="Cell154" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Користувач ID" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell159" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Користувач ПІБ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell160" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Кількість авторизованих кредитів" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data3" Top="164.65" Width="1047.06" Height="23.61" CanGrow="true" CanShrink="true" DataSource="Table1" KeepTogether="true">
+      <TableObject Name="Table2" Width="529.2" Height="23.61" Border.Lines="All" GrowToBottom="true">
+        <TableColumn Name="Column1" Width="141.75"/>
+        <TableColumn Name="Column2" Width="236.25"/>
+        <TableColumn Name="Column6" Width="151.2"/>
+        <TableRow Name="Row4" Height="23.61" AutoSize="true">
+          <TableCell Name="Cell90" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.DONEBY]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell91" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.FIO]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell94" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.COL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>
