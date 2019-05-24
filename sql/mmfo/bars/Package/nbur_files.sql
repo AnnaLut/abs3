@@ -278,13 +278,11 @@ function f_get_file_clob (p_report_date  in date,
   procedure SET_FILE_DEPENDENCIES
   ( p_file_id       in     nbur_lnk_files_files.file_id%type
   , p_file_pid      in     nbur_lnk_files_files.file_dep_id%type
---, p_strt_dt       in     nbur_lnk_files_files.start_date%type
   );
 
   procedure SET_FILE_DEPENDENCIES
   ( p_file_code     in     nbur_ref_files.file_code%type
   , p_file_pcode    in     nbur_ref_files.file_code%type
---, p_strt_dt       in     nbur_lnk_files_files.start_date%type
   );
 
   --
@@ -317,7 +315,7 @@ show errors
 create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64) := 'version 6.8  2018.08.23';
+  g_body_version  constant varchar2(64) := 'version 6.9  2019.05.24';
 
   MODULE_PREFIX   constant varchar2(8) := 'NBUR';
 
@@ -471,9 +469,6 @@ end f_get_id_file;
         where FILE_CODE = p_file_code;
     exception
       when no_data_found then
---      l_file_id := case SubStr(p_file_code,1,1) when '#' then '1' when '@' then '2' else '0' end
---                || to_char(ASCII(SubStr(p_file_code,2,1)))
---                || to_char(ASCII(SubStr(p_file_code,3,1)));
         l_file_id := null;
         raise_application_error( -20666, 'No file with code ' || p_file_code || ' found!', true );
     end;
@@ -517,11 +512,13 @@ end f_get_id_file;
   begin
 
     begin
-      select case FILE_FMT
+      select (case FILE_FMT
              when 'XML'
-             then case when substr(file_code, 1, 1) = '#' then SubStr(FILE_CODE,2,2) else SubStr(FILE_CODE,1,2) end
-             else nvl( SubStr(FILE_CODE_ALT,1,2), SubStr(FILE_CODE,2,2) )
-             end
+             then case when substr(file_code, 1, 1) = '#' 
+                       then nvl(SubStr(FILE_CODE_ALT,2,2), SubStr(FILE_CODE,2,2)) 
+                       else nvl(SubStr(FILE_CODE_ALT,1,2), SubStr(FILE_CODE,1,2)) end
+             else nvl(SubStr(FILE_CODE_ALT,1,2), SubStr(FILE_CODE,2,2))
+             end)
         into l_file_code_alt
         from NBUR_REF_FILES
        where ID = p_file_id;

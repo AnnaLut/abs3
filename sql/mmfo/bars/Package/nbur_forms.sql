@@ -58,7 +58,7 @@ show errors;
 create or replace package body NBUR_FORMS 
 is
 
-g_body_version  constant varchar2(64)  := 'version 4.2 2017.07.13';
+g_body_version  constant varchar2(64)  := 'version 4.3 2019.05.24';
 g_body_defs     constant varchar2(512) := '';
 
 MODULE_PREFIX   constant varchar2(10)   := 'NBUR';
@@ -248,8 +248,9 @@ begin
     end if;
 
     begin
-        select substr(a.file_code,1,1),  substr(a.file_code,2,2), a.scheme_code,
-            b.e_address, a.period_type
+        select substr(nvl(a.file_code_alt, a.file_code),1,1), 
+               substr(nvl(a.file_code_alt, a.file_code),2,2), a.scheme_code,
+               b.e_address, a.period_type
         into l_sFPrefix, l_NumFile, l_sGCode, l_sEBox, l_sPeriod
         from NBUR_REF_FILES a, NBUR_REF_FILES_LOCAL b
         where a.id = p_file_id and
@@ -388,8 +389,8 @@ is
    l_report_date    date := p_report_date;
 begin
     begin
-        select a.file_code, a.UNIT_CODE, a.PERIOD_TYPE, a.SCHEME_NUMBER,
-               a.FLAG_TURNS
+        select nvl(a.file_code_alt, a.file_code), a.UNIT_CODE, a.PERIOD_TYPE, 
+               a.SCHEME_NUMBER, a.FLAG_TURNS
         into l_FileCode, l_Msmt, l_Period, l_GNum, l_FlagTurns
         from NBUR_REF_FILES a
         where a.id = p_file_id;
@@ -514,7 +515,7 @@ is
     l_nbuc          NBUR_REF_FILES_LOCAL.nbuc%type;
 begin
     begin
-        select a.location_code, a.file_code, a.scheme_code, b.nbuc
+        select a.location_code, nvl(a.file_code_alt, a.file_code), a.scheme_code, b.nbuc
         into l_loc_code, l_report_code, l_GCode, l_nbuc
         from NBUR_REF_FILES a, NBUR_REF_FILES_LOCAL b
         where a.id = p_file_id and
@@ -548,6 +549,7 @@ is
   l_filebody      clob;
   l_row           varchar2(2000);
   l_rpt_code      nbur_ref_files.file_code%type;
+  l_rpt_rcode     nbur_ref_files.file_code%type;
   l_nbucp         nbur_agg_protocols.nbuc%type := null;
   l_cnt           number := 0;
   l_nbuc_set      varchar2(20);
@@ -574,8 +576,9 @@ begin
     l_filebody := l_filebody||l_row||chr(13)||chr(10);
 
     begin
-        select f.FILE_CODE, l.NBUC, f.FILE_FMT, f.CONSOLIDATION_TYPE
-          into l_rpt_code, l_nbuc_set, l_file_fmt, l_type_cons
+        select nvl(f.file_code_alt, f.file_code), f.file_code, l.NBUC, 
+            f.FILE_FMT, f.CONSOLIDATION_TYPE
+          into l_rpt_code, l_rpt_rcode, l_nbuc_set, l_file_fmt, l_type_cons
           from NBUR_REF_FILES f
           join NBUR_REF_FILES_LOCAL l
             on ( l.FILE_ID = f.ID and l.KF = p_kf )
@@ -633,7 +636,7 @@ begin
                              report_code = :l_rpt_code
                        order by nbuc, '||nvl(l_list_order, 'field_code');
 
-      open l_cursor for l_cursor_sel using p_report_date, p_kf, l_rpt_code;
+      open l_cursor for l_cursor_sel using p_report_date, p_kf, l_rpt_rcode;
 
       loop
           FETCH l_cursor INTO l_nbuc, l_field_code, l_field_value;
