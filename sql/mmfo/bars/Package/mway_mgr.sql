@@ -166,7 +166,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 4.84  02/04/2019';
+  g_body_version  constant varchar2(64)  := 'version 4.85  10/05/2019';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -197,6 +197,9 @@ is
   l_tech_user number;
 
   l_target varchar2(20);
+  
+  RESOURCE_BUSY          exception;
+  pragma exception_init(RESOURCE_BUSY,   -54  );
 
   --------------------------------------------------------------------------------
   -- header_version - возвращает версию заголовка пакета
@@ -1474,6 +1477,16 @@ is
 
       exception
         when NO_DATA_FOUND then
+          GET_ERROR(713,l_servicecode,p_error_code,p_error_message);
+          begin
+            insert
+              into MWAY_RVRS ( RRN_TR )
+            values ( p_rrn );
+          exception
+            when DUP_VAL_ON_INDEX then
+              null;
+          end;
+		when RESOURCE_BUSY then
           GET_ERROR(713,l_servicecode,p_error_code,p_error_message);
           begin
             insert
