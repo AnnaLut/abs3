@@ -470,6 +470,7 @@ is
 
 
 END NBUR_OBJECTS;
+
 /
 
 show errors;
@@ -485,7 +486,7 @@ is
   fmt_tm          constant varchar2(21) := 'dd.mm.yyyy hh24:mi:ss';
 
   MODULE_PREFIX   constant varchar2(4)  := 'NBUR';
-
+  c_enter         constant varchar2(1)  := chr(10);
   --
   -- types
   --
@@ -1208,6 +1209,161 @@ is
   --
   --
   --
+  procedure p_partition_range_add
+  (
+   ip_nbur_arc  in varchar2,
+   ip_rpt_dt    in date
+  )
+  as
+   resource_busy exception;
+   pragma autonomous_transaction;
+   pragma exception_init( resource_busy, -00054 );
+  begin
+    -- попытка добавить партицию
+    execute immediate 'LOCK TABLE '||ip_nbur_arc||' PARTITION FOR( '||date2to_date(ip_rpt_dt)||' ) IN SHARE MODE NOWAIT';
+    commit; -- for release lock
+
+  exception
+  when resource_busy then
+     null;
+     -- партиция уже создана и занята другим процессом(вставка данных)
+  end;
+
+  function f_partition_name
+  (
+   ip_table_name in varchar2,
+   ip_rpt_date   in date
+  )
+  return varchar2
+  as
+   v_partition_name varchar2(30);
+  begin
+    with partition_list as
+    (
+     select dbms_xmlgen.getxmltype('
+            select p.high_value, p.partition_name
+            from  user_tab_partitions p
+            where p.table_name  = '''||ip_table_name||''''
+                                  ) as xml
+       from  dual t
+    )
+    select min(partition_name) keep (dense_rank first order by date_value)
+    into v_partition_name
+    from (
+           select  x.partition_name, f_high_value_date(x.high_value) date_value
+           from partition_list p,
+                xmltable('/ROWSET/ROW'
+                  passing p.xml
+                  columns high_value      varchar2(256) path '/ROW/HIGH_VALUE',
+                          partition_name  varchar2(30)  path '/ROW/PARTITION_NAME'
+                         ) x
+          )
+    where date_value > ip_rpt_date
+    order by date_value;
+
+    return v_partition_name;
+  end;
+
+  function f_subpartition_maxval_name
+  (
+   ip_table_name      in varchar2,
+   ip_partition_name  in varchar2,
+   ip_kf              in varchar2
+  )
+  return varchar2
+  as
+   v_high_value        varchar2(20) := double_quotes(ip_kf)||', '||'MAXVALUE';
+   v_subpartition_name varchar2(30);
+   v_sql               varchar2(4000);
+  begin
+    v_sql :=   'select p.high_value, p.subpartition_name'
+      ||c_enter||'from  user_tab_subpartitions p'
+      ||c_enter||'where p.table_name  = '||double_quotes(ip_table_name)
+      ||c_enter||'and p.partition_name  = '||double_quotes(ip_partition_name);
+    begin
+      with partition_list as
+      (
+       select dbms_xmlgen.getxmltype(v_sql) as xml
+         from  dual t
+      )
+       select  x.subpartition_name
+       into v_subpartition_name
+       from partition_list p,
+            xmltable('/ROWSET/ROW'
+              passing p.xml
+              columns high_value         varchar2(256) path '/ROW/HIGH_VALUE',
+                      subpartition_name  varchar2(30)  path '/ROW/SUBPARTITION_NAME'
+                     ) x
+      where x.high_value = v_high_value;
+    exception
+      when NO_DATA_FOUND then
+        bars_audit.error('В таблице '||double_quotes(ip_table_name)||' партиция '||double_quotes(ip_partition_name)||
+                          'не найдена subpartition for ('||v_high_value||')');
+        raise;
+    end;
+
+    return v_subpartition_name;
+  end;
+
+  procedure p_subpartition_split
+  (
+   ip_nbur_arc              in varchar2,
+   ip_subpartition_maxvalue in varchar2,
+   ip_subpartition_new      in varchar2,
+   ip_kf                    in varchar2,
+   ip_vrsn_id               in int
+  )
+  as
+   v_vrsn_id_next   int := ip_vrsn_id + 1;
+   e_sbpt_split     exception; -- SubPartition cannot be split along the specified high bound
+   pragma exception_init( e_sbpt_split, -14212 );
+   pragma autonomous_transaction;
+  begin
+     execute immediate 'alter table '||ip_nbur_arc
+           ||c_enter||  'split subpartition '||ip_subpartition_maxvalue||' at ('||double_quotes(ip_kf)||', '||to_char(v_vrsn_id_next)||' )'
+           ||c_enter||  'into ( '
+           ||c_enter||  '      subpartition '||ip_subpartition_new||', '
+           ||c_enter||  '      subpartition '||ip_subpartition_maxvalue
+           ||c_enter||  '      ) update indexes';
+  exception
+    when e_sbpt_split then
+      null; -- т.к. subpartition уже существует.
+  end;
+
+  procedure p_subpartition_add
+  (
+   ip_nbur_arc   in varchar2,
+   ip_rpt_dt     in date,
+   ip_kf         in varchar2,
+   ip_vrsn_id    in int
+  )
+  as
+   v_partition_name         varchar2(30);
+   v_subpartition_maxvalue  varchar2(30);
+   v_subpartition_new       varchar2(30) := 'SP_'||to_char(ip_rpt_dt,'yyyymmdd')||'_'||ip_kf||'_'||to_char(ip_vrsn_id);
+  begin
+   -- добавляем партицию
+    p_partition_range_add(ip_nbur_arc, ip_rpt_dt);
+   -- находим имя добавленной партиции
+   v_partition_name := f_partition_name(ip_nbur_arc,ip_rpt_dt);
+   -- находим сабпартицию где high_value = (kf, maxvalue)
+   v_subpartition_maxvalue := f_subpartition_maxval_name(ip_nbur_arc,v_partition_name,ip_kf);
+   -- добавляем новую сабпартицию через split
+   p_subpartition_split(ip_nbur_arc, v_subpartition_maxvalue, v_subpartition_new, ip_kf, ip_vrsn_id);
+  end;
+
+  function f_subpartition_for
+  (
+   p_rpt_dt  in date,
+   p_kf      in varchar2,
+   p_vrsn_id in int
+  ) 
+  return varchar2
+  as
+  begin
+    return ' subpartition for ('||date2to_date(p_rpt_dt)||','||double_quotes(p_kf)||','||to_char(p_vrsn_id)||')';
+  end f_subpartition_for;
+  
   procedure MOVE_DATA_TO_ARCH
   ( p_obj_nm       in     nbur_ref_objects.object_name%type
   , p_rpt_dt       in     nbur_lst_objects.report_date%type
@@ -1288,28 +1444,12 @@ is
 
       begin
 
-        if ( p_kf Is Null )
-        then
-          if ( l_sp_key_cnt = 1 )
-          then -- partition by REPORT_DATE and VERSION_ID (subpartition by KF)
-            DM_UTL.EXCHANGE_PARTITION( p_source_table_nm => l_arc_tab_nm
-                                     , p_target_table_nm => p_obj_nm
-                                     , p_partition_nm    => 'P_'||to_char(p_rpt_dt,'YYYYMMDD')||'_'|| to_char(p_vrsn_id,'FM000') );
-          else
-            execute immediate 'insert /*+ APPEND */'
-                  ||chr(10)|| '  into '||l_arc_tab_nm
-                  ||chr(10)|| '     ( '||l_arc_col_lst||' )'
-                  ||chr(10)|| 'select /*+ PARALLEL( 16 ) */ '||l_obj_col_lst -- '/*+ PARALLEL( '||l_dop||' ) */'
-                  ||chr(10)|| '  from '||p_obj_nm
-            using p_vrsn_id;
-          end if;
-        else
-          execute immediate 'insert '
-                ||chr(10)|| '  into '||l_arc_tab_nm
-                ||chr(10)|| '     ( '||l_arc_col_lst||' )'
-                ||chr(10)|| 'select /*+ PARALLEL( 8 ) */ '||l_obj_col_lst
-                ||chr(10)|| '  from '||p_obj_nm
-                ||chr(10)|| ' where KF = :p_kf'
+        execute immediate 'insert /*+ APPEND*/ '
+              ||c_enter|| '  into '||l_arc_tab_nm|| f_subpartition_for(p_rpt_dt, p_kf, p_vrsn_id)
+              ||c_enter|| '     ( '||l_arc_col_lst||' )'
+              ||c_enter|| 'select '||l_obj_col_lst
+              ||c_enter|| '  from '||p_obj_nm
+              ||c_enter|| ' where KF = :p_kf'
           using p_vrsn_id, p_kf;
         end if;
 
@@ -1318,8 +1458,8 @@ is
       exception
         when OTHERS then
           bars_audit.error( title||': ( obj_nm='||p_obj_nm||')'
-                                 ||chr(10)||dbms_utility.format_error_stack()
-                                 ||chr(10)||dbms_utility.format_error_backtrace() );
+                                     ||c_enter||dbms_utility.format_error_stack()
+                                     ||c_enter||dbms_utility.format_error_backtrace() );
       end;
 
     exception
@@ -2475,6 +2615,11 @@ is
 
         bars_audit.trace( '%s: run SYNC_MO_SNAP ( %s ).', title, to_char(p_report_date,fmt_dt) );
 
+         -- страховочне накопичення
+         if to_char(p_report_date,'MM') = '12' then
+            FORM_SALDOZ (p_report_date);
+         end if;
+
         BARS_SNAPSHOT.CREATE_MONTHLY_SNAPSHOT
         ( p_snapshot_dt => trunc(p_report_date,'MM')
         , p_auto_daily  => true );
@@ -2507,7 +2652,13 @@ is
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
-    if ( trunc(sysdate) <= dat_next_u(trunc(sysdate,'MM'),10) )
+  if to_char(p_report_date, 'MM') = '12' then
+     l_date_lim := add_months(trunc(p_report_date,'MM'), 1) + 24;
+  else
+     l_date_lim := dat_next_u(trunc(sysdate,'MM'), 10);
+  end if;
+
+     if trunc(sysdate) <=  l_date_lim
     then -- в період формування коригуючих проводок (по 6-й роб. день міс.) знімки переформовуємо безумовно
       CRT_MO_SNPST
       ( p_report_date => p_report_date
@@ -6440,44 +6591,50 @@ $end
          and lf.KF          = p_kf
          and lf.VERSION_ID  = p_vrsn_id
          and lf.FILE_ID     = p_file_id
-         and lf.FILE_STATUS = 'FINISHED'
-      ;
+         and lf.FILE_STATUS = 'FINISHED';
+
+
+      p_subpartition_add('NBUR_DETAIL_PROTOCOLS_ARCH', p_report_dt, p_kf, p_vrsn_id);      
 
       dbms_application_info.set_client_info( 'Moving data into table "NBUR_DETAIL_PROTOCOLS_ARCH".' );
-
-      insert
-        into NBUR_DETAIL_PROTOCOLS_ARCH
-           ( REPORT_DATE, KF, VERSION_ID
-           , REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, DESCRIPTION
-           , ACC_ID, ACC_NUM, KV, MATURITY_DATE, CUST_ID, REF, ND, BRANCH )
-      select REPORT_DATE, KF, p_vrsn_id
-           , REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, DESCRIPTION
-           , ACC_ID, ACC_NUM, KV, MATURITY_DATE, CUST_ID, REF, ND, BRANCH
-        from NBUR_DETAIL_PROTOCOLS
-       where REPORT_CODE = l_rpt_code
-         and ( p_kf = KF or p_kf Is Null );
+      
+      execute immediate
+                'insert /*+ APPEND*/'
+    ||c_enter|| '  into NBUR_DETAIL_PROTOCOLS_ARCH '||f_subpartition_for(p_report_dt, p_kf, p_vrsn_id)
+    ||c_enter|| '     ( REPORT_DATE, KF, VERSION_ID'
+    ||c_enter|| '     , REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, DESCRIPTION'
+    ||c_enter|| '     , ACC_ID, ACC_NUM, KV, MATURITY_DATE, CUST_ID, REF, ND, BRANCH )'
+    ||c_enter|| 'select D.REPORT_DATE, D.KF, :p_vrsn_id'
+    ||c_enter|| '     , D.REPORT_CODE, D.NBUC, D.FIELD_CODE, D.FIELD_VALUE, D.DESCRIPTION'
+    ||c_enter|| '     , D.ACC_ID, D.ACC_NUM, D.KV, D.MATURITY_DATE, D.CUST_ID, D.REF, D.ND, D.BRANCH'
+    ||c_enter|| '  from NBUR_DETAIL_PROTOCOLS D'
+    ||c_enter|| ' where D.REPORT_CODE = :l_rpt_code'
+    ||c_enter|| '   and D.KF = :p_kf' 
+                using p_vrsn_id, l_rpt_code, p_kf;
+      
+      p_subpartition_add('NBUR_AGG_PROTOCOLS_ARCH', p_report_dt, p_kf, p_vrsn_id);      
 
       dbms_application_info.set_client_info( 'Moving data into table "NBUR_AGG_PROTOCOLS_ARCH".' );
-
-      insert
-        into NBUR_AGG_PROTOCOLS_ARCH
-           ( REPORT_DATE, KF, VERSION_ID
-           , REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ERROR_MSG, ADJ_IND )
-      select REPORT_DATE, KF, p_vrsn_id
-           , REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ERROR_MSG, ADJ_IND
-        from NBUR_AGG_PROTOCOLS
-       where REPORT_CODE = l_rpt_code
-         and ( p_kf = KF or p_kf Is Null );
-
+      execute immediate
+                   'insert /*+ APPEND*/'
+      ||c_enter||  '  into NBUR_AGG_PROTOCOLS_ARCH '||f_subpartition_for(p_report_dt, p_kf, p_vrsn_id)
+      ||c_enter||  '     ( REPORT_DATE, KF, VERSION_ID'
+      ||c_enter||  '     , REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ERROR_MSG, ADJ_IND )'
+      ||c_enter||  'select D.REPORT_DATE, D.KF, :p_vrsn_id'
+      ||c_enter||  '     , D.REPORT_CODE, D.NBUC, D.FIELD_CODE, D.FIELD_VALUE, D.ERROR_MSG, D.ADJ_IND'
+      ||c_enter||  '  from NBUR_AGG_PROTOCOLS D'
+      ||c_enter||  ' where D.REPORT_CODE = :l_rpt_code'
+      ||c_enter||  '   and D.KF = :p_kf'
+                   using p_vrsn_id, l_rpt_code, p_kf;
       dbms_application_info.set_client_info( 'Clear data from tables.' );
 
       -- NBUR_AGG_PROTOCOLS is a temporary table
       execute immediate 'truncate table NBUR_DETAIL_PROTOCOLS';
 
       delete
-        from NBUR_AGG_PROTOCOLS
-       where REPORT_CODE = l_rpt_code
-         and ( p_kf = KF or p_kf Is Null );
+        from NBUR_AGG_PROTOCOLS A
+       where A.REPORT_CODE = l_rpt_code
+         and A.KF = p_kf;
 
       dbms_application_info.set_client_info( null );
 
@@ -7415,9 +7572,16 @@ BEGIN
   l_dm_tblsps := CHK_DM_TBLSPS();
 
 END NBUR_OBJECTS;
+
 /
 
 show errors;
 
 grant EXECUTE on NBUR_OBJECTS to BARS_ACCESS_DEFROLE;
 grant EXECUTE on NBUR_OBJECTS to RPBN002;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/nbur_objects.sql =========*** End **
+ PROMPT ===================================================================================== 
