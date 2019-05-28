@@ -1220,7 +1220,7 @@ BEGIN
 
  IF (  gl.amfo in ('353553','325796') and trunc(PDAT_) >= to_date('01/03/2019','dd/mm/yyyy') 
                            OR
-       trunc(PDAT_) >= to_date('01/06/2019','dd/mm/yyyy')
+       trunc(PDAT_) >= to_date('01/07/2019','dd/mm/yyyy')
     )   Then     
   
     Begin
