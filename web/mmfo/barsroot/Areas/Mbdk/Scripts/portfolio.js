@@ -297,7 +297,15 @@ $(document).ready(function () {
                 var new_data = {
                     KV: $("#KV").data("kendoDropDownList").value(),
                     NLS: $("#NLS").val()
+                };
+
+                var nbs_loro = ["1600", "1602", "1608"];
+                if (nbs_loro.indexOf(new_data.NLS.substring(0,4)) !== -1) {
+                    bars.ui.error({ text: "Заборонено зберігати ЛОРО-рахунки: " + nbs_loro.join(" , ")});
+                    e.preventDefault();
+                    return;
                 }
+                
                 QueryFactory('InsertNostro', JSON.stringify(new_data), "Успішно створена угода з рахунком <b>" + $("#NLS").val() + "</b>", true, '.k-edit-form-container');
             }
             else {
