@@ -782,7 +782,7 @@ is
    --  Currency Inspection Module - Модуль валютного контролю
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.06 02/04/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.08 08/05/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -1549,7 +1549,7 @@ end get_license_link_sum;
                                                      --p_percent in number := null, --Процентна ставка (по замовчуванню)
                                                      p_s_limit in number := null, --Ліміт заборгованості
                                                      p_creditor_type in number := null, --Тип кредитора
-                                                     p_credit_borrower in number := null, -- Вид позичальника
+                                                     p_credit_borrower in varchar2 := null, -- Вид позичальника
                                                      p_credit_type in number := null, --Тип кредиту
                                                      --p_credit_period in number := null, --Код періодичності погашення
                                                      p_credit_term in number := null, --Код строковості кредиту
@@ -1557,7 +1557,7 @@ end get_license_link_sum;
                                                      p_credit_prepay in number := null, --Можливість дострокового погашення
                                                      p_name in varchar2 := null, --Назва договору
                                                      p_add_agree in varchar2 := null, --Додаткові угоди
-                                                     p_percent_nbu_type in number := null, --Назва максимальної процентної ставки НБУ
+                                                     p_percent_nbu_type in varchar2 := null, --Код максимальної процентної ставки НБУ
                                                      p_percent_nbu_info in varchar2 := null, --Додаткова інформація про максимальну процентну ставку НБУ
                                                      p_r_agree_date in date := null, --Дата реєстрації контракту (заповнюється при змінах)
                                                      p_r_agree_no in varchar2 := null, --Номер реєстрації контракту (заповнюється при змінах)
@@ -1571,11 +1571,11 @@ end get_license_link_sum;
                                                      p_f503_note in varchar2 := null, --Примітка звіту Ф503
                                                      p_f504_reason in number := null, --Підстави подання звіту Ф504
                                                      p_f504_note in varchar2 := null, --Примітка звіту Ф504
-                                                     p_f503_percent_type in number := null, --Тип процентної ставки
+                                                     p_f503_percent_type in varchar2 := null, --Тип процентної ставки
                                                      p_f503_percent_base in varchar2 := null, --База процентної ставки (база)
                                                      p_f503_percent_margin in number := null, --Маржа процентної ставки
                                                      p_f503_percent in number := null, --Процентна ставка за основною сумою боргу
-                                                     p_f503_purpose in number := null, --Ціль використання кредиту
+                                                     p_f503_purpose in varchar2 := null, --Ціль використання кредиту
                                                      p_f503_percent_base_t varchar2 :=null, --База процентної ставки (термін)
                                                      p_f503_change_info varchar2 :=null, --Інформація щодо внесення змін до договору
                                                      p_f503_percent_base_val varchar2 :=null, --База процентної ставки (валюта),
@@ -1593,7 +1593,7 @@ begin
   select count(*) into l_n from cim_contracts
     where rnk=p_rnk and benef_id=p_benef_id and contr_type=p_contr_type and num=p_num and subnum=p_subnum and open_date=p_open_date and kv=p_kv;
   if l_n>0 then bars_error.raise_error(g_module_name, 28); end if;
-  if p_contr_type=2 and nvl(p_f503_percent_type,-1)=2 and ( p_f503_percent_base is null or p_f503_percent_base_t is null or p_f503_percent_margin is null )
+  if p_contr_type=2 and nvl(p_f503_percent_type,'-1')='2' and ( p_f503_percent_base is null or p_f503_percent_base_t is null or p_f503_percent_margin is null )
     then bars_error.raise_error(g_module_name, 39); end if;
   select bars_sqnc.get_nextval('s_cim_contracts') into p_contr_id from dual;
   insert into cim_contracts (contr_id,contr_type,rnk,okpo,num, subnum,open_date,close_date,s,kv,benef_id,status_id,comments,bic,b010, service_branch,
@@ -1622,10 +1622,10 @@ begin
         p_credit_prepay, p_name,
         p_add_agree, p_percent_nbu_type, p_percent_nbu_info, p_r_agree_date, p_r_agree_no, p_prev_doc_key, p_prev_reestr_attr,
         p_ending_date_indiv, p_parent_ch_data, p_ending_date, p_f503_reason, p_f503_state, p_f503_note, p_f504_reason, p_f504_note,
-        p_f503_percent_type, case when p_f503_percent_type=2 then p_f503_percent_base else null end,
-        case when p_f503_percent_type=2 then p_f503_percent_margin else null end, p_f503_percent, p_f503_purpose,
-        case when p_f503_percent_type=2 then p_f503_percent_base_t else null end, p_f503_change_info,
-        case when p_f503_percent_type=2 then p_f503_percent_base_val else null end,
+        p_f503_percent_type, case when p_f503_percent_type='2' then p_f503_percent_base else null end,
+        case when p_f503_percent_type='2' then p_f503_percent_margin else null end, p_f503_percent, p_f503_purpose,
+        case when p_f503_percent_type='2' then p_f503_percent_base_t else null end, p_f503_change_info,
+        case when p_f503_percent_type='2' then p_f503_percent_base_val else null end,
         p_f057);
     end if;
     if p_contr_type=4 then
@@ -1672,11 +1672,11 @@ procedure update_contract                           (p_contr_id in number, -- id
                                                      p_deadline in number := null, -- Контрольний строк
                                                      p_txt_subject in varchar2 := null, -- Уточнення предмету контракту
                                                      -------Параметри кредитного контракту----------------------------------
-                                                     p_percent_nbu in number := null, -- Максимальна процентна ставка НБУ
+                                                     p_percent_nbu in varchar2 := null, -- Максимальна процентна ставка НБУ
                                                      --p_percent in number := null, --Процентна ставка (по замовчуванню)
                                                      p_s_limit in number := null, --Ліміт заборгованості
                                                      p_creditor_type in number := null, --Тип кредитора
-                                                     p_credit_borrower in number := null, -- Вид позичальника
+                                                     p_credit_borrower in varchar2 := null, -- Вид позичальника
                                                      p_credit_type in number := null, --Тип кредиту
                                                      --p_credit_period in number := null, --Код періодичності погашення
                                                      p_credit_term in number := null, --Код строковості кредиту
@@ -1684,7 +1684,7 @@ procedure update_contract                           (p_contr_id in number, -- id
                                                      p_credit_prepay in number := null, --Можливість дострокового погашення
                                                      p_name in varchar2 := null, --Назва договору
                                                      p_add_agree in varchar2 := null, --Додаткові угоди
-                                                     p_percent_nbu_type in number := null, --Назва максимальної процентної ставки НБУ
+                                                     p_percent_nbu_type in varchar2 := null, --Код максимальної процентної ставки НБУ
                                                      p_percent_nbu_info in varchar2 := null, --Додаткова інформація про максимальну процентну ставку НБУ
                                                      p_r_agree_date in date := null, --Дата реєстрації контракту (заповнюється при змінах)
                                                      p_r_agree_no in varchar2 := null, --Номер реєстрації контракту (заповнюється при змінах)
@@ -1698,11 +1698,11 @@ procedure update_contract                           (p_contr_id in number, -- id
                                                      p_f503_note in varchar2 := null, --Примітка звіту Ф503
                                                      p_f504_reason in number := null, --Підстави подання звіту Ф504
                                                      p_f504_note in varchar2 := null, --Примітка звіту Ф504
-                                                     p_f503_percent_type in number := null, --Тип процентної ставки
+                                                     p_f503_percent_type in varchar2 := null, --Тип процентної ставки
                                                      p_f503_percent_base in varchar2 := null, --База процентної ставки
                                                      p_f503_percent_margin in number := null, --Маржа процентної ставки
                                                      p_f503_percent in number := null, --Процентна ставка за основною сумою боргу
-                                                     p_f503_purpose in number := null, --Ціль використання кредиту
+                                                     p_f503_purpose in varchar2 := null, --Ціль використання кредиту
                                                      p_f503_percent_base_t varchar2 :=null, --База процентної ставки (термін)
                                                      p_f503_change_info varchar2 :=null, --Інформація щодо внесення змін до договору
                                                      p_f503_percent_base_val varchar2 :=null, --База процентної ставки (валюта)
@@ -1726,7 +1726,7 @@ begin
     into l_status_id, l_contr_type, l_okpo, l_branch, l_rnk, l_kv from cim_contracts c where contr_id=p_contr_id;
   if (p_s=0 or p_s is null) and l_contr_type=2 then bars_error.raise_error(g_module_name, 8); end if;
   if l_branch!=sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
-  if l_contr_type=2 and nvl(p_f503_percent_type,-1)=2 and ( p_f503_percent_base is null or p_f503_percent_base_t is null or p_f503_percent_margin is null )
+  if l_contr_type=2 and nvl(p_f503_percent_type,'-1')='2' and ( p_f503_percent_base is null or p_f503_percent_base_t is null or p_f503_percent_margin is null )
     then bars_error.raise_error(g_module_name, 39); end if;
   if l_contr_type=0 or l_contr_type=1 then
     select subject_id into l_subject_id from cim_contracts_trade where contr_id=p_contr_id;
@@ -1762,10 +1762,10 @@ begin
           else null end,
         f503_reason=p_f503_reason, f503_state=p_f503_state, f503_note=p_f503_note,
         f504_reason=p_f504_reason, f504_note=p_f504_note,
-        f503_percent_type=p_f503_percent_type, f503_percent_base=case when p_f503_percent_type=2 then p_f503_percent_base else null end,
-        f503_percent_margin=case when p_f503_percent_type=2 then p_f503_percent_margin else null end, f503_percent=p_f503_percent, f503_purpose=p_f503_purpose,
-        f503_percent_base_t=case when p_f503_percent_type=2 then p_f503_percent_base_t else null end, f503_change_info=p_f503_change_info,
-        f503_percent_base_val=case when p_f503_percent_type=2 then p_f503_percent_base_val else null end,
+        f503_percent_type=p_f503_percent_type, f503_percent_base=case when p_f503_percent_type='2' then p_f503_percent_base else null end,
+        f503_percent_margin=case when p_f503_percent_type='2' then p_f503_percent_margin else null end, f503_percent=p_f503_percent, f503_purpose=p_f503_purpose,
+        f503_percent_base_t=case when p_f503_percent_type='2' then p_f503_percent_base_t else null end, f503_change_info=p_f503_change_info,
+        f503_percent_base_val=case when p_f503_percent_type='2' then p_f503_percent_base_val else null end,
         f057 = p_f057
     where contr_id=p_contr_id;
    elsif l_contr_type=4 then
@@ -3318,6 +3318,7 @@ procedure vmd_link(p_payment_type in number, --тип платежу
 is
   l_n number;
   l_s_p number;
+  l_s_p0 number;
   l_s_p_pv number;
   l_s_v number;
   l_p_contr_id number;
@@ -3343,14 +3344,14 @@ is
   l_num varchar2(48);
 begin
   if p_payment_type=0 then
-    select count(*), max(s_cv), max(s), max(contr_id), max(journal_num), max(journal_id), max(comments), max(ref)
-      into l_n, l_s_p, l_s_p_pv, l_p_contr_id, l_p_jnum, l_p_jid, l_p_comments, l_p_id
+    select count(*), max(s_cv), max(s_cv), max(s), max(contr_id), max(journal_num), max(journal_id), max(comments), max(ref)
+      into l_n, l_s_p0, l_s_p, l_s_p_pv, l_p_contr_id, l_p_jnum, l_p_jid, l_p_comments, l_p_id
       from cim_payments_bound where bound_id=p_payment_id;
     select trunc(vdat) into l_p_dat from v_cim_oper where ref=l_p_id;
     select l_s_p-nvl(sum(s),0) into l_s_p from cim_link where delete_date is null and payment_id=p_payment_id;
   else
-    select count(*), max(s_cv), max(s), max(contr_id), max(journal_num), max(journal_id), max(comments), max(fantom_id)
-      into l_n, l_s_p, l_s_p_pv, l_p_contr_id, l_p_jnum, l_p_jid, l_p_comments, l_p_id
+    select count(*), max(s_cv), max(s_cv), max(s), max(contr_id), max(journal_num), max(journal_id), max(comments), max(fantom_id)
+      into l_n, l_s_p0, l_s_p, l_s_p_pv, l_p_contr_id, l_p_jnum, l_p_jid, l_p_comments, l_p_id
       from cim_fantoms_bound where bound_id=p_payment_id;
     select trunc(val_date), payment_type into l_p_dat, l_p_type from cim_fantom_payments where fantom_id=l_p_id;
     select l_s_p-nvl(sum(s),0) into l_s_p from cim_link where delete_date is null and fantom_id=p_payment_id;
@@ -3394,7 +3395,7 @@ begin
     end if;
 
     select num into l_num from v_cim_bound_vmd where type_id=p_vmd_type and bound_id=p_vmd_id;
-    l_p_comments:=substr(l_p_comments||'; '||round(p_s*l_s_p_pv/l_s_p, 2)||' - МД/Акт '||l_num||
+    l_p_comments:=substr(l_p_comments||'; '||round(p_s*l_s_p_pv/l_s_p0, 2)||' - МД/Акт '||l_num||
                   case when l_v_jid is not null then ' (запис №'||l_v_jid||')' else null end, 1, 4000);
     if p_s*100=l_s_p and l_p_jid is null then
       if p_payment_type=0 then

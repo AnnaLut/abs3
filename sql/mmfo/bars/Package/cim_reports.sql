@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.12 04/04/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.14.1 24/05/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -713,7 +713,7 @@ is l_txt varchar2(4000); -- Текст повідомлення
    l_p27 number :=1;
    l_benef_name varchar2(256);
    l_p22 number;
-   
+
    l_lim_day  number := F_get_CURR_LIM_DAY1;--Добовий ліміт купівлі безготівкової валюти(коп)
 begin
   if sys_context('bars_context','user_mfo') is null then
@@ -749,7 +749,15 @@ begin
 
   bars_audit.info('CIM p_f531  l_last_date='||l_last_date||' l_date_z_end='||l_date_z_end);
 
-  if l_last_date <= l_date_z_end -- перезаповнюється лише за останню дату (верхню)
+  if --l_last_date <= l_date_z_end -- перезаповнюється лише за останню дату (верхню)
+        l_last_date=l_date_z_end and
+          (to_char(l_sysdate,'yyyymm')=to_char(l_last_date,'yyyymm') and to_number(to_char(l_sysdate,'dd'))<=10 or
+           to_number(to_char(l_sysdate,'yyyymm'))<to_number(to_char(l_last_date,'yyyymm'))) 
+        or
+        add_months(l_last_date,1)=l_date_z_end and
+          (to_number(to_char(l_sysdate,'yyyymm'))+1=to_number(to_char(l_date_z_end,'yyyymm')) and to_number(to_char(l_sysdate,'dd'))>10 or
+           to_number(to_char(l_sysdate,'yyyymm'))+1>to_number(to_char(l_date_z_end,'yyyymm')) )
+  --      or to_char(p_date,'yyyymm')='201505'
   then
     delete from cim_f36 where create_date=l_date_z_end and branch like sys_context('bars_context', 'user_mfo_mask');
     insert into cim_f36 (b041, k020, p17, p16, doc_date, p21, p14, p01, p22, p15, p18, create_date, is_fragment)
@@ -765,23 +773,23 @@ begin
                decode(a.p22, 3, a.f_p09, a.p09) as p09, a.p13,
                nvl2(a.p15, a.p14, a.f_p14) as p14, decode(a.p22, 3, 0, a.p15) as p15, case when a.p15 is null or a.m_p22=3 then a.f_p16 else a.p16 end as p16,
                case when a.p15 is null or a.m_p22=3 then a.f_p17 else a.p17 end as p17,
-               decode(a.p22, 3, a.f_p18, a.p18) as p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
+               decode(a.p22, 3, a.f_p18, a.p18) as p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, nvl(a.p20,a.f_p20)), a.f_p20) as p20,
                case when a.p15 is null or a.m_p22=3 then a.f_p21 else nvl(a.f_p21,a.p21) end as p21, a.p22, decode(a.p22, 2, l_date_z_end, null) as p23,
                decode(a.p22, 3, case when a.p15=0 then a.max_pdat else null end, null) as p24, case when a.p27=0 then null else to_char(a.p27, 'fm999') end as p27, a.doc_date,
-               case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk, a.benef_adr as q002_2, 
+               /*case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end*/ null as p21_new, a.rnk, a.benef_adr as q002_2,
                decode(a.p22, 3, a.f_is_fragment, a.is_fragment) as is_fragment, decode(a.p22, 3, a.f_type_id,a.type_id) as type_id, decode(a.p22, 3, a.f_bound_id, a.bound_id) as bound_id
          from
          ( select nvl(m.m_p22,
-                      case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null or (not (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) and x.f_b041 is not null) then 3
-                           when x.f_b041 is null and (x.p13 > l_lim_day  or (x.p13 <= l_lim_day and x.is_fragment = 1)) then 1
-                           when x.f_p02 != e.k112 or x.f_p06 != k.nmk or x.f_p07 != nvl(x.adr, k.adr) or x.f_p08 != substr(b.benef_name,1,135) or
-                                x.f_p09 != b.country_id or x.f_p15 != x.p15 or x.f_p19 != x.p19 then 2 
-                           when x.f_b041 is not null then -1 
+                      case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null or (not (x.l_p13 > l_lim_day  or (x.l_p13 <= l_lim_day and x.is_fragment = 1)) and x.f_b041 is not null) then 3
+                           when x.f_b041 is null and (x.l_p13 > l_lim_day  or (x.l_p13 <= l_lim_day and x.is_fragment = 1)) then 1
+                           when x.f_b041 is not null and ( x.f_p02 != e.k112 or x.f_p06 != k.nmk or x.f_p07 != nvl(x.adr, k.adr) or x.f_p08 != substr(b.benef_name,1,135) or
+                                x.f_p09 != b.country_id or x.f_p15 != x.p15 or x.f_p19 != x.p19 or ( x.p20 is not null and lnnvl( x.f_p20=x.p20) ) ) then 2
+                           when x.f_b041 is not null then -1
                            else -2 end ) as p22,
                       x.b041, x.k020, x.p01, e.k112 as p02, x.f_p02, x.f_p02_old, k.nmk as p06 , x.f_p06, x.f_p06_old, nvl(x.adr, k.adr) as p07, x.f_p07, x.f_p07_old,
                       substr(b.benef_name,1,135) as p08, x.f_p08, x.f_p08_old, to_char(b.country_id, 'fm000') as p09, x.f_p09, x.p14, x.p15, x.p16, x.p17, x.p18, x.f_p18,
                       x.p19, x.f_p19, x.p20, x.f_p20, x.p21, x.max_pdat, x.contr_id, x.doc_date,
-                      x.f_b041, x.f_k020, x.f_p01, x.f_p14, x.f_p16, x.f_p17, x.f_p21, x.f_p21_new, m.m_p22, x.p27, x.rnk, b.benef_adr, x.is_fragment, x.p13,
+                      x.f_b041, x.f_k020, x.f_p01, x.f_p14, x.f_p16, x.f_p17, x.f_p21, /*x.f_p21_new,*/ m.m_p22, x.p27, x.rnk, b.benef_adr, x.is_fragment, x.p13,
                       x.type_id, x.bound_id, x.f_is_fragment, x.f_type_id, x.f_bound_id
              from
              ( select x.*, (select substr(b.b040,9,12) from branch b where b.branch=x.branch) as b041,
@@ -789,22 +797,24 @@ begin
                               case when upper(region) like '%МІСТО%' and upper(region) like '%'||upper(locality)||'%' then '' else nvl2(region, region || ', ', '') end ||
                               nvl2(locality, locality || ', ', '') || address
                          from customer_address a where a.type_id=1 and a.rnk=x.rnk) as adr,
-                      nvl2(x.min_ddat, case when x.p21+1095<l_date_z_end then 4 else 0 end,case when x.p21+1095<l_date_z_end then 1 else 2 end) as p19, 
-                      decode(x.p15, 0, 0, cim_mgr.val_convert(to_date(l_date_z_end-1), x.p15, x.p14, 980)) as p13
+                      nvl2(x.min_ddat, case when x.p21+1095<l_date_z_end then 4 else 0 end,case when x.p21+1095<l_date_z_end then 1 else 2 end) as p19,
+                      decode(x.p15, 0, 0, cim_mgr.val_convert(to_date(l_date_z_end-1), x.p15, x.p14, 980)) as p13,
+                      decode(x.p15, 0, 0, cim_mgr.val_convert(nvl( x.max_l_doc_date, to_date(x.doc_date,'ddmmyyyy') ), x.p15, x.p14, 980)) as l_p13
                  from
-                 ( select min(d.min_ddat) as min_ddat, max(d.max_pdat) as max_pdat, d.p01, d.p14, d.p21, sum(d.p15) as p15, max(d.p20) as p20,
+                 ( select max(d.max_l_doc_date) as max_l_doc_date, min(d.min_ddat) as min_ddat, max(d.max_pdat) as max_pdat, d.p01, d.p14, d.p21, sum(d.p15) as p15, max(d.p20) as p20,
                           c.branch, max(c.rnk) as rnk, c.benef_id, lpad(c.okpo,10,'0') as k020, c.num as p17, c.open_date as p16, min(t.subject_id)+1 as p18,
                           max(f.b041) as f_b041, max(f.p02) as f_p02, max(f.p06) as f_p06, max(f.p07) as f_p07, max(f.p08) as f_p08,
                           max(f.p09) as f_p09, max(f.p15) as f_p15, max(f.p18) as f_p18, max(f.p19) as f_p19, max(f.p20) as f_p20,
                           max(f.p02_old) as f_p02_old, max(f.p06_old) as f_p06_old, max(f.p07_old) as f_p07_old, max(f.p08_old) as f_p08_old,
                           max(d.contr_id) as contr_id, nvl(d.doc_date, f.doc_date) as doc_date, max(f.k020) as f_k020, max(f.p01) as f_p01,
-                          max(f.p14) as f_p14, max(f.p16) as f_p16, max(f.p17) as f_p17, max(f.p21) as f_p21, max(f.p21_new) as f_p21_new, max(t.p27_f531) as p27,
+                          max(f.p14) as f_p14, max(f.p16) as f_p16, max(f.p17) as f_p17, max(f.p21) as f_p21, /*max(f.p21_new) as f_p21_new,*/ max(t.p27_f531) as p27,
                           max(t.is_fragment) as is_fragment, max(d.type_id) as type_id, max(d.bound_id) as bound_id,
                           max(f.is_fragment) as f_is_fragment, max(f.type_id) as f_type_id, max(f.bound_id) as f_bound_id
                      from
                      ( select to_char(max(d.doc_date),'ddmmyyyy') as doc_date, max(d.contr_id) as contr_id, max(d.p14) as p14, max(d.p21) as p21,
                               decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
-                              max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15, d.type_id, d.bound_id
+                              max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15, d.type_id, d.bound_id,
+                              trunc(max(l_doc_date)) as max_l_doc_date
                          from
                          ( select d.p14, d.p21, d.p20, d.d_k, d.type_id, d.bound_id, d.contr_id, d.s, d.s_vk, d.doc_date, d.ls, d.l_create_date,
                                   decode(d.d_k, 0, nvl2(d.vmd_id, (select v.dat from customs_decl v join cim_vmd_bound b on v.cim_id=b.vmd_id where b.bound_id=d.vmd_id),
@@ -850,7 +860,8 @@ begin
                      join cim_contracts c on c.contr_type+1=d.p01 and c.contr_id=d.contr_id
                      join cim_contracts_trade t on t.contr_id=d.contr_id
                      full outer join v_cim_f36 f
-                       on f.b041 != 0 and f.p01=d.p01 and f.p14=d.p14 and f.doc_date=d.doc_date and nvl(f.p21_new, f.p21)=d.p21 and f.k020=lpad(c.okpo,10,'0') and f.p16=c.open_date and f.p17=c.num and f.branch like sys_context('bars_context', 'user_mfo_mask')
+                       on f.b041 != 0 and f.p01=d.p01 and f.p14=d.p14 and f.doc_date=d.doc_date and f.p21=d.p21/*nvl(f.p21_new, f.p21)=d.p21*/ and f.k020=lpad(c.okpo,10,'0') and f.p16=c.open_date 
+                          and f.p17=c.num and f.branch like sys_context('bars_context', 'user_mfo_mask')
                     where f.p22 is not null or d.p21>=l_date_z_end-3653 and d.p21<l_date_z_end and d.p15>0
                    group by c.benef_id, c.branch, c.okpo, c.num, c.open_date, d.p14, d.p21, d.p01, d.doc_date, f.p01, f.p14, f.p21, f.k020, f.p16, f.p17, f.doc_date) x ) x
              left outer join customer k on k.rnk=x.rnk
@@ -867,7 +878,7 @@ begin
           insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, rnk, create_date, q002_2, is_fragment, type_id, bound_id)
                        values (l.b041, l.k020, l.doc_date, l.p01, l.p02, l.p06, l.p07, l.p08, l.p09, l.p13, l.p14, l.p15, l.p16, l.p17, l.p18,
                                l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l.rnk, l_date_z_end, l.q002_2, l.is_fragment, l.type_id, l.bound_id);
-        end if;                       
+        end if;
       --COBUMMFO-9323
       exception
         when dup_val_on_index then
@@ -908,7 +919,7 @@ begin
     end loop;
     commit;
   elsif l_date_z_end>l_last_date then
-    p_error:='Формування звіту #36 за '||to_char(l_date_z_end,'dd.mm.yyyy')||'р. неможливе! Дата останнього сформованого звіту #36 - '||to_char(l_last_date,'dd.mm.yyyy')||'р.'; 
+    p_error:='Формування звіту #36 за '||to_char(l_date_z_end,'dd.mm.yyyy')||'р. неможливе! Дата останнього сформованого звіту #36 - '||to_char(l_last_date,'dd.mm.yyyy')||'р.';
     return '';
   end if;
 
@@ -2673,14 +2684,18 @@ end  p_f531;
     case l_indicator_id
       when 212 then l_indicator_name := 'сума платежів ОС боргу(без урахування майбутніх надходжень кредиту)';
       when 213 then l_indicator_name := 'сума платежів проц. платежів(без урахування майб надх кредиту)';
+      when 214 then l_indicator_name := 'прогноз погашення строкової заборгованості комісійних платежів';
+      when 215 then l_indicator_name := 'прогноз погашення строкової заборгованості пені та штрафів';
       when 201 then l_indicator_name := 'сума майбутнього надходження кредиту';
       when 222 then l_indicator_name := 'сума строкових платежів зі сплати ОС боргу';
       when 223 then l_indicator_name := 'сума строкових платежів зі сплати проц. платежів';
       when 292 then l_indicator_name := 'сума прогнозних платежів простроченої заборгованості за ОС боргу';
       when 293 then l_indicator_name := 'сума прогнозних платежів простроченої заборгованості за проц плат';
+      when 294 then l_indicator_name := 'прогноз погашення простроченої заборгованості комісійних платежів';      
+      when 295 then l_indicator_name := 'прогноз погашення простроченої заборгованості пені та штрафів';            
     end case;
 
-    if l_indicator_id in (201, 292, 293) then
+    if l_indicator_id in (201, 292, 293, 294, 295) then
       insert into cim_f504_detail(f504_det_id,
                              f504_id,
                              indicator_id,
