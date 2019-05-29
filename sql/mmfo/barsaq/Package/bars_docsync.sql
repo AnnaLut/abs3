@@ -154,7 +154,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
   G_BODY_VERSION constant varchar2(64)  := 'version 1.7 24/11/2018';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := 'KF - схема с полем kf';
-
+  
 
 
   ----
@@ -216,9 +216,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      select * into l_doc from bars.oper where ref = p_ref;
      return l_doc;
   exception when no_data_found then
-     if p_silent = 1 then 
-        return null;  
-     else 
+     if p_silent = 1 then
+        return null;
+     else
        raise_application_error(-20000, 'Документ не найден REF='||p_ref, TRUE);
      end if;
   end;
@@ -416,7 +416,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
               l_sqlerrm := substr(l_sqlerrm, 1, instr(l_sqlerrm, chr(10))-1);
               -- ищем символ '\' (ascci('\') = 92)
               l_slash_pos := instr(l_sqlerrm, chr(92));
-			  
+
               if l_slash_pos>0 then
                 -- вычленяем код ошибки
                 l_subcode_str := ''; i := 1;
@@ -523,7 +523,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
     l_str   varchar2(40) := '';
     i       integer;
   begin
-    if substr(p_err_msg, 12, 1)= chr(92)  then  --'\' 
+    if substr(p_err_msg, 12, 1)= chr(92)  then  --'\'
         l_str := ''; i := 1;
         while substr(p_err_msg, 12+i, 1) in ('0','1','2','3','4','5','6','7','8','9') loop
             l_str := l_str || substr(p_err_msg, 12+i, 1);
@@ -573,7 +573,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
   --
   -- Получить подпись от вертушки, которая обрабьатывает докуметнт от корп2 технологической подписью.
   --
-  procedure get_extsign_for_verification(p_ext_ref      in    number, 
+  procedure get_extsign_for_verification(p_ext_ref      in    number,
                                          p_key          out   varchar2,
                                          p_buff         out   varchar2,
                                          p_sign         out   varchar2 ) is
@@ -582,15 +582,15 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      l_hexbuff       varchar2(1000);
      l_asciibuff     varchar2(1000);
   begin
-     l_doc := read_corp_doc(p_ext_ref);  
-	 l_asciibuff := case when  bars.gl.amfo='300465' then 
+     l_doc := read_corp_doc(p_ext_ref);
+	 l_asciibuff := case when  bars.gl.amfo='300465' then
 							  nvl(rpad(l_doc.nd,10),rpad(' ',10))||nvl(to_char(l_doc.datd,'YYMMDD'),rpad(' ',6))
 							||nvl(lpad(to_char(l_doc.dk),1),' ')
 							||nvl(lpad(l_doc.mfo_a,9),rpad(' ',9))||nvl(lpad(l_doc.nls_a,14),rpad(' ',14))
 							||nvl(lpad(to_char(l_doc.kv),3),rpad(' ',3))||nvl(lpad(to_char(l_doc.s),16),rpad(' ',16))
 							||nvl(lpad(l_doc.mfo_b,9),rpad(' ',9))||nvl(lpad(l_doc.nls_b,14),rpad(' ',14))
 							||nvl(lpad(to_char(nvl(l_doc.kv2,l_doc.kv)),3),rpad(' ',3))||nvl(lpad(to_char(nvl(l_doc.s2,l_doc.s)),16),rpad(' ',16))
-			else				
+			else
 							  nvl(rpad(l_doc.nd,10),rpad(' ',10))||nvl(to_char(l_doc.datd,'YYMMDD'),rpad(' ',6))
 							||nvl(lpad(to_char(l_doc.dk),1),' ')
 							||nvl(lpad(l_doc.mfo_a,9),rpad(' ',9))||nvl(lpad(l_doc.nls_a,14),rpad(' ',14))
@@ -608,9 +608,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      p_sign := l_doc.sign;
 
      bars.bars_audit.info(l_trace||'extref = '||p_ext_ref||', buffer = '||l_asciibuff ||' hex buff='||l_hexbuff||', sign='||p_sign);
-             
-  end;  
-									  
+
+  end;
+
 
 
   -----------------------------------
@@ -736,13 +736,13 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
     end loop;
 
     -- выставляем признак BIS=1 при необходимости
-        
+
     if get_bis_count(l_ref) > 0 then
        update bars.oper set bis = 1
        where ref=l_ref;
-       bars.bars_audit.trace('bars_docsync.post_document: найдены бис строки');     
-    end if;     
-        
+       bars.bars_audit.trace('bars_docsync.post_document: найдены бис строки');
+    end if;
+
 
     bars.bars_audit.trace('bars_docsync.post_document: старт формирования доп. реквизитов в СЕП');
     -- формируем доп. реквизиты в СЭП
@@ -806,6 +806,33 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 
 
   -----------------------------------
+  -- GET_SOS_DESCRIPTION
+  --
+  -- 
+  --
+  function get_sos_description(p_sos number) return varchar2
+  is 
+      l_res varchar2(1000);
+  begin
+    
+    /*  Расшифровка значение OPLDOK.SOS-
+    - 0 оплачено по плану, в отложенном режиме (т.е. на счете стоит признак ОРT оплаты). { oper - вставлено, opldok - вставлено, accounts.ost - не меняется,  ждем цикла доплаты paysos0}
+    - 1 оплачено по плану,    ( oper - вставлено, opldok - вставлено, меняется accounts.ostb - плановый остаток, ждем последней визы)                      
+    - 3 оплачено по плану,    ( oper - вставлено, opldok - вставлено, меняется ccounts.ostf  - форвардный остаток, ждем наступления даты валютирования, а затем и оплаты по-факту
+    - 4 оплачено по факту OPT ( oper - вставлено, opldok - вставлено, без изменения accounts.ostс, ждем цикла доплаты paysos0)
+    - 5 оплачено по факту     ( oper - вставлено, opldok - вставлено, меняется изменения accounts.ostс)    
+    */
+    
+    l_res := case  when p_sos=0 then 'оплачен по-плану в отложенном режиме. Ожидает цикла запуска доплаты'
+                   when p_sos=1 then 'оплачен по-плану. Ожидает последней визы'
+                   when p_sos=3 then 'оплачен форвардно. Ожидает наступления даты валютирования'
+                   when p_sos=4 then 'оплачен по-факту в отложенном режиме. Ожидает цикла запуска доплаты'
+                   when p_sos=5 then 'оплачен по-факту'
+             end;
+    return l_res||'(sos='||p_sos||')';         
+  end;  
+
+  -----------------------------------
   -- PAY_DOCUMENT
   --
   -- Оплачивает один документ
@@ -857,20 +884,22 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
          where doc_id = l_doc.ext_ref;
     end if;
 
-    bars.bars_audit.info('bars_docsync.pay_document: документ EXT_REF='||p_ext_ref||', REF='||p_ref||' оплачен, oper.sos= '||l_sos);
+    
+    
+    bars.bars_audit.info('bars_docsync.pay_document: документ EXT_REF='||p_ext_ref||', REF='||p_ref||' '||get_sos_description(l_sos));
 
 
   end pay_document;
 
-  
-  
+
+
 
   ------------------------------------
   --  POST_ERROR_PROC
   --
   --  Набор операций для выполнения после неуспешной обработки докумнета
   --
-  procedure post_error_proc(p_ext_ref number, p_sqlerr_code number, p_sqlerr_stack varchar2) is     
+  procedure post_error_proc(p_ext_ref number, p_sqlerr_code number, p_sqlerr_stack varchar2) is
      l_app_err       varchar2(4000);
      l_err_count     number;
      l_ignore_error  boolean;
@@ -886,7 +915,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      bars.bars_audit.error('bars_docsync.post_error_proc: обработка ошибки оплаты: errcode='||p_sqlerr_code||', errmsg='||substr(p_sqlerr_stack, 1, 3900));
      l_doc := read_corp_doc(p_ext_ref);
      --l_bars_doc := read_bars_doc(l_doc.ref);
-     
+
      -- удаляем информацию о свифтовке со справочника sw_template в АБС
      if l_doc.tt in ('IBB','IBO','IBS') then
         delete from bars.sw_template where doc_id = l_doc.ext_ref;
@@ -898,35 +927,35 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      l_err_msg  := substr(p_sqlerr_stack, 1, 3900);
 
      -- прикладные ошибки трактуются как неустраняемые для данного док-та и передаются породившей док-т стороне
-     
-     -- По заказу от банка:    
+
+     -- По заказу от банка:
      -- Если платеж при автооплате вылетает с ошибкой нелдостачи денег  ORA-20203: \9301 broken limit on accounts
-     -- Тогда его не сторнировать (т.е. не устанавливать booking_flag = N), а оставлять на повторную оплату в этот день, 
-     -- и только в следующий банковский день - браковать его (т.е. не устанавливать booking_flag = N) 
-     
+     -- Тогда его не сторнировать (т.е. не устанавливать booking_flag = N), а оставлять на повторную оплату в этот день,
+     -- и только в следующий банковский день - браковать его (т.е. не устанавливать booking_flag = N)
+
      if   l_err_code >-21000 and l_err_code<=-20000 then
          -- нет средств на счете и банк дата = валютировнаию  - документ отправить на повторную оплату
         l_doc_vdat := nvl(l_doc.vdat, bars.gl.bdate);
-        
+
         bars.bars_audit.info(l_trace||'vdat='|| to_date(l_doc_vdat,'dd/mm/yyyy') ||' bars.gl.bdate='||to_date(bars.gl.bdate,'dd/mm/yyyy')||', instr ='||instr(l_err_msg, '\9301') );
 
-     -- Обработка прикладных ошибок, которые должны дать повторную оплату 
-        
+     -- Обработка прикладных ошибок, которые должны дать повторную оплату
+
      -- Если платеж при автооплате вылетает с ошибкой нелдостачи денег  ORA-20203: \9301 broken limit on accounts
      -- Тогда его не сторнировать , а оставлять на повторную оплату в этот день
-      if ( (l_err_code = -20203 and instr(l_err_msg, '\9301') > 0 and  l_doc_vdat = bars.gl.bdate) 
+      if ( (l_err_code = -20203 and instr(l_err_msg, '\9301') > 0 and  l_doc_vdat = bars.gl.bdate)
             or
            (l_err_code = -20060)   -- Будущая дата валютирования (описана в ошибках модуля DOC)
-         )   
-         then 
+         )
+         then
             -- оплата будет повторена в следующем цикле
             update doc_import
               set system_err_code = l_err_code,
                   system_err_msg  = l_err_msg,
                   system_err_date = sysdate
             where ext_ref = l_doc.ext_ref;
-          bars.bars_audit.info(l_trace||'нехватка денег на счете - документ ожидает оплаты в следующем цикле обработки' );     
-        else 
+          bars.bars_audit.info(l_trace||'нехватка денег на счете - документ ожидает оплаты в следующем цикле обработки' );
+        else
             -- обработка специальных случаев, типа "счет залочен" и пр.
             l_app_err  := extract_app_error(l_err_msg);
 
@@ -1038,11 +1067,11 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      l_ref number;
      l_errmod varchar2(3) := 'DOC';
      l_errtxt varchar2(4000);
-     
+
   begin
-      
+
       bars.bars_audit.info('bars_docsync.async_auto_pay: старт формирования и оплаты документа EXT_REF='||p_ext_ref);
-      
+
       --savepoint sp_before_pay;
       --Установить нужный бранч для создания документа в нем
       subst_nedded_branch( p_ext_ref => p_ext_ref );
@@ -1059,10 +1088,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 
       bars.bars_audit.trace('bars_docsync.async_auto_pay: формировани и оплата документа EXT_REF='||p_ext_ref||' выполнена c REF = '||l_ref);
             exception when others then
-          
+
           --Предполагается, что постобработка ошибки (установка флагов и т.д.) будет выполнена вертушкой
           l_errtxt := substr(dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), 1, 3900);
-          bars_audit.error('bars_docsync.async_auto_pay: Ошибка выполнения для EXT_REF=:'||p_ext_ref||': '||l_errtxt); 
+          bars_audit.error('bars_docsync.async_auto_pay: Ошибка выполнения для EXT_REF=:'||p_ext_ref||': '||l_errtxt);
           -- нужно выкинуть первичную ошибку. Поскольку в постобработке идет анализ кода ошибки:
           --  если системная - идет повторн оплаты
           --  если прикладная, докумнет останавливается в оплате
@@ -1083,7 +1112,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                 where w.ref = p_ref
                   and w.tag = v.tag
                   and v.vspo_char in ('F','П','C')
-                order by v.vspo_char,w.tag; 
+                order by v.vspo_char,w.tag;
      return l_cnt;
   end;
 
@@ -1097,7 +1126,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
   --
   procedure post_sep_rows (p_ext_ref number, p_doc bars.oper%rowtype)
   is
-     l_arc        bars.arc_rrp%rowtype;    
+     l_arc        bars.arc_rrp%rowtype;
      l_doc        bars.oper%rowtype;
      l_err        number;
      l_bis_count  number;
@@ -1114,7 +1143,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      l_nazn_list :=  bars.tt_str_array(null);
      l_doc := p_doc;
      l_bis_curr  := 0;
-     
+
      bars.bars_audit.info(l_trace||'старт вставки строк в arc_rrp EXT_REF='||p_ext_ref);
      -- если ест ьбис строки - сформируем массив назанчений платежа
      for c in (select w.tag, w.value, v.vspo_char
@@ -1139,25 +1168,25 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                     l_nazn_list(l_nazn_list.last) := l_req_value;
                   end loop;
      end loop;
-     l_bis_count := l_bis_curr;    
+     l_bis_count := l_bis_curr;
      bars.bars_audit.trace(l_trace||'кол-во бис строк: '||l_bis_count);
 
      l_bis_curr := 0;  -- номер текущей строки в arc_rrp, начинаем с 0
      l_arc.rec  := 0;
      --l_arc_count := l_bis_count + 1;
-     --l_arc_curr  := 
+     --l_arc_curr  :=
      -- начинаем формировать строки для arc_rrp
      -- пройтись по всем нужным строкам в arc_rrp
      while l_bis_curr <= l_bis_count loop
            if l_bis_curr = 0 then -- первая строка в arc_rr
-              l_arc.d_rec := case when l_bis_count > 0 then '#B' || lpad(l_bis_count + 1, 2, '0') || nvl(l_doc.d_rec, '#') else l_doc.d_rec end; 
+              l_arc.d_rec := case when l_bis_count > 0 then '#B' || lpad(l_bis_count + 1, 2, '0') || nvl(l_doc.d_rec, '#') else l_doc.d_rec end;
               l_arc.nazns := case when l_bis_count > 0 then '11' else  '10' end;
               l_arc.bis   := case when l_bis_count = 0 then 0 else 1 end;
               l_arc.sign  := l_doc.sign;
            else              -- остальные строки
               l_arc.nazns := '33';
               l_doc.s     := 0;
-              l_arc.bis   := l_bis_curr + 1; 
+              l_arc.bis   := l_bis_curr + 1;
               l_doc.dk := case l_doc.dk when 0 then 2 when 1 then 3 else l_doc.dk end;
               l_arc.sign  := null;
               l_req_value := l_nazn_list(l_bis_curr);
@@ -1204,9 +1233,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                   ref_i  => l_doc.ref,
                   blk_i  => 0,
                   ref_swt_ => null);
-           
+
                   l_bis_curr := l_bis_curr + 1;
-                  
+
                   if (l_sep_err <> '0') then
                     begin
                           select  l_sep_err||': '||n_er into l_seperr_text from bars.s_er where k_er = l_sep_err;
@@ -1214,14 +1243,14 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                           l_seperr_text := l_sep_err;
                     end;
                       bars.bars_error.raise_nerror( G_ERRMOD, 'SDO_AUTO_PAY_INSEP_ERROR', l_seperr_text, p_ext_ref, l_doc.ref);
-                  end if; 
-                  
+                  end if;
+
      end loop;
      bars.bars_audit.info('bars_docsync.async_auto_visa: документ EXT_REF='||p_ext_ref||',  REF = '||l_doc.ref||' вставлен в arc_rrp, l_sep_err=<'||l_sep_err||'>, кол-во бис строк = '||l_bis_count);
   end;
 
-  
-  
+
+
   ------------------------------------
   -- ASYNC_AUTO_VISA
   --
@@ -1241,9 +1270,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      l_bis_count    number;
      l_curr_bis     number;
      l_arc_row      bars.arc_rrp%rowtype;
+     l_trace        varchar2(1000) := 'bars_docsync.async_auto_visa: ';
 
   begin
-     bars.bars_audit.info('bars_docsync.async_auto_visa: старт формирования подписей и оплаты по-факту для документа EXT_REF='||p_ext_ref||',  REF = '||p_ref);
+     bars.bars_audit.info(l_trace||'старт формирования подписей и оплаты для документа EXT_REF='||p_ext_ref||',  REF = '||p_ref);
      l_doc     := read_bars_doc(p_ref);
      l_ext_doc := read_corp_doc(p_ext_ref);
 
@@ -1256,7 +1286,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                        sign1_  => l_ext_doc.sign,
                        sign2_  => null);
 
-     bars.bars_audit.info('bars_docsync.async_auto_visa: первичная виза с внутренней подписью сформирована');
+     bars.bars_audit.info(l_trace||'первичная виза с внутренней подписью сформирована');
 
 
     -- найдем последнюю визу
@@ -1277,43 +1307,43 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                           sign1_  => p_int_sign,
                           sign2_  => p_sep_sign);
 
-       bars.bars_audit.info('bars_docsync.async_auto_visa: для внешнего докумнета виза с внешней подписью сформирована с группой визировнаия '||l_chk_group);
+       bars.bars_audit.info(l_trace||'для внешнего докумнета виза с внешней подписью сформирована с группой визировнаия '||l_chk_group);
 
        -- оплачиваем документ принудительно до состяения "оплачен"
-       bars.bars_audit.info('bars_docsync.async_auto_visa: старт оплаты документа по-факту с датой валютировнаия '||to_char(l_doc.vdat,'dd/mm/yyyy'));
+       bars.bars_audit.info(l_trace||'старт оплаты документа по-факту с датой валютировнаия '||to_char(l_doc.vdat,'dd/mm/yyyy'));
        bars.gl.pay( p_flag => 2,
                     p_ref  => p_ref,
                     p_vdat => l_doc.vdat);
-       
+
        l_doc     := read_bars_doc(p_ref);
 
-       bars.bars_audit.info('bars_docsync.async_auto_visa: документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' успешно оплачен по-факту в oper, sos='||l_doc.sos );
-       
+       bars.bars_audit.info(l_trace||'документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' '||get_sos_description(l_doc.sos ));
+
        -- что - то пошлоне так (например, дата валютирования больше чем текущая - тогда документ останется ждать даты валютировнаия. В этом случае вообще приостанавливаем оплату.)
        if (l_doc.sos <> 5 ) then
             -- по какойто причине документ не смог оплатиться по-факту. При этом ошибки(exception) могло не быть.
-            -- Например, будущая дата валютировнаия. По-этому выкидываем прикладную ошибку
+            -- Например, будущая дата валютировнаия. 
             if l_doc.vdat > bars.gl.bDATE then
-               bars.bars_error.raise_nerror( G_ERRMOD, 'FUTURE_VALUE_DATE', p_ext_ref, p_ref, to_char(l_doc.vdat,'dd/mm/yyyy')); 
-                    end if;
-            
+               bars.bars_audit.info(l_trace||'статус документа EXT_REF='||p_ext_ref||',  REF = '||p_ref||' межбанк c датой валютирования '||to_char(l_doc.vdat,'dd/mm/yy')||' '||get_sos_description(l_doc.sos ));               
+               return;
+            end if;
+            bars.bars_audit.error(l_trace||'документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' межбанк не смог оплатиться по-факту:  sos= '||l_doc.sos);
             bars.bars_error.raise_nerror( G_ERRMOD, 'FAILED_TO_PAY_BY_FACT', p_ext_ref, p_ref);
-             
        end if;
-       
-       bars.bars_audit.info('bars_docsync.async_auto_visa: документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' успешно оплачен по-факту в oper, sos='||l_doc.sos );
+
+       bars.bars_audit.info(l_trace||'документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' '||get_sos_description(l_doc.sos ) );
        -- если удалось оплатить
        if (l_doc.sos = 5 ) then
            -- внести записи в arc_rrp (тут же бисы)
            post_sep_rows (p_ext_ref => p_ext_ref, p_doc => l_doc);
-                else
-           bars.bars_audit.info('bars_docsync.async_auto_visa: при попытке автооплаты СЕП/ВПС документа, документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' не был оплачен по-факту, sos='||l_doc.sos);
-                end if;
+       else
+           bars.bars_audit.info(l_trace||'при попытке автооплаты СЕП/ВПС документа, документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' не был оплачен по-факту. '||get_sos_description(l_doc.sos ));
+       end if;
 
-     
+
     else
-       
-      -- наложить вторую и последнюю визу для внутреннего документа 
+
+      -- наложить вторую и последнюю визу для внутреннего документа
       bars.chk.put_visa(ref_    => p_ref         ,
                         tt_     => l_doc.tt      ,
                         grp_    => l_chk_group   ,
@@ -1323,18 +1353,19 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                         sign2_  => null);
 
 
--- оплачиваем документ принудительно до состяения "оплачен"
+       -- оплачиваем документ принудительно до состяения "оплачен"
        bars.gl.pay( p_flag => 2,
                     p_ref  => p_ref,
-                    p_vdat => l_doc.datp);
-                    
-       
+                    p_vdat => l_doc.vdat);
+
+
 
     end if;
-
-    bars.bars_audit.info('bars_docsync.async_auto_visa: документ EXT_REF='||p_ext_ref||',  REF = '||p_ref||' успешно оплачен по-факту');
     
-            end;
+    select * into l_doc from bars.oper where ref =  p_ref;
+    bars.bars_audit.info(l_trace||'статус документа EXT_REF='||p_ext_ref||',  REF = '||p_ref||': счет А='||rpad(l_doc.nlsa,14)||', сумма='||lpad(l_doc.s,10)||'. '||get_sos_description(l_doc.sos ));
+
+    end;
 
 
 
@@ -1355,10 +1386,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 	l_doc_count     integer := 0;
   begin
     bars.bars_audit.info('bars_docsync.async_pay_documents: старт процедуры оплаты документов. Системная дата: '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') );
-	
+
     -- цикл по документам
     for d in (select * from doc_import d
-              where 
+              where
                      -- сделано через case, так как какогото черта, ктото  специально индекс строил под это условие. А других индексов нет, а в таблице около 60 млн записей.
                      case
                          when confirmation_flag='Y' and booking_flag is null and removal_flag is null then 'Y'
@@ -1444,12 +1475,3 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 
 end bars_docsync;
 /
- show err;
- 
- 
-grant execute on barsaq.bars_docsync to bars_access_defrole;
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARSAQ/package/bars_docsync.sql =========*** End 
- PROMPT ===================================================================================== 
- 
