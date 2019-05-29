@@ -1014,7 +1014,7 @@ is
 
         l_task_run_row := read_task_run(p_task_run_id, p_lock => true);
 
-        if (l_task_run_row.state_id not in (tms_utl.TASK_RUN_STATE_IDLE, tms_utl.TASK_RUN_STATE_TERMINATED)) then
+        if (l_task_run_row.state_id in (tms_utl.TASK_RUN_STATE_IN_PROGRESS)) then
             commit;
             return;
         end if;
