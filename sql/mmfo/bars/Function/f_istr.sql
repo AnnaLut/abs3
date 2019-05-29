@@ -16,15 +16,9 @@
 begin
 
   l_txt := f_fm_hash(p_txt);
-
-  for k in ( select c1, name_hash from v_finmon_reft where name_hash is not null )
-  loop
-     if l_txt = k.name_hash then
-        l_ret := k.c1;
-        exit;
-     end if;
-  end loop;
-
+  --max is used for avoid exceptions no_data_found and too_many_rows
+  select max(c1) into l_ret from v_finmon_reft where name_hash = l_txt;
+  l_ret := nvl(l_ret, 0);
   return l_ret;
 
 end;

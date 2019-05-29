@@ -409,44 +409,45 @@ public partial class finmon_doc : Bars.BarsPage
                 lbDat.Text = Session["FinmonSelectedStatus"].ToString();
 
             }
-            selectCommand = @"select v_finmon_que_oper.id,
-                                   v_finmon_que_oper.ref,
-                                   v_finmon_que_oper.tt,
-                                   v_finmon_que_oper.nd,
-                                   to_char(v_finmon_que_oper.datd,'dd.mm.yyyy') datd,
-                                   v_finmon_que_oper.nlsa,
-                                   v_finmon_que_oper.s/100 s,
-                                   v_finmon_que_oper.sq/100 sq,
-                                   v_finmon_que_oper.lcv,
-                                   v_finmon_que_oper.mfoa,
-                                   v_finmon_que_oper.dk,
-                                   v_finmon_que_oper.nlsb,
-                                   v_finmon_que_oper.s2/100 s2,
-                                   v_finmon_que_oper.sq2/100 sq2,
-                                   v_finmon_que_oper.lcv2,
-                                   v_finmon_que_oper.mfob,
-                                   v_finmon_que_oper.sk,
-                                   to_char(v_finmon_que_oper.vdat,'dd.mm.yyyy') vdat,
-                                   v_finmon_que_oper.nazn,
-                                   v_finmon_que_oper.status,
-                                   decode(v_finmon_que_oper.otm,0,null,v_finmon_que_oper.otm) otm,
-                                   v_finmon_que_oper.tobo,
-                                   v_finmon_que_oper.opr_vid2,
-                                   v_finmon_que_oper.opr_vid3,
-                                   v_finmon_que_oper.fio,
-                                   to_char(v_finmon_que_oper.in_date,'dd.mm.yyyy hh:mi:ss') in_date,
-                                   v_finmon_que_oper.comments,
-                                   null rules,
-                                   s.name status_name,
-                                   v_finmon_que_oper.nmka,
-                                   v_finmon_que_oper.nmkb,
-                                   v_finmon_que_oper.sos,
-                                   v_finmon_que_oper.fv2_agg,
-                                   case when tt.ref is not null then 1 else 0 end on3720
-                          from v_finmon_que_oper 
-                          left join finmon_que_status s on v_finmon_que_oper.status = s.status
-                          left join t902 tt on tt.ref = v_finmon_que_oper.ref
-                           where v_finmon_que_oper.vdat between to_date(decode('" + dat1 + "','01.01.1500',to_char(bars.DAT_NEXT_U(bars.web_utl.get_bankdate,-1),'dd.mm.yyyy'),'" + dat1 + "'),'dd.mm.yy') and to_date(decode('" + dat2 + "','01.01.1500',to_char(bars.DAT_NEXT_U(bars.web_utl.get_bankdate,-1),'dd.mm.yyyy'),'" + dat2 + "'),'dd.mm.yy') and ROWNUM <= 100000";
+
+            selectCommand = String.Format(@"select v_finmon_que_oper.id,
+                                                   v_finmon_que_oper.ref,
+                                                   v_finmon_que_oper.tt,
+                                                   v_finmon_que_oper.nd,
+                                                   to_char(v_finmon_que_oper.datd,'dd.mm.yyyy') datd,
+                                                   v_finmon_que_oper.nlsa,
+                                                   v_finmon_que_oper.s/100 s,
+                                                   v_finmon_que_oper.sq/100 sq,
+                                                   v_finmon_que_oper.lcv,
+                                                   v_finmon_que_oper.mfoa,
+                                                   v_finmon_que_oper.dk,
+                                                   v_finmon_que_oper.nlsb,
+                                                   v_finmon_que_oper.s2/100 s2,
+                                                   v_finmon_que_oper.sq2/100 sq2,
+                                                   v_finmon_que_oper.lcv2,
+                                                   v_finmon_que_oper.mfob,
+                                                   v_finmon_que_oper.sk,
+                                                   to_char(v_finmon_que_oper.vdat,'dd.mm.yyyy') vdat,
+                                                   v_finmon_que_oper.nazn,
+                                                   v_finmon_que_oper.status,
+                                                   decode(v_finmon_que_oper.otm,0,null,v_finmon_que_oper.otm) otm,
+                                                   v_finmon_que_oper.tobo,
+                                                   v_finmon_que_oper.opr_vid2,
+                                                   v_finmon_que_oper.opr_vid3,
+                                                   v_finmon_que_oper.fio,
+                                                   to_char(v_finmon_que_oper.in_date,'dd.mm.yyyy hh:mi:ss') in_date,
+                                                   v_finmon_que_oper.comments,
+                                                   null rules,
+                                                   s.name status_name,
+                                                   v_finmon_que_oper.nmka,
+                                                   v_finmon_que_oper.nmkb,
+                                                   v_finmon_que_oper.sos,
+                                                   v_finmon_que_oper.fv2_agg,
+                                                   case when tt.ref is not null then 1 else 0 end on3720
+                                              from v_finmon_que_oper 
+                                              left join finmon_que_status s on v_finmon_que_oper.status = s.status
+                                              left join t902 tt on tt.ref = v_finmon_que_oper.ref
+                                             where v_finmon_que_oper.vdat {0} and ROWNUM <= 100000", getDatesStr(dat1, dat2));
         }
 
         string p_status = Session["FinmonStatuses"].ToString();
@@ -500,6 +501,29 @@ public partial class finmon_doc : Bars.BarsPage
 
         HttpContext.Current.Session["SelectCommand"] = selectCommand;
         odsFmDocs.SelectCommand = selectCommand;
+    }
+
+    private string getDatesStr(string dateBegin, string dateEnd)
+    {
+        String datesStr = String.Empty;
+        if (dateBegin == dateEnd && dateBegin == "01.01.1500")
+        {
+            InitOraConnection();
+            try
+            {
+                datesStr = SQL_reader("select to_char(bars.DAT_NEXT_U(bars.web_utl.get_bankdate,-1),'dd.mm.yyyy') from dual")[0].ToString();
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+            datesStr = String.Format(" = to_date('{0}', 'dd.mm.yyyy') ", datesStr);
+        }
+        else
+        {
+            datesStr = String.Format(" between to_date('{0}','dd.mm.yyyy') and to_date('{1}','dd.mm.yyyy'), ", dateBegin, dateEnd);
+        }
+        return datesStr;
     }
 
     /// <summary>

@@ -8,8 +8,8 @@
 is
   l_tmp   varchar2(2000);
   l_tmp2  varchar2(2000);
-  l_ascii number;
-  n       number;
+  l_ascii pls_integer;
+  n       pls_integer;
   l_hash  varchar2(32);
 begin
 
@@ -35,10 +35,7 @@ begin
 
   -- hash-функция
   if l_tmp2 is not null then
-     select dbms_obfuscation_toolkit.MD5(
-            input => utl_raw.cast_to_raw(c => l_tmp2))
-       into l_hash
-       from dual;
+     l_hash:= dbms_obfuscation_toolkit.MD5(input => utl_raw.cast_to_raw(c => l_tmp2));
   else
      l_hash := null;
   end if;
