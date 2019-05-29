@@ -143,7 +143,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
    g_awk_body_defs constant varchar2(512) := ''
           ||'    - —бербанк'    || chr(10);
 
-   G_BODY_VERSION    constant varchar2(64) := 'version 13.15 09.08.2018';
+   G_BODY_VERSION    constant varchar2(64) := 'version 13.16 08.08.2019';
 
    G_MODULE          constant char(3)      := 'KLB';    -- код модул€
    G_TRACE           constant varchar2(50) := 'MBM_PAYMENTS.';
@@ -1194,6 +1194,12 @@ end add_dop_req;
      l_seperr_text  varchar2(4000);
 
      l_bis_count    number;
+     
+     l_tt_flags     bars.tts.flags%type;
+     l_sos          bars.oper.sos%type;
+     l_vdat          date;
+     l_sq            number;
+     
      l_curr_bis     number;
      l_arc_row      bars.arc_rrp%rowtype;
 
@@ -1203,6 +1209,22 @@ end add_dop_req;
      select o.* into l_doc from oper o where o.ref = p_ref;
 
      bc.subst_branch(l_doc.branch);
+     
+     select flags into l_tt_flags from bars.tts where tt = l_doc.tt;
+     
+     l_vdat := nvl(l_doc.vdat, bars.gl.bdate);
+     l_sq := case
+             when l_doc.kv = bars.gl.baseval then null
+             else bars.gl.p_icurval(l_doc.kv, l_doc.s, l_vdat)
+             end;
+
+    -- оплата
+    bars.gl.dyntt2 (
+          l_sos, to_number(substr(l_tt_flags,38,1)), 1,
+          p_ref, l_vdat,
+          null, l_doc.tt, l_doc.dk,
+          l_doc.kv,  l_doc.mfoa, l_doc.nlsa, l_doc.s,
+          l_doc.kv2, l_doc.mfob, l_doc.nlsb, l_doc.s2, l_sq, null);
 
      -- наложить нулевую подпись только с внутренней визой в oper_visa.sign и ключем корпа
      bars.chk.put_visa( ref_    => p_ref ,
@@ -1238,7 +1260,7 @@ end add_dop_req;
 
        bars.gl.pay( p_flag => 2,
                     p_ref  => p_ref,
-                    p_vdat => l_doc.datp);
+                    p_vdat => l_doc.vdat);
 
        select o.* into l_doc from oper o where o.ref = p_ref;
 
@@ -1309,7 +1331,7 @@ end add_dop_req;
        -- оплачиваем документ принудительно до сост€ени€ "оплачен"
        bars.gl.pay( p_flag => 2,
                     p_ref  => p_ref,
-                    p_vdat => l_doc.datp);
+                    p_vdat => l_doc.vdat);
        bars.bars_audit.trace('mbm_payments.set_auto_visa: документ REF = '||p_ref||' успешно оплачен по-факту');
 
        bc.set_context();
@@ -2379,8 +2401,8 @@ begin
                 prty_   => 0,
                 uid_    => l_userid
             );
-            
-            select bars.bars_swift.StrToSwift(ca.locality,'TRANS'), 
+
+            select bars.bars_swift.StrToSwift(ca.locality,'TRANS'),
                    bars.bars_swift.StrToSwift(ca.address,'TRANS')
             into l_ccodea, l_adr from bars.customer_address ca, bars.accounts acc where ca.rnk = acc.rnk and acc.nls = p_nlsa and acc.kv = p_kv and acc.dazs is null and ca.type_id = 1;
 
@@ -2415,7 +2437,7 @@ begin
             add_dop_req(l_ref, '57A', case when p_coracbb is null then p_swiftbb else
                 '/'|| p_coracbb || '$nl$' || p_swiftbb end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-         
+
             add_dop_req(l_ref, '59',
                    case when substr(p_nlsb,1,1) = '/' then substr(upper(p_nlsb),1,32)||'$nl$'
                                                       else '/'||substr(upper(p_nlsb),1,32)||'$nl$' end
@@ -2437,10 +2459,10 @@ begin
             case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34) is not null then '$nl$' else '' end||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34)) 
             end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-                
+
             add_dop_req(l_ref, '71A', substr(p_sw71a,1,34),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-                
+
             /*add_dop_req(l_ref, '72', substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_dopreq,'TRANS') else p_dopreq end,1,32),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             */
@@ -2588,6 +2610,7 @@ end mbm_payments;
  
 PROMPT *** Create  grants  MBM_PAYMENTS ***
 grant EXECUTE                                                                on MBM_PAYMENTS    to BARS_ACCESS_DEFROLE;
+
  
  
  PROMPT ===================================================================================== 
