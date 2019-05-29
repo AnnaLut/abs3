@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="12/03/2018 10:24:36" ReportInfo.Modified="04/24/2019 18:12:48" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="obmmfo6" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcnlCn+rFoD9rGtnHObpm8fQ==">
+      <TableDataSource Name="Table" Alias="zap_5718" DataType="System.Int32" Enabled="true" SelectCommand="SELECT CHAR00     KF,&#13;&#10;         NUM00      DOC_CREATE_NOT_FULL_VISA,&#13;&#10;         NUM01      DOC_NOT_VISA_FDATE,&#13;&#10;         NUM02      DOC_NOT_OPER_TIME,&#13;&#10;         NUM03      OTHER_DOC,&#13;&#10;         NUM04      DOC_CREATE_NOT_VISA,&#13;&#10;         NUM05      DOC_DOUBLE&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :session_id&#13;&#10;ORDER BY id">
+        <Column Name="DOC_CREATE_NOT_VISA" DataType="System.Decimal"/>
+        <Column Name="DOC_NOT_VISA_FDATE" DataType="System.Decimal"/>
+        <Column Name="DOC_NOT_OPER_TIME" DataType="System.Decimal"/>
+        <Column Name="OTHER_DOC" DataType="System.Decimal"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="DOC_DOUBLE" DataType="System.Decimal"/>
+        <Column Name="DOC_CREATE_NOT_FULL_VISA" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="818330"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="flg_auto_pay" DataType="System.String"/>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+    <Total Name="T_not_visa_fdate" TotalType="Count" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[zap_5718.DOC_NOT_VISA_FDATE]!=0"/>
+    <Total Name="T_not_oper_time" TotalType="Count" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[zap_5718.DOC_NOT_OPER_TIME] != 0"/>
+    <Total Name="T_doc_other" TotalType="Count" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[zap_5718.OTHER_DOC]!=0"/>
+    <Total Name="T_all_doc" TotalType="Count" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[zap_5718.DOC_CREATE_NOT_VISA]!=0"/>
+    <Total Name="T_doc_double" TotalType="Count" Evaluator="Data1" PrintOn="ReportSummary1" EvaluateCondition="[zap_5718.DOC_DOUBLE]!=0"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="230" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="793.8" Height="99.22" CanShrink="true">
+      <TableObject Name="Table2" Width="719.7" Height="18.9">
+        <TableColumn Name="Column69" Width="143.94"/>
+        <TableColumn Name="Column70" Width="143.94"/>
+        <TableColumn Name="Column71" Width="143.94"/>
+        <TableColumn Name="Column72" Width="143.94"/>
+        <TableColumn Name="Column73" Width="143.94"/>
+        <TableRow Name="Row21">
+          <TableCell Name="Cell188" Text="Звіт про поточну роботу автообробника СДО" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell189" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell190" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell191" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell192" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table1" Top="18.9" Width="719.67" Height="80.32" GrowToBottom="true" CanBreak="false" RepeatHeaders="false">
+        <TableColumn Name="Column57" Width="86.94"/>
+        <TableColumn Name="Column60" Width="128.52"/>
+        <TableColumn Name="Column63" Width="118.65"/>
+        <TableColumn Name="Column64" Width="128.52"/>
+        <TableColumn Name="Column65" Width="128.52"/>
+        <TableColumn Name="Column66" Width="128.52"/>
+        <TableRow Name="Row20" Height="28.34">
+          <TableCell Name="Cell182" Border.Lines="All" Border.Width="0.5" Text="Кількість платежів на візуванні" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell183" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell184" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell185" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell186" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell187" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="51.98">
+          <TableCell Name="Cell166" Border.Lines="All" Border.Width="0.5" Text="РУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell169" Border.Lines="All" Border.Width="0.5" Text="майбутня дата валютування (реф)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell172" Border.Lines="All" Border.Width="0.5" Text="введено після закриття СЕП (реф)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell173" Border.Lines="All" Border.Width="0.5" Text="інші (реф)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell174" Border.Lines="All" Border.Width="0.5" Text="загальна кількість" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell176" Border.Lines="All" Border.Width="0.5" Text="дублі (реф) " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="101.85" Width="793.8" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true">
+      <TableObject Name="Table4" Width="719.71" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column80" Width="86.94"/>
+        <TableColumn Name="Column81" Width="128.52"/>
+        <TableColumn Name="Column82" Width="118.69"/>
+        <TableColumn Name="Column83" Width="128.52"/>
+        <TableColumn Name="Column85" Width="128.52"/>
+        <TableColumn Name="Column84" Width="128.52"/>
+        <TableRow Name="Row23">
+          <TableCell Name="Cell219" Border.Lines="All" Border.Width="0.25" Text="[zap_5718.KF]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell220" Border.Lines="All" Border.Width="0.25" Text="[zap_5718.DOC_NOT_VISA_FDATE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell221" Border.Lines="All" Border.Width="0.25" Text="[zap_5718.DOC_NOT_OPER_TIME]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell222" Border.Lines="All" Border.Width="0.25" Text="[zap_5718.OTHER_DOC]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell244" Border.Lines="All" Border.Width="0.25" Text="[zap_5718.DOC_CREATE_NOT_VISA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell223" Border.Lines="All" Border.Width="0.25" Text="[zap_5718.DOC_DOUBLE]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="123.38" Width="793.8" Height="18.9">
+      <TableObject Name="Table3" Width="719.71" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column74" Width="86.94"/>
+        <TableColumn Name="Column75" Width="128.52"/>
+        <TableColumn Name="Column76" Width="118.69"/>
+        <TableColumn Name="Column77" Width="128.52"/>
+        <TableColumn Name="Column79" Width="128.52"/>
+        <TableColumn Name="Column78" Width="128.52"/>
+        <TableRow Name="Row22">
+          <TableCell Name="Cell193" Border.Lines="All" Border.Width="0.25" Text="Всього:" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell194" Border.Lines="All" Border.Width="0.25" Text="[T_not_visa_fdate]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell195" Border.Lines="All" Border.Width="0.25" Text="[T_not_oper_time]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell196" Border.Lines="All" Border.Width="0.25" Text="[T_doc_other]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell218" Border.Lines="All" Border.Width="0.25" Text="[T_all_doc]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell197" Border.Lines="All" Border.Width="0.25" Text="[T_doc_double]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>
