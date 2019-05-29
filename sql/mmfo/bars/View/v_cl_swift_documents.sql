@@ -178,9 +178,7 @@ AS
                      (SELECT CASE SUBSTR (ow.VALUE, 1, 1)
                                 WHEN '/'
                                 THEN
-                                   trim(SUBSTR (ow.VALUE,
-                                           INSTR (ow.VALUE, CHR (13)) + 1,
-                                           11))
+                                    SUBSTR (trim(ow.VALUE), -11)
                                 ELSE
                                    trim(SUBSTR (ow.VALUE, 1, 11))
                              END
@@ -190,7 +188,7 @@ AS
           (SELECT CASE SUBSTR (ow.VALUE, 1, 1)
                      WHEN '/'
                      THEN
-                        trim(SUBSTR (ow.VALUE, INSTR (ow.VALUE, CHR (13)) + 1, 11))
+                           SUBSTR (trim(ow.VALUE),-11)
                      ELSE
                         trim(SUBSTR (ow.VALUE, 1, 11))
                   END
@@ -203,9 +201,7 @@ AS
                        (SELECT CASE SUBSTR (ow.VALUE, 1, 1)
                                 WHEN '/'
                                 THEN
-                                   trim(SUBSTR (ow.VALUE,
-                                           INSTR (ow.VALUE, CHR (13)) + 1,
-                                           11))
+                                   SUBSTR (trim(ow.VALUE),-11)
                                 ELSE
                                    trim(SUBSTR (ow.VALUE, 1, 11))
                              END
