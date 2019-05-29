@@ -2238,7 +2238,7 @@ begin
                          n.nd,  
                          a.acc 
                   from   nd_acc n, accounts a
-                  where (a.nbs like '207%' or a.nbs in ('2044')) 
+                  where  a.nbs in ('2071','2044') 
                    and   ost_korr(a.acc,dat31_,null,a.nbs)<>0 
                    and   a.acc = n.acc
                  )
@@ -2287,6 +2287,7 @@ begin
      -- допривязка счетов нач процентов+9129 к залогам по КП
      for K1 in (select n.*, ost_korr(a.acc,dat31_,null,a.nbs) ostc from accounts a, nd_acc n 
                 where a.acc = n.acc 
+                 and n.nd  not in (select zn.nd  from accounts z, nd_acc zn where z.acc = zn.acc and z.nbs in ('2044','2071') ) 
                  and a.tip not in ('SS ','DEP','DIU','SDI','SNA','SDA','SDF','SDM','SRR') 
                  and (a.nls <'3' or a.nbs='9129') and (a.dazs is null or a.dazs >=p_dat01) 
                  and not exists (select 1 from cc_accp where accs = a.acc)
@@ -2312,7 +2313,8 @@ begin
      nd_  := -1;
      for K2 in (select nd, accs, count(*) kol
                 from cc_accp
-                where nd is not null
+                where nd  is not null
+                  and nd  not in (select zn.nd  from accounts z, nd_acc zn where z.acc = zn.acc and z.nbs in ('2044','2071') ) 
                 group by nd, accs
                 order by 1, 3 desc)
      loop

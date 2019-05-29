@@ -71,7 +71,7 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
  l_EAD         NUMBER; l_zal     NUMBER; l_EADQ     NUMBER; l_LGD      NUMBER; l_CR       NUMBER; l_RC        NUMBER; l_bv       NUMBER;
  l_BVQ         NUMBER; l_bv02    NUMBER; l_BV02q    NUMBER; l_ccf      NUMBER; l_srok     NUMBER; L_RCQ       NUMBER; L_CR_LGD   NUMBER;
  l_zalq        NUMBER; l_zal_BV  NUMBER; l_zal_BVq  NUMBER; l_dv       NUMBER; l_polis    NUMBER; l_zal_lgd   NUMBER; l_s        NUMBER;
- l_EADR        NUMBER; l_RZ      NUMBER; l_tip_kv   NUMBER; l_fin_okpo NUMBER; l_lgd_51   NUMBER;
+ l_EADR        NUMBER; l_RZ      NUMBER; l_tip_kv   NUMBER; l_fin_okpo NUMBER; l_lgd_51   NUMBER; l_cnt       NUMBER;
  l_kol_fin_max NUMBER; l_k       NUMBER; l_g_kved   NUMBER;
 
  VKR_       varchar2(3);  l_txt  varchar2(1000);  l_vkr   varchar2(50)  ;  l_real  varchar2(3);  l_text  VARCHAR2(250) ; l_kf varchar2(6);
@@ -341,21 +341,23 @@ begin
                end if;
 
                --logger.info('REZ_351 40 : nd = ' || d.nd || ' vidd =' || d.vidd || ' tipa =' || d.tipa || ' s.custtype=' ||s.custtype ) ;
-               if d.pd is not null THEN l_pd := d.pd;
-               else
-                  IF l_S250  = 8 and d.vidd in ( 1, 2, 3) THEN
-                     l_pd := f_fin_pd_grupa_ul (1, l_fin, nvl(z.rpb,0));
-                     --logger.info('2401 3 : nd = ' || d.nd || ' l_pd =' || l_pd || ' l_fin =' || l_fin || ' z.rpb ='|| z.rpb ) ;
-                  elsif  l_S250  = 8 and d.vidd not in ( 1, 2, 3) THEN
-                     l_pd := f_fin_pd_grupa (2, l_kol);
-                  else
-                     --if s.custtype = 3   THEN   --or d.prod like '21%' THEN
-                     l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_idf);
-                        --l_idf := l_fp;
-                     --else
-                     --   l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_idf);
-                     --end if;
-                  end if;
+               if d.pd is not null THEN 
+                  begin
+                     select count(*) into l_cnt from range_pd 
+                     where tip = d.tipa and fin = l_fin and tip_fin = l_tip_fin and rz = d.rz and  d.pd between min  and max;
+                     if l_cnt <> 0 THEN l_pd := d.pd; 
+                     else
+                        IF l_S250  = 8 and d.vidd in ( 1, 2, 3) THEN
+                           l_pd := f_fin_pd_grupa_ul (1, l_fin, nvl(z.rpb,0));
+                           --logger.info('2401 3 : nd = ' || d.nd || ' l_pd =' || l_pd || ' l_fin =' || l_fin || ' z.rpb ='|| z.rpb ) ;
+                        elsif  l_S250  = 8 and d.vidd not in ( 1, 2, 3) THEN
+                           l_pd := f_fin_pd_grupa (2, l_kol);
+                        else
+                           --if s.custtype = 3   THEN   --or d.prod like '21%' THEN
+                           l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_idf);
+                        end if; 
+                     end if;
+                  end; 
                end if;
                if s.rnk = 90931101 and sys_context('bars_context','user_mfo') = '300465' THEN  -- COBUSUPABS-5538
                   l_fin  := 1;
