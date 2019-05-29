@@ -10,6 +10,8 @@ is
   -- types
   --
   subtype tbl_nm_subtype is varchar2(30) Not Null;
+  
+  sql_rowcount pls_integer;
 
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2;
@@ -1357,13 +1359,13 @@ is
    p_rpt_dt  in date,
    p_kf      in varchar2,
    p_vrsn_id in int
-  ) 
+  )
   return varchar2
   as
   begin
     return ' subpartition for ('||date2to_date(p_rpt_dt)||','||double_quotes(p_kf)||','||to_char(p_vrsn_id)||')';
   end f_subpartition_for;
-  
+
   procedure MOVE_DATA_TO_ARCH
   ( p_obj_nm       in     nbur_ref_objects.object_name%type
   , p_rpt_dt       in     nbur_lst_objects.report_date%type
@@ -1447,8 +1449,8 @@ is
         execute immediate 'insert /*+ APPEND*/ '
               ||c_enter|| '  into '||l_arc_tab_nm|| f_subpartition_for(p_rpt_dt, p_kf, p_vrsn_id)
               ||c_enter|| '     ( '||l_arc_col_lst||' )'
-              ||c_enter|| 'select '||l_obj_col_lst
-              ||c_enter|| '  from '||p_obj_nm
+              ||c_enter|| 'select /*+ full(p)*/ '||l_obj_col_lst
+              ||c_enter|| '  from '||p_obj_nm||' p'
               ||c_enter|| ' where KF = :p_kf'
           using p_vrsn_id, p_kf;
         end if;
@@ -2251,10 +2253,11 @@ is
         left outer
         join KL_R030 r
           on ( r.R030 = c.R030 );
+        l_rowcount := sql%rowcount;
 
     else
 
-      insert /* APPEND */
+      /*insert \* APPEND *\
         into NBUR_DM_ACCOUNTS
            ( REPORT_DATE, KF, ACC_ID, ACC_TYPE, KV, BRANCH
            , ACC_NUM, ACC_NUM_ALT, NBS, OB22, OB22_ALT, ACC_ALT_DT
@@ -2271,7 +2274,7 @@ is
            , c.R011, c.r012, c.r013, c.R016, c.R030, r.R031, r.R032, r.R033, r.R034, c.S180
            , NVL(K.S181, '1') S181, NVL(K.S183, '1') S183
            , c.S240, c.S580, c.NBUC, c.B040
-        from ( select /*+ PARALLEL( 4 ) LEADING( a ) USE_HASH( a s ) */
+        from ( select \*+ PARALLEL( 4 ) LEADING( a ) USE_HASH( a s ) *\
                       a.KF,
                       a.ACC,
                       a.NLS,
@@ -2340,11 +2343,105 @@ is
           on ( k.S180 = c.S180)
         left outer
         join KL_R030 r
-          on ( r.R030 = c.R030 );
-
-    end if;
-
-    l_rowcount := sql%rowcount;
+          on ( r.R030 = c.R030 );*/
+  nbur_objects.sql_rowcount := 0;
+  execute immediate q'[declare
+    p_report_date date := :p_report_date;
+    l_frst_yr_dt  date := :l_frst_yr_dt;
+  begin 
+      insert /*+ APPEND */
+        into NBUR_DM_ACCOUNTS partition for (]'||double_quotes(p_kf)||q'[)
+           ( REPORT_DATE, KF, ACC_ID, ACC_TYPE, KV, BRANCH
+           , ACC_NUM, ACC_NUM_ALT, NBS, OB22, OB22_ALT, ACC_ALT_DT
+           , OPEN_DATE, CLOSE_DATE, MATURITY_DATE, CUST_ID, ACC_PID, LIMIT, PAP, VID, BLC_CODE_DB, BLC_CODE_CR
+           , R011, R012, R013, R016, R030, R031, R032, R033, R034, S180, S181, S183, S240, S580, NBUC, B040 )
+      select p_report_date, c.KF, c.ACC, c.TIP, c.KV, c.BRANCH
+           , case when p_report_date < c.DAT_ALT then c.NLSALT             else c.NLS      end as ACC_NUM
+           , case when p_report_date < c.DAT_ALT then null                 else c.NLSALT   end as ACC_NUM_ALT
+           , case when p_report_date < c.DAT_ALT then SubStr(c.NLSALT,1,4) else c.NBS      end as NBS
+           , case when p_report_date < c.DAT_ALT then nvl(c.OB22_ALT, '00')  else c.OB22     end as OB22
+           , case when p_report_date < c.DAT_ALT then null                 else c.OB22_ALT end as OB22_ALT
+           , case when p_report_date < c.DAT_ALT then null                 else c.DAT_ALT  end as ACC_ALT_DT
+           , c.daos, c.dazs, c.mdate, c.rnk, c.ACCC, c.lim, c.PAP, c.VID, c.BLKD, c.BLKK
+           , c.R011, c.r012, c.r013, c.R016, c.R030, r.R031, r.R032, r.R033, r.R034, c.S180
+           , NVL(K.S181, '1') S181, NVL(K.S183, '1') S183
+           , c.S240, c.S580, c.NBUC, c.B040
+        from ( select 
+                      a.KF,
+                      a.ACC,
+                      a.NLS,
+                      a.NLSALT,
+                      a.DAT_ALT,
+                      nvl(a.TIP, 'ODB') tip,
+                      a.branch,
+                      a.KV,
+                      a.DAOS,
+                      case when ( a.DAZS > p_report_date ) then null else a.DAZS end as DAZS,
+                      a.MDATE,
+                      a.RNK,
+                      a.ACCC,
+                      a.lim,
+                      nvl(a.PAP, '3') pap,
+                      a.VID,
+                      a.BLKD,
+                      a.BLKK,
+                      a.NBS,
+                      nvl(a.OB22, '00') ob22,
+                      NVL(s.R011, '0' ) R011,
+                      case
+                        when a.nbs like '1__6' or
+                             a.nbs like '2__6' and a.nbs not in ('2526', '2546', '2606', '2806', '2906') or
+                             a.nbs like '3__6' and a.nbs not in ('3006', '3106', '3906')
+                        then 'C'
+                        when a.tip = 'SNA'
+                        then '4'
+                        when a.nbs = '2620' and nvl(a.pap, '3') = '2' and nvl (s.r013, '0') = '1'
+                        then '2'
+                        when a.nbs = '2620' and nvl(a.pap, '3') = '2' and nvl (s.r013, '0') = '2'
+                        then '6'
+                        when a.nbs in ('2630', '2635') and nvl(a.pap, '3') = '2'
+                        then '2'
+                        when a.nbs in ('1890', '2890', '3590', '3599') and nvl(a.pap, '3') = '2'
+                        then 'A'
+                        else nvl(s.R012, '0')
+                      end R012,
+                      NVL(s.R013, '0' ) R013,
+                      NVL(s.R016, '00') R016,
+                      to_char(a.KV,'FM000') R030,
+                      nvl(trim(S.S180), '0') S180,
+                      nvl(trim(S.S240), '0') S240,
+                      NVL(s.s580, '9') S580,
+                      s.OB22_ALT,
+                      nvl(b.OBL,'00') NBUC,
+                      lpad(nvl(trim(b.b040), '0'), 20, '0') b040
+                 from ACCOUNTS a
+                 left outer
+                 join SPECPARAM s
+                   on ( s.KF = a.KF and s.ACC = a.ACC )
+                 join BRANCH   b
+                   on ( a.BRANCH = b.BRANCH )
+                where a.KF = ]'||double_quotes(p_kf)||
+                ' and a.NBS IS NOT NULL'||
+                ' and regexp_like(a.NLS,''^(([1-7,9])|(86([1][0,5,8]|[5][1,2,8]))|(899(8|9)))'')'||
+              q'[ and lnnvl( a.DAZS < l_frst_yr_dt ) 
+             ) c
+        left outer
+        join ( select S180, S181, S183
+                 from KL_S180
+                where nvl(DATA_O, p_report_date) <= p_report_date
+                  and ( DATA_C is null or
+                        DATA_C >= p_report_date + 1 )
+             ) k
+          on ( k.S180 = c.S180)
+        left outer
+        join KL_R030 r
+          on ( r.R030 = c.R030 );        
+        nbur_objects.sql_rowcount := sql%rowcount;                      
+        end;]' 
+        using p_report_date, l_frst_yr_dt;
+        
+        l_rowcount := nbur_objects.sql_rowcount;
+    end if;        
 
     p_finish_load_object(l_object_id, p_version_id, p_report_date, p_kf, l_rowcount);
 
@@ -6594,10 +6691,10 @@ $end
          and lf.FILE_STATUS = 'FINISHED';
 
 
-      p_subpartition_add('NBUR_DETAIL_PROTOCOLS_ARCH', p_report_dt, p_kf, p_vrsn_id);      
+      --p_subpartition_add('NBUR_DETAIL_PROTOCOLS_ARCH', p_report_dt, p_kf, p_vrsn_id);
 
       dbms_application_info.set_client_info( 'Moving data into table "NBUR_DETAIL_PROTOCOLS_ARCH".' );
-      
+
       execute immediate
                 'insert /*+ APPEND*/'
     ||c_enter|| '  into NBUR_DETAIL_PROTOCOLS_ARCH '||f_subpartition_for(p_report_dt, p_kf, p_vrsn_id)
@@ -6609,10 +6706,10 @@ $end
     ||c_enter|| '     , D.ACC_ID, D.ACC_NUM, D.KV, D.MATURITY_DATE, D.CUST_ID, D.REF, D.ND, D.BRANCH'
     ||c_enter|| '  from NBUR_DETAIL_PROTOCOLS D'
     ||c_enter|| ' where D.REPORT_CODE = :l_rpt_code'
-    ||c_enter|| '   and D.KF = :p_kf' 
+    ||c_enter|| '   and D.KF = :p_kf'
                 using p_vrsn_id, l_rpt_code, p_kf;
-      
-      p_subpartition_add('NBUR_AGG_PROTOCOLS_ARCH', p_report_dt, p_kf, p_vrsn_id);      
+
+     -- p_subpartition_add('NBUR_AGG_PROTOCOLS_ARCH', p_report_dt, p_kf, p_vrsn_id);
 
       dbms_application_info.set_client_info( 'Moving data into table "NBUR_AGG_PROTOCOLS_ARCH".' );
       execute immediate
@@ -6620,7 +6717,7 @@ $end
       ||c_enter||  '  into NBUR_AGG_PROTOCOLS_ARCH '||f_subpartition_for(p_report_dt, p_kf, p_vrsn_id)
       ||c_enter||  '     ( REPORT_DATE, KF, VERSION_ID'
       ||c_enter||  '     , REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, ERROR_MSG, ADJ_IND )'
-      ||c_enter||  'select D.REPORT_DATE, D.KF, :p_vrsn_id'
+      ||c_enter||  'select /*+ FULL(D)*/ D.REPORT_DATE, D.KF, :p_vrsn_id'
       ||c_enter||  '     , D.REPORT_CODE, D.NBUC, D.FIELD_CODE, D.FIELD_VALUE, D.ERROR_MSG, D.ADJ_IND'
       ||c_enter||  '  from NBUR_AGG_PROTOCOLS D'
       ||c_enter||  ' where D.REPORT_CODE = :l_rpt_code'
@@ -7585,3 +7682,4 @@ grant EXECUTE on NBUR_OBJECTS to RPBN002;
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/nbur_objects.sql =========*** End **
  PROMPT ===================================================================================== 
+ 
