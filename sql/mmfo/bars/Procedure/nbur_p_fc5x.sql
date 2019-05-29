@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 5СX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.008  16/11/2018 (08/11/2018)
+% VERSION     :  v.1.009  29/05/2019 (16/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := ' v.1.008  16/11/2018';
+  ver_              char(30)  := ' v.1.009  29/05/2019';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_old_file_code   constant varchar2(3 char) := '#C5';
   c_sleep_time      constant number := 30; --Время ожидания между тактами проверки
@@ -83,7 +83,8 @@ BEGIN
   end if;
    
   --Теперь сохрянем полученные данные в детальном протоколе
-  insert into nbur_log_fc5x(report_date, kf, nbuc, version_id, ekp, a012, t020, r020, r011, r013, r030_1, r030_2, r017, k077, s245, s580, t070, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
+  insert into nbur_log_fc5x(report_date, kf, nbuc, version_id, ekp, a012, t020, r020, r011, r013, r030_1, r030_2, 
+           r017, k077, s245, s580, t070, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
       select       
             p_report_date /*report_date*/
             , p_kod_filii /*kf*/
@@ -101,14 +102,19 @@ BEGIN
               end /*ekp*/
             , '1' /*a012*/
             , t.seg_d /*t020*/
-            , seg_bbbb /*r020*/
+            , t.seg_bbbb /*r020*/
             , t.seg_z /*r011*/
             , t.seg_p /*r013*/
             , t.seg_vvv /*r030_1*/
             , t.seg_www /*r030_2*/
             , t.seg_q /*r017*/
             , t.seg_k /*k077*/
-            , replace(t.seg_e, '0', '#') /*s245*/
+            , (case when t.seg_bbbb in ('1200', '1203', '3500', '4400', '4409', 
+                                        '4410', '4419', '4430', '4431', '4500', 
+                                        '4509', '4530', '4600', '4609') 
+                     then '#' 
+                     else replace(t.seg_e, '0', '#') 
+               end)/*s245*/
             , t.seg_y /*s580*/
             , t.znap /*t070*/
             , null /*description*/
