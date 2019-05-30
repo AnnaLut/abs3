@@ -653,7 +653,7 @@ begin
       into v_ndg, v_vidd
       from cc_deal 
       where nd = p_nd;
-    if v_vidd <5 then
+    if v_vidd <5 and v_ndg is not null then
       if v_ndg is null then -- не субдоговор, нет генерального, проходим дальше
         null;
       elsif v_ndg = p_nd then -- это генеральный
