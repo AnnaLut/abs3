@@ -199,7 +199,7 @@ END pkg_escr_reg_utl;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
 
-  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.5 21/09/2018';
+  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.6 30/05/2019';
   g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.3 05/05/2018';
 
   c_err_txt VARCHAR2(4000);
