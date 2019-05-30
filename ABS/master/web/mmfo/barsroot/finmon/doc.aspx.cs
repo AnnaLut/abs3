@@ -521,7 +521,7 @@ public partial class finmon_doc : Bars.BarsPage
         }
         else
         {
-            datesStr = String.Format(" between to_date('{0}','dd.mm.yyyy') and to_date('{1}','dd.mm.yyyy'), ", dateBegin, dateEnd);
+            datesStr = String.Format(" between to_date('{0}','dd.mm.yyyy') and to_date('{1}','dd.mm.yyyy') ", dateBegin, dateEnd);
         }
         return datesStr;
     }
