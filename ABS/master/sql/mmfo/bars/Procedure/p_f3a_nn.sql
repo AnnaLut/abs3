@@ -6,11 +6,13 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 12/04/2019 (02/04/2019)
+% VERSION     : 20/05/2019 (12/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+20/05/2019 - для субдоговорів поле LIM2 из CC_LIM потрібно вираховувати 
+             в копійках (зберігається в грн. тобто LIM2*100) 
 12/04/2019 - добавлено блок по формуванню Кт оборотів для депозитів МСБ
 02/04/2019 - для поточних рахункуів 2600,2620,2650 S180='1' і для активних
              залишків на початок дня значення показника оборотів будемо 
@@ -3322,7 +3324,7 @@ BEGIN
        FOR i IN (SELECT  a.kodp, a.acc acc_, a.nls, a.kv, TO_NUMBER (a.znap) ost, b.znap prc,
                          (TO_NUMBER (a.znap) * TO_NUMBER (b.znap))/36500 ost_prc, b.recid,
                          sum(Gl.P_Icurval(a.KV, to_number(TRANSLATE(t.txt,',','.')), Dat_)) kom,
-                         s.mdate-dat_ term, c.nd nd, c.cc_id,
+                         s.mdate-dat_ term, c.nd nd, c.ndg ndg, c.cc_id,
                          ABS(Gl.P_Icurval(a.KV, c.LIMIT * 100, Dat_)) s_zd2,
                          s.mdate
                  FROM RNBU_TRACE a, RNBU_TRACE b, ND_ACC n, CC_DEAL c, ND_TXT t, ACCOUNTS s
@@ -3347,7 +3349,7 @@ BEGIN
                    AND a.acc=s.acc
                  group by a.kodp, a.acc, a.nls, a.kv, TO_NUMBER (a.znap), b.znap,
                          (TO_NUMBER (a.znap) * TO_NUMBER (b.znap))/36500, b.recid,
-                         s.mdate-dat_, c.nd, c.cc_id,
+                         s.mdate-dat_, c.nd, c.ndg, c.cc_id,
                          ABS(Gl.P_Icurval(a.KV, c.LIMIT * 100, Dat_)), s.mdate
                  ORDER BY a.kodp)
         LOOP
@@ -3428,6 +3430,12 @@ BEGIN
                     when no_data_found then
                         RAISE_APPLICATION_ERROR(-20002, 'рах. '||i.nls||' Реф.дог. '||i.nd||' Помилка: не заповнена сума лiмiту');
                  end;
+              end if;
+
+              -- для субдоговорів поле LIM2 потрібно вираховувати в копійках (LIM2*100) 
+              if i.ndg is not null and i.nd <> i.ndg 
+              then
+                 s_zd2_ := s_zd2_ * 100; 
               end if;
 
               BEGIN
