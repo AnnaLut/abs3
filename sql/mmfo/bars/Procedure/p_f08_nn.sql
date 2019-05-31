@@ -11,15 +11,17 @@ CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #08 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :14/03/2019 (06/03/2019)
+% VERSION     :13/05/2019 (14/03/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-14.03.2019 для бал.счетов 2805,3510,3519,3550,3551,3552,3559,3578 
+13.05.2019 для 1911,1919 зм_нено формування параметру K072 (якщо K072 не
+           20,21,22,23 то будемо формувати значення '21')
+14.03.2019 для бал.счетов 2805,3510,3519,3550,3551,3552,3559,3578
            и S183='0' изменяем S183_ на '1'
            для всіх бал.рахунків параметр S183 змінюємо з "0" на "1"
-06.03.2019 добавлено блок для заміни параметру K072 для від'ємних значень 
+06.03.2019 добавлено блок для заміни параметру K072 для від'ємних значень
            показника для бал.рахунків 6 і 7 класів
 28.12.2018 изменения для групп бал.счетов 612, 630
 07.12.2019 для бал.рах. 3500,3600 параметр R011 будемо формувати нульовим
@@ -312,6 +314,11 @@ begin
                 when ob22_ in ('47', '48') then '31'
                 else '30'
             end);
+   end if;
+
+   if p_nbs_ in ('1911','1919') and s_ not in ('20', '21', '22', '23')
+   then
+      s_:= '21';
    end if;
 
    if p_nbs_ in ('1919') and s_ = '2D' then
@@ -1456,32 +1463,32 @@ and substr(kodp,9,1)='1';
 
 -- блок для заміни параметру K072 для від'ємних значень показника
 
-for z in ( select kodp, sum(znap) 
+for z in ( select kodp, sum(znap)
            from bars.rnbu_trace
-           where substr(kodp,2,1) in ('6','7')  
+           where substr(kodp,2,1) in ('6','7')
            group by kodp
            having sum(znap) < 0
          )
      loop
- 
-        for k in ( select r1.* 
+
+        for k in ( select r1.*
                    from rnbu_trace r1
-                   where r1.kodp = z.kodp 
+                   where r1.kodp = z.kodp
                  )
             loop
 
                begin
-                  select kodp 
+                  select kodp
                      into kodp_
-                  from rnbu_trace 
-                  where znap = ( select max(znap) 
-                                 from rnbu_trace 
-                                 where kodp like substr(z.kodp,1,6)||'__'||substr(z.kodp,9)||'%' 
+                  from rnbu_trace
+                  where znap = ( select max(znap)
+                                 from rnbu_trace
+                                 where kodp like substr(z.kodp,1,6)||'__'||substr(z.kodp,9)||'%'
                                    and substr(kodp,7,2) <> substr(z.kodp,7,2)
                                )
                     and rownum =1;
-               
-                  if k.znap < 0 
+
+                  if k.znap < 0
                   then
                      update rnbu_trace r set r.kodp = substr(z.kodp,1,6) || substr(kodp_,7,2) || substr(z.kodp,9),
                                              r.comm = substr(k.comm || 'заміна K072 з ' || substr(z.kodp,7,2) || ' на ' || substr(kodp_,7,2), 1,200)
@@ -1492,7 +1499,7 @@ for z in ( select kodp, sum(znap)
                end;
 
         end loop;
-end loop; 
+end loop;
 ---------------------------------------------------
 DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
 ---------------------------------------------------
