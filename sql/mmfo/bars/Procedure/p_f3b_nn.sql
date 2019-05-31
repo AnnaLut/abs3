@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
 % DESCRIPTION :	Процедура формирования #3B для
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : 04.02.2019 (24.05.2018, 23.05.2018, 17.05.2018)
+% VERSION     : 28.05.2019 (27.05.2019, 24.05.2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_    - отчетная дата
                sheme_  - код схемы
@@ -18,6 +18,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
  11    ZZZZZZZZZZ   ОКПО предприятия
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+28.05.2019 змінено формування показників
+           10PMK02280ZZZZZZZZZZ, 10PMK02285ZZZZZZZZZZ, 10PMK02290ZZZZZZZZZZ,
+           10PMK02295ZZZZZZZZZZ 
+27.05.2019 добавлено розрахунок кодів DDDDD in (2090, 2095, 2190, 2195)
+24.05.2019 змінено формування значення показника для LL='08'
+22.05.2019 для відбору клієнтів із таблиці OKPOF659  змінено умову для 
+           звітної дати з 01.01.2017  на  01.01.2019
 04.02.2019 Заявка COBUMMFO-10759
 	   змінено формування показника 06 (дані беруться з кредитного ризику)
            точність показника 09 до 3 знаків (було 2)
@@ -28,8 +35,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
 23.05.2018 не включаем контрагентов у которых сумма кредитов равна нулю
            (BVQ из NBU23_REZ)
 17.05.2018 добавлено формирование показателя 11LLPMKDDDDDZZZZZZZZZZ
-           изменено формирование показателей 04 и 06 
-           (будут формироваться как в файле #3V) 
+           изменено формирование показателей 04 и 06
+           (будут формироваться как в файле #3V)
 06.12.2017 Ограниченние набора показателей DDDDD для формы 3
 23.11.2017 Сегмент LL=10 -oбработка данных формы 3 для клиентов
 21.08.2017 Изменено формирование показателя 05 (признак АТО)
@@ -47,7 +54,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
     mfou_    number;
     ost_     number;
     ost_96_  number;
-    s190_    varchar2(1); 
+    s190_    varchar2(1);
     dtb_     date;
     dte_     date;
     znap_    number;
@@ -55,6 +62,12 @@ CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G
     p04_     varchar2(1);
     fmt_     varchar2 (10)  := '9990D000';
     gr_yo    varchar2(1);
+    p08_     varchar2(1);
+    s2090_   number;
+    sr2090_  number;
+    s2190_   number;
+    sr2190_  number; 
+
 BEGIN
     userid_ := user_id;
     mfo_:=F_OURMFO();
@@ -102,7 +115,7 @@ BEGIN
                                group by lpad(c.okpo,10,'0')
                                having count(*) > 1
                               )
-                and zvitdate = to_date('01012017','ddmmyyyy')
+                and zvitdate = to_date('01012019','ddmmyyyy')
              )
     loop
        INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,'ОКПО '||to_char(t.okpo)||' имеет более одного RNK');
@@ -126,7 +139,7 @@ BEGIN
                                                 and fdat in (dtb_, dte_)
                                                 and branch like '/'||mfo_||'/'
                                              )
-                and zvitdate = to_date('01012017','ddmmyyyy')
+                and zvitdate = to_date('01012019','ddmmyyyy')
              )
 
        loop
@@ -155,7 +168,7 @@ BEGIN
                                                     and fdat in (dtb_, dte_)
                                                     and branch like '/'||mfo_||'/'
                                                  )
-                                      and zvitdate = to_date('01012017','ddmmyyyy')
+                                      and zvitdate = to_date('01012019','ddmmyyyy')
                                    )
                     )
                group by okpo
@@ -204,7 +217,7 @@ BEGIN
                                             and fdat in (dtb_, dte_)
                                             and branch like '/'||mfo_||'/'
                                           )
-                              and zvitdate = to_date('01012017','ddmmyyyy')
+                              and zvitdate = to_date('01012019','ddmmyyyy')
                               and (mfo_ = 300465 or k is null)
                             order by nnnnn
                            ) a
@@ -218,12 +231,12 @@ BEGIN
                                               and n.TIPA in (3,10,4,23) --ddd like '12%'
                                               and r.TIPA not in (15,17,30)
                                               and r.fdat = n.fdat
-                                              and r.acc = n.acc 
+                                              and r.acc = n.acc
                                               and r.rnk = n.rnk
                                             --  union all
                                             --select edrpou okpo, k, kat, obs
                                             --from bars.okpof659
-                                            --where zvitdate = to_date('01012017','ddmmyyyy')
+                                            --where zvitdate = to_date('01012019','ddmmyyyy')
                                            )
                                       group by okpo
                                      ) b
@@ -273,13 +286,13 @@ BEGIN
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
                      '02'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.ll, 'OKPO='||k.OKPO, k.rnk);
 
-          if k.s190 = 0 
+          if k.s190 = 0
           then
              s190_ := '0';
-          elsif k.s190 > 0 and k.s190 < 8 
+          elsif k.s190 > 0 and k.s190 < 8
           then
              s190_ := 'A';
-          elsif k.s190 < 31 
+          elsif k.s190 < 31
           then
              s190_ := 'B';
           elsif k.s190 < 61
@@ -288,10 +301,10 @@ BEGIN
           elsif k.s190 < 91
           then
              s190_ := 'D';
-          elsif k.s190 < 181 
+          elsif k.s190 < 181
           then
              s190_ := 'E';
-          elsif k.s190 < 361 
+          elsif k.s190 < 361
           then
              s190_ := 'F';
           else
@@ -335,10 +348,36 @@ BEGIN
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
                      '07'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.plink, 'OKPO='||k.OKPO, k.rnk);
 
+          p08_ := k.pinvest;
+
+          if dat_ >= to_date('29122018','ddmmyyyy') 
+          then
+             BEGIN
+                SELECT NVL (trim(u.value), '0')
+                   into p08_
+                FROM CUSTOMERW_UPDATE U
+                WHERE U.RNK = k.rnk 
+                  AND U.TAG like 'ISSPE%' 
+                  AND U.IDUPD = (SELECT MAX (IDUPD)
+                                 FROM CUSTOMERW_UPDATE
+                                 WHERE RNK = U.RNK 
+                                   AND EFFECTDATE <= dat_
+                                   AND TAG like 'ISSPE%');
+             EXCEPTION WHEN NO_DATA_FOUND THEN
+                p08_ := '0';
+             END;
+
+             if p08_ <> '1' 
+             then       
+                p08_ := '0';
+             end if; 
+
+          end if;
+
           INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '08'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.pinvest, 'OKPO='||k.OKPO, k.rnk);
+                     '08'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), p08_, 'OKPO='||k.OKPO, k.rnk);
 
           INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
@@ -379,21 +418,25 @@ BEGIN
                                             and fdat in (dtb_, dte_)
                                             and branch like '/'||mfo_||'/'
                                           )
-                              and zvitdate = to_date('01012017','ddmmyyyy')
+                              and zvitdate = to_date('01012019','ddmmyyyy')
                               and (mfo_ = 300465 or k is null)
                             order by nnnnn
                            ) a
                            left join (select okpo, '00' k160, max(nvl(k,0)) k,
                                              max(nvl(kat,0)) s080,
                                              max(nvl(obs,0)) s190
-                                      from (select okpo, k, kat, obs
-                                            from bars.nbu23_rez
-                                            where fdat = dte_
-					      and TIPA in (3,10,4,23) --ddd like '12%'
+                                      from (select n.okpo, n.k, n.kat, n.obs
+                                            from bars.nbu23_rez n, bars.rez_cr r
+                                            where n.fdat = dte_
+					      and n.TIPA in (3,10,4,23) --ddd like '12%'
+                                              and r.TIPA not in (15,17,30)
+                                              and r.fdat = n.fdat
+                                              and r.acc = n.acc
+                                              and r.rnk = n.rnk
                                             --  union all
                                             --select edrpou okpo, k, kat, obs
                                             --from bars.okpof659
-                                            --where zvitdate = to_date('01012017','ddmmyyyy')
+                                            --where zvitdate = to_date('01012019','ddmmyyyy')
                                            )
                                       group by okpo
                                      ) b
@@ -474,10 +517,29 @@ BEGIN
                                               where okpo = edrpou
                                                 and fdat in (dtb_, dte_)
                                              )
-                                 and zvitdate = to_date('01012017','ddmmyyyy')
+                                 and zvitdate = to_date('01012019','ddmmyyyy')
                                  and (mfo_ = 300465 or k is null)
                                order by nnnnn
                              ) a
+                           left join (select okpo, '00' k160, max(nvl(k,0)) k,
+                                             max(nvl(kat,0)) s080,
+                                             max(nvl(obs,0)) s190
+                                      from (select n.okpo, n.k, n.kat, n.obs
+                                            from bars.nbu23_rez n, bars.rez_cr r
+                                            where n.fdat = dte_
+			                      and n.TIPA in (3,10,4,23) --ddd like '12%'
+                                              and r.TIPA not in (15,17,30)
+                                              and r.fdat = n.fdat
+                                              and r.acc = n.acc
+                                              and r.rnk = n.rnk
+                                            --  union all
+                                            --select edrpou okpo, k, kat, obs
+                                            --from bars.okpof659
+                                            --where zvitdate = to_date('01012019','ddmmyyyy')
+                                           )
+                                      group by okpo
+                                     ) b
+                              on a.okpo = b.okpo
                            left join (select okpo,
                                              decode(nvl(fm,'0'),'M',2,'R',2,1) fm
                                         from bars.fin_fm
@@ -544,25 +606,84 @@ BEGIN
 
        end loop;
 
-       delete from rnbu_trace where znap='0' and kodp like '10%';
+       -- 27.05.2019
+       -- удаление кодов 02350, 02355 
+       -- (удалаяем если для данного кода нулевое значение и есть другой код с ненулевим значением)
+       delete from rnbu_trace 
+       where znap = '0'  
+         and kodp like '10%'  
+         and substr(kodp,6,5) not in ('02350','11300','21900');
 
-       -- LL=01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11 
-       -- формируем только если остатки по кредитам ненулевые  
-       for k in ( select * 
-                  from rnbu_trace 
+       delete from rnbu_trace r1 
+       where r1.znap='0'  
+         and r1.kodp like '10%'  
+         and substr(r1.kodp,6,5) in ('02350')
+         and exists ( select 1 from rnbu_trace
+                      where kodp like '10%'
+                        and substr(kodp,6,5) in ('02355')
+                        and substr(kodp,3,3) = substr(r1.kodp,3,3) 
+                        and substr(kodp,11,10) = substr(r1.kodp,11,10)
+                        and znap >= '0'
+                    ); 
+
+       delete from rnbu_trace r1 
+       where r1.znap = '0'  
+         and r1.kodp like '10%'  
+         and substr(r1.kodp,6,5) in ('02355')
+         and exists ( select 1 from rnbu_trace
+                      where kodp like '10%' 
+                        and substr(kodp,6,5) in ('02350')
+                        and substr(kodp,3,3) = substr(r1.kodp,3,3) 
+                        and substr(kodp,11,10) = substr(r1.kodp,11,10)
+                        and znap <> '0'
+                    ); 
+
+       -- LL=01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11
+       -- формируем только если остатки по кредитам ненулевые
+       for k in ( select *
+                  from rnbu_trace
                   where kodp like '11%'
                 )
           loop
 
              select NVL(sum(bvq*100), 0)
                 into ost_
-             from nbu23_rez 
+             from nbu23_rez
              where fdat = dte_
                and nls like '2%'
                and rnk = k.rnk
                and ddd like '12%';
-        
-             if ost_ = 0 
+
+             if ost_ = 0
+             then
+                delete from rnbu_trace r
+                where substr(r.kodp,11,10) = substr(k.kodp,11,10)
+                  and substr(r.kodp,1,2) in ('01','02','03','04','05','06','07','08','09','10','11');
+             end if;
+
+       end loop;
+
+       for k in ( select *
+                  from rnbu_trace r
+                  where kodp like '10%'
+                    and not exists ( select 1 
+                                     from rnbu_trace r1
+                                     where r1.kodp like '11%' 
+                                       and substr(r1.kodp,3,18) = substr(r.kodp,3,18)
+                                   ) 
+             
+                )
+          loop
+
+             select NVL(sum(bvq*100), 0)
+                into ost_
+             from nbu23_rez
+             where fdat = dte_
+               and nls like '2%'
+               and rnk = k.rnk
+               and ddd like '12%';
+
+             if ost_ = 0
              then
                 delete from rnbu_trace r
                 where substr(r.kodp,11,10) = substr(k.kodp,11,10)
@@ -577,6 +698,203 @@ BEGIN
                          where substr(r1.kodp, 11, 10) = substr(r.kodp, 11, 10)
                            and r1.kodp like '10_1______' || substr(r.kodp, 11, 10) || '%'
                        );
+
+    --------------------------------------------------------
+       -- 22.05.2019 
+       -- блок для зміни значення показника 10PMKDDDDDZZZZZZZZZZ 
+       update rnbu_trace set znap = to_char(round (to_number(znap), 0) ) 
+       where kodp like '101%' OR kodp like '103%'; 
+
+       -- 27.05.2019 
+       -- розрахунки показників 2090, 2095, 2190, 2195
+       -- коди 2090, 2095
+       for t in ( select distinct substr(kodp,3,1) P, substr(kodp,4,1) M, '0' K, substr(kodp,11,10) OKPO
+                  from rnbu_trace 
+                  where (kodp like '101%' OR kodp like '103%')
+                    and substr(kodp, 6,5) not in ('02090', '02095')  
+                )
+        loop
+
+          select NVL( sum(znap), 0) 
+             into s2090_
+          from rnbu_trace 
+          where (kodp like '101%' OR kodp like '103%')
+            and substr(kodp, 6,5) in ('02090', '02095')
+            and substr(kodp,3,1) = t.P
+            and substr(kodp,4,1) = t.M 
+            and substr(kodp,5,1) in ('0','1','2')  
+            and substr(kodp,11,10) = t.OKPO;  
+
+          if s2090_ = 0 then
+             select NVL( sum(znap), 0) 
+                into sr2090_
+             from rnbu_trace 
+             where (kodp like '101%' OR kodp like '103%')
+               and substr(kodp, 6,5) in ('02000', '02010', '02050', '02070')
+               and substr(kodp,3,1) = t.P
+               and substr(kodp,4,1) = t.M 
+               and substr(kodp,5,1) in ('0','1','2')
+               and substr(kodp,11,10) = t.OKPO;  
+
+             if sr2090_ >= 0 then
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02090'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2090_), 'OKPO='||t.OKPO);
+             else
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02095'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2090_), 'OKPO='||t.OKPO);
+             end if;
+          end if;
+
+       end loop;
+
+       -- коди 2190, 2195
+       for t in ( select distinct substr(kodp,3,1) P, substr(kodp,4,1) M, '0' K, substr(kodp,11,10) OKPO
+                  from rnbu_trace 
+                  where (kodp like '101%' OR kodp like '103%')
+                    and substr(kodp, 6,5) not in ('02190', '02195')  
+                )
+        loop
+
+          select NVL( sum(znap), 0) 
+             into s2190_
+          from rnbu_trace 
+          where (kodp like '101%' OR kodp like '103%')
+            and substr(kodp, 6,5) in ('02190', '02195')
+            and substr(kodp,3,1) = t.P
+            and substr(kodp,4,1) = t.M 
+            and substr(kodp,5,1) in ('0','1','2')
+            and substr(kodp,11,10) = t.OKPO;  
+  
+          if s2190_ = 0 then
+             select NVL( sum(znap), 0) 
+                into sr2190_
+             from rnbu_trace 
+             where (kodp like '101%' OR kodp like '103%')
+               and substr(kodp, 6,5) in ('02000', '02010', '02050', '02070', '02105', '02110', '02120', '02130', '02150', '02180')
+               and substr(kodp,3,1) = t.P
+               and substr(kodp,4,1) = t.M 
+               and substr(kodp,5,1) in ('0','1','2')
+               and substr(kodp,11,10) = t.OKPO;  
+
+             if sr2190_ >= 0 then
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02190'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2190_), 'OKPO='||t.OKPO);
+             else
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02195'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2190_), 'OKPO='||t.OKPO);
+             end if;
+          end if;
+
+       end loop;
+
+       -- коди 2280, 2285
+       for t in ( select distinct substr(r1.kodp,3,1) P, substr(r1.kodp,4,1) M, '0' K, substr(r1.kodp,11,10) OKPO
+                  from rnbu_trace r1
+                  where r1.kodp like '102%' 
+                    and substr(r1.kodp, 6,5) not in ('02280') 
+                    and not exists ( select 1 from rnbu_trace
+                                     where kodp like '102%' 
+                                       and substr(kodp,6,5) in ('02280')
+                                       and substr(kodp,3,2) = substr(r1.kodp,3,2) 
+                                       and substr(kodp,11,10) = substr(r1.kodp,11,10)
+                               ) 
+                )
+        loop
+
+             select NVL( sum(znap), 0) 
+                into sr2090_
+             from rnbu_trace 
+             where kodp like '102%' 
+               and substr(kodp, 6,5) in ('02000', '02120', '02240', '02160')
+               and substr(kodp,3,1) = t.P
+               and substr(kodp,4,1) = t.M 
+               and substr(kodp,5,1) in ('0','1','2')
+               and substr(kodp,11,10) = t.OKPO;  
+
+             if ABS(sr2090_) >= 0 then
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02280'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2090_), 'OKPO='||t.OKPO);
+             end if;
+
+       end loop;
+
+       for t in ( select distinct substr(r1.kodp,3,1) P, substr(r1.kodp,4,1) M, '0' K, substr(r1.kodp,11,10) OKPO
+                  from rnbu_trace r1
+                  where r1.kodp like '102%' 
+                    and substr(r1.kodp, 6,5) not in ('02285') 
+                    and not exists ( select 1 from rnbu_trace
+                                     where kodp like '102%' 
+                                       and substr(kodp,6,5) in ('02285')
+                                       and substr(kodp,3,2) = substr(r1.kodp,3,2) 
+                                       and substr(kodp,11,10) = substr(r1.kodp,11,10)
+                               ) 
+                )
+        loop
+
+             select NVL( sum(znap), 0) 
+                into sr2090_
+             from rnbu_trace 
+             where kodp like '102%' 
+               and substr(kodp, 6,5) in ('02050', '02180', '02270', '02165') 
+               and substr(kodp,3,1) = t.P
+               and substr(kodp,4,1) = t.M 
+               and substr(kodp,5,1) in ('0','1','2')
+               and substr(kodp,11,10) = t.OKPO;  
+
+             if ABS(sr2090_) >= 0 then
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02285'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2090_), 'OKPO='||t.OKPO);
+             end if;
+
+       end loop;
+
+       -- коди 2290, 2295
+       for t in ( select distinct substr(kodp,3,1) P, substr(kodp,4,1) M, '0' K, substr(kodp,11,10) OKPO
+                  from rnbu_trace 
+                  where (kodp like '101%' OR kodp like '103%')
+                    and substr(kodp, 6,5) not in ('02290', '02295')  
+                )
+        loop
+
+          select NVL( sum(znap), 0) 
+             into s2190_
+          from rnbu_trace 
+          where (kodp like '101%' OR kodp like '103%')
+            and substr(kodp, 6,5) in ('02290', '02295')
+            and substr(kodp,3,1) = t.P
+            and substr(kodp,4,1) = t.M 
+            and substr(kodp,5,1) in ('0','1','2')
+            and substr(kodp,11,10) = t.OKPO;  
+  
+          if s2190_ = 0 then
+             select NVL( sum(znap), 0) 
+                into sr2190_
+             from rnbu_trace 
+             where (kodp like '101%' OR kodp like '103%')
+               and substr(kodp, 6,5) in ('02190', '02195', '02200', '02220', '02240', '02160', '02250', '02255', '02270', '02165', '02275')
+               and substr(kodp,3,1) = t.P
+               and substr(kodp,4,1) = t.M 
+               and substr(kodp,5,1) in ('0','1','2')
+               and substr(kodp,11,10) = t.OKPO;  
+
+             if sr2190_ >= 0 then
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02290'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2190_), 'OKPO='||t.OKPO);
+             else
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                           '10'||t.P||t.M||t.K||'02295'||LPAD(t.okpo,10,'0'), TO_CHAR(sr2190_), 'OKPO='||t.OKPO);
+             end if;
+          end if;
+
+       end loop;
 
     --------------------------------------------------------
     -- блок для зміни значення показника 06PZZZZZZZZZZ -- Заявка COBUMMFO-10759
@@ -595,7 +913,6 @@ BEGIN
              where kodp like '06%' and rnk = k.rnk;
        end loop;
 
-
     ---------------------------------------------------
     delete from tmp_nbu where kodf=kodf_ and datf= dat_;
     ---------------------------------------------------
@@ -613,4 +930,3 @@ BEGIN
 ------------------------------------------------------------------
 END p_f3b_NN;
 /
-
