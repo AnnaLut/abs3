@@ -4,13 +4,17 @@ CREATE OR REPLACE PROCEDURE BARS.P_POP_F13ZB(datb_ IN DATE, date_ IN DATE,
 % DESCRIPTION :    Процедура наполнения позабалансовых символов в табл.
 %             :    OTCN_F13_ZBSK для файла #13 (КБ)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    04/10/2018 (21/11/2017)
+% VERSION     :    03/05/2019 (17/04/2019)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Datb_  - начальная дата
                Date_  - конечная дата
                nmode_ - вариант наполнения (0-с удалением, 1-добавление, 2 - просмотр)
                         в библиотеке - вызывается с nmode_ = 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+03.05.2019 для проводок Дебет 2924  Кредит 2620/36 будемо формувати символ 88
+17.04.2019 балансовий рахунок 2625 замінений на 2620 і видалені деякі блоки повязані 
+           з балансовим рахунком 2625
+26.12.2018 із символу 95 виключаємо карткові рахунки 2620 і OB22='36'
 21.11.2017 добавлены изменения выполненные Вирко для оптимизации
 21.09.2017 поле SK_ZB (позабалансовый символ) не будет изменяться при повторном
            наполнении чтобы не изменять откоректированные значения
@@ -116,7 +120,9 @@ BEGIN
                        p.userid isp,
                        o.stmt,
                        o.kf,
-                       z.ref as refz
+                       z.ref as refz, 
+                       a.ob22 ob22d,
+                       a1.ob22 ob22k 
                   FROM opldok o,
                        accounts a,
                        opldok o1,
@@ -270,17 +276,7 @@ BEGIN
                          sk_zb_ := 86;
                      end if;
 
-                     if k.nlsd like '2924%' and k.nlsk like '2625%' and
-                        (LOWER(k.nazn) like '%пенс%' or
-                         LOWER(k.nazn) like '%пенс__%' or
-                         LOWER(k.nazn) like '%допомог_%' or
-                         LOWER(k.nazn) like '%дитяч%' or
-                         LOWER(k.nazn) like '%пособи_%') and sk_zb_ <> 87
-                     then
-                         sk_zb_ := 87;
-                     end if;
-
-                     if k.nlsd like '2924%' and k.nlsk like '2625%'
+                     if k.nlsd like '2924%' and k.nlsk like '2620%'
                         and ( LOWER(k.nazn) like '%зарахування%допомог_ до в_дпустки%' or
                               LOWER(k.nazn) like '%зарахування в_дпускних%' or
                               LOWER(k.nazn) like '%перерах%в_дпускн_%' or
@@ -359,7 +355,7 @@ BEGIN
                          sk_zb_ := 0;
                      end if;
 
-                     if k.nlsd like '2625%' and k.nlsk like '2924%' and
+                     if k.nlsd like '2620%' and k.nlsk like '2924%' and
                         (LOWER(k.nazn) like '%_еренесення залишку%' or
                          LOWER(k.nazn) like '%_ереведення залишку%') and
                         sk_zb_ <> 0
@@ -367,7 +363,7 @@ BEGIN
                          sk_zb_ := 0;
                      end if;
 
-                     if k.nlsd like '2924%' and k.nlsk like '2625%' and
+                     if k.nlsd like '2924%' and k.nlsk like '2620%' and
                         (LOWER(k.nazn) like '%процент%' or
                          LOWER(k.nazn) like '%внесение нал%' or
                          LOWER(k.nazn) like '%другие платежи%' or
@@ -384,13 +380,13 @@ BEGIN
                      end if;
 
                      -- для компенсации
-                     if k.nlsd like '2924%' and k.nlsk like '2625%' and
+                     if k.nlsd like '2924%' and k.nlsk like '2620%' and
                         LOWER(k.nazn) like '%w%' and sk_zb_ <> 88
                      then
                          sk_zb_ := 88;
                      end if;
 
-                     if k.nlsd like '2924%' and k.nlsk like '2625%'
+                     if k.nlsd like '2924%' and k.nlsk like '2620%'
                         and (LOWER(k.nazn) like '%внесен_е налич%' or
                              LOWER(k.nazn) like '%_еренесення залишку%' or
                              LOWER(k.nazn) like '%_ереведення залишку%')
@@ -400,8 +396,8 @@ BEGIN
                      end if;
 
                      -- обнуляем позабаланс. символ для проводок Дт 262 Кт 263
-                     if ( (k.nlsd like '2924%' and k.nlsk like '2625%') or
-                          (k.nlsd like '2625%' and k.nlsk like '2924%')
+                     if ( (k.nlsd like '2924%' and k.nlsk like '2620%') or
+                          (k.nlsd like '2620%' and k.nlsk like '2924%')
                         )
                         and (k.tt like 'PK%' OR k.tt like 'W43%')
                         and sk_zb_ <> 0
@@ -425,19 +421,29 @@ BEGIN
                          sk_zb_ := 95;
                      end if;
 
-                     if mfo_ = 322669 and k.nlsd like '2620%' and k.nlsk like '3739%'
+                     if mfo_ = 322669 and k.nlsd like '2620%' and k.nlsk like '3739%' and k.ob22d <> '07'
                      then
-                         BEGIN
-                            select ob22
-                               into ob22_
-                            from specparam_int
-                            where acc=k.accd;
-                         EXCEPTION WHEN NO_DATA_FOUND THEN
-                            ob22_ := '00';
-                         END;
-                         if ob22_ <> '07' then
-                            sk_zb_ := 0;
-                         end if;
+                        sk_zb_ := 0;
+                     end if;
+
+                     -- із символу 95 виключаємо карткові рахунки 2620 і OB22='36'
+                     if k.nlsd like '2620%' and k.ob22d = '36' and sk_zb_ = 95
+                     then
+                         sk_zb_ := 0;
+                     end if;
+
+                     -- Дебет 3801/33  Кредит 2620/36    символ 88 
+                     if k.nlsd like '3801%' and k.ob22d = '33' and 
+                        k.nlsk like '2620%' and k.ob22k = '36' and sk_zb_ <> 88
+                     then
+                         sk_zb_ := 88;
+                     end if;
+
+                     -- Дебет 2924  Кредит 2620/36    символ 88
+                     if k.nlsd like '2924%' and k.nlsk like '2620%' and
+                        k.ob22k = '36' and sk_zb_ <> 88
+                     then
+                         sk_zb_ := 88;
                      end if;
 
                      if k.refz is null then
@@ -492,9 +498,10 @@ BEGIN
        
             -- новый блок наполнения символа 97
            insert into otcn_f13_zbsk
-               (fdat, ref, tt, accd, nlsd, kv, acck, nlsk, s, sq, nazn, isp,
+               (recid, fdat, ref, tt, accd, nlsd, kv, acck, nlsk, s, sq, nazn, isp,
                 sk_zb, ko, tobo, stmt )
                SELECT /*+ leading(a) */
+                      s_zbsk_record.nextval, 
                       o.fdat,
                       o.ref,
                       o.tt,
@@ -559,4 +566,3 @@ BEGIN
    commit;
 END;
 /
-
