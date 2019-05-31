@@ -1334,9 +1334,10 @@ end add_dop_req;
                     p_vdat => l_doc.vdat);
        bars.bars_audit.trace('mbm_payments.set_auto_visa: документ REF = '||p_ref||' успешно оплачен по-факту');
 
-       bc.set_context();
-
+       
     end if;
+
+    bc.set_context();
 
     set_payment_payed(p_ref);
 
