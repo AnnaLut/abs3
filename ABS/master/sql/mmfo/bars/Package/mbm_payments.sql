@@ -1297,7 +1297,7 @@ end add_dop_req;
                   d_rec_ => l_doc.d_rec,
                   otm_i  => 0,
                   ref_i  => p_ref,
-                  blk_i  => 0,
+                  blk_i  => null,
                   ref_swt_ => null);
            bars.bars_audit.trace('mbm_payments.set_auto_visa: документ REF = '||p_ref||' успешно оплачен по-факту, l_sep_err=<'||l_sep_err||'>');
 
