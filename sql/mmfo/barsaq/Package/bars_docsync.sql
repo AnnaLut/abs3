@@ -151,7 +151,7 @@ show err
 CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 
   -- global consts
-  G_BODY_VERSION constant varchar2(64)  := 'version 1.7 24/11/2018';
+  G_BODY_VERSION constant varchar2(64)  := 'version 1.8 03/06/2019';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := 'KF - схема с полем kf';
   
@@ -589,7 +589,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 							||nvl(lpad(l_doc.mfo_a,9),rpad(' ',9))||nvl(lpad(l_doc.nls_a,14),rpad(' ',14))
 							||nvl(lpad(to_char(l_doc.kv),3),rpad(' ',3))||nvl(lpad(to_char(l_doc.s),16),rpad(' ',16))
 							||nvl(lpad(l_doc.mfo_b,9),rpad(' ',9))||nvl(lpad(l_doc.nls_b,14),rpad(' ',14))
-							||nvl(lpad(to_char(nvl(l_doc.kv2,l_doc.kv)),3),rpad(' ',3))||nvl(lpad(to_char(nvl(l_doc.s2,l_doc.s)),16),rpad(' ',16))
+							||nvl(lpad(to_char(l_doc.kv2),3),rpad(' ',3))||nvl(lpad(to_char(l_doc.s2),16),rpad(' ',16))
 			else
 							  nvl(rpad(l_doc.nd,10),rpad(' ',10))||nvl(to_char(l_doc.datd,'YYMMDD'),rpad(' ',6))
 							||nvl(lpad(to_char(l_doc.dk),1),' ')
@@ -597,7 +597,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 							||nvl(lpad(to_char(l_doc.kv),3),rpad(' ',3))||nvl(lpad(to_char(l_doc.s),16),rpad(' ',16))
 							||nvl(rpad(l_doc.nam_a,38),rpad(' ',38))||lpad(nvl(l_doc.id_a,' '), 14)
 							||nvl(lpad(l_doc.mfo_b,9),rpad(' ',9))||nvl(lpad(l_doc.nls_b,14),rpad(' ',14))
-							||nvl(lpad(to_char(nvl(l_doc.kv2,l_doc.kv)),3),rpad(' ',3))||nvl(lpad(to_char(nvl(l_doc.s2,l_doc.s)),16),rpad(' ',16))
+							||nvl(lpad(to_char(l_doc.kv2),3),rpad(' ',3))||nvl(lpad(to_char(l_doc.s2),16),rpad(' ',16))
 							||nvl(rpad(l_doc.nam_b,38),rpad(' ',38))||lpad(nvl(l_doc.id_b,' '), 14)
 							||nvl(rpad(l_doc.nazn,160),rpad(' ',160))
                        end;
@@ -753,7 +753,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                     where w.ref = l_ref
                       and w.tag = f.tag
                       and f.vspo_char is not null
-                      and f.vspo_char not in ('F','C','ѕ')
+                      and f.vspo_char not in ('!','+','-','?')
                   )
         loop
             -- тип сообщени€  SWIFT
@@ -904,8 +904,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      l_err_count     number;
      l_ignore_error  boolean;
      l_ignore_count  number;
-    l_err_code      number;
-    l_err_msg       varchar2(4000);
+     l_err_code      number;
+     l_err_msg       varchar2(4000);
+	 l_gap_days      number; -- колво дней, сколько болтаетс€ докумнет на вретушке име€ ошибки недостатка средств или блокировки по счету	 
      l_doc           doc_import%rowtype;
      l_bars_doc      bars.oper%rowtype;
      l_doc_vdat date;
@@ -925,9 +926,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
      -- сохран€ем информацию об ошибке
      l_err_code := p_sqlerr_code;
      l_err_msg  := substr(p_sqlerr_stack, 1, 3900);
+     l_gap_days := nvl(to_number(bars.branch_attribute_utl.get_value('/', 'SDO_COUNT_DAY')),1);
 
      -- прикладные ошибки трактуютс€ как неустран€емые дл€ данного док-та и передаютс€ породившей док-т стороне
-
      -- ѕо заказу от банка:
      -- ≈сли платеж при автооплате вылетает с ошибкой нелдостачи денег  ORA-20203: \9301 broken limit on accounts
      -- “огда его не сторнировать (т.е. не устанавливать booking_flag = N), а оставл€ть на повторную оплату в этот день,
@@ -937,13 +938,12 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
          -- нет средств на счете и банк дата = валютировнаию  - документ отправить на повторную оплату
         l_doc_vdat := nvl(l_doc.vdat, bars.gl.bdate);
 
-        bars.bars_audit.info(l_trace||'vdat='|| to_date(l_doc_vdat,'dd/mm/yyyy') ||' bars.gl.bdate='||to_date(bars.gl.bdate,'dd/mm/yyyy')||', instr ='||instr(l_err_msg, '\9301') );
+        bars.bars_audit.info(l_trace||'vdat='|| to_date(l_doc_vdat,'dd/mm/yyyy') ||' bars.gl.bdate='||to_date(bars.gl.bdate,'dd/mm/yyyy')||', instr ='||instr(l_err_msg, '\9301') ||', with_gap_days='||to_char(l_doc_vdat + l_gap_days, 'dd/mm/yy'));
 
      -- ќбработка прикладных ошибок, которые должны дать повторную оплату
-
      -- ≈сли платеж при автооплате вылетает с ошибкой нелдостачи денег  ORA-20203: \9301 broken limit on accounts
      -- “огда его не сторнировать , а оставл€ть на повторную оплату в этот день
-      if ( (l_err_code = -20203 and instr(l_err_msg, '\9301') > 0 and  l_doc_vdat = bars.gl.bdate)
+      if ( (l_err_code = -20203 and instr(l_err_msg, '\9301') > 0 and  l_doc_vdat + l_gap_days >= bars.gl.bdate)
             or
            (l_err_code = -20060)   -- Ѕудуща€ дата валютировани€ (описана в ошибках модул€ DOC)
          )
@@ -955,7 +955,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                   system_err_date = sysdate
             where ext_ref = l_doc.ext_ref;
           bars.bars_audit.info(l_trace||'нехватка денег на счете - документ ожидает оплаты в следующем цикле обработки' );
-        else
+       else
             -- обработка специальных случаев, типа "счет залочен" и пр.
             l_app_err  := extract_app_error(l_err_msg);
 
@@ -1111,7 +1111,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                  from bars.operw w, bars.op_field v
                 where w.ref = p_ref
                   and w.tag = v.tag
-                  and v.vspo_char in ('F','ѕ','C')
+				  and v.vspo_char is not null
+                  and v.vspo_char not in ('!','+','-','?')                  
                 order by v.vspo_char,w.tag;
      return l_cnt;
   end;
@@ -1150,7 +1151,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                  from bars.operw w, bars.op_field v
                 where w.ref = l_doc.ref
                   and w.tag = v.tag
-                  and v.vspo_char in ('F','ѕ','C')
+                  and v.vspo_char is not null
+                  and v.vspo_char not in ('!','+','-','?')    
                 order by v.vspo_char,w.tag
                ) loop
 
@@ -1169,7 +1171,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                   end loop;
      end loop;
      l_bis_count := l_bis_curr;
-     bars.bars_audit.trace(l_trace||'кол-во бис строк: '||l_bis_count);
+     bars.bars_audit.info(l_trace||'кол-во бис строк: '||l_bis_count);
 
      l_bis_curr := 0;  -- номер текущей строки в arc_rrp, начинаем с 0
      l_arc.rec  := 0;
