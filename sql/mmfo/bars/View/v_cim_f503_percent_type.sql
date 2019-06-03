@@ -8,12 +8,7 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_CIM_F503_PERCENT_TYPE ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_CIM_F503_PERCENT_TYPE ("ID", "NAME") AS 
-  select 2, 'плаваюча' from dual
-union
-select 3, 'фіксована' from dual
-union
-select 0, 'одержання кредиту без процентних нарахувань' from dual
-;
+  select id, name from CIM_CREDIT_PERCENT where D_CLOSE is null;
 
 PROMPT *** Create  grants  V_CIM_F503_PERCENT_TYPE ***
 grant SELECT                                                                 on V_CIM_F503_PERCENT_TYPE to BARSREADER_ROLE;

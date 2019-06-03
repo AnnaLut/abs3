@@ -34,7 +34,7 @@ begin
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
 	P1000 VARCHAR2(27), 
 	Z VARCHAR2(10), 
-	P0100 NUMBER, 
+	P0100 VARCHAR2(2), 
 	P1300 VARCHAR2(54), 
 	P0300 VARCHAR2(3), 
 	P1400 NUMBER(2,0), 
@@ -468,6 +468,21 @@ end;
 / 
 COMMENT ON COLUMN BARS.CIM_F503.Q011_2 IS ' ≤À‹-—“‹ œÀ¿“≈∆≤¬ «¿ –≤ ';
 
+begin   
+ execute immediate 'alter table CIM_F503 modify p1000 VARCHAR2(200)';
+ end;
+/
+
+
+begin   
+ execute immediate 'alter table CIM_F503 modify p1300 VARCHAR2(200)';
+ end;
+/
+
+begin   
+ execute immediate 'alter table CIM_F503 modify p0500 VARCHAR2(100)';
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_F503 ***
