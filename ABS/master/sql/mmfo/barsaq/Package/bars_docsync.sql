@@ -1233,7 +1233,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                   d_rec_ => l_arc.d_rec,
                   otm_i  => 0,
                   ref_i  => l_doc.ref,
-                  blk_i  => 0,
+                  blk_i  => null,
                   ref_swt_ => null);
 
                   l_bis_curr := l_bis_curr + 1;
