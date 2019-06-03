@@ -135,7 +135,7 @@ function p_f504(p_date in date :=bankdate, p_contr_id in number :=null, p_error 
 
 function p_f531(p_date in date :=bankdate, p_error out varchar2) return clob;
 function p_f531_2(p_date in date :=bankdate)
-  return t_arr_nbur_36x pipelined PARALLEL_ENABLE;
+  return t_arr_nbur_36x pipelined;
 
   --Процедура заселення/дозаселення попередніми данними для подальшої зміни і вигрузки
   procedure prepare_f503_change(p_date_to date);
@@ -204,7 +204,7 @@ is
    --  CIM_REPORTS
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.02.14.1 24/05/2019';
+   g_body_version      constant varchar2 (64) := 'version 1.02.15 24/05/2019';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -1598,7 +1598,7 @@ end  p_f531;
         ||cur.m||'1200'||l_znyvt||to_char(cur.p1200,'DDMMYYYY')||chr(13)||chr(10)
         ||cur.m||'1300'||l_znyvt||translatewin2dos(cur.p1300)||chr(13)||chr(10)
         ||cur.m||'1400'||l_znyvt||cur.p1400||chr(13)||chr(10)
-        ||cur.m||'0100'||l_znyvt||num_code(cur.p0100)||chr(13)||chr(10)
+        ||cur.m||'0100'||l_znyvt||cur.p0100||chr(13)||chr(10)
         ||cur.m||'1500'||l_znyvt||cur.p1500||chr(13)||chr(10)
         ||cur.m||'1600'||l_znyvt||cur.p1600||chr(13)||chr(10)
         ||cur.m||'1700'||l_znyvt||cur.p1700||chr(13)||chr(10)
@@ -1762,7 +1762,7 @@ end  p_f531;
            ||cur.m||'103'||l_zn0yvt||to_char(cur.p103,'DDMMYYYY')||chr(13)||chr(10)
            ||cur.m||'107'||l_zn0yvt||translatewin2dos(cur.p107)||chr(13)||chr(10)
 
-           ||cur.m||'010'||l_zn0yvt||num_code(cur.p010)||chr(13)||chr(10)
+           ||cur.m||'010'||l_zn0yvt||cur.p010||chr(13)||chr(10)
 
            ||cur.m||'108'||l_zn0yvt||cur.p108||chr(13)||chr(10)
            ||cur.m||'140'||l_zn0yvt||cur.p140||chr(13)||chr(10)
@@ -2412,8 +2412,8 @@ end  p_f531;
                              p2030, p2031, p2032, p2033, p2034, p2035,
                              p2036, p2037, p2038, p2042,
                              p3000, f057)
-        values (cur.contr_id, l_date_to, substr(cur.nmkk,1,27) /*as p1000*/, lpad(substr(cur.okpo,1,10),10,'0') /*as z*/, cur.borrower_id /*as p0100*/,
-               substr(cur.benef_name,1,54) /*as p1300*/, lpad(cur.country_id,3,'0') /*as p0300*/, decode(cur.creditor_type,11,1,cur.creditor_type) /*as p1400*/,
+        values (cur.contr_id, l_date_to, substr(cur.nmkk,1,200) /*as p1000*/, lpad(substr(cur.okpo,1,10),10,'0') /*as z*/, cur.borrower_id /*as p0100*/,
+               substr(cur.benef_name,1,200) /*as p1300*/, lpad(cur.country_id,3,'0') /*as p0300*/, decode(cur.creditor_type,11,1,cur.creditor_type) /*as p1400*/,
                decode(cur.credit_term, 3 , 1, cur.credit_term) /*as p1900*/, lpad(cur.kv,3,'0') /*as pval*/, cur.credit_type /*as p1500*/,
                case when cur.credit_type=0 then 1 when cur.creditor_type=11 then 3 else 2 end /*as m*/,
                cur.credit_prepay /*as p1600*/, cur.f503_change_info /*as p9800*/,
@@ -2425,7 +2425,7 @@ end  p_f531;
                cur.close_date /*as p3100*/, --Раніше було : nvl2(c.close_date, c.close_date-c.open_date, '') as p9700, --має бути різниця між датою підписання і здійснення останнього платежу
                cur.f503_note /*as p9900*/, decode(cur.f503_percent_type, 1, 3, cur.f503_percent_type) /*as p0400*/,
                cur.f503_percent_base /*as p0800_1*/, cur.f503_percent_base_t /*as p0800_2*/, cur.f503_percent_base_val /*as p0800_3*/,
-               cur.f503_percent_margin /*as p0700*/, cur.s /*as p0900*/, substr(cur.num, 1, 16) /*as p0500*/, cur.open_date /*as p0600*/,
+               cur.f503_percent_margin /*as p0700*/, cur.s /*as p0900*/, substr(cur.num, 1, 100) /*as p0500*/, cur.open_date /*as p0600*/,
                l_indicators_f503.p2010, l_indicators_f503.p2011, l_indicators_f503.p2012, l_indicators_f503.p2013, l_indicators_f503.p2014, l_indicators_f503.p2016,
                l_indicators_f503.p2017, l_indicators_f503.p2018, l_indicators_f503.p2020, l_indicators_f503.p2021, l_indicators_f503.p2022, l_indicators_f503.p2023,
                l_indicators_f503.p2024, l_indicators_f503.p2025, l_indicators_f503.p2026, l_indicators_f503.p2027, l_indicators_f503.p2028, l_indicators_f503.p2029,
@@ -2491,15 +2491,15 @@ end  p_f531;
                              p070, p950, p030,
                              f057 --показник в файл поки не вигружається, потрібен для іншого звіту
                               )
-              values (c.contr_id, l_date_to, substr(c.nmkk,1,27) /*as p101*/, lpad(substr(c.okpo,1,10),10,'0'), lpad(substr(c.r_agree_no,1,5),5,'0') /*r_agree_no*/,
+              values (c.contr_id, l_date_to, substr(c.nmkk,1,200) /*as p101*/, lpad(substr(c.okpo,1,10),10,'0'), lpad(substr(c.r_agree_no,1,5),5,'0') /*r_agree_no*/,
                c.r_agree_date /*as p103*/, lpad(c.kv,3,'0') /*as pval*/, '0' /*as t*/, case when c.credit_type=0 then 1 when c.creditor_type=11 then 3 else 2 end /*as m*/,
-               substr(c.benef_name,1,54) /*as p107*/,
+               substr(c.benef_name,1,200) /*as p107*/,
                decode(c.creditor_type,11,1,c.creditor_type) /*as p108*/, decode(c.credit_term, 3 , 1, c.credit_term) /*as p184*/, c.credit_type /*as p140*/,
                (select nvl(case when max(payment_period)=min(payment_period) then max(decode(payment_period,14,4,payment_period))
                                      else 6 end,6)
                   from cim_credgraph_period where contr_id=c.contr_id) /*as p142*/,
                c.credit_prepay /*as p141*/, '0000' /*as p020*/,  c.f503_reason /*as p143*/,
-               substr(c.num, 1, 16) /*as p050*/, c.open_date /*as p060*/, c.s /*as p090*/, c.f503_purpose /*as p960*/,
+               substr(c.num, 1, 100) /*as p050*/, c.open_date /*as p060*/, c.s /*as p090*/, c.f503_purpose /*as p960*/,
                --nvl2(c.close_date, c.close_date-c.open_date, '') /*as p970*/, --має бути різниця між датою підписання і здійснення останнього платежу
                c.close_date /*as p310*/,
                c.f504_note /*as p999*/,
