@@ -11267,7 +11267,17 @@ is
   l_rate number;
 begin
 
-  bars_audit.info(h || 'Start.');
+--  bars_audit.info(h || 'Start.');
+  bars_audit.info(h || 'Start.P_ACC='   ||p_acc||
+                       ',MASK='         ||p_trmask.mask||
+                       ',A_W4_ACC='     ||p_trmask.a_w4_acc||
+                       ',A_W4_NBS_OB22='||p_trmask.a_w4_nbs_ob22||
+                       ',NBS='          ||p_trmask.nbs||
+                       ',TIP='          ||p_trmask.tip||
+                       ',NMS='          ||p_trmask.nms||
+                       ',TAB_NAME='     ||p_trmask.tab_name
+                       );
+
   if p_trmask.tab_name = 'W4_ACC' then
     begin 
     l_sql:= 'select p.percent_osn, p.percent_over, p.percent_mob, p.percent_cred ';
@@ -11333,7 +11343,8 @@ begin
      END IF;
        
 
-  bars_audit.info(h || 'Finish.');
+--  bars_audit.info(h || 'Finish.');
+    bars_audit.info(h || 'Finish.P_ACC='||p_acc);
 
 end set_account_rate;
 --
