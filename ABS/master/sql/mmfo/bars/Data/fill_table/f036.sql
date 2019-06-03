@@ -25,6 +25,4 @@ values (3, 'Інше - У разі якщо протягом всього терміну дії договору застосовують
     exception when dup_val_on_index then null;
 end;
 /
-
-
 commit;

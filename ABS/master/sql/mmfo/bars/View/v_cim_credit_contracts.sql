@@ -118,7 +118,7 @@ PROMPT *** Create  view V_CIM_CREDIT_CONTRACTS ***
           f503_percent_base,
           f503_percent_margin,
           f503_percent,
-          to_number(f503_purpose),
+          f503_purpose,
           ccd.f503_percent_base_t,
           ccd.f503_percent_base_val,
           ccd.f503_change_info,

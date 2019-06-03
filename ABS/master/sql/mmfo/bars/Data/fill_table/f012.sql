@@ -25,5 +25,4 @@ values (4, '0% - приватна', to_date('01-07-2018', 'dd-mm-yyyy'), null, null);
     exception when dup_val_on_index then null;
 end;
 /
-
 commit;

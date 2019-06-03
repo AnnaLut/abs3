@@ -144,7 +144,7 @@ exception when others then
 /
 
 begin
-    execute immediate 'alter table bars.cim_f504 add (p010  number(1))';
+    execute immediate 'alter table bars.cim_f504 add (p010  varchar2(2))';
  exception when others then 
     if sqlcode = -1430 then null; else raise; 
     end if; 
@@ -161,13 +161,6 @@ end;
 / 
 COMMENT ON COLUMN bars.cim_f504.p320 IS 'Код типу реорганізації';
 
-begin
-    execute immediate 'alter table bars.cim_f504 modify p010  number(2)';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
 
 begin
     execute immediate 'alter table bars.cim_f504 add (p040  number(2))';
@@ -466,6 +459,24 @@ begin
 end;
 / 
 COMMENT ON COLUMN BARS.CIM_F504.Q011_2 IS 'КІЛЬ-СТЬ ПЛАТЕЖІВ ЗА РІК';
+
+
+begin   
+ execute immediate 'alter table CIM_F504 modify p101 VARCHAR2(200)';
+ end;
+/
+
+
+begin   
+ execute immediate 'alter table CIM_F504 modify p107 VARCHAR2(200)';
+ end;
+/
+
+begin   
+ execute immediate 'alter table CIM_F504 modify p050 VARCHAR2(100)';
+ end;
+/
+
 
 PROMPT *** Create  grants  CIM_F504 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F504        to BARS_ACCESS_DEFROLE;

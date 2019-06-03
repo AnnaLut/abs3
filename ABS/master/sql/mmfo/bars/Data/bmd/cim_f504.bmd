@@ -121,14 +121,14 @@ begin
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 2, 'CONTR_ID', 'N', 'Внутрішній ~код ~контракту', null, 6, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'P_DATE_TO', 'D', 'Сформовано ~на ~дату', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'P101', 'C', 'Найменування ~позичальника', null, 27, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'P101', 'C', 'Найменування ~позичальника', null, 200, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 5, 'Z', 'C', 'Код ~позичальника', null, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'R_AGREE_NO', 'C', 'Номер ~реєстрації ~договору ~(свідоцтва)', null, 5, 6, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'P103', 'D', 'Дата ~реєстраційного ~свідоцтва', null, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'PVAL', 'C', 'Код ~валюти', null, 3, 8, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 9, 'T', 'C', 'Номер ~траншу', null, 1, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'M', 'N', 'Ознака ~кредиту', null, 2, 10, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'P107', 'C', 'Назва ~нерезидента-~кредитора', null, 54, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'M', 'C', 'Ознака ~кредиту', null, 2, 10, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'P107', 'C', 'Назва ~нерезидента-~кредитора', null, 200, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'P108', 'N', 'Тип ~кредитора', null, 2, 12, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'P184', 'N', 'Строковість ~кредиту', null, 2, 13, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'P140', 'N', 'Тип ~кредиту', null, 2, 14, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
@@ -136,10 +136,10 @@ begin
   bars_metabase.add_column(l_tabid, 16, 'P141', 'N', 'Дострокове ~погашення', null, 2, 16, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 17, 'P020', 'C', 'Номер ~балансового ~рахунку', null, 4, 17, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 18, 'P143', 'N', 'Підстава ~подання ~звіту', null, 2, 18, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'P050', 'C', 'Номер ~кредитної ~угоди', null, 16, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'P050', 'C', 'Номер ~кредитної ~угоди', null, 100, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'P060', 'D', 'Дата ~кредитної ~угоди', null, null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 21, 'P090', 'N', 'Загальна ~сума ~кредиту', null, 10, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'P960', 'N', 'Цілі ~використання ~кредиту', null, 2, 22, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'P960', 'C', 'Цілі ~використання ~кредиту', null, 2, 22, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 23, 'P310', 'D', 'Строк ~погашення ~кредиту', null, null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 24, 'P999', 'C', 'Примітка', null, 108, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 25, 'P212', 'C', '(212)сума платежів ~ОС боргу(без ~урахування майбутніх ~надходжень кредиту)', null, 1, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=212][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,212)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
@@ -156,9 +156,9 @@ begin
   bars_metabase.add_column(l_tabid, 36, 'USER_CH', 'C', 'Користувач ~редагування', null, 30, 36, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 37, 'BRANCH', 'C', 'Відділення', null, 30, 37, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 38, 'KF', 'C', 'МФО', null, 6, 38, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'P010', 'N', 'Вид ~позичальника', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'P320', 'N', 'Код ~типу ~реорганізації', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'P040', 'N', 'Тип ~процентної ~ставки', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'P010', 'C', 'Вид ~позичальника', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'P320', 'C', 'Код ~типу ~реорганізації', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'P040', 'C', 'Тип ~процентної ~ставки', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 42, 'P330', 'C', 'Код ~валюти~розрахунків', null, 3, 24, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 43, 'P080', 'C', 'База~ для обчислення~ плаваючої ставки', null, 15, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 44, 'P070', 'N', 'Розмір ~маржі ~процентної ~ставки', null, 4, 24, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);

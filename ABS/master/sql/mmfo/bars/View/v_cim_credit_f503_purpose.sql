@@ -10,7 +10,7 @@ PROMPT *** Create  view V_CIM_CREDIT_F503_PURPOSE ***
   CREATE OR REPLACE FORCE VIEW BARS.V_CIM_CREDIT_F503_PURPOSE ("ID", "NAME") AS 
   select ID, NAME
 from CIM_CREDIT_F503_PURPOSE
-where delete_date is null;
+where d_close is null;
 
 PROMPT *** Create  grants  V_CIM_CREDIT_F503_PURPOSE ***
 grant SELECT                                                                 on V_CIM_CREDIT_F503_PURPOSE to BARSREADER_ROLE;

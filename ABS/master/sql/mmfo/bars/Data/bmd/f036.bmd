@@ -1,7 +1,6 @@
 set serveroutput on
 
 declare
-
   type t_rec_extrnval is record (
     tabid            meta_extrnval.tabid%type,
     colid            meta_extrnval.colid%type,

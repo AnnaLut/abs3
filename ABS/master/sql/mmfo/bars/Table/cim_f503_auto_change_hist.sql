@@ -67,6 +67,15 @@ exception when others then
  end;
 /
 
+begin   
+ execute immediate 'alter table CIM_F503_AUTO_CHANGE_HIST modify rep_value VARCHAR2(200)';
+ end;
+/
+
+begin   
+ execute immediate 'alter table CIM_F503_AUTO_CHANGE_HIST modify vk_value VARCHAR2(200)';
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_F503_AUTO_CHANGE_HIST ***

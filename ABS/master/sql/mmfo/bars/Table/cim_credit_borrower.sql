@@ -24,8 +24,9 @@ PROMPT *** Create  table CIM_CREDIT_BORROWER ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CIM_CREDIT_BORROWER 
-   (	ID NUMBER, 
+   (	ID VARCHAR2(2), 
 	NAME VARCHAR2(256), 
+        OPEN_DATE DATE,
 	DELETE_DATE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
@@ -48,55 +49,6 @@ COMMENT ON COLUMN BARS.CIM_CREDIT_BORROWER.ID IS 'ID виду позичальника';
 COMMENT ON COLUMN BARS.CIM_CREDIT_BORROWER.NAME IS 'Назва виду позичальника';
 COMMENT ON COLUMN BARS.CIM_CREDIT_BORROWER.DELETE_DATE IS 'Дата видалення';
 
-
-
-
-/*
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_CREDIT_BORROWER ADD CONSTRAINT PK_CIMCREDITBORROWER PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_CIMCREDITBORROWER ON BARS.CIM_CREDIT_BORROWER (ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-*/
-
--- Drop primary, unique and foreign key constraints 
-begin   
- execute immediate '
-    alter table CIM_CREDIT_BORROWER
-      drop constraint PK_CIMCREDITBORROWER cascade';
-exception when others then
-  if  sqlcode=-2443  then null; else raise; end if;
- end;
-/
-
-
-begin
-    execute immediate 'alter table CIM_CREDIT_BORROWER add open_date date';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-
 begin   
  execute immediate '
   ALTER TABLE BARS.CIM_CREDIT_BORROWER ADD CONSTRAINT PK_CIMCREDITBORROWERIO PRIMARY KEY (ID, OPEN_DATE)
@@ -106,6 +58,7 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
+
 
 
 PROMPT *** Create  grants  CIM_CREDIT_BORROWER ***

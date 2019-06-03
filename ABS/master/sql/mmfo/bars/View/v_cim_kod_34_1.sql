@@ -8,11 +8,7 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_CIM_KOD_34_1 ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_CIM_KOD_34_1 ("ID", "NAME") AS 
-  select 1, 'гарантований' from dual
-union
-select 2, 'негарантований' from dual
-union
-select 3, 'у гривнях від ЄБРР' from dual
+  select f045 as id, txt as name from f045 where d_close is null
 ;
 
 PROMPT *** Create  grants  V_CIM_KOD_34_1 ***

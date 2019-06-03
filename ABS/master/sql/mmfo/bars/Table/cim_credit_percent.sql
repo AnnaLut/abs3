@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CIM_CREDIT_PERCENT'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CIM_CREDIT_PERCENT'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''CIM_CREDIT_PERCENT'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_PERCENT'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -24,8 +24,11 @@ PROMPT *** Create  table CIM_CREDIT_PERCENT ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CIM_CREDIT_PERCENT 
-   (	ID NUMBER, 
-	NAME VARCHAR2(64)
+   (	ID VARCHAR2(2), 
+	NAME VARCHAR2(64),
+        D_OPEN DATE,
+        D_CLOSE DATE,
+        D_MODI DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
