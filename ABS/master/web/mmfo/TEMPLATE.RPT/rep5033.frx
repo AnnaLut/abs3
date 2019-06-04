@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="04/05/2016 16:30:44" ReportInfo.Modified="12/11/2018 11:58:02" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/05/2016 16:30:44" ReportInfo.Modified="06/04/2019 17:27:05" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="SBERDEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQBIouJ0wOqr2eJdT/vdQWcI=">
+    <OracleDataConnection Name="SBERDEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJtLMMBvQu37v+N8tOJKuI8=">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as npp,&#13;&#10;       corporation_name,&#13;&#10;       mfo_obu,&#13;&#10;       mfo_other,&#13;&#10;       nb_other,&#13;&#10;       okpoa,&#13;&#10;       nama,&#13;&#10;       sq&#13;&#10;from &#13;&#10;(select max(c.corporation_name) as corporation_name,&#13;&#10;       max(case when b.mfou = 300465 then b.mfo else null end) as mfo_obu,&#13;&#10;       max(case when b.mfou != 300465 then b.mfo else null end) as mfo_other,&#13;&#10;       max(case when b.mfou != 300465 then b.nb else null end) as nb_other,&#13;&#10;       d.okpoa,&#13;&#10;       max(d.nama) as nama,&#13;&#10;       sum(d.sq / 100) as sq&#13;&#10;  from ob_corp_data_acc a&#13;&#10;  join v_ob_corp_rep_nbs q on q.rep_id = 5033 and q.nbs = a.nbs and Q.CORP_ID = a.corp_id&#13;&#10;  join ob_corp_data_doc d on A.ACC = d.acc and A.SESS_ID = d.sess_id&#13;&#10;  left join banks$base b on d.mfoa = b.mfo&#13;&#10;  left join ob_corporation c on c.external_id = a.kod_ustan and c.base_corp=a.corp_id&#13;&#10;  where d.dk = 1&#13;&#10;    and a.is_last = 1&#13;&#10;    and case when replace(:KF, ' ', '') = '%' then nvl(a.kf,' ') else replace(:KF, ' ', '') end like '%'||nvl(a.kf,' ')||'%'&#13;&#10;    and a.corp_id = :Param0&#13;&#10;    and a.fdat BETWEEN :sFdat1 AND :sFdat2&#13;&#10;    and d.nbsb = '2603'&#13;&#10;    and d.nbsa in ('2600', '2602', '2604', '2062', '2063', '2610', '2520', '2541', '2542', '2650')&#13;&#10;    and case when replace(:kod_analyt, ' ', '') = '%' then nvl(a.kod_analyt,' ') else replace(:kod_analyt, ' ', '') end like '%'||nvl(a.kod_analyt,' ')||'%'&#13;&#10;  group by d.okpoa, d.mfoa&#13;&#10;  order by okpoa, d.mfoa)">
         <Column Name="NPP" DataType="System.Decimal"/>
         <Column Name="CORPORATION_NAME" DataType="System.String"/>
@@ -84,7 +84,7 @@ namespace FastReport
       <TextObject Name="Text2" Top="18.9" Width="1048.95" Height="18.9" Text="щодо бази клієнтів-платників ПЕК ([Table3.CORPORATION_NAME])" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
       <TextObject Name="Text3" Top="37.8" Width="1048.95" Height="18.9" Text="[PERIOD] по [Table4.NAME] регіональному управлінню" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="111.95" Width="1047.06" Height="18.9" CanGrow="true" DataSource="Table" KeepTogether="true">
+    <DataBand Name="Data1" Top="114.62" Width="1047.06" Height="18.9" CanGrow="true" DataSource="Table" KeepTogether="true">
       <TableObject Name="Table2" Width="1048.95" Height="18.9" Border.Lines="All">
         <TableColumn Name="Column9" Width="37.8"/>
         <TableColumn Name="Column10" Width="226.8"/>
@@ -95,7 +95,7 @@ namespace FastReport
         <TableColumn Name="Column15" Width="189"/>
         <TableColumn Name="Column16" Width="113.4"/>
         <TableRow Name="Row3">
-          <TableCell Name="Cell32" Border.Lines="All" Text="[Table.NPP]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[Row#]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell33" Border.Lines="All" Text="[Table.CORPORATION_NAME]" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell34" Border.Lines="All" Text="[Table.MFO_OBU]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell35" Border.Lines="All" Text="[Table.MFO_OTHER]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
@@ -105,7 +105,7 @@ namespace FastReport
           <TableCell Name="Cell59" Border.Lines="All" Text="[Table.SQ]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="60.7" Width="1047.06" Height="47.25" PrintOn="FirstPage">
+      <DataHeaderBand Name="DataHeader1" Top="62.03" Width="1047.06" Height="47.25" PrintOn="FirstPage">
         <TableObject Name="Table1" Width="1048.95" Height="47.25">
           <TableColumn Name="Column1" Width="37.8"/>
           <TableColumn Name="Column2" Width="226.8"/>
@@ -138,7 +138,9 @@ namespace FastReport
         </TableObject>
       </DataHeaderBand>
       <Sort>
-        <Sort Expression="[Table.NPP]"/>
+        <Sort Expression="[Table.OKPOA]"/>
+        <Sort Expression="[Table.MFO_OBU]"/>
+        <Sort Expression="[Table.NB_OTHER]"/>
       </Sort>
     </DataBand>
   </ReportPage>
